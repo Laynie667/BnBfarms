@@ -370,3 +370,6 @@
     s.nursery = o;
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __nurseryTick: () => { state.nurseryAt = 0; nurseryTick(); }, __littleNow: (m) => littleNow(m), __nurseryStats: (m, x) => nurseryStats(m, x) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("nursery little care",      { topic: "nursery", run: (c) => nurseryCommand(c.cmd, c.sender, c.args, c.R, c.huh) });

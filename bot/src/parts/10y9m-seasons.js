@@ -237,3 +237,6 @@
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __seasonTick: () => { state.seasonAt = 0; seasonTick(); }, __seasonsOn: () => seasonsOn(), __seasonPick: (m, s) => seasonPick(m, s),
     __seasons: () => SEASONS, __seasonOf: () => SEASON_OF, __seasonPlaces: () => SEASON_PLACES, __easterOf: (y) => easterOf(y), __seasonCostume: () => seasonCostume(), __seasonsByDate: (d) => seasonsByDate(new Date(d)) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("seasons calendar",         { topic: "seasons", run: (c) => seasonCommand(c.sender, c.args, c.R) });   // (?season is the Breedin' bot part's)

@@ -402,3 +402,7 @@
       "\n\nEARN 'EM: make your milk quota · finish a stall session · do a chore · work a glory shift · best milk or top sire of the week · staff hand 'em out for good behavior"+
       "\nSPEND 'EM: ?store");
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("ribbons ribbon buy gift",  { topic: "ribbons", run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });
+  addCommand("store",                    { topic: "ribbons", words: true, run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });

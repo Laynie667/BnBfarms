@@ -156,3 +156,6 @@
   // a bit of mischief, for the Mischief track
   function mischief(mn, k){ const r = rec(mn); if (!r) return; r.mischief = r.mischief || {}; r.mischief[k] = (r.mischief[k] || 0) + 1; }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __featCheck: (m, q) => featCheck(m, q), __featsTick: () => { state.featsAt = 0; featsTick(); }, __perkLv: (m, k) => perkLv(m, k), __perkPrice: (m, p) => perkPrice(m, p), __perks: { perkMilkX, perkCap, perkFertX, perkPregX, perkEggX, perkEggDaysX, perkEggPayX, perkLoadX, perkCatchX, perkTrapX, perkBetX, perkStars, perkHintLetters } });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("feats feat achievements perks perk", { topic: "feats", private: true, run: (c) => featsCommand(c.cmd === "perk" ? "perks" : c.cmd, c.sender, c.args, c.R) });

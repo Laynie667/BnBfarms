@@ -514,3 +514,6 @@
             "The egg in the hedge turns out to be a pebble somebody painted. %n keeps it anyway."],
   };
   if (W.__FARMHAND_TEST__) Object.assign(W, { __easterWeek: (d) => easterWeek(new Date(d)) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("egghunt",                  { topic: "seasons", run: (c) => eggHuntCommand(c.sender, c.args, c.R) });

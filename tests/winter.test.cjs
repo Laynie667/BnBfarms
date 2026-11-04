@@ -33,6 +33,7 @@ const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper'
 const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e==='AccountBeep')).map(([e,d])=>d.Content==='FarmhandMsg'?JSON.stringify(d.Dictionary):String(d.Content||d.Message)).join(' | ');
 const marks=(n,mn)=>sent.slice(n).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Dictionary&&d.Dictionary.type==='mark'&&(!mn||d.Target===mn)).map(([e,d])=>d.Dictionary);
 const free=(...mns)=>{ for(const mn of mns){ const r=P(mn); r.trapAt=0; r.penned=null; r.gear=null; r.trapQuiet=0; r.trapWait=null; r.benched=null; r.quietUntil=0; if(W.__st().trapRuns) W.__st().trapRuns.delete(mn); } };
+const saidEnd=(n,kind,keys)=>{ const T=W.__lines().SEASON_LINES[kind]||{}, txt=all(n); return keys.some(k=>(T[k]||[]).some(line=>{ const bits=line.replace(/^(\{[a-z]+\})+/,'').split(/%[a-z]+|"/).map(x=>x.trim()).filter(x=>x.length>=12).sort((a,b)=>b.length-a.length); return bits.length>0 && txt.includes(bits[0]); })); };
 const done=async(mn,ms)=>{ for(let i=0;i<80;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(mn))) break; } for(let i=0;i<60;i++){ const s=W.__st(); if(![s.urgent,s.replies,s.queue].some(q=>q&&q.length)) break; await wait(250); } await wait(ms||600); };
 const LEAK=/\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bNaN\b|\[object/;
 const BODIES=[[500,'Moo'],[600,'Rex'],[700,'Pip'],[800,'Fu']];
@@ -128,7 +129,7 @@ async function everyTrap(kinds, label, onEach, pre){
   ok(YU.every(k=>W.__lines().INTENSITY_BY_TRAP[k] && W.__lines().INTENSITY_BY_TRAP[k].tender.length>=3), 'every Yule trap has its tender and filthy lines');
   // a body with eggs ruled out: the ivy only teases
   { free(700); P(700).prod.eggs=null; P(700).limits="no eggs"; let n=sent.length; await say(221397,'?trap spring Pip ivy',500); await done(700,700);
-    ok(!(P(700).prod.eggs||{}).n && /ache|wound right up|tinglin'/.test(all(n)), 'eggs ruled out: the ivy only plays'); P(700).limits=""; }
+    ok(!(P(700).prod.eggs||{}).n && saidEnd(n,'ivy',['endTease']), 'eggs ruled out: the ivy only plays'); P(700).limits=""; }
 
   // ── after the season: the calendar moves on ──
   W.__date="2027-02-03T12:00:00";

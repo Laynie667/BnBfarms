@@ -480,3 +480,6 @@
                  "Nothin' on this farm is too dirty to do to %n, and they've just proved it again.", "It grunts, and %n grunts with it, just another animal gettin' rutted in the muck.",
                  "%n's holes are left gapin' and foamin', and they're still humpin' the air.", "It wipes itself off on %n's face when it's done with that end."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("stalldial bringin bedrest callme nevercall intensity keep kept", { topic: "milk", run: (c) => uddersCommand(c.cmd, c.sender, c.args, c.R) });

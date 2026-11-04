@@ -608,3 +608,6 @@
   };
 
   if (W.__FARMHAND_TEST__) Object.assign(W, { __stocking: (m) => stockingCommand(m, [], (t) => tell(m, t)) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("stocking stockings",       { topic: "seasons", run: (c) => stockingCommand(c.sender, c.args, c.R) });   // what's in your stockin' on the hearth

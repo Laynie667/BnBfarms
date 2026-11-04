@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.1: the command book (Phase 1 of the plan).** Laynie, Nov 4: "we are good to proceed". Under the hood only: every command answers exactly as before. No Companion update needed.
+  - **One place for every ?command.** `bot/src/parts/01b-commands.js` writes each command down once: its words, who may use it (staff or everybody), whether the answer stays private when asked in the room, whether it never waits its turn (safety), whether it takes free text, whether it works mid-application, and whether staff lookups land in the Office tab. Before, that was seven lists kept by hand in three files.
+  - **Parts answer their own commands.** The store, potions and dares, the bench, traps, shots and kryptonite, feats, the nursery, services, parasites and symbiotes, messes, your own outfit, the brood, bets, corruption, cursed suits, keepers, udders, the seasons, trick-or-treat, stockings, the egg hunt, trap ratings, renewals and the suggestion box each write their commands into the book next to the code that runs them. 97 hand-off lines left the big switch in 15-commands.js.
+  - **Add a command:** one `addCommand("word alias", { topic, staff, private, run })` line in the part that handles it. A word written down twice is caught by the tests.
+  - tests/command-book.test.cjs checks the book gives back exactly the old lists (176 for everybody, 84 for staff, the private ones, safety and the rest), that every command has somebody answering it and only once, and that ?feats, ?store, a staff command, a near miss and ?watersport answer as before.
+  - `npm test` now names the files that only passed on a second, solo run, so they can be fixed for good. The first ones it named are fixed:
+    - **The bait and bet checks** compared the whole purse, and a feat paid in the same few seconds threw it off by one. They now look for the payment itself in the ribbon log.
+    - **Yule's ivy** had the same stale end words as Litha and Mabon.
+    - **The thing in the water** has grown more beats, so the egg count now waits for the scene to finish.
+    - **The auto-injector check** allows for the heartbeat dosing a second time inside its wait.
 - **Bot 0.70.0 + Companion 0.52.0: feats and perks.** Laynie, Nov 3–4: tracks by category whose perks stack as the tiers climb, credit for the past, Trap Magnet as it is, a Gold Star track for littles, and an egg track "at a penalty to how much they earn ribbon wise. cant have them exploiting the tentacle traps". (bot/src/parts/10us-feats.js)
   - **Ten tracks, five tiers each.** A new tier is a feat: announced in the farm's voice, and the tier's number in ribbons (1 to 5). Every perk grows with its track on its own (no slots); `?perks off <perk>` switches one off, `?perks on` brings it back.
     - 🥛 **Dairy** (10, 50, 150, 400, 1000 L milked) → **Heavy Udders**: +5% milk capacity a tier, and a grade higher from III.

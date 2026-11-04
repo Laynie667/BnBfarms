@@ -412,3 +412,7 @@
     tell(by, "💉 I couldn't read a farm word on " + itemName(tool) + ", sugar, so it did nothin' on the farm's side. ?help shots lists the words: lactation, fertility, udder growth, aphrodisiac, cum flood and the rest.");
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __shotsTick: () => { state.shots2At = 0; shotsMoreTick(); }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("kryptonite",               { topic: "shots", private: true, run: (c) => kryptoCommand(c.sender, c.args, c.R, c.channel) });
+  addCommand("myshots shotsin",          { topic: "shots", private: true, run: (c) => c.R(myShotsText(c.sender)) });

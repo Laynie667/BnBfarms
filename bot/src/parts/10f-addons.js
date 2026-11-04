@@ -196,7 +196,7 @@
     a.api = addonApi(a);
     for (const [word0, c] of Object.entries(def.commands || {})){
       const word = String(word0).toLowerCase();
-      if (PUBLIC_CMDS.includes(word) || STAFF_CMDS.includes(word) || ["addons","addon"].includes(word)) { warn("add-on "+name+": ?"+word+" belongs to the bot, skipped"); continue; }
+      if (commandOf(word)) { warn("add-on "+name+": ?"+word+" belongs to the bot, skipped"); continue; }
       if (ADDON_CMDS.has(word)) { warn("add-on "+name+": ?"+word+" is already taken by "+ADDON_CMDS.get(word).addon.name+", skipped"); continue; }
       if (!c || typeof c.run !== "function") continue;
       a.commands[word] = c;
@@ -204,7 +204,7 @@
       // longer spellings that also work (?leaderboard for ?top); lists only show the short one
       for (const al0 of (c.aliases || [])){
         const al = String(al0).toLowerCase();
-        if (PUBLIC_CMDS.includes(al) || STAFF_CMDS.includes(al) || ADDON_CMDS.has(al)) continue;
+        if (commandOf(al) || ADDON_CMDS.has(al)) continue;
         ADDON_CMDS.set(al, { addon:a, def:c });
       }
     }

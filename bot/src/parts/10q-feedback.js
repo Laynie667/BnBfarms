@@ -103,3 +103,6 @@
     }
     R("📬 #"+id+" is "+FB_STATUS[f.status]+(f.status !== "open" ? ", and "+f.name+" has been told" : "")+".");
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("feedback suggest idea bug meh more", { topic: "feedback", private: true, words: true, run: (c) => feedbackCommand(c.cmd, c.sender, c.args, c.rest, c.R) });   // the suggestion box

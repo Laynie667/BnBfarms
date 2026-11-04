@@ -304,3 +304,6 @@
       "It's black down here and close, and the thing fills the whole shaft. %n hangs in it, held on every side, turned slowly, with its arms goin' over every inch of them in the dark.",
       "%n can't see it. They can only feel it: coils everywhere, the walls themselves movin', and no way to tell up from down. It has all the time in the world down here."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("quiet tend",               { topic: "traps", run: (c) => { if (c.cmd !== "tend" || !bedTend(c.sender, c.args, c.R)) broodCommand(c.cmd, c.sender, c.args, c.R); } });   // (?tend at a bedside: 10y7-udders.js)

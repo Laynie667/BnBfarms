@@ -31,10 +31,10 @@ let next = 0;
 await Promise.all(Array.from({ length: AT_ONCE }, async () => { while (next < files.length) { const f = files[next++]; results.push(await run(f)); process.stdout.write("."); } }));
 process.stdout.write("\n");
 // anything that failed under load, again on its own
-let flaky = 0;
+let flaky = 0; const shaky = [];   // which ones, and the check that missed: worth fixin' for good
 for (const r of results.filter((r) => r.bad.length || r.crashed)) {
   const again = await run(r.f);
-  if (!again.bad.length && !again.crashed) { flaky++; r.bad = []; r.crashed = false; }
+  if (!again.bad.length && !again.crashed) { flaky++; shaky.push(r.f + (r.bad[0] ? ": " + r.bad[0].slice(0, 90) : " (crashed)")); r.bad = []; r.crashed = false; }
   else Object.assign(r, again);
 }
 let problems = 0;
@@ -46,5 +46,6 @@ for (const r of results.sort((a, b) => a.f.localeCompare(b.f))) {
 }
 const checks = results.reduce((n, r) => n + r.lines.length, 0), mins = ((Date.now() - started) / 60000).toFixed(1);
 console.log("\n" + files.length + " files, " + checks + " checks, " + mins + " min" + (flaky ? " (" + flaky + " passed on a second, solo run)" : ""));
+for (const x of shaky) console.log("  ~ " + x);
 console.log(problems ? problems + " problem(s) found." : "✅ Everything passed.");
 process.exit(problems ? 1 : 0);

@@ -168,3 +168,6 @@
   // somebody who isn't staff drainin' somebody who said yes (the ?milk way, 15-commands.js)
   function friendDrainLine(by, t, out){ return "🪣 " + svcFill(pickFor(t, "svc:friendDrain", SERVICE_LINES.friendDrain), t, { by, ml: ml(out) }); }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __latch: (m, h) => parasiteLatch(m, h), __svc: () => svc() });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("services service coax",    { topic: "services", run: (c) => serviceCommand(c.cmd, c.sender, c.args, c.R) });

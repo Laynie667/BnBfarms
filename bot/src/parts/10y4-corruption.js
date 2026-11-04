@@ -316,3 +316,6 @@
     lendWon: ["Sold to %c for %x ribbons. %n is led down off the block on a short rope and handed over.", "%c takes it at %x. %n looks at their buyer, and at the traps, and swallows."],
     lendWalk: ["%c takes %n by the collar and walks them to the first one. The order's been decided: %x.", "\"This way.\" %c has a route planned for %n: %x."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("cleanse corruption gauntlet lend bid route", { topic: "traps", run: (c) => corruptionCommand(c.cmd, c.sender, c.args, c.R) });

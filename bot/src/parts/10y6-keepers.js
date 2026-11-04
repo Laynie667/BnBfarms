@@ -511,3 +511,6 @@
                  "The barn's gettin' light. What you're carryin' kept you dreamin' till dawn, and it's sat low and full in you now."],
     leaderDose: ["%x takes %n by the collar, turns them round and slides a needle into the fat of their ass like they're dosin' their own heifer. Which they are."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("whistle send dose herdtraps sit broody album holes vat", { topic: "traps", run: (c) => keepersCommand(c.cmd, c.sender, c.args, c.R) });

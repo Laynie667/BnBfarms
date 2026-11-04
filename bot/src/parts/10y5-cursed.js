@@ -210,3 +210,6 @@
               "It lets go of %n all at once: mouth, hands, the roots inside, and pools at their feet. Their own skin feels strange and far too loose."],
     suitPeeled: ["It takes two farmhands and a bucket of somethin' cold to get the suit to let go of %n. It comes away a strip at a time, clingin', and the roots inside come out last and slowest."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("mysterybox suit",          { topic: "traps", run: (c) => cursedCommand(c.cmd, c.sender, c.args, c.R) });

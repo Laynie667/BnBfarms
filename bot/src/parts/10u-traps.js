@@ -661,3 +661,7 @@
     }
     return false;
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("traps trap subject subjects watersports watersport", { topic: "traps", run: (c) => trapCommand(c.cmd === "watersport" ? "watersports" : c.cmd, c.sender, c.args, c.R) });
+  addCommand("eager",                    { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["eager"].concat(c.args), c.R) });   // the no-cooldown switch, as its own command (and a Toggles switch)

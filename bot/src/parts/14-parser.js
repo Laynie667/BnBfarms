@@ -4,13 +4,10 @@
   */
   /* ───────────── PARSER ───────────── */
 
-  // FIX: safety commands never get throttled
-  const NO_COOLDOWN = ["safe","safeword","red","stuck","report","staff"];
-
   // how long someone waits between commands: panel clicks come quick, so they get a short gap
   const cooldownMs = (channel) => (channel === "companion" || channel === "local" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1000;
   function onCooldown(mn, cmd, channel){
-    if (NO_COOLDOWN.includes(cmd)) return false;
+    if ((commandOf(cmd) || {}).now) return false;   // safety never waits (01b-commands.js)
     const last = state.cooldowns.get(mn)||0;
     if (Date.now()-last < cooldownMs(channel)) return true;
     state.cooldowns.set(mn, Date.now());
@@ -79,7 +76,7 @@
 
   // the command they probably meant: a stray letter in front ("a-addons"), or one or two letters off ("adons")
   function nearestCommand(cmd, sender){
-    const pool = PUBLIC_CMDS.filter(c => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));   // (the nursery's words only for nursery folk)
+    const pool = commandWords(e => !e.staff).filter(c => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? commandWords(e => e.staff) : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));   // (the nursery's words only for nursery folk)
     const strip = cmd.replace(/^[a-z][-.]/, "");
     if (strip !== cmd && pool.includes(strip)) return strip;
     if (cmd.length < 4) return null;
@@ -131,37 +128,13 @@
     return null;
   }
 
-  const PUBLIC_CMDS = ["help","commands","info","guide","rules","consent","tour","species","luxury","doors",
-                       "ping","apply","record","keys","who","herd","safe","safeword","red","report",
-                       "staff","stuck","friend","notice","teaseme","tease","dressme","dress","hypnotize","hypnotise","allow","letgo","echs","roam",
-                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","grooming","futa","size","sizes","measure","penis","cock","rights","accept",
-                       "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
-                       "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","seasons","calendar","trickortreat","tot","stocking","stockings","egghunt","rate","renew","renewal","renewals","services","service","coax","nursery","little","care","kryptonite","myshots","shotsin","feats","feat","achievements","perks","perk"];
-  const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
-                       "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
-                       "pasture","onduty","cover","staffadd","staffremove",
-                       "backup","staffhelp","note","keysync","keydump","where",
-                       "roster","stock","find","signed","setrescue","stucklog","addfriend",
-                       "forced","summon","health",
-                       "tier","vet","brand","spot","spots","appclear",
-                       "milk","collect","heat","heatline","shotlog",
-                       "stocks","unstock","walk","reins","tourstop","clockin","clockout","hours","done","chore","chores",
-                       "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench","purge","away"];
 
-  const SAFETY_CMDS = ["safe","safeword","red","stuck"];
-  // staff commands that stock can also use on other stock, with a yes from them first (15-commands.js)
-  const STOCK_PLAY = ["milk","edge","drain"];   // (drain: Oct 29, so nobody waits on staff to be emptied)
+  // ?milk, ?edge and ?drain: stock can use them on other stock, with a yes first (stockPlay in 01b-commands.js; drain: Oct 29)
   function stockPlayOk(by, t){
     const r = rec(t); if (r && r.freeuse) return true;
     state.playOk = state.playOk || new Map();
     const u = state.playOk.get(t+":"+by); return !!(u && u > Date.now());
   }
-  const PRIVATE_REPLY = ["feats","feat","achievements","perks","perk","kryptonite","myshots","shotsin","today","feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
-                         "myherd","herd","stucklog","keydump","summon","where","cover",
-                         "vet","spot","spots","tease","teaseme","stats","pedigree",
-                         "hours","chores","wheel","tourstop","quota","contract","contracts"];
 
   function parseRoles(args){
     const out=[];

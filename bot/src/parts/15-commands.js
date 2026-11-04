@@ -51,17 +51,16 @@
       // Now only a prefixed command (?rules) or a lone safety word interrupts the interview.
       const p0 = parseCommand(raw, false, false, true);   // prefixed / bot-word forms only
       const lone = String(raw).trim().toLowerCase();
-      const pass = (p0 && ["help","rules","species","tour","consent","luxury","doors",
-                           "safe","safeword","red","stuck","staff"].includes(p0.cmd))
+      const pass = (p0 && !!(commandOf(p0.cmd) || {}).interview)
                 || ["safe","safeword","red","stuck"].includes(lone)
                 // a switch flipped mid-interview ("potions on", often a Companion toggle) is a command, not an answer
                 // (live, Oct 8: Nikto's application saved "potions on" as their name)
-                || (/^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]))
+                || (/^[a-z]+ (on|off)$/.test(lone) && !!commandOf(lone.split(" ")[0]) && !commandOf(lone.split(" ")[0]).staff)
                 || (channel === "companion" && /^[a-z]+ (on|off)$/.test(lone));
       // a panel button or switch pressed mid-application (reported: it was saved as the answer). Safety and the
       // guides still work; anything else waits till they're on the books, and the question stays open.
       const button = channel === "companion" && state.panelBtn === sender;
-      if (button && !(p0 && pass) && !["safe","safeword","red","stuck","staff","help","rules","consent","tour","species","luxury","doors","apply"].includes(lone.split(" ")[0])){
+      if (button && !(p0 && pass) && !((commandOf(lone.split(" ")[0]) || {}).interview || lone.split(" ")[0] === "apply")){
         reply(sender, "You're in the middle of your application, sugar, so I've left that button alone: it wasn't taken as your answer. Type your answer to the last question in the box below (or say ?apply to see it again). The switches work once you're on the books.", channel);
         return;
       }
@@ -91,7 +90,7 @@
     // an animal noise tacked on the end ("?help nya", "?breedable on, nya~", "?stats moo") isn't part of the command
     // (live, Oct 7: "!help nya" was answered "I don't have a guide called 'nya'")
     // (not for commands that take free text, where the last word is somebody's words)
-    if (!["feedback","suggest","idea","bug","meh","more","jot","report","notice","dare","contract","voice","heatline","tease","begphrase","beg","chore","edit","wheel","store","say","note"].includes(cmd))
+    if (!((commandOf(cmd) || {}).words || ["jot","say"].includes(cmd)))   // (jot and say: bot parts' own)
     { const NOISE =/^(nya+n?|nyaa+|mew+|meow+|mrr+p?|purr+|woof+|arf+|bark+|ruff+|awoo+|moo+|oink+|neigh+|whinny|snrt|brrhh|baa+|squeak+|yip+|hiss+)[~!.,]*$/i;
       // (a word that is somebody's name, like a cow called Moo, stays)
       while (args.length && NOISE.test(args[args.length - 1]) && !(() => { try { const m = resolveTarget(args[args.length - 1].replace(/[~!.,]+$/, "")); state.ambiguous = null; return m; } catch(e){ return null; } })()) args.pop();
@@ -104,7 +103,7 @@
     if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
     // a bare word that's both a staff guide and an add-on's command (?play): staff get the guide, as before
     if (addonCmd && !args.length && isStaff(sender) && guideTopic(cmd)) addonCmd = null;
-    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){
+    if (!commandOf(cmd) && !addonCmd){
       // a guide's name on its own opens that guide (?play, ?herd2, ?barnstaff)
       if (guideTopic(cmd)){ args = [cmd]; rest = cmd; cmd = "help"; }
       else {
@@ -116,6 +115,7 @@
         huh("I don't know ?"+cmd+", hon."+(near ? " Did you mean ?"+near+"?" : "")+" ?help lists what I can do."); return;
       }
     }
+    const entry = commandOf(cmd) || {};   // what the command book says about it (01b-commands.js)
     if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)){ reply(sender, myContractsText(sender), channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel); return; }
     // somebody not on the books tryin' to sign themselves up (live, Oct 7: "Register stock", "?register", "stock"
     // got "just for farm staff" and then silence): point them at ?apply
@@ -127,7 +127,7 @@
     const joining = ["register","stock","approve","grant","claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
     // STOCK ON STOCK: ?milk and ?edge are open to anybody on the books, on somebody else on the books who's said
     // yes to them (asked once, good for a couple of hours; never asked with ?freeuse on). Staff aren't asked about.
-    if (STOCK_PLAY.includes(cmd) && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length){
+    if (entry.stockPlay && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length){
       const t = resolveTarget(args[0]);
       if (!t || !rec(t) || !(rec(t).roles || []).length){ huh("Who, sugar? ?"+cmd+" <who>, somebody on the farm's books, standin' right by you."); return; }
       if (t === sender){ huh(cmd === "milk" ? "Milkin' yourself? Stand in a milkin' stall, sugar, or ask somebody to do it for you." : "No edgin' yourself for the farm's count, sugar. Ask somebody."); return; }
@@ -145,7 +145,7 @@
         reply(sender, "I've asked "+plainName(t)+" first, sugar. Once they say yes, it'll happen.", channel); return;
       }
     } else
-    if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){
+    if (entry.staff && !isStaff(sender)){
       if (joining){ reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel); return; }
       huh("?"+cmd+" is just for farm staff, sugar."); return;
     }
@@ -154,7 +154,7 @@
     dbg("CMD:", cmd, "from", sender, "via", channel);
 
     // ?safe / ?stuck cover the farm only: a beep from another room gets told so
-    if (CFG.SAFETY_REQUIRE_IN_ROOM && SAFETY_CMDS.includes(cmd) && !charFor(sender)){
+    if (CFG.SAFETY_REQUIRE_IN_ROOM && entry.safety && !charFor(sender)){
       reply(sender, "🔴 I hear you, "+plainName(sender)+". The farm office only covers the farm, and you're not here right now, so I can't stop "+
                     "anything where you are. Please use the club's own safeword and your room's admins.\n\n"+
                     "?staff still reaches our people if you'd like a hand.", channel);
@@ -162,10 +162,10 @@
       return;
     }
     // Files, rosters and keys are nobody else's business: never said out loud.
-    const replyCh = (channel === "chat" && (PRIVATE_REPLY.includes(cmd) || (addonCmd && addonCmd.def.private)))
+    const replyCh = (channel === "chat" && (entry.private || (addonCmd && addonCmd.def.private)))
       ? (canBeep(sender) ? "beep" : "whisper") : channel;
     // staff lookin' up somebody else from the Companion: the answer goes in their Office, not the feed
-    const docAbout = (channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
+    const docAbout = (channel === "companion" && entry.doc && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
     // seen live: somebody who'd just finished applyin' was told "Say ?apply first!" a minute later. With an
     // application in the queue, every "not on the books" answer says it's waitin' on the proprietors instead.
     const waiting = (txt) => {
@@ -179,6 +179,7 @@
       : (txt) => reply(sender, waiting(txt), replyCh);
 
     if (addonCmd){ runAddonCommand(addonCmd, sender, args, rest, channel, R); return; }
+    if (entry.run){ entry.run({ cmd, sender, args, rest, channel, R, huh, raw }); return; }   // answered by its own part
 
     switch (cmd) {
 
@@ -1595,37 +1596,8 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      /* ── RIBBONS, THE STORE, POTIONS, DARES, THE CORRAL (10l, 10m) ── */
-      case "ribbons": case "ribbon": case "store": case "buy": case "gift": ribbonCommand(cmd, sender, args, R); break;
-      case "potions": case "potion": potionCommand(cmd, sender, args, R); break;
-      case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
-      case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
-      case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
-      case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
-      case "kryptonite": kryptoCommand(sender, args, R, channel); break;
-      case "feats": case "feat": case "achievements": case "perks": case "perk": featsCommand(cmd === "perk" ? "perks" : cmd, sender, args, R); break;   // 10us-feats.js   // 10ur-shots-more.js
-      case "myshots": case "shotsin": R(myShotsText(sender)); break;
-      case "nursery": case "little": case "care": nurseryCommand(cmd, sender, args, R, huh); break;   // 10up2-nursery.js
-      case "services": case "service": case "coax": serviceCommand(cmd, sender, args, R); break;   // 10uo-services.js
-      case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
-      case "symbiote": case "symbiotes": symbioteCommand(sender, args, R); break;   // 10v4-symbiotes.js
-      case "messes": messesCommand(sender, args, R); break;
-      case "ownoutfit": case "myoutfit": ownOutfitCommand(sender, args, R); break;   // bring your own outfit (10c-outfits.js)   // 10u9-mess-store.js
-      case "quiet": case "tend": if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
-      case "brood": case "bet": ranksCommand(cmd, sender, args, R); break;   // 10y3-trap-ranks.js
-      case "cleanse": case "corruption": case "gauntlet": case "lend": case "bid": case "route": corruptionCommand(cmd, sender, args, R); break;   // 10y4-corruption.js
-      case "mysterybox": case "suit": cursedCommand(cmd, sender, args, R); break;   // 10y5-cursed.js
-      case "whistle": case "send": case "dose": case "herdtraps": case "sit": case "broody": case "album": case "holes": case "vat": keepersCommand(cmd, sender, args, R); break;   // 10y6-keepers.js
-      case "stalldial": case "bringin": case "bedrest": case "callme": case "nevercall": case "intensity": case "keep": case "kept": uddersCommand(cmd, sender, args, R); break;   // 10y7-udders.js
-      case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
-      case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
-      case "trickortreat": case "tot": trickOrTreat(sender, args, R); break;   // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
-      case "stocking": case "stockings": stockingCommand(sender, args, R); break;   // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
-      case "egghunt": eggHuntCommand(sender, args, R); break;   // huntin' for eggs round the farm at Easter, and the board (10y9x-easter.js)
-      case "rate": rateCommand(sender, args, R); break;   // how a trap went for them (10y9o-trap-ratings.js)
-      case "renew": case "renewal": case "renewals": renewCommand(sender, args, R); break;   // another contract when this one ends (10y9t-renewals.js)
-      case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
-      case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
+      /* ── the store, potions, traps, feats, the nursery, seasons, feedback and the rest answer their own
+            commands: each part writes them in the command book with run (01b-commands.js) ── */
 
       case "edit": {
         // proprietors fix somebody's record: ?edit <who> shows what can change · ?edit <who> <field> <new value>

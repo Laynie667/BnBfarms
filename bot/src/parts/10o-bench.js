@@ -284,3 +284,7 @@
     benchIn(t, mins, sender, t === sender ? "volunteered" : "staff");
     R(t === sender ? "🪵 Strappin' you in for "+mins+" minutes, sugar." : "🪵 "+plainName(t)+" is on the use bench for "+mins+" minutes.");
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("bench use",                { topic: "bench", run: (c) => benchCommand(c.cmd, c.sender, c.args, c.R) });
+  addCommand("unbench",                  { topic: "bench", staff: true, run: (c) => benchCommand(c.cmd, c.sender, c.args, c.R) });

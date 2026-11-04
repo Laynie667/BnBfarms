@@ -104,3 +104,6 @@
     tell(mn, "🛍️ Your Companion couldn't put "+w.name.toLowerCase()+" on you ("+why+"). Reload your page, and if it keeps happenin', tell Laynie, sugar.");
     if (w.by !== mn) tell(w.by, "🛍️ "+plainName(mn)+"'s Companion couldn't draw your "+w.name.replace(/^an? /i, "")+" on them ("+why+").");
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("messes",                   { topic: "messes", run: (c) => messesCommand(c.sender, c.args, c.R) });

@@ -154,3 +154,6 @@
              "The traps on this farm talk to each other. %n is tipped, slid and delivered: %c."],
     betDone: ["%x. The ones who called it right about %n: %c.", "It's settled: %x. Winnin's to %c.", "%x, for all the yard to see. %c had the right of it."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("brood bet",                { topic: "traps", run: (c) => ranksCommand(c.cmd, c.sender, c.args, c.R) });

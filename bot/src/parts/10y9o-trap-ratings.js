@@ -190,3 +190,6 @@
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __trapRateX: (m, k) => trapRateX(m, k), __trapOfDay: () => trapOfDay(), __trapDayPool: () => trapDayPool(),
     __trapDayTick: () => { state.trapDayAt = 0; trapDayTick(); }, __rateWord: (t) => rateWord(t), __trapEnded: (m, k, b) => trapEnded(m, k, b || {}) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("rate",                     { topic: "traps", run: (c) => rateCommand(c.sender, c.args, c.R) });   // how a trap went for them

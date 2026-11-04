@@ -504,3 +504,6 @@
             "She pulls a rubber spider out of the bowl and drops it down %n's top, and laughs till her hat falls off."],
   };
   if (W.__FARMHAND_TEST__) Object.assign(W, { __hwFill: (m, a) => hwFill(m, a, 1), __treatCandy: (m) => treatCandy(m) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("trickortreat tot",         { topic: "seasons", run: (c) => trickOrTreat(c.sender, c.args, c.R) });   // knockin' on the farm girl's door at Halloween

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.0
+// @version      0.70.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,7 +2793,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.0";
+  var VERSION = "0.70.1";
   var COMPANION_VERSION = "0.52.0";
 
   // bot-parts:farmhand-bot-parts
@@ -3719,6 +3719,158 @@
       DEBUG: true,
       LOG_HEARD: true
     };
+    const COMMANDS = /* @__PURE__ */ new Map();
+    const COMMAND_CLASH = [];
+    function addCommand(words, o) {
+      const list2 = String(words).trim().split(/\s+/);
+      const e = Object.assign({ name: list2[0], aka: list2, topic: "" }, o || {});
+      for (const w of list2) {
+        if (COMMANDS.has(w)) COMMAND_CLASH.push(w);
+        else COMMANDS.set(w, e);
+      }
+      return e;
+    }
+    const commandOf = (w) => COMMANDS.get(String(w || "").toLowerCase()) || null;
+    const commandWords = (test) => [...COMMANDS.keys()].filter((w) => !test || test(COMMANDS.get(w)));
+    addCommand("help", { topic: "guides", interview: true });
+    addCommand("commands info guide", { topic: "guides" });
+    addCommand("staffhelp", { topic: "guides", staff: true });
+    addCommand("rules", { topic: "guides", interview: true });
+    addCommand("consent", { topic: "guides", interview: true });
+    addCommand("tour", { topic: "guides", interview: true });
+    addCommand("species", { topic: "guides", interview: true });
+    addCommand("luxury", { topic: "guides", interview: true });
+    addCommand("doors", { topic: "guides", interview: true });
+    addCommand("ping", { topic: "guides" });
+    addCommand("addons addon", { topic: "guides" });
+    addCommand("apply", { topic: "joining" });
+    addCommand("safe safeword red", { topic: "safety", safety: true, now: true, interview: true });
+    addCommand("stuck", { topic: "safety", safety: true, now: true, interview: true });
+    addCommand("report", { topic: "safety", now: true, words: true });
+    addCommand("staff", { topic: "safety", now: true, interview: true });
+    addCommand("setrescue", { topic: "safety", staff: true });
+    addCommand("stucklog", { topic: "safety", staff: true, private: true });
+    addCommand("record", { topic: "records", private: true, doc: true });
+    addCommand("keys", { topic: "records", private: true, doc: true });
+    addCommand("who", { topic: "records" });
+    addCommand("today", { topic: "records", private: true });
+    addCommand("friend", { topic: "records" });
+    addCommand("addfriend", { topic: "records", staff: true });
+    addCommand("roster", { topic: "records", staff: true, private: true });
+    addCommand("stock", { topic: "records", staff: true, private: true });
+    addCommand("find", { topic: "records", staff: true, private: true });
+    addCommand("signed", { topic: "records", staff: true });
+    addCommand("where", { topic: "records", staff: true, private: true });
+    addCommand("keysync", { topic: "records", staff: true });
+    addCommand("keydump", { topic: "records", staff: true, private: true });
+    addCommand("health", { topic: "records", staff: true, private: true });
+    addCommand("edit", { topic: "records", staff: true, words: true });
+    addCommand("note", { topic: "records", staff: true, words: true });
+    addCommand("queue", { topic: "office", staff: true, private: true });
+    addCommand("app", { topic: "office", staff: true, private: true });
+    addCommand("approve register", { topic: "office", staff: true });
+    addCommand("deny", { topic: "office", staff: true });
+    addCommand("away", { topic: "office", staff: true });
+    addCommand("unregister", { topic: "office", staff: true });
+    addCommand("grant", { topic: "office", staff: true });
+    addCommand("revoke", { topic: "office", staff: true });
+    addCommand("pasture", { topic: "office", staff: true });
+    addCommand("onduty", { topic: "office", staff: true });
+    addCommand("cover", { topic: "office", staff: true, private: true });
+    addCommand("staffadd", { topic: "office", staff: true });
+    addCommand("staffremove", { topic: "office", staff: true });
+    addCommand("spot spots", { topic: "office", staff: true, private: true });
+    addCommand("tier", { topic: "office", staff: true });
+    addCommand("vet", { topic: "office", staff: true, private: true, doc: true });
+    addCommand("brand", { topic: "office", staff: true });
+    addCommand("notice", { topic: "office", words: true });
+    addCommand("appclear", { topic: "office", staff: true });
+    addCommand("backup", { topic: "office", staff: true });
+    addCommand("zone zones", { topic: "office", staff: true });
+    addCommand("herd", { topic: "herds", private: true });
+    addCommand("claim", { topic: "herds", staff: true });
+    addCommand("release", { topic: "herds", staff: true });
+    addCommand("myherd", { topic: "herds", staff: true, private: true });
+    addCommand("herdname", { topic: "herds", staff: true });
+    addCommand("herdcall", { topic: "herds", staff: true });
+    addCommand("herdsummon", { topic: "herds", staff: true });
+    addCommand("turnout", { topic: "herds", staff: true });
+    addCommand("letup", { topic: "herds", staff: true });
+    addCommand("goldkey", { topic: "herds", staff: true });
+    addCommand("forced", { topic: "herds", staff: true });
+    addCommand("summon", { topic: "herds", staff: true, private: true });
+    addCommand("contract", { topic: "contracts", staff: true, private: true, words: true });
+    addCommand("contracts", { topic: "contracts", staff: true, private: true });
+    addCommand("rights", { topic: "contracts" });
+    addCommand("accept", { topic: "contracts" });
+    addCommand("milkable", { topic: "milk" });
+    addCommand("seedmilk", { topic: "milk" });
+    addCommand("jarok", { topic: "milk" });
+    addCommand("wash", { topic: "milk" });
+    addCommand("quota", { topic: "milk", private: true, doc: true });
+    addCommand("milk", { topic: "milk", staff: true, stockPlay: true });
+    addCommand("collect", { topic: "milk", staff: true });
+    addCommand("drain", { topic: "milk", staff: true, stockPlay: true });
+    addCommand("edge", { topic: "milk", staff: true, stockPlay: true });
+    addCommand("denial", { topic: "milk", staff: true });
+    addCommand("ruin", { topic: "milk", staff: true });
+    addCommand("jars", { topic: "milk", staff: true });
+    addCommand("inseminate", { topic: "milk", staff: true });
+    addCommand("machine", { topic: "milk", staff: true });
+    addCommand("nomilk", { topic: "milk", staff: true });
+    addCommand("inspect", { topic: "milk", staff: true });
+    addCommand("shotlog", { topic: "milk", staff: true });
+    addCommand("breedable fertile naturalheat mpreg", { topic: "breeding" });
+    addCommand("breed", { topic: "breeding" });
+    addCommand("cum", { topic: "breeding" });
+    addCommand("yes no", { topic: "breeding" });
+    addCommand("pedigree", { topic: "breeding", private: true, doc: true });
+    addCommand("heat", { topic: "breeding", staff: true });
+    addCommand("heatline", { topic: "breeding", staff: true, words: true });
+    addCommand("stats", { topic: "body", private: true, doc: true });
+    addCommand("board", { topic: "body" });
+    addCommand("size", { topic: "body", doc: true });
+    addCommand("sizes", { topic: "body" });
+    addCommand("measure", { topic: "body", doc: true });
+    addCommand("chest", { topic: "body" });
+    addCommand("futa", { topic: "body" });
+    addCommand("penis cock", { topic: "body" });
+    addCommand("gender", { topic: "body" });
+    addCommand("freeuse tally eggs", { topic: "body" });
+    addCommand("praise degrade", { topic: "body" });
+    addCommand("dressme dress", { topic: "outfits" });
+    addCommand("outfit outfits uniform", { topic: "outfits" });
+    addCommand("outfitwheel dresswheel wheeloutfit", { topic: "outfits" });
+    addCommand("grooming", { topic: "outfits" });
+    addCommand("tease", { topic: "voice", private: true, words: true });
+    addCommand("teaseme", { topic: "voice", private: true });
+    addCommand("hypnotize hypnotise", { topic: "voice" });
+    addCommand("allow letgo", { topic: "voice" });
+    addCommand("echs", { topic: "voice" });
+    addCommand("hypno", { topic: "voice" });
+    addCommand("voice", { topic: "voice", staff: true, words: true });
+    addCommand("roam", { topic: "farmlife" });
+    addCommand("feeding curfew", { topic: "farmlife" });
+    addCommand("weather", { topic: "farmlife" });
+    addCommand("stocks", { topic: "farmlife", staff: true });
+    addCommand("unstock", { topic: "farmlife", staff: true });
+    addCommand("reins", { topic: "farmlife", staff: true });
+    addCommand("walk", { topic: "farmlife", staff: true });
+    addCommand("tourstop", { topic: "farmlife", staff: true, private: true });
+    addCommand("clockin", { topic: "work", staff: true });
+    addCommand("clockout", { topic: "work", staff: true });
+    addCommand("hours", { topic: "work", staff: true, private: true });
+    addCommand("done", { topic: "work", staff: true });
+    addCommand("chore", { topic: "work", staff: true, words: true });
+    addCommand("chores", { topic: "work", staff: true, private: true });
+    addCommand("wheel", { topic: "play", staff: true, private: true, words: true });
+    addCommand("spin", { topic: "play", staff: true });
+    addCommand("beg", { topic: "play", words: true });
+    addCommand("please", { topic: "play" });
+    addCommand("begphrase", { topic: "play", staff: true, words: true });
+    addCommand("fair", { topic: "play" });
+    addCommand("enter", { topic: "play" });
+    addCommand("score", { topic: "play", staff: true });
     const W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
     const TAG = "[Farmhand]";
     const log = (...a) => console.log(TAG, ...a);
@@ -4756,7 +4908,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L2;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ SEASON_LINES, TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __commands: COMMANDS, __commandClash: COMMAND_CLASH, __lines: () => ({ SEASON_LINES, TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -5954,7 +6106,6 @@
       ownOutfit: "ownoutfit",
       teaseMe: "teaseme"
     };
-    const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
       n = Number(n) || 0;
       return n >= 1e3 ? Math.round(n / 100) * 100 : Math.round(n / 50) * 50;
@@ -9444,6 +9595,7 @@
       R(r.ownOutfit ? "\u{1F457} Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no." : "\u{1F457} Bring your own outfit: off. " + (r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });
+    addCommand("ownoutfit myoutfit", { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });
     function zonesLedger() {
       L2.zones = L2.zones || {};
     }
@@ -9962,7 +10114,7 @@
       a.api = addonApi(a);
       for (const [word0, c] of Object.entries(def.commands || {})) {
         const word = String(word0).toLowerCase();
-        if (PUBLIC_CMDS.includes(word) || STAFF_CMDS.includes(word) || ["addons", "addon"].includes(word)) {
+        if (commandOf(word)) {
           warn("add-on " + name + ": ?" + word + " belongs to the bot, skipped");
           continue;
         }
@@ -9975,7 +10127,7 @@
         ADDON_CMDS.set(word, { addon: a, def: c });
         for (const al0 of c.aliases || []) {
           const al = String(al0).toLowerCase();
-          if (PUBLIC_CMDS.includes(al) || STAFF_CMDS.includes(al) || ADDON_CMDS.has(al)) continue;
+          if (commandOf(al) || ADDON_CMDS.has(al)) continue;
           ADDON_CMDS.set(al, { addon: a, def: c });
         }
       }
@@ -11928,6 +12080,8 @@
       const d = dayKey(), today = r.rday && r.rday.d === d ? r.rday.n : 0;
       R("\u{1F380} " + (t === sender ? "YOUR RIBBONS" : plainName(t).toUpperCase() + "'S RIBBONS") + ": " + (r.ribbons || 0) + "\nEarned today: " + today + " of " + CFG.RIBBON_DAY_CAP + (r.quotaGrace ? " \xB7 quota grace held: " + r.quotaGrace : "") + (mine.length ? "\n\nLately\n" + mine.map((e) => "  " + (e.n > 0 ? "+" : "") + e.n + " \xB7 " + e.why).join("\n") : "") + "\n\nEARN 'EM: make your milk quota \xB7 finish a stall session \xB7 do a chore \xB7 work a glory shift \xB7 best milk or top sire of the week \xB7 staff hand 'em out for good behavior\nSPEND 'EM: ?store");
     }
+    addCommand("ribbons ribbon buy gift", { topic: "ribbons", run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });
+    addCommand("store", { topic: "ribbons", words: true, run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });
     const POTIONS = [
       {
         id: "clover",
@@ -12836,6 +12990,10 @@
       }
       R(potionsText(sender));
     }
+    addCommand("potions potion", { topic: "potions", run: (c) => potionCommand(c.cmd, c.sender, c.args, c.R) });
+    addCommand("dares dared", { topic: "potions", run: (c) => dareCommand(c.cmd, c.sender, c.args, c.R) });
+    addCommand("dare", { topic: "potions", words: true, run: (c) => dareCommand(c.cmd, c.sender, c.args, c.R) });
+    addCommand("corral uncorral", { topic: "potions", staff: true, run: (c) => penCommand(c.cmd === "corral" ? "pen" : "unpen", c.sender, c.args, c.R) });
     const FX_MORE = {
       clover: [
         "%n's breasts have gone heavy and tight, warm milk beadin' at both nipples without anybody touchin' 'em.",
@@ -13525,6 +13683,8 @@
       benchIn(t, mins, sender, t === sender ? "volunteered" : "staff");
       R(t === sender ? "\u{1FAB5} Strappin' you in for " + mins + " minutes, sugar." : "\u{1FAB5} " + plainName(t) + " is on the use bench for " + mins + " minutes.");
     }
+    addCommand("bench use", { topic: "bench", run: (c) => benchCommand(c.cmd, c.sender, c.args, c.R) });
+    addCommand("unbench", { topic: "bench", staff: true, run: (c) => benchCommand(c.cmd, c.sender, c.args, c.R) });
     const BENCH_MORE = {
       on: [
         '%t is marched to the bench by the collar, bent over it, and buckled down tight. The farm girl kicks their feet apart. "Open for business, sugar."',
@@ -13889,6 +14049,7 @@
       }
       R("\u{1F4EC} #" + id + " is " + FB_STATUS[f.status] + (f.status !== "open" ? ", and " + f.name + " has been told" : "") + ".");
     }
+    addCommand("feedback suggest idea bug meh more", { topic: "feedback", private: true, words: true, run: (c) => feedbackCommand(c.cmd, c.sender, c.args, c.rest, c.R) });
     const TAIL_KINDS = [
       [/pony|horse|mare|stallion|equine/i, "pony"],
       [/cow|bull|calf|heifer/i, "cow"],
@@ -14988,6 +15149,8 @@
       }
       return false;
     }
+    addCommand("traps trap subject subjects watersports watersport", { topic: "traps", run: (c) => trapCommand(c.cmd === "watersport" ? "watersports" : c.cmd, c.sender, c.args, c.R) });
+    addCommand("eager", { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["eager"].concat(c.args), c.R) });
     const TRAP_LINES = {
       injector: {
         beats: [
@@ -18147,6 +18310,7 @@
       tell(mn, "\u{1F6CD}\uFE0F Your Companion couldn't put " + w.name.toLowerCase() + " on you (" + why + "). Reload your page, and if it keeps happenin', tell Laynie, sugar.");
       if (w.by !== mn) tell(w.by, "\u{1F6CD}\uFE0F " + plainName(mn) + "'s Companion couldn't draw your " + w.name.replace(/^an? /i, "") + " on them (" + why + ").");
     }
+    addCommand("messes", { topic: "messes", run: (c) => messesCommand(c.sender, c.args, c.R) });
     const TRAP_THEMES = {
       kennel: { label: "the kennels", near: /kennel|dog|pup|hound/, kinds: ["kennel", "wolves", "teaser", "crate", "bell", "groomer", "whelping", "leashpost"] },
       stalls: { label: "the stalls", near: /^milking|stall|barn|dairy|parlou?r/, kinds: ["milker", "cups", "carousel", "pump", "breeder", "stallion", "bull", "saddle", "collection", "injector", "incubator", "crate", "sow", "teatcheck"] },
@@ -23711,6 +23875,7 @@
       return "\u{1FAA3} " + svcFill(pickFor(t, "svc:friendDrain", SERVICE_LINES.friendDrain), t, { by, ml: ml(out) });
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __latch: (m, h) => parasiteLatch(m, h), __svc: () => svc() });
+    addCommand("services service coax", { topic: "services", run: (c) => serviceCommand(c.cmd, c.sender, c.args, c.R) });
     const NURSERY_LINES = {
       // ── little space, on and off ──
       spaceOn: [
@@ -24642,6 +24807,7 @@
       state.nurseryAt = 0;
       nurseryTick();
     }, __littleNow: (m) => littleNow(m), __nurseryStats: (m, x) => nurseryStats(m, x) });
+    addCommand("nursery little care", { topic: "nursery", run: (c) => nurseryCommand(c.cmd, c.sender, c.args, c.R, c.huh) });
     const BRAND_PLACE_KEYS = ["hipL", "hipR", "thighL", "thighR", "mons", "tummy", "chestL", "chestR", "shoulderL", "shoulderR"];
     const BRAND_PLACE_NAMES = {
       hipL: "left hip",
@@ -25362,6 +25528,8 @@
       state.shots2At = 0;
       shotsMoreTick();
     }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });
+    addCommand("kryptonite", { topic: "shots", private: true, run: (c) => kryptoCommand(c.sender, c.args, c.R, c.channel) });
+    addCommand("myshots shotsin", { topic: "shots", private: true, run: (c) => c.R(myShotsText(c.sender)) });
     const FEATS = [
       {
         key: "dairy",
@@ -25673,6 +25841,7 @@
       state.featsAt = 0;
       featsTick();
     }, __perkLv: (m, k) => perkLv(m, k), __perkPrice: (m, p) => perkPrice(m, p), __perks: { perkMilkX, perkCap, perkFertX, perkPregX, perkEggX, perkEggDaysX, perkEggPayX, perkLoadX, perkCatchX, perkTrapX, perkBetX, perkStars, perkHintLetters } });
+    addCommand("feats feat achievements perks perk", { topic: "feats", private: true, run: (c) => featsCommand(c.cmd === "perk" ? "perks" : c.cmd, c.sender, c.args, c.R) });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -26045,6 +26214,8 @@
         "The parasite is peeled off %n's face and its long root pulled hand over hand up out of their throat. It squirms. %n gags, spits, and has their own mouth back."
       ]
     };
+    addCommand("parasite parasites", { topic: "parasites", run: (c) => parasiteCommand("parasite", c.sender, c.args, c.R) });
+    addCommand("purge", { topic: "parasites", staff: true, run: (c) => parasiteCommand("purge", c.sender, c.args, c.R) });
     const PARASITE_SIRE = -7;
     const STRAINS = {
       breeder: {
@@ -27030,6 +27201,7 @@
       sent_moss: ["%n brushes the moss away, and it lets go easily, leavin' their chest soft and bare."],
       sent_nestling: ["%n asks the nestling to go, and it wriggles out obligingly and trundles off."]
     };
+    addCommand("symbiote symbiotes", { topic: "parasites", run: (c) => symbioteCommand(c.sender, c.args, c.R) });
     if (CFG.SYM && CFG.SYM.SPREAD === void 0) CFG.SYM.SPREAD = 0.25;
     const LATEX_BLACK = "#121214", MOSS_GREEN = "#5E8F3A";
     const SYM_GEAR = {
@@ -29667,6 +29839,7 @@
         "%x eggs, counted into the basket by %n. They'll fetch a fair price at market."
       ]
     };
+    addCommand("struggle free goad hunt lay gather pack", { topic: "traps", run: (c) => extrasCommand(c.cmd, c.sender, c.args, c.R) });
     (function() {
       const more = (pool, lines) => {
         if (Array.isArray(pool)) pool.push(...lines);
@@ -30373,6 +30546,9 @@
         "%n can't see it. They can only feel it: coils everywhere, the walls themselves movin', and no way to tell up from down. It has all the time in the world down here."
       ]
     };
+    addCommand("quiet tend", { topic: "traps", run: (c) => {
+      if (c.cmd !== "tend" || !bedTend(c.sender, c.args, c.R)) broodCommand(c.cmd, c.sender, c.args, c.R);
+    } });
     const SUBJECT_RANKS = [{ at: 0, name: "Bait" }, { at: 10, name: "Trap Fodder" }, { at: 25, name: "Brood Sow" }, { at: 60, name: "Broodmother" }];
     function rankOfSubject(mn) {
       const n = (rec(mn) || {}).trapN || 0;
@@ -30598,6 +30774,7 @@
       ],
       betDone: ["%x. The ones who called it right about %n: %c.", "It's settled: %x. Winnin's to %c.", "%x, for all the yard to see. %c had the right of it."]
     };
+    addCommand("brood bet", { topic: "traps", run: (c) => ranksCommand(c.cmd, c.sender, c.args, c.R) });
     const cLine = (key, mn, v) => tFill(pickFor(mn, "corr:" + key, CORR_LINES[key]), mn, v);
     const CORR_MARKS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
     const corrHas = (mn, m) => ((rec(mn) || {}).corrMarks || []).includes(m);
@@ -31127,6 +31304,7 @@
       lendWon: ["Sold to %c for %x ribbons. %n is led down off the block on a short rope and handed over.", "%c takes it at %x. %n looks at their buyer, and at the traps, and swallows."],
       lendWalk: ["%c takes %n by the collar and walks them to the first one. The order's been decided: %x.", '"This way." %c has a route planned for %n: %x.']
     };
+    addCommand("cleanse corruption gauntlet lend bid route", { topic: "traps", run: (c) => corruptionCommand(c.cmd, c.sender, c.args, c.R) });
     const zLine = (key, mn, v) => tFill(pickFor(mn, "curse:" + key, CURSE_LINES[key]), mn, v);
     const CURSES = {
       plug: {
@@ -31484,6 +31662,7 @@
       ],
       suitPeeled: ["It takes two farmhands and a bucket of somethin' cold to get the suit to let go of %n. It comes away a strip at a time, clingin', and the roots inside come out last and slowest."]
     };
+    addCommand("mysterybox suit", { topic: "traps", run: (c) => cursedCommand(c.cmd, c.sender, c.args, c.R) });
     const kLine = (key, mn, v) => tFill(pickFor(mn, "keep:" + key, KEEP_LINES[key]), mn, v);
     function toysFollow(mn, level, until) {
       if (hasCompanion(mn)) enqueue(makeMsg("vibe", { level, until: until || 0 }, mn));
@@ -32302,6 +32481,7 @@
       ],
       leaderDose: ["%x takes %n by the collar, turns them round and slides a needle into the fat of their ass like they're dosin' their own heifer. Which they are."]
     };
+    addCommand("whistle send dose herdtraps sit broody album holes vat", { topic: "traps", run: (c) => keepersCommand(c.cmd, c.sender, c.args, c.R) });
     const uLine = (key, mn, v) => tFill(pickFor(mn, "udd:" + key, UDDER_LINES[key]), mn, v);
     const onBooks = (mn) => {
       const r = rec(mn);
@@ -33108,6 +33288,7 @@
         "It wipes itself off on %n's face when it's done with that end."
       ]
     };
+    addCommand("stalldial bringin bedrest callme nevercall intensity keep kept", { topic: "milk", run: (c) => uddersCommand(c.cmd, c.sender, c.args, c.R) });
     const MORE_KEEP = {
       customDose: [
         "The arm draws its needle back out of %n slow, leavin' one bright bead, and tucks itself away under the straw.",
@@ -36452,6 +36633,7 @@
       __seasonCostume: () => seasonCostume(),
       __seasonsByDate: (d) => seasonsByDate(new Date(d))
     });
+    addCommand("seasons calendar", { topic: "seasons", run: (c) => seasonCommand(c.sender, c.args, c.R) });
     Object.assign(MESS, { pumpkin: "#E07A1F", caramel: "#B8702A", ecto: "#7FEAD0", cider: "#D9902E", brew: "#7A3FB0" });
     season("halloween", {
       label: "Halloween week",
@@ -38184,6 +38366,7 @@
       ]
     };
     if (W.__FARMHAND_TEST__) Object.assign(W, { __hwFill: (m, a) => hwFill(m, a, 1), __treatCandy: (m) => treatCandy(m) });
+    addCommand("trickortreat tot", { topic: "seasons", run: (c) => trickOrTreat(c.sender, c.args, c.R) });
     if (CFG.RATE_LOVED_X === void 0) CFG.RATE_LOVED_X = 1.25;
     if (CFG.RATE_NO_X === void 0) CFG.RATE_NO_X = 0.5;
     if (CFG.RATE_FLOOR === void 0) CFG.RATE_FLOOR = 0.2;
@@ -38414,6 +38597,7 @@
       __rateWord: (t) => rateWord(t),
       __trapEnded: (m, k, b) => trapEnded(m, k, b || {})
     });
+    addCommand("rate", { topic: "traps", run: (c) => rateCommand(c.sender, c.args, c.R) });
     if (CFG.AFTER_CHANCE === void 0) CFG.AFTER_CHANCE = 0.4;
     if (CFG.AFTER_DELAY === void 0) CFG.AFTER_DELAY = [7e3, 12e3];
     function heldNow(mn) {
@@ -40595,6 +40779,7 @@
       if (rows.length) s.renewals = rows.map((r) => Object.assign({}, r, { until: Math.ceil(r.until / 6e4) * 6e4 }));
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __renewTick: () => renewTick(), __renewable: (m) => renewable(m), __renewals: () => renewalsList() });
+    addCommand("renew renewal renewals", { topic: "contracts", run: (c) => renewCommand(c.sender, c.args, c.R) });
     Object.assign(MESS, { icing: "#FFFDF8", cocoa: "#6E4128", eggnog: "#F1E0AA", peppermint: "#E23A52" });
     season("winter", {
       label: "Winter",
@@ -41593,6 +41778,7 @@
       }
     };
     if (W.__FARMHAND_TEST__) Object.assign(W, { __stocking: (m) => stockingCommand(m, [], (t) => tell(m, t)) });
+    addCommand("stocking stockings", { topic: "seasons", run: (c) => stockingCommand(c.sender, c.args, c.R) });
     Object.assign(MESS, { wax: "#A3162B" });
     season("yule", {
       label: "Yule",
@@ -43466,6 +43652,7 @@
       ]
     };
     if (W.__FARMHAND_TEST__) Object.assign(W, { __easterWeek: (d) => easterWeek(new Date(d)) });
+    addCommand("egghunt", { topic: "seasons", run: (c) => eggHuntCommand(c.sender, c.args, c.R) });
     season("litha", {
       label: "Litha",
       icon: "\u2600\uFE0F",
@@ -61293,10 +61480,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
       }
     }
-    const NO_COOLDOWN = ["safe", "safeword", "red", "stuck", "report", "staff"];
     const cooldownMs = (channel) => (channel === "companion" || channel === "local" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1e3;
     function onCooldown(mn, cmd, channel) {
-      if (NO_COOLDOWN.includes(cmd)) return false;
+      if ((commandOf(cmd) || {}).now) return false;
       const last = state.cooldowns.get(mn) || 0;
       if (Date.now() - last < cooldownMs(channel)) return true;
       state.cooldowns.set(mn, Date.now());
@@ -61369,7 +61555,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       return null;
     }
     function nearestCommand(cmd, sender) {
-      const pool = PUBLIC_CMDS.filter((c) => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
+      const pool = commandWords((e) => !e.staff).filter((c) => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? commandWords((e) => e.staff) : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
       const strip = cmd.replace(/^[a-z][-.]/, "");
       if (strip !== cmd && pool.includes(strip)) return strip;
       if (cmd.length < 4) return null;
@@ -61425,272 +61611,6 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       }
       return null;
     }
-    const PUBLIC_CMDS = [
-      "help",
-      "commands",
-      "info",
-      "guide",
-      "rules",
-      "consent",
-      "tour",
-      "species",
-      "luxury",
-      "doors",
-      "ping",
-      "apply",
-      "record",
-      "keys",
-      "who",
-      "herd",
-      "safe",
-      "safeword",
-      "red",
-      "report",
-      "staff",
-      "stuck",
-      "friend",
-      "notice",
-      "teaseme",
-      "tease",
-      "dressme",
-      "dress",
-      "hypnotize",
-      "hypnotise",
-      "allow",
-      "letgo",
-      "echs",
-      "roam",
-      "stats",
-      "board",
-      "pedigree",
-      "breedable",
-      "fertile",
-      "mpreg",
-      "naturalheat",
-      "breed",
-      "cum",
-      "milkable",
-      "seedmilk",
-      "outfitwheel",
-      "dresswheel",
-      "wheeloutfit",
-      "grooming",
-      "futa",
-      "size",
-      "sizes",
-      "measure",
-      "penis",
-      "cock",
-      "rights",
-      "accept",
-      "freeuse",
-      "jarok",
-      "gender",
-      "outfit",
-      "outfits",
-      "uniform",
-      "hypno",
-      "tally",
-      "eggs",
-      "yes",
-      "no",
-      "wash",
-      "quota",
-      "praise",
-      "degrade",
-      "weather",
-      "feeding",
-      "curfew",
-      "beg",
-      "please",
-      "fair",
-      "enter",
-      "addons",
-      "addon",
-      "ribbons",
-      "ribbon",
-      "store",
-      "buy",
-      "messes",
-      "ownoutfit",
-      "myoutfit",
-      "chest",
-      "gift",
-      "potions",
-      "potion",
-      "dares",
-      "dare",
-      "dared",
-      "bench",
-      "use",
-      "feedback",
-      "suggest",
-      "idea",
-      "bug",
-      "meh",
-      "more",
-      "today",
-      "subject",
-      "subjects",
-      "traps",
-      "trap",
-      "watersports",
-      "parasite",
-      "symbiote",
-      "symbiotes",
-      "struggle",
-      "free",
-      "goad",
-      "hunt",
-      "lay",
-      "gather",
-      "pack",
-      "watersport",
-      "parasites",
-      "eager",
-      "quiet",
-      "tend",
-      "brood",
-      "bet",
-      "cleanse",
-      "corruption",
-      "gauntlet",
-      "lend",
-      "bid",
-      "route",
-      "mysterybox",
-      "suit",
-      "whistle",
-      "send",
-      "dose",
-      "herdtraps",
-      "sit",
-      "broody",
-      "album",
-      "holes",
-      "vat",
-      "stalldial",
-      "bringin",
-      "bedrest",
-      "callme",
-      "nevercall",
-      "intensity",
-      "keep",
-      "kept",
-      "seasons",
-      "calendar",
-      "trickortreat",
-      "tot",
-      "stocking",
-      "stockings",
-      "egghunt",
-      "rate",
-      "renew",
-      "renewal",
-      "renewals",
-      "services",
-      "service",
-      "coax",
-      "nursery",
-      "little",
-      "care",
-      "kryptonite",
-      "myshots",
-      "shotsin",
-      "feats",
-      "feat",
-      "achievements",
-      "perks",
-      "perk"
-    ];
-    const STAFF_CMDS = [
-      "queue",
-      "app",
-      "approve",
-      "deny",
-      "register",
-      "unregister",
-      "grant",
-      "revoke",
-      "claim",
-      "release",
-      "myherd",
-      "herdname",
-      "herdcall",
-      "herdsummon",
-      "turnout",
-      "letup",
-      "goldkey",
-      "pasture",
-      "onduty",
-      "cover",
-      "staffadd",
-      "staffremove",
-      "backup",
-      "staffhelp",
-      "note",
-      "keysync",
-      "keydump",
-      "where",
-      "roster",
-      "stock",
-      "find",
-      "signed",
-      "setrescue",
-      "stucklog",
-      "addfriend",
-      "forced",
-      "summon",
-      "health",
-      "tier",
-      "vet",
-      "brand",
-      "spot",
-      "spots",
-      "appclear",
-      "milk",
-      "collect",
-      "heat",
-      "heatline",
-      "shotlog",
-      "stocks",
-      "unstock",
-      "walk",
-      "reins",
-      "tourstop",
-      "clockin",
-      "clockout",
-      "hours",
-      "done",
-      "chore",
-      "chores",
-      "wheel",
-      "spin",
-      "begphrase",
-      "score",
-      "drain",
-      "denial",
-      "ruin",
-      "jars",
-      "inseminate",
-      "nomilk",
-      "inspect",
-      "edge",
-      "contract",
-      "contracts",
-      "zone",
-      "zones",
-      "voice",
-      "machine",
-      "edit",
-      "corral",
-      "uncorral",
-      "unbench",
-      "purge",
-      "away"
-    ];
-    const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
-    const STOCK_PLAY = ["milk", "edge", "drain"];
     function stockPlayOk(by, t) {
       const r = rec(t);
       if (r && r.freeuse) return true;
@@ -61698,52 +61618,6 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       const u = state.playOk.get(t + ":" + by);
       return !!(u && u > Date.now());
     }
-    const PRIVATE_REPLY = [
-      "feats",
-      "feat",
-      "achievements",
-      "perks",
-      "perk",
-      "kryptonite",
-      "myshots",
-      "shotsin",
-      "today",
-      "feedback",
-      "suggest",
-      "idea",
-      "bug",
-      "meh",
-      "more",
-      "record",
-      "keys",
-      "find",
-      "app",
-      "queue",
-      "roster",
-      "stock",
-      "health",
-      "myherd",
-      "herd",
-      "stucklog",
-      "keydump",
-      "summon",
-      "where",
-      "cover",
-      "vet",
-      "spot",
-      "spots",
-      "tease",
-      "teaseme",
-      "stats",
-      "pedigree",
-      "hours",
-      "chores",
-      "wheel",
-      "tourstop",
-      "quota",
-      "contract",
-      "contracts"
-    ];
     function parseRoles(args) {
       const out = [];
       for (const a of args) {
@@ -61888,22 +61762,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       if (state.sessions.has(sender)) {
         const p0 = parseCommand(raw, false, false, true);
         const lone = String(raw).trim().toLowerCase();
-        const pass = p0 && [
-          "help",
-          "rules",
-          "species",
-          "tour",
-          "consent",
-          "luxury",
-          "doors",
-          "safe",
-          "safeword",
-          "red",
-          "stuck",
-          "staff"
-        ].includes(p0.cmd) || ["safe", "safeword", "red", "stuck"].includes(lone) || /^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]) || channel === "companion" && /^[a-z]+ (on|off)$/.test(lone);
+        const pass = p0 && !!(commandOf(p0.cmd) || {}).interview || ["safe", "safeword", "red", "stuck"].includes(lone) || /^[a-z]+ (on|off)$/.test(lone) && !!commandOf(lone.split(" ")[0]) && !commandOf(lone.split(" ")[0]).staff || channel === "companion" && /^[a-z]+ (on|off)$/.test(lone);
         const button = channel === "companion" && state.panelBtn === sender;
-        if (button && !(p0 && pass) && !["safe", "safeword", "red", "stuck", "staff", "help", "rules", "consent", "tour", "species", "luxury", "doors", "apply"].includes(lone.split(" ")[0])) {
+        if (button && !(p0 && pass) && !((commandOf(lone.split(" ")[0]) || {}).interview || lone.split(" ")[0] === "apply")) {
           reply(sender, "You're in the middle of your application, sugar, so I've left that button alone: it wasn't taken as your answer. Type your answer to the last question in the box below (or say ?apply to see it again). The switches work once you're on the books.", channel);
           return;
         }
@@ -61937,7 +61798,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           cmd = "help";
         }
       }
-      if (!["feedback", "suggest", "idea", "bug", "meh", "more", "jot", "report", "notice", "dare", "contract", "voice", "heatline", "tease", "begphrase", "beg", "chore", "edit", "wheel", "store", "say", "note"].includes(cmd)) {
+      if (!((commandOf(cmd) || {}).words || ["jot", "say"].includes(cmd))) {
         const NOISE = /^(nya+n?|nyaa+|mew+|meow+|mrr+p?|purr+|woof+|arf+|bark+|ruff+|awoo+|moo+|oink+|neigh+|whinny|snrt|brrhh|baa+|squeak+|yip+|hiss+)[~!.,]*$/i;
         while (args.length && NOISE.test(args[args.length - 1]) && !(() => {
           try {
@@ -61961,7 +61822,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
       if (addonCmd && !args.length && isStaff(sender) && guideTopic(cmd)) addonCmd = null;
-      if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
+      if (!commandOf(cmd) && !addonCmd) {
         if (guideTopic(cmd)) {
           args = [cmd];
           rest = cmd;
@@ -61987,6 +61848,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           return;
         }
       }
+      const entry2 = commandOf(cmd) || {};
       if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)) {
         reply(sender, myContractsText(sender), channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel);
         return;
@@ -62011,7 +61873,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return;
       }
       const joining = ["register", "stock", "approve", "grant", "claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
-      if (STOCK_PLAY.includes(cmd) && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length) {
+      if (entry2.stockPlay && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length) {
         const t = resolveTarget(args[0]);
         if (!t || !rec(t) || !(rec(t).roles || []).length) {
           huh("Who, sugar? ?" + cmd + " <who>, somebody on the farm's books, standin' right by you.");
@@ -62041,7 +61903,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           reply(sender, "I've asked " + plainName(t) + " first, sugar. Once they say yes, it'll happen.", channel);
           return;
         }
-      } else if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
+      } else if (entry2.staff && !isStaff(sender)) {
         if (joining) {
           reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel);
           return;
@@ -62054,13 +61916,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return;
       }
       dbg("CMD:", cmd, "from", sender, "via", channel);
-      if (CFG.SAFETY_REQUIRE_IN_ROOM && SAFETY_CMDS.includes(cmd) && !charFor(sender)) {
+      if (CFG.SAFETY_REQUIRE_IN_ROOM && entry2.safety && !charFor(sender)) {
         reply(sender, "\u{1F534} I hear you, " + plainName(sender) + ". The farm office only covers the farm, and you're not here right now, so I can't stop anything where you are. Please use the club's own safeword and your room's admins.\n\n?staff still reaches our people if you'd like a hand.", channel);
         audit(sender, "SAFETY_OUTSIDE", cmd);
         return;
       }
-      const replyCh = channel === "chat" && (PRIVATE_REPLY.includes(cmd) || addonCmd && addonCmd.def.private) ? canBeep(sender) ? "beep" : "whisper" : channel;
-      const docAbout = channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
+      const replyCh = channel === "chat" && (entry2.private || addonCmd && addonCmd.def.private) ? canBeep(sender) ? "beep" : "whisper" : channel;
+      const docAbout = channel === "companion" && entry2.doc && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
       const waiting = (txt) => {
         if (!/\?apply/.test(String(txt)) || !/books|apply first|\?apply first|Say \?apply/i.test(String(txt))) return txt;
         const r0 = rec(sender);
@@ -62070,6 +61932,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, waiting(txt), replyCh);
       if (addonCmd) {
         runAddonCommand(addonCmd, sender, args, rest, channel, R);
+        return;
+      }
+      if (entry2.run) {
+        entry2.run({ cmd, sender, args, rest, channel, R, huh, raw });
         return;
       }
       switch (cmd) {
@@ -64123,186 +63989,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           R("Got it, I've noted that on their file.");
           break;
         }
-        /* ── RIBBONS, THE STORE, POTIONS, DARES, THE CORRAL (10l, 10m) ── */
-        case "ribbons":
-        case "ribbon":
-        case "store":
-        case "buy":
-        case "gift":
-          ribbonCommand(cmd, sender, args, R);
-          break;
-        case "potions":
-        case "potion":
-          potionCommand(cmd, sender, args, R);
-          break;
-        case "dares":
-        case "dare":
-        case "dared":
-          dareCommand(cmd, sender, args, R);
-          break;
-        case "corral":
-        case "uncorral":
-          penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R);
-          break;
-        case "bench":
-        case "unbench":
-        case "use":
-          benchCommand(cmd, sender, args, R);
-          break;
-        case "subject":
-        case "subjects":
-        case "traps":
-        case "trap":
-        case "watersports":
-        case "watersport":
-          trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R);
-          break;
-        // 10u-traps.js
-        case "kryptonite":
-          kryptoCommand(sender, args, R, channel);
-          break;
-        case "feats":
-        case "feat":
-        case "achievements":
-        case "perks":
-        case "perk":
-          featsCommand(cmd === "perk" ? "perks" : cmd, sender, args, R);
-          break;
-        // 10us-feats.js   // 10ur-shots-more.js
-        case "myshots":
-        case "shotsin":
-          R(myShotsText(sender));
-          break;
-        case "nursery":
-        case "little":
-        case "care":
-          nurseryCommand(cmd, sender, args, R, huh);
-          break;
-        // 10up2-nursery.js
-        case "services":
-        case "service":
-        case "coax":
-          serviceCommand(cmd, sender, args, R);
-          break;
-        // 10uo-services.js
-        case "parasite":
-        case "parasites":
-        case "purge":
-          parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R);
-          break;
-        // 10v-parasite.js
-        case "symbiote":
-        case "symbiotes":
-          symbioteCommand(sender, args, R);
-          break;
-        // 10v4-symbiotes.js
-        case "messes":
-          messesCommand(sender, args, R);
-          break;
-        case "ownoutfit":
-        case "myoutfit":
-          ownOutfitCommand(sender, args, R);
-          break;
-        // bring your own outfit (10c-outfits.js)   // 10u9-mess-store.js
-        case "quiet":
-        case "tend":
-          if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R);
-          break;
-        // 10y2-brood.js
-        case "brood":
-        case "bet":
-          ranksCommand(cmd, sender, args, R);
-          break;
-        // 10y3-trap-ranks.js
-        case "cleanse":
-        case "corruption":
-        case "gauntlet":
-        case "lend":
-        case "bid":
-        case "route":
-          corruptionCommand(cmd, sender, args, R);
-          break;
-        // 10y4-corruption.js
-        case "mysterybox":
-        case "suit":
-          cursedCommand(cmd, sender, args, R);
-          break;
-        // 10y5-cursed.js
-        case "whistle":
-        case "send":
-        case "dose":
-        case "herdtraps":
-        case "sit":
-        case "broody":
-        case "album":
-        case "holes":
-        case "vat":
-          keepersCommand(cmd, sender, args, R);
-          break;
-        // 10y6-keepers.js
-        case "stalldial":
-        case "bringin":
-        case "bedrest":
-        case "callme":
-        case "nevercall":
-        case "intensity":
-        case "keep":
-        case "kept":
-          uddersCommand(cmd, sender, args, R);
-          break;
-        // 10y7-udders.js
-        case "eager":
-          trapCommand("traps", sender, ["eager"].concat(args), R);
-          break;
-        // the no-cooldown switch, as its own command (and a Toggles switch)
-        case "seasons":
-        case "calendar":
-          seasonCommand(sender, args, R);
-          break;
-        // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
-        case "trickortreat":
-        case "tot":
-          trickOrTreat(sender, args, R);
-          break;
-        // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
-        case "stocking":
-        case "stockings":
-          stockingCommand(sender, args, R);
-          break;
-        // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
-        case "egghunt":
-          eggHuntCommand(sender, args, R);
-          break;
-        // huntin' for eggs round the farm at Easter, and the board (10y9x-easter.js)
-        case "rate":
-          rateCommand(sender, args, R);
-          break;
-        // how a trap went for them (10y9o-trap-ratings.js)
-        case "renew":
-        case "renewal":
-        case "renewals":
-          renewCommand(sender, args, R);
-          break;
-        // another contract when this one ends (10y9t-renewals.js)
-        case "struggle":
-        case "free":
-        case "goad":
-        case "hunt":
-        case "lay":
-        case "gather":
-        case "pack":
-          extrasCommand(cmd, sender, args, R);
-          break;
-        // 10x-trap-extras.js
-        case "feedback":
-        case "suggest":
-        case "idea":
-        case "bug":
-        case "meh":
-        case "more":
-          feedbackCommand(cmd, sender, args, rest, R);
-          break;
-        // the suggestion box (10q)
+        /* ── the store, potions, traps, feats, the nursery, seasons, feedback and the rest answer their own
+              commands: each part writes them in the command book with run (01b-commands.js) ── */
         case "edit": {
           if (!isProprietor(sender)) {
             R("Sorry, sugar, that one's just for the proprietors.");

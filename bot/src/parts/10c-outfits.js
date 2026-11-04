@@ -138,3 +138,6 @@
                   : "👗 Bring your own outfit: off. "+(r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("ownoutfit myoutfit",       { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });   // bring your own outfit

@@ -301,3 +301,6 @@
     sent_moss: ["%n brushes the moss away, and it lets go easily, leavin' their chest soft and bare."],
     sent_nestling: ["%n asks the nestling to go, and it wriggles out obligingly and trundles off."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("symbiote symbiotes",       { topic: "parasites", run: (c) => symbioteCommand(c.sender, c.args, c.R) });

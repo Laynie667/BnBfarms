@@ -351,3 +351,6 @@
     gather: ["%n goes round the nest with a basket and collects %x warm eggs, wipin' each one on their apron.",
              "%x eggs, counted into the basket by %n. They'll fetch a fair price at market."],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("struggle free goad hunt lay gather pack", { topic: "traps", run: (c) => extrasCommand(c.cmd, c.sender, c.args, c.R) });

@@ -577,3 +577,9 @@
     }
     R(potionsText(sender));
   }
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("potions potion",           { topic: "potions", run: (c) => potionCommand(c.cmd, c.sender, c.args, c.R) });
+  addCommand("dares dared",              { topic: "potions", run: (c) => dareCommand(c.cmd, c.sender, c.args, c.R) });
+  addCommand("dare",                     { topic: "potions", words: true, run: (c) => dareCommand(c.cmd, c.sender, c.args, c.R) });
+  addCommand("corral uncorral",          { topic: "potions", staff: true, run: (c) => penCommand(c.cmd === "corral" ? "pen" : "unpen", c.sender, c.args, c.R) });

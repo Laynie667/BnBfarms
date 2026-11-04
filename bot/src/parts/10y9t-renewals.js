@@ -122,3 +122,6 @@
     const rows = renewalsList(); if (rows.length) s.renewals = rows.map(r => Object.assign({}, r, { until: Math.ceil(r.until/60000)*60000 }));
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __renewTick: () => renewTick(), __renewable: (m) => renewable(m), __renewals: () => renewalsList() });
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("renew renewal renewals",   { topic: "contracts", run: (c) => renewCommand(c.sender, c.args, c.R) });

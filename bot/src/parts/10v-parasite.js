@@ -289,3 +289,7 @@
       "The parasite is peeled off %n's face and its long root pulled hand over hand up out of their throat. It squirms. %n gags, spits, and has their own mouth back.",
     ],
   };
+
+  // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
+  addCommand("parasite parasites",       { topic: "parasites", run: (c) => parasiteCommand("parasite", c.sender, c.args, c.R) });
+  addCommand("purge",                    { topic: "parasites", staff: true, run: (c) => parasiteCommand("purge", c.sender, c.args, c.R) });

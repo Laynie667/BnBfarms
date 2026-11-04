@@ -139,6 +139,21 @@ export function seasonsCard(ctx) {
       btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx.send("seasons costume " + (sa.costume ? "off" : "on"))), btn("The calendar", () => ctx.send("seasons"))),
     muted("Other lengths, or several at once: ?seasons start halloween 3d · ?seasons start halloween winter on"));
 }
+// 🏅 FEATS (Nov 4): each track, how far along the next tier, and its perk (with a switch, if you'd rather it didn't work)
+const TIER = ["–", "I", "II", "III", "IV", "V"];
+function feats(ctx) {
+  const F = ctx.s.feats;
+  if (!F || !Array.isArray(F.tracks)) return [card(title("🏅 Feats"), muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too."))];
+  return [
+    muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
+    F.tracks.map((t) => card(
+      h("div", { class: "fhc-kv" }, title(t.icon + " " + t.name + " " + TIER[t.tier] ), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
+      t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
+      muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
+      t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx.send("perks " + (t.off ? "on " : "off ") + t.key)) : null)),
+    F.titles && F.titles.length ? card(title("🎖️ Titles"), muted(F.titles.join(" · "))) : null,
+  ];
+}
 function traps(ctx) {
   const s = ctx.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
   return [
@@ -354,6 +369,7 @@ export const LIVESTOCK_TABS = [
   { id: "breed", label: "🐂 Breeding", render: breeding },
   { id: "traps", label: "🧪 Traps", render: traps },
   { id: "store", label: "🎀 Store", render: storeTab },
+  { id: "feats", label: "🏅 Feats", render: feats },
   { id: "inbox", label: "📬 Inbox", render: inbox },
   { id: "toggles", label: "⚙️ Toggles", render: toggles },
   { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, false) },

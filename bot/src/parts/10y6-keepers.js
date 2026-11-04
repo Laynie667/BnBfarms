@@ -170,7 +170,7 @@
     L.hatched = (L.hatched || 0) + s.n;
     // the layers get half what market would have paid; the sitter is paid for her patience
     for (const [m, k] of Object.entries(s.by)){
-      const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2)), "your eggs hatched under "+plainName(mn));
+      const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2 * perkEggPayX(layer))), "your eggs hatched under "+plainName(mn));
       leaderShare(layer, got);
     }
     leaderShare(mn, earnRibbons(mn, Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.ceil(s.n / 4))), "hatchin' a brood of "+s.n));

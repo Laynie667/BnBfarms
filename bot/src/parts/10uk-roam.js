@@ -162,7 +162,7 @@
   function roamState(mn){
     const x = roamContract(mn); if (!x) return null;
     const g = roamOf(mn);
-    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };   // safe: their Companion opens the gate (index.js)
+    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: perkPrice(mn, CFG.ROAM_PASS_PRICE), safe: (rec(mn).roamSafeUntil || 0) > Date.now() };   // safe: their Companion opens the gate (index.js)
   }
   // An old Companion has no farm gate (it came in 0.40): a pet on a summonable contract runnin' one walks straight out,
   // and only the summon brings them back (Laynie, Oct 24: "registered and contracted pets being able to leave the room

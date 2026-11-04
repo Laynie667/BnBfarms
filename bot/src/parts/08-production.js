@@ -123,7 +123,7 @@
   }
   function capacity(mn){
     const p = prodOf(mn);
-    return CFG.PROD.BASE_CAPACITY + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0) + symbioteCap(mn);   // (a symbiote makes room: 10v4-symbiotes.js)
+    return CFG.PROD.BASE_CAPACITY + perkCap(mn) + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0) + symbioteCap(mn);   // (a symbiote makes room: 10v4-symbiotes.js)
   }
   // futa make milk and semen, and can breed and be bred
   // their ?gender says first: a male or a femboy has a cock and no pussy whatever the game's wardrobe shows (Oct 12:
@@ -349,7 +349,7 @@
   }
   // "x3", "x 3" or "×3" on a crafted needle, toy or trap: that many doses at once
   function shotTimes(text){ const m = String(text || "").toLowerCase().match(/(?:^|[^a-z0-9])[x×]\s?([1-9])(?![a-z0-9])/); return m ? Math.min(CFG.STACK_MAX, parseInt(m[1], 10)) : 1; }
-  function milkCapNatural(mn){ return CFG.PROD.MILK_CAP * speciesInfo(mn).milk * udderX(mn); }
+  function milkCapNatural(mn){ return CFG.PROD.MILK_CAP * speciesInfo(mn).milk * udderX(mn) * perkMilkX(mn); }   // (Heavy Udders: 10us-feats.js)
   function milkCap(mn){ const p = prodOf(mn); return milkCapNatural(mn) + (p ? p.capBonus : 0); }
   // stock make milk unless they switch it off; anyone else can switch it on
   function makesMilk(mn){
@@ -470,7 +470,7 @@
       // milk pays by the litre, stingy: a ribbon every CFG.LITRE_RIBBON_ML, CFG.LITRE_RIBBON_DAY a day at most
       const was = Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML); p.mday.ml += take;
       try { quotaLive(mn); } catch(e){ warn("quota:", e); }   // the streak counts the moment the pail's full (Oct 24)
-      const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY - (p.mday.paid || 0));
+      const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY + perkMilkRibbon(mn) - (p.mday.paid || 0));
       if (owe > 0){ p.mday.paid = (p.mday.paid || 0) + owe; later(() => earnRibbons(mn, owe, "every "+(CFG.LITRE_RIBBON_ML/1000)+" litres you're milked"), 2500); }
     }
     if (!nursing && (!p.lastMilkAt || now - p.lastMilkAt > CFG.GRADE.SESSION_GAP_MIN*60000)){
@@ -546,6 +546,7 @@
                  (0.5 + Math.min(1, (p.held[hole]||0) / capacity(mother)));
     if (inHeat(p)) chance *= 3;
     chance *= 1 + boostLevel(p,"fert");
+    chance *= perkFertX(mother) * perkCatchX(stud);   // Breeder's Belly, Prize Stud (10us-feats.js)
     if (wornTags(mother).has("fertility")) chance *= 1.5;
     chance *= symbioteX(mother, "fert");   // the nestling (10v4-symbiotes.js)
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
@@ -565,7 +566,7 @@
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
-    if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;   // twins first, so a hyper litter is never cut back down to two
+    if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE + perkTwins(mother)) count = 2;   // twins first, so a hyper litter is never cut back down to two
     // hyper pregnancy: a worn "hyper" item, a hyper shot, or a Broodmare Tonic
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")){
       const [a, b] = CFG.HYPER_LITTER_X, hx = 1 + 0.5*Math.max(0, boostLevel(p, "hyper") - 1);   // stacked hyper shots: bigger yet
@@ -573,7 +574,7 @@
     }
     // a twins shot: double, a triple dose triples (10ur-shots-more.js)
     if (boosted(p, "twins")){ count = Math.min(CFG.HYPER_MAX, count * (1 + ((p.boostX && p.boostX.twins) || 1))); delete p.boosts.twins; }
-    p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
+    p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000*perkPregX(mother), sires:[stud], count, warned:false };
     try { bredBack(mother); } catch(e){ warn("bred back:", e); }
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
     try { oneSireAfter(mother, stud, "new"); } catch(e){ warn("one sire:", e); }
@@ -633,9 +634,9 @@
   function milkGrade(mn){
     const p = prodOf(mn);
     const h = (p && p.grades) || [];
-    if (!h.length) return gradeLetter(CFG.GRADE.BASE + (CFG.GRADE.TIER[tierOf(mn)||"new"]||0));
+    if (!h.length) return gradeLetter(CFG.GRADE.BASE + (CFG.GRADE.TIER[tierOf(mn)||"new"]||0) + perkGrade(mn));
     const last = h.slice(-CFG.GRADE.AVERAGE_OF);
-    return gradeLetter(last.reduce((a,b)=>a+b,0)/last.length);
+    return gradeLetter(last.reduce((a,b)=>a+b,0)/last.length + perkGrade(mn));   // (Heavy Udders III+: 10us-feats.js)
   }
 
   function prodTick(){
@@ -1033,6 +1034,7 @@
       load = base * (T.loadX || 1);            // a flared or ridged cock pumps more than it drains
       if (sp.edges){ load *= 1 + CFG.EDGE_X * Math.min(sp.edges, CFG.EDGE_MAX); opt.edged = sp.edges; sp.edges = 0; }
       load *= floodX(sp);   // a flood serum (10ur-shots-more.js)
+      load *= perkLoadX(stud);   // Prize Stud (10us-feats.js)
       // stamina: a stud who's been busy this hour runs drier (pent up or a virility shot skips it)
       sp.fills = (sp.fills||[]).filter(x => Date.now() - x < 3600000);
       if (!pent && !boosted(sp,"semen") && sp.fills.length >= CFG.STAMINA_FILLS)
@@ -1119,7 +1121,7 @@
       clutch = Math.round((lo + Math.floor(Math.random()*(hi-lo+1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));   // stacked egg shots, fertility, heat, Tentacle Musk: a bigger clutch
       clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
       if (tp.eggs) tp.eggs.n += clutch;   // clutches stack on what they're already carryin'
-      else tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
+      else tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000*perkEggDaysX(t) };
       eggTypesNote(tp, clutch, penisType(stud) === "draconic" ? -16 : stud);   // a draconic stud's are drake eggs
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
@@ -1512,7 +1514,7 @@
   }
   function quotaCount(mn, d, got, q, late){
     const r = rec(mn); r.quotaMetDay = d;
-    r.quotaStreak = (r.quotaStreak||0) + 1;
+    r.quotaStreak = (r.quotaStreak||0) + 1; r.quotaBest = Math.max(r.quotaBest || 0, r.quotaStreak);   // (the Hard worker track: 10us-feats.js)
     earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
     const tier = tierOf(mn), up = { new:"trained", trained:"prize" }[tier];
     if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && r.quotaStreak % CFG.QUOTA_STREAK_UP === 0 && up){

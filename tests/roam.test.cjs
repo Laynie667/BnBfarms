@@ -48,7 +48,8 @@ const tick=async()=>{ W.__roamTick(); await wait(500); };
   n=sent.length; await say(500,'?roam start');
   ok(/haven't got a roam pass/.test(all(n)) && !(P(500).roam.until>Date.now()), 'no pass, no roam');
   n=sent.length; await say(500,'?buy roampass'); await wait(6000); await say(500,'?buy roampass');
-  ok(P(500).roamPasses===2 && P(500).ribbons===10 && /roam pass in your pocket/.test(all(n)), 'they buy them in the store, 30 ribbons each');
+  const pass=W.__perkPrice?W.__perkPrice(500,30):30; // 30, less the Favourite perk's few percent
+  ok(P(500).roamPasses===2 && P(500).ribbons===70-2*pass && /roam pass in your pocket/.test(all(n)), 'they buy them in the store, 30 ribbons each (less the Favourite perk): '+P(500).ribbons);
   n=sent.length; await say(700,'?buy roampass');
   ok(/come and go as you please/.test(all(n)) && !P(700).roamPasses, 'nobody without a summonable contract can buy one');
   n=sent.length; await say(700,'?roam');

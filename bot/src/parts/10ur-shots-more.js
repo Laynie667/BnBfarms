@@ -181,7 +181,7 @@
     // the first to land it gets a reward (a hand on the needle, not a toy)
     if (by && by !== mn && by !== CFG.BOT_MEMBER){
       r.kryptonite.found = r.kryptonite.found || [];
-      if (!r.kryptonite.found.includes(by)){ r.kryptonite.found.push(by); later(() => earnRibbons(by, CFG.SHOTS2.KRYPTO_RIBBONS, "findin' " + plainName(mn) + "'s kryptonite", CFG.BOT_MEMBER), 2000); }
+      if (!r.kryptonite.found.includes(by)){ r.kryptonite.found.push(by); mischief(by, "krypto"); later(() => earnRibbons(by, CFG.SHOTS2.KRYPTO_RIBBONS, "findin' " + plainName(mn) + "'s kryptonite", CFG.BOT_MEMBER), 2000); }
     }
     saveLedger(); audit(by || CFG.BOT_MEMBER, "KRYPTONITE", mn + " " + Math.round((r.krypto.until - now) / 60000) + "m"); syncCompanions(true);
   }
@@ -192,14 +192,16 @@
     const was = r.krypto.until > Date.now(); r.krypto = null; saveLedger(); syncCompanions(true);   // (their panels come back)
     if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
   }
-  function kryptoHint(mn){
+  function kryptoHint(mn, letters){
     const k = (rec(mn) || {}).kryptonite; if (!k || !k.word) return null;
+    if (k.hint && letters > 1) return k.hint + " (your Sharp Eyes catch more: it starts “" + k.word.trim().slice(0, letters) + "”)";
+    if (letters > 1) return "somethin' that starts with “" + k.word.trim().slice(0, letters) + "”, " + k.word.trim().length + " letters long";
     return k.hint || ("somethin' that starts with “" + k.word.trim()[0].toUpperCase() + "”, " + k.word.trim().length + " letters long");
   }
   function kryptoCommand(sender, args, R, channel){
     const a0 = String(args[0] || "").toLowerCase(), r = rec(sender);
     const rumors = () => Object.values(L.people || {}).filter(p => p && p.kryptonite && p.kryptonite.word && (p.roles || []).includes(ROLE.PROPRIETOR))
-      .map(p => "• " + (p.name || p.mn) + ": " + kryptoHint(p.mn) + ((p.kryptonite.found || []).length ? " (found " + p.kryptonite.found.length + " time" + (p.kryptonite.found.length === 1 ? "" : "s") + ")" : ""));
+      .map(p => "• " + (p.name || p.mn) + ": " + kryptoHint(p.mn, perkHintLetters(sender)) + ((p.kryptonite.found || []).length ? " (found " + p.kryptonite.found.length + " time" + (p.kryptonite.found.length === 1 ? "" : "s") + ")" : ""));
     if (!isProprietor(sender) || !a0){
       const list = rumors();
       R("🗝️ THE BARN'S RUMOURS\n" + (list.length ? list.join("\n") + "\n\nCraft a needle (or an auto-injector, or a piercing) with the right word on it and see what happens." : "No proprietor's admitted to a weakness. Yet.") +

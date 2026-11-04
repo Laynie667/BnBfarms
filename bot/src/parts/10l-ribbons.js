@@ -29,7 +29,7 @@
       if (!n) return 0;
       r.rday.n += n;
     }
-    r.ribbons = (r.ribbons || 0) + n; ribbonWeek(r).earned += n; ribbonLog(mn, n, why, by); saveLedger();
+    r.ribbons = (r.ribbons || 0) + n; r.ribbonsEver = (r.ribbonsEver || 0) + n; ribbonWeek(r).earned += n; ribbonLog(mn, n, why, by); saveLedger();
     if (!quiet) tell(mn, "🎀 +"+n+" ribbon"+(n === 1 ? "" : "s")+" for "+why+". That's "+r.ribbons+" in your purse, sugar.");
     return n;
   }
@@ -148,7 +148,7 @@
   }
   function storeText(mn){
     const items = storeItems().filter(it => !it.off);
-    const row = it => "  "+it.price+"🎀 · "+(it.potion ? it.potion : it.id)+" · "+it.name;
+    const row = it => "  "+(it.id === "bounty" ? it.price : perkPrice(mn, it.price))+"🎀 · "+(it.potion ? it.potion : it.id)+" · "+it.name;   // their price, Favourite perk and all
     return "🛍️ THE FARM STORE · you've got "+ribbonsOf(mn)+" ribbons\n"+
       "\nTREATS & FAVORS\n"+items.filter(it => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n")+
       "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n"+items.filter(it => it.shelf === "mess").map(row).join("\n")+
@@ -173,7 +173,7 @@
     if (fi >= 0 && rest[fi+1]){ forWho = resolveTarget(rest[fi+1]); rest = rest.slice(0, fi).concat(rest.slice(fi+2)); }
     if (forWho === sender) forWho = null;
     const text = rest.join(" ").trim();
-    const price = it.price;
+    const price = it.id === "bounty" ? it.price : perkPrice(sender, it.price);   // Favourite (10us-feats.js)
     const short = () => R("That's "+price+" ribbons, sugar, and you've only got "+ribbonsOf(sender)+". Earn a few more: make your quota, finish a stall session, be good.");
     if (it.id !== "bounty" && ribbonsOf(sender) < price){ short(); return; }
     const today = dayKey(); r.buys = r.buys && r.buys.d === today ? r.buys : { d: today, n: {} };

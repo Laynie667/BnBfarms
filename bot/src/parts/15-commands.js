@@ -1602,7 +1602,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
-      case "kryptonite": kryptoCommand(sender, args, R, channel); break;   // 10ur-shots-more.js
+      case "kryptonite": kryptoCommand(sender, args, R, channel); break;
+      case "feats": case "feat": case "achievements": case "perks": case "perk": featsCommand(cmd === "perk" ? "perks" : cmd, sender, args, R); break;   // 10us-feats.js   // 10ur-shots-more.js
       case "myshots": case "shotsin": R(myShotsText(sender)); break;
       case "nursery": case "little": case "care": nurseryCommand(cmd, sender, args, R, huh); break;   // 10up2-nursery.js
       case "services": case "service": case "coax": serviceCommand(cmd, sender, args, R); break;   // 10uo-services.js

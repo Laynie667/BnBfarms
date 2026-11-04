@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.51.0
+// @version      0.52.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.51.0";
+  var VERSION = "0.52.0";
 
   // shared/species.js
   var WORDS = {
@@ -567,6 +567,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
+    { name: "Feats and perks", cmds: ["feats", "feats <who>", "perks", "perks off <perk>", "perks on <perk>", "myshots"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
@@ -6321,6 +6322,21 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
     );
   }
+  var TIER = ["\u2013", "I", "II", "III", "IV", "V"];
+  function feats(ctx3) {
+    const F = ctx3.s.feats;
+    if (!F || !Array.isArray(F.tracks)) return [card(title("\u{1F3C5} Feats"), muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too."))];
+    return [
+      muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
+      F.tracks.map((t) => card(
+        h("div", { class: "fhc-kv" }, title(t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
+        t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
+        muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
+        t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx3.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
+      )),
+      F.titles && F.titles.length ? card(title("\u{1F396}\uFE0F Titles"), muted(F.titles.join(" \xB7 "))) : null
+    ];
+  }
   function traps(ctx3) {
     const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
     return [
@@ -6683,6 +6699,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { id: "breed", label: "\u{1F402} Breeding", render: breeding },
     { id: "traps", label: "\u{1F9EA} Traps", render: traps },
     { id: "store", label: "\u{1F380} Store", render: storeTab },
+    { id: "feats", label: "\u{1F3C5} Feats", render: feats },
     { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
     { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles },
     { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },

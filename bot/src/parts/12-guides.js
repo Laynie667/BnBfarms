@@ -483,6 +483,9 @@ RIBBONS are the farm's scrip. They keep day to day.
   Up to 40 a day from farm things. The Sunday till pays the
     week's top earner a bonus.
   ?ribbons · your purse · ?ribbons top · this week's board
+  ?feats · your feats and how close the next tier is · ?feats <who>
+  ?perks · what your feats give you · ?perks off|on <perk>
+  ?myshots · what's workin' in you right now
 
 THE STORE · ?store
   Spins, a lucky spin, a luxury day, skip a chore, quota grace,

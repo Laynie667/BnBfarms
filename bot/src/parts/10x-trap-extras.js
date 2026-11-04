@@ -258,7 +258,7 @@
     if (!n){ R("The nest's empty, sugar."); return; }
     if (!nestSpots().some(s => onSpot(sender, s, 2))){ R("Come over to the nest to gather, sugar."); return; }
     const by = L.nest.by, types = L.nest.types || {}; L.nest = { eggs: 0, by: {} }; saveLedger(); audit(sender, "GATHER", String(n));
-    for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market"+(eggTypesText(types[m]) ? " ("+eggTypesText(types[m])+")" : "")));   // a herd leader takes a share (10y6-keepers.js)
+    for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)) * perkEggPayX(parseInt(m, 10))), "eggs sold at market"+(eggTypesText(types[m]) ? " ("+eggTypesText(types[m])+")" : "")));   // a herd leader takes a share (10y6-keepers.js)
     earnRibbons(sender, 1, "gatherin' the eggs");
     emote("🧺 "+xLine("gather", sender, { x: String(n) }), sender);
     R("🧺 "+n+" eggs gathered and off to market. The layers have been paid: "+Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10))+" ("+k+")").join(", ")+".");

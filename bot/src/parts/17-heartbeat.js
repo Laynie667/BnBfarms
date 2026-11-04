@@ -54,6 +54,7 @@
       try { roamTick(); } catch(e){ warn("roam:", e); }
       try { nurseryTick(); } catch(e){ warn("nursery:", e); }
       try { shotsMoreTick(); } catch(e){ warn("shots more:", e); }
+      try { featsTick(); } catch(e){ warn("feats:", e); }
       rutTick();
       quotaTick();
       prodTick();

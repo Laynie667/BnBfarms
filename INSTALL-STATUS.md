@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-03. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-04. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.69.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.1** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.1** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.51.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.52.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,23 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.0 + Companion 0.52.0: feats and perks.** Laynie, Nov 3–4: tracks by category whose perks stack as the tiers climb, credit for the past, Trap Magnet as it is, a Gold Star track for littles, and an egg track "at a penalty to how much they earn ribbon wise. cant have them exploiting the tentacle traps". (bot/src/parts/10us-feats.js)
+  - **Ten tracks, five tiers each.** A new tier is a feat: announced in the farm's voice, and the tier's number in ribbons (1 to 5). Every perk grows with its track on its own (no slots); `?perks off <perk>` switches one off, `?perks on` brings it back.
+    - 🥛 **Dairy** (10, 50, 150, 400, 1000 L milked) → **Heavy Udders**: +5% milk capacity a tier, and a grade higher from III.
+    - 🐂 **Breeding stock** (1, 4, 10, 25, 60 L of seed taken) → **Breeder's Belly**: +4% fertility and +100 mL of room a tier.
+    - 🍼 **Motherhood** (1, 3, 6, 12, 25 litters) → **Good Mother**: pregnancy 5% shorter a tier, and twins far likelier at V.
+    - 🥚 **Egg layer** (10, 50, 150, 400, 1000 eggs) → **Prolific Layer**: clutches 10% bigger and 8% quicker a tier, but eggs fetch 15% fewer ribbons a tier at market and at a hatchin' (down to a quarter).
+    - 💦 **Stud** (10, 50, 150, 400, 1000 covers) → **Prize Stud**: loads +5% a tier, likelier to catch at IV and V.
+    - 🪤 **Trapped** (10, 40, 100, 250, 600 traps) → **Trap Magnet**: traps reset and find you 10% sooner a tier, and from III a trap sometimes pays a ribbon.
+    - 📋 **Hard worker** (best quota streak 3, 7, 14, 30, 60 days) → **Reliable**: a free quota grace a week at II (two at IV), a ribbon more for milk a day at V.
+    - 🎀 **Farm favourite** (25, 100, 250, 600, 1500 ribbons earned) → **Favourite**: 2% off at the store a tier (on things over a ribbon).
+    - 🗝️ **Mischief** (1, 5, 15, 40, 100: kryptonite found, bets won, parasites coaxed) → **Sharp Eyes**: bets pay 2.1 to 2.5 times, and the kryptonite rumours show more letters.
+    - ⭐ **Gold stars** (littles only: 5, 20, 50, 120, 300 nursery stars) → **Gold Star Little**: an extra star a day at II (two at IV), stars come easier from III. Private like the rest of the nursery: never announced to the room, never shown to anybody outside it.
+  - **The past counts.** The first time the farm looks, every tier somebody's totals already earn is theirs, in one quiet message (no ribbons for the back-pay). The ribbons-earned count starts from the purse they hold.
+  - `?feats` · `?feats <who>` · `?perks`. The Companion has a 🏅 **Feats** tab with a bar for every track and a switch for every perk. The eleven titles (Cream Queen and the rest) show alongside.
+  - **Prices show the perk.** `?store`, the panel's Store tab and the roam-pass button all show what that player actually pays, Favourite discount included. Bounties stay at their full price.
+  - **Tests that failed now and then, fixed.** Litha's "heat ruled out", Mabon's cider press and Easter's "eggs ruled out" checked for words from a trap's first three end lines, but more end lines came later (10z6e-trap-ends-5.js), so a newer one drawn at random failed the check. They now accept any line from that trap's own ending. Trap tests also wait for the send queue to empty before they look.
+  - **`?record` shows a waiting application too.** Laynie, Nov 4: the record should show their application. It already did once they were approved; now staff (and the applicant) also see the one still waiting in the queue, marked ⏳.
 - **Bot 0.69.1: the safeword holds kryptonite off for an hour.** Laynie, Nov 3: yes. After a proprietor's safeword, nothin' carryin' their word (a needle, an injector, a piercing or a drip) can drop them again for an hour. No Companion update needed.
 - **Bot 0.69.0: the farm reads descriptions properly, and the IV drip never lets up.** Laynie, Oct 31: "need better checking inside the descriptions of items, not just the names on them. the iv drip for instance should be a constant top up". No Companion update needed.
   - **Descriptions in plain words.** Shot words were already read from descriptions, but only as exact phrases, so a description saying it the way people write missed. Now word forms and sentences count, for example:

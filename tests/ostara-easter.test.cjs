@@ -35,7 +35,8 @@ const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper'
 const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e==='AccountBeep')).map(([e,d])=>d.Content==='FarmhandMsg'?JSON.stringify(d.Dictionary):String(d.Content||d.Message)).join(' | ');
 const marks=(n,mn)=>sent.slice(n).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Dictionary&&d.Dictionary.type==='mark'&&(!mn||d.Target===mn)).map(([e,d])=>d.Dictionary);
 const free=(...mns)=>{ for(const mn of mns){ const r=P(mn); r.trapAt=0; r.penned=null; r.gear=null; r.trapQuiet=0; r.trapWait=null; r.benched=null; r.quietUntil=0; if(W.__st().trapRuns) W.__st().trapRuns.delete(mn); } };
-const done=async(mn,ms)=>{ for(let i=0;i<80;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(mn))) break; } await wait(ms||600); };
+const saidEnd=(n,kind,keys)=>{ const T=W.__lines().SEASON_LINES[kind]||{}, txt=all(n); return keys.some(k=>(T[k]||[]).some(line=>{ const bits=line.replace(/^(\{[a-z]+\})+/,'').split(/%[a-z]+|"/).map(x=>x.trim()).filter(x=>x.length>=12).sort((a,b)=>b.length-a.length); return bits.length>0 && txt.includes(bits[0]); })); };
+const done=async(mn,ms)=>{ for(let i=0;i<80;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(mn))) break; } for(let i=0;i<60;i++){ const s=W.__st(); if(![s.urgent,s.replies,s.queue].some(q=>q&&q.length)) break; await wait(250); } await wait(ms||600); };
 const LEAK=/\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bNaN\b|\[object/;
 const BODIES=[[500,'Moo'],[600,'Rex'],[700,'Pip'],[800,'Fu']];
 // every trap of a pack, start to finish, on four bodies
@@ -131,7 +132,7 @@ async function heldGear(mn, name, kind){
     ok(g.suit && g.suit.label==="Bunny Girl Suit" && g.suit.only && (g.suit.items||[]).includes("BunnySuit") && g.cloak && /Collar and Cuffs/.test(g.cloak.label) && g.plug && /Tail Plug/.test(g.plug.label) && g.ears && g.ears.only, 'the bunny suit puts on the real suit, ears, collar and cuffs, and a tail plug ('+Object.keys(g).join(", ")+')'); }
   // eggs ruled out: the hunt hides them on Pip instead, and finds them all
   { free(700); P(700).limits="no eggs"; let n=sent.length; await say(221397,'?trap spring Pip hiddeneggs',500); await done(700,700);
-    ok(/rolled down somewhere|very well searched|tucked/.test(all(n)) && !/won't spring/.test(all(n)), 'eggs ruled out: the eggs are hidden on Pip, not in them'); P(700).limits=""; }
+    ok(saidEnd(n,'hiddeneggs',['endTease']) && !/won't spring/.test(all(n)), 'eggs ruled out: the eggs are hidden on Pip, not in them'); P(700).limits=""; }
 
   // ── ?egghunt ──
   const rnd=Math.random;

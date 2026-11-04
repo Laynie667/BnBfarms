@@ -34,7 +34,8 @@ const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper'
 const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e==='AccountBeep')).map(([e,d])=>d.Content==='FarmhandMsg'?JSON.stringify(d.Dictionary):String(d.Content||d.Message)).join(' | ');
 const marks=(n,mn)=>sent.slice(n).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Dictionary&&d.Dictionary.type==='mark'&&(!mn||d.Target===mn)).map(([e,d])=>d.Dictionary);
 const free=(...mns)=>{ for(const mn of mns){ const r=P(mn); r.trapAt=0; r.penned=null; r.gear=null; r.trapQuiet=0; r.trapWait=null; r.benched=null; r.quietUntil=0; if(W.__st().trapRuns) W.__st().trapRuns.delete(mn); } };
-const done=async(mn,ms)=>{ for(let i=0;i<80;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(mn))) break; } await wait(ms||600); };
+const saidEnd=(n,kind,keys)=>{ const T=W.__lines().SEASON_LINES[kind]||{}, txt=all(n); return keys.some(k=>(T[k]||[]).some(line=>{ const bits=line.replace(/^(\{[a-z]+\})+/,'').split(/%[a-z]+|"/).map(x=>x.trim()).filter(x=>x.length>=12).sort((a,b)=>b.length-a.length); return bits.length>0 && txt.includes(bits[0]); })); };
+const done=async(mn,ms)=>{ for(let i=0;i<80;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(mn))) break; } for(let i=0;i<60;i++){ const s=W.__st(); if(![s.urgent,s.replies,s.queue].some(q=>q&&q.length)) break; await wait(250); } await wait(ms||600); };
 const LEAK=/\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bNaN\b|\[object/;
 const BODIES=[[500,'Moo'],[600,'Rex'],[700,'Pip'],[800,'Fu']];
 // every trap of a pack, start to finish, on four bodies
@@ -100,7 +101,7 @@ const roomFor=(mn)=>{ P(mn).prod.held={}; P(mn).prod.capBonus=(P(mn).prod.capBon
     ok(g.device && g.device.label==="The Sun Wheel" && (g.device.items||[]).includes("WheelFortune") && g.arms && /Rose Garlands/.test(g.arms.label), 'the sun wheel is the real wheel, with rose garlands at the wrists ('+Object.keys(g).join(", ")+')'); }
   // heat in their limits: the flower still works its mischief, but no heat after
   { free(700); P(700).limits="no heat"; W.__prodOf(700).heat=null; let n=sent.length; await say(221397,'?trap spring Pip puck',500); await done(700,700);
-    ok(!/won't spring/.test(all(n)) && /wears off at sunset|wakes up properly|fades with the light/.test(all(n)) && !(((W.__prodOf(700).heat||{}).until||0) > Date.now()), 'heat ruled out: the love-in-idleness wears off by sunset, and no heat'); P(700).limits=""; }
+    ok(!/won't spring/.test(all(n)) && saidEnd(n,'puck',['endPlain']) && !(((W.__prodOf(700).heat||{}).until||0) > Date.now()), 'heat ruled out: the love-in-idleness wears off by sunset, and no heat'); P(700).limits=""; }
 
   // ── Mabon, the harvest home ──
   W.__date="2027-09-21T12:00:00";
@@ -122,7 +123,7 @@ const roomFor=(mn)=>{ P(mn).prod.held={}; P(mn).prod.capBonus=(P(mn).prod.capBon
   ok(MA.every(k=>W.__lines().INTENSITY_BY_TRAP[k] && W.__lines().INTENSITY_BY_TRAP[k].tender.length>=3 && W.__lines().INTENSITY_BY_TRAP[k].filthy.length>=3), 'every Mabon trap has its tender and filthy lines');
   // the cider press on somebody who isn't makin' milk: pressed with the apples, and cider all over
   { free(500); const r=P(500); r.milkable=false; let n=sent.length; await say(221397,'?trap spring Moo ciderpress',500); await done(500,700);
-    ok(/orchard|very well pressed|prize batch|tastes faintly/.test(all(n)) && marks(n,500).some(m=>m.mess==="cider"), 'no milk: pressed with the apples instead, and left drippin\' cider'); delete r.milkable; }
+    ok(saidEnd(n,'ciderpress',['endPress']) && marks(n,500).some(m=>m.mess==="cider"), 'no milk: pressed with the apples instead, and left drippin\' cider'); delete r.milkable; }
 
   // ── after the harvest: nothin' till Halloween ──
   W.__date="2027-10-05T12:00:00";

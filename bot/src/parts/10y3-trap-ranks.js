@@ -87,7 +87,7 @@
   function settleBets(mn, bet, result, how){
     if (!bet.stakes.length) return;
     const won = bet.stakes.filter(s => s.side === result), lost = bet.stakes.filter(s => s.side !== result);
-    for (const s of won) earnRibbons(s.by, s.n*2, "callin' it right on "+plainName(mn));
+    for (const s of won){ earnRibbons(s.by, Math.round(s.n*perkBetX(s.by)), "callin' it right on "+plainName(mn)); mischief(s.by, "bets"); }   // Sharp Eyes, Mischief (10us-feats.js)
     for (const s of lost) tell(s.by, "🎲 "+how+". You called it wrong on "+plainName(mn)+", sugar. That's "+s.n+" ribbon"+(s.n === 1 ? "" : "s")+" gone.");
     if (charFor(mn)) emote("🎲 "+rkLine("betDone", mn, { x: how, c: won.length ? won.map(s => plainName(s.by)).join(" and ") : "nobody" }), mn);
   }

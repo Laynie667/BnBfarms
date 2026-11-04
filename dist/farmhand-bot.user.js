@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.69.1
+// @version      0.70.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2772,6 +2772,7 @@
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
+    { name: "Feats and perks", cmds: ["feats", "feats <who>", "perks", "perks off <perk>", "perks on <perk>", "myshots"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
@@ -2792,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.69.1";
-  var COMPANION_VERSION = "0.51.0";
+  var VERSION = "0.70.0";
+  var COMPANION_VERSION = "0.52.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4755,7 +4756,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L2;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ SEASON_LINES, TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -6016,7 +6017,7 @@
           warn("record state:", e);
         }
         s.ribbonLog = (L2.ribbonLog || []).filter((e) => e.mn === mn).slice(-6).reverse().map((e) => ({ n: e.n, why: e.why }));
-        s.store = storeItems().filter((it) => !it.off).map((it) => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
+        s.store = storeItems().filter((it) => !it.off).map((it) => ({ id: it.potion || it.id, name: it.name, price: it.id === "bounty" ? it.price : perkPrice(mn, it.price), desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
         s.fx = activePotions(mn).map((f) => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until / 6e4) * 6e4 }));
         if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
         if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
@@ -6071,6 +6072,7 @@
         part("keepsakes", () => keepersStateFor(mn, s));
         part("udders", () => uddersStateFor(mn, s));
         part("nursery", () => nurseryStateFor(mn, s));
+        part("feats", () => featsStateFor(mn, s));
         part("brand", () => {
           const b = brandFor(mn);
           if (b) s.brand = b;
@@ -6379,7 +6381,7 @@
     }
     function capacity(mn) {
       const p = prodOf(mn);
-      return CFG.PROD.BASE_CAPACITY + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0) + symbioteCap(mn);
+      return CFG.PROD.BASE_CAPACITY + perkCap(mn) + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0) + symbioteCap(mn);
     }
     function makesSemen(mn) {
       const r = rec(mn), p = prodOf(mn);
@@ -6642,7 +6644,7 @@
       return m ? Math.min(CFG.STACK_MAX, parseInt(m[1], 10)) : 1;
     }
     function milkCapNatural(mn) {
-      return CFG.PROD.MILK_CAP * speciesInfo(mn).milk * udderX(mn);
+      return CFG.PROD.MILK_CAP * speciesInfo(mn).milk * udderX(mn) * perkMilkX(mn);
     }
     function milkCap(mn) {
       const p = prodOf(mn);
@@ -6793,7 +6795,7 @@
         } catch (e) {
           warn("quota:", e);
         }
-        const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY - (p.mday.paid || 0));
+        const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY + perkMilkRibbon(mn) - (p.mday.paid || 0));
         if (owe > 0) {
           p.mday.paid = (p.mday.paid || 0) + owe;
           later(() => earnRibbons(mn, owe, "every " + CFG.LITRE_RIBBON_ML / 1e3 + " litres you're milked"), 2500);
@@ -6894,6 +6896,7 @@
       let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert * (0.5 + Math.min(1, (p.held[hole] || 0) / capacity(mother)));
       if (inHeat(p)) chance *= 3;
       chance *= 1 + boostLevel(p, "fert");
+      chance *= perkFertX(mother) * perkCatchX(stud);
       if (wornTags(mother).has("fertility")) chance *= 1.5;
       chance *= symbioteX(mother, "fert");
       if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
@@ -6914,7 +6917,7 @@
       }
       const [lo, hi] = speciesInfo(mother).litter;
       let count = lo + Math.floor(Math.random() * (hi - lo + 1));
-      if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
+      if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE + perkTwins(mother)) count = 2;
       if (wornTags(mother).has("hyper") || boosted(p, "hyper")) {
         const [a, b] = CFG.HYPER_LITTER_X, hx = 1 + 0.5 * Math.max(0, boostLevel(p, "hyper") - 1);
         count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random() * (b - a)) * hx)));
@@ -6923,7 +6926,7 @@
         count = Math.min(CFG.HYPER_MAX, count * (1 + (p.boostX && p.boostX.twins || 1)));
         delete p.boosts.twins;
       }
-      p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5, sires: [stud], count, warned: false };
+      p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5 * perkPregX(mother), sires: [stud], count, warned: false };
       try {
         bredBack(mother);
       } catch (e) {
@@ -7007,9 +7010,9 @@
     function milkGrade(mn) {
       const p = prodOf(mn);
       const h = p && p.grades || [];
-      if (!h.length) return gradeLetter(CFG.GRADE.BASE + (CFG.GRADE.TIER[tierOf(mn) || "new"] || 0));
+      if (!h.length) return gradeLetter(CFG.GRADE.BASE + (CFG.GRADE.TIER[tierOf(mn) || "new"] || 0) + perkGrade(mn));
       const last = h.slice(-CFG.GRADE.AVERAGE_OF);
-      return gradeLetter(last.reduce((a, b) => a + b, 0) / last.length);
+      return gradeLetter(last.reduce((a, b) => a + b, 0) / last.length + perkGrade(mn));
     }
     function prodTick() {
       const now = Date.now();
@@ -7460,6 +7463,7 @@
           sp.edges = 0;
         }
         load *= floodX(sp);
+        load *= perkLoadX(stud);
         sp.fills = (sp.fills || []).filter((x) => Date.now() - x < 36e5);
         if (!pent && !boosted(sp, "semen") && sp.fills.length >= CFG.STAMINA_FILLS)
           load *= Math.pow(CFG.STAMINA_X, sp.fills.length - CFG.STAMINA_FILLS + 1);
@@ -7560,7 +7564,7 @@
         clutch = Math.round((lo + Math.floor(Math.random() * (hi - lo + 1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));
         clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
         if (tp.eggs) tp.eggs.n += clutch;
-        else tp.eggs = { n: clutch, by: stud, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
+        else tp.eggs = { n: clutch, by: stud, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 * perkEggDaysX(t) };
         eggTypesNote(tp, clutch, penisType(stud) === "draconic" ? -16 : stud);
       }
       saveLedger();
@@ -8069,6 +8073,7 @@
       const r = rec(mn);
       r.quotaMetDay = d;
       r.quotaStreak = (r.quotaStreak || 0) + 1;
+      r.quotaBest = Math.max(r.quotaBest || 0, r.quotaStreak);
       earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
       const tier = tierOf(mn), up = { new: "trained", trained: "prize" }[tier];
       if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && r.quotaStreak % CFG.QUOTA_STREAK_UP === 0 && up) {
@@ -11367,6 +11372,7 @@
         r.rday.n += n;
       }
       r.ribbons = (r.ribbons || 0) + n;
+      r.ribbonsEver = (r.ribbonsEver || 0) + n;
       ribbonWeek(r).earned += n;
       ribbonLog(mn, n, why, by);
       saveLedger();
@@ -11509,7 +11515,7 @@
     }
     function storeText(mn) {
       const items = storeItems().filter((it) => !it.off);
-      const row = (it) => "  " + it.price + "\u{1F380} \xB7 " + (it.potion ? it.potion : it.id) + " \xB7 " + it.name;
+      const row = (it) => "  " + (it.id === "bounty" ? it.price : perkPrice(mn, it.price)) + "\u{1F380} \xB7 " + (it.potion ? it.potion : it.id) + " \xB7 " + it.name;
       return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n") + "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n" + items.filter((it) => it.shelf === "mess").map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot") && it.shelf !== "shrink").map(row).join("\n") + "\n\nSHRINKIN' SHOTS (a size back down, for good)\n" + items.filter((it) => it.shelf === "shrink").map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
     }
     function buy(sender, args, R) {
@@ -11537,7 +11543,7 @@
       }
       if (forWho === sender) forWho = null;
       const text = rest.join(" ").trim();
-      const price = it.price;
+      const price = it.id === "bounty" ? it.price : perkPrice(sender, it.price);
       const short = () => R("That's " + price + " ribbons, sugar, and you've only got " + ribbonsOf(sender) + ". Earn a few more: make your quota, finish a stall session, be good.");
       if (it.id !== "bounty" && ribbonsOf(sender) < price) {
         short();
@@ -14326,13 +14332,14 @@
       if (inHeat(p)) x *= 1.25;
       x *= 1 + 2 * potionX(mn, "tentaclemusk");
       x *= rankX(mn).eggs;
+      x *= perkEggX(mn);
       return x;
     }
     function layClutch(mn, n, by) {
       const p = prodOf(mn), [dl, dh] = CFG.EGG_DAYS;
       n = Math.max(1, Math.min(CFG.EGG_MAX, Math.round(n * eggX(mn))));
       if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
-      else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
+      else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 * perkEggDaysX(mn) };
       eggTypesNote(p, n, by);
       try {
         bredBack(mn);
@@ -14368,6 +14375,11 @@
       const r = rec(mn), p = prodOf(mn), T = TRAP_LINES[kind], v = {};
       r.trapLog = (r.trapLog || []).concat(Object.assign({ t: Date.now(), kind, spot: spot || "" }, state.trapByHand ? { hand: 1 } : {})).slice(-20);
       r.trapN = (r.trapN || 0) + 1;
+      try {
+        perkTrapPay(mn);
+      } catch (e) {
+        warn("trap magnet:", e);
+      }
       trapSprung(mn, kind, spot);
       audit(BOTMN(), "TRAP", mn + " " + kind + (spot ? " at " + spot : "") + (force ? " (by hand)" : ""));
       tell(mn, TRAP_KINDS[kind].icon + " " + (drewBy ? drewBy + " " : "") + "You've sprung a trap, sugar: " + TRAP_KINDS[kind].what + ". Your safeword stops it cold.");
@@ -14600,11 +14612,11 @@
         }
         const fresh = !was || was.spot !== here;
         if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-        if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4) continue;
+        if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4 / perkTrapX(mn)) continue;
         if (on) {
           if (!fresh) continue;
           r.spotTrapAt = r.spotTrapAt || {};
-          if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance / rankX(mn).reset) continue;
+          if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance / rankX(mn).reset / perkTrapX(mn)) continue;
           const kind = trapKindOf(here);
           if (kind !== "random" && rateLetsBy(mn, kind)) {
             r.spotTrapAt[here] = now;
@@ -14621,7 +14633,7 @@
           if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
           st.rolled = now;
           const wk = waterKindOf(here);
-          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * rankX(mn).water * (corrHas(mn, 10) ? 1.25 : 1) * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1) * waterDayX(mn, wk))) && !springTrap(mn, wk, here)) {
+          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * perkTrapX(mn) * nightX().water * dangerX(mn).chance * rankX(mn).water * (corrHas(mn, 10) ? 1.25 : 1) * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1) * waterDayX(mn, wk))) && !springTrap(mn, wk, here)) {
             r.trapAt = now;
             saveLedger();
           }
@@ -22938,7 +22950,7 @@
       const x = roamContract(mn);
       if (!x) return null;
       const g = roamOf(mn);
-      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
+      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: perkPrice(mn, CFG.ROAM_PASS_PRICE), safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
     }
     const verNum = (v) => String(v || "0").split(".").map((n) => parseInt(n, 10) || 0).reduce((a, n, i) => a + n * Math.pow(1e3, 2 - i), 0);
     function companionTooOld(mn, ver) {
@@ -23653,6 +23665,7 @@
               return;
             }
             earnRibbons(sender, CFG.SERVICES.COAX_RIBBON, "coaxin' a parasite off " + svcName(t));
+            mischief(sender, "coax");
           }
         });
       } });
@@ -24030,11 +24043,12 @@
       if (!n) return;
       const d = dayKey();
       if (!n.stars || n.stars.d !== d) n.stars = { d, n: 0 };
-      const cap = n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY;
+      const cap = n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY + perkStars(mn);
       if (n.stars.n >= cap) return;
       const got = earnRibbons(mn, 1, why, 0, true);
       if (!got) return;
       n.stars.n += got;
+      if (n.role === "little") n.starsEver = (n.starsEver || 0) + got;
       saveLedger();
       if (n.role === "little") nurserySay(mn, nFill(nPick("star", NURSERY_LINES.star), { n: mn }));
       nurseryTell(mn, "\u{1F380} +1 ribbon for " + why + " (" + n.stars.n + " of " + cap + " today).");
@@ -24120,7 +24134,7 @@
               saveLedger();
               const beats = pool[Math.floor(Math.random() * pool.length)].map((t) => nFill(t, { n: mn }));
               nurseryScene(mn, beats, "\u{1F9F8}", () => {
-                if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(mn, "playin' in the nursery");
+                if (Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(mn)) nurseryStar(mn, "playin' in the nursery");
               });
               continue;
             }
@@ -24458,7 +24472,7 @@
       }
       const beats = beatsList[Math.floor(Math.random() * beatsList.length)].map((t) => nFill(t, { n: sender }));
       if (!nurseryScene(sender, beats, "\u{1F9F8}", () => {
-        if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(sender, NURSERY_LINES.activityName[a0] || "playin'");
+        if (Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(sender)) nurseryStar(sender, NURSERY_LINES.activityName[a0] || "playin'");
       })) {
         R("\u{1F9F8} One thing at a time, sweetpea.");
         return;
@@ -24502,7 +24516,7 @@
       }
       state.nurseryGameAt.set(mn, Date.now());
       nurserySay(mn, "\u{1F3B2} " + line);
-      if (won && Math.random() < CFG.NURSERY.STAR_CHANCE) later(() => nurseryStar(mn, "winnin' a game"), 1500);
+      if (won && Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(mn)) later(() => nurseryStar(mn, "winnin' a game"), 1500);
     }
     function bathTime(little, carer, R) {
       const C2 = NURSERY_LINES.care, v = { n: little, c: carer };
@@ -24607,7 +24621,7 @@
         space: !!n.space,
         traps: n.traps !== false,
         stars: n.stars && n.stars.d === dayKey() ? n.stars.n : 0,
-        cap: n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY,
+        cap: n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY + perkStars(mn),
         acts: Object.keys(NURSERY_LINES.play),
         cares: Object.keys(NURSERY_LINES.care).filter((k) => !/^bath(Mid|End)$/.test(k)),
         asks: Object.keys(NURSERY_LINES.ask),
@@ -24921,6 +24935,7 @@
         r.kryptonite.found = r.kryptonite.found || [];
         if (!r.kryptonite.found.includes(by)) {
           r.kryptonite.found.push(by);
+          mischief(by, "krypto");
           later(() => earnRibbons(by, CFG.SHOTS2.KRYPTO_RIBBONS, "findin' " + plainName(mn) + "'s kryptonite", CFG.BOT_MEMBER), 2e3);
         }
       }
@@ -24939,14 +24954,16 @@
       syncCompanions(true);
       if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
     }
-    function kryptoHint(mn) {
+    function kryptoHint(mn, letters) {
       const k = (rec(mn) || {}).kryptonite;
       if (!k || !k.word) return null;
+      if (k.hint && letters > 1) return k.hint + " (your Sharp Eyes catch more: it starts \u201C" + k.word.trim().slice(0, letters) + "\u201D)";
+      if (letters > 1) return "somethin' that starts with \u201C" + k.word.trim().slice(0, letters) + "\u201D, " + k.word.trim().length + " letters long";
       return k.hint || "somethin' that starts with \u201C" + k.word.trim()[0].toUpperCase() + "\u201D, " + k.word.trim().length + " letters long";
     }
     function kryptoCommand(sender, args, R, channel) {
       const a0 = String(args[0] || "").toLowerCase(), r = rec(sender);
-      const rumors = () => Object.values(L2.people || {}).filter((p) => p && p.kryptonite && p.kryptonite.word && (p.roles || []).includes(ROLE.PROPRIETOR)).map((p) => "\u2022 " + (p.name || p.mn) + ": " + kryptoHint(p.mn) + ((p.kryptonite.found || []).length ? " (found " + p.kryptonite.found.length + " time" + (p.kryptonite.found.length === 1 ? "" : "s") + ")" : ""));
+      const rumors = () => Object.values(L2.people || {}).filter((p) => p && p.kryptonite && p.kryptonite.word && (p.roles || []).includes(ROLE.PROPRIETOR)).map((p) => "\u2022 " + (p.name || p.mn) + ": " + kryptoHint(p.mn, perkHintLetters(sender)) + ((p.kryptonite.found || []).length ? " (found " + p.kryptonite.found.length + " time" + (p.kryptonite.found.length === 1 ? "" : "s") + ")" : ""));
       if (!isProprietor(sender) || !a0) {
         const list2 = rumors();
         R("\u{1F5DD}\uFE0F THE BARN'S RUMOURS\n" + (list2.length ? list2.join("\n") + "\n\nCraft a needle (or an auto-injector, or a piercing) with the right word on it and see what happens." : "No proprietor's admitted to a weakness. Yet.") + (isProprietor(sender) ? "\n\nYours: " + (r.kryptonite && r.kryptonite.word ? "set (?kryptonite word shows it, privately)" : "none. Whisper me ?kryptonite set <word>") + ". ?kryptonite hint <text> \xB7 ?kryptonite off" : ""));
@@ -25345,6 +25362,317 @@
       state.shots2At = 0;
       shotsMoreTick();
     }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });
+    const FEATS = [
+      {
+        key: "dairy",
+        icon: "\u{1F95B}",
+        name: "Dairy",
+        unit: "L milked",
+        tiers: [10, 50, 150, 400, 1e3],
+        count: (mn) => (prodOf(mn).totals.milked || 0) / 1e3,
+        perk: "Heavy Udders",
+        desc: (t) => "+" + 5 * t + "% milk capacity" + (t >= 3 ? ", and your milk grades a step higher" : "")
+      },
+      {
+        key: "breeding",
+        icon: "\u{1F402}",
+        name: "Breeding stock",
+        unit: "L of seed taken",
+        tiers: [1, 4, 10, 25, 60],
+        count: (mn) => (prodOf(mn).totals.received || 0) / 1e3,
+        perk: "Breeder's Belly",
+        desc: (t) => "+" + 4 * t + "% fertility and " + 100 * t + " mL more room"
+      },
+      {
+        key: "mother",
+        icon: "\u{1F37C}",
+        name: "Motherhood",
+        unit: "litters",
+        tiers: [1, 3, 6, 12, 25],
+        count: (mn) => (prodOf(mn).offspring || {}).litters || 0,
+        perk: "Good Mother",
+        desc: (t) => "pregnancy " + 5 * t + "% shorter" + (t >= 5 ? ", and twins far likelier" : "")
+      },
+      {
+        key: "eggs",
+        icon: "\u{1F95A}",
+        name: "Egg layer",
+        unit: "eggs laid",
+        tiers: [10, 50, 150, 400, 1e3],
+        count: (mn) => (prodOf(mn).offspring || {}).eggs || 0,
+        perk: "Prolific Layer",
+        desc: (t) => "clutches " + 10 * t + "% bigger and " + 8 * t + "% quicker to come, but your eggs fetch " + 15 * t + "% fewer ribbons at market"
+      },
+      {
+        key: "stud",
+        icon: "\u{1F4A6}",
+        name: "Stud",
+        unit: "covers",
+        tiers: [10, 50, 150, 400, 1e3],
+        count: (mn) => prodOf(mn).totals.covers || 0,
+        perk: "Prize Stud",
+        desc: (t) => "loads " + 5 * t + "% bigger" + (t >= 4 ? ", and likelier to catch" : "")
+      },
+      {
+        key: "trapped",
+        icon: "\u{1FAA4}",
+        name: "Trapped",
+        unit: "traps sprung",
+        tiers: [10, 40, 100, 250, 600],
+        count: (mn) => (rec(mn) || {}).trapN || 0,
+        perk: "Trap Magnet",
+        desc: (t) => "traps find you " + 10 * t + "% more often" + (t >= 3 ? ", and now and then one pays you a ribbon" : "")
+      },
+      {
+        key: "worker",
+        icon: "\u{1F4CB}",
+        name: "Hard worker",
+        unit: "day quota streak (your best)",
+        tiers: [3, 7, 14, 30, 60],
+        count: (mn) => {
+          const r = rec(mn) || {};
+          return Math.max(r.quotaBest || 0, r.quotaStreak || 0);
+        },
+        perk: "Reliable",
+        desc: (t) => (t >= 2 ? (t >= 4 ? "two" : "one") + " free quota grace a week" : "nothin' yet (a free quota grace comes at II)") + (t >= 5 ? ", and a ribbon more for milk a day" : "")
+      },
+      {
+        key: "favourite",
+        icon: "\u{1F380}",
+        name: "Farm favourite",
+        unit: "ribbons earned",
+        tiers: [25, 100, 250, 600, 1500],
+        count: (mn) => (rec(mn) || {}).ribbonsEver || 0,
+        perk: "Favourite",
+        desc: (t) => 2 * t + "% off at the store (on things over a ribbon)"
+      },
+      {
+        key: "mischief",
+        icon: "\u{1F5DD}\uFE0F",
+        name: "Mischief",
+        unit: "bits of mischief",
+        tiers: [1, 5, 15, 40, 100],
+        count: (mn) => {
+          const m = (rec(mn) || {}).mischief || {};
+          return (m.krypto || 0) + (m.bets || 0) + (m.coax || 0);
+        },
+        perk: "Sharp Eyes",
+        desc: (t) => (t >= 2 ? "sharper kryptonite rumours, " : "") + "bets pay " + (2 + 0.1 * t).toFixed(1) + " times"
+      },
+      {
+        key: "goldstar",
+        icon: "\u2B50",
+        name: "Gold stars",
+        unit: "gold stars",
+        tiers: [5, 20, 50, 120, 300],
+        count: (mn) => ((rec(mn) || {}).nursery || {}).starsEver || 0,
+        nursery: true,
+        perk: "Gold Star Little",
+        desc: (t) => (t >= 2 ? "+" + (t >= 4 ? 2 : 1) + " star" + (t >= 4 ? "s" : "") + " a day" : "nothin' yet (an extra star a day comes at II)") + (t >= 3 ? ", and stars come easier" : "")
+      }
+    ];
+    const TIER_NAME = ["", "I", "II", "III", "IV", "V"];
+    const FEAT_LINES = [
+      "\u{1F3C5} %n earns a feat: %f %t. %why The farm's noticed. %p",
+      "\u{1F3C5} Somebody chalks it on the barn door: %n, %f %t. %why %p",
+      "\u{1F3C5} The farm girl rings the bell for %n: %f %t! %why %p",
+      "\u{1F3C5} %n's made %f %t, and the whole barn hears about it. %why %p"
+    ];
+    const trackFor = (mn, F) => !F.nursery || ((rec(mn) || {}).nursery || {}).role === "little";
+    function featTierOf(F, n) {
+      let t = 0;
+      for (let i = 0; i < F.tiers.length; i++) if (n >= F.tiers[i]) t = i + 1;
+      return t;
+    }
+    const fmt = (n) => n >= 100 || Number.isInteger(n) ? Math.floor(n) : Math.floor(n * 10) / 10;
+    function perkLv(mn, key) {
+      const r = rec(mn);
+      if (!r || !r.feats || (r.perksOff || []).includes(key)) return 0;
+      return r.feats[key] || 0;
+    }
+    function featCheck(mn, quiet) {
+      const r = rec(mn);
+      if (!r || !(r.roles || []).length) return [];
+      const first = !r.feats;
+      r.feats = r.feats || {};
+      if (r.ribbonsEver == null) r.ribbonsEver = r.ribbons || 0;
+      const got = [];
+      for (const F of FEATS) {
+        if (!trackFor(mn, F)) continue;
+        let n = 0;
+        try {
+          n = F.count(mn);
+        } catch (e) {
+          continue;
+        }
+        const t = featTierOf(F, n), was = r.feats[F.key] || 0;
+        if (t > was) {
+          r.feats[F.key] = t;
+          for (let k = was + 1; k <= t; k++) got.push({ F, t: k });
+        }
+      }
+      if (!got.length) {
+        if (first) saveLedger();
+        return got;
+      }
+      saveLedger();
+      syncCompanions(true);
+      if (first || quiet) {
+        if (got.length) tell(mn, "\u{1F3C5} The farm's been keepin' count, sugar, and some of it's already yours: " + bestOf(got).map((g) => g.F.icon + " " + g.F.name + " " + TIER_NAME[g.t] + " (" + g.F.perk + ")").join(", ") + ". Your perks are workin' already. ?feats shows the lot.");
+        return got;
+      }
+      for (const g of got) {
+        const why = "(" + g.F.tiers[g.t - 1] + " " + g.F.unit + ")", perk = g.F.perk + " grows: " + g.F.desc(g.t) + ".";
+        if (g.F.nursery) {
+          if (typeof nurseryTell === "function") nurseryTell(mn, "\u2B50 " + plainName(mn) + "'s earned a gold-star feat: " + g.F.name + " " + TIER_NAME[g.t] + "! " + perk);
+        } else if (charFor(mn)) emote(pickFresh("feat", FEAT_LINES).replace(/%n/g, plainName(mn)).replace(/%f/g, g.F.icon + " " + g.F.name).replace(/%t/g, TIER_NAME[g.t]).replace(/%why/g, why).replace(/%p/g, perk), mn);
+        else tell(mn, "\u{1F3C5} A feat: " + g.F.icon + " " + g.F.name + " " + TIER_NAME[g.t] + " " + why + ". " + perk);
+        earnRibbons(mn, g.t, "the " + g.F.name + " " + TIER_NAME[g.t] + " feat", CFG.BOT_MEMBER);
+      }
+      return got;
+    }
+    const bestOf = (got) => {
+      const m = /* @__PURE__ */ new Map();
+      for (const g of got) if (!m.has(g.F.key) || m.get(g.F.key).t < g.t) m.set(g.F.key, g);
+      return [...m.values()];
+    };
+    function featsTick() {
+      const now = Date.now();
+      if (now - (state.featsAt || 0) < 12e4) return;
+      state.featsAt = now;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
+        if (mn === CFG.BOT_MEMBER) continue;
+        try {
+          featCheck(mn);
+          reliableTick(mn, now);
+        } catch (e) {
+          warn("feats:", e);
+        }
+      }
+    }
+    function reliableTick(mn, now) {
+      const r = rec(mn), t = perkLv(mn, "worker");
+      if (!r || t < 2) return;
+      const wk = weekKey(), per = t >= 4 ? 2 : 1;
+      if (!r.graceGift || r.graceGift.wk !== wk) r.graceGift = { wk, n: 0 };
+      if (r.graceGift.n >= per || (r.quotaGrace || 0) >= 2) return;
+      r.graceGift.n++;
+      r.quotaGrace = (r.quotaGrace || 0) + 1;
+      saveLedger();
+      tell(mn, "\u{1F4CB} Reliable: the farm's put a quota grace in your pocket for the week, sugar (" + r.quotaGrace + " held).");
+    }
+    function featsText(mn, asker) {
+      const r = rec(mn);
+      if (!r || !(r.roles || []).length) return plainName(mn) + " isn't on the books, sugar.";
+      if (!r.feats) featCheck(mn, true);
+      const self = mn === asker, nurseryOk = self || typeof nurseryOn === "function" && nurseryOn(asker);
+      const rows = FEATS.filter((F) => trackFor(mn, F) && (!F.nursery || nurseryOk)).map((F) => {
+        let n = 0;
+        try {
+          n = F.count(mn);
+        } catch (e) {
+        }
+        const t = r.feats[F.key] || 0, next = F.tiers[t], off = (r.perksOff || []).includes(F.key);
+        return F.icon + " " + F.name + " " + (t ? TIER_NAME[t] : "\u2013") + " \xB7 " + fmt(n) + (next ? " of " + next : "") + " " + F.unit + (t ? "\n    " + F.perk + (off ? " (switched off)" : "") + ": " + F.desc(t) : "");
+      });
+      const titles = titleNames(mn);
+      return "\u{1F3C5} " + (self ? "YOUR FEATS" : plainName(mn).toUpperCase() + "'S FEATS") + "\n" + rows.join("\n") + (titles.length ? "\n\u{1F396}\uFE0F Titles: " + titles.join(" \xB7 ") : "") + (self ? "\n\n?perks off <perk> switches one off." : "");
+    }
+    function featsCommand(cmd, sender, args, R) {
+      const r = rec(sender);
+      if (cmd === "feats" || cmd === "feat" || cmd === "achievements") {
+        const t = args[0] ? resolveTarget(args[0]) : sender;
+        if (!t || !rec(t)) {
+          R("Whose feats, sugar? ?feats <who>, or just ?feats for yours.");
+          return;
+        }
+        R(featsText(t, sender));
+        return;
+      }
+      if (!r || !(r.roles || []).length) {
+        R("Perks are for folks on the books, sugar.");
+        return;
+      }
+      if (!r.feats) featCheck(sender, true);
+      const a0 = String(args[0] || "").toLowerCase(), name = args.slice(1).join(" ").toLowerCase();
+      if (a0 === "off" || a0 === "on") {
+        const F = FEATS.find((F2) => F2.key === name || F2.perk.toLowerCase() === name || F2.name.toLowerCase() === name || F2.perk.toLowerCase().startsWith(name) && name.length >= 3);
+        if (!F) {
+          R("Which perk, sugar? " + FEATS.filter((F2) => trackFor(sender, F2)).map((F2) => F2.perk).join(", ") + ".");
+          return;
+        }
+        r.perksOff = (r.perksOff || []).filter((k) => k !== F.key);
+        if (a0 === "off") r.perksOff.push(F.key);
+        saveLedger();
+        syncCompanions(true);
+        R("\u{1F3C5} " + F.perk + ": " + (a0 === "off" ? "switched off. It stays earned; ?perks on " + F.perk + " brings it back." : "on again."));
+        return;
+      }
+      const mine = FEATS.filter((F) => trackFor(sender, F) && (r.feats[F.key] || 0) > 0);
+      R("\u{1F3C5} YOUR PERKS\n" + (mine.length ? mine.map((F) => F.icon + " " + F.perk + " " + TIER_NAME[r.feats[F.key]] + ((r.perksOff || []).includes(F.key) ? " (off)" : "") + ": " + F.desc(r.feats[F.key])).join("\n") : "None yet, sugar. ?feats shows how close you are.") + "\n\n?perks off <perk> \xB7 ?perks on <perk>");
+    }
+    function featsStateFor(mn, s) {
+      const r = rec(mn);
+      if (!r || !(r.roles || []).length) return;
+      if (!r.feats) featCheck(mn, true);
+      s.feats = {
+        tracks: FEATS.filter((F) => trackFor(mn, F)).map((F) => {
+          let n = 0;
+          try {
+            n = F.count(mn);
+          } catch (e) {
+          }
+          const t = r.feats[F.key] || 0;
+          return { key: F.key, icon: F.icon, name: F.name, tier: t, n: fmt(n), next: F.tiers[t] || null, prev: t ? F.tiers[t - 1] : 0, unit: F.unit, perk: F.perk, desc: t ? F.desc(t) : F.desc(1).replace(/^/, "at I: "), off: (r.perksOff || []).includes(F.key) };
+        }),
+        titles: titleNames(mn)
+      };
+    }
+    const perkMilkX = (mn) => 1 + 0.05 * perkLv(mn, "dairy");
+    const perkGrade = (mn) => perkLv(mn, "dairy") >= 3 ? 8 : 0;
+    const perkCap = (mn) => 100 * perkLv(mn, "breeding");
+    const perkFertX = (mn) => 1 + 0.04 * perkLv(mn, "breeding");
+    const perkPregX = (mn) => 1 - 0.05 * perkLv(mn, "mother");
+    const perkTwins = (mn) => perkLv(mn, "mother") >= 5 ? 0.2 : 0;
+    const perkEggX = (mn) => 1 + 0.1 * perkLv(mn, "eggs");
+    const perkEggDaysX = (mn) => 1 - 0.08 * perkLv(mn, "eggs");
+    const perkEggPayX = (mn) => Math.max(0.25, 1 - 0.15 * perkLv(mn, "eggs"));
+    const perkLoadX = (mn) => 1 + 0.05 * perkLv(mn, "stud");
+    const perkCatchX = (mn) => {
+      const t = perkLv(mn, "stud");
+      return t >= 5 ? 1.2 : t >= 4 ? 1.1 : 1;
+    };
+    const perkTrapX = (mn) => 1 + 0.1 * perkLv(mn, "trapped");
+    const perkMilkRibbon = (mn) => perkLv(mn, "worker") >= 5 ? 1 : 0;
+    function perkPrice(mn, price) {
+      const t = perkLv(mn, "favourite");
+      return !t || !(price > 1) ? price : Math.max(1, Math.round(price * (1 - 0.02 * t)));
+    }
+    const perkBetX = (mn) => 2 + 0.1 * perkLv(mn, "mischief");
+    const perkHintLetters = (mn) => {
+      const t = perkLv(mn, "mischief");
+      return t >= 4 ? 3 : t >= 2 ? 2 : 1;
+    };
+    const perkStars = (mn) => {
+      const t = perkLv(mn, "goldstar");
+      return t >= 4 ? 2 : t >= 2 ? 1 : 0;
+    };
+    const perkStarChance = (mn) => perkLv(mn, "goldstar") >= 3 ? 0.1 : 0;
+    function perkTrapPay(mn) {
+      const t = perkLv(mn, "trapped");
+      if (t >= 3 && Math.random() < (t >= 5 ? 0.35 : 0.2)) later(() => earnRibbons(mn, 1, "bein' the farm's favourite bait (Trap Magnet)"), 2500);
+    }
+    function mischief(mn, k) {
+      const r = rec(mn);
+      if (!r) return;
+      r.mischief = r.mischief || {};
+      r.mischief[k] = (r.mischief[k] || 0) + 1;
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __featCheck: (m, q) => featCheck(m, q), __featsTick: () => {
+      state.featsAt = 0;
+      featsTick();
+    }, __perkLv: (m, k) => perkLv(m, k), __perkPrice: (m, p) => perkPrice(m, p), __perks: { perkMilkX, perkCap, perkFertX, perkPregX, perkEggX, perkEggDaysX, perkEggPayX, perkLoadX, perkCatchX, perkTrapX, perkBetX, perkStars, perkHintLetters } });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -29187,7 +29515,7 @@
       L2.nest = { eggs: 0, by: {} };
       saveLedger();
       audit(sender, "GATHER", String(n));
-      for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market" + (eggTypesText(types[m]) ? " (" + eggTypesText(types[m]) + ")" : "")));
+      for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)) * perkEggPayX(parseInt(m, 10))), "eggs sold at market" + (eggTypesText(types[m]) ? " (" + eggTypesText(types[m]) + ")" : "")));
       earnRibbons(sender, 1, "gatherin' the eggs");
       emote("\u{1F9FA} " + xLine("gather", sender, { x: String(n) }), sender);
       R("\u{1F9FA} " + n + " eggs gathered and off to market. The layers have been paid: " + Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10)) + " (" + k + ")").join(", ") + ".");
@@ -30168,7 +30496,10 @@
     function settleBets(mn, bet, result, how) {
       if (!bet.stakes.length) return;
       const won = bet.stakes.filter((s) => s.side === result), lost = bet.stakes.filter((s) => s.side !== result);
-      for (const s of won) earnRibbons(s.by, s.n * 2, "callin' it right on " + plainName(mn));
+      for (const s of won) {
+        earnRibbons(s.by, Math.round(s.n * perkBetX(s.by)), "callin' it right on " + plainName(mn));
+        mischief(s.by, "bets");
+      }
       for (const s of lost) tell(s.by, "\u{1F3B2} " + how + ". You called it wrong on " + plainName(mn) + ", sugar. That's " + s.n + " ribbon" + (s.n === 1 ? "" : "s") + " gone.");
       if (charFor(mn)) emote("\u{1F3B2} " + rkLine("betDone", mn, { x: how, c: won.length ? won.map((s) => plainName(s.by)).join(" and ") : "nobody" }), mn);
     }
@@ -31384,7 +31715,7 @@
       bump1(w.hatched, mn, s.n);
       L2.hatched = (L2.hatched || 0) + s.n;
       for (const [m, k] of Object.entries(s.by)) {
-        const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2)), "your eggs hatched under " + plainName(mn));
+        const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2 * perkEggPayX(layer))), "your eggs hatched under " + plainName(mn));
         leaderShare(layer, got);
       }
       leaderShare(mn, earnRibbons(mn, Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.ceil(s.n / 4))), "hatchin' a brood of " + s.n));
@@ -59986,6 +60317,9 @@ RIBBONS are the farm's scrip. They keep day to day.
   Up to 40 a day from farm things. The Sunday till pays the
     week's top earner a bonus.
   ?ribbons \xB7 your purse \xB7 ?ribbons top \xB7 this week's board
+  ?feats \xB7 your feats and how close the next tier is \xB7 ?feats <who>
+  ?perks \xB7 what your feats give you \xB7 ?perks off|on <perk>
+  ?myshots \xB7 what's workin' in you right now
 
 THE STORE \xB7 ?store
   Spins, a lucky spin, a luxury day, skip a chore, quota grace,
@@ -61262,7 +61596,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "care",
       "kryptonite",
       "myshots",
-      "shotsin"
+      "shotsin",
+      "feats",
+      "feat",
+      "achievements",
+      "perks",
+      "perk"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -61360,6 +61699,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       return !!(u && u > Date.now());
     }
     const PRIVATE_REPLY = [
+      "feats",
+      "feat",
+      "achievements",
+      "perks",
+      "perk",
       "kryptonite",
       "myshots",
       "shotsin",
@@ -61459,6 +61803,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         o += "\n\n\u{1FAD9} Holding: " + parts.join(" \xB7 ") + " (" + Math.round(100 * held / Math.max(1, cap)) + "% full)";
       }
       if (staffView && r.application) o += "\n\n" + applicationText(r.application, true);
+      else if (staffView) {
+        const q = (L2.applications || []).filter((a) => a.mn === mn).pop();
+        if (q) o += "\n\n\u23F3 Still in the queue\n" + applicationText(q, false);
+      }
       return o;
     }
     function whoText() {
@@ -63813,7 +64161,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "kryptonite":
           kryptoCommand(sender, args, R, channel);
           break;
-        // 10ur-shots-more.js
+        case "feats":
+        case "feat":
+        case "achievements":
+        case "perks":
+        case "perk":
+          featsCommand(cmd === "perk" ? "perks" : cmd, sender, args, R);
+          break;
+        // 10us-feats.js   // 10ur-shots-more.js
         case "myshots":
         case "shotsin":
           R(myShotsText(sender));
@@ -65919,6 +66274,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           shotsMoreTick();
         } catch (e) {
           warn("shots more:", e);
+        }
+        try {
+          featsTick();
+        } catch (e) {
+          warn("feats:", e);
         }
         rutTick();
         quotaTick();

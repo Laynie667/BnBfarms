@@ -16,6 +16,7 @@ export const PUBLIC_GROUPS = [
   { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
   { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
   { name: "Fun", cmds: ["fair", "enter"] },
+  { name: "Feats and perks", cmds: ["feats", "feats <who>", "perks", "perks off <perk>", "perks on <perk>", "myshots"] },
   { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] },
 ];
 

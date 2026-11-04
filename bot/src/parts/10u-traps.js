@@ -204,6 +204,7 @@
     if (inHeat(p)) x *= 1.25;
     x *= 1 + 2*potionX(mn, "tentaclemusk");
     x *= rankX(mn).eggs;   // a higher-ranked subject carries more (10y3-trap-ranks.js)
+    x *= perkEggX(mn);     // Prolific Layer (10us-feats.js)
     return x;
   }
   // clutches STACK: every encounter adds to what they're already carryin', up to CFG.EGG_MAX
@@ -211,7 +212,7 @@
     const p = prodOf(mn), [dl, dh] = CFG.EGG_DAYS;
     n = Math.max(1, Math.min(CFG.EGG_MAX, Math.round(n * eggX(mn))));
     if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
-    else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random()*(dh - dl))*86400000 };
+    else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random()*(dh - dl))*86400000*perkEggDaysX(mn) };
     eggTypesNote(p, n, by);   // what laid them (10y4-corruption.js)
     try { bredBack(mn); } catch(e){ warn("bred back:", e); }   // filled again inside the hour (10y7-udders.js)
     saveLedger(); audit(BOTMN(), "CLUTCH", mn+" "+n+" by "+by);
@@ -238,6 +239,7 @@
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES[kind], v = {};
     r.trapLog = (r.trapLog || []).concat(Object.assign({ t: Date.now(), kind, spot: spot || "" }, state.trapByHand ? { hand: 1 } : {})).slice(-20);
     r.trapN = (r.trapN || 0) + 1;
+    try { perkTrapPay(mn); } catch(e){ warn("trap magnet:", e); }   // (10us-feats.js)
     trapSprung(mn, kind, spot);   // tallies, the trap card, bait (10x-trap-extras.js)
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
     tell(mn, TRAP_KINDS[kind].icon+" "+(drewBy ? drewBy+" " : "")+"You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
@@ -422,11 +424,11 @@
       if (!here){ state.trapAt.delete(mn); continue; }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
+      if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000/perkTrapX(mn)) continue;    // one trap at a time, with a breather between (not durin' a hunt)
       if (on){
         if (!fresh) continue;                                                             // step off and back on to spring it again
         r.spotTrapAt = r.spotTrapAt || {};
-        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset) continue;   // each trap takes a while to reset (half as long after dark)
+        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset/perkTrapX(mn)) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
         if (kind !== "random" && rateLetsBy(mn, kind)){ r.spotTrapAt[here] = now; saveLedger(); continue; }   // one they said isn't for them lets them by now and then (10y9o-trap-ratings.js)
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
@@ -436,7 +438,7 @@
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
         const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
-        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1)*waterDayX(mn, wk))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*perkTrapX(mn)*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1)*waterDayX(mn, wk))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();

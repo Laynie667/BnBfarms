@@ -139,7 +139,7 @@
           const hop = rs.parasiteOn && !parasiteOn(sender) && !(rs.parasiteNext > Date.now()) && Math.random() < CFG.SERVICES.HOP_CHANCE;
           parasiteOff(t, "service");
           if (hop){ emote("🍯 " + svcFill(SERVICE_LINES.coaxHop[0], t, { by: sender }), t); parasiteLatch(sender, "hop"); return; }
-          earnRibbons(sender, CFG.SERVICES.COAX_RIBBON, "coaxin' a parasite off " + svcName(t));
+          earnRibbons(sender, CFG.SERVICES.COAX_RIBBON, "coaxin' a parasite off " + svcName(t)); mischief(sender, "coax");
         } });
     } });
     askCard(t, "play", "🍯 " + svcName(sender) + " wants to coax that parasite off you, sugar. Say yes or no (?yes or ?no works too).");

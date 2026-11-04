@@ -43,10 +43,10 @@
   function nurseryStar(mn, why){
     const n = nrec(mn); if (!n) return;
     const d = dayKey(); if (!n.stars || n.stars.d !== d) n.stars = { d, n: 0 };
-    const cap = n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY;
+    const cap = n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY + perkStars(mn);   // Gold Star Little (10us-feats.js)
     if (n.stars.n >= cap) return;
     const got = earnRibbons(mn, 1, why, 0, true); if (!got) return;
-    n.stars.n += got; saveLedger();
+    n.stars.n += got; if (n.role === "little") n.starsEver = (n.starsEver || 0) + got; saveLedger();
     if (n.role === "little") nurserySay(mn, nFill(nPick("star", NURSERY_LINES.star), { n: mn }));
     nurseryTell(mn, "🎀 +1 ribbon for " + why + " (" + n.stars.n + " of " + cap + " today).");
   }
@@ -116,7 +116,7 @@
           if (now - (n.trapAt[kind] || 0) > CFG.NURSERY.TRAP_MIN*60000){
             n.trapAt[kind] = now; saveLedger();
             const beats = pool[Math.floor(Math.random() * pool.length)].map(t => nFill(t, { n: mn }));
-            nurseryScene(mn, beats, "🧸", () => { if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(mn, "playin' in the nursery"); });
+            nurseryScene(mn, beats, "🧸", () => { if (Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(mn)) nurseryStar(mn, "playin' in the nursery"); });
             continue;
           }
         }
@@ -268,7 +268,7 @@
     const beatsList = NURSERY_LINES.play[a0];
     if (!beatsList){ R("🧸 I don't know that one, sweetpea. Try: " + Object.keys(NURSERY_LINES.play).join(", ") + ", or bath."); return; }
     const beats = beatsList[Math.floor(Math.random() * beatsList.length)].map(t => nFill(t, { n: sender }));
-    if (!nurseryScene(sender, beats, "🧸", () => { if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(sender, NURSERY_LINES.activityName[a0] || "playin'"); })){ R("🧸 One thing at a time, sweetpea."); return; }
+    if (!nurseryScene(sender, beats, "🧸", () => { if (Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(sender)) nurseryStar(sender, NURSERY_LINES.activityName[a0] || "playin'"); })){ R("🧸 One thing at a time, sweetpea."); return; }
     R("🧸 " + (NURSERY_LINES.activityName[a0] || a0).replace(/^./, c => c.toUpperCase()) + "!");
   }
   function littleGame(mn, game, pick, R){
@@ -294,7 +294,7 @@
     if (Date.now() - (state.nurseryGameAt.get(mn) || 0) < 8000){ R("🎲 Slow down, sweetpea! One game at a time."); return; }
     state.nurseryGameAt.set(mn, Date.now());
     nurserySay(mn, "🎲 " + line);
-    if (won && Math.random() < CFG.NURSERY.STAR_CHANCE) later(() => nurseryStar(mn, "winnin' a game"), 1500);
+    if (won && Math.random() < CFG.NURSERY.STAR_CHANCE + perkStarChance(mn)) later(() => nurseryStar(mn, "winnin' a game"), 1500);
   }
   // bath time: everything comes off (the nursery never says what)
   function bathTime(little, carer, R){
@@ -356,7 +356,7 @@
     const n = nrec(mn); if (!n) return;
     const here = new Set(nurseryHere());
     const o = { role: n.role, space: !!n.space, traps: n.traps !== false, stars: (n.stars && n.stars.d === dayKey()) ? n.stars.n : 0,
-      cap: n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY,
+      cap: n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY + perkStars(mn),
       acts: Object.keys(NURSERY_LINES.play), cares: Object.keys(NURSERY_LINES.care).filter(k => !/^bath(Mid|End)$/.test(k)), asks: Object.keys(NURSERY_LINES.ask),
       gear: Object.entries(NURSERY_GEAR).map(([id, g]) => ({ id, label: g.label, kind: g.kind, group: g.group, name: g.name })) };
     if (n.role === "little"){

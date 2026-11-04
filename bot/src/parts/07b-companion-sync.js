@@ -64,7 +64,7 @@
       s.ribbons = r.ribbons || 0; s.quotaGrace = r.quotaGrace || 0; s.messesOn = !!r.messesOn;
       try { chatlogState(mn, s); } catch(e){ warn("record state:", e); }   // recorded always? reads the record? (10z9-chatlog.js)
       s.ribbonLog = (L.ribbonLog || []).filter(e => e.mn === mn).slice(-6).reverse().map(e => ({ n: e.n, why: e.why }));
-      s.store = storeItems().filter(it => !it.off).map(it => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
+      s.store = storeItems().filter(it => !it.off).map(it => ({ id: it.potion || it.id, name: it.name, price: it.id === "bounty" ? it.price : perkPrice(mn, it.price), desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
       s.fx = activePotions(mn).map(f => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until/60000)*60000 }));
       if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
       if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
@@ -88,6 +88,7 @@
       part("keepsakes", () => keepersStateFor(mn, s));
       part("udders", () => uddersStateFor(mn, s));   // the dial, their words, intensity, kept (10y7-udders.js)   // the album, trained holes, the vat, sittin' the nest (10y6-keepers.js)
       part("nursery", () => nurseryStateFor(mn, s));
+      part("feats", () => featsStateFor(mn, s));   // the 🏅 Feats tab (10us-feats.js)
       part("brand", () => { const b = brandFor(mn); if (b) s.brand = b; });   // the farm's logo, seared on (10uq-brand.js)   // the 🧸 Nursery panel, for nursery folk only (10up2-nursery.js)
       part("roam", () => { const x = roamState(mn); if (x) s.roam = x; });   // roam passes (10uk-roam.js)
       part("wants", () => { const w = wantsFor(mn); if (w.length) s.wants = w; });   // what the farm is waitin' to hear from them: Say it buttons (10ui-say.js)

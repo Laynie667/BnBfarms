@@ -53,5 +53,10 @@ const since=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNu
   await B(221397,'?edit 900 name clear');
   ok(!D().nameSet && D().name==='N900', 'clearing the name goes back to their game name');
   ok(L().log.some(e=>e.action==='EDIT'||/EDIT/.test(JSON.stringify(e))), 'edits are in the audit log');
+  // Nov 4: ?record shows the application; one not approved yet comes from the queue
+  n=sent.length; await B(700,'?record 900');
+  ok(/Application/.test(since(700,n)) && !/Still in the queue/.test(since(700,n)), 'staff ?record shows the kept application');
+  delete D().application; n=sent.length; await B(700,'?record 900');
+  ok(/Still in the queue/.test(since(700,n)) && /Application/.test(since(700,n)), 'not approved yet: ?record shows the one waiting in the queue: '+since(700,n).slice(-160));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

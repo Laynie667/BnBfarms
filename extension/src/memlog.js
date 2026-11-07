@@ -5,16 +5,17 @@
 // grew, and copies the whole log so it can be pasted to whoever's looking into it.
 import { drawnBodyMemory } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
-import { trimStats } from "./trimpics.js";
+import { trimStats, cacheSize } from "./trimpics.js";
 import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
 import { lookSent } from "./look.js";
-import { screenSkipped, screenLight } from "./botscreen.js";
+import { screenSkipped, screenLight, screenNapOn, screenNaps, screenNapping } from "./botscreen.js";
 // what this page has sent of your look since it opened (look.js), and on the bot's account how much drawin' it skipped
 function sentLine() {
   let t = "";
   try { const x = lookSent(); t = "Your look sent to the room: " + x.items + " single pieces, " + x.whole + " whole, " + x.merged + " changes gathered together"; } catch (e) { /* fine */ }
   try { if (screenLight()) t += " · the farm girl's screen skipped drawin' people " + screenSkipped() + " times"; } catch (e) { /* fine */ }
+  try { if (screenNapOn()) t += " · napped " + screenNaps() + " times" + (screenNapping() ? ", nappin' now" : ""); } catch (e) { /* fine */ }
   return t;
 }
 
@@ -25,12 +26,25 @@ try { const v = JSON.parse(W.localStorage.getItem(KEY)); if (Array.isArray(v)) l
 function snap() {
   const s = { t: Date.now() };
   try { if (W.performance && W.performance.memory) s.heapMB = Math.round(W.performance.memory.usedJSHeapSize / 1e6); } catch (e) { /* not this browser */ }
+  // the new game (R133 on): two picture caches, the graphics card's (people) and the screen's (the map, buttons)
+  let newGame = false;
   try {
-    const c0 = W.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;   // (R133 on: an ImageCache, its Map inside)
+    const g = cacheSize(W.GLDrawImageCache), sc = cacheSize(W.DrawImageCache);
+    if (g) { newGame = true; s.gamePics = g.n; s.madePics = g.made; s.madePicsKB = g.madeKB; s.textures = g.loaded; s.textureMB = g.mb; }
+    if (sc) { newGame = true; s.scrPics = sc.n; s.scrMB = sc.mb; s.scrMade = sc.made; }
+  } catch (e) { /* fine */ }
+  // and every character the game has loaded (people who left should be let go), with their drawing canvases
+  try {
+    const cs = Array.isArray(W.Character) ? W.Character : []; let px = 0;
+    for (const C of cs) for (const cv of [C && C.Canvas, C && C.CanvasBlink]) if (cv && cv.width) px += cv.width * cv.height;
+    s.chars = cs.length; s.charMB = Math.round(px * 4 / 1e6);
+  } catch (e) { /* fine */ }
+  // the old game (before R133)
+  if (!newGame) try {
+    const c0 = W.GLDrawImageCache, m = c0;
     if (m && typeof m.keys === "function") { s.gamePics = m.size; let d = 0, dk = 0; for (const k of m.keys()) if (typeof k === "string" && k.startsWith("data:")) { d++; dk += k.length; } s.madePics = d; s.madePicsKB = Math.round(dk / 1000); }
     const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache;
     if (tc) { let px = 0; for (const v of tc.values()) px += (v.width || 0) * (v.height || 0); s.textures = tc.size; s.textureMB = Math.round(px * 4 / 1e6); }
-    else if (m && m !== c0) { let px = 0, n = 0; for (const v of m.values()) { const dd = v && v.data; if (dd && dd.width) { px += dd.width * dd.height; n++; } } s.textures = n; s.textureMB = Math.round(px * 4 / 1e6); }
   } catch (e) { /* fine */ }
   try { s.body = drawnBodyMemory(); } catch (e) { /* fine */ }
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
@@ -49,6 +63,8 @@ function tick() {
 }
 const line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") +
   "  page " + (s.heapMB ?? "?") + " MB · game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) · graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") +
+  (s.scrPics != null ? " · screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") +
+  (s.chars != null ? " · " + s.chars + " characters loaded, " + s.charMB + " MB drawn" : "") +
   " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "") +
   (s.chat != null ? " · chat log " + s.chat + " lines" : "") + (s.els != null ? " · " + s.els + " page elements" : "");
 
@@ -60,7 +76,11 @@ const lastPage = fast.filter((x) => x.t < born).slice(-12);
 function quick() {
   const x = { t: Date.now() };
   try { if (W.performance && W.performance.memory) x.h = Math.round(W.performance.memory.usedJSHeapSize / 1e6); } catch (e) { /* fine */ }
-  try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W.GLDrawImageCache; x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : undefined; } catch (e) { /* fine */ }
+  try {
+    const a = W.GLDrawImageCache, b = W.DrawImageCache, gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+    if (a && a.cache instanceof Map) x.p = a.cache.size + (b && b.cache instanceof Map ? b.cache.size : 0);
+    else if (tc) x.p = tc.size;
+  } catch (e) { /* fine */ }
   try { x.r = (W.ChatRoomCharacter || []).length; x.s = W.CurrentScreen; } catch (e) { /* fine */ }
   fast.push(x); if (fast.length > 40) fast = fast.slice(-40);
   try { W.localStorage.setItem(FAST, JSON.stringify(fast)); } catch (e) { /* fine */ }

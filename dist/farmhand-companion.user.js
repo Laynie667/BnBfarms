@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.2
+// @version      0.54.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.2";
+  var VERSION = "0.54.3";
 
   // shared/species.js
   var WORDS = {
@@ -5786,15 +5786,69 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var sdk4 = null;
   var trimmed = 0;
   var started = Date.now();
+  var isCache = (c) => !!(c && c.cache instanceof Map && typeof c.delete === "function");
+  var picBytes = (img2) => {
+    const d = img2 && img2.data;
+    return d && d.width ? d.width * d.height * 4 : 0;
+  };
+  function cacheSize(c) {
+    if (!isCache(c)) return null;
+    let n = 0, loaded = 0, b = 0, made3 = 0, madeK = 0;
+    for (const [url, img2] of c.cache) {
+      n++;
+      const x = picBytes(img2);
+      if (x) {
+        loaded++;
+        b += x;
+      }
+      if (typeof url === "string" && url.startsWith("data:")) {
+        made3++;
+        madeK += url.length;
+      }
+    }
+    return { n, loaded, mb: Math.round(b / 1e6), made: made3, madeKB: Math.round(madeK / 1e3) };
+  }
+  function trimNew(force, idle, target) {
+    const caches = [W6.GLDrawImageCache, W6.DrawImageCache].filter(isCache);
+    if (!caches.length) return 0;
+    const now = Date.now(), wait2 = idle ?? IDLE, old = [];
+    let total = 0;
+    for (const c of caches) for (const [url, img2] of c.cache) {
+      const b = picBytes(img2);
+      total += b;
+      if (typeof url !== "string" || url.startsWith("blob:")) continue;
+      if (img2 && typeof img2.isLoading === "function" && img2.isLoading()) continue;
+      const used2 = img2 && img2.lastUsed || 0;
+      if (now - used2 < wait2) continue;
+      old.push([used2, url, c, b]);
+    }
+    if (!force && total <= LIMIT) return 0;
+    old.sort((a, b) => a[0] - b[0]);
+    const goal = target ?? TARGET;
+    let n = 0;
+    for (const [, url, c, b] of old) {
+      if (goal > 0 && total <= goal) break;
+      try {
+        c.delete(url);
+      } catch (e) {
+        continue;
+      }
+      total -= b;
+      n++;
+    }
+    trimmed += n;
+    return n;
+  }
   function bytes(tc) {
     let n = 0;
     for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4;
     return n;
   }
   function trimPictures(force, idle, target) {
-    const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W6.GLDrawImageCache;
-    if (!cache || typeof cache.purge === "function") return 0;
-    if (!tc || typeof tc.forEach !== "function") return 0;
+    const cache = W6.GLDrawImageCache;
+    if (isCache(cache) || isCache(W6.DrawImageCache)) return trimNew(force, idle, target);
+    const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+    if (!cache || !tc || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
     if (!force && total <= LIMIT) return 0;
     const now = Date.now(), old = [];
@@ -5826,21 +5880,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function trimStats() {
     return { trimmed };
   }
+  function trimTick() {
+    const bot = !!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER);
+    return bot ? trimPictures(true, IDLE, 0) : trimPictures(false);
+  }
   function initTrim(mod2) {
     sdk4 = mod2;
     W6.__farmTrim = trimPictures;
     try {
-      sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
+      if (typeof W6.GLDrawLoadImage === "function") sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
         return next(args);
       });
     } catch (e) {
-      console.warn("[Farmhand Companion] picture trim unavailable:", e);
-      return;
+      console.warn("[Farmhand Companion] picture trim (old game) unavailable:", e);
     }
     setInterval(() => {
       try {
-        trimPictures(false);
+        trimTick();
       } catch (e) {
         console.warn("[Farmhand Companion] picture trim:", e);
       }
@@ -5917,12 +5974,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // extension/src/botscreen.js
   var W8 = window;
+  var NAP_MS = 2 * 6e4;
   var prefs = () => ({});
   var skipped = 0;
   var wasRoom = false;
+  var lastTouch = Date.now();
+  var naps = 0;
+  var wasNapping = false;
   var onBot3 = () => !!(W8.Player && W8.Player.MemberNumber === BOT_MEMBER);
   var screenLight = () => onBot3() && !prefs().drawRoom;
   var screenSkipped = () => skipped;
+  var screenNapOn = () => onBot3() && !prefs().noNap;
+  var screenNapping = () => screenNapOn() && W8.CurrentScreen === "ChatRoom" && Date.now() - lastTouch > NAP_MS;
+  var screenNaps = () => naps;
   function redraw2(list) {
     for (const C of list) {
       try {
@@ -5934,8 +5998,27 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function redrawRoom() {
     redraw2([W8.Player].concat(W8.ChatRoomCharacter || []));
   }
+  function napCard() {
+    try {
+      if (typeof W8.DrawRect === "function") W8.DrawRect(0, 0, 1e3, 1e3, "#1d1712");
+      if (typeof W8.DrawText === "function") {
+        W8.DrawText("The farm girl's screen is nappin'.", 500, 470, "#e8d9bd", "black");
+        W8.DrawText("The farm runs the same. Move the mouse to wake it.", 500, 530, "#a8977a", "black");
+      }
+    } catch (e) {
+    }
+  }
   function initBotScreen(mod2, getPrefs) {
     prefs = getPrefs;
+    const touch = () => {
+      lastTouch = Date.now();
+    };
+    for (const ev of ["mousemove", "mousedown", "wheel", "keydown", "touchstart", "pointerdown"]) {
+      try {
+        W8.document.addEventListener(ev, touch, { capture: true, passive: true });
+      } catch (e) {
+      }
+    }
     try {
       mod2.hookFunction("CommonDrawAppearanceBuild", 20, (args, next) => {
         if (W8.CurrentScreen === "ChatRoom" && screenLight()) {
@@ -5946,7 +6029,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       });
     } catch (e) {
       console.warn("[Farmhand Companion] light bot screen unavailable:", e);
-      return;
+    }
+    try {
+      mod2.hookFunction("ChatRoomMapViewDrawGrid", 20, (args, next) => {
+        if (screenNapping()) {
+          if (!wasNapping) {
+            wasNapping = true;
+            naps++;
+          }
+          napCard();
+          return void 0;
+        }
+        wasNapping = false;
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] screen nap unavailable:", e);
     }
     setInterval(() => {
       const inRoom = W8.CurrentScreen === "ChatRoom";
@@ -5967,6 +6065,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (screenLight()) t += " \xB7 the farm girl's screen skipped drawin' people " + screenSkipped() + " times";
     } catch (e) {
     }
+    try {
+      if (screenNapOn()) t += " \xB7 napped " + screenNaps() + " times" + (screenNapping() ? ", nappin' now" : "");
+    } catch (e) {
+    }
     return t;
   }
   var W9 = window;
@@ -5985,8 +6087,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (W9.performance && W9.performance.memory) s.heapMB = Math.round(W9.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
+    let newGame = false;
     try {
-      const c0 = W9.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
+      const g = cacheSize(W9.GLDrawImageCache), sc = cacheSize(W9.DrawImageCache);
+      if (g) {
+        newGame = true;
+        s.gamePics = g.n;
+        s.madePics = g.made;
+        s.madePicsKB = g.madeKB;
+        s.textures = g.loaded;
+        s.textureMB = g.mb;
+      }
+      if (sc) {
+        newGame = true;
+        s.scrPics = sc.n;
+        s.scrMB = sc.mb;
+        s.scrMade = sc.made;
+      }
+    } catch (e) {
+    }
+    try {
+      const cs = Array.isArray(W9.Character) ? W9.Character : [];
+      let px = 0;
+      for (const C of cs) for (const cv of [C && C.Canvas, C && C.CanvasBlink]) if (cv && cv.width) px += cv.width * cv.height;
+      s.chars = cs.length;
+      s.charMB = Math.round(px * 4 / 1e6);
+    } catch (e) {
+    }
+    if (!newGame) try {
+      const c0 = W9.GLDrawImageCache, m = c0;
       if (m && typeof m.keys === "function") {
         s.gamePics = m.size;
         let d = 0, dk = 0;
@@ -6002,17 +6131,6 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         let px = 0;
         for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
         s.textures = tc.size;
-        s.textureMB = Math.round(px * 4 / 1e6);
-      } else if (m && m !== c0) {
-        let px = 0, n = 0;
-        for (const v of m.values()) {
-          const dd = v && v.data;
-          if (dd && dd.width) {
-            px += dd.width * dd.height;
-            n++;
-          }
-        }
-        s.textures = n;
         s.textureMB = Math.round(px * 4 / 1e6);
       }
     } catch (e) {
@@ -6056,7 +6174,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (log.length > MAX2) log = log.slice(-MAX2);
     save3();
   }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + (s.scrPics != null ? " \xB7 screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") + (s.chars != null ? " \xB7 " + s.chars + " characters loaded, " + s.charMB + " MB drawn" : "") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
   var FAST = "farmhand-memfast";
   var born = Date.now();
   var fast = [];
@@ -6074,8 +6192,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
     try {
-      const gl = W9.GLDrawCanvas && W9.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W9.GLDrawImageCache;
-      x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : void 0;
+      const a = W9.GLDrawImageCache, b = W9.DrawImageCache, gl = W9.GLDrawCanvas && W9.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      if (a && a.cache instanceof Map) x.p = a.cache.size + (b && b.cache instanceof Map ? b.cache.size : 0);
+      else if (tc) x.p = tc.size;
     } catch (e) {
     }
     try {
@@ -8420,6 +8539,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             ctx3.setPref("drawRoom", on2);
             if (on2) setTimeout(redrawRoom, 50);
           }
+        ) : null,
+        bot ? toggle(
+          "Let the farm girl's screen nap",
+          "On (the default), after 2 minutes with nobody touching this tab the map stops being drawn, and any mouse move or key wakes it right up. The game's newest version works hard on every picture it puts on screen, and this tab is on all day. The farm runs the same either way.",
+          !ctx3.prefs.noNap,
+          () => ctx3.setPref("noNap", !ctx3.prefs.noNap)
         ) : null,
         pref(ctx3, "compact", "Compact cards", "Smaller text, more on screen"),
         pref(ctx3, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
@@ -12592,7 +12717,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => {
         const r = next(args);
-        drawMarkers();
+        if (!screenNapping()) drawMarkers();
         return r;
       });
     } catch (e) {

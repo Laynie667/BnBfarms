@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Companion 0.54.3: the farm girl's screen naps, and old pictures get let go again.** Laynie, Nov 7: "the memory used by the page is skyrocketing and crashing it sometimes", on the bot's tab only, with the farm itself under 1% of the work in every recording.
+  - **What it was:** the game's newest version (R133) changed how it finds a picture to draw. Before, a quick look in a list. Now, every picture on every frame gets a time stamp, a "just in case" error note and a loading job, all thrown away straight after. It also keeps every picture unpacked, in two places (the screen's and the graphics card's), and only clears out the ones unused for half an hour, once an hour. Switching the bot's mods to stable and turning the extras off changed nothing in the recordings, so it wasn't them.
+  - **The screen nap (the bot's own tab only):** after 2 minutes with nobody touching the bot's tab, the map isn't drawn, just a plain "nappin'" card. A mouse move, click, wheel or key wakes it at once. The bot hears, answers, milks and moves the same either way. Settings → Advanced → "Let the farm girl's screen nap" switches it off.
+  - **The picture trim works on the new game again.** It had stepped aside thinking the game's new cache cleaned up after itself. Now on everybody's tab, past 380 MB of pictures, the ones nobody's drawn for 5 minutes go, oldest first, down to 260 MB. On the bot's tab, every picture unused for 5 minutes goes, every minute. Anything let go loads again from the browser's own copy when it's wanted.
+  - **/farmmem counts what it missed:** the screen's pictures, every character the game has loaded (and their drawings), and how often the bot's screen has napped.
 - **Bot 0.70.6 + Companion 0.54.2: the bot's tab keeps its chat log short.** Laynie, Nov 7: "as soon as i turn admin powers on the tabs ram usage shoots through the roof", then "even with the admin powers off, the ram usage is spiking way up again", only on the bot's tab.
   - **What it was:** the game never trims its chat log by itself (only its Cut button does), and the bot's tab runs all day with thousands of lines an hour, so every line ever said stayed on the page. The admin power (whole-map sight and hearing) only made it climb faster, by showin' every line on the map. /farmmem's "page" number stayed flat because that's the scripts' memory, not the page's.
   - **Now the bot keeps the last 500 lines** on its own tab (the oldest go, the room's divider stays), checked every 20 seconds. Only the bot's account: players' chat logs are left alone. The bot hears everything from the game's connection, never from this log, so nothin' it does changes.

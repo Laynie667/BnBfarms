@@ -62,7 +62,7 @@ if (!flag("--no-test")) {
 
 // 5. commit and push (your studio saves stay out of it)
 git("add", "-A", "--", ".", ":!studio/fits");
-const msg = head + (summary ? ": " + summary : "") + "\n\nCo-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>\n";
+const msg = head + (summary ? ": " + summary : "") + "\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n";
 execFileSync("git", ["commit", "-q", "-F", "-"], { input: msg });
 say("Committed: " + git("log", "--oneline", "-1"));
 if (flag("--no-push")) say("Not pushed (--no-push). Players get it when you push.");

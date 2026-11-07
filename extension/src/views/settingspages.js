@@ -137,6 +137,8 @@ function advancedPage(ctx) {
     card(title("🧰 This panel"), muted("Only on this computer."),
       bot ? toggle("Draw the room on the farm girl's screen", "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
         !!ctx.prefs.drawRoom, () => { const on = !ctx.prefs.drawRoom; ctx.setPref("drawRoom", on); if (on) setTimeout(redrawRoom, 50); }) : null,
+      bot ? toggle("Let the farm girl's screen nap", "On (the default), after 2 minutes with nobody touching this tab the map stops being drawn, and any mouse move or key wakes it right up. The game's newest version works hard on every picture it puts on screen, and this tab is on all day. The farm runs the same either way.",
+        !ctx.prefs.noNap, () => ctx.setPref("noNap", !ctx.prefs.noNap)) : null,
       pref(ctx, "compact", "Compact cards", "Smaller text, more on screen"),
       pref(ctx, "btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
       h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()))),

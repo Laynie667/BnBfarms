@@ -19,7 +19,7 @@ import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
-import { initBotScreen } from "./botscreen.js";
+import { initBotScreen, screenNapping } from "./botscreen.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
@@ -459,7 +459,8 @@ function start() {
       "The bot script isn't running on this page. Install farmhand-bot.user.js here (it runs next to the Companion), then reload."), "notice");
   }, 30000);
   // staff map markers, drawn over the game's own map (never breaks the game's drawing)
-  try { mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => { const r = next(args); drawMarkers(); return r; }); }
+  // (not over the farm girl's sleeping screen: botscreen.js)
+  try { mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => { const r = next(args); if (!screenNapping()) drawMarkers(); return r; }); }
   catch (e) { console.warn("[Farmhand Companion] map markers unavailable:", e); }
 
   // ROAM PASSES (bot 10uk-roam.js): under a summonable contract, the farm's exit only opens with a pass. Holdin' one,

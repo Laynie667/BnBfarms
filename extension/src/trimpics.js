@@ -86,14 +86,55 @@ export function trimPictures(force, idle, target) {
   trimmed += n;
   return n;
 }
-export function trimStats() { return { trimmed }; }
-// once a minute: on the farm girl's own tab, everything unused for IDLE; anywhere else, only past LIMIT
+export function trimStats() { return { trimmed, people: letGo }; }
+
+// FOLKS WHO LEFT (Nov 7). When somebody leaves the room the game takes them off the room's list, but keeps them loaded,
+// drawing and all, till YOU leave the room (then it lets everybody go at once). Players hop rooms, so theirs empties
+// all the time; the farm girl never leaves the farm, so everybody who ever came by stayed loaded till her tab died
+// (Laynie: "it was a mem crash"). On her tab only, somebody gone from the room for LEFT_MS gets let go the game's own
+// way. Come back, and the game loads them fresh like any newcomer. The farm never reads this list (it keeps people in
+// its ledger), so nothin' it does changes. Never the bot herself, nor anybody whose profile or menu is open.
+const LEFT_MS = 10 * 60000;
+const missing = new Map();   // member number → when the farm girl's tab first saw them gone from the room
+let letGo = 0;
+const isOnline = (C) => !!(C && typeof C.AccountName === "string" && C.AccountName.startsWith("Online-"));
+export function letGoOfLeavers(now) {
+  now = now ?? Date.now();
+  if (!(W.Player && W.Player.MemberNumber === BOT_MEMBER)) return 0;
+  if (W.CurrentScreen !== "ChatRoom" || !W.ChatRoomData || !Array.isArray(W.Character) || typeof W.CharacterDelete !== "function") return 0;
+  const here = new Set((W.ChatRoomCharacter || []).map((c) => c && c.MemberNumber));
+  const keep = new Set([W.Player, W.InformationSheetSelection, W.CurrentCharacter].filter(Boolean));
+  let n = 0;
+  for (const C of W.Character.slice()) {
+    if (!isOnline(C) || keep.has(C)) continue;
+    const mn = C.MemberNumber;
+    if (here.has(mn)) { missing.delete(mn); continue; }
+    const since = missing.get(mn);
+    if (since == null) { missing.set(mn, now); continue; }
+    if (now - since < LEFT_MS) continue;
+    try { W.CharacterDelete(C, false); n++; missing.delete(mn); } catch (e) { /* fine */ }
+  }
+  for (const mn of [...missing.keys()]) if (!W.Character.some((c) => c && c.MemberNumber === mn)) missing.delete(mn);
+  letGo += n;
+  return n;
+}
+// how many of the game's loaded characters are people no longer in the room
+export function leftLoaded() {
+  if (!Array.isArray(W.Character)) return null;
+  const here = new Set((W.ChatRoomCharacter || []).map((c) => c && c.MemberNumber));
+  return W.Character.filter((C) => isOnline(C) && C !== W.Player && !here.has(C.MemberNumber)).length;
+}
+
+// once a minute: on the farm girl's own tab, folks long gone and everything unused for IDLE; anywhere else, only past LIMIT
 export function trimTick() {
   const bot = !!(W.Player && W.Player.MemberNumber === BOT_MEMBER);
-  return bot ? trimPictures(true, IDLE, 0) : trimPictures(false);
+  if (!bot) return trimPictures(false);
+  try { letGoOfLeavers(); } catch (e) { console.warn("[Farmhand Companion] lettin' go of folks who left:", e); }
+  return trimPictures(true, IDLE, 0);
 }
 export function initTrim(mod) {
   sdk = mod; W.__farmTrim = trimPictures;   // (from the console: __farmTrim(true, 0, 0) lets go of every picture not loading, now)
+  W.__farmLetGo = letGoOfLeavers;           // (and folks gone from the room for 10 minutes, on the bot's tab)
   // the old game only: when each picture was last asked for (the new game keeps that itself)
   try { if (typeof W.GLDrawLoadImage === "function") sdk.hookFunction("GLDrawLoadImage", 0, (args, next) => { if (typeof args[1] === "string") seen.set(args[1], Date.now()); return next(args); }); }
   catch (e) { console.warn("[Farmhand Companion] picture trim (old game) unavailable:", e); }

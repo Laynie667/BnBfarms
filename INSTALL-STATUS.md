@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Companion 0.54.4: the farm girl's tab lets go of folks who left.** Laynie, Nov 7, after another crash at 14:49: "it was a mem crash", and "just a cache clear type thing, right".
+  - **What it was:** when somebody leaves the room, the game takes them off the room's list but keeps them loaded, drawing and all, till *you* leave the room. Players hop rooms, so theirs clears all the time. The bot never leaves the farm, so everybody who ever came by stayed loaded till her tab died. The first 0.54.3 memory log showed 28 characters loaded with 8 in the room, holding 133 MB of drawings.
+  - **Now, on the bot's tab only,** anybody gone from the room for 10 minutes is let go, the game's own way. Come back, and the game loads them fresh like any newcomer. Never the bot herself, anybody still in the room, anybody whose profile is open, or the game's own characters, and never while the bot's out of the room. The farm keeps people in its ledger, not that list, so nothin' it does changes.
+  - **/farmmem says how many loaded characters have left the room,** and how many were let go.
+  - (Also: the earlier "under 1%" for the farm's own work counted only the farm's own lines. Counting the game work it sets off, it's about 4% of the bot's tab.)
 - **Companion 0.54.3: the farm girl's screen naps, and old pictures get let go again.** Laynie, Nov 7: "the memory used by the page is skyrocketing and crashing it sometimes", on the bot's tab only, with the farm itself under 1% of the work in every recording.
   - **What it was:** the game's newest version (R133) changed how it finds a picture to draw. Before, a quick look in a list. Now, every picture on every frame gets a time stamp, a "just in case" error note and a loading job, all thrown away straight after. It also keeps every picture unpacked, in two places (the screen's and the graphics card's), and only clears out the ones unused for half an hour, once an hour. Switching the bot's mods to stable and turning the extras off changed nothing in the recordings, so it wasn't them.
   - **The screen nap (the bot's own tab only):** after 2 minutes with nobody touching the bot's tab, the map isn't drawn, just a plain "nappin'" card. A mouse move, click, wheel or key wakes it at once. The bot hears, answers, milks and moves the same either way. Settings → Advanced → "Let the farm girl's screen nap" switches it off.

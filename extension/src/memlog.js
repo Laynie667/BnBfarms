@@ -5,7 +5,7 @@
 // grew, and copies the whole log so it can be pasted to whoever's looking into it.
 import { drawnBodyMemory } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
-import { trimStats, cacheSize } from "./trimpics.js";
+import { trimStats, cacheSize, leftLoaded } from "./trimpics.js";
 import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
 import { lookSent } from "./look.js";
@@ -37,7 +37,7 @@ function snap() {
   try {
     const cs = Array.isArray(W.Character) ? W.Character : []; let px = 0;
     for (const C of cs) for (const cv of [C && C.Canvas, C && C.CanvasBlink]) if (cv && cv.width) px += cv.width * cv.height;
-    s.chars = cs.length; s.charMB = Math.round(px * 4 / 1e6);
+    s.chars = cs.length; s.charMB = Math.round(px * 4 / 1e6); s.left = leftLoaded();
   } catch (e) { /* fine */ }
   // the old game (before R133)
   if (!newGame) try {
@@ -48,7 +48,7 @@ function snap() {
   } catch (e) { /* fine */ }
   try { s.body = drawnBodyMemory(); } catch (e) { /* fine */ }
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
-  try { s.let = trimStats().trimmed; } catch (e) { /* fine */ }
+  try { const ts = trimStats(); s.let = ts.trimmed; s.letPeople = ts.people; } catch (e) { /* fine */ }
   try { s.room = (W.ChatRoomCharacter || []).length; s.screen = W.CurrentScreen; } catch (e) { /* fine */ }
   // the page's own weight, which the number above doesn't count (Nov 7: the bot's tab climbed while that stayed flat):
   // lines in the chat log, and every element on the page
@@ -64,7 +64,8 @@ function tick() {
 const line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") +
   "  page " + (s.heapMB ?? "?") + " MB · game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) · graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") +
   (s.scrPics != null ? " · screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") +
-  (s.chars != null ? " · " + s.chars + " characters loaded, " + s.charMB + " MB drawn" : "") +
+  (s.chars != null ? " · " + s.chars + " characters loaded" + (s.left != null ? " (" + s.left + " who left the room)" : "") + ", " + s.charMB + " MB drawn" : "") +
+  (s.letPeople ? " · " + s.letPeople + " who left let go" : "") +
   " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "") +
   (s.chat != null ? " · chat log " + s.chat + " lines" : "") + (s.els != null ? " · " + s.els + " page elements" : "");
 

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.5** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.6** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.6 + Companion 0.54.2: the bot's tab keeps its chat log short.** Laynie, Nov 7: "as soon as i turn admin powers on the tabs ram usage shoots through the roof", then "even with the admin powers off, the ram usage is spiking way up again", only on the bot's tab.
+  - **What it was:** the game never trims its chat log by itself (only its Cut button does), and the bot's tab runs all day with thousands of lines an hour, so every line ever said stayed on the page. The admin power (whole-map sight and hearing) only made it climb faster, by showin' every line on the map. /farmmem's "page" number stayed flat because that's the scripts' memory, not the page's.
+  - **Now the bot keeps the last 500 lines** on its own tab (the oldest go, the room's divider stays), checked every 20 seconds. Only the bot's account: players' chat logs are left alone. The bot hears everything from the game's connection, never from this log, so nothin' it does changes.
+  - **/farmmem now shows the chat log's lines and the page's elements,** so the page's own weight shows next time.
+  - The admin power isn't needed on the bot's tab: the bot hears every message anywhere on the map either way, and never asks the game who can see or hear whom.
+  - tests/chatlog-trim.test.cjs: a 1,200-line log cut to 500, the room's divider and the newest lines kept, a short log left alone.
 - **Bot 0.70.5 + Companion 0.54.1: a game that won't let the farm move somebody, and pinnin' is off till switched on.** From the Nov 7 watch report (Laynie: "It says Exe is trying to summon alexia and i, seems like some kind of bug, because exe isnt staff").
   - **What it was:** not Exe summonin' anybody. The bot was tryin' to put Exe back where somethin' held them (Laynie: "the script half loaded on Exe's end, and i think Alexia and I tried to milk them before they were fully in, so the bot got confused on wheter to pin them"). Exe's game won't let the bot move them, and answered every try with "A teleportation attempt has been cancelled because not allowed", out loud in the room under Exe's name. The bot tried again every few seconds (21 times in the 4 minutes recorded).
   - **Now, when somebody's game says no to a teleport the bot just sent,** it stops tryin' to move them for half an hour (or till they come back into the room). Whatever was holdin' them lets them be, they're told once, privately, the stocks stop whisperin' "back in the stocks you go", the pen stops tellin' the room it walked them back, and staff who ?summon them are told why. A "no" the bot didn't just ask for is ignored.

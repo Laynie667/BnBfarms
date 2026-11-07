@@ -36,6 +36,9 @@ function snap() {
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
   try { s.let = trimStats().trimmed; } catch (e) { /* fine */ }
   try { s.room = (W.ChatRoomCharacter || []).length; s.screen = W.CurrentScreen; } catch (e) { /* fine */ }
+  // the page's own weight, which the number above doesn't count (Nov 7: the bot's tab climbed while that stayed flat):
+  // lines in the chat log, and every element on the page
+  try { const cl = W.document.getElementById("TextAreaChatLog"); if (cl) s.chat = cl.childElementCount; s.els = W.document.getElementsByTagName("*").length; } catch (e) { /* fine */ }
   return s;
 }
 function save() { try { W.localStorage.setItem(KEY, JSON.stringify(log)); } catch (e) { log = log.slice(-30); } }
@@ -46,7 +49,8 @@ function tick() {
 }
 const line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") +
   "  page " + (s.heapMB ?? "?") + " MB · game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) · graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") +
-  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "");
+  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "") +
+  (s.chat != null ? " · chat log " + s.chat + " lines" : "") + (s.els != null ? " · " + s.els + " page elements" : "");
 
 // and every three seconds, a quick look (the last two minutes): a page that fills up all at once, between two half-minute
 // looks, still leaves its last seconds behind. /farmmem shows the last of these from the page before this one.

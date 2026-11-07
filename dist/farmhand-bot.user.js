@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.5
+// @version      0.70.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.5";
-  var COMPANION_VERSION = "0.54.1";
+  var VERSION = "0.70.6";
+  var COMPANION_VERSION = "0.54.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3320,6 +3320,8 @@
       // a knot ties the pair this long (random), and leashes them together
       NO_MOVE_MIN: 30,
       // somebody whose game says no to my teleport: not moved again for this long (or till they come back in; 05-map.js)
+      CHATLOG_KEEP: 500,
+      // the bot's own tab keeps this many chat lines on the page, the oldest go (17-heartbeat.js)
       KNOT_FERT_X: 1.5,
       // a tied load is more likely to take
       CUMFLATE_PIN_X: 1.5,
@@ -65951,6 +65953,20 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       log("Listeners attached (chat + beeps + friends + sync)" + (state.relistened ? ", again (" + state.relistened + ")" : "") + ".");
       return true;
     }
+    function trimChatLog() {
+      const log2 = W.document && W.document.getElementById && W.document.getElementById("TextAreaChatLog");
+      if (!log2 || log2.childElementCount <= CFG.CHATLOG_KEEP) return 0;
+      const seps = log2.querySelectorAll(".chat-room-sep"), keep = seps.length ? seps[seps.length - 1] : null;
+      let n = 0;
+      while (log2.childElementCount > CFG.CHATLOG_KEEP) {
+        let el = log2.firstElementChild;
+        if (el === keep) el = keep.nextElementSibling;
+        if (!el) break;
+        el.remove();
+        n++;
+      }
+      return n;
+    }
     function heartbeat() {
       try {
         if (typeof W.ServerSend !== "function") {
@@ -66037,6 +66053,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           featsTick();
         } catch (e) {
           warn("feats:", e);
+        }
+        try {
+          trimChatLog();
+        } catch (e) {
+          warn("chat log trim:", e);
         }
         rutTick();
         quotaTick();

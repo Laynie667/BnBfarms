@@ -247,6 +247,7 @@
     KNOT_REMOVE_TAGS: ["knot remover","unknotting"],
     TIE_MIN_M: 5, TIE_MAX_M: 30,  // a knot ties the pair this long (random), and leashes them together
     NO_MOVE_MIN: 30,              // somebody whose game says no to my teleport: not moved again for this long (or till they come back in; 05-map.js)
+    CHATLOG_KEEP: 500,            // the bot's own tab keeps this many chat lines on the page, the oldest go (17-heartbeat.js)
     KNOT_FERT_X: 1.5,             // a tied load is more likely to take
     CUMFLATE_PIN_X: 1.5,          // held semen past 1.5x your capacity pins you (only a knot gets you past full)
     BREEDING_STAND: "breedingstand", BREEDING_STAND_X: 1.5,   // fills on (or next to) that spot catch more

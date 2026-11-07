@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.1
+// @version      0.54.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.1";
+  var VERSION = "0.54.2";
 
   // shared/species.js
   var WORDS = {
@@ -6034,6 +6034,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       s.screen = W9.CurrentScreen;
     } catch (e) {
     }
+    try {
+      const cl = W9.document.getElementById("TextAreaChatLog");
+      if (cl) s.chat = cl.childElementCount;
+      s.els = W9.document.getElementsByTagName("*").length;
+    } catch (e) {
+    }
     return s;
   }
   function save3() {
@@ -6050,7 +6056,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (log.length > MAX2) log = log.slice(-MAX2);
     save3();
   }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "");
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
   var FAST = "farmhand-memfast";
   var born = Date.now();
   var fast = [];

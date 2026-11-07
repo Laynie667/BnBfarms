@@ -4,6 +4,25 @@
   */
   /* ───────────── heartbeat ───────────── */
 
+  // THE BOT'S OWN CHAT LOG, KEPT SHORT (Laynie, Nov 7: "even with the admin powers off, the ram usage is spikin' way up
+  // again", on the bot's tab only). The game never trims its chat log by itself (only its Cut button does), and the bot's
+  // tab runs all day with thousands of lines an hour: every one of them stayed on the page. /farmmem's page number didn't
+  // see it (that's the scripts' memory, not the page's). The bot hears everything from the connection, never from this
+  // log, so only the last CFG.CHATLOG_KEEP lines are kept: oldest first, the current room's divider stays.
+  function trimChatLog(){
+    const log = W.document && W.document.getElementById && W.document.getElementById("TextAreaChatLog");
+    if (!log || log.childElementCount <= CFG.CHATLOG_KEEP) return 0;
+    const seps = log.querySelectorAll(".chat-room-sep"), keep = seps.length ? seps[seps.length - 1] : null;
+    let n = 0;
+    while (log.childElementCount > CFG.CHATLOG_KEEP){
+      let el = log.firstElementChild;
+      if (el === keep) el = keep.nextElementSibling;   // (the room's own divider: what's after it goes instead, like the game's Cut)
+      if (!el) break;
+      el.remove(); n++;
+    }
+    return n;
+  }
+
   function heartbeat(){
     try {
       if (typeof W.ServerSend!=="function"){ setBadge("game not found","#ff9b9b"); watchdog(); return; }
@@ -55,6 +74,7 @@
       try { nurseryTick(); } catch(e){ warn("nursery:", e); }
       try { shotsMoreTick(); } catch(e){ warn("shots more:", e); }
       try { featsTick(); } catch(e){ warn("feats:", e); }
+      try { trimChatLog(); } catch(e){ warn("chat log trim:", e); }
       rutTick();
       quotaTick();
       prodTick();

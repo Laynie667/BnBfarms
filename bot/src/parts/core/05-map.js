@@ -125,8 +125,28 @@
     if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
     return teleportNow(mn, pt, urgent);
   }
+  // SOMEBODY WHOSE GAME WON'T LET ME MOVE THEM (Laynie, Nov 7: "It says Exe is trying to summon alexia and i"). Exe's game
+  // answered every teleport of mine with "A teleportation attempt has been cancelled because not allowed", out loud in
+  // the room under Exe's name, and somethin' holdin' Exe in place had me tryin' again every few seconds. So when a game
+  // says no to a teleport I just sent, I stop askin' for half an hour (or till they come back into the room): whatever
+  // was holdin' them lets them be, and they're told once, privately. (16-listeners.js hears the no.)
+  function teleportRefused(mn){
+    const now = Date.now(), sent = state.tpSent && state.tpSent.get(mn);
+    if (!sent || now - sent > 15000) return;   // only a no to one of mine
+    state.noMove = state.noMove || new Map();
+    const was = state.noMove.get(mn);
+    state.noMove.set(mn, now);
+    if (state.tpCheck) state.tpCheck.delete(mn);   // and no second try
+    if (was && now - was < CFG.NO_MOVE_MIN*60000) return;
+    log("Teleport of "+mn+" refused by their game: not movin' them for "+CFG.NO_MOVE_MIN+" minutes.");
+    tell(mn, "🚫 Your game won't let me move you, sugar: it just said no to the farm's teleport (that's your settings or one of your mods). "+
+      "So whatever was holdin' you in place, a knot, the stocks, the pen, the reins or a belly too full to waddle, lets you be for now. Nothin' you need to do.");
+  }
+  const cantMove = (mn) => !!(state.noMove && Date.now() - (state.noMove.get(mn) || 0) < CFG.NO_MOVE_MIN*60000);
   function teleportNow(mn, pt, urgent, tries){
-    if (!pt || !botIsAdmin() || !charFor(mn)) return false;
+    if (!pt || !botIsAdmin() || !charFor(mn) || cantMove(mn)) return false;
+    if (!(pt.X >= 0 && pt.Y >= 0)) return false;   // never off the map (a spot taken while somebody's game was still loadin' them in)
+    (state.tpSent = state.tpSent || new Map()).set(mn, Date.now());
     // The game reads entry.Position — {X,Y} at the top level was silently ignored.
     send("ChatRoomChat", {
       Content:"ChatRoomMapViewTeleport", Type:"Hidden",

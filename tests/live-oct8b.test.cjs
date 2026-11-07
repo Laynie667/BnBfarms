@@ -32,8 +32,8 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&typeof d.Content==="string").map((
 (async()=>{ await wait(3500); W.__cfg.USER_COOLDOWN_S=0;
   ['Laynie','Moo','Rex'].forEach((nm,i)=>chars[i+1].Name=nm);
   const p=()=>P(500).prod;
-  // pinned by too much milk, at the stocks, far from a stall
-  W.__pt(); p().held.vulva=7000; W.__pt(); await wait(500);
+  // pinned by too much milk, at the stocks, far from a stall (Nov 7: only with ?pinme on, off till switched on)
+  P(500).pinMe=true; W.__pt(); p().held.vulva=7000; W.__pt(); await wait(500);
   ok(p().pin && p().pin.since, 'too full: pinned where they stand');
   p().pin.since=Date.now()-21*60000; let n=sent.length; W.__pt(); await wait(4500);   // (the send queue paces: the day's weather and the whitelist go out first)
   ok(!p().pin && p().unpinUntil>Date.now() && /takes pity/.test(all(n)), 'after 20 minutes the farm girl milks them down where they stand, and they can move');

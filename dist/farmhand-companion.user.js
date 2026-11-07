@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.0
+// @version      0.54.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.0";
+  var VERSION = "0.54.1";
 
   // shared/species.js
   var WORDS = {
@@ -8249,7 +8249,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
   var FARM_GROUPS = [
     ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
-    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok"]],
+    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
   ];
@@ -8994,6 +8994,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
     ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
     ["praise", "Praise", "Let staff's praise count"],
+    // Laynie, Nov 7: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic" (off till switched on)
+    ["pinme", "Can be pinned", "Fill up past bursting, or grow too big, and you're stuck right where you stand till you're milked down, drained or given a reducer shot: twenty minutes at most, and your safeword frees you. Off: you just waddle"],
     ["degrade", "Degrade", "Let staff's degradin' count"],
     ["tally", "Tally marks", "Show your tally on ?who and the board"],
     ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],

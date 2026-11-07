@@ -1136,6 +1136,7 @@
         if (charFor(t)){
           const pt = sp ? spotFor(sp) : spotBeside(sender);
           if (!pt){ R("I can't see where you're standin', sugar. Step onto the map and try again."); break; }
+          if (cantMove(t)){ R("🚫 "+plainName(t)+"'s game won't let me move them, sugar (it said no to my teleport). Ask 'em to walk over."); break; }
           if (!teleport(t, pt, true)){ R("I can't move folks right now, hon. I've lost my room admin rights."); break; }
           tell(t, "🔗 "+plainName(sender)+" called you over, sugar.");
           audit(sender, "SUMMON_HERE", t+(sp ? " "+sp : ""));
@@ -2138,19 +2139,21 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      case "breedable": case "fertile": case "naturalheat": case "mpreg": {
+      case "breedable": case "fertile": case "naturalheat": case "mpreg": case "pinme": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
-        const field = cmd === "naturalheat" ? "naturalHeat" : cmd;
+        const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd;
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. For example: ?"+cmd+" on"); break; }
         if (!v){ R(switchStatus(cmd, !!r[field])); break; }
         const on = v === "on" || v === "yes";
-        if (on && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
+        if (on && field !== "pinMe" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r[field] = on;
         if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
         saveLedger(); audit(sender, field.toUpperCase(), on?"on":"off");
-        R({ breedable:"Breedable", fertile:"Fertile (can catch)", mpreg:"Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
+        R({ breedable:"Breedable", fertile:"Fertile (can catch)", mpreg:"Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days",
+            pinMe:"Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
+        if (field === "pinMe" && !on) syncCompanions(true);   // (anybody pinned right now is let go on the next tick)
         break;
       }
 

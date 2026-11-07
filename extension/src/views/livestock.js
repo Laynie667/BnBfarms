@@ -295,6 +295,8 @@ export const SWITCH_INFO = [
   ["milkable", "Milkable", "Make milk"],
   ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],
+  // Laynie, Nov 7: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic" (off till switched on)
+  ["pinme", "Can be pinned", "Fill up past bursting, or grow too big, and you're stuck right where you stand till you're milked down, drained or given a reducer shot: twenty minutes at most, and your safeword frees you. Off: you just waddle"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
   ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],

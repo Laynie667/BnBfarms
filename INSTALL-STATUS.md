@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-04. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-07. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.4** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.5** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.5 + Companion 0.54.1: a game that won't let the farm move somebody, and pinnin' is off till switched on.** From the Nov 7 watch report (Laynie: "It says Exe is trying to summon alexia and i, seems like some kind of bug, because exe isnt staff").
+  - **What it was:** not Exe summonin' anybody. The bot was tryin' to put Exe back where somethin' held them (Laynie: "the script half loaded on Exe's end, and i think Alexia and I tried to milk them before they were fully in, so the bot got confused on wheter to pin them"). Exe's game won't let the bot move them, and answered every try with "A teleportation attempt has been cancelled because not allowed", out loud in the room under Exe's name. The bot tried again every few seconds (21 times in the 4 minutes recorded).
+  - **Now, when somebody's game says no to a teleport the bot just sent,** it stops tryin' to move them for half an hour (or till they come back into the room). Whatever was holdin' them lets them be, they're told once, privately, the stocks stop whisperin' "back in the stocks you go", the pen stops tellin' the room it walked them back, and staff who ?summon them are told why. A "no" the bot didn't just ask for is ignored.
+  - **A pin is never taken off the map.** A game still loadin' somebody in has them at -1,-1; the pin waits till they're placed, an old pin sittin' off the map moves to where they stand, and the bot never sends anybody to a spot off the map.
+  - **?pinme: "Can be pinned", off till they switch it on** (Laynie: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic", and off by default, like the traps). Too full or too big to move, stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, safeword frees you. Off, they just waddle: the cumflation line says "so swollen they can barely waddle" instead of "stuck right where they are". It's in ⚙ Settings › Farm switches › 🥛 Milk, and ?pinme on|off from chat. Anybody pinned now is let go on the next tick unless they switch it on.
+  - tests/teleport-refused.test.cjs covers all of it, from a no to the stocks, the summon, the half hour, a pin off the map, and ?pinme.
 - **Bot 0.70.4 and every part of the farm girl: the parts' manifests, a starter part, and one line checker (Phases 4 and 5 of the plan).** Laynie, Nov 4: "phase 4 and 5 sound innocent enough, go ahead". Nothin' changes in play except four lines worded better. Install the parts' updates along with the bot (Tampermonkey picks them up).
   - **Every part tells the bot its real version now.** Each one had said 1.0.0 (or close) for months while the release bumped its addon.json: glory stalls was really 1.10.1, barn life 1.4.1. The build now puts the addon.json version into the script, so the Dashboard's 🧩 Bot parts tab shows the right numbers, and they can't drift again.
   - **A starter part:** `addons/_template` is a whole, workin' part (a command, a game event, a Companion card, lines that fit) with a README listin' everything a part can hand the bot: its commands, the game events it can hear, its cards, rates, lines and vetoes. Copy the folder to make a new one.

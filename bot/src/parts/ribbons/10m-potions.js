@@ -527,7 +527,7 @@
       if (Math.max(Math.abs(pos.X - r.penned.X), Math.abs(pos.Y - r.penned.Y)) <= 2) continue;
       if (now - (r.penned.pullAt || 0) < 30000) continue;
       r.penned.pullAt = now; saveLedger();
-      teleport(mn, { X: r.penned.X, Y: r.penned.Y }, true);
+      if (!teleport(mn, { X: r.penned.X, Y: r.penned.Y }, true)) continue;   // (a game that won't let me move them: no "walked back" for the room, 05-map.js)
       emote("🚧 "+pickFresh("penback", ["The farm girl catches "+plainName(mn)+" by the collar and walks 'em right back to the pen. \"Nice try, sugar.\"",
         plainName(mn)+" makes it three steps before a farmhand steers 'em back through the gate.",
         "\"And where do you think you're goin'?\" The farm girl tuts and herds "+plainName(mn)+" back where they belong."]), mn);

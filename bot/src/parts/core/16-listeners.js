@@ -75,6 +75,12 @@
         }
 
         if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
+        // their game sayin' no to my teleport, out loud ("A teleportation attempt has been cancelled because not allowed"):
+        // I stop askin' (teleportRefused, 05-map.js)
+        if (data.Type === "Action" && /teleportation attempt has been cancelled/i.test(String(data.Content||"") + " " + (Array.isArray(data.Dictionary) ? data.Dictionary.map(d => d && (d.Text || d.text || "")).join(" ") : ""))){
+          try { teleportRefused(data.Sender); } catch(e){ warn("teleport refused:", e); }
+          return;
+        }
         if (data.Type === "Activity" && data.Content === "BCPAction"){ try { onBCPAction(data); } catch(e){ warn("bc+:",e); } return; }
         if (data.Type === "Activity" && /^(Orgasm\d|OrgasmResist|OrgasmFail)/.test(String(data.Content||""))){ try { onClimax(data.Sender, String(data.Content)); } catch(e){ warn("climax:",e); } addonsEmit("climax", data.Sender, String(data.Content)); return; }
         if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } addonsEmit("activity", data); return; }
@@ -119,6 +125,7 @@
         state.lastHealthy = Date.now();
         greet(mn);
         onArrive(mn);
+        if (state.noMove) state.noMove.delete(mn);   // back in the room: their game gets a fresh ask (05-map.js)
         welcomeBack(mn);   // back after hours away: what they missed (10p-lookout.js)
         later(()=>deliverMail(mn), 8000);   // anything kept for them while they were away
         addonsEmit("join", mn);

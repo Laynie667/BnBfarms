@@ -804,7 +804,9 @@
       // a Heavy Udder Draught makes you ache, never stuck: with the stalls refusin' you, its milk pinned you
       // somewhere you could never get milked (live, Oct 8: Laynie held at the stocks with 27 L in her)
       const heavy = potionOn(mn, "heavy");
-      const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || (cumflated && !heavy)) && !(p.unpinUntil > now);
+      // only for somebody who said ?pinme on (Laynie, Nov 7: "some players seem really frustrated with the mechanic":
+      // off until they switch it on, like the traps); everybody else just waddles
+      const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || (cumflated && !heavy)) && !(p.unpinUntil > now) && r.pinMe === true;
       const Cp = charFor(mn), pos = Cp && Cp.MapData && Cp.MapData.Pos;
       // and no pin lasts past PIN_MAX_MIN: the farm girl comes, milks 'em down where they stand (or lets the
       // swellin' ease), and they're free to move for an hour
@@ -816,7 +818,11 @@
         whisper(mn, "🪣 You can move again, "+plainName(mn)+". You've got an hour before it can pin you again.");
         continue;
       }
-      if (pinned && pos){
+      // only where they really stand on the map (Nov 7: Exe's game half loaded, milked before they were all the way in,
+      // and a pin taken off the map had me teleportin' them back to it every few seconds). A game still loadin' somebody
+      // in has them at -1,-1: no pin there, and one taken there moves to where they stand once they're placed.
+      if (pinned && pos && pos.X >= 0 && pos.Y >= 0){
+        if (p.pin && (p.pin.X < 0 || p.pin.Y < 0)) p.pin = { X:pos.X, Y:pos.Y, since: p.pin.since };
         if (!p.pin){ p.pin = { X:pos.X, Y:pos.Y, since: now };
           if (cumflated && !bySize){ /* doCum already announced it */ }
           else whisper(mn, bySize
@@ -1150,7 +1156,9 @@
     // cumflation
     const fullNow = heldTotal(tp) / capacity(t);
     if (fullNow >= CFG.CUMFLATE_PIN_X && fullBefore < CFG.CUMFLATE_PIN_X)
-      emote("🎈 "+plainName(t)+"'s belly is stretched round, tight and sloshin' with "+plainName(stud)+"'s seed, way too swollen to waddle off. They're stuck right where they are till it drains.");
+      emote("🎈 "+plainName(t)+"'s belly is stretched round, tight and sloshin' with "+plainName(stud)+"'s seed, "+((rec(t) || {}).pinMe === true
+        ? "way too swollen to waddle off. They're stuck right where they are till it drains."
+        : "so swollen they can barely waddle, slow and sloshin' with every step."));   // (stuck only with ?pinme on)
     else if (fullNow > 1 && fullBefore <= 1)
       emote("🎈 "+plainName(t)+"'s belly starts to round out, warm and heavy with "+plainName(stud)+"'s load.");
     if (caught === "new") emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(stud)+"'s young now. Due in "+CFG.PROD.PREG_DAYS+" days.");

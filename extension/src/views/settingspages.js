@@ -22,7 +22,7 @@ import { workCard } from "./staff.js";
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
 const FARM_GROUPS = [
   ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
-  ["🥛 Milk", ["milkable", "seedmilk", "jarok"]],
+  ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
   ["🪤 Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
   ["🪱 Things that latch on", ["parasite", "symbiote", "watersports"]],
 ];

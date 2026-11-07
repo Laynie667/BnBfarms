@@ -134,7 +134,7 @@
   addCommand("shotlog",                   { topic: "milk", staff: true });
 
   /* ── breedin' ── */
-  addCommand("breedable fertile naturalheat mpreg", { topic: "breeding" });
+  addCommand("breedable fertile naturalheat mpreg pinme", { topic: "breeding" });   // (pinme: Nov 7, off till they switch it on)
   addCommand("breed",                     { topic: "breeding" });
   addCommand("cum",                       { topic: "breeding" });
   addCommand("yes no",                    { topic: "breeding" });

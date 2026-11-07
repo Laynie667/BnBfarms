@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.4
+// @version      0.70.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.4";
-  var COMPANION_VERSION = "0.54.0";
+  var VERSION = "0.70.5";
+  var COMPANION_VERSION = "0.54.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3318,6 +3318,8 @@
       TIE_MIN_M: 5,
       TIE_MAX_M: 30,
       // a knot ties the pair this long (random), and leashes them together
+      NO_MOVE_MIN: 30,
+      // somebody whose game says no to my teleport: not moved again for this long (or till they come back in; 05-map.js)
       KNOT_FERT_X: 1.5,
       // a tied load is more likely to take
       CUMFLATE_PIN_X: 1.5,
@@ -3820,7 +3822,7 @@
     addCommand("nomilk", { topic: "milk", staff: true });
     addCommand("inspect", { topic: "milk", staff: true });
     addCommand("shotlog", { topic: "milk", staff: true });
-    addCommand("breedable fertile naturalheat mpreg", { topic: "breeding" });
+    addCommand("breedable fertile naturalheat mpreg pinme", { topic: "breeding" });
     addCommand("breed", { topic: "breeding" });
     addCommand("cum", { topic: "breeding" });
     addCommand("yes no", { topic: "breeding" });
@@ -4666,8 +4668,22 @@
       if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
       return teleportNow(mn, pt, urgent);
     }
+    function teleportRefused(mn) {
+      const now = Date.now(), sent = state.tpSent && state.tpSent.get(mn);
+      if (!sent || now - sent > 15e3) return;
+      state.noMove = state.noMove || /* @__PURE__ */ new Map();
+      const was = state.noMove.get(mn);
+      state.noMove.set(mn, now);
+      if (state.tpCheck) state.tpCheck.delete(mn);
+      if (was && now - was < CFG.NO_MOVE_MIN * 6e4) return;
+      log("Teleport of " + mn + " refused by their game: not movin' them for " + CFG.NO_MOVE_MIN + " minutes.");
+      tell(mn, "\u{1F6AB} Your game won't let me move you, sugar: it just said no to the farm's teleport (that's your settings or one of your mods). So whatever was holdin' you in place, a knot, the stocks, the pen, the reins or a belly too full to waddle, lets you be for now. Nothin' you need to do.");
+    }
+    const cantMove = (mn) => !!(state.noMove && Date.now() - (state.noMove.get(mn) || 0) < CFG.NO_MOVE_MIN * 6e4);
     function teleportNow(mn, pt, urgent, tries) {
-      if (!pt || !botIsAdmin() || !charFor(mn)) return false;
+      if (!pt || !botIsAdmin() || !charFor(mn) || cantMove(mn)) return false;
+      if (!(pt.X >= 0 && pt.Y >= 0)) return false;
+      (state.tpSent = state.tpSent || /* @__PURE__ */ new Map()).set(mn, Date.now());
       send("ChatRoomChat", {
         Content: "ChatRoomMapViewTeleport",
         Type: "Hidden",
@@ -6104,7 +6120,8 @@
       trapEager: "eager",
       trapsOn: "traps",
       ownOutfit: "ownoutfit",
-      teaseMe: "teaseme"
+      teaseMe: "teaseme",
+      pinMe: "pinme"
     };
     function shownMl(n) {
       n = Number(n) || 0;
@@ -7344,7 +7361,7 @@
         const bySize = sizePinned(mn);
         const cumflated = CFG.PROD.PIN_FROM_INFLATION && heldTotal(p) >= CFG.CUMFLATE_PIN_X * capacity(mn);
         const heavy = potionOn(mn, "heavy");
-        const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || cumflated && !heavy) && !(p.unpinUntil > now);
+        const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || cumflated && !heavy) && !(p.unpinUntil > now) && r.pinMe === true;
         const Cp = charFor(mn), pos = Cp && Cp.MapData && Cp.MapData.Pos;
         if (pinned && p.pin && p.pin.since && now - p.pin.since > CFG.PROD.PIN_MAX_MIN * 6e4) {
           const over = Math.max(0, p.milk - milkCapNatural(mn));
@@ -7356,7 +7373,8 @@
           whisper(mn, "\u{1FAA3} You can move again, " + plainName(mn) + ". You've got an hour before it can pin you again.");
           continue;
         }
-        if (pinned && pos) {
+        if (pinned && pos && pos.X >= 0 && pos.Y >= 0) {
+          if (p.pin && (p.pin.X < 0 || p.pin.Y < 0)) p.pin = { X: pos.X, Y: pos.Y, since: p.pin.since };
           if (!p.pin) {
             p.pin = { X: pos.X, Y: pos.Y, since: now };
             if (cumflated && !bySize) {
@@ -7755,7 +7773,7 @@
       }
       const fullNow = heldTotal(tp) / capacity(t);
       if (fullNow >= CFG.CUMFLATE_PIN_X && fullBefore < CFG.CUMFLATE_PIN_X)
-        emote("\u{1F388} " + plainName(t) + "'s belly is stretched round, tight and sloshin' with " + plainName(stud) + "'s seed, way too swollen to waddle off. They're stuck right where they are till it drains.");
+        emote("\u{1F388} " + plainName(t) + "'s belly is stretched round, tight and sloshin' with " + plainName(stud) + "'s seed, " + ((rec(t) || {}).pinMe === true ? "way too swollen to waddle off. They're stuck right where they are till it drains." : "so swollen they can barely waddle, slow and sloshin' with every step."));
       else if (fullNow > 1 && fullBefore <= 1)
         emote("\u{1F388} " + plainName(t) + "'s belly starts to round out, warm and heavy with " + plainName(stud) + "'s load.");
       if (caught === "new") emote("\u{1F37C} It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(stud) + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days.");
@@ -9074,8 +9092,7 @@
         }
         const C2 = charFor(r.mn), pos = C2 && C2.MapData && C2.MapData.Pos, pt = spotFor("stocks");
         if (pt && pos && (Math.abs(pos.X - pt.X) > 1 || Math.abs(pos.Y - pt.Y) > 1)) {
-          teleport(r.mn, pt, false, true);
-          whisper(r.mn, "Uh-uh, back in the stocks you go, hon! " + Math.ceil((s.until - Date.now()) / 6e4) + " minutes left.");
+          if (teleport(r.mn, pt, false, true)) whisper(r.mn, "Uh-uh, back in the stocks you go, hon! " + Math.ceil((s.until - Date.now()) / 6e4) + " minutes left.");
         }
       }
       for (const r of Object.values(L2.people)) {
@@ -12924,7 +12941,7 @@
         if (now - (r.penned.pullAt || 0) < 3e4) continue;
         r.penned.pullAt = now;
         saveLedger();
-        teleport(mn, { X: r.penned.X, Y: r.penned.Y }, true);
+        if (!teleport(mn, { X: r.penned.X, Y: r.penned.Y }, true)) continue;
         emote("\u{1F6A7} " + pickFresh("penback", [
           "The farm girl catches " + plainName(mn) + ` by the collar and walks 'em right back to the pen. "Nice try, sugar."`,
           plainName(mn) + " makes it three steps before a farmhand steers 'em back through the gate.",
@@ -63402,6 +63419,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               R("I can't see where you're standin', sugar. Step onto the map and try again.");
               break;
             }
+            if (cantMove(t)) {
+              R("\u{1F6AB} " + plainName(t) + "'s game won't let me move them, sugar (it said no to my teleport). Ask 'em to walk over.");
+              break;
+            }
             if (!teleport(t, pt, true)) {
               R("I can't move folks right now, hon. I've lost my room admin rights.");
               break;
@@ -64906,13 +64927,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "breedable":
         case "fertile":
         case "naturalheat":
-        case "mpreg": {
+        case "mpreg":
+        case "pinme": {
           const r = rec(sender);
           if (!r || !r.roles.length) {
             R("That's just for folks on the books, sugar. Say ?apply first!");
             break;
           }
-          const field = cmd === "naturalheat" ? "naturalHeat" : cmd;
+          const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd;
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
             R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. For example: ?" + cmd + " on");
@@ -64923,7 +64945,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           const on = v === "on" || v === "yes";
-          if (on && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")) {
+          if (on && field !== "pinMe" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
           }
@@ -64931,7 +64953,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D * 864e5;
           saveLedger();
           audit(sender, field.toUpperCase(), on ? "on" : "off");
-          R({ breedable: "Breedable", fertile: "Fertile (can catch)", mpreg: "Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days" }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
+          R({
+            breedable: "Breedable",
+            fertile: "Fertile (can catch)",
+            mpreg: "Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)",
+            naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days",
+            pinMe: "Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)"
+          }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
+          if (field === "pinMe" && !on) syncCompanions(true);
           break;
         }
         case "breed": {
@@ -65765,6 +65794,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             return;
           }
           if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
+          if (data.Type === "Action" && /teleportation attempt has been cancelled/i.test(String(data.Content || "") + " " + (Array.isArray(data.Dictionary) ? data.Dictionary.map((d) => d && (d.Text || d.text || "")).join(" ") : ""))) {
+            try {
+              teleportRefused(data.Sender);
+            } catch (e) {
+              warn("teleport refused:", e);
+            }
+            return;
+          }
           if (data.Type === "Activity" && data.Content === "BCPAction") {
             try {
               onBCPAction(data);
@@ -65841,6 +65878,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           state.lastHealthy = Date.now();
           greet(mn);
           onArrive(mn);
+          if (state.noMove) state.noMove.delete(mn);
           welcomeBack(mn);
           later(() => deliverMail(mn), 8e3);
           addonsEmit("join", mn);

@@ -64,8 +64,8 @@
       if (Date.now() >= s.until){ r.stocked = null; saveLedger(); whisper(r.mn, "🔓 Time's up, "+plainName(r.mn)+"! Out of the stocks you come, sugar."); continue; }
       const C = charFor(r.mn), pos = C && C.MapData && C.MapData.Pos, pt = spotFor("stocks");
       if (pt && pos && (Math.abs(pos.X-pt.X) > 1 || Math.abs(pos.Y-pt.Y) > 1)){
-        teleport(r.mn, pt, false, true);   // the stocks hold you: straight back
-        whisper(r.mn, "Uh-uh, back in the stocks you go, hon! "+Math.ceil((s.until-Date.now())/60000)+" minutes left.");
+        // the stocks hold you: straight back (and a word only if it worked: a game that won't let me move them, 05-map.js)
+        if (teleport(r.mn, pt, false, true)) whisper(r.mn, "Uh-uh, back in the stocks you go, hon! "+Math.ceil((s.until-Date.now())/60000)+" minutes left.");
       }
     }
     // a prize from the fair wears off

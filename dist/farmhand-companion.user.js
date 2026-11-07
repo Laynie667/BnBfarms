@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.3
+// @version      0.54.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.3";
+  var VERSION = "0.54.4";
 
   // shared/species.js
   var WORDS = {
@@ -5878,15 +5878,62 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return n;
   }
   function trimStats() {
-    return { trimmed };
+    return { trimmed, people: letGo };
+  }
+  var LEFT_MS = 10 * 6e4;
+  var missing = /* @__PURE__ */ new Map();
+  var letGo = 0;
+  var isOnline = (C) => !!(C && typeof C.AccountName === "string" && C.AccountName.startsWith("Online-"));
+  function letGoOfLeavers(now) {
+    now = now ?? Date.now();
+    if (!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER)) return 0;
+    if (W6.CurrentScreen !== "ChatRoom" || !W6.ChatRoomData || !Array.isArray(W6.Character) || typeof W6.CharacterDelete !== "function") return 0;
+    const here = new Set((W6.ChatRoomCharacter || []).map((c) => c && c.MemberNumber));
+    const keep2 = new Set([W6.Player, W6.InformationSheetSelection, W6.CurrentCharacter].filter(Boolean));
+    let n = 0;
+    for (const C of W6.Character.slice()) {
+      if (!isOnline(C) || keep2.has(C)) continue;
+      const mn = C.MemberNumber;
+      if (here.has(mn)) {
+        missing.delete(mn);
+        continue;
+      }
+      const since = missing.get(mn);
+      if (since == null) {
+        missing.set(mn, now);
+        continue;
+      }
+      if (now - since < LEFT_MS) continue;
+      try {
+        W6.CharacterDelete(C, false);
+        n++;
+        missing.delete(mn);
+      } catch (e) {
+      }
+    }
+    for (const mn of [...missing.keys()]) if (!W6.Character.some((c) => c && c.MemberNumber === mn)) missing.delete(mn);
+    letGo += n;
+    return n;
+  }
+  function leftLoaded() {
+    if (!Array.isArray(W6.Character)) return null;
+    const here = new Set((W6.ChatRoomCharacter || []).map((c) => c && c.MemberNumber));
+    return W6.Character.filter((C) => isOnline(C) && C !== W6.Player && !here.has(C.MemberNumber)).length;
   }
   function trimTick() {
     const bot = !!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER);
-    return bot ? trimPictures(true, IDLE, 0) : trimPictures(false);
+    if (!bot) return trimPictures(false);
+    try {
+      letGoOfLeavers();
+    } catch (e) {
+      console.warn("[Farmhand Companion] lettin' go of folks who left:", e);
+    }
+    return trimPictures(true, IDLE, 0);
   }
   function initTrim(mod2) {
     sdk4 = mod2;
     W6.__farmTrim = trimPictures;
+    W6.__farmLetGo = letGoOfLeavers;
     try {
       if (typeof W6.GLDrawLoadImage === "function") sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
@@ -6112,6 +6159,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       for (const C of cs) for (const cv of [C && C.Canvas, C && C.CanvasBlink]) if (cv && cv.width) px += cv.width * cv.height;
       s.chars = cs.length;
       s.charMB = Math.round(px * 4 / 1e6);
+      s.left = leftLoaded();
     } catch (e) {
     }
     if (!newGame) try {
@@ -6144,7 +6192,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
     try {
-      s.let = trimStats().trimmed;
+      const ts = trimStats();
+      s.let = ts.trimmed;
+      s.letPeople = ts.people;
     } catch (e) {
     }
     try {
@@ -6174,7 +6224,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (log.length > MAX2) log = log.slice(-MAX2);
     save3();
   }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + (s.scrPics != null ? " \xB7 screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") + (s.chars != null ? " \xB7 " + s.chars + " characters loaded, " + s.charMB + " MB drawn" : "") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + (s.scrPics != null ? " \xB7 screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") + (s.chars != null ? " \xB7 " + s.chars + " characters loaded" + (s.left != null ? " (" + s.left + " who left the room)" : "") + ", " + s.charMB + " MB drawn" : "") + (s.letPeople ? " \xB7 " + s.letPeople + " who left let go" : "") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
   var FAST = "farmhand-memfast";
   var born = Date.now();
   var fast = [];

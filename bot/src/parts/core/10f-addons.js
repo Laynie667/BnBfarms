@@ -168,6 +168,12 @@
       peek: (other) => JSON.parse(JSON.stringify((L.mods && L.mods[other]) || {})),
       yieldWeek: (mn) => { rollBoard(); return (L.yield && L.yield.w && L.yield.w[mn]) || 0; },   // milk (and seed) given this week
       studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
+      // labour (10y2b-birthing.js): start(mn) brings it on now (a midwife's doin', asked first) · help(mn, mins) takes
+      // minutes off, → minutes left or null · unstick(mn, by) turns a stuck one · place(mn) where their kind births ·
+      // young(mn) → [one, many] · sound(mn) a noise their kind makes birthin'
+      labour: Object.freeze({ start: (mn) => startLabour(mn, "induced"), help: (mn, mins) => helpLabour(mn, mins == null ? CFG.MIDWIFE_HELP_MIN : mins),
+        unstick: (mn, by) => unstickLabour(mn, by), place: (mn) => birthWords(mn).place, young: (mn) => { const w = birthWords(mn); return [w.one, w.many]; },
+        sound: (mn) => { const w = birthWords(mn); return w.sounds[Math.floor(Math.random()*w.sounds.length)]; } }),
       clockedIn, isMandated, hoursThisWeek: (mn) => { const r = rec(mn); return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 3600000 : 0; }, inHeat, startHeat, rollConception, canCatchIn, mpregOn, gearOf, funnelOn,
       // the map
       pos: posOf, spot: (n) => (L.spots && L.spots[n]) || null, spots: () => Object.assign({}, L.spots||{}),

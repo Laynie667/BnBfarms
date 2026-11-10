@@ -580,7 +580,8 @@
     try { oneSireAfter(mother, stud, "new"); } catch(e){ warn("one sire:", e); }
     return "new";
   }
-  function giveBirth(mn){
+  function giveBirth(mn, info){   // info (from labour): { midwife, helps, turnedBy, induced }
+    info = info || {};
     const p = prodOf(mn), g = p.preg;
     const kids = { male:0, female:0, futa:0 };
     const [m,f] = CFG.PROD.SEX_SPLIT;
@@ -597,17 +598,15 @@
     const sires = g.sires.slice();
     p.preg = null; p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS*86400000; openedUp(mn);
     saveLedger(); audit(CFG.BOT_MEMBER,"BIRTH",mn+" "+JSON.stringify(kids));
-    later(() => addonsEmit("birth", mn, kids, sires), 1500);   // midwives, pregnancy add-on
-    const parts = [];
-    if (kids.male)   parts.push(kids.male+" male");
-    if (kids.female) parts.push(kids.female+" female");
-    if (kids.futa)   parts.push(kids.futa+" futa");
-    const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+g.count+" ("+parts.join(", ")+"), sired by "+
-                g.sires.map(plainName).join(" & ")+". Milk's comin' in strong now!";
-    try { albumAdd(mn, "🍼", "A litter delivered", g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
-    if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);   // the birth, in beats (10y2-brood.js)
-    else if (onMap(mn)) emote(bodyWords(mn, "🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
-                         ". The farm girl tucks 'em in the straw, and "+plainName(mn)+"'s milk comes in strong, breasts swellin' heavy."));   // (fitted: a male carryin' has a chest, not breasts)
+    later(() => addonsEmit("birth", mn, kids, sires, info), 1500);   // midwives, pregnancy add-on
+    // in their kind's words (10y2b-birthing.js): "3 pups, 2 male and 1 female" · "a calf, a little female"
+    const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, v: { c: siresTxt, x: String(g.count) } };
+    const what = birthKids(mn, g.count) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
+    const mw = info.midwife && info.midwife !== CFG.BOT_MEMBER ? info.midwife : 0;
+    const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+what+", sired by "+siresTxt+(mw ? ", with "+plainName(mw)+" as midwife" : "")+". Milk's comin' in strong now!";
+    try { albumAdd(mn, "🍼", g.count === 1 ? "A "+birthWords(mn).one+" delivered" : "A litter delivered", what+", sired by "+siresTxt+(mw ? ". Midwife: "+plainName(mw) : "")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
+    if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);   // the birth, in beats (10y2-brood.js)
+    else if (onMap(mn)) emote("🍼 "+birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
     else beep(mn, msg);
     try { const split = revealSplit(mn, sires, g.count); if (split) L.studbook[L.studbook.length - 1].split = split; } catch(e){ warn("split:", e); }   // whose they were (10y7-udders.js)
     for (const h of herdsOf(mn)) beep(h.leader, msg);
@@ -761,22 +760,11 @@
           beep(mn, "🍼 You're due in less than a day, "+plainName(mn)+"! Almost there, sweetie.");
           for (const h of herdsOf(mn)) beep(h.leader, "🍼 "+plainName(mn)+" is due in less than a day, hon.");
         }
-        // labour: on the farm when it's time, there's a show first
-        if (now >= p.preg.due){
-          if (p.labour){
-            if (now >= p.labour.until){ p.labour = null; giveBirth(mn); }
-            else if (onMap(mn) && now >= p.labour.next){
-              p.labour.next = now + (8 + Math.random()*6)*60000;
-              const c = ["%n grips the rail and moans through another contraction, belly tight and heavin'.",
-                         "%n pants and rocks on all fours. The litter's movin' lower, any time now.",
-                         "Another wave rolls through %n, and they let out a long, low moo. Not long now, sugar."];
-              emote("🍼 "+c[Math.floor(Math.random()*c.length)].replace(/%n/g, plainName(mn)));
-            }
-          } else if (onMap(mn)){
-            p.labour = { until: now + CFG.LABOUR_MIN*60000, next: now + 10*60000 };
-            emote("🍼 Y'all, "+plainName(mn)+"'s water just broke! They're in labour with "+p.preg.sires.map(plainName).join(" & ")+"'s litter. Come gather round the stall.");
-            for (const h of herdsOf(mn)) tell(h.leader, "🍼 "+plainName(mn)+" just went into labour, hon. Come watch!");
-          } else if (now - p.preg.due > CFG.LABOUR_WAIT_H*3600000) giveBirth(mn);
+        // labour: on the farm when it's time, there's a show first, in their kind's own way (10y2b-birthing.js)
+        if (p.labour) labourTick(mn, p, now);
+        else if (now >= p.preg.due){
+          if (onMap(mn)) startLabour(mn);
+          else if (now - p.preg.due > CFG.LABOUR_WAIT_H*3600000) giveBirth(mn);
         }
       }
       if (p.tieUntil && now >= p.tieUntil) untie(mn, true);
@@ -784,7 +772,7 @@
       // expectin' and showin': a little emote once a day from day 3
       if (p.preg && now - p.preg.since > 3*86400000 && charFor(mn) && now - (p.showSaid||0) > 86400000){
         p.showSaid = now;
-        emote("🤰 "+plainName(mn)+" rests a hand on that swellin' belly. "+plainName(p.preg.sires[0])+"'s litter is really showin' now.");
+        emote("🤰 "+plainName(mn)+" rests a hand on that swellin' belly. "+plainName(p.preg.sires[0])+"'s "+((p.preg.count || 1) === 1 ? birthWords(mn).one+" is" : birthWords(mn).many+" are")+" really showin' now.");   // (a calf, not a litter)
       }
       // a loose hole drips its load now and then (not while plugged or tied)
       for (const h of ["vulva","butt"]){

@@ -262,7 +262,15 @@
     MILK_QUOTA_ML: 1000,          // stock that makes milk should give this much a day (staff: ?quota)
     QUOTA_MIN_PRESENT: 60,        // the milk quota only counts a day they spent at least this many minutes on the farm
     QUOTA_STREAK_UP: 5,           // this many days in a row on quota moves 'em up a tier (new → trained → prize)
-    LABOUR_MIN: 45,               // labour lasts this long before the litter comes
+    LABOUR_MIN: 45,               // labour lasts this long before the litter comes (10y2b-birthing.js: and then…)
+    LABOUR_FIRST_MIN: 15,         // …this much longer for a first litter
+    LABOUR_OLD_HAND_MIN: 10,      // …this much shorter once they've birthed twice before
+    LABOUR_PER_YOUNG: 3, LABOUR_BIG_MAX: 30,   // …and longer for every young past the first, up to this much more
+    LABOUR_BEAT_MIN: [6, 10],     // a line from them every so many minutes while they labour on the farm
+    LABOUR_FLOOR_MIN: 3,          // a midwife's help never brings the birth closer than this
+    MIDWIFE_HELP_MIN: 5,          // what each lendin' of a midwife's hands takes off (the breeding add-on)
+    STUCK_AT: 0.6, STUCK_CHANCE: [0.15, 0.4],   // past this far through labour, one may come turned crossways (a single, a litter)
+    STUCK_WAIT_MIN: 10,           // nobody turns it in this long: the farm girl does it herself
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show
     EGG_CHANCE: 0.2, EGG_TIED_CHANCE: 0.4, EGG_COUNT: [2,6], EGG_DAYS: [2,3],
     // traps, the thing in the water, and toys that act on their own (10u-traps.js)

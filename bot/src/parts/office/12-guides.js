@@ -268,8 +268,16 @@ WHILE YOU'RE EXPECTIN'
   • Due in 5 days. Your belly shows on ?stats and ?measure, and your
     udder swells a cup.
   • Here on the farm when you're due? Your water breaks and you're in
-    labour for 45 minutes, with the herd invited, then the litter
-    comes (male, female or futa) and your milk comes in strong.
+    labour your kind's own way: about 45 minutes, longer for a first
+    litter or a big one, shorter once you've birthed twice. Then your
+    young come (male, female or futa) and your milk comes in strong.
+  • Now and then one comes turned crossways and everything waits till
+    a midwife turns it (or the farm girl, after 10 minutes).
+  • Midwives (staff, and anybody staff trust with it): ?checkup <who>
+    feels how far along you are and how many; ?midwife <who> helps you
+    through labour and cuts it short, and tends you after; ?induce
+    <who> brings it on once you're nestin' (you're asked first).
+    ?checkup off: no checkups on you. ?checkup on your own: a feel.
   • Not milkable? I'll ask if you want your milk to come in.
 
 EGGS · ?eggs on|off

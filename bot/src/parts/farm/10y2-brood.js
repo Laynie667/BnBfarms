@@ -71,16 +71,17 @@
       face(mn, "afterglow", 120); arouse(mn, 30);
     }, v);
   }
-  // ── farrowin': the litter comes, in beats ──
-  function farrowScene(mn, count, parts, sires){
-    const v = { x: String(count), c: sires.map(plainName).join(" & ") };
+  // ── farrowin': the young come, in beats, in their kind's own way (10y2b-birthing.js) ──
+  // kids: { male, female, futa }. A single gets its own crown and end (never "the first of the litter")
+  function farrowScene(mn, count, kids, sires){
+    const x = { count, kids, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
     const mids = count <= 2 ? 0 : count <= 5 ? 1 : count <= 10 ? 2 : 3;
-    const beats = [BROOD_LINES.farrowStart, BROOD_LINES.farrowCrown];
-    for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? BROOD_LINES.farrowHuge : BROOD_LINES.farrowMid);
+    const beats = [birthBeat(mn, "push", x, "labour"), birthBeat(mn, count === 1 ? "crownOne" : "crownMany", x, "crown")];
+    for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? birthBeat(mn, "huge", x) : birthBeat(mn, "mid", x));
     sceneRun(mn, "🍼", beats, (here) => {
-      if (here) emote("🍼 "+bLine("farrowEnd", mn, Object.assign({ ml: parts }, v)), mn);
+      if (here) emote("🍼 "+birthLine(count === 1 ? "endOne" : "endMany", mn, x), mn);
       face(mn, "afterglow", 180);
-    }, v);
+    }, x.v);
   }
 
   // ── a belly that shows ──
@@ -246,21 +247,21 @@
       "It's over. %x. A whole barrow-load, laid by one body. %n can't speak and can't stand. They lie in the wreck of the nest, empty for the first time in days, and already missin' the weight.",
       "%n's belly, that was restin' on their thighs this mornin', is flat. %x eggs lie heaped round them. They're cryin' a little, and smilin', and they don't know which one they mean."],
     farrowStart: [
-      "%n drops to their knees in the farrowin' straw and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
-      "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. The litter's comin', and it's comin' now."],
+      "%n drops to their knees in %place and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
+      "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. It's comin', and it's comin' now."],
     farrowCrown: [
       "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a warm wet rush it slides out into the farm girl's waitin' hands.",
       "%n strains till the cords stand out in their neck, and the first of the litter comes, slick and squallin'. The farm girl wipes it down and lays it in the straw by their teats."],
     farrowMid: [
       "No rest. The next one's right behind, and %n is pushin' again before they've caught their breath. Their milk's lettin' down already, runnin' in streams with every heave.",
-      "Another, and another. %n is on all fours now, rockin', lowin' like stock, and every push leaves one more squirmin' in the straw.",
+      "Another, and another. %n is on all fours now, rockin', lettin' out %sound, and every push leaves one more squirmin' in the straw.",
       "The farm girl reaches in to help turn one, and %n shrieks, and it comes, and so does the one behind it."],
     farrowHuge: [
-      "It's a litter fit for a sow. %n has been at it so long they've gone quiet and glassy, just pushin' when their body says push, while the straw fills up round them.",
+      "It's a huge litter. %n has been at it so long they've gone quiet and glassy, just pushin' when their body says push, while the straw fills up round them.",
       "They keep comin'. %n's belly is shrinkin' by the handful, and there's still a row of little shapes movin' under the skin, waitin' their turn."],
     farrowEnd: [
-      "With one last long push, %n delivers the last of %x (%ml), sired by %c. The farm girl tucks them in the straw against %n's swollen teats, and the milk comes in hard.",
-      "%x in the straw (%ml), every one of them %c's. %n lies on their side, spent and leakin' milk, while the litter roots and latches on."],
+      "With one last long push, %n delivers the last of %kids, %sexes, sired by %c. The farm girl tucks them in the straw against %n's swollen teats, and the milk comes in hard.",
+      "%kids in the straw, %sexes, every one of them %c's. %n lies on their side, spent and leakin' milk, while the litter roots and latches on."],
     belly1: ["%n's belly has started to round out. It's showin' now.", "There's a soft new curve low on %n. Somethin' in there is growin'."],
     belly2: ["%n's belly has gone heavy. It hangs, and sways when they walk, and they've started carryin' a hand under it.",
              "%n is properly swollen now: a taut, heavy gut that leads the way into every room."],

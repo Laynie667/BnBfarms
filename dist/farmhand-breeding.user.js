@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.2.3
+// @version      1.3.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -51,29 +51,29 @@
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
-  var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+  var fill = (text, vars2) => String(text).replace(/%(\w+)%/g, (m, k) => vars2[k] !== void 0 ? vars2[k] : m);
   var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}/g;
   var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|nb|v|c|t|f|m)\})+)/;
   var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
   var untag = (t) => String(t == null ? "" : t).replace(TAG_ANY, "");
-  var bodyOf = (api3, mn) => {
+  var bodyOf = (api4, mn) => {
     try {
-      return api3 && api3.body && mn ? api3.body(mn) : null;
+      return api4 && api4.body && mn ? api4.body(mn) : null;
     } catch (e) {
       return null;
     }
   };
-  var gearOf = (api3, mn) => {
+  var gearOf = (api4, mn) => {
     try {
-      return api3 && api3.gear && mn && api3.gear(mn) || {};
+      return api4 && api4.gear && mn && api4.gear(mn) || {};
     } catch (e) {
       return {};
     }
   };
-  function fits(line, b) {
-    const s = String(line), m = s.match(TAG_LEAD);
+  function fits(line2, b) {
+    const s = String(line2), m = s.match(TAG_LEAD);
     if (!b) return !m;
     if (m) {
       for (const t of m[1].slice(1, -1).split("}{")) {
@@ -93,16 +93,16 @@
     return plain.length ? plain : list;
   }
   var pickFit = (list, b) => untag(pick(fitting(list, b)));
-  function lineFor(api3, mn, list, key) {
+  function lineFor(api4, mn, list, key) {
     if (!Array.isArray(list) || !list.length) return "";
-    const b = bodyOf(api3, mn);
+    const b = bodyOf(api4, mn);
     let t;
     try {
-      t = key && api3 && api3.pickFor && api3.tags >= 2 ? untag(api3.pickFor(mn, key, list)) : pickFit(list, b);
+      t = key && api4 && api4.pickFor && api4.tags >= 2 ? untag(api4.pickFor(mn, key, list)) : pickFit(list, b);
     } catch (e) {
       t = pickFit(list, b);
     }
-    return api3 && api3.fit && api3.tags >= 2 ? api3.fit(mn, t) : t;
+    return api4 && api4.fit && api4.tags >= 2 ? api4.fit(mn, t) : t;
   }
   var ANIMALS = {
     cow: { f: "cow", m: "bull", young: ["calf", "calves"], call: "moo", sound: ["a low moo", "a soft, needy moo", "a long, shaky moo"] },
@@ -142,13 +142,13 @@
     sheep: "goat",
     goat: "sheep"
   };
-  function animalOf(api3, mn) {
+  function animalOf(api4, mn) {
     let k = "default";
     try {
-      k = api3 && api3.species && api3.species(mn) || "default";
+      k = api4 && api4.species && api4.species(mn) || "default";
     } catch (e) {
     }
-    const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api3, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
+    const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api4, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
     return { key: ANIMALS[k] ? k : "default", kin: KIN[k] || null, a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
   }
 
@@ -420,8 +420,8 @@
     if (!studs.length) return c.reply("No stud on the farm is takin' calls right now, sugar. (Studs sign up with ?studcall on.)");
     p.called[sender] = Date.now();
     A.save();
-    const line = fill(lineFor(A, sender, CALL_STUD, "call"), { name: A.name(sender), where: whereIs(sender) });
-    for (const m of studs) A.notice(m, line);
+    const line2 = fill(lineFor(A, sender, CALL_STUD, "call"), { name: A.name(sender), where: whereIs(sender) });
+    for (const m of studs) A.notice(m, line2);
     c.reply(fill(pick(CALLED), { n: studs.length, s: studs.length === 1 ? "" : "s" }));
   }
   function cmdMate(c) {
@@ -489,10 +489,361 @@
   }
   var PAIRS_GUIDE = " Studs: ?studcall on to be told when somebody in heat says ?callstud. Mates for the day: ?mate <who> (breedin' your mate is likelier to take, and pays you both a ribbon).";
 
-  // addons/breeding/index.js
+  // addons/breeding/midwife.js
   var api2 = null;
-  function D2() {
-    const d = api2.data();
+  var D2 = null;
+  var POOLS = { claim: [], born: [] };
+  function midwifeSetup(a, data, pools) {
+    api2 = a;
+    D2 = data;
+    POOLS = Object.assign(POOLS, pools || {});
+  }
+  var HELP_GAP_MIN = 3;
+  var AFTER_MIN = 60;
+  var M = () => {
+    const d = D2();
+    d.mw = d.mw || {};
+    for (const k of ["trusted", "noCheck", "checked", "paid", "helpAt", "born", "labour"]) d.mw[k] = d.mw[k] || {};
+    return d.mw;
+  };
+  var canMidwife = (mn) => !!(mn && (api2.rank(mn) >= 1 || M().trusted[mn]));
+  var near = (a, b) => {
+    const p = api2.pos(a), q = api2.pos(b);
+    return !!(p && q && Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) <= 1);
+  };
+  var along = (p) => p && p.preg ? Math.min(1, Math.max(0, (Date.now() - p.preg.since) / Math.max(1, p.preg.due - p.preg.since))) : null;
+  var stageKey = (f) => f < 0.33 ? "early" : f < 0.66 ? "showing" : f < 0.9 ? "heavy" : "nesting";
+  var STAGE_WORD = { early: "early days", showing: "showin'", heavy: "heavy with it", nesting: "nestin'" };
+  function vars(mn, by, extra) {
+    const an = animalOf(api2, mn), L = api2.labour, y = L && L.young ? L.young(mn) : an.young, p = api2.prod(mn), n = p && p.preg && p.preg.count || 1;
+    return Object.assign({
+      name: api2.name(mn),
+      by: by ? api2.name(by) : "",
+      young: y[0],
+      youngs: y[1],
+      brood: n > 1 ? y[1] : y[0],
+      place: L && L.place ? L.place(mn) : "the birthin' straw",
+      sound: L && L.sound ? L.sound(mn) : an.sound
+    }, extra || {});
+  }
+  var line = (mn, pool, key, by, extra) => fill(lineFor(api2, mn, pool, "mw:" + key), vars(mn, by, extra));
+  var CHECKUP = [
+    "%by% kneels beside %name% and lays both hands flat on their belly, feelin' slow and careful for the %brood%.",
+    "%by% presses an ear to %name%'s swollen belly, listenin', one hand rubbin' slow circles.",
+    "%by% runs practiced hands over %name%'s belly, pressin' here and there, judgin' how high they're carryin'.",
+    "%by% has %name% lie back in the straw and feels along their belly from top to bottom, hummin' to themselves.",
+    "%by% cups the underside of %name%'s belly and gives it a gentle heft, weighin' what's in there.",
+    "%by% checks %name% over the way a good hand checks stock: belly, teats, hips, then a pat on the rump.",
+    "%by% spreads warm hands on %name%'s belly and waits. Somethin' in there kicks right back, and %by% grins."
+  ];
+  var SELF_CHECK = [
+    "%name% sits back in the straw with both hands on their belly, feelin' for the %brood%.",
+    "%name% rubs slow circles on their own belly, pressin' gently, tryin' to feel what's in there."
+  ];
+  var CARRY = {
+    early: ["carryin' small yet, hardly a swell", "barely showin', just a little firmness low down"],
+    showing: ["carryin' high and round", "belly firm and high, and growin' nicely"],
+    heavy: ["carryin' heavy and wide", "belly big and tight, and plenty movin' in there"],
+    nesting: ["dropped low and heavy, any time now", "sittin' low, belly hard, ready to come"]
+  };
+  var HELP = [
+    '%by% gets behind %name% and holds them up under the arms. "Breathe with me. Now push, long and slow."',
+    "%by% digs the heel of their hand into the small of %name%'s back, right where it aches, and the next push goes deeper.",
+    `%by% counts %name% through the push, one hand flat on their belly, feelin' it work. "That's it. That's it. Good."`,
+    "%by% presses warm cloths low on %name%'s belly and talks them through it, soft and steady.",
+    `%by% kneels between %name%'s knees, watchin', coachin'. "I can see it movin'. One more like that."`,
+    "%by% lets %name% grip both their hands through a long one, and doesn't flinch when they squeeze.",
+    "%by% strokes the sweaty hair back off %name%'s face and murmurs to them, and %name% pushes harder for it.",
+    "%by% presses on the top of %name%'s belly in time with the push, helpin' it down.",
+    "%name% lets out %sound% and bears down with everything, %by% right there holdin' them.",
+    "%by% rolls %name%'s nipples slow between finger and thumb, and the next squeeze comes harder and quicker for it.",
+    "%by% rocks %name%'s hips side to side through the squeeze, openin' them up, coaxin' the %brood% lower."
+  ];
+  var UNSTICK = [
+    `%by% slicks their hand and reaches in slow and gentle, feelin' for the stuck %young%. A careful turn, a long groan from %name%, and it comes round right. "There. Now push."`,
+    `%by% presses on %name%'s belly from outside with both hands, coaxin' the %young% round, slow, slow, till it shifts. "Got it. Push, sugar."`,
+    "%by% has %name% up on all fours, rocks their hips side to side, and works the %young% round with patient hands till it lines up."
+  ];
+  var INDUCE = [
+    "%by% rubs %name%'s belly low and firm, workin' slow circles, and brings them a cup of the farm's bitter labour tea. It isn't long before the first real squeeze comes.",
+    "%by% walks %name% up and down the barn, hands on their hips, then has them squat and rock. The %brood% drops low. Their body's ready.",
+    "%by% kneads the base of %name%'s belly and rolls their nipples between finger and thumb till %name% gasps. That does it: here comes the first squeeze."
+  ];
+  var AFTER = [
+    "%by% cleans %name% up with warm water and soft cloths, then kneads their swollen breasts till the milk lets down in a rush.",
+    "%by% props %name% up in fresh straw, brings them water, and rubs their achin' belly while they nurse the %brood%.",
+    "%by% kneads %name%'s heavy breasts slow and firm, coaxin' the milk in, then tucks a blanket round them. Good work, sugar.",
+    "%by% washes %name% down, checks them over gentle, and sits with them a while, hand on their emptied belly, till they doze."
+  ];
+  var CALL = [
+    "\u{1F37C} %name% has gone into labour in %place%. Midwives wanted: ?midwife %name%, standin' next to them.",
+    "\u{1F37C} Labour's started: %name%, in %place%. A midwife's hands would help. ?midwife %name%, right beside them."
+  ];
+  var STUCK_CALL = [
+    "\u{1F37C} %name% has one stuck, turned crossways! A midwife's hands, quick: ?midwife %name%, standin' next to them.",
+    "\u{1F37C} %name%'s labour has stalled on a stuck %young%. Anybody who can midwife: ?midwife %name%, right beside them."
+  ];
+  function timeLeft(p) {
+    const ms = p.preg.due - Date.now();
+    if (ms <= 0) return "past their time";
+    const h = ms / 36e5;
+    if (h < 24) {
+      const r = Math.max(1, Math.round(h));
+      return "due within " + r + " hour" + (r === 1 ? "" : "s");
+    }
+    const dd = Math.round(h / 24);
+    return "about " + dd + " day" + (dd === 1 ? "" : "s") + " to go";
+  }
+  function countGuess(mn, f, n, rough) {
+    const v = vars(mn);
+    if (f < 0.33) return "too soon to feel how many";
+    if (rough && f < 0.9) return "can't tell how many on your own";
+    if (f < 0.66) return n === 1 ? "just the one, by the feel of it" : "more than one in there, at least two";
+    if (f < 0.9) {
+      if (n <= 2) return n === 1 ? "one " + v.young + ", by the feel of it" : "two, by the feel of it";
+      const lo = n - (Math.random() < 0.5 ? 1 : 0);
+      return "feels like " + lo + ", maybe " + (lo + 1);
+    }
+    return n === 1 ? "one " + v.young + ", sure as anything" : n + " " + v.youngs + ", every one countable now";
+  }
+  function findings(mn, rough, forThem) {
+    const p = api2.prod(mn), f = along(p), n = p.preg.count || 1, k = stageKey(f);
+    const parts = [STAGE_WORD[k] + ", " + timeLeft(p), p.preg.due <= Date.now() ? "more than ready" : pick(CARRY[k]), countGuess(mn, f, n, rough)];
+    if (p.preg.via === "butt") parts.push("carried in the ass, high and snug");
+    if (p.preg2) parts.push("and a second litter in the other hole");
+    if (!rough && !forThem) parts.push("bred by " + p.preg.sires.map(api2.name).join(" & "));
+    return parts.map((x) => x.charAt(0).toUpperCase() + x.slice(1)).join(". ") + ".";
+  }
+  function doCheckup(c, by, t, lead) {
+    const m = M();
+    if (api2.onMap(t)) api2.emote("\u{1FA7A} " + line(t, CHECKUP, "checkup", by), t);
+    c.reply("\u{1FA7A} " + (lead || "") + "Checkup on " + api2.name(t) + ": " + findings(t, false, false));
+    api2.notice(t, "\u{1FA7A} " + api2.name(by) + " gave you a checkup: " + findings(t, false, true));
+    m.checked[t] = { at: Date.now(), by };
+    const key = by + ":" + t;
+    if (m.paid[key] !== api2.dayKey()) {
+      m.paid[key] = api2.dayKey();
+      if (api2.isStaff(by)) api2.staffPoints(by, 1, "checkup");
+    }
+    api2.save();
+  }
+  function cmdCheckup(c) {
+    const { sender, args } = c, w = String(args[0] || "").toLowerCase(), m = M();
+    if (w === "off" || w === "on") {
+      if (w === "off") m.noCheck[sender] = true;
+      else delete m.noCheck[sender];
+      api2.save();
+      return c.reply(w === "off" ? "\u{1FA7A} No checkups on you, sugar. ?checkup on lets the midwives' hands back." : "\u{1FA7A} Midwives can check you over again, sugar. ?checkup off stops it.");
+    }
+    const t = args[0] ? api2.find(args[0]) : sender;
+    if (!t) return c.reply("Who am I checkin', sugar? ?checkup <who>, standin' next to them.");
+    const p = api2.prod(t);
+    if (t === sender) {
+      if (!p || !p.preg) return c.reply("You're not carryin' right now, sugar.");
+      if (api2.onMap(t)) api2.emote("\u{1FA7A} " + line(t, SELF_CHECK, "self"), t);
+      return c.reply("\u{1FA7A} What you can feel: " + findings(t, true, true));
+    }
+    if (!canMidwife(sender)) return c.reply("Checkups are for staff and the midwives they trust, sugar. ?midwives shows who.");
+    if (!p || !p.preg) return c.reply(api2.name(t) + " isn't carryin' right now, hon.");
+    if (m.noCheck[t]) return c.reply(api2.name(t) + " has said no checkups, sugar.");
+    if (p.labour) return c.reply(api2.name(t) + " is in labour right now! ?midwife " + api2.name(t) + " to help 'em through it.");
+    if (!near(sender, t)) return c.reply("Get right down next to " + api2.name(t) + " to feel, sugar.");
+    doCheckup(c, sender, t);
+  }
+  function cmdMidwife(c) {
+    const { sender, args } = c, m = M();
+    const t = args[0] ? api2.find(args[0]) : null, p = t && api2.prod(t);
+    if (!t || !p) return c.reply("Who's birthin', sugar? ?midwife <who>, standin' next to them.");
+    if (!canMidwife(sender)) return c.reply("Midwifin' is for staff and the midwives they trust, sugar. ?midwives shows who.");
+    if (t === sender) return c.reply("You can't midwife yourself, sugar. ?checkup on your own gives you a feel.");
+    const lb = p.labour, now = Date.now();
+    if (!lb) {
+      const born = m.born[t];
+      if (born && now - born.at < AFTER_MIN * 6e4 && !born.tended) {
+        if (!near(sender, t)) return c.reply("Get right down next to " + api2.name(t) + " to tend 'em, sugar.");
+        born.tended = sender;
+        p.freshUntil = Math.max(p.freshUntil || now, now) + 864e5;
+        if (api2.onMap(t)) api2.emote("\u{1F37C} " + line(t, AFTER, "after", sender), t);
+        if (api2.isStaff(sender)) api2.staffPoints(sender, 1, "midwife");
+        api2.notice(t, "\u{1F37C} " + api2.name(sender) + " tended you after the birth. Your milk'll stay fresh and heavy a day longer.");
+        api2.save();
+        return c.reply("\u{1F37C} You tended " + api2.name(t) + ". Their milk'll stay fresh a day longer.");
+      }
+      if (p.preg) {
+        if (m.noCheck[t]) return c.reply(api2.name(t) + " isn't in labour yet, and they've said no checkups, sugar.");
+        if (!near(sender, t)) return c.reply(api2.name(t) + " isn't in labour yet. Get right down next to 'em for a checkup, sugar.");
+        return doCheckup(c, sender, t, "Not in labour yet, so you give 'em a checkup. ");
+      }
+      return c.reply(api2.name(t) + " isn't carryin', hon. The midwives get called when somebody goes into labour.");
+    }
+    if (!near(sender, t)) return c.reply("Get right down next to " + api2.name(t) + " to help, sugar.");
+    const rec = m.labour[t] = m.labour[t] || { helpers: {} };
+    rec.helpers = rec.helpers || {};
+    if (!lb.midwife) {
+      lb.midwife = sender;
+      rec.midwife = sender;
+      api2.emote("\u{1F37C} " + line(t, POOLS.claim, "claim", sender), t);
+      api2.save();
+      return c.reply("\u{1F37C} You're " + api2.name(t) + "'s midwife. Stay by 'em, and ?midwife " + api2.name(t) + " every few minutes to help 'em along.");
+    }
+    if (!rec.midwife) rec.midwife = lb.midwife;
+    const k = sender + ":" + t, wait = (m.helpAt[k] || 0) + HELP_GAP_MIN * 6e4 - now;
+    if (wait > 0) return c.reply("Let 'em catch their breath, sugar. You can help again in " + (wait > 9e4 ? Math.ceil(wait / 6e4) + " minutes" : "a moment") + ".");
+    if (!api2.labour) {
+      api2.emote("\u{1F37C} " + line(t, HELP, "help", sender), t);
+      return c.reply("\u{1F37C} You help " + api2.name(t) + " through it.");
+    }
+    m.helpAt[k] = now;
+    rec.helpers[sender] = (rec.helpers[sender] || 0) + 1;
+    if (lb.stuck) {
+      api2.labour.unstick(t, sender);
+      rec.turned = sender;
+      api2.emote("\u{1F37C} " + line(t, UNSTICK, "unstick", sender), t);
+      api2.save();
+      return c.reply("\u{1F37C} You turned it. " + api2.name(t) + "'s movin' again.");
+    }
+    const left = api2.labour.help(t);
+    api2.emote("\u{1F37C} " + line(t, HELP, "help", sender), t);
+    api2.save();
+    c.reply("\u{1F37C} That helped. " + (left == null ? "" : left <= 4 ? "Nearly there." : "About " + left + " minutes to go."));
+  }
+  function cmdInduce(c) {
+    const { sender, args } = c;
+    const t = args[0] ? api2.find(args[0]) : null, p = t && api2.prod(t);
+    if (!canMidwife(sender)) return c.reply("Bringin' labour on is for staff and the midwives they trust, sugar.");
+    if (!t || !p || !p.preg) return c.reply("Who's ready to birth, sugar? ?induce <who>, standin' next to them.");
+    if (t === sender) return c.reply("Ask a midwife to bring it on for you, sugar.");
+    if (p.labour) return c.reply(api2.name(t) + " is already in labour, hon. ?midwife " + api2.name(t) + " to help.");
+    const f = along(p);
+    if (f < 0.9) return c.reply("Too soon, sugar: " + api2.name(t) + " is only " + STAGE_WORD[stageKey(f)] + ". Wait till they're nestin'.");
+    if (!api2.labour) return c.reply("The farm girl can't bring labour on yet, sugar: she needs updatin'.");
+    if (!near(sender, t)) return c.reply("Get right down next to " + api2.name(t) + " first, sugar.");
+    c.reply("\u{1FA7A} I've asked " + api2.name(t) + " if they're ready to birth.");
+    api2.ask(t, "\u{1FA7A} " + api2.name(sender) + " wants to bring your labour on now, sugar. Ready to birth? Say yes or no.", (yes) => {
+      if (!yes) {
+        api2.notice(sender, "\u{1FA7A} " + api2.name(t) + " isn't ready yet. Let 'em be, sugar.");
+        return;
+      }
+      const pp = api2.prod(t);
+      if (!pp || !pp.preg || pp.labour) return;
+      if (!api2.onMap(t)) {
+        api2.notice(sender, "\u{1FA7A} " + api2.name(t) + " said yes, but they're not on the farm anymore.");
+        return;
+      }
+      api2.emote("\u{1FA7A} " + line(t, INDUCE, "induce", sender), t);
+      api2.labour.start(t);
+      const lb = api2.prod(t).labour;
+      if (lb) lb.midwife = sender;
+      M().labour[t] = { midwife: sender, helpers: {}, induced: true };
+      api2.save();
+    });
+  }
+  function cmdMidwives(c) {
+    const { sender, args } = c, m = M(), w = String(args[0] || "").toLowerCase();
+    if (w === "add" || w === "remove" || w === "off") {
+      if (api2.rank(sender) < 2) return c.reply("Only herdmasters and proprietors trust somebody with midwifin', sugar.");
+      const t = args[1] ? api2.find(args[1]) : null;
+      if (!t || !api2.rec(t)) return c.reply("Who, sugar? ?midwives " + w + " <who> (they need to be on the farm's books).");
+      if (w === "add") {
+        m.trusted[t] = { by: sender, at: Date.now() };
+        api2.save();
+        api2.notice(t, "\u{1FA7A} " + api2.name(sender) + " trusts you as one of the farm's midwives now, sugar: ?checkup <who> to feel how far along somebody is, ?midwife <who> to see 'em through labour, ?induce <who> once they're nestin'.");
+        return c.reply("\u{1FA7A} " + api2.name(t) + " is a farm midwife now.");
+      }
+      delete m.trusted[t];
+      api2.save();
+      return c.reply("\u{1FA7A} " + api2.name(t) + " isn't a farm midwife anymore" + (api2.isStaff(t) ? " (staff can always midwife, though)" : "") + ".");
+    }
+    const names = Object.keys(m.trusted).map((x) => api2.name(Number(x)));
+    c.reply("\u{1FA7A} Midwives: every member of staff" + (names.length ? ", plus " + names.join(", ") : "") + "." + (api2.rank(sender) >= 2 ? " ?midwives add <who> / remove <who>." : ""));
+  }
+  var midwifeCommands = {
+    checkup: { usage: "checkup [<who>|on|off]", private: true, run: cmdCheckup },
+    midwife: { usage: "midwife <who>", private: true, run: cmdMidwife },
+    induce: { usage: "induce <who>", private: true, run: cmdInduce },
+    midwives: { usage: "midwives [add|remove <who>]", private: true, run: cmdMidwives }
+  };
+  function callMidwives(mn, text) {
+    try {
+      api2.notifyStaff(untag(text), true);
+    } catch (e) {
+    }
+    const m = M();
+    for (const x of api2.here()) if (m.trusted[x] && !api2.isStaff(x) && x !== mn) api2.notice(x, text);
+  }
+  function midwifeLabour(mn, info) {
+    const m = M();
+    m.labour[mn] = m.labour[mn] || { helpers: {} };
+    api2.save();
+    callMidwives(mn, line(mn, CALL, "call", 0, { place: info && info.place || vars(mn).place }));
+  }
+  function midwifeStuck(mn) {
+    callMidwives(mn, line(mn, STUCK_CALL, "stuckcall"));
+  }
+  function midwifeBirth(mn, kids, sires, info) {
+    const m = M(), rec = m.labour[mn] || {}, d = D2();
+    delete m.labour[mn];
+    const mw = rec.midwife || info && info.midwife || d.lastMidwife && d.lastMidwife[mn] || 0;
+    if (d.lastMidwife) delete d.lastMidwife[mn];
+    m.born[mn] = { at: Date.now(), midwife: mw && mw !== api2.cfg.BOT_MEMBER ? mw : 0 };
+    const helpers = Object.assign({}, rec.helpers || {});
+    if (mw && mw !== api2.cfg.BOT_MEMBER && helpers[mw] == null) helpers[mw] = 0;
+    let helps = 0;
+    for (const [h, n0] of Object.entries(helpers)) {
+      const hm = Number(h), n = Number(n0) || 0, turned = rec.turned === hm ? 1 : 0;
+      helps += n;
+      if (api2.isStaff(hm)) {
+        const pts = (hm === mw ? 2 : 0) + Math.min(4, n) + turned;
+        if (pts > 0) api2.staffPoints(hm, pts, "midwife");
+      } else if (api2.ribbons && (n > 0 || hm === mw)) api2.ribbons(hm, 1 + (n >= 3 ? 1 : 0), "midwifin' " + api2.name(mn));
+    }
+    if (helps >= 2 && api2.ribbons) api2.ribbons(mn, 1, "a smooth birthin'");
+    if (mw && mw !== api2.cfg.BOT_MEMBER && api2.onMap(mn) && POOLS.born.length) api2.later(() => api2.emote(line(mn, POOLS.born, "born", mw), mn), 8e3);
+    api2.save();
+  }
+  function midwifeTick() {
+    const m = M(), now = Date.now();
+    for (const [k, b] of Object.entries(m.born)) if (now - b.at > 2 * AFTER_MIN * 6e4) delete m.born[k];
+    for (const [k, at] of Object.entries(m.helpAt)) if (now - at > 36e5) delete m.helpAt[k];
+    for (const mn of Object.keys(m.labour)) {
+      const p = api2.prod(Number(mn));
+      if (!p || !p.labour && !p.preg) delete m.labour[mn];
+    }
+  }
+  function ago(t) {
+    const mins = Math.round((Date.now() - t) / 6e4);
+    return mins < 60 ? mins + " min ago" : mins < 1440 ? Math.round(mins / 60) + " h ago" : Math.round(mins / 1440) + " d ago";
+  }
+  function midwifeCard(viewer) {
+    if (!canMidwife(viewer)) return null;
+    const m = M(), rows = [], buttons = [];
+    const carrying = api2.here().map((mn) => [mn, api2.prod(mn)]).filter(([, p]) => p && p.preg).sort((a, b) => (b[1].labour ? 1 : 0) - (a[1].labour ? 1 : 0) || a[1].preg.due - b[1].preg.due);
+    for (const [mn, p] of carrying.slice(0, 12)) {
+      const nm = api2.name(mn);
+      if (p.labour) {
+        const left = Math.max(0, Math.ceil((p.labour.until - Date.now()) / 6e4));
+        rows.push([nm, "\u{1F37C} in labour" + (p.labour.stuck ? ", one's stuck!" : ", about " + left + " min to go") + (p.labour.midwife ? " \xB7 midwife " + api2.name(p.labour.midwife) : " \xB7 no midwife yet")]);
+        if (buttons.length < 4) buttons.push({ label: (p.labour.stuck ? "Turn it: " : "Help ") + nm, cmd: "midwife " + nm });
+      } else {
+        const f = along(p), ck = m.checked[mn];
+        rows.push([nm, STAGE_WORD[stageKey(f)] + " \xB7 " + timeLeft(p) + " \xB7 " + (m.noCheck[mn] ? "no checkups" : ck ? "checked " + ago(ck.at) : "not checked yet")]);
+        if (buttons.length < 4 && !m.noCheck[mn]) buttons.push({ label: "Checkup " + nm, cmd: "checkup " + nm });
+      }
+    }
+    return {
+      staff: api2.isStaff(viewer),
+      title: "\u{1FA7A} Expectin' on the farm",
+      note: "Stand right beside them first. ?checkup <who> \xB7 ?midwife <who> in labour (again every few minutes helps it along) \xB7 ?induce <who> once they're nestin'.",
+      lines: rows.length ? rows : [["Nobody", "nobody carryin' on the farm right now"]],
+      buttons: buttons.length ? buttons : void 0
+    };
+  }
+  var MIDWIFE_GUIDE = " Midwives (staff, and anybody a herdmaster trusts with ?midwives add <who>): ?checkup <who> feels how far along somebody is and how many; ?midwife <who> sees them through labour (again every few minutes helps it along, and turns a stuck one) and tends them after; ?induce <who> brings labour on once they're nestin', if they say yes. ?checkup off: no checkups on you.";
+
+  // addons/breeding/index.js
+  var api3 = null;
+  function D3() {
+    const d = api3.data();
     d.preg = d.preg || {};
     d.bookings = d.bookings || [];
     d.week = d.week || {};
@@ -500,7 +851,7 @@
     d.scent = d.scent || {};
     return d;
   }
-  function along(p) {
+  function along2(p) {
     return p && p.preg ? Math.min(1, Math.max(0, (Date.now() - p.preg.since) / Math.max(1, p.preg.due - p.preg.since))) : null;
   }
   var STAGES = [
@@ -549,11 +900,11 @@
     "%name% can't stop lookin' toward the scent of heat nearby. Their breathing's gone heavy."
   ];
   function words(mn, extra) {
-    const an = animalOf(api2, mn), p = api2.prod(mn), n = p && p.preg && p.preg.count || 1, young = an.young || ["little one", "little ones"];
+    const an = animalOf(api3, mn), p = api3.prod(mn), n = p && p.preg && p.preg.count || 1, young = an.young || ["little one", "little ones"];
     const litter = "the " + (n > 1 ? young[1] : young[0]);
-    return Object.assign({ name: api2.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0] }, extra || {});
+    return Object.assign({ name: api3.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0] }, extra || {});
   }
-  var lineAbout = (mn, pool, key, extra) => fill(lineFor(api2, mn, pool, key), words(mn, extra));
+  var lineAbout = (mn, pool, key, extra) => fill(lineFor(api3, mn, pool, key), words(mn, extra));
   var isBreedWeek = (d = /* @__PURE__ */ new Date()) => d.getDate() >= 15 && d.getDate() <= 21;
   var NIGHT_HOUR = 21;
   var PENT_H = 4;
@@ -565,11 +916,11 @@
     return new Date(d.getFullYear(), d.getMonth(), 22, 0, 0, 0).getTime();
   }
   function tick() {
-    const d = D2(), now = Date.now(), here = api2.here();
+    const d = D3(), now = Date.now(), here = api3.here();
     for (const mn of here) {
-      const p = api2.prod(mn);
+      const p = api3.prod(mn);
       if (!p) continue;
-      const f = along(p);
+      const f = along2(p);
       if (f === null) {
         delete d.preg[mn];
         continue;
@@ -578,16 +929,16 @@
       const st = stageOf(f);
       if (st.key !== x.stage && STAGE_LINES[st.key]) {
         x.stage = st.key;
-        api2.notice(mn, lineAbout(mn, [STAGE_LINES[st.key].you].concat(MORE2.STAGE_YOU[st.key] || []), "you:" + st.key));
-        if (api2.onMap(mn)) api2.emote("\u{1F930} " + lineAbout(mn, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || []), "room:" + st.key), mn);
-        api2.save();
+        api3.notice(mn, lineAbout(mn, [STAGE_LINES[st.key].you].concat(MORE2.STAGE_YOU[st.key] || []), "you:" + st.key));
+        if (api3.onMap(mn)) api3.emote("\u{1F930} " + lineAbout(mn, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || []), "room:" + st.key), mn);
+        api3.save();
       }
       if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
-        if (x.craveAt) api2.notice(mn, "\u{1F930} " + lineAbout(mn, CRAVINGS, "crave"));
+        if (x.craveAt) api3.notice(mn, "\u{1F930} " + lineAbout(mn, CRAVINGS, "crave"));
         x.craveAt = now + between(120, 240) * 6e4;
       }
-      if ((st.key === "heavy" || st.key === "nesting") && api2.onMap(mn) && now >= (x.kickAt || 0)) {
-        if (x.kickAt) api2.emote("\u{1F930} " + lineAbout(mn, KICKS, "kick"), mn);
+      if ((st.key === "heavy" || st.key === "nesting") && api3.onMap(mn) && now >= (x.kickAt || 0)) {
+        if (x.kickAt) api3.emote("\u{1F930} " + lineAbout(mn, KICKS, "kick"), mn);
         x.kickAt = now + between(20, 40) * 6e4;
       }
     }
@@ -595,18 +946,18 @@
     breedWeekTick(here);
   }
   function bookingsTick(here) {
-    const d = D2(), set = new Set(here);
+    const d = D3(), set = new Set(here);
     for (const b of d.bookings) {
-      if (b.told || !set.has(b.stud) || !set.has(b.dam) || !api2.onMap(b.stud) || !api2.onMap(b.dam)) continue;
+      if (b.told || !set.has(b.stud) || !set.has(b.dam) || !api3.onMap(b.stud) || !api3.onMap(b.dam)) continue;
       b.told = Date.now();
-      const who = { dam: api2.name(b.dam), stud: api2.name(b.stud) };
-      api2.notice(b.stud, fill(pick(MORE2.TIME_STUD), who));
-      api2.notice(b.dam, fill(pick(MORE2.TIME_DAM), who));
-      api2.save();
+      const who = { dam: api3.name(b.dam), stud: api3.name(b.stud) };
+      api3.notice(b.stud, fill(pick(MORE2.TIME_STUD), who));
+      api3.notice(b.dam, fill(pick(MORE2.TIME_DAM), who));
+      api3.save();
     }
   }
   function cmdBook(c) {
-    const { sender, args, api: A } = c, d = D2(), w = String(args[0] || "").toLowerCase();
+    const { sender, args, api: A } = c, d = D3(), w = String(args[0] || "").toLowerCase();
     if (w === "done" || w === "remove" || w === "cancel") {
       const i = d.bookings.findIndex((b2) => String(b2.id) === String(args[1] || "").replace(/^#/, ""));
       if (i < 0) return c.reply("Which booking, sugar? ?book shows the numbers.");
@@ -630,16 +981,16 @@
     c.reply("\u{1F402} Booked: #" + d.seq + " " + A.name(stud) + " \xD7 " + A.name(dam) + ".");
   }
   var bookingsText = () => {
-    const b = D2().bookings;
-    return b.length ? "\u{1F402} STUD BOOKINGS\n" + b.map((x) => "#" + x.id + " " + api2.name(x.stud) + " \xD7 " + api2.name(x.dam) + (x.told ? " \xB7 told, waitin' on 'em" : "")).join("\n") : "\u{1F402} No stud bookings right now. Staff add them with ?book <stud> <who>.";
+    const b = D3().bookings;
+    return b.length ? "\u{1F402} STUD BOOKINGS\n" + b.map((x) => "#" + x.id + " " + api3.name(x.stud) + " \xD7 " + api3.name(x.dam) + (x.told ? " \xB7 told, waitin' on 'em" : "")).join("\n") : "\u{1F402} No stud bookings right now. Staff add them with ?book <stud> <who>.";
   };
   function breedWeekTick(here) {
-    const d = D2(), now = /* @__PURE__ */ new Date(), mk = monthKey(now);
+    const d = D3(), now = /* @__PURE__ */ new Date(), mk = monthKey(now);
     if (d.week.month !== mk) d.week = { month: mk };
     if (now.getDate() === 14 && !d.week.warned && here.length) {
       d.week.warned = true;
-      api2.announce("\u{1F4C5} Breedin' season starts tomorrow, y'all! Anybody who said ?season on comes into heat for it, and every breedin' goes in the stud book.");
-      api2.save();
+      api3.announce("\u{1F4C5} Breedin' season starts tomorrow, y'all! Anybody who said ?season on comes into heat for it, and every breedin' goes in the stud book.");
+      api3.save();
     }
     if (!isBreedWeek(now)) {
       crownTick(here);
@@ -647,35 +998,35 @@
     }
     if (!d.week.said && here.length) {
       d.week.said = true;
-      api2.announce("\u{1F525} It's breedin' season on the farm! Everybody signed up is comin' into heat, the studs are fillin' up fast, and every breedin' goes in the stud book. I read it out every night, and the most-bred gets crowned on the last one. \u{1F402}");
-      for (const mn of here) if (d.optIn[mn] && api2.makesSemen(mn)) api2.notice(mn, "\u{1F402} Breedin' season's on, sugar. Your balls fill half again faster all week, and four hours full leaves you pent up. Go find somebody in heat.");
-      api2.save();
+      api3.announce("\u{1F525} It's breedin' season on the farm! Everybody signed up is comin' into heat, the studs are fillin' up fast, and every breedin' goes in the stud book. I read it out every night, and the most-bred gets crowned on the last one. \u{1F402}");
+      for (const mn of here) if (d.optIn[mn] && api3.makesSemen(mn)) api3.notice(mn, "\u{1F402} Breedin' season's on, sugar. Your balls fill half again faster all week, and four hours full leaves you pent up. Go find somebody in heat.");
+      api3.save();
     }
     seasonPentTick(here);
     nightlyTick(here);
     d.week.heated = d.week.heated || {};
     for (const mn of here) {
-      const r = api2.rec(mn), p = api2.prod(mn);
-      if (!r || !p || !d.optIn[mn] || d.week.heated[mn] || !r.breedable || !r.fertile || api2.limitBlocks(mn, "heat") || p.preg) continue;
+      const r = api3.rec(mn), p = api3.prod(mn);
+      if (!r || !p || !d.optIn[mn] || d.week.heated[mn] || !r.breedable || !r.fertile || api3.limitBlocks(mn, "heat") || p.preg) continue;
       d.week.heated[mn] = true;
-      api2.startHeat(mn, api2.ANON_STUD, Math.max(1, (weekEnd() - Date.now()) / 36e5));
-      api2.save();
+      api3.startHeat(mn, api3.ANON_STUD, Math.max(1, (weekEnd() - Date.now()) / 36e5));
+      api3.save();
     }
-    const inHeat = here.filter((mn) => api2.prod(mn) && api2.inHeat(api2.prod(mn)) && !api2.prod(mn).heat.quiet);
+    const inHeat = here.filter((mn) => api3.prod(mn) && api3.inHeat(api3.prod(mn)) && !api3.prod(mn).heat.quiet);
     if (!inHeat.length) return;
     for (const stud of here) {
-      if (!api2.makesSemen(stud) || inHeat.includes(stud) || Date.now() - (d.scent[stud] || 0) < 15 * 6e4) continue;
-      const sp = api2.pos(stud);
+      if (!api3.makesSemen(stud) || inHeat.includes(stud) || Date.now() - (d.scent[stud] || 0) < 15 * 6e4) continue;
+      const sp = api3.pos(stud);
       if (!sp || !inHeat.some((m) => {
-        const q = api2.pos(m);
+        const q = api3.pos(m);
         return q && Math.max(Math.abs(q.X - sp.X), Math.abs(q.Y - sp.Y)) <= 3;
       })) continue;
       d.scent[stud] = Date.now();
-      api2.privateEmote(stud, lineAbout(stud, RUTTY, "rutty"));
+      api3.privateEmote(stud, lineAbout(stud, RUTTY, "rutty"));
     }
   }
   function season() {
-    const d = D2(), mk = monthKey();
+    const d = D3(), mk = monthKey();
     if (d.week.month !== mk) d.week = { month: mk };
     const w = d.week;
     w.bred = w.bred || {};
@@ -703,43 +1054,43 @@
   RUTTY.push(...MORE.RUTTY, ...MORE2.RUTTY);
   for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k], ...MORE2.BRED_MARKS[k] || []);
   function onBred(stud, dam, hole, mlIn, took) {
-    const counts = hole === "vulva" || hole === "butt" && api2.mpregOn && api2.mpregOn(dam);
-    if (!counts || !isBreedWeek() || !D2().optIn[dam] || !(mlIn > 0)) return;
+    const counts = hole === "vulva" || hole === "butt" && api3.mpregOn && api3.mpregOn(dam);
+    if (!counts || !isBreedWeek() || !D3().optIn[dam] || !(mlIn > 0)) return;
     const w = season();
     w.bred[dam] = (w.bred[dam] || 0) + 1;
     if (took) w.took[dam] = (w.took[dam] || 0) + 1;
-    if (stud > 0 && stud !== dam && D2().optIn[stud]) w.covers[stud] = (w.covers[stud] || 0) + 1;
-    api2.save();
+    if (stud > 0 && stud !== dam && D3().optIn[stud]) w.covers[stud] = (w.covers[stud] || 0) + 1;
+    api3.save();
     const lines = BRED_MARKS[w.bred[dam]];
-    if (lines && api2.onMap(dam)) api2.later(() => api2.emote("\u{1F525} " + lineAbout(dam, lines, "marks"), dam), 6e3);
+    if (lines && api3.onMap(dam)) api3.later(() => api3.emote("\u{1F525} " + lineAbout(dam, lines, "marks"), dam), 6e3);
   }
   function rankList(o, n, unit) {
-    return Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1]).slice(0, n).map(([m, v], i) => "  " + (["\u{1F947}", "\u{1F948}", "\u{1F949}"][i] || i + 1 + ".") + " " + api2.name(Number(m)) + ", " + v + " " + unit(v)).join("\n");
+    return Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1]).slice(0, n).map(([m, v], i) => "  " + (["\u{1F947}", "\u{1F948}", "\u{1F949}"][i] || i + 1 + ".") + " " + api3.name(Number(m)) + ", " + v + " " + unit(v)).join("\n");
   }
   function bookText(night) {
     const w = season();
     const dams = rankList(w.bred, 5, (v) => v === 1 ? "time" : "times"), studs = rankList(w.covers, 3, (v) => v === 1 ? "cover" : "covers");
-    const caught = Object.keys(w.took).filter((m) => Number(m) > 0).map((m) => api2.name(Number(m)));
+    const caught = Object.keys(w.took).filter((m) => Number(m) > 0).map((m) => api3.name(Number(m)));
     const head = "\u{1F4D6} THE STUD BOOK" + (night ? ", night " + night + " of breedin' season" : "");
     if (!dams && !studs) return head + "\nNot one breedin' in it yet. Y'all are slackin'. \u{1F402}";
     return head + "\n\u{1F404} Most bred\n" + (dams || "  (nobody yet)") + "\n\u{1F402} Busiest studs\n" + (studs || "  (nobody yet)") + (caught.length ? "\n\u{1F37C} Caught this season: " + caught.join(", ") : "");
   }
   function seasonPentTick(here) {
-    const d = D2(), now = Date.now();
+    const d = D3(), now = Date.now();
     for (const mn of here) {
-      if (!d.optIn[mn] || !api2.makesSemen(mn)) continue;
-      const p = api2.prod(mn);
+      if (!d.optIn[mn] || !api3.makesSemen(mn)) continue;
+      const p = api3.prod(mn);
       if (!p || p.pentUp || !p.semenFullSince || now - p.semenFullSince < PENT_H * 36e5) continue;
       p.pentUp = true;
-      api2.save();
-      api2.notice(mn, "\u{1F624} Breedin' season's got you achin', " + api2.name(mn) + ". You're all pent up: the next load's a big, potent one.");
+      api3.save();
+      api3.notice(mn, "\u{1F624} Breedin' season's got you achin', " + api3.name(mn) + ". You're all pent up: the next load's a big, potent one.");
     }
   }
   function readOut(here, text) {
-    if (!api2.hasCompanion || !api2.privateSay) return api2.announce(text);
+    if (!api3.hasCompanion || !api3.privateSay) return api3.announce(text);
     for (const mn of here) {
-      if (api2.hasCompanion(mn)) api2.notice(mn, text);
-      else api2.privateSay(mn, text);
+      if (api3.hasCompanion(mn)) api3.notice(mn, text);
+      else api3.privateSay(mn, text);
     }
   }
   function nightlyTick(here) {
@@ -750,11 +1101,11 @@
       return;
     }
     w.readDay = localDay(now);
-    api2.save();
+    api3.save();
     readOut(here, bookText(now.getDate() - 14));
   }
   function crownTick(here, lastNight) {
-    const d = D2(), w = season(), now = /* @__PURE__ */ new Date();
+    const d = D3(), w = season(), now = /* @__PURE__ */ new Date();
     if (w.prized || !w.said || !here.length) return;
     if (!lastNight && now.getDate() < 22) return;
     w.prized = true;
@@ -762,51 +1113,27 @@
     const top = (o) => Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1] || (w.took[b[0]] || 0) - (w.took[a[0]] || 0))[0];
     const dam = top(w.bred), stud = top(w.covers);
     if (!dam) {
-      api2.save();
+      api3.save();
       readOut(here, "\u{1F4D6} Breedin' season's over, and not a single breedin' made the stud book. Next month, y'all. \u{1F402}");
       return;
     }
     const champ = { month: w.month, dam: Number(dam[0]), times: dam[1], stud: stud ? Number(stud[0]) : 0, covers: stud ? stud[1] : 0 };
     d.champions = (d.champions || []).concat(champ).slice(-12);
-    api2.save();
-    readOut(here, bookText(7) + "\n\n\u{1F451} That's the season, y'all! " + api2.name(champ.dam) + " is the farm's most-bred, " + champ.times + " times" + (champ.stud ? ", and " + api2.name(champ.stud) + " the busiest stud with " + champ.covers : "") + ". Ribbons for the winners! \u{1F402}");
-    if (api2.ribbons) api2.ribbons(champ.dam, PRIZE.dam, "bein' the most-bred of breedin' season", true);
-    if (champ.stud && api2.ribbons) api2.ribbons(champ.stud, PRIZE.stud, "bein' the busiest stud of breedin' season", true);
-    if (api2.onMap(champ.dam)) api2.later(() => api2.emote(lineAbout(champ.dam, gearOf(api2, champ.dam).collar ? MORE2.CROWN_COLLAR : MORE2.CROWN, "crown"), champ.dam), 4e3);
-    api2.audit(api2.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
+    api3.save();
+    readOut(here, bookText(7) + "\n\n\u{1F451} That's the season, y'all! " + api3.name(champ.dam) + " is the farm's most-bred, " + champ.times + " times" + (champ.stud ? ", and " + api3.name(champ.stud) + " the busiest stud with " + champ.covers : "") + ". Ribbons for the winners! \u{1F402}");
+    if (api3.ribbons) api3.ribbons(champ.dam, PRIZE.dam, "bein' the most-bred of breedin' season", true);
+    if (champ.stud && api3.ribbons) api3.ribbons(champ.stud, PRIZE.stud, "bein' the busiest stud of breedin' season", true);
+    if (api3.onMap(champ.dam)) api3.later(() => api3.emote(lineAbout(champ.dam, gearOf(api3, champ.dam).collar ? MORE2.CROWN_COLLAR : MORE2.CROWN, "crown"), champ.dam), 4e3);
+    api3.audit(api3.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
   }
-  function cmdMidwife(c) {
-    const { sender, args, api: A } = c;
-    const t = A.find(args[0]), p = t && A.prod(t);
-    if (!t || !p) return c.reply("Who's birthin', sugar? ?midwife <who>, standin' next to them.");
-    if (!p.labour) return c.reply(A.name(t) + " isn't in labour, hon. I'll let staff know when they are.");
-    const me = A.pos(sender), them = A.pos(t);
-    if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right down next to " + A.name(t) + " to help, sugar.");
-    p.labour.midwife = sender;
-    A.save();
-    A.emote("\u{1F37C} " + lineAbout(t, MIDWIFE, "midwife", { by: A.name(sender) }), t);
-  }
-  function onBirth(mn) {
-    const d = D2();
+  function onBirth(mn, kids, sires, info) {
+    const d = D3();
     delete d.preg[mn];
-    const m = d.lastMidwife && d.lastMidwife[mn];
-    if (m) {
-      api2.staffPoints(m, 2, "midwife");
-      if (api2.onMap(mn)) api2.emote(lineAbout(mn, MORE2.BIRTH_MIDWIFE, "born", { by: api2.name(m) }), mn);
-      delete d.lastMidwife[mn];
-    }
-    api2.save();
-  }
-  function watchLabour() {
-    const d = D2();
-    d.lastMidwife = d.lastMidwife || {};
-    for (const mn of api2.here()) {
-      const p = api2.prod(mn);
-      if (p && p.labour && p.labour.midwife) d.lastMidwife[mn] = p.labour.midwife;
-    }
+    midwifeBirth(mn, kids, sires, info);
+    api3.save();
   }
   function cmdBreedweek(c) {
-    const { sender, args, api: A } = c, d = D2(), w = String(args[0] || "").toLowerCase();
+    const { sender, args, api: A } = c, d = D3(), w = String(args[0] || "").toLowerCase();
     if (!A.rec(sender)) return c.reply("You'll need to be on the farm's books first, sugar.");
     if (w === "book" || w === "top" || w === "board") return c.reply(bookText() + (isBreedWeek() ? "" : "\n(Breedin' season is the 15th to the 21st.)") + champText());
     if (w === "on" || w === "off") {
@@ -820,22 +1147,22 @@
     c.reply("\u{1F525} Breedin' season is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off). ?season book shows the stud book." + (isBreedWeek() && d.optIn[sender] ? "\nYou've been bred " + (w0.bred[sender] || 0) + " times this season" + (A.makesSemen(sender) ? " and covered " + (w0.covers[sender] || 0) : "") + "." : "") + champText());
   }
   function champText() {
-    const c = (D2().champions || []).slice(-1)[0];
-    return c ? "\n\u{1F451} Last season's most-bred: " + api2.name(c.dam) + " (" + c.times + ")" + (c.stud ? " \xB7 busiest stud: " + api2.name(c.stud) + " (" + c.covers + ")" : "") : "";
+    const c = (D3().champions || []).slice(-1)[0];
+    return c ? "\n\u{1F451} Last season's most-bred: " + api3.name(c.dam) + " (" + c.times + ")" + (c.stud ? " \xB7 busiest stud: " + api3.name(c.stud) + " (" + c.covers + ")" : "") : "";
   }
   function companion(mn) {
-    const r = api2.rec(mn);
+    const r = api3.rec(mn);
     if (!r) return null;
-    const d = D2(), p = api2.prod(mn), f = along(p), cards = [];
+    const d = D3(), p = api3.prod(mn), f = along2(p), cards = [];
     if (f !== null) {
       const st = stageOf(f), days = Math.max(0, Math.ceil((p.preg.due - Date.now()) / 864e5));
       cards.push({
         title: "Expectin'",
         bars: [{ label: "Along", value: Math.round(f * 100) + "%", pct: f * 100, kind: "good" }],
-        lines: [["Stage", st.label], ["Belly size", bellySize(f) + " of 5"], ["Due", days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now"], ["Sired by", p.preg.sires.map(api2.name).join(" & ")]]
+        lines: [["Stage", st.label], ["Belly size", bellySize(f) + " of 5"], ["Due", days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now"], ["Sired by", p.preg.sires.map(api3.name).join(" & ")]]
       });
     }
-    const w = season(), seasonLines = isBreedWeek() && d.optIn[mn] ? [["Bred this season", String(w.bred[mn] || 0)]].concat(api2.makesSemen(mn) ? [["Covers this season", String(w.covers[mn] || 0)]] : []) : void 0;
+    const w = season(), seasonLines = isBreedWeek() && d.optIn[mn] ? [["Bred this season", String(w.bred[mn] || 0)]].concat(api3.makesSemen(mn) ? [["Covers this season", String(w.covers[mn] || 0)]] : []) : void 0;
     cards.push({
       title: "Breedin' season",
       note: "The 15th to the 21st each month. You come into heat for it if you're breedable and fertile; studs fill faster. Every breedin' goes in the stud book, read out each night, and the most-bred is crowned on the last one.",
@@ -845,21 +1172,24 @@
       buttons: [{ label: "My pedigree", cmd: "pedigree" }, { label: "Stud book", cmd: "season book" }]
     });
     const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
-    if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api2.name(b.stud) + " \xD7 " + api2.name(b.dam)]) });
-    if (api2.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
+    if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api3.name(b.stud) + " \xD7 " + api3.name(b.dam)]) });
+    if (api3.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
     if (r.roles && r.roles.length) cards.push(...pairsCards(mn));
+    const mc = midwifeCard(mn);
+    if (mc) cards.push(mc);
     return { cards };
   }
   connect({
     name: "breeding",
     label: "Breeding",
-    version: "1.2.3",
+    version: "1.3.0",
     // (its addon.json's, put in by the build)
-    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breedin' season is the 15th\u201321st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour." + PAIRS_GUIDE,
+    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breedin' season is the 15th\u201321st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>." + MIDWIFE_GUIDE + PAIRS_GUIDE,
     setup(a) {
-      api2 = a;
-      D2();
-      pairsSetup(a, D2);
+      api3 = a;
+      D3();
+      pairsSetup(a, D3);
+      midwifeSetup(a, D3, { claim: MIDWIFE, born: MORE2.BIRTH_MIDWIFE });
     },
     commands: {
       ...pairsCommands,
@@ -871,23 +1201,23 @@
       } },
       // the "Expectin'" card, for people without the Companion
       belly: { usage: "belly", private: true, run: (c) => {
-        const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, p = t && c.api.prod(t), f = along(p);
+        const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, p = t && c.api.prod(t), f = along2(p);
         if (f === null) return c.reply((t === c.sender ? "You're" : c.api.name(t) + " is") + " not expectin' right now, sugar.");
         const days = Math.max(0, Math.ceil((p.preg.due - Date.now()) / 864e5));
         c.reply("\u{1F930} " + c.api.name(t) + ": " + stageOf(f).label + " \xB7 belly size " + bellySize(f) + " of 5 \xB7 " + Math.round(f * 100) + "% along \xB7 due " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " \xB7 sired by " + p.preg.sires.map(c.api.name).join(" & "));
       } },
       season: { usage: "season on|off|book", aliases: ["breedweek", "studbook"], private: true, run: cmdBreedweek },
-      midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife }
+      ...midwifeCommands
     },
     on: { tick: () => {
-      watchLabour();
+      midwifeTick();
       tick();
-    }, birth: onBirth, bred: (...x) => {
+    }, birth: onBirth, labour: midwifeLabour, labourStuck: midwifeStuck, bred: (...x) => {
       onBred(...x);
       pairsBred(...x);
     } },
     // signed-up studs fill half again faster during breedin' season
-    rates: { semen: (mn) => isBreedWeek() && D2().optIn[mn] ? 1.5 : 1 },
+    rates: { semen: (mn) => isBreedWeek() && D3().optIn[mn] ? 1.5 : 1 },
     companion
   });
 })();

@@ -1,13 +1,13 @@
 # What to install (current versions)
 
-Updated 2026-11-07. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-10. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.6** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.71.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.3** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.2** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
@@ -24,6 +24,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.71.0 + Breeding 1.3.0: every kind births its own way, and the midwives get real work.** Laynie, Nov 10: "revisit pregnancy and Midwife mechanics. Midwifes need a way to check progress, speed labor along, variable messages per species". Her picks: midwives are "staff and any trusted", checkups "on by default", a stuck one is fine "as long as its not a bad thing".
+  - **Every kind its own way** (bot, 10y2b-birthing.js). Before, everybody moo'd through labour and farrowed like a sow. Now a cow calves in the calvin' pen and licks her calf clean, a mare foals front hooves first, a bitch whelps and tears each sac open, a bunny pulls her own fur to line a kindlin' nest, a cat queens in the loft purrin', wolves and foxes den, goats kid, ewes lamb, rats shred straw, goblins steal blankets, and a dragon scorches a hollow. Their own young (calf, foal, pups, kits, hatchlings…) and their own sounds, and the farm's shared lines fill in the same words. A single reads like one ("a calf, a little female"), a litter like a litter ("4 pups, 2 male and 2 female").
+  - **Labour takes as long as it takes:** 45 minutes, plus 15 for a first litter, plus 3 for every young past the first (30 at most), less 10 once they've birthed twice. It moves through early squeezes, harder ones, then pushin'.
+  - **A stuck one, now and then,** past the middle of labour (likelier in a litter): one comes turned crossways and everything waits. A midwife turns it; nobody comes in 10 minutes and the farm girl does it herself. The time stuck is added back, so it's only ever a wait.
+  - **Midwives** (breeding add-on, midwife.js): staff, plus anybody a herdmaster or proprietor trusts with **?midwives add <who>** (?midwives lists them, ?midwives remove <who>).
+    - **?checkup <who>**, standin' right beside them: how far along, how long to go, how they're carryin', and a guess at how many that sharpens as they go (too soon → at least two → three, maybe four → exact). The midwife hears it privately, the room sees hands on the belly, and the one carryin' is told what was found. A staff point for each, once a day. On for everybody; **?checkup off** keeps hands off you. **?checkup** on your own gives a rougher feel.
+    - **?midwife <who>** in labour: the first time takes the job; every time after, once every 3 minutes (any midwife), coaches, rubs, holds or helps 'em push, and takes 5 minutes off. 45 minutes alone comes down to about 20 with somebody workin' at it. A stuck one: it turns it. Just after the birth (an hour): it tends them, and their milk stays fresh a day longer. Before labour: a checkup.
+    - **?induce <who>** once they're nestin': they're asked first, and on a yes their water breaks with the one who brought it on as their midwife.
+    - **The call:** when labour starts, staff on duty and trusted midwives on the farm are told where; a stuck one calls them again.
+    - **The pay:** 2 staff points for the midwife, one more for each help (four at most) and one for turnin' a stuck one. Trusted midwives who aren't staff get ribbons. Two helps or more and the one who birthed gets a ribbon for a smooth birthin'. The birth's keepsake names the midwife.
+    - **🩺 Expectin' on the farm:** a card for staff (in the Staff panel) and trusted midwives: who's carryin', how far, when they're due, who's in labour and whether one's stuck, when each was last checked, with buttons.
+- **Chat records kept off GitHub.** Three of the farm's chat records (backup/logs) went out with the Nov 7 release, because the ignore list only named "Backups/". They're gone from the files, the whole backup folder and every record-*.txt are ignored, and `npm run release` now refuses to commit anything that looks private.
 - **Companion 0.54.4: the farm girl's tab lets go of folks who left.** Laynie, Nov 7, after another crash at 14:49: "it was a mem crash", and "just a cache clear type thing, right".
   - **What it was:** when somebody leaves the room, the game takes them off the room's list but keeps them loaded, drawing and all, till *you* leave the room. Players hop rooms, so theirs clears all the time. The bot never leaves the farm, so everybody who ever came by stayed loaded till her tab died. The first 0.54.3 memory log showed 28 characters loaded with 8 in the room, holding 133 MB of drawings.
   - **Now, on the bot's tab only,** anybody gone from the room for 10 minutes is let go, the game's own way. Come back, and the game loads them fresh like any newcomer. Never the bot herself, anybody still in the room, anybody whose profile is open, or the game's own characters, and never while the bot's out of the room. The farm keeps people in its ledger, not that list, so nothin' it does changes.

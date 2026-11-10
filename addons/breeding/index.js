@@ -8,8 +8,9 @@
      card (ready for custom belly art).
    • Cravings while showing and heavy, every 2–4 hours they're here, privately.
    • Baby kicks once they're heavy, every 20–40 minutes they're here, seen by whoever's nearby.
-   • Midwife: during labour, staff ?midwife <who> standing next to them; the birth gets a midwife's
-     touch and the midwife a staff point.
+   • Midwives (midwife.js, Nov 10): staff and anybody trusted with it. ?checkup <who> feels how far along and how
+     many; ?midwife <who> sees them through labour, hurries it along, turns a stuck one, and tends them after;
+     ?induce <who> brings it on once they're nestin', if they say yes. An Expectin' card for staff and midwives.
    • Stud bookings, no fee: only staff add them. ?book <stud> <who>, ?book, ?book done <#>.
      When both are on the farm, they're both told it's time.
    • Breeding season: the third week of each month (the 15th to the 21st). Everyone who said ?season on
@@ -22,7 +23,8 @@
 import { connect, pick, between, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
 import { MORE } from "./more-lines.js";
 import { MORE2 } from "./more-lines-2.js";
-import { pairsSetup, pairsBred, pairsCommands, pairsCards, PAIRS_GUIDE } from "./pairs.js";   // call a stud, mates for the day
+import { pairsSetup, pairsBred, pairsCommands, pairsCards, PAIRS_GUIDE } from "./pairs.js";
+import { midwifeSetup, midwifeCommands, midwifeLabour, midwifeStuck, midwifeBirth, midwifeTick, midwifeCard, MIDWIFE_GUIDE } from "./midwife.js";   // checkups, labour, aftercare (Nov 10)   // call a stud, mates for the day
 
 let api = null;
 function D() {
@@ -285,32 +287,11 @@ function crownTick(here, lastNight) {
   api.audit(api.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
 }
 
-// ── midwives and births ────────────────────────────────────
-function cmdMidwife(c) {
-  const { sender, args, api: A } = c;
-  const t = A.find(args[0]), p = t && A.prod(t);
-  if (!t || !p) return c.reply("Who's birthin', sugar? ?midwife <who>, standin' next to them.");
-  if (!p.labour) return c.reply(A.name(t) + " isn't in labour, hon. I'll let staff know when they are.");
-  const me = A.pos(sender), them = A.pos(t);
-  if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right down next to " + A.name(t) + " to help, sugar.");
-  p.labour.midwife = sender; A.save();
-  A.emote("🍼 " + lineAbout(t, MIDWIFE, "midwife", { by: A.name(sender) }), t);
-}
-function onBirth(mn) {
+// ── midwives and births (midwife.js) ───────────────────
+function onBirth(mn, kids, sires, info) {
   const d = D(); delete d.preg[mn];
-  // the bot clears p.labour right before the birth, so the midwife is remembered by watchLabour()
-  const m = d.lastMidwife && d.lastMidwife[mn];
-  if (m) {
-    api.staffPoints(m, 2, "midwife");
-    if (api.onMap(mn)) api.emote(lineAbout(mn, MORE2.BIRTH_MIDWIFE, "born", { by: api.name(m) }), mn);
-    delete d.lastMidwife[mn];
-  }
+  midwifeBirth(mn, kids, sires, info);
   api.save();
-}
-// remember who's midwifing (the bot drops p.labour right before the birth)
-function watchLabour() {
-  const d = D(); d.lastMidwife = d.lastMidwife || {};
-  for (const mn of api.here()) { const p = api.prod(mn); if (p && p.labour && p.labour.midwife) d.lastMidwife[mn] = p.labour.midwife; }
 }
 
 // ── commands and Companion cards ───────────────────────────
@@ -354,6 +335,7 @@ function companion(mn) {
   if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " × " + api.name(b.dam)]) });
   if (api.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
   if (r.roles && r.roles.length) cards.push(...pairsCards(mn));
+  const mc = midwifeCard(mn); if (mc) cards.push(mc);   // the Expectin' card: staff and trusted midwives
   return { cards };
 }
 
@@ -362,8 +344,8 @@ connect({
   label: "Breeding",
   version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. " +
-    "Breedin' season is the 15th–21st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour." + PAIRS_GUIDE,
-  setup(a) { api = a; D(); pairsSetup(a, D); },
+    "Breedin' season is the 15th–21st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>." + MIDWIFE_GUIDE + PAIRS_GUIDE,
+  setup(a) { api = a; D(); pairsSetup(a, D); midwifeSetup(a, D, { claim: MIDWIFE, born: MORE2.BIRTH_MIDWIFE }); },
   commands: {
     ...pairsCommands,
     // ?book lists them (anyone) · staff: ?book <stud> <who> adds one, ?book done|remove <#>
@@ -381,9 +363,9 @@ connect({
         (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " · sired by " + p.preg.sires.map(c.api.name).join(" & "));
     } },
     season: { usage: "season on|off|book", aliases: ["breedweek", "studbook"], private: true, run: cmdBreedweek },
-    midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife },
+    ...midwifeCommands,
   },
-  on: { tick: () => { watchLabour(); tick(); }, birth: onBirth, bred: (...x) => { onBred(...x); pairsBred(...x); } },
+  on: { tick: () => { midwifeTick(); tick(); }, birth: onBirth, labour: midwifeLabour, labourStuck: midwifeStuck, bred: (...x) => { onBred(...x); pairsBred(...x); } },
   // signed-up studs fill half again faster during breedin' season
   rates: { semen: (mn) => (isBreedWeek() && D().optIn[mn] ? 1.5 : 1) },
   companion,

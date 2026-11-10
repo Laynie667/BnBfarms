@@ -41,7 +41,7 @@
 
     // ── farrowin' ──
     more(B.farrowStart, [
-      "%n's water goes in the middle of the aisle, and their knees go with it. The farm girl gets them to the farrowin' pen just in time.",
+      "%n's water goes in the middle of the aisle, and their knees go with it. The farm girl gets them to %place just in time.",
       "%n's belly drops and hardens all at once, and they go down on all fours in the straw with a long low moan. It's time."]);
     more(B.farrowCrown, [
       "%n pushes, rests, pushes, and the first of the litter slips out into the straw on a warm wet rush, kickin' already.",
@@ -49,14 +49,14 @@
     more(B.farrowMid, [
       "{t}%n's tits are leakin' in steady streams now, and every new arrival roots its way toward them before %n's even finished pushin'.",
       "{nt}%n's chest is wet and achin', milk beadin' up and runnin' from both nipples, and the little ones already born are rootin' toward it.",
-      "%n pushes through another, and another, sweat-soaked, lowin', the straw round them filling with squirmin' little bodies."]);
+      "%n pushes through another, and another, sweat-soaked, groanin', the straw round them filling with squirmin' little bodies."]);
     more(B.farrowHuge, [
       "The litter goes on and on. %n is past countin', past talkin', just a body doin' what bodies do while the farm girl keeps catchin'.",
       "Another, and another. %n's belly is half what it was and still there's movement under the skin, and still they push."]);
     more(B.farrowEnd, [
-      "{t}The last of %x (%ml), sired by %c, slides out into the straw. The whole litter crowds onto %n's leakin' tits, and %n lies back and lets them.",
-      "{nt}The last of %x (%ml), sired by %c, slides out into the straw. %n's chest is swollen and leakin', and the litter latches on, greedy.",
-      "%x born (%ml), every one of them %c's. %n lies in the warm straw with the litter tucked round them, too tired to lift their head and too happy to want to."]);
+      "{t}The last of %kids, %sexes, sired by %c, slides out into the straw. The whole litter crowds onto %n's leakin' tits, and %n lies back and lets them.",
+      "{nt}The last of %kids, %sexes, sired by %c, slides out into the straw. %n's chest is swollen and leakin', and the litter latches on, greedy.",
+      "%kids born, %sexes, every one of them %c's. %n lies in the warm straw with the litter tucked round them, too tired to lift their head and too happy to want to."]);
 
     // ── the belly showin' ──
     more(B.belly1, [

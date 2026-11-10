@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.6
+// @version      0.71.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,7 +2793,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.6";
+  var VERSION = "0.71.0";
   var COMPANION_VERSION = "0.54.4";
 
   // bot-parts:farmhand-bot-parts
@@ -3351,7 +3351,25 @@
       QUOTA_STREAK_UP: 5,
       // this many days in a row on quota moves 'em up a tier (new → trained → prize)
       LABOUR_MIN: 45,
-      // labour lasts this long before the litter comes
+      // labour lasts this long before the litter comes (10y2b-birthing.js: and then…)
+      LABOUR_FIRST_MIN: 15,
+      // …this much longer for a first litter
+      LABOUR_OLD_HAND_MIN: 10,
+      // …this much shorter once they've birthed twice before
+      LABOUR_PER_YOUNG: 3,
+      LABOUR_BIG_MAX: 30,
+      // …and longer for every young past the first, up to this much more
+      LABOUR_BEAT_MIN: [6, 10],
+      // a line from them every so many minutes while they labour on the farm
+      LABOUR_FLOOR_MIN: 3,
+      // a midwife's help never brings the birth closer than this
+      MIDWIFE_HELP_MIN: 5,
+      // what each lendin' of a midwife's hands takes off (the breeding add-on)
+      STUCK_AT: 0.6,
+      STUCK_CHANCE: [0.15, 0.4],
+      // past this far through labour, one may come turned crossways (a single, a litter)
+      STUCK_WAIT_MIN: 10,
+      // nobody turns it in this long: the farm girl does it herself
       LABOUR_WAIT_H: 12,
       // due but away from the farm this long: the litter comes without the show
       EGG_CHANCE: 0.2,
@@ -7119,14 +7137,15 @@
       }
       return "new";
     }
-    function giveBirth(mn) {
+    function giveBirth(mn, info) {
+      info = info || {};
       const p = prodOf(mn), g = p.preg;
       const kids = { male: 0, female: 0, futa: 0 };
       const [m, f] = CFG.PROD.SEX_SPLIT;
       for (let i = 0; i < g.count; i++) {
-        const x = Math.random() * 100;
-        if (x < m) kids.male++;
-        else if (x < m + f) kids.female++;
+        const x2 = Math.random() * 100;
+        if (x2 < m) kids.male++;
+        else if (x2 < m + f) kids.female++;
         else kids.futa++;
       }
       p.offspring.male += kids.male;
@@ -7146,18 +7165,17 @@
       openedUp(mn);
       saveLedger();
       audit(CFG.BOT_MEMBER, "BIRTH", mn + " " + JSON.stringify(kids));
-      later(() => addonsEmit("birth", mn, kids, sires), 1500);
-      const parts = [];
-      if (kids.male) parts.push(kids.male + " male");
-      if (kids.female) parts.push(kids.female + " female");
-      if (kids.futa) parts.push(kids.futa + " futa");
-      const msg = "\u{1F37C} Oh, y'all! " + plainName(mn) + " just delivered " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". Milk's comin' in strong now!";
+      later(() => addonsEmit("birth", mn, kids, sires, info), 1500);
+      const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, v: { c: siresTxt, x: String(g.count) } };
+      const what = birthKids(mn, g.count) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
+      const mw = info.midwife && info.midwife !== CFG.BOT_MEMBER ? info.midwife : 0;
+      const msg = "\u{1F37C} Oh, y'all! " + plainName(mn) + " just delivered " + what + ", sired by " + siresTxt + (mw ? ", with " + plainName(mw) + " as midwife" : "") + ". Milk's comin' in strong now!";
       try {
-        albumAdd(mn, "\u{1F37C}", "A litter delivered", g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ".");
+        albumAdd(mn, "\u{1F37C}", g.count === 1 ? "A " + birthWords(mn).one + " delivered" : "A litter delivered", what + ", sired by " + siresTxt + (mw ? ". Midwife: " + plainName(mw) : "") + ".");
       } catch (e) {
       }
-      if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);
-      else if (onMap(mn)) emote(bodyWords(mn, "\u{1F37C} With one last long push, " + plainName(mn) + " delivers " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". The farm girl tucks 'em in the straw, and " + plainName(mn) + "'s milk comes in strong, breasts swellin' heavy."));
+      if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);
+      else if (onMap(mn)) emote("\u{1F37C} " + birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
       else beep(mn, msg);
       try {
         const split = revealSplit(mn, sires, g.count);
@@ -7319,25 +7337,10 @@
             beep(mn, "\u{1F37C} You're due in less than a day, " + plainName(mn) + "! Almost there, sweetie.");
             for (const h of herdsOf(mn)) beep(h.leader, "\u{1F37C} " + plainName(mn) + " is due in less than a day, hon.");
           }
-          if (now >= p.preg.due) {
-            if (p.labour) {
-              if (now >= p.labour.until) {
-                p.labour = null;
-                giveBirth(mn);
-              } else if (onMap(mn) && now >= p.labour.next) {
-                p.labour.next = now + (8 + Math.random() * 6) * 6e4;
-                const c = [
-                  "%n grips the rail and moans through another contraction, belly tight and heavin'.",
-                  "%n pants and rocks on all fours. The litter's movin' lower, any time now.",
-                  "Another wave rolls through %n, and they let out a long, low moo. Not long now, sugar."
-                ];
-                emote("\u{1F37C} " + c[Math.floor(Math.random() * c.length)].replace(/%n/g, plainName(mn)));
-              }
-            } else if (onMap(mn)) {
-              p.labour = { until: now + CFG.LABOUR_MIN * 6e4, next: now + 10 * 6e4 };
-              emote("\u{1F37C} Y'all, " + plainName(mn) + "'s water just broke! They're in labour with " + p.preg.sires.map(plainName).join(" & ") + "'s litter. Come gather round the stall.");
-              for (const h of herdsOf(mn)) tell(h.leader, "\u{1F37C} " + plainName(mn) + " just went into labour, hon. Come watch!");
-            } else if (now - p.preg.due > CFG.LABOUR_WAIT_H * 36e5) giveBirth(mn);
+          if (p.labour) labourTick(mn, p, now);
+          else if (now >= p.preg.due) {
+            if (onMap(mn)) startLabour(mn);
+            else if (now - p.preg.due > CFG.LABOUR_WAIT_H * 36e5) giveBirth(mn);
           }
         }
         if (p.tieUntil && now >= p.tieUntil) untie(mn, true);
@@ -7348,7 +7351,7 @@
         }
         if (p.preg && now - p.preg.since > 3 * 864e5 && charFor(mn) && now - (p.showSaid || 0) > 864e5) {
           p.showSaid = now;
-          emote("\u{1F930} " + plainName(mn) + " rests a hand on that swellin' belly. " + plainName(p.preg.sires[0]) + "'s litter is really showin' now.");
+          emote("\u{1F930} " + plainName(mn) + " rests a hand on that swellin' belly. " + plainName(p.preg.sires[0]) + "'s " + ((p.preg.count || 1) === 1 ? birthWords(mn).one + " is" : birthWords(mn).many + " are") + " really showin' now.");
         }
         for (const h of ["vulva", "butt"]) {
           if (!charFor(mn) || sizeOf(mn, h) < CFG.LEAKY_GAPE || (p.held[h] || 0) < 30 || p.tieUntil > now || holeBlocked(mn, h)) continue;
@@ -10056,6 +10059,23 @@
         },
         // milk (and seed) given this week
         studbook: () => JSON.parse(JSON.stringify(L2.studbook || [])),
+        // labour (10y2b-birthing.js): start(mn) brings it on now (a midwife's doin', asked first) · help(mn, mins) takes
+        // minutes off, → minutes left or null · unstick(mn, by) turns a stuck one · place(mn) where their kind births ·
+        // young(mn) → [one, many] · sound(mn) a noise their kind makes birthin'
+        labour: Object.freeze({
+          start: (mn) => startLabour(mn, "induced"),
+          help: (mn, mins) => helpLabour(mn, mins == null ? CFG.MIDWIFE_HELP_MIN : mins),
+          unstick: (mn, by) => unstickLabour(mn, by),
+          place: (mn) => birthWords(mn).place,
+          young: (mn) => {
+            const w = birthWords(mn);
+            return [w.one, w.many];
+          },
+          sound: (mn) => {
+            const w = birthWords(mn);
+            return w.sounds[Math.floor(Math.random() * w.sounds.length)];
+          }
+        }),
         clockedIn,
         isMandated,
         hoursThisWeek: (mn) => {
@@ -30257,15 +30277,15 @@
         arouse(mn, 30);
       }, v);
     }
-    function farrowScene(mn, count, parts, sires) {
-      const v = { x: String(count), c: sires.map(plainName).join(" & ") };
+    function farrowScene(mn, count, kids, sires) {
+      const x = { count, kids, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
       const mids = count <= 2 ? 0 : count <= 5 ? 1 : count <= 10 ? 2 : 3;
-      const beats = [BROOD_LINES.farrowStart, BROOD_LINES.farrowCrown];
-      for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? BROOD_LINES.farrowHuge : BROOD_LINES.farrowMid);
+      const beats = [birthBeat(mn, "push", x, "labour"), birthBeat(mn, count === 1 ? "crownOne" : "crownMany", x, "crown")];
+      for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? birthBeat(mn, "huge", x) : birthBeat(mn, "mid", x));
       sceneRun(mn, "\u{1F37C}", beats, (here) => {
-        if (here) emote("\u{1F37C} " + bLine("farrowEnd", mn, Object.assign({ ml: parts }, v)), mn);
+        if (here) emote("\u{1F37C} " + birthLine(count === 1 ? "endOne" : "endMany", mn, x), mn);
         face(mn, "afterglow", 180);
-      }, v);
+      }, x.v);
     }
     const BELLY = ["", "showin'", "heavy", "huge", "so big they can't see their feet"];
     function bellyStage(mn) {
@@ -30496,8 +30516,8 @@
         "%n's belly, that was restin' on their thighs this mornin', is flat. %x eggs lie heaped round them. They're cryin' a little, and smilin', and they don't know which one they mean."
       ],
       farrowStart: [
-        "%n drops to their knees in the farrowin' straw and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
-        "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. The litter's comin', and it's comin' now."
+        "%n drops to their knees in %place and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
+        "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. It's comin', and it's comin' now."
       ],
       farrowCrown: [
         "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a warm wet rush it slides out into the farm girl's waitin' hands.",
@@ -30505,16 +30525,16 @@
       ],
       farrowMid: [
         "No rest. The next one's right behind, and %n is pushin' again before they've caught their breath. Their milk's lettin' down already, runnin' in streams with every heave.",
-        "Another, and another. %n is on all fours now, rockin', lowin' like stock, and every push leaves one more squirmin' in the straw.",
+        "Another, and another. %n is on all fours now, rockin', lettin' out %sound, and every push leaves one more squirmin' in the straw.",
         "The farm girl reaches in to help turn one, and %n shrieks, and it comes, and so does the one behind it."
       ],
       farrowHuge: [
-        "It's a litter fit for a sow. %n has been at it so long they've gone quiet and glassy, just pushin' when their body says push, while the straw fills up round them.",
+        "It's a huge litter. %n has been at it so long they've gone quiet and glassy, just pushin' when their body says push, while the straw fills up round them.",
         "They keep comin'. %n's belly is shrinkin' by the handful, and there's still a row of little shapes movin' under the skin, waitin' their turn."
       ],
       farrowEnd: [
-        "With one last long push, %n delivers the last of %x (%ml), sired by %c. The farm girl tucks them in the straw against %n's swollen teats, and the milk comes in hard.",
-        "%x in the straw (%ml), every one of them %c's. %n lies on their side, spent and leakin' milk, while the litter roots and latches on."
+        "With one last long push, %n delivers the last of %kids, %sexes, sired by %c. The farm girl tucks them in the straw against %n's swollen teats, and the milk comes in hard.",
+        "%kids in the straw, %sexes, every one of them %c's. %n lies on their side, spent and leakin' milk, while the litter roots and latches on."
       ],
       belly1: ["%n's belly has started to round out. It's showin' now.", "There's a soft new curve low on %n. Somethin' in there is growin'."],
       belly2: [
@@ -30599,6 +30619,545 @@
     addCommand("quiet tend", { topic: "traps", run: (c) => {
       if (c.cmd !== "tend" || !bedTend(c.sender, c.args, c.R)) broodCommand(c.cmd, c.sender, c.args, c.R);
     } });
+    const BIRTH_KIND_OF = {
+      cow: "cow",
+      bull: "cow",
+      pony: "horse",
+      horse: "horse",
+      deer: "deer",
+      pig: "pig",
+      pup: "dog",
+      dog: "dog",
+      wolf: "den",
+      fox: "den",
+      kitt: "cat",
+      cat: "cat",
+      bunny: "bunny",
+      rabbit: "bunny",
+      goat: "goat",
+      sheep: "sheep",
+      rat: "rat",
+      goblin: "goblin",
+      dragon: "dragon"
+    };
+    const BIRTH_YOUNG = {
+      cow: ["calf", "calves"],
+      bull: ["calf", "calves"],
+      pony: ["foal", "foals"],
+      horse: ["foal", "foals"],
+      deer: ["fawn", "fawns"],
+      pig: ["piglet", "piglets"],
+      pup: ["pup", "pups"],
+      dog: ["pup", "pups"],
+      wolf: ["pup", "pups"],
+      fox: ["kit", "kits"],
+      kitt: ["kitten", "kittens"],
+      cat: ["kitten", "kittens"],
+      bunny: ["kit", "kits"],
+      rabbit: ["kit", "kits"],
+      goat: ["kid", "kids"],
+      sheep: ["lamb", "lambs"],
+      rat: ["pinkie", "pinkies"],
+      goblin: ["goblin brat", "goblin brats"],
+      dragon: ["hatchling", "hatchlings"],
+      default: ["little one", "little ones"]
+    };
+    const BIRTH_SOUNDS = {
+      cow: ["a long, low moo", "a deep, shaky low", "a moan that turns into a moo"],
+      bull: ["a deep, rumblin' bellow", "a long, low groan", "a shaky snort"],
+      pony: ["a breathy whinny", "a shudderin' little nicker", "a high, wavering whinny"],
+      horse: ["a high, breathy whinny", "a low, shudderin' nicker", "a groan through flared nostrils"],
+      deer: ["a thin, wavering bleat", "a soft, broken bleat"],
+      pig: ["a deep grunt", "a long, shakin' squeal", "a low, rhythmic grunt"],
+      pup: ["a high, needy whine", "a long whimper", "a pant that breaks into a whine"],
+      dog: ["a needy whine", "a low, long whimper", "a pant that breaks into a whine"],
+      wolf: ["a low, wavering howl", "a needy whine", "a rumblin' growl"],
+      fox: ["a high, thin yip", "a breathy little whine", "a sharp, shaky yip"],
+      kitt: ["a broken, rumblin' purr", "a needy mewl", "a high, sharp little cry"],
+      cat: ["a broken, rumblin' purr", "a long, low yowl", "a needy mewl"],
+      bunny: ["a breathy squeak", "a soft little squeak", "a hard thump of one foot"],
+      rabbit: ["a breathy squeak", "a soft little squeak", "a hard thump of one foot"],
+      goat: ["a loud, complainin' bleat", "a shaky bleat", "a long, indignant bleat"],
+      sheep: ["a trembling baa", "a low, soft baa"],
+      rat: ["a shaky chitter", "a high, needy squeak", "a breathless little squeak"],
+      goblin: ["a ragged cackle that turns into a moan", "a filthy little curse", "a breathless giggle"],
+      dragon: ["a low, rumblin' growl", "a hot, hissin' breath", "a roar that rattles the rafters"],
+      default: ["a long, low moan", "a needy whimper", "a shaky gasp"]
+    };
+    const BIRTH_PLACE = {
+      cow: "the calvin' pen",
+      horse: "the foalin' stall",
+      deer: "a hollow in the long grass",
+      pig: "the farrowin' straw",
+      dog: "the whelpin' box",
+      den: "the den",
+      cat: "a quiet corner of the loft",
+      bunny: "the fur-lined nest",
+      goat: "the kiddin' pen",
+      sheep: "the lambin' pen",
+      rat: "a nest of shredded straw",
+      goblin: "a heap of stolen blankets",
+      dragon: "a scorched hollow in the straw",
+      default: "the birthin' straw"
+    };
+    const BIRTH_KIND_LINES = {
+      cow: {
+        water: [
+          "%n lets out a long, low moo and their water breaks in a hot rush, soakin' the straw. The calvin' pen is ready, and so is %c's %brood.",
+          "%n's tail end goes tight and their water lets go, splashin' down their legs. They turn a slow circle in the calvin' pen, lowin', lookin' for the right spot to lie."
+        ],
+        labour: [
+          "%n lies down, gets up, lies down again, tail held out stiff, lowin' through every squeeze.",
+          "%n strains with their head low and their back humped, a long moo rumblin' out of them as their belly goes hard.",
+          "%n's udder is tight and drippin' already, and every squeeze pushes a few more drops out of their teats."
+        ],
+        crown: [
+          "Two little hooves show first, then a wet nose restin' on them, and with one long bawlin' push the %one slides out into the straw.",
+          "%n bears down with a deep, shudderin' moo, and the %one comes in a slick rush, all legs, landin' soft in the calvin' straw."
+        ],
+        endOne: [
+          "%n swings round and licks their %one clean with long, rough strokes till it's tryin' to stand on wobbly legs. It's %sexone, %c's, already nosin' for a teat.",
+          "%n sinks down in the calvin' pen with their %one tucked against their side, lowin' soft. It's %sexone, sired by %c, and their milk comes in heavy."
+        ],
+        endMany: [
+          "When it's done there are %kids in the calvin' straw, %sexes, all %c's. %n licks each one clean in turn, lowin' soft, udder swellin' with milk.",
+          "%n lies in the calvin' pen with %kids nosin' at their teats, %sexes, every one %c's. Their milk lets down hard."
+        ]
+      },
+      horse: {
+        water: [
+          "%n paws at the straw, sweatin' down their flanks, and their water breaks with a splash. They're in labour in the foalin' stall with %c's %brood.",
+          "A breathy whinny and a rush down %n's legs: their water's gone. They circle the foalin' stall, ears back, tail switchin'."
+        ],
+        labour: [
+          "%n goes down on their side in the foalin' stall, legs stretched out stiff, groanin' as their belly rolls hard.",
+          "%n is up again, pacin', pawin', lookin' back at their own flank with a high, worried whinny.",
+          "Sweat darkens %n's neck and flanks. They lie flat and push with their whole body, nostrils flared."
+        ],
+        crown: [
+          "A pale sac shows, then two little front hooves inside it, one a touch ahead of the other, then a nose. %n heaves, and heaves again, and the %one slides free in a long, wet rush.",
+          "%n strains flat out in the straw, and the %one comes front feet first, then its head, then all of it at once, slick and steamin'."
+        ],
+        endOne: [
+          "%n lifts their head and nickers low at the %one in the straw, nuzzlin' it till it gets its long legs under it and wobbles up. It's %sexone, %c's.",
+          "Within the hour the %one is up on four shaky legs, findin' %n's teat. It's %sexone, sired by %c, and %n's milk comes in strong."
+        ],
+        endMany: [
+          "%kids in the foalin' straw, %sexes, every one of them %c's, all legs and wet manes. %n nickers to each in turn.",
+          "%n lies spent in the foalin' stall while %kids, %sexes, struggle up on spindly legs and nose for their teats."
+        ]
+      },
+      deer: {
+        water: [
+          "%n slips off to a hollow in the long grass, flanks heavin', and their water breaks in a quiet gush. %c's %brood, comin' soon.",
+          "%n's ears flick back and their water lets go, runnin' down their slim legs. They lie down low in the grass and go very still."
+        ],
+        labour: [
+          "%n lies curled in the hollow, belly tight, lettin' out a thin, wavering bleat with each push.",
+          "%n stands, lies down, stands again, restless and quiet, their tail flickin' with every squeeze."
+        ],
+        crown: [
+          "Tiny pointed hooves show first, then a narrow wet head, and the %one slips out into the grass, spotted and blinkin'.",
+          "%n gives a soft, broken bleat and pushes, and the %one comes all at once, small and slick, folded up like a fern."
+        ],
+        endOne: [
+          "%n licks their spotted %one dry in the long grass till it tucks itself down, still as a stone. It's %sexone, %c's.",
+          "The %one lies hidden in the grass beside %n, all spots and huge dark eyes. It's %sexone, sired by %c, and %n's milk is comin' in."
+        ],
+        endMany: [
+          "%kids lie folded in the grass beside %n, %sexes, every one %c's, spotted and still, while %n licks them dry.",
+          "%n noses their %kids, %sexes, into the deep grass to hide, then lies down beside them to let them nurse."
+        ]
+      },
+      pig: {
+        water: [
+          "%n starts tearin' up the straw with their snout and hands, buildin' a nest in a frenzy, and then their water breaks. Farrowin' time, and %c's %brood with it.",
+          "%n gives a long, shakin' squeal and their water gushes out. They flop down on their side in the farrowin' straw, gruntin' hard."
+        ],
+        labour: [
+          "%n lies on their side, gruntin' low and steady, their belly goin' tight with every push.",
+          "%n's teats are drippin' already, two neat rows of them, beaded with milk as the next squeeze rolls through.",
+          "%n kicks at the straw and squeals, rolls, and settles again, their whole belly heavin'."
+        ],
+        crown: [
+          "A slick little %one shoots out on a long squeal, landin' in the straw already wrigglin', and %n doesn't even stop pushin'.",
+          "%n grunts once, deep, and a %one slides out wet and squeakin' into the farrowin' straw."
+        ],
+        huge: ["It's a litter fit for a sow and then some. %n has gone quiet and glassy, just pushin' when their body says push, while the farrowin' straw fills up round them."],
+        endOne: [
+          "Just the one %one, %sexone, %c's, and %n noses it up to the front teats and grunts, pleased with themselves.",
+          "%n lies in the farrowin' straw with their single %one latched on, gruntin' soft. It's %sexone, sired by %c."
+        ],
+        endMany: [
+          "%kids in the farrowin' straw, %sexes, every one of them %c's, squealin' and shovin' for a teat. %n lies on their side and lets them all latch on, milk flowin'.",
+          "When it's over, %n is ringed by %kids, %sexes, all %c's, a row of pink little bodies sucklin' down both lines of teats."
+        ]
+      },
+      dog: {
+        water: [
+          "%n has been diggin' at the blankets in the whelpin' box all afternoon, and now their water breaks. They pant and whine, turnin' circles. %c's %brood, comin' soon.",
+          "%n's water goes with a soft gush and they lie down hard in the whelpin' box, pantin' with their tongue out."
+        ],
+        labour: [
+          "%n pants hard, flanks shiverin', then goes still and strains with %sound.",
+          "%n licks at themselves between pushes, whinin', tail thumpin' weakly against the side of the whelpin' box.",
+          "%n digs at the bedding again, turns, lies down with a groan, and pushes."
+        ],
+        crown: [
+          "%n gives a low whine and a long push, and a %one slides out in its sac. %n turns and tears it open with their teeth and licks the %one till it squeaks.",
+          "With a grunt and a shiver, %n delivers a %one into the whelpin' box, and they're lickin' it clean before it's even stopped movin'."
+        ],
+        endOne: [
+          "Just the one %one, %sexone, %c's. %n curls round it in the whelpin' box, lickin' and lickin', and lets it nurse.",
+          "%n lies in the whelpin' box with a single fat %one tucked against their belly. It's %sexone, sired by %c."
+        ],
+        endMany: [
+          "%kids in the whelpin' box, %sexes, every one %c's, a squirmin' pile at %n's belly. %n licks each one in turn and lets them nurse.",
+          "%n curls round %kids, %sexes, all %c's, in the whelpin' box, tail over their nose, milk lettin' down."
+        ]
+      },
+      den: {
+        water: [
+          "%n slinks off into the den, low to the ground, and their water breaks in the dark. %c's %brood, on the way.",
+          "%n's water goes and they dig into the back of the den, pawin' out a hollow, pantin'."
+        ],
+        labour: [
+          "From the back of the den comes %sound, then quiet, then the scrape of claws as %n strains.",
+          "%n lies curled in the dark of the den, flanks heavin', ears flat, pushin' with every wave."
+        ],
+        crown: [
+          "There's a wet little squeak from the den: %n has delivered a %one, and you can hear them lickin' it clean.",
+          "%n strains, growls low, and a %one slides out into the den, blind and squirmin'."
+        ],
+        endOne: [
+          "In the den, %n is curled round a single %one, %sexone, %c's, lickin' it and growlin' soft at anybody who looks too close.",
+          "%n lies in the dark of the den with one %one tucked under their chin. It's %sexone, sired by %c."
+        ],
+        endMany: [
+          "%kids in the den, %sexes, all %c's, a blind, squeakin' heap at %n's belly. %n's eyes glint in the dark, darin' anybody to come closer.",
+          "%n lies curled round %kids in the den, %sexes, every one %c's, and they're all nursin' already."
+        ]
+      },
+      cat: {
+        water: [
+          "%n has been kneadin' a nest in a quiet corner of the loft all mornin', and now their water breaks. They purr through it, low and shaky. %c's %brood, comin'.",
+          "%n's water lets go with a soft splash and they hunker down in the loft corner, tail lashin', purrin' and pantin' at once."
+        ],
+        labour: [
+          "%n purrs, loud and broken, and strains, then purrs again, kneadin' at the straw with their hands.",
+          "%n crouches in their nest with their eyes half closed, lettin' out %sound with each push.",
+          "%n licks at themselves, restless, then lies back and bears down, belly goin' tight."
+        ],
+        crown: [
+          "%n gives a sharp little cry and a %one slides out in its sac. They lick it open at once, rough tongue workin', till it mews.",
+          "With a long, shakin' purr, %n delivers a damp little %one, and they're washin' it before it's even squeaked."
+        ],
+        endOne: [
+          "%n curls round one tiny %one in the loft, %sexone, %c's, purrin' so loud the boards hum.",
+          "A single %one, %sexone, sired by %c, kneadin' at %n's belly and nursin', while %n purrs and purrs."
+        ],
+        endMany: [
+          "%kids in a tumble at %n's belly, %sexes, every one %c's, kneadin' and nursin' while %n purrs, eyes shut, utterly content.",
+          "%n lies curled in the loft corner round %kids, %sexes, all %c's, washin' them one after another."
+        ]
+      },
+      bunny: {
+        water: [
+          "%n has been pullin' fur from their own chest and belly all day to line a nest, and now their water breaks. Kindlin' time. %c's %brood, comin' soon.",
+          "%n's water goes, and they dive into the nest they've built, thumpin' a foot, nose twitchin' hard."
+        ],
+        labour: [
+          "%n hunches in the fur-lined nest, quiet, eyes wide, belly clenchin' with each push.",
+          "%n gives %sound and tugs another tuft of fur loose to tuck in the nest, then bears down again.",
+          "%n's sides heave fast and shallow. Bunnies birth quick, and this one's nearly there."
+        ],
+        crown: [
+          "In a few quick pushes, a pink little %one is out and tucked into the fur. %n hardly makes a sound.",
+          "%n strains once, hard, and a tiny, hairless %one slips out into the soft nest of fur."
+        ],
+        endOne: [
+          "One little %one, %sexone, %c's, tucked deep in the fur nest. %n covers it over with fur and sits by, nose twitchin', guardin' it.",
+          "%n has kindled a single %one, %sexone, sired by %c, and it's buried snug in the fur they pulled for it."
+        ],
+        endMany: [
+          "%kids buried in the fur nest, %sexes, every one %c's, a warm wrigglin' heap. %n covers them over and stands guard, nose goin'.",
+          "Kindlin's done: %kids in the nest, %sexes, all %c's. %n lets them nurse in a quick, twitchy hurry, the way bunnies do."
+        ]
+      },
+      goat: {
+        water: [
+          "%n paws at the straw in the kiddin' pen and lets out a loud bleat as their water breaks. %c's %brood, on the way.",
+          "%n's water goes with a splash and they lie down, get up, lie down again in the kiddin' pen, bleatin' at everybody."
+        ],
+        labour: [
+          "%n stretches their neck out and bleats, loud and complainin', every time their belly goes hard.",
+          "%n lies in the kiddin' pen, pushin', then scrambles up to look at their own back end, bleatin'.",
+          "%n grinds their teeth and strains, tail up, belly rollin'."
+        ],
+        crown: [
+          "Two little hooves and a nose, and with a yell %n pushes out a %one in a slick rush into the kiddin' straw.",
+          "%n gives one more indignant bleat and the %one drops out into the straw, wet and kickin'."
+        ],
+        endOne: [
+          "%n licks their %one clean, chucklin' low in their throat, till it's up and buttin' at their udder. It's %sexone, %c's.",
+          "One %one, %sexone, sired by %c, up on its feet in minutes and already bouncin' round the kiddin' pen."
+        ],
+        endMany: [
+          "%kids in the kiddin' pen, %sexes, every one %c's, bleatin' and buttin' at %n's udder. %n licks them in turn, chucklin'.",
+          "%n stands in the kiddin' pen with %kids, %sexes, all %c's, shovin' at their teats, milk runnin'."
+        ]
+      },
+      sheep: {
+        water: [
+          "%n has gone off by themselves to the lambin' pen, quiet and restless, and their water breaks there in the straw. %c's %brood, comin' soon.",
+          "A trembling baa and a gush: %n's water has gone. They paw at the lambin' straw and lie down heavy."
+        ],
+        labour: [
+          "%n lies with their head stretched out, lip curled, strainin' with each wave.",
+          "%n gets up, turns, lies back down in the lambin' pen, lettin' out %sound."
+        ],
+        crown: [
+          "Two little hooves and a nose on top of them, and with a long push %n delivers a %one, all wet wool and long legs.",
+          "%n heaves, and the %one slides out into the lambin' straw, and %n is up and lickin' it at once, mutterin' low."
+        ],
+        endOne: [
+          "%n licks their %one dry, makin' soft, deep little sounds at it, till it bleats back. It's %sexone, %c's.",
+          "One %one in the lambin' pen, %sexone, sired by %c, already up and tuggin' at %n's teat, tail waggin'."
+        ],
+        endMany: [
+          "%kids in the lambin' pen, %sexes, every one %c's, wobblin' up on knobbly legs. %n licks each one and lets them nurse, tails waggin'.",
+          "%n stands patient in the lambin' straw while %kids, %sexes, all %c's, butt and suckle at their teats."
+        ]
+      },
+      rat: {
+        water: [
+          "%n has been shreddin' straw into a nest in a corner, frantic, and now their water breaks. %c's %brood, comin' fast.",
+          "%n's water goes and they curl tight in their shredded-straw nest, whiskers twitchin', breathin' fast."
+        ],
+        labour: [
+          "%n stretches long, belly flat to the straw, then curls up tight and pushes with %sound.",
+          "%n's tail lashes and their whiskers quiver as another squeeze rolls through."
+        ],
+        crown: [
+          "%n stretches, strains, and a tiny pink %one slips out, and %n curls round and cleans it in a blink.",
+          "A pink, squirmin' %one, no bigger than a thumb, slides out into the nest of shredded straw."
+        ],
+        endOne: ["Just one %one, %sexone, %c's, pink and squeakin' in the shredded straw. %n tucks it under their chin."],
+        endMany: [
+          "%kids in the shredded-straw nest, %sexes, every one %c's, a pink, squeakin' pile. %n curls over them all and lets them nurse.",
+          "%n lies stretched in the nest with %kids, %sexes, all %c's, latched in a row along their belly, squeakin'."
+        ]
+      },
+      goblin: {
+        water: [
+          "%n has been draggin' stolen blankets into a heap all day, cacklin', and now their water breaks all over it. %c's %brood, comin' noisy.",
+          "%n's water goes with a splash and a filthy curse, and they squat in their heap of stolen blankets, gigglin' and gaspin'."
+        ],
+        labour: [
+          "%n squats and pushes and swears, cacklin' between squeezes like it's the best joke they ever heard.",
+          "%n grips the blankets and bears down, lettin' out %sound."
+        ],
+        crown: [
+          "With a squawk and a shove, a wrinkled little %one pops out into the blankets, already yellin'.",
+          "%n cackles, pushes, and a green and squallin' %one slides out, grabbin' at the blankets with tiny claws."
+        ],
+        endOne: [
+          "One %one, %sexone, %c's, loud as anything, latched on to %n and bitin'. %n just cackles and lets it.",
+          "%n sprawls in the stolen blankets with one squallin' %one at their chest, %sexone, sired by %c, both of them grinnin'."
+        ],
+        endMany: [
+          "%kids in the stolen blankets, %sexes, every one %c's, yellin', bitin' and fightin' over %n's teats. %n laughs till they cry.",
+          "When it's over, %n is buried in %kids, %sexes, all %c's, a squirmin', squawkin' heap of trouble."
+        ]
+      },
+      dragon: {
+        water: [
+          "%n scrapes a hollow in the straw and breathes on it till it smokes, and then their water breaks with a hiss of steam. %c's %brood, comin'.",
+          "%n's water goes, and they curl in their scorched hollow, scales ripplin', smoke curlin' from their nostrils."
+        ],
+        labour: [
+          "%n strains with a low, rumblin' growl, heat pourin' off them, scales shiftin' as their belly clenches.",
+          "%n's tail lashes and a hot, hissin' breath scorches the straw as another squeeze takes them."
+        ],
+        crown: [
+          "With a roar that shakes the rafters, %n pushes out a %one in a soft, leathery shell that splits at once, and a damp, wing-folded little thing crawls free.",
+          "%n bears down, smoke pourin' from their jaws, and a %one slides out slick and hot, wings plastered to its back, already hissin'."
+        ],
+        endOne: [
+          "One %one, %sexone, %c's, curled in the scorched straw against %n's belly, little wings twitchin' as it nurses. %n rumbles, deep and proud.",
+          "%n curls round a single %one, %sexone, sired by %c, and breathes warm smoke over it."
+        ],
+        endMany: [
+          "%kids in the scorched hollow, %sexes, every one %c's, hissin' and squabblin', wings flappin' damp. %n curls round them all, rumblin'.",
+          "When it's over, %n lies coiled round %kids, %sexes, all %c's, guardin' them with one slitted eye open."
+        ]
+      }
+    };
+    const BIRTH_SHARED = {
+      water: [
+        "Y'all, %n's water just broke! They're in labour with %c's %brood. Come gather round %place.",
+        "A warm gush down %n's thighs and a gasp: their water's gone. It's time, so somebody fetch a midwife to %place.",
+        "%n stops dead, knees pressed together, as their water breaks and runs into the straw. It's time. Get 'em to %place, and somebody find a midwife."
+      ],
+      early: [
+        "%n paces the straw, one hand under their belly, breathin' slow through every squeeze. It's early yet.",
+        "%n leans on the rail and sways, belly goin' tight, then soft, then tight again.",
+        "%n's belly hardens under their hands and they hold their breath till it passes, then laugh, shaky.",
+        "%n kneels in %place, rockin', lettin' out %sound when the next one comes."
+      ],
+      strong: [
+        "The squeezes are comin' harder now. %n is on all fours in %place, groanin', head hangin' low.",
+        "%n grips the rail with white knuckles and rides out another long one, sweat runnin' down their back.",
+        "%n's belly heaves, drum-tight, and they let out %sound that carries across the whole farm.",
+        "%n can't talk through them anymore. They just breathe, and hold on, and push when their body tells them to."
+      ],
+      close: [
+        "%n's belly has dropped low and heavy, and they're bearin' down now with every wave. Any minute.",
+        "%n is pushin' in earnest, chin to chest, a long low groan pourin' out of them.",
+        "%n plants their knees wide in %place and pushes, and pushes, red-faced, and you can feel how close it is."
+      ],
+      crownOne: [
+        "%n strains till the cords stand out in their neck, and a slick %one slides out into the farm girl's waitin' hands.",
+        "%n gives one long, ragged push and a wet %one comes, squallin', and the farm girl wipes its face and lays it in %place."
+      ],
+      endOne: [
+        "%n sinks back in %place with their %one on their chest, %sexone, %c's. Their milk comes in heavy and warm.",
+        "It's over. One %one, %sexone, sired by %c, nursin' already, and %n can't stop smilin'."
+      ],
+      stuck: [
+        "%n pushes and pushes and nothin' comes. One's turned crossways and isn't budgin'. %n groans, and a midwife's hands would help right now.",
+        "%n's pushes stop gettin' anywhere: a %one is lyin' sideways, stuck, and %n pants and whimpers through it, waitin' for help to turn it.",
+        "Everything stalls. %n strains, red-faced, and gets nowhere. Somethin' in there needs turnin', gentle, by somebody who knows how."
+      ],
+      stuckWait: [
+        "Still stuck. %n rocks on all fours, pantin', and the %one won't come round on its own.",
+        "%n whimpers and shifts, tryin' to move the stuck %one with their own body, and can't."
+      ],
+      unstuck: [
+        "The farm girl kneels behind %n, slicks her hand, and reaches in slow and careful. A gentle turn, a long groan from %n, and it's come round right. Push now, sugar.",
+        "With nobody else comin', the farm girl rolls up her sleeves, presses on %n's belly with one hand and turns the %one with the other. There. It's lined up. Push."
+      ]
+    };
+    const BIRTH_FROM_BROOD = { push: "farrowStart", crownMany: "farrowCrown", mid: "farrowMid", huge: "farrowHuge", endMany: "farrowEnd" };
+    const sharedBirth = (key) => BIRTH_SHARED[key] || BIRTH_FROM_BROOD[key] && BROOD_LINES[BIRTH_FROM_BROOD[key]] || [];
+    function birthKind(mn) {
+      return BIRTH_KIND_OF[speciesKey(mn)] || "default";
+    }
+    function birthWords(mn) {
+      const k = speciesKey(mn), kind = birthKind(mn), y = BIRTH_YOUNG[k] || BIRTH_YOUNG.default;
+      return { kind, one: y[0], many: y[1], place: BIRTH_PLACE[kind] || BIRTH_PLACE.default, sounds: BIRTH_SOUNDS[k] || BIRTH_SOUNDS.default };
+    }
+    function birthSexes(kids) {
+      const parts = [];
+      if (kids.male) parts.push(kids.male + " male");
+      if (kids.female) parts.push(kids.female + " female");
+      if (kids.futa) parts.push(kids.futa + " futa");
+      return parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0] || "";
+    }
+    const birthSexOne = (kids) => kids.male ? "a little male" : kids.futa ? "a little futa" : "a little female";
+    function birthKids(mn, n) {
+      const w = birthWords(mn);
+      return n === 1 ? "a " + w.one : n + " " + w.many;
+    }
+    function birthFill(t, mn, x) {
+      const w = birthWords(mn), p = prodOf(mn), n = x && x.count || p && p.preg && p.preg.count || 1, kids = x && x.kids || null;
+      return String(t).replace(/%place/g, w.place).replace(/%brood/g, n === 1 ? w.one : w.many).replace(/%sexone/g, kids ? birthSexOne(kids) : "a little one").replace(/%sexes/g, kids ? birthSexes(kids) : "").replace(/%kids/g, birthKids(mn, n)).replace(/%many/g, w.many).replace(/%one/g, w.one).replace(/%sound/g, () => w.sounds[Math.floor(Math.random() * w.sounds.length)]);
+    }
+    function birthPool(mn, key, ownKey) {
+      const own = (BIRTH_KIND_LINES[birthKind(mn)] || {})[ownKey || key] || [], shared = sharedBirth(key);
+      return own.length && (!shared.length || Math.random() < 0.6) ? own : own.concat(shared);
+    }
+    function birthVars(mn, x) {
+      const p = prodOf(mn), g = p && p.preg || {};
+      return Object.assign({ count: x && x.count || g.count || 1 }, x || {}, { v: Object.assign({ c: (g.sires || []).map(plainName).join(" & "), x: String(x && x.count || g.count || 1) }, x && x.v || {}) });
+    }
+    function birthLine(key, mn, x, ownKey) {
+      const pool = birthPool(mn, key, ownKey);
+      if (!pool.length) return "";
+      const vx = birthVars(mn, x);
+      return tFill(birthFill(pickFor(mn, "birth:" + key, pool), mn, vx), mn, vx.v);
+    }
+    function birthBeat(mn, key, x, ownKey) {
+      return birthPool(mn, key, ownKey).map((l) => birthFill(l, mn, x));
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, {
+      __birthLine: (k, mn, x, own) => birthLine(k, mn, x, own),
+      __birthWords: (mn) => birthWords(mn),
+      __labourMins: (mn) => labourMinutes(mn),
+      __birthKinds: () => BIRTH_KIND_LINES,
+      __birthShared: (k) => sharedBirth(k)
+    });
+    function labourMinutes(mn) {
+      const p = prodOf(mn), n = p && p.preg && p.preg.count || 1, done = p && p.offspring && p.offspring.litters || 0;
+      let m = CFG.LABOUR_MIN + Math.min(CFG.LABOUR_BIG_MAX, Math.max(0, n - 1) * CFG.LABOUR_PER_YOUNG);
+      if (!done) m += CFG.LABOUR_FIRST_MIN;
+      else if (done >= 2) m -= CFG.LABOUR_OLD_HAND_MIN;
+      return Math.max(15, m);
+    }
+    const labourGap = () => (CFG.LABOUR_BEAT_MIN[0] + Math.random() * (CFG.LABOUR_BEAT_MIN[1] - CFG.LABOUR_BEAT_MIN[0])) * 6e4;
+    function startLabour(mn, how) {
+      const p = prodOf(mn);
+      if (!p || !p.preg || p.labour) return false;
+      const now = Date.now(), mins = labourMinutes(mn);
+      if (how === "induced") p.preg.due = Math.min(p.preg.due, now);
+      p.labour = { start: now, until: now + mins * 6e4, next: now + labourGap(), total: mins, helps: 0, how: how || "" };
+      emote("\u{1F37C} " + birthLine("water", mn), mn);
+      for (const h of herdsOf(mn)) tell(h.leader, "\u{1F37C} " + plainName(mn) + " just went into labour, hon. Come watch!");
+      later(() => addonsEmit("labour", mn, { place: birthWords(mn).place, minutes: mins, induced: how === "induced" }), 1500);
+      saveLedger();
+      return true;
+    }
+    function labourTick(mn, p, now) {
+      const lb = p.labour;
+      if (!lb.start) lb.start = lb.until - CFG.LABOUR_MIN * 6e4;
+      if (lb.stuck) {
+        if (now - lb.stuck.at >= CFG.STUCK_WAIT_MIN * 6e4) unstickLabour(mn, 0);
+        else if (onMap(mn) && now >= lb.next) {
+          lb.next = now + labourGap();
+          emote("\u{1F37C} " + birthLine("stuckWait", mn), mn);
+        }
+        return;
+      }
+      if (now >= lb.until) {
+        const info = { midwife: lb.midwife || 0, helps: lb.helps || 0, turnedBy: lb.turnedBy || 0, induced: lb.how === "induced" };
+        p.labour = null;
+        giveBirth(mn, info);
+        return;
+      }
+      if (!onMap(mn) || now < lb.next) return;
+      lb.next = now + labourGap();
+      const f = (now - lb.start) / Math.max(1, lb.until - lb.start);
+      if (!lb.stuckDone && f >= CFG.STUCK_AT && Math.random() < CFG.STUCK_CHANCE[p.preg && p.preg.count > 1 ? 1 : 0]) {
+        lb.stuckDone = true;
+        lb.stuck = { at: now };
+        emote("\u{1F37C} " + birthLine("stuck", mn), mn);
+        later(() => addonsEmit("labourStuck", mn), 1e3);
+        saveLedger();
+        return;
+      }
+      emote("\u{1F37C} " + birthLine(f < 0.4 ? "early" : f < 0.8 ? "strong" : "close", mn, null, "labour"), mn);
+    }
+    function unstickLabour(mn, by) {
+      const p = prodOf(mn), lb = p && p.labour;
+      if (!lb || !lb.stuck) return false;
+      const now = Date.now();
+      lb.until += now - lb.stuck.at;
+      lb.stuck = null;
+      lb.turnedBy = by || CFG.BOT_MEMBER;
+      lb.next = now + labourGap();
+      if (!by) emote("\u{1F37C} " + birthLine("unstuck", mn), mn);
+      saveLedger();
+      return true;
+    }
+    function helpLabour(mn, mins) {
+      const p = prodOf(mn), lb = p && p.labour;
+      if (!lb || lb.stuck) return null;
+      const now = Date.now();
+      lb.until = Math.max(now + CFG.LABOUR_FLOOR_MIN * 6e4, lb.until - Math.max(0, Number(mins) || 0) * 6e4);
+      lb.helps = (lb.helps || 0) + 1;
+      saveLedger();
+      return Math.max(1, Math.ceil((lb.until - now) / 6e4));
+    }
     const SUBJECT_RANKS = [{ at: 0, name: "Bait" }, { at: 10, name: "Trap Fodder" }, { at: 25, name: "Brood Sow" }, { at: 60, name: "Broodmother" }];
     function rankOfSubject(mn) {
       const n = (rec(mn) || {}).trapN || 0;
@@ -34251,7 +34810,7 @@
         "%n lays the last of %x and goes limp. Somebody has to bring a wheelbarrow for the clutch. Somebody else brings %n a blanket."
       ]);
       more(B.farrowStart, [
-        "%n's water goes in the middle of the aisle, and their knees go with it. The farm girl gets them to the farrowin' pen just in time.",
+        "%n's water goes in the middle of the aisle, and their knees go with it. The farm girl gets them to %place just in time.",
         "%n's belly drops and hardens all at once, and they go down on all fours in the straw with a long low moan. It's time."
       ]);
       more(B.farrowCrown, [
@@ -34261,16 +34820,16 @@
       more(B.farrowMid, [
         "{t}%n's tits are leakin' in steady streams now, and every new arrival roots its way toward them before %n's even finished pushin'.",
         "{nt}%n's chest is wet and achin', milk beadin' up and runnin' from both nipples, and the little ones already born are rootin' toward it.",
-        "%n pushes through another, and another, sweat-soaked, lowin', the straw round them filling with squirmin' little bodies."
+        "%n pushes through another, and another, sweat-soaked, groanin', the straw round them filling with squirmin' little bodies."
       ]);
       more(B.farrowHuge, [
         "The litter goes on and on. %n is past countin', past talkin', just a body doin' what bodies do while the farm girl keeps catchin'.",
         "Another, and another. %n's belly is half what it was and still there's movement under the skin, and still they push."
       ]);
       more(B.farrowEnd, [
-        "{t}The last of %x (%ml), sired by %c, slides out into the straw. The whole litter crowds onto %n's leakin' tits, and %n lies back and lets them.",
-        "{nt}The last of %x (%ml), sired by %c, slides out into the straw. %n's chest is swollen and leakin', and the litter latches on, greedy.",
-        "%x born (%ml), every one of them %c's. %n lies in the warm straw with the litter tucked round them, too tired to lift their head and too happy to want to."
+        "{t}The last of %kids, %sexes, sired by %c, slides out into the straw. The whole litter crowds onto %n's leakin' tits, and %n lies back and lets them.",
+        "{nt}The last of %kids, %sexes, sired by %c, slides out into the straw. %n's chest is swollen and leakin', and the litter latches on, greedy.",
+        "%kids born, %sexes, every one of them %c's. %n lies in the warm straw with the litter tucked round them, too tired to lift their head and too happy to want to."
       ]);
       more(B.belly1, [
         "%n's belly's gone soft and round low down, the way a mare's does a few weeks along.",
@@ -60346,8 +60905,16 @@ WHILE YOU'RE EXPECTIN'
   \u2022 Due in 5 days. Your belly shows on ?stats and ?measure, and your
     udder swells a cup.
   \u2022 Here on the farm when you're due? Your water breaks and you're in
-    labour for 45 minutes, with the herd invited, then the litter
-    comes (male, female or futa) and your milk comes in strong.
+    labour your kind's own way: about 45 minutes, longer for a first
+    litter or a big one, shorter once you've birthed twice. Then your
+    young come (male, female or futa) and your milk comes in strong.
+  \u2022 Now and then one comes turned crossways and everything waits till
+    a midwife turns it (or the farm girl, after 10 minutes).
+  \u2022 Midwives (staff, and anybody staff trust with it): ?checkup <who>
+    feels how far along you are and how many; ?midwife <who> helps you
+    through labour and cuts it short, and tends you after; ?induce
+    <who> brings it on once you're nestin' (you're asked first).
+    ?checkup off: no checkups on you. ?checkup on your own: a feel.
   \u2022 Not milkable? I'll ask if you want your milk to come in.
 
 EGGS \xB7 ?eggs on|off

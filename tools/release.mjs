@@ -62,6 +62,11 @@ if (!flag("--no-test")) {
 
 // 5. commit and push (your studio saves stay out of it)
 git("add", "-A", "--", ".", ":!studio/fits");
+// never anything private (Nov 10: three chat records went out with a release because the ignore list missed their
+// folder): chat records, ledger backups, logins, private add-ons. Unstaged again, and the release stops.
+const PRIVATE = /(^|\/)(backup|Backups)\/|(^|\/)record-[^/]*\.txt$|ledger[^/]*\.json$|(^|\/)\.env$|(^|\/)addons\/private-|farmhand-private-/i;
+const risky = git("diff", "--cached", "--name-only").split("\n").filter((f) => f && PRIVATE.test(f));
+if (risky.length) { try { git("reset", "-q", "--", ...risky); } catch (e) { /* fine */ } stop("These look private and were about to go to GitHub, so nothin' was committed:\n  " + risky.join("\n  ") + "\nAdd them to .gitignore, then release again."); }
 const msg = head + (summary ? ": " + summary : "") + "\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n";
 execFileSync("git", ["commit", "-q", "-F", "-"], { input: msg });
 say("Committed: " + git("log", "--oneline", "-1"));

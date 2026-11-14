@@ -1,5 +1,8 @@
 # Splitting Farmhand into a bot and a Companion extension
 
+> **Next:** the farm's planned direction from here (a server brain, the Companion in any room, our own farm rules and
+> hypnosis, the new studio) is in [DIRECTION.md](DIRECTION.md). 📌 Planned, not started (Nov 14, 2026).
+
 Why: one script that whispers and beeps everything is hard for players to read (some clients and mods hide bot whispers), and one 6,000-line file is hard to work on.
 
 ## The big rule

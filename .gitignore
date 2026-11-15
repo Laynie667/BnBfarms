@@ -17,6 +17,9 @@ vps/node_modules/
 studio/catalogue/
 tests/out/
 
+# the map studio's layouts, their old versions and its stamps (Nov 14): a layout knows where every trap is, never on GitHub
+studio/maps/
+
 # the outfit studio's copy of the live game's files (fetched from its site as they're needed)
 studio/game-cache/
 

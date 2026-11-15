@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-10. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-15. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.71.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.72.0: the map studio, and layouts for events.** Laynie, Nov 14: "similar to the outfit studio, could we make a map studio?", then "all of it", ".mappaste is fine", and "maybe event swaps, like races or for trap mazes, etc. being able to swap the map as needed would be cool".
+  - **The map studio** (on the bot's PC: **Start the map studio.bat**, or `localhost:4780/map` while the studio runs). The whole 40 × 40 farm, drawn by the game's own map code, so it looks exactly as in the room, walls and lighting and all, with the bot's spots and zones on top. It opens on the farm as the bot last saw it, read from its own backup.
+    - **Paint:** the game's whole catalogue of floors, walls, furniture and lighting, searchable, with a brush (1, 3 or 5 squares), fill, box and eraser. Right-click picks up what's under the mouse.
+    - **Blocks:** select a block and move it with the mouse or the arrow keys (its spots and zones go along), copy it, cut it, stamp it elsewhere. Keep favourite pieces as **stamps** (a milking stall, a pen, a stretch of glory row).
+    - **The farm's layer:** add, move, rename and remove spots and zones right on the map, coloured by kind (traps, water, troughs, milking, glory, pens, nests, home and safe). It **warns** about a spot nobody can stand on, a glory hole without its visitor side, two spots on one square, or a zone missing a corner. On the farm today it found **glory-6 (31,21) on a square nobody can stand on, with no visitor side**.
+    - **Seeing:** what someone on a square can see and hear (walls block, the dashed box is whisper range), where nobody can stand, and where folks spend their time (the heat map).
+    - **The glaze** (Laynie's Nov 7 trap-marker idea): a faint colour per kind of spot, designed and previewed here "as players would see it". The Companion drawing it for players comes later.
+    - **Layouts:** a whole farm for an occasion (the everyday farm, race day, a trap maze), each save keeping the one before (the last 40), with notes. Kept on the bot's PC only, never on GitHub: a layout knows where every trap is.
+    - **In and out of the room:** bring the room's map in by pasting `/mapcopy` (or from the bot's backup), and take one out with **Copy for /mappaste**.
+    - **The map doc** (`docs/farm-map-decoded.txt`) is written from the studio. Traps are never in it, since that page is public; the studio's server refuses one that has a trap in it.
+  - **Swapping a layout in for an event, two steps:** paste its map with `/mappaste`, then **`?layout <name>`** so the farm girl takes its spots and zones from the studio. **`?layout back`** puts the old ones back, and **`?layout`** says which is in and lists the rest. Proprietors only. A spot that didn't move keeps who set it and when.
+  - **Safety:** the studio only listens to the bot's PC. No website can save a layout or read the bot's backup, and only the bot's own game tab can read a layout (for `?layout`). The release tool now also refuses to commit anything from `studio/maps/`.
+  - **Built the new way** (docs/DIRECTION.md): TypeScript and Preact, type-checked by the tests. The first piece of the new setup, and it doesn't touch the live farm.
 - **Bot 0.71.0 + Breeding 1.3.0: every kind births its own way, and the midwives get real work.** Laynie, Nov 10: "revisit pregnancy and Midwife mechanics. Midwifes need a way to check progress, speed labor along, variable messages per species". Her picks: midwives are "staff and any trusted", checkups "on by default", a stuck one is fine "as long as its not a bad thing".
   - **Every kind its own way** (bot, 10y2b-birthing.js). Before, everybody moo'd through labour and farrowed like a sow. Now a cow calves in the calvin' pen and licks her calf clean, a mare foals front hooves first, a bitch whelps and tears each sac open, a bunny pulls her own fur to line a kindlin' nest, a cat queens in the loft purrin', wolves and foxes den, goats kid, ewes lamb, rats shred straw, goblins steal blankets, and a dragon scorches a hollow. Their own young (calf, foal, pups, kits, hatchlings…) and their own sounds, and the farm's shared lines fill in the same words. A single reads like one ("a calf, a little female"), a litter like a litter ("4 pups, 2 male and 2 female").
   - **Labour takes as long as it takes:** 45 minutes, plus 15 for a first litter, plus 3 for every young past the first (30 at most), less 10 once they've birthed twice. It moves through early squeezes, harder ones, then pushin'.

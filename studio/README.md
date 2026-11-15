@@ -2,6 +2,16 @@
 
 An offline dressing room for Bondage Club, for our own use. It runs on this computer only and signs in to nothing.
 
+> **The map studio (Nov 14, 2026)** lives beside it: double-click **`Start the map studio.bat`**, or open
+> `http://localhost:4780/map` while the studio runs. The whole farm drawn by the game's own map code, with the bot's
+> spots and zones on top: paint floors, walls, furniture and lighting; move blocks (spots and zones go along); keep
+> stamps; check that every spot can be stood on; see what someone can see and hear from a square; design the glaze;
+> keep whole **layouts** for events (race day, a trap maze) with their old versions. A layout goes into the farm room
+> in two steps: its map with `/mappaste` (the studio copies it), then **`?layout <name>`** so the bot's spots and zones
+> match (**`?layout back`** undoes it; proprietors only). Layouts are kept in `studio/maps/` and never go on GitHub:
+> they know where every trap is. The code is TypeScript in `studio/map/src` (built by the server when the page asks),
+> the first piece made the new way from docs/DIRECTION.md.
+
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the
 way it looks in the game.

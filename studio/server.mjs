@@ -13,6 +13,7 @@ import { readFile, stat, writeFile, mkdir, rename } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { mapRoutes } from "./map/routes.mjs";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 // where reference/ and scratch-previews/ live: two folders up, as it always was, unless studio/local.json says
@@ -94,6 +95,8 @@ createServer(async (req, res) => {
       if (req.method === "OPTIONS") { res.writeHead(204, { "Access-Control-Allow-Methods": "GET", "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600" }).end(); return; }
       if (req.method !== "GET") { res.writeHead(403).end("read only"); return; }
     }
+    // the map studio (Nov 14): /map, its layouts, stamps, the bot's spots and zones (studio/map/routes.mjs)
+    if (await mapRoutes(req, res, path, origin, { gameFile, send, GAME_ORIGIN, LIVE })) return;
     if (path === "/" || path === "/index.html") {
       // the game's own page, with the studio added at the end
       const idx = await gameFile("index.html"); if (!idx) { res.writeHead(502).end("the game's page couldn't be fetched"); return; }
@@ -171,4 +174,4 @@ createServer(async (req, res) => {
     if (f) return send(res, f);
     res.writeHead(404, { "Content-Type": "text/plain" }).end("not found");
   } catch (e) { res.writeHead(500, { "Content-Type": "text/plain" }).end(String(e && e.message || e)); }
-}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nGame files from: " + (LIVE ? "the live game, " + LIVE.ver + " (" + LIVE.base + "), kept in " + LIVE.dir : GAME) + "\nThis computer only. Ctrl+C stops it."));
+}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nB&B map studio:    http://localhost:" + PORT + "/map\nGame files from: " + (LIVE ? "the live game, " + LIVE.ver + " (" + LIVE.base + "), kept in " + LIVE.dir : GAME) + "\nThis computer only. Ctrl+C stops it."));

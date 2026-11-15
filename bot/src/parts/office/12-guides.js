@@ -760,6 +760,10 @@ SPOTS · stand on it, then ?spot set <name>
   trough · barn · stocks · breedingstand
   milking1, milking2… · milkin' stalls
   ?spot · the list · ?spot clear <name> · ?spot go <name>
+  The map studio (localhost:4780/map on the bot's PC) shows and
+  edits them all on the map, and keeps whole layouts for events.
+  ?layout <name> · its spots and zones in (paste its map too, with
+  /mappaste) · ?layout · which is in · ?layout back · undo (proprietors)
   (herdmasters and up)
 
 THE TOUR (herdmasters and up)

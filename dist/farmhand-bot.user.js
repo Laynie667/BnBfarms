@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.71.0
+// @version      0.72.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,7 +2793,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.71.0";
+  var VERSION = "0.72.0";
   var COMPANION_VERSION = "0.54.4";
 
   // bot-parts:farmhand-bot-parts
@@ -23184,6 +23184,70 @@
       saveLedger();
       later(() => tell(mn, "\u{1F9ED} Your Companion is v" + ver + ", sugar, and the farm gate needs " + CFG.ROAM_GATE_MIN + " or newer. Update it: Tampermonkey's menu \u2192 Dashboard \u2192 Utilities \u2192 Check for userscript updates, then reload the game. (Or install it again from the farm's page.)"), 6e3);
     }
+    const STUDIO_URL = "http://localhost:4780";
+    function layoutTake(name, data, sender) {
+      const farm = data && data.farm || {}, now = Date.now();
+      const before = { spots: JSON.parse(JSON.stringify(L2.spots || {})), zones: JSON.parse(JSON.stringify(L2.zones || {})), name: L2.layoutActive || "", at: now };
+      const spots = {};
+      for (const [n, p] of Object.entries(farm.spots || {})) {
+        if (!p || typeof p.X !== "number" || typeof p.Y !== "number") continue;
+        const was = L2.spots && L2.spots[n];
+        spots[n] = was && was.X === p.X && was.Y === p.Y ? was : { X: p.X, Y: p.Y, by: sender, at: now };
+      }
+      const zones = {};
+      for (const [n, z] of Object.entries(farm.zones || {})) {
+        if (!z || typeof z !== "object") continue;
+        zones[n] = Object.assign({}, L2.zones && L2.zones[n] || {}, { a: z.a ? { X: z.a.X, Y: z.a.Y } : void 0, b: z.b ? { X: z.b.X, Y: z.b.Y } : void 0, group: z.group || n });
+      }
+      L2.layoutBefore = before;
+      L2.spots = spots;
+      L2.zones = zones;
+      L2.layoutActive = name;
+      saveLedger();
+      audit(sender, "LAYOUT", name + " " + Object.keys(spots).length + " spots " + Object.keys(zones).length + " zones");
+      try {
+        syncCompanions(true);
+      } catch (e) {
+      }
+      return { spots: Object.keys(spots).length, zones: Object.keys(zones).length };
+    }
+    function layoutCommand(sender, args, R) {
+      if (!isProprietor(sender)) return R("Swappin' the farm's layout is for the proprietors, sugar.");
+      const w = String(args[0] || "").toLowerCase();
+      if (w === "back") {
+        const b = L2.layoutBefore;
+        if (!b) return R("There's nothin' to go back to, hon: no layout's been swapped in yet.");
+        const was = L2.layoutActive || "";
+        L2.layoutBefore = { spots: L2.spots, zones: L2.zones, name: was, at: Date.now() };
+        L2.spots = b.spots;
+        L2.zones = b.zones;
+        L2.layoutActive = b.name || "";
+        saveLedger();
+        audit(sender, "LAYOUT", "back to " + (b.name || "the one before"));
+        try {
+          syncCompanions(true);
+        } catch (e) {
+        }
+        return R("\u{1F5FA}\uFE0F The spots and zones are back as they were" + (b.name ? " (" + b.name + ")" : "") + ". If the map changed too, paste the old one back with /mappaste.");
+      }
+      if (!w) {
+        W.fetch(STUDIO_URL + "/__studio/maps/", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+          const names = (d.layouts || []).map((x) => x.name);
+          R("\u{1F5FA}\uFE0F In now: " + (L2.layoutActive || "the farm's own spots and zones") + ".\nThe studio has: " + (names.join(", ") || "none saved yet") + ".\n?layout <name> swaps one in (paste its map with /mappaste too) \xB7 ?layout back undoes it.");
+        }).catch(() => R("\u{1F5FA}\uFE0F In now: " + (L2.layoutActive || "the farm's own spots and zones") + ". I couldn't reach the map studio on this computer to list the others: is it running?"));
+        return;
+      }
+      if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(w)) return R("A layout's name is small letters, numbers and dashes, sugar: ?layout race-day.");
+      W.fetch(STUDIO_URL + "/__studio/maps/" + w + ".json", { cache: "no-store" }).then((r) => {
+        if (r.status === 404) throw new Error("the studio has no layout called " + w);
+        if (!r.ok) throw new Error("the studio said " + r.status);
+        return r.json();
+      }).then((d) => {
+        const n = layoutTake(w, d, sender);
+        R("\u{1F5FA}\uFE0F Layout " + w + " is in: " + n.spots + " spots and " + n.zones + " zones. If you haven't yet, paste its map in the room with /mappaste (the studio's Copy for /mappaste). ?layout back undoes it.");
+      }).catch((e) => R("\u{1F5FA}\uFE0F I couldn't get that layout: " + (e && e.message || e) + ". Is the map studio running on this computer (Start the studio.bat)?"));
+    }
+    addCommand("layout layouts", { topic: "map", staff: true, private: true, run: (c) => layoutCommand(c.sender, c.args, c.R) });
     POTIONS.push(
       {
         id: "bulltithe",
@@ -61385,6 +61449,10 @@ SPOTS \xB7 stand on it, then ?spot set <name>
   trough \xB7 barn \xB7 stocks \xB7 breedingstand
   milking1, milking2\u2026 \xB7 milkin' stalls
   ?spot \xB7 the list \xB7 ?spot clear <name> \xB7 ?spot go <name>
+  The map studio (localhost:4780/map on the bot's PC) shows and
+  edits them all on the map, and keeps whole layouts for events.
+  ?layout <name> \xB7 its spots and zones in (paste its map too, with
+  /mappaste) \xB7 ?layout \xB7 which is in \xB7 ?layout back \xB7 undo (proprietors)
   (herdmasters and up)
 
 THE TOUR (herdmasters and up)

@@ -16,6 +16,8 @@
    • Play and evenin' turn-out, for the herd to do with no staff around: see herd.js.
    • Milk-drunk: drinking somebody's milk (?nurse / nursing) makes you content, then sleepy, then
      milk-drunk. It wears off one step every 7 minutes. Richer milk (grade A) counts extra.
+   • Fed through a tube (an auto-feed gag, the cursed funnel): what's in it counts. Water waters, slop feeds, milk does
+     both and makes you milk-drunk, cum feeds, piss waters a little. Past full, a "stuffed" line now and then.
    • Lines fit who's eatin' or bein' groomed (more-lines.js): their kind (a cow chews, a pig roots, a cat picks), their
      hands (tied or pawed: face first into the trough), a gag (they eat and drink round it, messily; a funnel gets
      water poured down it), and what they wear gets groomed too (latex polished, a harness oiled).
@@ -164,6 +166,33 @@ function groomedByFarm(mn) {
   const n = needsOf(mn); n.groom = Math.min(FULL, n.groom + 60); n.warned.groom = 100; api.save();
 }
 
+// fed through a tube: an auto-feed gag, or the cursed funnel. What came down it decides what it does (Laynie, Nov 17):
+// per 150 mL, [food, water]. Water waters, slop feeds, milk does both (and makes you milk-drunk, like nursing), cum feeds,
+// piss waters a little. The farm already said the feedin' line; this only keeps count, and says so once they're stuffed.
+const FED = { water: [0, 15], slop: [12, 3], milk: [8, 8], cum: [8, 2], piss: [0, 8] };
+const STUFFED = [
+  "%name%'s belly is round and tight from the feeder, and it keeps right on pourin'. They're stuffed fuller than any trough.",
+  "%name% lets out a soft, helpless groan: the feeder's filled them past full, and their belly sloshes when they shift.",
+  "There's no room left in %name%, but the tube doesn't care. They're stuffed, glassy-eyed and gurglin'.",
+  "%name% is fed fat and full, belly bulgin', and the tube still drips into them.",
+  "Every swallow's a struggle now: %name% is so full of the feeder's pourin' they can feel it sittin' high in their chest.",
+];
+const STUFFED_EVERY_MIN = 45;
+function onFed(mn, ml, kind) {
+  if (!on(mn)) return;
+  const n = needsOf(mn), [f, w] = FED[kind] || FED.slop, k = Math.max(0, Number(ml) || 150) / 150;
+  const wasFull = n.food >= 99 && n.water >= 99;
+  n.food = Math.min(FULL, n.food + f * k); n.water = Math.min(FULL, n.water + w * k);
+  if (f) n.warned.food = 100;
+  if (w) n.warned.water = 100;
+  if (kind === "milk") milkDrunk(null, mn, ml, "");
+  if (wasFull && Date.now() - (n.stuffedAt || 0) > STUFFED_EVERY_MIN * 60000) {
+    n.stuffedAt = Date.now();
+    api.emote("🍼 " + fill(lineFor(api, mn, STUFFED, "stuffed"), words(mn)), mn);
+  }
+  api.save();
+}
+
 // milk-drunk: each drink of milk adds a step (grade A milk, or a big drink, adds two)
 function milkDrunk(milker, drinker, ml, grade) {
   if (!on(drinker)) return;
@@ -289,7 +318,7 @@ connect({
     refill: { usage: "refill <trough>", rank: "staff", run: cmdRefill },
     groom: { usage: "groom <who>", run: cmdGroom },   // stock can groom each other too
   },
-  on: { tick: () => { tick(); herdTick(); }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm },
+  on: { tick: () => { tick(); herdTick(); }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm, fed: onFed },
   rates: { milk: rate },
   companion,
 });

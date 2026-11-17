@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.72.4
+// @version      0.72.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2901,7 +2901,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.72.4";
+  var VERSION = "0.72.5";
   var COMPANION_VERSION = "0.54.10";
 
   // bot-parts:farmhand-bot-parts
@@ -14924,6 +14924,14 @@
     const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
     const OVI_WORDS = ["ovipositor"];
     const FEED_WORDS = ["auto-feed", "autofeed", "auto feeder", "self-feed", "force-feed", "forcefeed"];
+    function feedKind(text, r) {
+      const t = String(text || "").toLowerCase();
+      if (r && r.watersports && /piss|golden|urin/.test(t)) return "piss";
+      if (/\b(cum|semen|seed|spunk|jizz|protein)\b|stud cream/.test(t)) return "cum";
+      if (/\b(milk|cream|formula)\b/.test(t)) return "milk";
+      if (/\bwater\b/.test(t) && !/slop|mash|oat|gruel|porridge|kibble|grain|food|meal|chow|feed bag/.test(t)) return "water";
+      return "slop";
+    }
     const TOY_GROUPS = { ItemMouth: "mouth", ItemMouth2: "mouth", ItemMouth3: "mouth", ItemVulva: "vulva", ItemButt: "butt", ItemPelvis: "vulva", ItemDevices: "vulva", ItemVulvaPiercings: "vulva" };
     const hasWord = (text, words) => {
       const flat = squash(text);
@@ -14973,12 +14981,13 @@
             arouse(mn, 20);
           }
           if (TOY_GROUPS[g] === "mouth" && isFeeder(text) && due("feed", CFG.AUTOFEED_MIN)) {
-            const piss = !!r.watersports && /piss|golden|urin/.test(text);
+            const kind = feedKind(text, r), piss = kind === "piss";
             const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML * shotTimes(text), CFG.TRAP_OVERFULL);
             if (kept >= 1) {
               if (!piss) p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
-              emote("\u{1F37C} " + tFill(pickFor(mn, "toy:feed:" + (piss ? "p" : "f"), piss ? TOY_LINES.feedPiss : TOY_LINES.feed), mn, { c: itemName(it), ml: ml(kept) }), mn);
-              if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, piss ? "piss" : "feed");
+              const pool = { piss: TOY_LINES.feedPiss, cum: TOY_LINES.feedCum, milk: TOY_LINES.feedMilk, water: TOY_LINES.feedWater }[kind] || TOY_LINES.feed;
+              emote("\u{1F37C} " + tFill(pickFor(mn, "toy:feed:" + kind, pool), mn, { c: itemName(it), ml: ml(kept) }), mn);
+              if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, kind);
             } else if (now - (p.toyAt.fullTold || 0) > 30 * 6e4) {
               p.toyAt.fullTold = now;
               tell(mn, "\u{1F37C} Your " + itemName(it) + " gurgles, but there's not room for another drop in you, sugar.");
@@ -15666,7 +15675,34 @@
         "The %c on %n gurgles and a thick warm stream of farm slop runs down the funnel. %n has to swallow, and swallow, and swallow: %ml.",
         "Feedin' time for %n, like it or not: the %c pours %ml of sweet heavy mash straight down their throat.",
         "%n's throat works in big helpless gulps as their %c tips another %ml into them. Their belly's gettin' round with it.",
-        "The %c clicks, and %ml of warm cream and stud seed slides down into %n. They get fed like a veal calf, and nobody asked."
+        "The %c on %n burbles, and %ml of oat mash, warm and sticky, slides down the tube. They chew what they can and swallow the rest.",
+        "%n's %c dumps another %ml of farm feed into their mouth, thick as porridge, and they have to keep up or choke on it.",
+        "The %c feeds %n like a calf bein' fattened: %ml of sweet grain slop, and a drip of it down their chin when they can't keep pace."
+      ],
+      // what else a feeder can be crafted to pour (Nov 17): Barn Life counts each one its own way
+      feedWater: [
+        "The %c on %n burbles, and %ml of cool clean water runs down the tube. %n gulps it down, no say in the matter.",
+        "Waterin' time: the %c tips %ml of water straight down %n's throat, like fillin' a trough.",
+        "%n's %c hisses and pours %ml of cold well water into them. They swallow it in big gasping gulps, chin drippin'.",
+        "A valve clicks on %n's %c and fresh water floods down the funnel, %ml of it. Their throat bobs till it's gone.",
+        "The %c keeps %n watered whether they're thirsty or not: %ml down the hatch, slosh and all.",
+        "%n can hear it before they feel it: the %c gurgles and %ml of water fills their mouth faster than they can swallow."
+      ],
+      feedMilk: [
+        "The %c on %n gurgles and %ml of warm, rich milk pours down the tube. %n drinks like a calf at the bucket.",
+        "Fresh from the dairy: the %c feeds %n %ml of creamy milk, still warm, and they can't help but suckle at it.",
+        "%n's %c fills their mouth with sweet milk, %ml of it, and their eyes go heavy as they gulp it down.",
+        "Milk time for %n: the %c tips %ml of thick farm milk down their throat, a white dribble escapin' the corner of their mouth.",
+        "The %c pumps %ml of somebody's good milk into %n. They swallow and swallow, belly gettin' warm and full.",
+        "A slow, steady stream of milk runs from the %c into %n, %ml all told, and they're soft and drowsy by the end of it."
+      ],
+      feedCum: [
+        "The %c clicks, and %ml of warm cream and stud seed slides down into %n. They get fed like a veal calf, and nobody asked.",
+        "The %c on %n pulses and a thick, salty load comes down the tube, %ml of it. %n has to swallow every drop.",
+        "Protein feed for %n: the %c pumps %ml of fresh cum straight down their throat, warm and heavy.",
+        "%n sputters as their %c floods their mouth with seed, %ml of it, and swallows it down like a good farm slut.",
+        "The %c gurgles and spurts, and %n gulps down %ml of somebody's stud cum, lips glazed with it.",
+        "%n's belly gets warm and full as the %c feeds them %ml of cum, load after load, till their breath tastes of it."
       ],
       feedPiss: [
         "The %c on %n gurgles and runs hot and yellow. %n has no choice but to drink it down, %ml, every drop.",
@@ -32405,6 +32441,7 @@
               if (kept >= 1) {
                 p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
                 emote("\u{1F381} " + zLine("tick_funnel", mn, { ml: ml(kept) }), mn);
+                if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, "slop");
               }
             }
             saveLedger();

@@ -448,6 +448,17 @@
   const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
   const OVI_WORDS = ["ovipositor"];
   const FEED_WORDS = ["auto-feed", "autofeed", "auto feeder", "self-feed", "force-feed", "forcefeed"];
+  // what comes down a feeder's tube, read off how it was crafted, so Barn Life gets fed or watered to match (Laynie, Nov 17).
+  // First match wins: piss (only with ?watersports on) · cum · milk · water (on its own: water with oats in it is still feed) ·
+  // slop (the farm's mash, and anything that doesn't say)
+  function feedKind(text, r){
+    const t = String(text || "").toLowerCase();
+    if (r && r.watersports && /piss|golden|urin/.test(t)) return "piss";
+    if (/\b(cum|semen|seed|spunk|jizz|protein)\b|stud cream/.test(t)) return "cum";
+    if (/\b(milk|cream|formula)\b/.test(t)) return "milk";
+    if (/\bwater\b/.test(t) && !/slop|mash|oat|gruel|porridge|kibble|grain|food|meal|chow|feed bag/.test(t)) return "water";
+    return "slop";
+  }
   const TOY_GROUPS = { ItemMouth: "mouth", ItemMouth2: "mouth", ItemMouth3: "mouth", ItemVulva: "vulva", ItemButt: "butt", ItemPelvis: "vulva", ItemDevices: "vulva", ItemVulvaPiercings: "vulva" };
   const hasWord = (text, words) => { const flat = squash(text); return words.some(w => flat.includes(squash(w))); };
   const itemName = it => String((it.Craft && it.Craft.Name) || (it.Asset && (it.Asset.Description || it.Asset.Name)) || "toy").replace(/[()]/g, "").slice(0, 40);
@@ -490,12 +501,13 @@
         }
         // a funnel gag (or any gag) that feeds on its own
         if (TOY_GROUPS[g] === "mouth" && isFeeder(text) && due("feed", CFG.AUTOFEED_MIN)){
-          const piss = !!r.watersports && /piss|golden|urin/.test(text);
+          const kind = feedKind(text, r), piss = kind === "piss";
           const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML * shotTimes(text), CFG.TRAP_OVERFULL);
           if (kept >= 1){
             if (!piss) p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
-            emote("🍼 "+tFill(pickFor(mn, "toy:feed:"+(piss ? "p" : "f"), piss ? TOY_LINES.feedPiss : TOY_LINES.feed), mn, { c: itemName(it), ml: ml(kept) }), mn);
-            if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, piss ? "piss" : "feed");
+            const pool = { piss: TOY_LINES.feedPiss, cum: TOY_LINES.feedCum, milk: TOY_LINES.feedMilk, water: TOY_LINES.feedWater }[kind] || TOY_LINES.feed;
+            emote("🍼 "+tFill(pickFor(mn, "toy:feed:"+kind, pool), mn, { c: itemName(it), ml: ml(kept) }), mn);
+            if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, kind);   // Barn Life feeds or waters them by what it was
           } else if (now - (p.toyAt.fullTold || 0) > 30*60000){ p.toyAt.fullTold = now; tell(mn, "🍼 Your "+itemName(it)+" gurgles, but there's not room for another drop in you, sugar."); }
         }
         // a toy crafted as a cock: the farm talks about it like one

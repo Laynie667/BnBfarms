@@ -74,6 +74,17 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   W.__addons('nurse', 600, 500, 50, 'C'); ok(d().drunk['500'].lvl===3, 'one more and they are milk-drunk');
   d().drunk['500'].t=Date.now()-8*60000; W.__addons('tick'); ok(d().drunk['500'].lvl===2, 'it wears off a step at a time');
   const st=W.__stateFor(500); ok(st.mods && st.mods['barn-life'] && st.mods['barn-life'].cards[0].bars.length===3, 'the Companion gets the bars');
+  // fed through a tube: what's in it decides it (Laynie, Nov 17)
+  n.food=40; n.water=40; W.__addons('fed', 500, 150, 'water'); ok(n.food===40 && Math.round(n.water)===55, 'a water feeder waters them, no food');
+  W.__addons('fed', 500, 150, 'slop'); ok(Math.round(n.food)===52 && Math.round(n.water)===58, 'a slop feeder feeds them, and a little water');
+  W.__addons('fed', 500, 300, 'cum'); ok(Math.round(n.food)===68 && Math.round(n.water)===62, 'cum feeds them, by how much came down');
+  delete d().drunk['500']; W.__addons('fed', 500, 150, 'milk'); ok(Math.round(n.food)===76 && Math.round(n.water)===70 && d().drunk['500'] && d().drunk['500'].lvl===2, 'milk does both, and makes them milk-drunk like nursing');
+  W.__addons('fed', 500, 150, 'piss'); ok(Math.round(n.water)===78 && Math.round(n.food)===76, 'piss waters them a little');
+  W.__addons('fed', 500, 150, 'feed'); ok(Math.round(n.food)===88, "an older farm's word for slop still feeds");
+  n.food=100; n.water=100; n.stuffedAt=0; k=sent.length; W.__addons('fed', 500, 150, 'slop'); await drain();
+  ok(sent.slice(k).some(([e,x])=>x&&/stuffed|full/.test(String(x.Content))&&/Moo/.test(String(x.Content))), 'past full, a stuffed line');
+  k=sent.length; W.__addons('fed', 500, 150, 'slop'); await drain(); ok(!sent.slice(k).some(([e,x])=>x&&/stuffed|past full|fed fat/.test(String(x.Content))), '...but not every pump');
+  W.__addons('fed', 600, 150, 'slop'); ok(!d().needs['600'], 'nobody without barn life on gets counted');
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'needs farm off'}); await drain(5500);
   ok(d().farmOff, 'proprietors can switch it off farm-wide');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));

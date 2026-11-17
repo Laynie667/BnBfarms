@@ -112,7 +112,7 @@
           }
           if (c.kind === "belt"){ privateLine(mn, zLine("tick_belt", mn), "emote"); arouse(mn, 30, 94); }
           if (c.kind === "cups" && p && makesMilk(mn)){ const got = drainMilk(mn, p.milk * 0.7); if (got >= 5) emote("🎁 "+zLine("tick_cups", mn, { ml: ml(got) }), mn); }
-          if (c.kind === "funnel" && p){ const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML, CFG.TRAP_OVERFULL); if (kept >= 1){ p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK); emote("🎁 "+zLine("tick_funnel", mn, { ml: ml(kept) }), mn); } }
+          if (c.kind === "funnel" && p){ const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML, CFG.TRAP_OVERFULL); if (kept >= 1){ p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK); emote("🎁 "+zLine("tick_funnel", mn, { ml: ml(kept) }), mn); if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, "slop"); } }
           saveLedger();
         }
       }

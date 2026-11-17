@@ -5,11 +5,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.4** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.5** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.2** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.72.5 + Barn life 1.4.3: the auto-feeder feeds Barn Life by what's in the tube.** Laynie, Nov 17: "the auto-feeder needs to tap in to barn life, and actually feed or reduce thirst depending on whats coming down the tube".
+  - **What's in the tube:** the farm girl reads it off how the feeder was crafted. Piss (only with ?watersports on), then cum (cum, seed, protein…), then milk (milk, cream), then water (water on its own; water with oats in it is still feed), then slop (mash, oats, the farm's feed, and anything that doesn't say).
+  - **Its own lines:** water, milk and cum each have their own pool now, and slop has a few more.
+  - **Barn Life counts it** (only for people who have ?needs on), per 150 mL pump:
+    - water: water +15
+    - slop: food +12, water +3
+    - milk: food +8, water +8, and it makes them milk-drunk, like nursing
+    - cum: food +8, water +2
+    - piss: water +8
+  - **Stuffed:** once they're full, a "stuffed" line now and then (at most every 45 minutes), never every pump.
+  - **The cursed funnel** feeds Barn Life the same way, as slop.
+  - **For add-on writers:** a new `fed(mn, ml, kind)` hook (docs/ADDONS.md).
 
 - **Bot 0.72.4 + Companion 0.54.10 + Dispensary 0.1.4: the shots and potions that work anywhere.** Laynie, Nov 17: "lets continue with the dispensary", and earlier, "the ones that need her voice, couldnt the voice be built into the dispensary too, so it triggers there?"
   - **New in the Dispensary:**

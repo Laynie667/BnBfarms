@@ -58,6 +58,7 @@ connect({
     join(mn) {}, leave(mn) {}, safe(mn) {},     // safe = they used their safeword: stop everything for them
     nurse(milker, drinker, ml, grade) {}, birth(mn, kids, sires) {},
     bred(stud, mn, hole, ml, took) {},          // a load landed inside somebody (?cum, breedin', the use bench, api.bred from an add-on)
+    fed(mn, ml, kind) {},                       // a tube fed them (an auto-feed gag, the cursed funnel): kind is water, slop, milk, cum or piss
   },
   rates: { milk: (mn) => 1, semen: (mn) => 1 }, // nudge production (0.25×–3× overall)
   lines: { pump: (info) => "…" },               // write the farm's milking lines (pump, echo, stallMilk, stallSemen, stallDone, stallDoneSemen, gearDry)

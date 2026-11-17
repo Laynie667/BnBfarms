@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.4.2
+// @version      1.4.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -817,6 +817,30 @@
     n.warned.groom = 100;
     api2.save();
   }
+  var FED = { water: [0, 15], slop: [12, 3], milk: [8, 8], cum: [8, 2], piss: [0, 8] };
+  var STUFFED = [
+    "%name%'s belly is round and tight from the feeder, and it keeps right on pourin'. They're stuffed fuller than any trough.",
+    "%name% lets out a soft, helpless groan: the feeder's filled them past full, and their belly sloshes when they shift.",
+    "There's no room left in %name%, but the tube doesn't care. They're stuffed, glassy-eyed and gurglin'.",
+    "%name% is fed fat and full, belly bulgin', and the tube still drips into them.",
+    "Every swallow's a struggle now: %name% is so full of the feeder's pourin' they can feel it sittin' high in their chest."
+  ];
+  var STUFFED_EVERY_MIN = 45;
+  function onFed(mn, ml, kind) {
+    if (!on(mn)) return;
+    const n = needsOf2(mn), [f, w] = FED[kind] || FED.slop, k = Math.max(0, Number(ml) || 150) / 150;
+    const wasFull = n.food >= 99 && n.water >= 99;
+    n.food = Math.min(FULL, n.food + f * k);
+    n.water = Math.min(FULL, n.water + w * k);
+    if (f) n.warned.food = 100;
+    if (w) n.warned.water = 100;
+    if (kind === "milk") milkDrunk(null, mn, ml, "");
+    if (wasFull && Date.now() - (n.stuffedAt || 0) > STUFFED_EVERY_MIN * 6e4) {
+      n.stuffedAt = Date.now();
+      api2.emote("\u{1F37C} " + fill(lineFor(api2, mn, STUFFED, "stuffed"), words(mn)), mn);
+    }
+    api2.save();
+  }
   function milkDrunk(milker, drinker, ml, grade) {
     if (!on(drinker)) return;
     const d = D2(), x = d.drunk[drinker] = d.drunk[drinker] || { lvl: 0, t: Date.now() };
@@ -940,7 +964,7 @@
   connect({
     name: "barn-life",
     label: "Barn life",
-    version: "1.4.2",
+    version: "1.4.3",
     // (its addon.json's, put in by the build)
     guide: "?needs on to get hungry, thirsty and scruffy while you're on the farm (?needs off stops it). Eat at a trough spot with ?eat, drink at a water spot with ?drink (BC+ and MPA bowl activities count there too). Staff: ?groom <who> next to them, ?refill <trough> next to it. Drinking milk makes you content, then sleepy, then milk-drunk. Proprietors: ?needs farm on|off." + HERD_GUIDE,
     setup(a) {
@@ -960,7 +984,7 @@
     on: { tick: () => {
       tick();
       herdTick();
-    }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm },
+    }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm, fed: onFed },
     rates: { milk: rate },
     companion
   });

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.72.1
+// @version      0.72.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,7 +2793,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.72.1";
+  var VERSION = "0.72.2";
   var COMPANION_VERSION = "0.54.6";
 
   // bot-parts:farmhand-bot-parts
@@ -5760,6 +5760,7 @@
         relayRefused(m.id);
         return;
       }
+      if (onDispensaryMsg(mn, m)) return;
       if (m.type === "markDone") {
         dbg("mark", mn, m.ok, (m.did || []).join(","), m.why || "");
         try {
@@ -8842,7 +8843,7 @@
         fx0.push("contraceptive");
       }
       try {
-        shotsMore(target, by, text, tags, x, done, fx0);
+        shotsMore(target, by, text, tags, x, done, fx0, how);
       } catch (e) {
         warn("shots more:", e);
       }
@@ -14978,7 +14979,7 @@
       const r = rec(mn);
       if (r && r.penned && !r.penned.trap) s += 0.3;
       if (r && r.gluedUntil > now) s += 0.6;
-      if (boosted(p, "sedate")) s += 0.8;
+      if (boosted(p, "sedate") && !(dispFor(mn) && !dispFor(mn).lscg)) s += 0.8;
       return Math.round(Math.min(CFG.SLOW_MAX, s) * 10) / 10;
     }
     function trapsList() {
@@ -25305,7 +25306,7 @@
       }
       R("?kryptonite \xB7 ?kryptonite set <word> (whisper it) \xB7 hint <text> \xB7 word \xB7 off");
     }
-    function shotsMore(target, by, text, tags, x, done, fx0) {
+    function shotsMore(target, by, text, tags, x, done, fx0, how) {
       const r = rec(target), p = prodOf(target), now = Date.now(), H = 36e5, lim = String(r.limits || "");
       const potion = (id, why) => {
         const P = potionDef(id);
@@ -25329,9 +25330,16 @@
       if (tags.has("denial")) {
         if (/\b(denial|chast|orgasm|edg)/i.test(lim)) done.push("no denial, their limits rule it out");
         else {
-          p.deniedUntil = Math.max(p.deniedUntil || 0, now) + 2 * H * x;
-          done.push("held at the edge for " + Math.ceil((p.deniedUntil - now) / H) + " hours");
-          fx0.push("denial");
+          const was = p.deniedUntil || 0;
+          const dc = dispCall(target, "denial", { x, mins: 120 * x, by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("denial", target), undo: () => {
+            p.deniedUntil = was;
+          } });
+          if (dc === "ladder" || dc === "off") done.push("no denial, " + dispWhy(dc));
+          else {
+            p.deniedUntil = Math.max(was, now) + 2 * H * x;
+            done.push("held at the edge for " + Math.ceil((p.deniedUntil - now) / H) + " hours");
+            if (dc !== "sent") fx0.push("denial");
+          }
         }
       }
       if (tags.has("flood")) {
@@ -25342,9 +25350,16 @@
       if (tags.has("sedative")) {
         if (/\b(sedat|drug|sleep)/i.test(lim)) done.push("no sedative, their limits rule it out");
         else {
-          p.boosts.sedate = Math.max(p.boosts.sedate || 0, now) + H * x;
-          done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour"));
-          fx0.push("sedative");
+          const was = p.boosts.sedate || 0;
+          const dc = dispCall(target, "sedative", { x, mins: 60 * x, by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("sedative", target), undo: () => {
+            p.boosts.sedate = was;
+          } });
+          if (dc === "ladder" || dc === "off") done.push("no sedative, " + dispWhy(dc));
+          else {
+            p.boosts.sedate = Math.max(was, now) + H * x;
+            done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour"));
+            if (dc !== "sent") fx0.push("sedative");
+          }
         }
       }
       if (tags.has("obey")) {
@@ -25458,7 +25473,7 @@
             privateLine(mn, kFill(pickFresh("krypto:stock", KRYPTO_LINES.stock), mn), "chat");
           }
         }
-        if (boosted(p, "sedate") && charFor(mn) && now - (p.sedTold || 0) > 9 * 6e4 && Math.random() < 0.3) {
+        if (boosted(p, "sedate") && charFor(mn) && !dispFor(mn) && now - (p.sedTold || 0) > 9 * 6e4 && Math.random() < 0.3) {
           p.sedTold = now;
           privateLine(mn, kFill(pickFresh("sed", SHOT_LINES.sedative), mn), "emote");
         }
@@ -25657,6 +25672,91 @@
     }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });
     addCommand("kryptonite", { topic: "shots", private: true, run: (c) => kryptoCommand(c.sender, c.args, c.R, c.channel) });
     addCommand("myshots shotsin", { topic: "shots", private: true, run: (c) => c.R(myShotsText(c.sender)) });
+    const DISP_TTL_MS = 3 * 36e5, DISP_WAIT_MS = 2 * 6e4;
+    const dispMap = () => state.disp || (state.disp = /* @__PURE__ */ new Map());
+    function dispFor(mn) {
+      const d = dispMap().get(mn);
+      return d && Date.now() - d.at < DISP_TTL_MS && charFor(mn) ? d : null;
+    }
+    function dispFarmList() {
+      const out = [CFG.BOT_MEMBER].concat(CFG.PROPRIETORS || []);
+      for (const k of Object.keys(L2.people || {})) {
+        const mn = Number(k);
+        if (mn && !out.includes(mn) && isStaff(mn)) out.push(mn);
+      }
+      return out.slice(0, 300);
+    }
+    function onDispHello(mn, m) {
+      const had = dispMap().has(mn);
+      dispMap().set(mn, {
+        ver: String(m.ver || "?").slice(0, 20),
+        farm: m.farm !== false,
+        lscg: !!m.lscg,
+        off: Array.isArray(m.off) ? m.off.filter((x) => typeof x === "string").slice(0, 40) : [],
+        at: Date.now()
+      });
+      if (!had) log("Dispensary hello from " + mn + " (v" + String(m.ver || "?").slice(0, 20) + ")");
+      enqueue(makeMsg("dispWelcome", { farm: dispFarmList() }, mn));
+    }
+    const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
+    function dispCall(mn, dose, o) {
+      const d = dispFor(mn);
+      if (!d) return null;
+      if (!d.farm) return "ladder";
+      if (d.off.includes(dose)) return "off";
+      const id = state.dispSeq = (state.dispSeq || 0) + 1, P = state.dispPending || (state.dispPending = /* @__PURE__ */ new Map()), now = Date.now();
+      for (const [k, c] of P) if (now - c.at > DISP_WAIT_MS) P.delete(k);
+      P.set(id, { mn, dose, undo: o.undo, at: now });
+      enqueue(makeMsg("dose", { id, dose, x: o.x || 1, mins: o.mins, by: o.by, line: o.quiet ? void 0 : o.line, hand: !!o.hand, quiet: !!o.quiet }, mn), true);
+      return "sent";
+    }
+    function onDoseDone(mn, m) {
+      const P = state.dispPending, id = Number(m.id), c = P && P.get(id);
+      if (!c || c.mn !== mn) return;
+      P.delete(id);
+      dbg("DOSE", mn, c.dose, m.ok ? "took" : "didn't take", m.why || "");
+      if (m.ok) return;
+      try {
+        if (typeof c.undo === "function") c.undo();
+      } catch (e) {
+        warn("dose undo:", e);
+      }
+      saveLedger();
+      syncCompanions(true);
+      if (m.why === "lscg-off") tell(mn, "\u{1F489} That " + c.dose + " didn't take, sugar: it's switched off in LSCG's Drug Enhancements.");
+    }
+    function dispSafeSide(mn) {
+      const p = prodOf(mn);
+      if (!p) return;
+      p.deniedUntil = 0;
+      if (p.boosts) delete p.boosts.sedate;
+      saveLedger();
+      syncCompanions(true);
+    }
+    function onDispSafeword(mn) {
+      dispSafeSide(mn);
+      audit(mn, "DISPSAFE", "");
+    }
+    function dispSafe(mn) {
+      if (!dispFor(mn)) return;
+      enqueue(makeMsg("dispClear", {}, mn), true);
+      dispSafeSide(mn);
+    }
+    function onDispensaryMsg(mn, m) {
+      if (m.type === "dispHello") {
+        onDispHello(mn, m);
+        return true;
+      }
+      if (m.type === "doseDone") {
+        onDoseDone(mn, m);
+        return true;
+      }
+      if (m.type === "dispSafeword") {
+        onDispSafeword(mn);
+        return true;
+      }
+      return false;
+    }
     const FEATS = [
       {
         key: "dairy",
@@ -64233,6 +64333,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             reinsLet(sender, "safe");
           } catch (e) {
             warn("safeword reins:", e);
+          }
+          try {
+            dispSafe(sender);
+          } catch (e) {
+            warn("safeword dispensary:", e);
           }
           say2("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. \u{1F534}", true);

@@ -37,6 +37,8 @@ const botParts = {
 const targets = [
   { name: "bot",       entry: "farmhand-bot-parts",     header: "bot/header.txt",       out: "dist/farmhand-bot.user.js",       version: pkg.versions.bot, plugins: [botParts] },
   { name: "companion", entry: "extension/src/index.js", header: "extension/header.txt", out: "dist/farmhand-companion.user.js", version: pkg.versions.companion },
+  // The Farmhand's Dispensary: doses from crafted items, anywhere in the club; stands on its own, works with the farm
+  { name: "dispensary", entry: "dispensary/src/index.js", header: "dispensary/header.txt", out: "dist/farmhand-dispensary.user.js", version: pkg.versions.dispensary },
   // the Farm Watcher: a stand-alone diagnostics recorder for a player's game (not part of the bot)
   { name: "watcher",   entry: "watcher/index.js",       header: "watcher/header.txt",   out: "dist/farm-watcher.user.js",       version: pkg.versions.watcher },
 ];
@@ -79,5 +81,5 @@ for (const t of targets) {
   else await esbuild.build(options);
 }
 const addonCount = targets.filter((t) => t.name.startsWith("add-on ")).length;
-if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + ", companion v" + pkg.versions.companion + ", watcher v" + pkg.versions.watcher +
+if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + ", companion v" + pkg.versions.companion + ", watcher v" + pkg.versions.watcher + ", dispensary v" + pkg.versions.dispensary +
   (addonCount ? " and " + addonCount + " add-on(s)" : "") + " into dist/");

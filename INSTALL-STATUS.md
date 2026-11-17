@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -14,6 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.6** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +24,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.72.2 + Dispensary 0.1.0: The Farmhand's Dispensary, step 1.** Laynie, Nov 16: "a add-on that doesnt rely on the farm, or farmhand companion, but would work in tandem with it". Then, Nov 17: "have the farm girl 'call' on the extension to apply shots", and "anything to make the farmgirls load a little lighter". The whole plan is in `docs/DISPENSARY.md`.
+  - **A new add-on, `farmhand-dispensary.user.js`:** doses from crafted items, anywhere in the club. A needle whose name or description carries the right words gives that dose. It has its own page under Preferences → Extensions, and `/dispensary` too.
+  - **Saved on your account:** settings and running doses follow you between your phone and your PC.
+  - **Who can dose you:** a dropdown, from only me, through owner, lovers, the farm, whitelist and friends, to everyone (blacklist too). Out of the box it's your owner, your lovers and the farm.
+  - **The clock:** while online (timers count only while you're here), or real time (they run while you're away, but 50% longer). The hover tip says so.
+  - **The first two doses:** Denial Serum holds you right at the edge, two hours a dose. The Sedative gives you a sleepy face, slow feet and drowsy moments, an hour a dose. x2 to x5 stacks, and each dose has its own switch.
+  - **The safeword:** the button, `/dispensary safeword`, the game's own safeword and LSCG's safeword all lift every dose at once.
+  - **LSCG, LSCG's way:** its sedative, aphrodisiac, mind control and antidote stay LSCG's. Our doses show up in LSCG's Drug Enhancements list, with a bar for the time left.
+  - **The farm girl's call (bot):** on the farm she still reads the needle and keeps the books. When the person dosed runs the Dispensary, she doesn't narrate it: their game does the dose and says her line, and she's told if it didn't take. If the farm isn't on their list, or they've switched a dose off, she treats it like a limit. Without a Dispensary, everything is as before.
+  - **Safewords both ways (bot):** their Dispensary's safeword lifts the farm's side of those doses (denial, drowsiness), and `?safeword` lifts every dose in their Dispensary.
 
 - **Companion 0.54.6: the farm girl's screen draws nothing at all.** The bot's tab ran out of memory six times between 00:02 and 00:15 on Nov 17, each time within a minute of walking into the room. Laynie: "The bot doesnt need to render anything".
   - **What it was:** not the farm's own work. Opera's crash reports showed the page's own memory at only 120 to 150 MB each time, and the bot ran steady on that night's ledger. It was the pictures. The bot's tab already skipped drawing people (since Oct 27), but walking in still loaded two things. The map was drawn for its first 2 minutes (the floor, walls and furniture, about 170 MB). And every person still got two full-size drawing sheets, blank, about 7 MB a body.

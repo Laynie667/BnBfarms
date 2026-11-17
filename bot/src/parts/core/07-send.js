@@ -509,6 +509,7 @@
     const mn = m.from;
     if (!mn) return;
     if (m.type === "relayNo"){ relayRefused(m.id); return; }
+    if (onDispensaryMsg(mn, m)) return;   // a player's Dispensary (10ur2-dispensary.js)
     if (m.type === "markDone"){ dbg("mark", mn, m.ok, (m.did || []).join(","), m.why || ""); try { messMarkDone(mn, m); } catch(e){} return; }
     if (m.type === "chatlog"){ onChatlog(mn, m); return; }   // the record (10z9-chatlog.js)
     if (m.type === "logAsk"){ chatlogAsk(mn, m); return; }

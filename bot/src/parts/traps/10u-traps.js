@@ -530,7 +530,7 @@
     if (makesMilk(mn) && p.milk >= milkCap(mn)*0.95) s += 0.2;                              // udders fit to burst
     const r = rec(mn); if (r && r.penned && !r.penned.trap) s += 0.3;                       // hobbled in the pen
     if (r && r.gluedUntil > now) s += 0.6;                                                  // glue or slime still on their feet
-    if (boosted(p, "sedate")) s += 0.8;                                                     // a sedative in 'em (10ur-shots-more.js)
+    if (boosted(p, "sedate") && !(dispFor(mn) && !dispFor(mn).lscg)) s += 0.8;             // a sedative in 'em (10ur-shots-more.js); their own Dispensary slows them itself (10ur2-dispensary.js)
     return Math.round(Math.min(CFG.SLOW_MAX, s) * 10) / 10;
   }
 

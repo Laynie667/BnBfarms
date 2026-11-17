@@ -1217,6 +1217,7 @@
         try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
         try { tempOutfitEnd(sender, "safe"); } catch(e){ warn("safeword outfit wheel:", e); }   // a wheel or Wrong Barn outfit comes off (10un-outfit-wheel.js)
         try { reinsLet(sender, "safe"); } catch(e){ warn("safeword reins:", e); }   // off anybody's reins (10y9s-reins.js)
+        try { dispSafe(sender); } catch(e){ warn("safeword dispensary:", e); }   // every dose in their Dispensary, and its farm side (10ur2-dispensary.js)
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);

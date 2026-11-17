@@ -222,19 +222,30 @@
   }
 
   // ── what a shot's new words do (applyShot calls this) ──
-  function shotsMore(target, by, text, tags, x, done, fx0){
+  function shotsMore(target, by, text, tags, x, done, fx0, how){
     const r = rec(target), p = prodOf(target), now = Date.now(), H = 3600000, lim = String(r.limits || "");
     const potion = (id, why) => { const P = potionDef(id); if (P && P.limit && P.limit.test(lim)){ done.push("no " + why + ", their limits rule it out"); return false; } givePotion(target, id, by, "from a shot"); return true; };
     if (tags.has("aphro") && potion("needy", "aphrodisiac")){ arouse(target, 30 * x); done.push("achin' and needy"); fx0.push("aphro"); }
     if (tags.has("trigger")){ p.boosts.trigger = Math.max(p.boosts.trigger || 0, now) + H * x; done.push("hair trigger for " + (x > 1 ? x + " hours" : "an hour")); fx0.push("trigger"); }
     if (tags.has("denial")){
       if (/\b(denial|chast|orgasm|edg)/i.test(lim)) done.push("no denial, their limits rule it out");
-      else { p.deniedUntil = Math.max(p.deniedUntil || 0, now) + 2 * H * x; done.push("held at the edge for " + Math.ceil((p.deniedUntil - now) / H) + " hours"); fx0.push("denial"); }
+      else {
+        // with a Dispensary, their own game holds them and says the line; I keep the books (10ur2-dispensary.js)
+        const was = p.deniedUntil || 0;
+        const dc = dispCall(target, "denial", { x, mins: 120 * x, by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("denial", target), undo: () => { p.deniedUntil = was; } });
+        if (dc === "ladder" || dc === "off") done.push("no denial, " + dispWhy(dc));
+        else { p.deniedUntil = Math.max(was, now) + 2 * H * x; done.push("held at the edge for " + Math.ceil((p.deniedUntil - now) / H) + " hours"); if (dc !== "sent") fx0.push("denial"); }
+      }
     }
     if (tags.has("flood")){ const lv = addBoost(p, "flood", 12 * H, x); done.push("loads " + (1 + 1.5 * lv) + " times as big for half a day"); fx0.push("flood"); }
     if (tags.has("sedative")){
       if (/\b(sedat|drug|sleep)/i.test(lim)) done.push("no sedative, their limits rule it out");
-      else { p.boosts.sedate = Math.max(p.boosts.sedate || 0, now) + H * x; done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour")); fx0.push("sedative"); }
+      else {
+        const was = p.boosts.sedate || 0;
+        const dc = dispCall(target, "sedative", { x, mins: 60 * x, by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("sedative", target), undo: () => { p.boosts.sedate = was; } });
+        if (dc === "ladder" || dc === "off") done.push("no sedative, " + dispWhy(dc));
+        else { p.boosts.sedate = Math.max(was, now) + H * x; done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour")); if (dc !== "sent") fx0.push("sedative"); }
+      }
     }
     if (tags.has("obey")){ if (/\b(hypno|trance|mind)/i.test(lim)) done.push("no trance, their limits rule it out"); else { goUnder(target, 1 + x); done.push("a step deeper under"); fx0.push("obey"); } }
     if (tags.has("mooserum") && potion("moo", "moo serum")){ done.push("moo, moo"); fx0.push("mooserum"); }
@@ -290,7 +301,7 @@
         else if (charFor(mn) && now - (r.krypto.told || 0) > (6 + Math.random() * 4) * 60000){ r.krypto.told = now; privateLine(mn, kFill(pickFresh("krypto:stock", KRYPTO_LINES.stock), mn), "chat"); }
       }
       // drowsy, now and then
-      if (boosted(p, "sedate") && charFor(mn) && now - (p.sedTold || 0) > 9 * 60000 && Math.random() < 0.3){ p.sedTold = now; privateLine(mn, kFill(pickFresh("sed", SHOT_LINES.sedative), mn), "emote"); }
+      if (boosted(p, "sedate") && charFor(mn) && !dispFor(mn) && now - (p.sedTold || 0) > 9 * 60000 && Math.random() < 0.3){ p.sedTold = now; privateLine(mn, kFill(pickFresh("sed", SHOT_LINES.sedative), mn), "emote"); }
     }
     // the barn's gossip about a proprietor's weakness, every few hours, when they're here and there's an audience
     if (now >= (state.kryptoRumorAt || 0)){

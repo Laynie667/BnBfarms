@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dispensary page preview</title>
+<style>body{background:#15111a;margin:0;color:#ccc;font:13px system-ui}</style></head>
+<body>
+<!-- A pretend game around the Dispensary's page, to look at it without the club. Not shipped (only dist/ is). -->
+<script>
+window.__FARMHAND_TEST__ = true; window.CurrentScreen = "ChatRoom";
+window.LZString = { compressToBase64: (t) => btoa(unescape(encodeURIComponent(t))), decompressFromBase64: (t) => decodeURIComponent(escape(atob(t))) };
+window.Player = { MemberNumber: 600, Name: "Hana", ExtensionSettings: {}, Ownership: { MemberNumber: 700 }, Lovership: [], WhiteList: [], FriendList: [], BlackList: [], ArousalSettings: { Progress: 0 }, IsPlayer: () => true };
+window.ChatRoomCharacter = [window.Player];
+window.ServerSend = () => {}; window.ChatRoomSendLocal = () => {}; window.CommandCombine = () => {};
+window.ServerPlayerExtensionSettingsSync = () => {}; window.CharacterSetFacialExpression = () => {};
+let pg = null; window.PreferenceRegisterExtensionSetting = (p) => { pg = p; };
+window.ChatRoomMessage = function () {}; window.ActivityOrgasmPrepare = function () {}; window.ChatRoomMapViewCanEnterTile = function () { return 100; };
+window.ChatRoomSafewordRevert = function () {}; window.ChatRoomSafewordRelease = function () {}; window.ChatRoomSync = function () {};
+</script>
+<script src="../dist/farmhand-dispensary.user.js"></script>
+<script>
+setTimeout(() => { window.__disp.give("denial", { by: 700, x: 2, quiet: true }); window.__disp.give("sedative", { by: 700, quiet: true }); pg && pg.load(); }, 1300);
+</script>
+</body></html>

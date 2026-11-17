@@ -330,7 +330,7 @@
     if (tags.has("mpreg"))       { p.boosts.mpreg = Math.max(p.boosts.mpreg || 0, now) + 7*24*H*x; done.push("a load in the ass can take for "+(x > 1 ? x+" weeks" : "a week")+" (mpreg)"); fx0.push("mpreg"); }
     if (tags.has("hyper"))       { { const lv = addBoost(p, "hyper", 24*H, x); done.push("hyper pregnancy for a day: huge litters"+(lv > 1 ? ", level "+lv : "")); }; fx0.push("hyper"); }
     if (tags.has("contraceptive")){ p.boosts.contra = Math.max(p.boosts.contra || 0, now) + 48*H*x; done.push("no catching for "+(2*x)+" days"); fx0.push("contraceptive"); }
-    try { shotsMore(target, by, text, tags, x, done, fx0); } catch(e){ warn("shots more:", e); }   // aphrodisiac, denial, flood, futa, twins… (10ur-shots-more.js)
+    try { shotsMore(target, by, text, tags, x, done, fx0, how); } catch(e){ warn("shots more:", e); }   // aphrodisiac, denial, flood, futa, twins… (10ur-shots-more.js)
     if (tags.has("capacity")) fx0.push("capacity");
     if (tags.has("reducing")) fx0.push("reducing");
     if (tags.has("capacity"))    { const b = p.capBonus; p.capBonus = Math.min(CFG.PROD.MAX_CAPACITY - CFG.PROD.BASE_CAPACITY, b + CFG.PROD.INJECT_CAPACITY*x);

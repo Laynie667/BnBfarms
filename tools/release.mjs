@@ -25,7 +25,7 @@ const changed = (file) => spawnSync("git", ["diff", "--quiet", "HEAD", "--", fil
 const bump = (v) => { const p = v.split(".").map(Number); return flag("--minor") ? p[0] + "." + (p[1] + 1) + ".0" : p[0] + "." + p[1] + "." + (p[2] + 1); };
 const pkg = JSON.parse(readFileSync("package.json", "utf8")), pkgHead = atHead("package.json") || { versions: {} };
 const bumped = [];
-for (const [k, file] of [["bot", "dist/farmhand-bot.user.js"], ["companion", "dist/farmhand-companion.user.js"], ["watcher", "dist/farm-watcher.user.js"]]) {
+for (const [k, file] of [["bot", "dist/farmhand-bot.user.js"], ["companion", "dist/farmhand-companion.user.js"], ["watcher", "dist/farm-watcher.user.js"], ["dispensary", "dist/farmhand-dispensary.user.js"]]) {
   if (!changed(file)) continue;
   if (pkg.versions[k] === pkgHead.versions[k]) pkg.versions[k] = bump(pkg.versions[k]);
   bumped.push({ name: k[0].toUpperCase() + k.slice(1), file, v: pkg.versions[k] });

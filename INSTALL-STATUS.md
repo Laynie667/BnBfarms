@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-15. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-17. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.4** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.5** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.72.1 + Companion 0.54.5: bellies that settle, and less redrawing.** A player saw a lot of belly-size work in their console, and the room lagged. Laynie, Nov 16: "Is it possible that fluid updates that would effect the size also keeps sending updates to the belly?", then "Lets go ahead and do that".
+  - **What it was:** the farm only tells the room about a belly when its size changes, but the sizes had hard lines. A belly sitting right on one went up with a load and back down as it leaked. Every time, every Companion in the room threw away all its drawings of that body and fitted it again. At "heavy", with "Farm can change my body shape" on, the real hips changed too, so every game in the room loaded every piece they wore again.
+  - **Bellies settle (bot):** a belly still grows the moment it's big enough. Going back down on fluids alone means dropping 15% under the line and staying there 10 minutes. Laying eggs, giving birth, or being emptied right out still shows at once.
+  - **Body sizes hold (bot):** once the farm changes someone's real chest or hips, it won't turn them back the other way for 15 minutes. The safeword and switching body shape off still put your own shape back at once.
+  - **A new belly keeps the drawings (Companion):** only the pieces the belly touches are fitted again, and the breasts, straps and nipples stay as they were. If the belly goes back to its last size, those drawings are still there.
+  - **At most two redraws of anyone in 3 seconds (Companion):** a size change, a picture loading and a message from their Companion each asked for a drawing, and they piled up. Now they wait their turn, and the last one still comes, so you always see the latest size.
+  - **Quieter console:** a drawing that goes wrong used to warn on every layer of every drawing, dozens a second. Now it's one warning of each kind a minute, saying how many were skipped. The drawing also can't keep asking to draw itself again: at most 4 of those in 10 seconds.
+  - Belly sizes are unchanged: showin', heavy, huge, and the rare fourth one ("can't see their feet").
 
 - **Bot 0.72.0: the map studio, and layouts for events.** Laynie, Nov 14: "similar to the outfit studio, could we make a map studio?", then "all of it", ".mappaste is fine", and "maybe event swaps, like races or for trap mazes, etc. being able to swap the map as needed would be cool".
   - **The map studio** (on the bot's PC: **Start the map studio.bat**, or `localhost:4780/map` while the studio runs). The whole 40 × 40 farm, drawn by the game's own map code, so it looks exactly as in the room, walls and lighting and all, with the bot's spots and zones on top. It opens on the farm as the bot last saw it, read from its own backup.

@@ -84,6 +84,16 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     // somebody else's Companion tells us their cup and belly: drawn with our own copy of the look, once
     n = sent.length; w.ChatRoomMessage({ Sender: 777, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "body", on: true, farm: FL.id, cup: 10, bm: "farm", bs: 1 } }); await wait(200);
     ok(!sent.slice(n).some((s) => s[1] && s[1].Content === "FarmhandMsg" && /bodyAsk|body/.test(s[1].Dictionary.type)), "hearing somebody's size says nothin' back");
+    // Nov 16: somebody's size changin' fast is drawn at most twice in 3 seconds, and the last size still gets drawn
+    await wait(3200);
+    const draws = []; w.ChatRoomCharacter.push({ MemberNumber: 777 }); w.CharacterLoadCanvas = (C) => draws.push([C.MemberNumber, Date.now()]);
+    const t0 = Date.now();
+    for (const bs of [2, 3, 2, 3, 2]) { w.ChatRoomMessage({ Sender: 777, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "body", on: true, farm: FL.id, cup: 10, bm: "farm", bs } }); await wait(150); }
+    await wait(2900 - (Date.now() - t0));
+    const early = draws.filter((d) => d[0] === 777).length;
+    ok(early >= 1 && early <= 2, "five sizes in under a second: drawn " + early + " time(s) in the first 3 seconds, not once a size");
+    await wait(3000);
+    ok(draws.filter((d) => d[0] === 777).length > early, "...and drawn once more after, so the last size shows");
   }
   // ── the bot's own account: draws nobody and says nothin' about bodies ──
   {

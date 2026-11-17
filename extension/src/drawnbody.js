@@ -29,6 +29,7 @@ import { makeMsg } from "../../shared/protocol.js";
 import { bcrOverBreast } from "./bcr.js";
 import FARM_LOOK from "../../shared/farm-look.json";   // the farm's look, built in (tools/farm-look-bake.mjs, Oct 26)
 import { BOT_MEMBER } from "./config.js";
+import { warnSome } from "./warn.js";
 
 const W = window;
 const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see", FARM_KEY = "farmhand-drawn-body-farm";
@@ -119,6 +120,7 @@ function prune() {
     try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache; const t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ }
   }
   if (gone.size > 400) gone.clear();
+  for (const [mn, t] of drewAt) if (!t.length || Date.now() - t[t.length - 1] > AGAIN_MS) drewAt.delete(mn);
   // and anybody who's left the room and not been seen for an hour
   for (const [mn, o] of others) if (Date.now() - o.at > 3600000 && !charOf(mn)) others.delete(mn);
   // somebody who's left the room: their drawings go (they're big); what they look like stays, and is drawn fresh if they're back
@@ -131,10 +133,20 @@ const charOf = (mn) => (W.Player && W.Player.MemberNumber === mn ? W.Player : (W
 const itemOf = (C, g) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : undefined);
 
 // ── drawing somebody again ──
-const againT = new Map();
+// Nobody is drawn again more than twice in 3 seconds (Nov 16). A size change, a new picture loading and a message from
+// their Companion each asked for a drawing or two of their own, and they came on top of each other. One asked for inside
+// the window waits for it to open, so the last drawing still comes and shows them as they are now.
+const againT = new Map(), drewAt = new Map();   // member number → the times we drew them again, the last 3 seconds
+const AGAIN_MAX = 2, AGAIN_MS = 3000;
 function redrawMn(mn, soon) {
   clearTimeout(againT.get(mn));
-  againT.set(mn, setTimeout(() => { try { const C = charOf(mn); if (C && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { console.warn("[Farmhand Companion] drawn body redraw:", e); } }, soon || 60));
+  const go = () => {
+    const now = Date.now(), t = (drewAt.get(mn) || []).filter((x) => now - x < AGAIN_MS);
+    if (t.length >= AGAIN_MAX) { drewAt.set(mn, t); againT.set(mn, setTimeout(go, AGAIN_MS - (now - t[0]) + 20)); return; }
+    t.push(now); drewAt.set(mn, t);
+    try { const C = charOf(mn); if (C && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { warnSome("[Farmhand Companion] drawn body redraw:", e); }
+  };
+  againT.set(mn, setTimeout(go, soon || 60));
 }
 const redraw = (soon) => { if (W.Player) redrawMn(W.Player.MemberNumber, soon); };
 
@@ -157,17 +169,24 @@ function makeEngine(mn) {
   });
 }
 function engine() { if (!mine.E && W.Player) mine.E = makeEngine(null); if (mine.E) apply(mine.E, eff()); return mine.E; }
+// What an engine's kept drawings were fitted to, besides the belly. A new belly alone keeps them (Nov 16): every fitted
+// piece the belly touches has the belly's shape in its own name already, so it's fitted fresh by itself, and the rest
+// (straps on the breasts, the breasts, the nipples) stay as they were. A belly going back to the size before finds its
+// drawings still there. It used to throw the lot away and fit everything again, in every Companion in the room.
+const keptFor = new WeakMap();   // engine → what its kept drawings were fitted to
 function apply(E, s) {
   if (!E) return;
   const B = E.BREAST, b = s.breast || {};
   B.cup = Math.max(0, Math.min(W.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
   for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
   B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
-  B.out.clear(); B.cover.clear(); B.cvKey = ""; B.holdSig = "";
+  const kept = JSON.stringify([B.cup, b, B.wear, s.auto !== false, s.tuck !== false, s.dress !== false, s.mould || {}]);
+  const refit = keptFor.get(E) !== kept; keptFor.set(E, kept);
+  if (refit) { B.out.clear(); B.cover.clear(); B.cvKey = ""; B.holdSig = ""; }
   const fits = s.belly && typeof s.belly === "object" ? s.belly : null;
   for (const k of Object.keys(E.BELLY.fits)) { const f = E.BELLY.fits[k]; Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 }); if (fits && fits[k]) Object.assign(f, fits[k]); }
   E.BELLY.auto = s.auto !== false; B.tuck = s.tuck !== false; B.dress = s.dress !== false;
-  E.MOULD.items.clear(); E.MOULD.mode.clear(); E.MOULD.out.clear();
+  E.MOULD.items.clear(); E.MOULD.mode.clear(); if (refit) E.MOULD.out.clear();
   for (const it of (s.mould && s.mould.items) || []) E.MOULD.items.add(String(it));
   for (const [k, m] of Object.entries((s.mould && s.mould.mode) || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
   E.GEN.drawn = false;          // the game's own cock: the drawn ones aren't ready
@@ -246,7 +265,7 @@ function hook() {
       fresh = false;
       let out;
       try { out = E.draw(C, args[1], (cb2) => { args[1] = cb2; return next(args); }); }
-      catch (e) { console.warn("[Farmhand Companion] drawn body:", e); return next(args); }
+      catch (e) { warnSome("[Farmhand Companion] drawn body:", e); return next(args); }
       if (fresh) { const mn = C.MemberNumber; redrawMn(mn, 250); setTimeout(() => redrawMn(mn, 0), 1200); }   // (a new picture takes a moment to load)
       return out;
     });

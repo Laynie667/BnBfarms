@@ -86,6 +86,14 @@
 
   // ── a belly that shows ──
   const BELLY = ["", "showin'", "heavy", "huge", "so big they can't see their feet"];
+  // where each size starts: showin' at 0.8, heavy at 2, huge at 4, past their feet at 8
+  const BELLY_AT = [0, 0.8, 2, 4, 8];
+  // A belly that SETTLES (Nov 16). It grows the moment it's big enough, but goin' back down off fluids alone takes droppin'
+  // well under the line (CFG.BELLY_GIVE) and stayin' there a while (CFG.BELLY_SETTLE_MIN). A belly sittin' right on a line
+  // used to flip up with every load and back down as it leaked; every flip had every Companion in the room throw their
+  // drawings of that body away and fit it all again, and at "heavy" it changed their real hips, so every game in the room
+  // loaded every piece they wore over again (a player saw it in their console, and it lagged). Laid eggs, a birth, or
+  // bein' emptied right out still show at once.
   function bellyStage(mn){
     const p = prodOf(mn); if (!p) return 0;
     let w = 0; const now = Date.now();
@@ -93,7 +101,17 @@
     if (p.preg2) w += 1;   // a second litter (10y7-udders.js)
     if (p.preg){ const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since))); w += frac * (1 + (p.preg.count || 1) * 0.5); }
     const full = heldTotal(p) / capacity(mn); if (full > 0.8) w += (full - 0.8) * 3;
-    return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+    const raw = w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+    const sig = (p.preg ? "p" : "") + (p.preg2 ? "2" : "") + (p.eggs ? "e" + p.eggs.n : ""), settle = CFG.BELLY_SETTLE_MIN * 60000, h = p.bellyHeld;
+    // growin', somethin' besides fluids changed, or not looked at in a while (they were away): as it is
+    if (!h || raw >= h.st || h.sig !== sig || now - (h.at || 0) > settle){ p.bellyHeld = { st: raw, sig, at: now }; return raw; }
+    h.at = now;
+    let keep = h.st; while (keep > 0 && w < BELLY_AT[keep] * CFG.BELLY_GIVE) keep--;
+    if (keep >= h.st){ h.low = 0; return h.st; }                                                   // under the line, but not by much
+    if (w < BELLY_AT[h.st] * 0.5){ p.bellyHeld = { st: keep, sig, at: now }; return keep; }        // emptied right out
+    if (!h.low) h.low = now;
+    if (now - h.low >= settle){ p.bellyHeld = { st: keep, sig, at: now }; return keep; }           // down there long enough
+    return h.st;
   }
   function bellyTick(now){
     for (const C of (W.ChatRoomCharacter || [])){

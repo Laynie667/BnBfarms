@@ -402,7 +402,24 @@
     const U = CFG.SIZES.udder, Bt = CFG.SIZES.butt, belly = bellyStage(mn);
     const up = Math.max(-2, Math.min(5, Math.trunc((udderLevel(mn) - U.start) / CFG.SHAPE_UDDER_PER_STEP)));
     const low = Math.max(0, Math.min(3, Math.floor((sizeOf(mn, "butt") - Bt.start) / CFG.SHAPE_BUTT_PER_STEP) + (belly >= 4 ? 2 : belly >= 2 ? 1 : 0)));
-    return { up, low };
+    return shapeHold(p, { up, low });
+  }
+  // Once the farm changes a body size it doesn't turn BACK inside CFG.SHAPE_HOLD_MIN (Nov 16). Every change of their real
+  // chest or hips has every game in the room load every piece they wear again, so a size wobblin' over a line lagged the
+  // whole stall. Growin' on the way it was already goin' is never held. (Their safeword skips this: uddersSafe quiets the
+  // shape altogether, and switchin' "Farm can change my body shape" off puts their own back at once.)
+  function shapeHold(p, sh){
+    const now = Date.now(), hold = CFG.SHAPE_HOLD_MIN * 60000;
+    let h = p.shapeHeld; if (!h || typeof h !== "object"){ p.shapeHeld = { up: sh.up, low: sh.low, at: {}, dir: {} }; return sh; }
+    h.at = h.at || {}; h.dir = h.dir || {};
+    const out = {};
+    for (const k of ["up", "low"]){
+      const was = Number(h[k]) || 0, d = Math.sign(sh[k] - was);
+      if (!d){ out[k] = was; continue; }
+      if (d === -(h.dir[k] || 0) && now - (h.at[k] || 0) < hold){ out[k] = was; continue; }   // turnin' back too soon
+      h[k] = sh[k]; h.dir[k] = d; h.at[k] = now; out[k] = sh[k];
+    }
+    return out;
   }
   function uddersStateFor(mn, s){
     { const sh = (rec(mn).shapeQuiet || 0) > Date.now() ? null : shapeFor(mn); if (sh && (sh.up || sh.low)) s.shape = sh; }

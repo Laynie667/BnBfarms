@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.72.0
+// @version      0.72.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.72.0";
-  var COMPANION_VERSION = "0.54.4";
+  var VERSION = "0.72.1";
+  var COMPANION_VERSION = "0.54.5";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3468,6 +3468,10 @@
       SCENT_WAIT_MIN: 2,
       SCENT_CHANCE: 0.15,
       // how often a belly gets noticed; how soon and how surely a scent brings somethin'
+      BELLY_GIVE: 0.85,
+      BELLY_SETTLE_MIN: 10,
+      SHAPE_HOLD_MIN: 15,
+      // a belly goes down a size only 15% under the line and after 10 min there; the farm's body sizes don't turn back inside 15 min (Nov 16)
       MUSK_WATER_X: 20,
       // Tentacle Musk: the thing in the water is this many times likelier to come
       EGG_MAX: 400,
@@ -30352,6 +30356,7 @@
       }, x.v);
     }
     const BELLY = ["", "showin'", "heavy", "huge", "so big they can't see their feet"];
+    const BELLY_AT = [0, 0.8, 2, 4, 8];
     function bellyStage(mn) {
       const p = prodOf(mn);
       if (!p) return 0;
@@ -30365,7 +30370,29 @@
       }
       const full = heldTotal(p) / capacity(mn);
       if (full > 0.8) w += (full - 0.8) * 3;
-      return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+      const raw = w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+      const sig = (p.preg ? "p" : "") + (p.preg2 ? "2" : "") + (p.eggs ? "e" + p.eggs.n : ""), settle = CFG.BELLY_SETTLE_MIN * 6e4, h = p.bellyHeld;
+      if (!h || raw >= h.st || h.sig !== sig || now - (h.at || 0) > settle) {
+        p.bellyHeld = { st: raw, sig, at: now };
+        return raw;
+      }
+      h.at = now;
+      let keep = h.st;
+      while (keep > 0 && w < BELLY_AT[keep] * CFG.BELLY_GIVE) keep--;
+      if (keep >= h.st) {
+        h.low = 0;
+        return h.st;
+      }
+      if (w < BELLY_AT[h.st] * 0.5) {
+        p.bellyHeld = { st: keep, sig, at: now };
+        return keep;
+      }
+      if (!h.low) h.low = now;
+      if (now - h.low >= settle) {
+        p.bellyHeld = { st: keep, sig, at: now };
+        return keep;
+      }
+      return h.st;
     }
     function bellyTick(now) {
       for (const C2 of W.ChatRoomCharacter || []) {
@@ -33825,7 +33852,34 @@
       const U = CFG.SIZES.udder, Bt = CFG.SIZES.butt, belly = bellyStage(mn);
       const up = Math.max(-2, Math.min(5, Math.trunc((udderLevel(mn) - U.start) / CFG.SHAPE_UDDER_PER_STEP)));
       const low = Math.max(0, Math.min(3, Math.floor((sizeOf(mn, "butt") - Bt.start) / CFG.SHAPE_BUTT_PER_STEP) + (belly >= 4 ? 2 : belly >= 2 ? 1 : 0)));
-      return { up, low };
+      return shapeHold(p, { up, low });
+    }
+    function shapeHold(p, sh) {
+      const now = Date.now(), hold = CFG.SHAPE_HOLD_MIN * 6e4;
+      let h = p.shapeHeld;
+      if (!h || typeof h !== "object") {
+        p.shapeHeld = { up: sh.up, low: sh.low, at: {}, dir: {} };
+        return sh;
+      }
+      h.at = h.at || {};
+      h.dir = h.dir || {};
+      const out = {};
+      for (const k of ["up", "low"]) {
+        const was = Number(h[k]) || 0, d = Math.sign(sh[k] - was);
+        if (!d) {
+          out[k] = was;
+          continue;
+        }
+        if (d === -(h.dir[k] || 0) && now - (h.at[k] || 0) < hold) {
+          out[k] = was;
+          continue;
+        }
+        h[k] = sh[k];
+        h.dir[k] = d;
+        h.at[k] = now;
+        out[k] = sh[k];
+      }
+      return out;
     }
     function uddersStateFor(mn, s) {
       {

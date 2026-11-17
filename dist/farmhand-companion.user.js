@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.4
+// @version      0.54.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.4";
+  var VERSION = "0.54.5";
 
   // shared/species.js
   var WORDS = {
@@ -1378,6 +1378,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // studio/web/body-engine.js
   (() => {
+    const WARNED2 = /* @__PURE__ */ new Map();
+    const warnSome2 = (what, e) => {
+      const now = Date.now(), w = WARNED2.get(what);
+      if (w && now - w.at < 6e4) {
+        w.n++;
+        return;
+      }
+      WARNED2.set(what, { at: now, n: 0 });
+      if (WARNED2.size > 200) WARNED2.clear();
+      console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
+    };
     window.FarmBodyEngine = function(host) {
       "use strict";
       const S3 = host.S;
@@ -1387,8 +1398,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         try {
           host.redraw();
         } catch (e) {
-          console.warn("[body] redraw:", e);
+          warnSome2("[body] redraw:", e);
         }
+      };
+      const seenAgain = [];
+      const againFromSeen = () => {
+        const now = Date.now();
+        while (seenAgain.length && now - seenAgain[0] > 1e4) seenAgain.shift();
+        if (seenAgain.length >= 4) return;
+        seenAgain.push(now);
+        clearTimeout(BREAST.holdT);
+        BREAST.holdT = setTimeout(bellyDraw, 40);
       };
       const FIT0 = () => ({ on: false, rx: 70, ry: 80, sag: 0.22, x: 0, y: 0, behind: false, flat: false, cut: 0.74 });
       const BELLY = { fits: { std: FIT0(), AllFours: Object.assign(FIT0(), { behind: true, y: -60 }), Hogtied: Object.assign(FIT0(), { behind: true, y: -75 }) }, skin: /* @__PURE__ */ new Map() };
@@ -2198,7 +2218,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (typeof real.drawImageBlink === "function") put2("drawImageBlink", o.cv, o.x, o.y, {});
                       }
                     } catch (e) {
-                      console.warn("[body] over the breasts:", e);
+                      warnSome2("[body] over the breasts:", e);
                     }
                   }
                   ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
@@ -2229,7 +2249,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     try {
                       if (!nipDraw(...h2)) put2(h2[0], h2[1], h2[2], h2[3], h2[4]);
                     } catch (e) {
-                      console.warn("[studio] nipples:", e);
+                      warnSome2("[studio] nipples:", e);
                     }
                   }
                 }
@@ -2285,7 +2305,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       const sh = bellyShade(c, x - ox, y, ctx3);
                       if (sh) c = sh;
                     } catch (e) {
-                      console.warn("[body] belly form:", e);
+                      warnSome2("[body] belly form:", e);
                     }
                   }
                   keepIn(BREAST.out, key, c);
@@ -2690,7 +2710,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind && BELLY.auto !== false ? ctx3.sig : "") + "|" + MOULD.ver;
+                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
                 let c = BREAST.out.get(key);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
@@ -3244,7 +3264,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         c = sh;
                       }
                     } catch (e) {
-                      console.warn("[body] belly form:", e);
+                      warnSome2("[body] belly form:", e);
                     }
                   }
                   keepIn(BREAST.out, key, c);
@@ -3430,7 +3450,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   try {
                     if (pumpDraw(name, src, x, y, o)) return true;
                   } catch (e) {
-                    console.warn("[studio] pump:", e);
+                    warnSome2("[studio] pump:", e);
                   }
                 }
                 const B = ctx3.breast, im = B && mouldImg(src);
@@ -3491,7 +3511,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   try {
                     before(src, x, y, o);
                   } catch (e) {
-                    console.warn("[studio] belly:", e);
+                    warnSome2("[studio] belly:", e);
                   }
                 }
                 if (br && typeof src === "string") {
@@ -3504,7 +3524,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     try {
                       if (nipDraw(name, src, x, y, o)) return;
                     } catch (e) {
-                      console.warn("[studio] nipples:", e);
+                      warnSome2("[studio] nipples:", e);
                     }
                   }
                   if (done && /Decal/i.test(gname) && ctx3.breast && ctx3.breast.pose !== "AllFours") {
@@ -3523,7 +3543,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         }
                       }
                     } catch (e) {
-                      console.warn("[studio] decal:", e);
+                      warnSome2("[studio] decal:", e);
                     }
                   }
                   if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) {
@@ -3542,7 +3562,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (dressDraw(name, src, x, y, o)) return;
                       }
                     } catch (e) {
-                      console.warn("[studio] chest wear:", e);
+                      warnSome2("[studio] chest wear:", e);
                     }
                   }
                   if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx3.breast && ctx3.breast.pose !== "AllFours") {
@@ -3552,12 +3572,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (fr != null) ctx3.handF = Math.max(ctx3.handF || 0, fr);
                       }
                     } catch (e) {
-                      console.warn("[studio] hands:", e);
+                      warnSome2("[studio] hands:", e);
                     }
                     try {
                       if (handDraw(name, src, x, y, o)) return;
                     } catch (e) {
-                      console.warn("[studio] hands:", e);
+                      warnSome2("[studio] hands:", e);
                     }
                   }
                 }
@@ -3576,7 +3596,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
                     return;
                   } catch (e) {
-                    console.warn("[studio] cock:", e);
+                    warnSome2("[studio] cock:", e);
                   }
                 }
                 let drawn = false;
@@ -3593,14 +3613,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                   }
                 } catch (e) {
-                  console.warn("[studio] mould:", e);
+                  warnSome2("[studio] mould:", e);
                 }
                 if (!drawn) put2(name, src, x, y, o);
                 if (!blink) {
                   try {
                     after(src, x, y, o);
                   } catch (e) {
-                    console.warn("[studio] belly:", e);
+                    warnSome2("[studio] belly:", e);
                   }
                 }
               } : real[name];
@@ -3608,22 +3628,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               finish = paint;
             }
           } catch (e) {
-            console.warn("[studio] belly hook:", e);
+            warnSome2("[studio] belly hook:", e);
           }
           const out = game(cb);
           if (finish) {
             try {
               finish();
             } catch (e) {
-              console.warn("[studio] belly:", e);
+              warnSome2("[studio] belly:", e);
             }
           }
           if (finish && seenNow && handFNow && handFNow.v != null) {
             const behind = handFNow.v >= 0.45;
             if (behind !== !!BREAST.handsBehind) {
               BREAST.handsBehind = behind;
-              clearTimeout(BREAST.holdT);
-              BREAST.holdT = setTimeout(bellyDraw, 40);
+              againFromSeen();
             }
           }
           if (finish && seenNow) {
@@ -3635,8 +3654,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               BREAST.solid = {};
               for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true;
               BREAST.holdSig = sig2;
-              clearTimeout(BREAST.holdT);
-              BREAST.holdT = setTimeout(bellyDraw, 40);
+              againFromSeen();
             }
           }
           return out;
@@ -3680,6 +3698,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
     };
   })();
+
+  // extension/src/warn.js
+  var WARNED = /* @__PURE__ */ new Map();
+  function warnSome(what, e) {
+    const now = Date.now(), w = WARNED.get(what);
+    if (w && now - w.at < 6e4) {
+      w.n++;
+      return;
+    }
+    WARNED.set(what, { at: now, n: 0 });
+    if (WARNED.size > 200) WARNED.clear();
+    console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
+  }
 
   // extension/src/belly.js
   var W2 = window;
@@ -3992,27 +4023,27 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               try {
                 before(src, x, y, o);
               } catch (e) {
-                console.warn("[Farmhand Companion] belly:", e);
+                warnSome("[Farmhand Companion] belly:", e);
               }
               cb[name](src, x, y, o);
               try {
                 after(src, x, y, o);
               } catch (e) {
-                console.warn("[Farmhand Companion] belly:", e);
+                warnSome("[Farmhand Companion] belly:", e);
               }
             } : cb[name];
             args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
             finish = paint;
           }
         } catch (e) {
-          console.warn("[Farmhand Companion] belly hook:", e);
+          warnSome("[Farmhand Companion] belly hook:", e);
         }
         const out = next(args);
         if (finish) {
           try {
             finish();
           } catch (e) {
-            console.warn("[Farmhand Companion] belly:", e);
+            warnSome("[Farmhand Companion] belly:", e);
           }
         }
         return out;
@@ -4309,6 +4340,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
     }
     if (gone.size > 400) gone.clear();
+    for (const [mn, t] of drewAt) if (!t.length || Date.now() - t[t.length - 1] > AGAIN_MS) drewAt.delete(mn);
     for (const [mn, o] of others) if (Date.now() - o.at > 36e5 && !charOf(mn)) others.delete(mn);
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
@@ -4316,16 +4348,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var charOf = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
+  var drewAt = /* @__PURE__ */ new Map();
+  var AGAIN_MAX = 2;
+  var AGAIN_MS = 3e3;
   function redrawMn(mn, soon) {
     clearTimeout(againT.get(mn));
-    againT.set(mn, setTimeout(() => {
+    const go = () => {
+      const now = Date.now(), t = (drewAt.get(mn) || []).filter((x) => now - x < AGAIN_MS);
+      if (t.length >= AGAIN_MAX) {
+        drewAt.set(mn, t);
+        againT.set(mn, setTimeout(go, AGAIN_MS - (now - t[0]) + 20));
+        return;
+      }
+      t.push(now);
+      drewAt.set(mn, t);
       try {
         const C = charOf(mn);
         if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
       } catch (e) {
-        console.warn("[Farmhand Companion] drawn body redraw:", e);
+        warnSome("[Farmhand Companion] drawn body redraw:", e);
       }
-    }, soon || 60));
+    };
+    againT.set(mn, setTimeout(go, soon || 60));
   }
   var redraw = (soon) => {
     if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
@@ -4355,16 +4399,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
+  var keptFor = /* @__PURE__ */ new WeakMap();
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
     B.cup = Math.max(0, Math.min(W4.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
-    B.out.clear();
-    B.cover.clear();
-    B.cvKey = "";
-    B.holdSig = "";
+    const kept2 = JSON.stringify([B.cup, b, B.wear, s.auto !== false, s.tuck !== false, s.dress !== false, s.mould || {}]);
+    const refit = keptFor.get(E) !== kept2;
+    keptFor.set(E, kept2);
+    if (refit) {
+      B.out.clear();
+      B.cover.clear();
+      B.cvKey = "";
+      B.holdSig = "";
+    }
     const fits = s.belly && typeof s.belly === "object" ? s.belly : null;
     for (const k of Object.keys(E.BELLY.fits)) {
       const f = E.BELLY.fits[k];
@@ -4376,7 +4426,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     B.dress = s.dress !== false;
     E.MOULD.items.clear();
     E.MOULD.mode.clear();
-    E.MOULD.out.clear();
+    if (refit) E.MOULD.out.clear();
     for (const it of s.mould && s.mould.items || []) E.MOULD.items.add(String(it));
     for (const [k, m] of Object.entries(s.mould && s.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
     E.GEN.drawn = false;
@@ -4511,7 +4561,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             return next(args);
           });
         } catch (e) {
-          console.warn("[Farmhand Companion] drawn body:", e);
+          warnSome("[Farmhand Companion] drawn body:", e);
           return next(args);
         }
         if (fresh) {

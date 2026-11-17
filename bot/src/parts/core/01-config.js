@@ -299,6 +299,7 @@
     BET_MAX: 5, BET_OPEN_S: 120,        // watchers' bets: the most ribbons, and how long the book stays open
     LAY_SCENE: true,             // layin' and birthin' play out in beats (false: the old single line)
     BELLY_SEEN_MIN: 20, SCENT_WAIT_MIN: 2, SCENT_CHANCE: 0.15,   // how often a belly gets noticed; how soon and how surely a scent brings somethin'
+    BELLY_GIVE: 0.85, BELLY_SETTLE_MIN: 10, SHAPE_HOLD_MIN: 15,   // a belly goes down a size only 15% under the line and after 10 min there; the farm's body sizes don't turn back inside 15 min (Nov 16)
     MUSK_WATER_X: 20,            // Tentacle Musk: the thing in the water is this many times likelier to come
     EGG_MAX: 400,                // the most eggs one body can carry (clutches stack; Laynie, Oct 15: 400)
     LITRE_RIBBON_ML: 2000, LITRE_RIBBON_DAY: 3,   // milk pays a ribbon every 2 litres, 3 a day at most (Laynie, Oct 15: stingy)

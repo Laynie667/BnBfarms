@@ -17,12 +17,31 @@
    draw(C, cb, game) is the step itself: game(cb) is the game's own drawing, with whatever brushes it's handed.
 */
 (() => {
+// Warnings, a few at most (Nov 16): somethin' going wrong part way through a drawing went wrong on every layer of every
+// drawing, dozens a second, and a console filling that fast lags the game by itself. One of each kind a minute, and the
+// next one says how many were skipped. (The Companion has the same in extension/src/warn.js; this file has no imports.)
+const WARNED = new Map();
+const warnSome = (what, e) => {
+  const now = Date.now(), w = WARNED.get(what);
+  if (w && now - w.at < 60000) { w.n++; return; }
+  WARNED.set(what, { at: now, n: 0 }); if (WARNED.size > 200) WARNED.clear();
+  console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
+};
 window.FarmBodyEngine = function (host) {
   "use strict";
   const S = host.S;
   const bodyItem = (g) => host.bodyItem(g);
   const setBody = (g, n) => host.setBody(g, n);
-  const bellyDraw = () => { try { host.redraw(); } catch (e) { console.warn("[body] redraw:", e); } };
+  const bellyDraw = () => { try { host.redraw(); } catch (e) { warnSome("[body] redraw:", e); } };
+  // A drawing that saw somethin' new (hands now hidden behind the breasts, a different set of pieces on the chest) asks to
+  // be drawn again with it. At most 4 of those in 10 seconds (Nov 16): two answers that kept swapping each other drew
+  // the body over and over, for as long as they stood there.
+  const seenAgain = [];
+  const againFromSeen = () => {
+    const now = Date.now(); while (seenAgain.length && now - seenAgain[0] > 10000) seenAgain.shift();
+    if (seenAgain.length >= 4) return; seenAgain.push(now);
+    clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40);
+  };
 
   // ── the belly ──
   // A fit for each pose: where it sits and what shape it is. "std" is standing, kneeling and every arms pose (the torso
@@ -503,7 +522,7 @@ window.FarmBodyEngine = function (host) {
               }
               put("drawImage", bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
               // marks another mod keeps on the chest (BCR's welts and bruises), moved onto the drawn breasts
-              if (typeof host.overBreast === "function") { try { const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay); if (o && o.cv) { put("drawImage", o.cv, o.x, o.y, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", o.cv, o.x, o.y, {}); } } catch (e) { console.warn("[body] over the breasts:", e); } }
+              if (typeof host.overBreast === "function") { try { const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay); if (o && o.cv) { put("drawImage", o.cv, o.x, o.y, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", o.cv, o.x, o.y, {}); } } catch (e) { warnSome("[body] over the breasts:", e); } }
               ctx.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {
@@ -515,7 +534,7 @@ window.FarmBodyEngine = function (host) {
                 ng.fillStyle = gr; ng.beginPath(); ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2); ng.fill(); BREAST.nc = nc; BREAST.ncKey = ncKey; }
                 for (const p of B.nips) if (p[1] + rad < B.ground) { put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); }
               }
-              for (const h of held.splice(0)) { try { if (!nipDraw(...h)) put(h[0], h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }
+              for (const h of held.splice(0)) { try { if (!nipDraw(...h)) put(h[0], h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[studio] nipples:", e); } }
             }
           };
           // the game's nipples, and what's worn on them, set down on the drawn breasts: each side of the picture is
@@ -541,7 +560,7 @@ window.FarmBodyEngine = function (host) {
             let c = BREAST.out.get(key);
             if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
               /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
-              if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { console.warn("[body] belly form:", e); } }
+              if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { warnSome("[body] belly form:", e); } }
               keepIn(BREAST.out, key, c); }
             put(name, c, x - ox, y, o); return true;
           };
@@ -736,7 +755,7 @@ window.FarmBodyEngine = function (host) {
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) { const e0 = edgesOf(src); if (e0) { let t0 = -1; for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) { t0 = j; break; } if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o); } }   /* (every layer of a banded piece goes the same way: its clasp in the middle too) */
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
             const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc))), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-            const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
+            const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind ? ctx.sig : "") + "|" + MOULD.ver;   // (the belly's shade goes on with auto off too, so its shape is in the name either way: a new belly no longer empties every kept drawing, Nov 16)
             let c = BREAST.out.get(key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S2.sc;
@@ -1042,7 +1061,7 @@ window.FarmBodyEngine = function (host) {
                   for (let k = 0; k < 2; k++) { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, Math.PI * 0.08, Math.PI * 0.92); g.stroke(); } });
               }
               if (sleeves) { g.save(); g.globalCompositeOperation = "destination-over"; g.drawImage(sleeves, 0, 0); g.restore(); }   /* (the sleeves, back where the game has them, behind her breasts: a catsuit's long sleeves laid on top ran down over them) */
-              if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { console.warn("[body] belly form:", e); } }
+              if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { warnSome("[body] belly form:", e); } }
               keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
@@ -1116,7 +1135,7 @@ window.FarmBodyEngine = function (host) {
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
           const nipDraw = (name, src, x, y, o) => {
-            if (/LactationPump/.test(src)) { try { if (pumpDraw(name, src, x, y, o)) return true; } catch (e) { console.warn("[studio] pump:", e); } }
+            if (/LactationPump/.test(src)) { try { if (pumpDraw(name, src, x, y, o)) return true; } catch (e) { warnSome("[studio] pump:", e); } }
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split); if (!own) return false;
             if (!ctx.native && groupOf(src) === "Nipples") ctx.native = own.map((p) => p && [x + p[0], y + p[1]]);   // where the game has the nipples
@@ -1141,22 +1160,22 @@ window.FarmBodyEngine = function (host) {
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { try { upperSkin = bellySkin(src, o && o.HexColor, FarmBelly.bellyPose(src)); } catch (e) { /* the usual colour */ } upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
           const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
             const blink = /Blink$/.test(name);
-            if (!blink) { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
+            if (!blink) { try { before(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
-              if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
+              if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { warnSome("[studio] nipples:", e); } }
               // A decal (lettering, a logo, a mark) is its own piece, sitting on the chest. Grown with the chest it's the game's
               // picture blown up, and lettering goes soft and fat (Laynie, Oct 13: "the hornywood decal isn't part of the
               // shirt"). So a decal is never grown: it's the game's own picture at its own size, moved down to where that
               // part of her chest now is.
               if (done && /Decal/i.test(gname) && ctx.breast && ctx.breast.pose !== "AllFours") {
                 try { const p0 = edgesOf(src); if (p0) { let t0 = -1, t1 = -1; for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) { if (t0 < 0) t0 = j; t1 = j; }
-                    if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; put(name, src, x, y + (ctx.breast.fit.mapY(cyL) - cyL), o); return; } } } catch (e) { console.warn("[studio] decal:", e); }
+                    if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; put(name, src, x, y + (ctx.breast.fit.mapY(cyL) - cyL), o); return; } } } catch (e) { warnSome("[studio] decal:", e); }
               }
               if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
                 try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.012) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
-                  else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } }   /* ("nipple" goes through dressDraw too: it reads the choice itself) */ catch (e) { console.warn("[studio] chest wear:", e); } }
+                  else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } }   /* ("nipple" goes through dressDraw too: it reads the choice itself) */ catch (e) { warnSome("[studio] chest wear:", e); } }
               // Hands, and what's worn on the wrists and arms. They're the game's own pictures and they stay WHOLE: either in
               // front of the breasts, as the game has them, or hidden behind them. Never cut through. (I had the breasts'
               // outline cut out of them, and at the sizes where it crossed the knuckles it left torn hands with the
@@ -1170,12 +1189,12 @@ window.FarmBodyEngine = function (host) {
               // draws them all together, in front, and that is always right. So that's the default.)
               /* (only what is worn ON the hands and wrists: ropes, harnesses, binders and jackets in the arms slot are bondage on the body, and treated as hands they vanished. Found in the catalogue, Oct 14.) */
               if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || (ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1))) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
-                try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { console.warn("[studio] hands:", e); }
+                try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { warnSome("[studio] hands:", e); }
                 // Her breasts hang IN FRONT of her hands (Laynie, Oct 13: "the hands don't layer properly with the breast"): the
                 // hands were being drawn over the underside of them, or else vanishing whole. So each hand picture, and
                 // what's worn on it, is drawn with exactly the breasts' outline taken out of it: what the breast hangs in
                 // front of is hidden, the rest shows, and the edge between is the breast's own drawn edge.
-                try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); }
+                try { if (handDraw(name, src, x, y, o)) return; } catch (e) { warnSome("[studio] hands:", e); }
               } }
             // a drawn cock, in place of the game's picture of one (soft or hard, whichever the game was about to draw)
             if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf(src) === "Pussy" && /Penis/.test(src)) {
@@ -1183,24 +1202,24 @@ window.FarmBodyEngine = function (host) {
                 const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
                 if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin }); GEN.cvKey = key; }
                 if (hard) { if (!blink) ctx.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay]; return; }   // standing: held back, and drawn once the belly is on, in front of it
-                put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { console.warn("[studio] cock:", e); }
+                put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { warnSome("[studio] cock:", e); }
             }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);
                 const gname2 = groupOf(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q || q.mode !== "under") ? (m ? bellyShade(m, x - MOULD.M, y, ctx) : bellyShade(mouldImg(src), x, y, ctx)) : null;
                 if (formed) { put(name, formed, m ? x - MOULD.M : x, y, o); drawn = true; }
-                else if (m) { put(name, m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
+                else if (m) { put(name, m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { warnSome("[studio] mould:", e); }
             if (!drawn) put(name, src, x, y, o);
-            if (!blink) { try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
+            if (!blink) { try { after(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
           } : real[name]);
           cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
           finish = paint;
         }
-      } catch (e) { console.warn("[studio] belly hook:", e); }
+      } catch (e) { warnSome("[studio] belly hook:", e); }
       const out = game(cb);
-      if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
-      if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.45;   /* (Laynie, Oct 13: "hands should be hidden once breasts exceed a certain size". Hidden means all of them, with what's on them: never part.) */ if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
-      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
+      if (finish) { try { finish(); } catch (e) { warnSome("[studio] belly:", e); } }
+      if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.45;   /* (Laynie, Oct 13: "hands should be hidden once breasts exceed a certain size". Hidden means all of them, with what's on them: never part.) */ if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; againFromSeen(); } }
+      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; againFromSeen(); } }
       return out;
     }
   }

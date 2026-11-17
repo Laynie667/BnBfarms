@@ -9,6 +9,7 @@
    How: the game builds a character by drawing its layers one after another (CommonDrawAppearanceBuild). We step in
    once all the skin is drawn, work out the skin colour from the body's own picture, and paint the belly there.
 */
+import { warnSome } from "./warn.js";
 const W = window;
 const SKIN_TOP = 12;                 // the game's drawing order: everything up to here is skin (the body, nipples, pussy or cock)
 let trial = 0;                       // 0 off · 1 small · 2 medium · 3 large
@@ -243,13 +244,13 @@ function hookBelly(mod) {
             if (gate ? gate(src) : (lower && prio(src) > SKIN_TOP)) paint();
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };
-          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
+          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } } : cb[name]);
           args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
           finish = paint;   // (a bare body: nothin' comes after the skin, so it goes in at the very end)
         }
-      } catch (e) { console.warn("[Farmhand Companion] belly hook:", e); }
+      } catch (e) { warnSome("[Farmhand Companion] belly hook:", e); }
       const out = next(args);   // the game's own drawing, called once, whatever happened above
-      if (finish) { try { finish(); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } }
+      if (finish) { try { finish(); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } }
       return out;
     });
   } catch (e) { console.warn("[Farmhand Companion] belly test unavailable:", e); }

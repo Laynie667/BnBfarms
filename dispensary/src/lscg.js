@@ -23,6 +23,7 @@ let api = null, caps = null, syncing = null;
 const REG = {}, lastLscg = {};
 const ours = (id) => LSCG_ID + "." + id;
 const minsLeft = (id) => Math.ceil(leftMs(id) / 60000);
+export const BREATH_MINS = 10;   // what each breath through soaked gear keeps a dose topped up to
 
 // is LSCG here at all (an old one without the extension API still owns its own)
 export function lscgPresent() {
@@ -61,6 +62,14 @@ function setUp(L) {
             if (syncing === id) { ctx.setLevel(minsLeft(id)); return; }
             // LSCG caught it (a needle, a drink, a breath of gas): the dose is ours to give
             lastLscg[id] = Date.now();
+            // a soaked or laced gag, mask or bit, or a gas mask (LSCG 0.9.9): it doses on every breath, so a breath keeps
+            // the dose topped up to a few minutes instead of addin' a whole dose each time (Nov 17: it piled up hours a
+            // minute). It wears off soon after the gear comes off.
+            if (ctx.method === "breath") {
+              const r0 = give(id, { by: ctx.sender, mins: BREATH_MINS, upto: true, quiet: active(id) });
+              ctx.setLevel(r0.ok ? minsLeft(id) : 0);
+              return;
+            }
             const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
             const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult) });
             ctx.setLevel(r.ok ? minsLeft(id) : 0);

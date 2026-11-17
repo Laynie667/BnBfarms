@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.7** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.2** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.1.3: soaked gear tops up instead of piling up.** LSCG 0.9.9 doses whoever wears a soaked or laced gag, mask or bit (or a gas mask) on every breath, and our doses work in it too. The Dispensary was taking each breath as a whole dose, so a denial-soaked bit piled up hours a minute. Now breathing through it keeps the dose topped up to ten minutes, and it wears off soon after the gear comes off.
 
 - **Bot 0.72.3 + Companion 0.54.7 + Dispensary 0.1.2: hardcore, and keyholders.** Laynie, Nov 16: "make sure that the owner level, and the proprietors of the farm can always access and change their settings". Then, Nov 17: "it can be set to have no end date, but a keyholder, owner, proprieters companion needs to ping the hardcore users dispensary and companion atleast once every 30 days, otherwise, it will unlock after 30 days without the ping."
   - **Only you switch it on, for yourself:** on the Dispensary's page, after a plain warning. It needs a keyholder.

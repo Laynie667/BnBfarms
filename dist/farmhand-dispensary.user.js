@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.1.2
+// @version      0.1.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -215,7 +215,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.1.2";
+  var VERSION = "0.1.3";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -802,6 +802,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var lastLscg = {};
   var ours = (id) => LSCG_ID + "." + id;
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
+  var BREATH_MINS = 10;
   function lscgPresent() {
     if (W5.LSCG) return true;
     try {
@@ -860,6 +861,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return;
               }
               lastLscg[id] = Date.now();
+              if (ctx.method === "breath") {
+                const r0 = give(id, { by: ctx.sender, mins: BREATH_MINS, upto: true, quiet: active(id) });
+                ctx.setLevel(r0.ok ? minsLeft(id) : 0);
+                return;
+              }
               const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
               const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult) });
               ctx.setLevel(r.ok ? minsLeft(id) : 0);

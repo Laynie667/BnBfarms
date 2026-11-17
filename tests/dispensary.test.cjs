@@ -208,6 +208,9 @@ function page(opts) {
   ok(pay.types.join() === "sedative", "a stranger's dose through LSCG: ours is taken out, LSCG's own left to LSCG");
   ons.safeword && ons.safeword({ kind: "release" });
   ok(!G.active("denial"), "LSCG's safeword lifts ours too");
+  // a denial-soaked bit (LSCG doses on every breath): it tops up, it doesn't pile up
+  for (let i = 0; i < 30; i++) reg.denial.onDose({ level: 0, setLevel(v) { return v; }, multiplier: 0.2, method: "breath", sender: OWNER });
+  ok(G.active("denial") && G.leftMs("denial") <= 10 * 60000 + 2000 && G.leftMs("denial") > 9 * 60000, "a denial-soaked bit: thirty breaths keep it topped up to ten minutes, not thirty doses");
 
   // ---- HARDCORE (Laynie, Nov 17: "it can be set to have no end date, but a keyholder ... needs to ping the hardcore users
   // dispensary and companion atleast once every 30 days, otherwise, it will unlock after 30 days without the ping")

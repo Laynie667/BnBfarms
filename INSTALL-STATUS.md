@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.5** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.6** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.54.6: the farm girl's screen draws nothing at all.** The bot's tab ran out of memory six times between 00:02 and 00:15 on Nov 17, each time within a minute of walking into the room. Laynie: "The bot doesnt need to render anything".
+  - **What it was:** not the farm's own work. Opera's crash reports showed the page's own memory at only 120 to 150 MB each time, and the bot ran steady on that night's ledger. It was the pictures. The bot's tab already skipped drawing people (since Oct 27), but walking in still loaded two things. The map was drawn for its first 2 minutes (the floor, walls and furniture, about 170 MB). And every person still got two full-size drawing sheets, blank, about 7 MB a body.
+  - **Naps from the moment it walks in:** the map isn't drawn until somebody moves the mouse or presses a key on the bot's tab. After that it naps again after 2 untouched minutes, as before.
+  - **People are kept a speck:** in the room, the bot doesn't build anybody's drawing at all. Their sheets are 1 by 1, with nothing listed on them for the game to keep loaded. Out of the room (a profile, the wardrobe), or with "Draw the room on the farm girl's screen" switched on, they're built full size again.
+  - Only on the bot's own account. Players' screens are unchanged. `/farmmem` on the bot now also says how many people are kept a speck.
 
 - **Bot 0.72.1 + Companion 0.54.5: bellies that settle, and less redrawing.** A player saw a lot of belly-size work in their console, and the room lagged. Laynie, Nov 16: "Is it possible that fluid updates that would effect the size also keeps sending updates to the belly?", then "Lets go ahead and do that".
   - **What it was:** the farm only tells the room about a belly when its size changes, but the sizes had hard lines. A belly sitting right on one went up with a load and back down as it leaked. Every time, every Companion in the room threw away all its drawings of that body and fitted it again. At "heavy", with "Farm can change my body shape" on, the real hips changed too, so every game in the room loaded every piece they wore again.

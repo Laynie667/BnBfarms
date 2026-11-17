@@ -9,12 +9,12 @@ import { trimStats, cacheSize, leftLoaded } from "./trimpics.js";
 import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
 import { lookSent } from "./look.js";
-import { screenSkipped, screenLight, screenNapOn, screenNaps, screenNapping } from "./botscreen.js";
+import { screenSkipped, screenLight, screenNapOn, screenNaps, screenNapping, screenSpecks } from "./botscreen.js";
 // what this page has sent of your look since it opened (look.js), and on the bot's account how much drawin' it skipped
 function sentLine() {
   let t = "";
   try { const x = lookSent(); t = "Your look sent to the room: " + x.items + " single pieces, " + x.whole + " whole, " + x.merged + " changes gathered together"; } catch (e) { /* fine */ }
-  try { if (screenLight()) t += " · the farm girl's screen skipped drawin' people " + screenSkipped() + " times"; } catch (e) { /* fine */ }
+  try { if (screenLight()) t += " · the farm girl's screen skipped drawin' people " + screenSkipped() + " times, " + screenSpecks() + " kept a speck"; } catch (e) { /* fine */ }
   try { if (screenNapOn()) t += " · napped " + screenNaps() + " times" + (screenNapping() ? ", nappin' now" : ""); } catch (e) { /* fine */ }
   return t;
 }

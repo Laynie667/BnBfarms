@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.5
+// @version      0.54.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.5";
+  var VERSION = "0.54.6";
 
   // shared/species.js
   var WORDS = {
@@ -6078,16 +6078,54 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var lastTouch = Date.now();
   var naps = 0;
   var wasNapping = false;
+  var roomAt = 0;
   var onBot3 = () => !!(W8.Player && W8.Player.MemberNumber === BOT_MEMBER);
   var screenLight = () => onBot3() && !prefs().drawRoom;
   var screenSkipped = () => skipped;
+  var screenSpecks = () => {
+    try {
+      return (Array.isArray(W8.Character) ? W8.Character : []).filter((C) => C && C.__farmSpeck).length;
+    } catch (e) {
+      return 0;
+    }
+  };
   var screenNapOn = () => onBot3() && !prefs().noNap;
-  var screenNapping = () => screenNapOn() && W8.CurrentScreen === "ChatRoom" && Date.now() - lastTouch > NAP_MS;
+  var screenNapping = () => {
+    if (!screenNapOn() || W8.CurrentScreen !== "ChatRoom") return false;
+    if (!roomAt) roomAt = Date.now();
+    return lastTouch < roomAt || Date.now() - lastTouch > NAP_MS;
+  };
   var screenNaps = () => naps;
+  function speck(C) {
+    if (!C || typeof C !== "object") return;
+    for (const k of ["Canvas", "CanvasBlink"]) {
+      let cv = C[k];
+      if (!cv || typeof cv !== "object") {
+        cv = W8.document.createElement("canvas");
+        C[k] = cv;
+      }
+      if (cv.width !== 1 || cv.height !== 1) {
+        cv.width = 1;
+        cv.height = 1;
+      }
+    }
+    if (C.DrawnAssets && typeof C.DrawnAssets.clear === "function") C.DrawnAssets.clear();
+    C.__farmSpeck = true;
+  }
+  function unspeck(C) {
+    if (C && C.__farmSpeck) {
+      C.Canvas = null;
+      C.CanvasBlink = null;
+      delete C.__farmSpeck;
+    }
+  }
   function redraw2(list) {
     for (const C of list) {
       try {
-        if (C && typeof W8.CharacterLoadCanvas === "function") W8.CharacterLoadCanvas(C);
+        if (C && typeof W8.CharacterLoadCanvas === "function") {
+          unspeck(C);
+          W8.CharacterLoadCanvas(C);
+        }
       } catch (e) {
       }
     }
@@ -6115,6 +6153,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         W8.document.addEventListener(ev, touch, { capture: true, passive: true });
       } catch (e) {
       }
+    }
+    try {
+      mod2.hookFunction("CharacterAppearanceBuildCanvas", 20, (args, next) => {
+        const C = args[0];
+        if (C && W8.CurrentScreen === "ChatRoom" && screenLight()) {
+          skipped++;
+          speck(C);
+          return void 0;
+        }
+        unspeck(C);
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] speck sheets unavailable:", e);
     }
     try {
       mod2.hookFunction("CommonDrawAppearanceBuild", 20, (args, next) => {
@@ -6146,6 +6198,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     setInterval(() => {
       const inRoom = W8.CurrentScreen === "ChatRoom";
       if (wasRoom && !inRoom && screenLight()) redraw2([W8.Player, W8.InformationSheetSelection].filter(Boolean));
+      if (!wasRoom && inRoom && screenLight()) for (const C of [W8.Player].concat(W8.ChatRoomCharacter || [])) {
+        try {
+          speck(C);
+        } catch (e) {
+        }
+      }
+      if (!inRoom) roomAt = 0;
       wasRoom = inRoom;
     }, 1e3);
   }
@@ -6159,7 +6218,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
     try {
-      if (screenLight()) t += " \xB7 the farm girl's screen skipped drawin' people " + screenSkipped() + " times";
+      if (screenLight()) t += " \xB7 the farm girl's screen skipped drawin' people " + screenSkipped() + " times, " + screenSpecks() + " kept a speck";
     } catch (e) {
     }
     try {

@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.8** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.9** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.54.9: the flight recorder names who asked.** Every crash of the farm girl's tab tonight ended at about 12 GB, some only 26 seconds after the page opened, so something grabs it all at once. When a count on her tab jumps past anything a normal few seconds need (20 million canvas or picture pixels, hundreds of pictures, blobs or sounds), the recorder now also writes down which script asked: its web address and line, or a userscript's name. The bot loads other club mods through FUSAM, and this names the one. After a crash, `/farmmem` shows it as **WHO:** in the last seconds before the crash.
 
 - **Companion 0.54.8: the brand goes under your clothes, and a flight recorder for the farm girl's tab.**
   - **The brand, on the skin (Laynie, Nov 17: it "renders over a lot of things and clothes"):** it now goes in right after the body's torso and lower body, before the first worn piece. Two things held it late. The drawn body hands its fitted pieces (a bra or top over the drawn breasts) to the game as drawings, and those weren't counted as worn; now each drawing says what it is. It also waited for every skin picture the last drawing had, so arms drawn in front after the clothes held it back. Arms drawn in front still cover it, as they should. Messes go in the same way.

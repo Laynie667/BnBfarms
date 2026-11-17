@@ -5,10 +5,34 @@
    counts, on the bot's own tab only, everything that can make that kind of memory, and memlog.js writes the counts down
    every 3 seconds with the rest ("the last seconds of the page before this one" in /farmmem). After the next crash, the
    one that ran away is the answer. It only counts: nothing is changed, held on to or sent anywhere.
+   WHO ASKED (Nov 17): every crash came at about 12 GB, some only 26 seconds after the page opened, so somethin' grabs it
+   all at once. When a count jumps past what a normal few seconds ever need, the recorder also writes down which script
+   asked for it (its web address and line, from the call's own trail), once each time: the bot loads other club mods
+   (FUSAM), and that names the one.
 */
 const W = window;
 const C = { cvPx: 0, cvNew: 0, readPx: 0, img: 0, bitmap: 0, texPx: 0, tex: 0, blob: 0, blobFree: 0, audio: 0, actx: 0, sync: 0, msg: 0 };
 let on = false;
+// how much in three seconds is never normal on a tab that draws nothin': past this, write down who asked
+const SPIKE = { cvPx: 20e6, readPx: 20e6, texPx: 20e6, img: 300, bitmap: 300, blob: 200, audio: 100, actx: 5 };
+const since = {}, who = {};
+function trail() {
+  const lines = String((new Error()).stack || "").split("\n").slice(3), out = [];
+  for (const l of lines) {
+    // "at f (https://host/path/file.js:12:3)", or a userscript's own name ("userscript.html?name=WCE.user.js:12:3")
+    const m = /\(?((?:[a-z-]+:\/\/)?[^\s()]+?):(\d+):\d+\)?\s*$/.exec(l);
+    if (!m) continue;
+    let u = m[1]; try { const x = new URL(u); u = x.host + "/" + x.pathname.split("/").filter(Boolean).slice(-1)[0] + (x.search ? x.search.slice(0, 50) : ""); } catch (e) { u = u.slice(-70); }
+    if (!out.includes(u + ":" + m[2])) out.push(u + ":" + m[2]);
+    if (out.length >= 3) break;
+  }
+  return out.join(" < ");
+}
+// count it, and if this kind has jumped past normal since the last line, note who asked (once a line)
+function add(kind, n) {
+  C[kind] += n;
+  if (SPIKE[kind] && !who[kind] && C[kind] - (since[kind] || 0) > SPIKE[kind]) { try { who[kind] = trail() || "(no script address)"; } catch (e) { who[kind] = "?"; } }
+}
 export const allocCounts = () => Object.assign({}, C);
 
 function wrapSetter(proto, prop, after) {
@@ -31,28 +55,28 @@ export function initAllocWatch(isBot, mod) {
   try {
     // canvas sheets: every width or height set is a new backing store of width × height pixels
     const H = W.HTMLCanvasElement && W.HTMLCanvasElement.prototype;
-    const sized = (cv) => { C.cvPx += (cv.width || 0) * (cv.height || 0); };
+    const sized = (cv) => { add("cvPx", (cv.width || 0) * (cv.height || 0)); };
     wrapSetter(H, "width", sized); wrapSetter(H, "height", sized);
     wrapMethod(W.document, "createElement", (tag) => { if (String(tag).toLowerCase() === "canvas") C.cvNew++; });
     // pixels read back (picture data held outside the page's JavaScript)
     const C2 = W.CanvasRenderingContext2D && W.CanvasRenderingContext2D.prototype;
-    wrapMethod(C2, "getImageData", (x, y, w, h) => { C.readPx += Math.abs((w || 0) * (h || 0)); });
+    wrapMethod(C2, "getImageData", (x, y, w, h) => { add("readPx", Math.abs((w || 0) * (h || 0))); });
     // pictures and picture bitmaps
-    wrapSetter(W.HTMLImageElement && W.HTMLImageElement.prototype, "src", () => { C.img++; });
-    wrapMethod(W, "createImageBitmap", () => { C.bitmap++; });
+    wrapSetter(W.HTMLImageElement && W.HTMLImageElement.prototype, "src", () => { add("img", 1); });
+    wrapMethod(W, "createImageBitmap", () => { add("bitmap", 1); });
     // picture data sent to the graphics card
     for (const G of [W.WebGLRenderingContext, W.WebGL2RenderingContext]) {
       const P = G && G.prototype; if (!P) continue;
-      wrapMethod(P, "texImage2D", function (...a) { C.tex++; const s = a[a.length - 1]; const w = (s && (s.width || s.videoWidth)) || a[3] || 0, h = (s && (s.height || s.videoHeight)) || a[4] || 0; C.texPx += (Number(w) || 0) * (Number(h) || 0); });
+      wrapMethod(P, "texImage2D", function (...a) { C.tex++; const s = a[a.length - 1]; const w = (s && (s.width || s.videoWidth)) || a[3] || 0, h = (s && (s.height || s.videoHeight)) || a[4] || 0; add("texPx", (Number(w) || 0) * (Number(h) || 0)); });
     }
     // blob links made and let go (one never let go keeps its whole file in memory)
-    wrapMethod(W.URL, "createObjectURL", () => { C.blob++; });
+    wrapMethod(W.URL, "createObjectURL", () => { add("blob", 1); });
     wrapMethod(W.URL, "revokeObjectURL", () => { C.blobFree++; });
     // sound players and sound engines
-    wrapSetter(W.HTMLMediaElement && W.HTMLMediaElement.prototype, "src", () => { C.audio++; });
+    wrapSetter(W.HTMLMediaElement && W.HTMLMediaElement.prototype, "src", () => { add("audio", 1); });
     for (const k of ["AudioContext", "webkitAudioContext"]) {
       const A = W[k]; if (typeof A !== "function") continue;
-      W[k] = class extends A { constructor(...a) { super(...a); C.actx++; } };
+      W[k] = class extends A { constructor(...a) { super(...a); add("actx", 1); } };
     }
   } catch (e) { console.warn("[Farmhand Companion] flight recorder:", e); }
   // how often the server sends room updates and messages
@@ -69,6 +93,9 @@ export function allocLine() {
   const now = allocCounts(), d = {};
   for (const k of Object.keys(now)) d[k] = now[k] - ((last && last[k]) || 0);
   last = now;
+  for (const k of Object.keys(now)) since[k] = now[k];
+  const asked = Object.entries(who).map(([k, v]) => k + " from " + v);
+  for (const k of Object.keys(who)) delete who[k];
   const mp = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n));
   const bits = [];
   if (d.cvNew || d.cvPx) bits.push("canvas " + d.cvNew + " new, " + mp(d.cvPx) + " px");
@@ -80,5 +107,6 @@ export function allocLine() {
   if (d.audio || d.actx) bits.push("sound " + d.audio + (d.actx ? ", engines " + d.actx : ""));
   if (d.sync) bits.push("syncs " + d.sync);
   if (d.msg) bits.push("msgs " + d.msg);
+  if (asked.length) bits.push("WHO: " + asked.join("; "));
   return bits.join(" · ");
 }

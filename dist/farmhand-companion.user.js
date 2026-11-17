@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.8
+// @version      0.54.9
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.8";
+  var VERSION = "0.54.9";
 
   // shared/species.js
   var WORDS = {
@@ -854,7 +854,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h("div", null, btn("I did it", () => ctx3.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx3.send("dare skip")))
     ] : null;
     const pen = s.penned ? muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.") : null;
-    const who = () => String(ctx3.ui.giftWho || "").trim();
+    const who2 = () => String(ctx3.ui.giftWho || "").trim();
     const row = (it) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
@@ -870,7 +870,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         null,
         btn("Buy", () => ctx3.send("buy " + it.id), true),
         s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx3.send("buy " + it.id + " with milk")) : null,
-        it.gift ? btn("Gift it", () => who() ? ctx3.send("buy " + it.id + " for " + who()) : ctx3.hint("Type who it's for in the box above the potions first.")) : null
+        it.gift ? btn("Gift it", () => who2() ? ctx3.send("buy " + it.id + " for " + who2()) : ctx3.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
     const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
@@ -4430,12 +4430,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function makeEngine(mn) {
     if (!W5.FarmBelly) W5.FarmBelly = bellyDrawing;
     if (typeof W5.FarmBodyEngine !== "function" || !W5.FarmBreasts) return null;
-    const who = mn == null ? () => W5.Player || null : () => charOf(mn);
+    const who2 = mn == null ? () => W5.Player || null : () => charOf(mn);
     return W5.FarmBodyEngine({
       S: { get C() {
-        return who();
+        return who2();
       } },
-      bodyItem: (g) => itemOf(who(), g),
+      bodyItem: (g) => itemOf(who2(), g),
       setBody: () => {
       },
       // never: their body items are theirs
@@ -6023,12 +6023,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         missing.delete(mn);
         continue;
       }
-      const since = missing.get(mn);
-      if (since == null) {
+      const since2 = missing.get(mn);
+      if (since2 == null) {
         missing.set(mn, now);
         continue;
       }
-      if (now - since < LEFT_MS) continue;
+      if (now - since2 < LEFT_MS) continue;
       try {
         W7.CharacterDelete(C2, false);
         n++;
@@ -6288,6 +6288,36 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var W10 = window;
   var C = { cvPx: 0, cvNew: 0, readPx: 0, img: 0, bitmap: 0, texPx: 0, tex: 0, blob: 0, blobFree: 0, audio: 0, actx: 0, sync: 0, msg: 0 };
   var on = false;
+  var SPIKE = { cvPx: 2e7, readPx: 2e7, texPx: 2e7, img: 300, bitmap: 300, blob: 200, audio: 100, actx: 5 };
+  var since = {};
+  var who = {};
+  function trail() {
+    const lines = String(new Error().stack || "").split("\n").slice(3), out = [];
+    for (const l of lines) {
+      const m = /\(?((?:[a-z-]+:\/\/)?[^\s()]+?):(\d+):\d+\)?\s*$/.exec(l);
+      if (!m) continue;
+      let u = m[1];
+      try {
+        const x = new URL(u);
+        u = x.host + "/" + x.pathname.split("/").filter(Boolean).slice(-1)[0] + (x.search ? x.search.slice(0, 50) : "");
+      } catch (e) {
+        u = u.slice(-70);
+      }
+      if (!out.includes(u + ":" + m[2])) out.push(u + ":" + m[2]);
+      if (out.length >= 3) break;
+    }
+    return out.join(" < ");
+  }
+  function add2(kind, n) {
+    C[kind] += n;
+    if (SPIKE[kind] && !who[kind] && C[kind] - (since[kind] || 0) > SPIKE[kind]) {
+      try {
+        who[kind] = trail() || "(no script address)";
+      } catch (e) {
+        who[kind] = "?";
+      }
+    }
+  }
   var allocCounts = () => Object.assign({}, C);
   function wrapSetter(proto, prop, after) {
     const d = proto && Object.getOwnPropertyDescriptor(proto, prop);
@@ -6322,7 +6352,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const H = W10.HTMLCanvasElement && W10.HTMLCanvasElement.prototype;
       const sized = (cv) => {
-        C.cvPx += (cv.width || 0) * (cv.height || 0);
+        add2("cvPx", (cv.width || 0) * (cv.height || 0));
       };
       wrapSetter(H, "width", sized);
       wrapSetter(H, "height", sized);
@@ -6331,13 +6361,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       });
       const C2 = W10.CanvasRenderingContext2D && W10.CanvasRenderingContext2D.prototype;
       wrapMethod(C2, "getImageData", (x, y, w, h2) => {
-        C.readPx += Math.abs((w || 0) * (h2 || 0));
+        add2("readPx", Math.abs((w || 0) * (h2 || 0)));
       });
       wrapSetter(W10.HTMLImageElement && W10.HTMLImageElement.prototype, "src", () => {
-        C.img++;
+        add2("img", 1);
       });
       wrapMethod(W10, "createImageBitmap", () => {
-        C.bitmap++;
+        add2("bitmap", 1);
       });
       for (const G of [W10.WebGLRenderingContext, W10.WebGL2RenderingContext]) {
         const P5 = G && G.prototype;
@@ -6346,17 +6376,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           C.tex++;
           const s = a[a.length - 1];
           const w = s && (s.width || s.videoWidth) || a[3] || 0, h2 = s && (s.height || s.videoHeight) || a[4] || 0;
-          C.texPx += (Number(w) || 0) * (Number(h2) || 0);
+          add2("texPx", (Number(w) || 0) * (Number(h2) || 0));
         });
       }
       wrapMethod(W10.URL, "createObjectURL", () => {
-        C.blob++;
+        add2("blob", 1);
       });
       wrapMethod(W10.URL, "revokeObjectURL", () => {
         C.blobFree++;
       });
       wrapSetter(W10.HTMLMediaElement && W10.HTMLMediaElement.prototype, "src", () => {
-        C.audio++;
+        add2("audio", 1);
       });
       for (const k of ["AudioContext", "webkitAudioContext"]) {
         const A = W10[k];
@@ -6364,7 +6394,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         W10[k] = class extends A {
           constructor(...a) {
             super(...a);
-            C.actx++;
+            add2("actx", 1);
           }
         };
       }
@@ -6395,6 +6425,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const now = allocCounts(), d = {};
     for (const k of Object.keys(now)) d[k] = now[k] - (last && last[k] || 0);
     last = now;
+    for (const k of Object.keys(now)) since[k] = now[k];
+    const asked = Object.entries(who).map(([k, v]) => k + " from " + v);
+    for (const k of Object.keys(who)) delete who[k];
     const mp = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
     const bits = [];
     if (d.cvNew || d.cvPx) bits.push("canvas " + d.cvNew + " new, " + mp(d.cvPx) + " px");
@@ -6406,6 +6439,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (d.audio || d.actx) bits.push("sound " + d.audio + (d.actx ? ", engines " + d.actx : ""));
     if (d.sync) bits.push("syncs " + d.sync);
     if (d.msg) bits.push("msgs " + d.msg);
+    if (asked.length) bits.push("WHO: " + asked.join("; "));
     return bits.join(" \xB7 ");
   }
 
@@ -8376,7 +8410,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   var line2 = (r) => when(r.t) + " [" + r.k + "] " + (r.n || r.f || "") + (r.w ? " \u2192 " + r.w : "") + ": " + r.x;
   function logTab(ctx3) {
-    const ui = ctx3.ui, who = ctx3.s.logWho || [], res = ui.logRows;
+    const ui = ctx3.ui, who2 = ctx3.s.logWho || [], res = ui.logRows;
     const ask3 = () => ctx3.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
     const save7 = () => {
       try {
@@ -8400,7 +8434,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           h(
             "select",
             { class: "fhc-sel", onchange: (e) => ctx3.setUi({ logWho: e.target.value }, true) },
-            [["", "Everybody"]].concat(who.map((w) => [String(w.mn), w.name + " (" + w.mn + ")"])).map(([v, l]) => h("option", { value: v, selected: String(ui.logWho || "") === v ? "selected" : null }, l))
+            [["", "Everybody"]].concat(who2.map((w) => [String(w.mn), w.name + " (" + w.mn + ")"])).map(([v, l]) => h("option", { value: v, selected: String(ui.logWho || "") === v ? "selected" : null }, l))
           )
         ),
         h(
@@ -8527,10 +8561,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function office(ctx3) {
     const docs = ctx3.docs.slice().reverse();
     const sel = docs.find((d) => d.id === ctx3.ui.doc) || docs[0];
-    const who = () => String(ctx3.ui.look || "").trim();
-    const look = (c) => () => who() ? ctx3.send(c + " " + who()) : ctx3.hint("Type who first, in the Look somebody up box.");
+    const who2 = () => String(ctx3.ui.look || "").trim();
+    const look = (c) => () => who2() ? ctx3.send(c + " " + who2()) : ctx3.hint("Type who first, in the Look somebody up box.");
     const typed = () => {
-      const v = who();
+      const v = who2();
       if (!v) return;
       ctx3.send(LOOKUPS.includes(v.split(/\s+/)[0].toLowerCase()) && /\s/.test(v) ? v : "record " + v);
       ctx3.setUi({ look: "" });
@@ -8573,7 +8607,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   function contracts(ctx3) {
-    const tpl = () => (ctx3.ui.ctTpl || "deep").trim(), who = () => (ctx3.ui.ctWho || "").trim(), dur = () => ctx3.ui.ctDur || "1w";
+    const tpl = () => (ctx3.ui.ctTpl || "deep").trim(), who2 = () => (ctx3.ui.ctWho || "").trim(), dur = () => ctx3.ui.ctDur || "1w";
     const q2 = (v) => /\s/.test(v) ? '"' + v + '"' : v;
     const when3 = () => {
       const u = ctx3.ui, p = [];
@@ -8636,8 +8670,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h(
           "div",
           null,
-          btn("Preview", () => ctx3.send("contract show " + tpl() + (who() ? " " + who() : "") + when3())),
-          btn("Offer it", () => who() ? ctx3.send("contract offer " + tpl() + " " + who() + " " + dur() + when3()) : ctx3.hint("Type who it's for first, in the For box."), true)
+          btn("Preview", () => ctx3.send("contract show " + tpl() + (who2() ? " " + who2() : "") + when3())),
+          btn("Offer it", () => who2() ? ctx3.send("contract offer " + tpl() + " " + who2() + " " + dur() + when3()) : ctx3.hint("Type who it's for first, in the For box."), true)
         )
       ),
       card(
@@ -8655,8 +8689,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   function barn(ctx3) {
-    const who = () => (ctx3.ui.barnWho || "").trim();
-    const act = (c) => () => who() ? ctx3.send(c + " " + who()) : ctx3.hint("Type who first, in the Who box.");
+    const who2 = () => (ctx3.ui.barnWho || "").trim();
+    const act = (c) => () => who2() ? ctx3.send(c + " " + who2()) : ctx3.hint("Type who first, in the Who box.");
     return [
       card(
         title("Barn work"),
@@ -8667,7 +8701,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         title("Jars"),
         btn("The jar shelf", () => ctx3.send("jars")),
         muted("To breed somebody from a jar: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar breedin' off can't be."),
-        h("div", null, btn("Breed from a jar\u2026", () => ctx3.fillBox("inseminate " + (who() ? who() + " " : ""))))
+        h("div", null, btn("Breed from a jar\u2026", () => ctx3.fillBox("inseminate " + (who2() ? who2() + " " : ""))))
       ),
       card(
         title("Herd"),
@@ -9902,15 +9936,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     name: "what the farm calls them; clear goes back to their game nickname"
   };
   function records(ctx3) {
-    const who = () => String(ctx3.ui.eWho || "").trim().replace(/\s+/g, " ");
+    const who2 = () => String(ctx3.ui.eWho || "").trim().replace(/\s+/g, " ");
     const fld = ctx3.ui.eField || "species";
-    const need = () => who() ? false : (ctx3.hint("Who? Their member number is safest."), true);
+    const need = () => who2() ? false : (ctx3.hint("Who? Their member number is safest."), true);
     return [
       card(
         title("Edit a record"),
         muted("Fix a mistake on somebody's application or change their details. Member numbers are safest; a name works if it's on the books."),
         field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx3.ui.eWho || "", oninput: (e) => ctx3.setUi({ eWho: e.target.value }, true) })),
-        btn("Show what's on file", () => !need() && ctx3.send("edit " + who())),
+        btn("Show what's on file", () => !need() && ctx3.send("edit " + who2())),
         field2("What to change", h(
           "select",
           { class: "fhc-sel", onchange: (e) => ctx3.setUi({ eField: e.target.value }) },
@@ -9924,10 +9958,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (need()) return;
             const v = String(ctx3.ui.eVal || "").replace(/\s+/g, " ").trim();
             if (!v) return ctx3.hint("Type the new value first (or press Clear it).");
-            ctx3.send("edit " + who() + " " + fld + " " + v);
+            ctx3.send("edit " + who2() + " " + fld + " " + v);
             ctx3.setUi({ eVal: "" });
           }),
-          btn("Clear it", () => !need() && ctx3.send("edit " + who() + " " + fld + " clear"))
+          btn("Clear it", () => !need() && ctx3.send("edit " + who2() + " " + fld + " clear"))
         ),
         muted("Changes are saved on their record and in the audit log. Typed: ?edit <who> <field> <value>.")
       ),

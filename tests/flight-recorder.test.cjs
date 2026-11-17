@@ -30,5 +30,10 @@ const lastFast = (w) => { try { const f = JSON.parse(w.localStorage.getItem("far
   const b = lastFast(bot).a || "";
   ok(!/canvas/.test(b), "the next line only counts what's new since the last one");
   ok(!lastFast(pl).a, "never on a player's tab");
+  // a runaway: a script makin' huge canvases over and over gets named (here, the test page's own address)
+  bot.eval("for (let i = 0; i < 12; i++) { const c = document.createElement('canvas'); c.width = 4000; c.height = 4000; }");
+  await wait(3300);
+  const c2 = lastFast(bot).a || "";
+  ok(/WHO: cvPx from /.test(c2), "a jump past normal names the script that asked (" + c2.slice(0, 160) + ")");
   out(fails ? fails + " FAILED" : "ALL PASSED"); process.exit(fails ? 1 : 0);
 })();

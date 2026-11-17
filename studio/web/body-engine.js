@@ -460,7 +460,10 @@ window.FarmBodyEngine = function (host) {
         // (A piece fitted to her breasts leaves its arm mask behind: a mask is cut where the game's arms sit in front of a
         // breast the game's size, and on a fitted piece it cut square holes through the cloth with her bare breast showing
         // in each. Echo's newer dresses all carry one. Found in the Echo catalogue, Oct 14. Her hands are drawn on their own.)
-        const put = (name, img, x, y, o) => { if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: undefined });
+        // (from: what the drawing is, for whoever's watchin' the build: "skin" for the drawn belly, breasts, nipples and cock,
+        // or the game picture of the worn piece it stands in for. The Companion's messes lay the brand under worn pieces.)
+        const put = (name, img, x, y, o, from) => { if (from && img && typeof img === "object") { try { img.__farmFrom = from; } catch (e) { /* fine */ } }
+          if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: undefined });
           if (typeof img === "string" || !host.picture || takesDrawings()) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
         if (fit && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
@@ -483,11 +486,11 @@ window.FarmBodyEngine = function (host) {
             const dx = upper[0] + 250 - cv0.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv0.height / 2 + fit.y;
             // (under the game's own breasts when they're the game's size: our drawn ones go on after it anyway)
             const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
-            put("drawImage", cv, dx, dy, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", cv, dx, dy, {});
+            put("drawImage", cv, dx, dy, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", cv, dx, dy, {}, "skin");
             ctx.belly = { cv, dx, dy };
             ctx.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
             }
-            if (ctx.cock) { const k = ctx.cock; ctx.cock = null; put("drawImage", k[0], k[1], k[2], {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", k[0], k[1], k[2], {}); }
+            if (ctx.cock) { const k = ctx.cock; ctx.cock = null; put("drawImage", k[0], k[1], k[2], {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", k[0], k[1], k[2], {}, "skin"); }
             if (br) {
               // over the belly: they hang in front of it
               const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S3 = isHeld ? FarmBreasts.held(freeS) : freeS;
@@ -520,9 +523,9 @@ window.FarmBodyEngine = function (host) {
                 }
                 bc = BREAST.flat;
               }
-              put("drawImage", bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+              put("drawImage", bc, rx - bc.ax, ry - bc.ay, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {}, "skin");
               // marks another mod keeps on the chest (BCR's welts and bruises), moved onto the drawn breasts
-              if (typeof host.overBreast === "function") { try { const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay); if (o && o.cv) { put("drawImage", o.cv, o.x, o.y, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", o.cv, o.x, o.y, {}); } } catch (e) { warnSome("[body] over the breasts:", e); } }
+              if (typeof host.overBreast === "function") { try { const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay); if (o && o.cv) { put("drawImage", o.cv, o.x, o.y, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", o.cv, o.x, o.y, {}, "skin"); } } catch (e) { warnSome("[body] over the breasts:", e); } }
               ctx.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {
@@ -532,7 +535,7 @@ window.FarmBodyEngine = function (host) {
                 const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
                 gr.addColorStop(0, tone(0.92, 1)); gr.addColorStop(0.3, tone(1, 0.95)); gr.addColorStop(0.75, tone(1.02, 0.8)); gr.addColorStop(1, tone(1.02, 0));
                 ng.fillStyle = gr; ng.beginPath(); ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2); ng.fill(); BREAST.nc = nc; BREAST.ncKey = ncKey; }
-                for (const p of B.nips) if (p[1] + rad < B.ground) { put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); }
+                for (const p of B.nips) if (p[1] + rad < B.ground) { put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}, "skin"); }
               }
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) put(h[0], h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[studio] nipples:", e); } }
             }
@@ -562,7 +565,7 @@ window.FarmBodyEngine = function (host) {
               /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
               if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { warnSome("[body] belly form:", e); } }
               keepIn(BREAST.out, key, c); }
-            put(name, c, x - ox, y, o); return true;
+            put(name, c, x - ox, y, o, src); return true;
           };
           // ── straps round each breast ──
           // A piece that frames each breast with a strap (over the top, down the sides, under it: the Leather Harness) has
@@ -658,7 +661,7 @@ window.FarmBodyEngine = function (host) {
               }
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           // how much of the game's two breasts this picture covers (0 to 1): a belt or a collar isn't chest wear
           // wide: measured a third wider than the breast (is it round or under them: does it hold them?). Not wide: measured
@@ -689,7 +692,7 @@ window.FarmBodyEngine = function (host) {
                 g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0); }
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           const chestCover = (src, im, x, y, B, wide) => {
             const key = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
@@ -1064,7 +1067,7 @@ window.FarmBodyEngine = function (host) {
               if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { warnSome("[body] belly form:", e); } }
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           // the piece's own colour, out of its picture (for one worn in the game's own colours, with no tint to go by)
           const ownColour = (src, im) => {
@@ -1106,7 +1109,7 @@ window.FarmBodyEngine = function (host) {
               }
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           const held = [];
           // The lactation pump is one picture: two cups, a Y of tube, a long hose, and the pump with its bottle down by her
@@ -1132,7 +1135,7 @@ window.FarmBodyEngine = function (host) {
               PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));   // the cups: on her nipples, their own size
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           const nipDraw = (name, src, x, y, o) => {
             if (/LactationPump/.test(src)) { try { if (pumpDraw(name, src, x, y, o)) return true; } catch (e) { warnSome("[studio] pump:", e); } }
@@ -1153,7 +1156,7 @@ window.FarmBodyEngine = function (host) {
               });
               keepIn(BREAST.out, key, c);
             }
-            put(name, c, x - c.MX, y - c.MY, o); return true;
+            put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.on && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (gate ? gate(src) : (lower && prio(src) > 12)) paint(); };
           let upperSkin = null;
@@ -1207,8 +1210,8 @@ window.FarmBodyEngine = function (host) {
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);
                 const gname2 = groupOf(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q || q.mode !== "under") ? (m ? bellyShade(m, x - MOULD.M, y, ctx) : bellyShade(mouldImg(src), x, y, ctx)) : null;
-                if (formed) { put(name, formed, m ? x - MOULD.M : x, y, o); drawn = true; }
-                else if (m) { put(name, m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { warnSome("[studio] mould:", e); }
+                if (formed) { put(name, formed, m ? x - MOULD.M : x, y, o, src); drawn = true; }
+                else if (m) { put(name, m, x - MOULD.M, y, o, src); drawn = true; } } } catch (e) { warnSome("[studio] mould:", e); }
             if (!drawn) put(name, src, x, y, o);
             if (!blink) { try { after(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
           } : real[name]);

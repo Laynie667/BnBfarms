@@ -148,14 +148,42 @@ function messPicture(C, list, body, brand) {
   const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true }; keep(C.MemberNumber, p);
   return p;
 }
+// WHERE THE BRAND (AND THE MESSES) GO IN (Nov 17, Laynie: the brand "renders over a lot of things and clothes"). On the
+// skin: once the body's own torso and lower body are drawn, right before the first worn piece. Two things kept it late.
+// The drawn body hands the game its fitted pieces (a bra or a top over the drawn breasts) as drawings, not picture names,
+// and they weren't seen as worn at all; now each says what it stands in for (__farmFrom, body-engine.js put). And it
+// waited for every skin picture the last drawing had, so arms drawn in front, after the clothes, held it back till after
+// them; now it's the torso and lower body (arms drawn later still cover it, as they should).
+const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
+const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
+const groupOfSrc = (src) => { const m = groupRe.exec(String(src || "")); return m ? m[1] : ""; };
+const fromOf = (src) => (typeof src === "string" ? src : src && typeof src.__farmFrom === "string" ? src.__farmFrom : "");
+// is this (a picture name, or one of the engine's drawings) a worn piece goin' on over the skin, now that `body` is drawn?
+// before: the skin pictures the last whole drawing had (which of the torso and lower body to wait for)
+export function wornOverSkin(src, body, before) {
+  const from = fromOf(src);
+  if (!from || from === "skin" || !body.length) return false;
+  const g = groupOfSrc(from);
+  if (!g || SKIN.test(g)) return false;
+  const core = ["BodyUpper", "BodyLower"].filter((c) => before.some((b) => groupOfSrc(b[0]) === c) || (!before.length && c === "BodyUpper"));
+  return core.every((c) => body.some((b) => groupOfSrc(b[0]) === c));
+}
+// for the tests: where the brand would go in, in a list of what's drawn (srcs, or drawings with __farmFrom)
+W.__farmMessLayAt = (seq, before) => {
+  const body = [], was = (before || []).map((s) => [s, 0, 0]);
+  for (let i = 0; i < seq.length; i++) {
+    const src = seq[i];
+    if (typeof src === "string" && BODY.test(src)) { if (!body.some((b) => b[0] === src)) body.push([src, 0, 0]); continue; }
+    if (wornOverSkin(src, body, was)) return i;
+  }
+  return seq.length;
+};
 function hook() {
   if (hooked || !sdk) return; hooked = true;
   try {
     // outside the drawn body's own step (priority 3 over its 2), so it has the game's real brushes. The mess goes on where
     // the game's own splatters would: on the skin, after the body (and the drawn belly and breasts), and before the first
     // thing worn over it, so clothes and hands cover it as they would. Naked, it's the last thing drawn.
-    const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
-    const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
     sdk.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
       const C = args[0], real = args[1];
       if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess || onBot()) return next(args);
@@ -179,10 +207,10 @@ function hook() {
       const seen = (name) => (src, x, y, ...rest) => {
         if (C === W.Player) { if (typeof src === "string") { if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, "")); } else canv++; }
         if (typeof src === "string" && BODY.test(src) && !all.some((b) => b[0] === src)) all.push([src, x, y]);
-        if (typeof src === "string" && !done) {
-          if (BODY.test(src)) { if (!body.some((b) => b[0] === src)) body.push([src, x, y]); }
-          // the first thing worn over the skin, once all of it is drawn (as many skin pictures as last time)
-          else { const m = groupRe.exec(src); if (m && !SKIN.test(m[1]) && body.length && body.length >= before.length) lay(); }
+        if (!done) {
+          if (typeof src === "string" && BODY.test(src)) { if (!body.some((b) => b[0] === src)) body.push([src, x, y]); }
+          // the first thing worn over the skin (a picture, or the drawn body's fitted piece), once the torso is drawn
+          else if (wornOverSkin(src, body, before)) lay();
         }
         return real[name](src, x, y, ...rest);
       };

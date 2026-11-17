@@ -20,6 +20,7 @@ import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmStat
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initBotScreen, screenNapping } from "./botscreen.js";
+import { initAllocWatch } from "./allocwatch.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
@@ -446,6 +447,7 @@ function start() {
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)
   initBotScreen(mod, () => (st.panel && st.panel.prefs) || {});   // on the bot's own account the room isn't drawn (botscreen.js)
+  initAllocWatch(() => onBotAccount(), mod);   // the bot tab's flight recorder (allocwatch.js)
   // the record: what lands in your chat, your beeps and your commands, to the farm girl by the hour (chatlog.js).
   // Always for the proprietors; anybody else only with Toggles → "Send a record..." on.
   initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere });

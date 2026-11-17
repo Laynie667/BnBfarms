@@ -2794,7 +2794,7 @@
 
   // bot/src/version.js
   var VERSION = "0.72.3";
-  var COMPANION_VERSION = "0.54.7";
+  var COMPANION_VERSION = "0.54.8";
 
   // bot-parts:farmhand-bot-parts
   (function() {

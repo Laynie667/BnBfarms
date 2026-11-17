@@ -10,6 +10,7 @@ import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
 import { lookSent } from "./look.js";
 import { screenSkipped, screenLight, screenNapOn, screenNaps, screenNapping, screenSpecks } from "./botscreen.js";
+import { allocLine } from "./allocwatch.js";
 // what this page has sent of your look since it opened (look.js), and on the bot's account how much drawin' it skipped
 function sentLine() {
   let t = "";
@@ -83,10 +84,11 @@ function quick() {
     else if (tc) x.p = tc.size;
   } catch (e) { /* fine */ }
   try { x.r = (W.ChatRoomCharacter || []).length; x.s = W.CurrentScreen; } catch (e) { /* fine */ }
+  try { const a = allocLine(); if (a) x.a = a; } catch (e) { /* fine */ }   // the bot tab's flight recorder (allocwatch.js)
   fast.push(x); if (fast.length > 40) fast = fast.slice(-40);
   try { W.localStorage.setItem(FAST, JSON.stringify(fast)); } catch (e) { /* fine */ }
 }
-const quickLine = (x) => new Date(x.t).toTimeString().slice(0, 8) + "  page " + (x.h ?? "?") + " MB · " + (x.p ?? "?") + " pictures · " + (x.r ?? "?") + " in the room · " + (x.s || "");
+const quickLine = (x) => new Date(x.t).toTimeString().slice(0, 8) + "  page " + (x.h ?? "?") + " MB · " + (x.p ?? "?") + " pictures · " + (x.r ?? "?") + " in the room · " + (x.s || "") + (x.a ? " · " + x.a : "");
 export function memlogText(n) { return log.slice(-(n || 20)).map(line).join("\n"); }
 export function initMemlog() {
   setTimeout(tick, 20000); setInterval(tick, 30000); setInterval(quick, 3000);

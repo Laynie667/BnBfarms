@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.7** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.8** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.54.8: the brand goes under your clothes, and a flight recorder for the farm girl's tab.**
+  - **The brand, on the skin (Laynie, Nov 17: it "renders over a lot of things and clothes"):** it now goes in right after the body's torso and lower body, before the first worn piece. Two things held it late. The drawn body hands its fitted pieces (a bra or top over the drawn breasts) to the game as drawings, and those weren't counted as worn; now each drawing says what it is. It also waited for every skin picture the last drawing had, so arms drawn in front after the clothes held it back. Arms drawn in front still cover it, as they should. Messes go in the same way.
+  - **The farm girl's flight recorder (only on her tab):** the tab kept dying "out of memory" with the page's own memory small. Opera's crash report shows why: the tab grew to 12.9 GB in eight and a half minutes, outside the page's JavaScript. Every 3 seconds the Companion now counts what makes that kind of memory: new canvas pixels, pixels read back, pictures and bitmaps, picture data sent to the graphics card, blob links never let go, sounds, and room updates. It only counts. After the next crash, `/farmmem` on her tab shows the last two minutes of counts before it died, and the one that ran away is the culprit.
 
 - **Dispensary 0.1.3: soaked gear tops up instead of piling up.** LSCG 0.9.9 doses whoever wears a soaked or laced gag, mask or bit (or a gas mask) on every breath, and our doses work in it too. The Dispensary was taking each breath as a whole dose, so a denial-soaked bit piled up hours a minute. Now breathing through it keeps the dose topped up to ten minutes, and it wears off soon after the gear comes off.
 

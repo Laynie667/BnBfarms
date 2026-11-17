@@ -4,7 +4,7 @@
    Who gets to stand down:
    - On the farm, with the farm girl in the room, a farm shot is hers: she reads it, keeps the books, and calls on your
      Dispensary to do the rest (farm.js). We don't give it twice.
-   - LSCG's own four are LSCG's (lscg.js).
+   - LSCG's own drugs are LSCG's (lscg.js).
    - A dose we've put in LSCG's list: LSCG catches it if you've switched it on there. If it hasn't come through LSCG
      a moment later, we give it ourselves.
 */

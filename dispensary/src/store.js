@@ -9,7 +9,7 @@ const W = window;
 let S = null, saveT = null;
 const listeners = [];
 
-const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0 });
+const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [] });
 const num = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
 // only what's expected, in range: what comes back from the server could be anything
@@ -32,6 +32,19 @@ export function clean(d) {
   if (Array.isArray(d.farm)) s.farm = d.farm.filter((m) => Number.isInteger(m) && m > 0).slice(0, 300);
   s.farmAt = num(d.farmAt, 0, 1e14, 0);
   s.seen = num(d.seen, 0, 1e14, 0);
+  s.stock = d.stock === true;
+  if (Array.isArray(d.keys)) s.keys = [...new Set(d.keys.filter((m) => Number.isInteger(m) && m > 0 && m < 1e9))].slice(0, 10);
+  if (d.hard && typeof d.hard === "object") {
+    const H = d.hard;
+    s.hard = { on: H.on === true, since: num(H.since, 0, 1e14, 0), until: num(H.until, 0, 1e14, 0), checkAt: num(H.checkAt, 0, 1e14, 0),
+      log: Array.isArray(H.log) ? H.log.filter((l) => l && typeof l === "object").slice(-50).map((l) => ({ t: num(l.t, 0, 1e14, 0), by: Math.round(num(l.by, 0, 1e9, 0)), what: String(l.what || "").slice(0, 200) })) : [] };
+  }
+  if (d.wards && typeof d.wards === "object") {
+    for (const [k, x] of Object.entries(d.wards).slice(0, 50)) {
+      if (!/^\d{1,9}$/.test(k) || !x || typeof x !== "object") continue;
+      s.wards[k] = { name: String(x.name || "").slice(0, 40), until: num(x.until, 0, 1e14, 0), due: num(x.due, 0, 1e14, 0), seen: num(x.seen, 0, 1e14, 0), checked: num(x.checked, 0, 1e14, 0), asked: num(x.asked, 0, 1e14, 0) };
+    }
+  }
   return s;
 }
 

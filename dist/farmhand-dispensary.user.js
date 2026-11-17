@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.1.1
+// @version      0.1.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -215,7 +215,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.1.1";
+  var VERSION = "0.1.2";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -240,7 +240,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var S = null;
   var saveT = null;
   var listeners = [];
-  var fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0 });
+  var fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [] });
   var num = (v, lo, hi, d) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
   function clean(d) {
     const s = fresh();
@@ -263,6 +263,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (Array.isArray(d.farm)) s.farm = d.farm.filter((m) => Number.isInteger(m) && m > 0).slice(0, 300);
     s.farmAt = num(d.farmAt, 0, 1e14, 0);
     s.seen = num(d.seen, 0, 1e14, 0);
+    s.stock = d.stock === true;
+    if (Array.isArray(d.keys)) s.keys = [...new Set(d.keys.filter((m) => Number.isInteger(m) && m > 0 && m < 1e9))].slice(0, 10);
+    if (d.hard && typeof d.hard === "object") {
+      const H = d.hard;
+      s.hard = {
+        on: H.on === true,
+        since: num(H.since, 0, 1e14, 0),
+        until: num(H.until, 0, 1e14, 0),
+        checkAt: num(H.checkAt, 0, 1e14, 0),
+        log: Array.isArray(H.log) ? H.log.filter((l) => l && typeof l === "object").slice(-50).map((l) => ({ t: num(l.t, 0, 1e14, 0), by: Math.round(num(l.by, 0, 1e9, 0)), what: String(l.what || "").slice(0, 200) })) : []
+      };
+    }
+    if (d.wards && typeof d.wards === "object") {
+      for (const [k, x] of Object.entries(d.wards).slice(0, 50)) {
+        if (!/^\d{1,9}$/.test(k) || !x || typeof x !== "object") continue;
+        s.wards[k] = { name: String(x.name || "").slice(0, 40), until: num(x.until, 0, 1e14, 0), due: num(x.due, 0, 1e14, 0), seen: num(x.seen, 0, 1e14, 0), checked: num(x.checked, 0, 1e14, 0), asked: num(x.asked, 0, 1e14, 0) };
+      }
+    }
     return s;
   }
   var localKey = () => "fd-" + (W.Player && W.Player.MemberNumber);
@@ -452,8 +470,331 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var ladderWho = () => (LADDER[rungIndex(st().who)] || LADDER[0]).who;
 
-  // dispensary/src/lscg.js
+  // shared/protocol.js
+  var FARM_MSG = "FarmhandMsg";
+  var PROTOCOL = 2;
+  function makeMsg(type, data = {}, target) {
+    const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
+    if (target) m.Target = target;
+    return m;
+  }
+  function readMsg(data) {
+    if (!data || data.Type !== "Hidden" || data.Content !== FARM_MSG) return null;
+    const d = data.Dictionary;
+    if (!d || typeof d !== "object" || Array.isArray(d) || typeof d.type !== "string") return null;
+    return { ...d, from: data.Sender };
+  }
+
+  // dispensary/src/hardcore.js
   var W4 = window;
+  var DAY = 864e5;
+  var CHECK_DAYS = 30;
+  var me = () => W4.Player && W4.Player.MemberNumber || 0;
+  var here = (mn) => (W4.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var who = (mn) => here(mn) ? nameOf(mn) : "#" + mn;
+  var onChange = () => {
+  };
+  function onHardChange(f) {
+    onChange = f;
+  }
+  var hardOn = () => !!(st().hard && st().hard.on);
+  function keyholders() {
+    const P = W4.Player, out = [];
+    const own = P && P.Ownership && P.Ownership.MemberNumber;
+    if (typeof own === "number" && own > 0 && own !== me()) out.push(own);
+    if (st().stock) {
+      for (const m of PROPRIETORS) if (m !== me() && !out.includes(m)) out.push(m);
+    }
+    for (const m of st().keys || []) if (m !== me() && !out.includes(m)) out.push(m);
+    return out;
+  }
+  var MAX_KEYS = 10;
+  function addKey(mn) {
+    mn = Math.round(Number(mn));
+    if (hardOn()) return { ok: false, why: "locked" };
+    if (!Number.isInteger(mn) || mn <= 0 || mn >= 1e9) return { ok: false, why: "number" };
+    if (mn === me()) return { ok: false, why: "self" };
+    const S2 = st();
+    S2.keys = S2.keys || [];
+    if (S2.keys.includes(mn) || keyholders().includes(mn)) return { ok: false, why: "already" };
+    if (S2.keys.length >= MAX_KEYS) return { ok: false, why: "full" };
+    S2.keys.push(mn);
+    save();
+    onChange();
+    return { ok: true };
+  }
+  function removeKey(mn) {
+    if (hardOn()) return { ok: false, why: "locked" };
+    const S2 = st(), i = (S2.keys || []).indexOf(Number(mn));
+    if (i < 0) return { ok: false, why: "none" };
+    S2.keys.splice(i, 1);
+    save();
+    onChange();
+    return { ok: true };
+  }
+  var companion = () => {
+    try {
+      const C = W4.FarmhandCompanion;
+      return C && typeof C.hardPrefs === "function" ? C : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var isKey = (mn) => typeof mn === "number" && keyholders().includes(mn);
+  function dueAt() {
+    const H = st().hard || {};
+    return H.until ? H.until : (H.checkAt || H.since || Date.now()) + CHECK_DAYS * DAY;
+  }
+  function log(by, what) {
+    const H = st().hard;
+    H.log = (H.log || []).concat({ t: Date.now(), by, what: String(what).slice(0, 200) }).slice(-50);
+  }
+  var hardLog = () => (st().hard && st().hard.log || []).slice();
+  function sendTo(mn, type, data) {
+    try {
+      if (here(mn) && typeof W4.ServerSend === "function") {
+        W4.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+  function beepTo(mn, text) {
+    try {
+      if (typeof W4.ServerSend === "function") {
+        W4.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text).slice(0, 900) });
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+  function announce() {
+    const H = st().hard || {}, keys = keyholders();
+    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W4.Player && (W4.Player.Nickname || W4.Player.Name) || "" });
+  }
+  function lock(days) {
+    if (hardOn()) return { ok: false, why: "on" };
+    if (!keyholders().length) return { ok: false, why: "nokey" };
+    const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
+    st().hard = { on: true, since: now, until: d ? now + d * DAY : 0, checkAt: now, log: st().hard && st().hard.log || [] };
+    log(me(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
+    save(true);
+    announce();
+    onChange();
+    return { ok: true };
+  }
+  function unlock(by, why) {
+    if (!hardOn()) return false;
+    const H = st().hard;
+    H.on = false;
+    H.until = 0;
+    log(by, "hardcore off: " + why);
+    save(true);
+    announce();
+    onChange();
+    local("\u{1F513} Hardcore's off (" + why + "). Your settings are yours again, and so is your safeword.");
+    return true;
+  }
+  function checkIn(by) {
+    if (!hardOn() || !isKey(by)) return false;
+    const H = st().hard, now = Date.now(), last = H.checkAt || 0;
+    H.checkAt = now;
+    if (now - last > DAY) log(by, "checked in");
+    save();
+    onChange();
+    return true;
+  }
+  function tickHard() {
+    if (!hardOn()) return;
+    const H = st().hard, now = Date.now();
+    if (H.until && now >= H.until) unlock(me(), "the end date came");
+    else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
+  }
+  var askedAt = 0;
+  function askOut() {
+    const now = Date.now(), keys = keyholders(), name = W4.Player && (W4.Player.Nickname || W4.Player.Name) || "Somebody";
+    if (now - askedAt < 5 * 6e4) {
+      local("\u{1F5DD}\uFE0F Your keyholders have already been asked. Your doses stay till one of them lets you out.");
+      return 0;
+    }
+    askedAt = now;
+    let n = 0;
+    for (const k of keys) {
+      if (sendTo(k, "dispAsk", { name })) n++;
+      else if (beepTo(k, "\u{1F5DD}\uFE0F " + name + " (" + me() + ") is askin' to be let out of hardcore in The Farmhand's Dispensary. If you've the Dispensary, open its page (Keys you hold); with the Companion, /keys letout " + me() + ".")) n++;
+    }
+    log(me(), "asked to be let out");
+    save();
+    local("\u{1F5DD}\uFE0F Hardcore: your doses stay. " + (n ? "Your keyholders have been asked to let you out: " + keys.map(who).join(", ") + "." : "None of your keyholders could be reached just now."));
+    return n;
+  }
+  function onKey(by, m) {
+    if (!isKey(by) || !m || typeof m !== "object") return false;
+    const H = st().hard, nm = who(by);
+    if (m.do === "check") {
+      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H.until || 0, due: dueAt(), keys: keyholders(), name: W4.Player && (W4.Player.Nickname || W4.Player.Name) || "" });
+      return true;
+    }
+    if (!hardOn()) return false;
+    if (m.do === "state") {
+      sendTo(by, "dispKeyState", stateFor());
+      checkIn(by);
+      return true;
+    }
+    if (m.do === "letout") {
+      const n = clearAll("keyholder");
+      log(by, "let you out (" + n + " dose" + (n === 1 ? "" : "s") + " lifted)");
+      save();
+      local("\u{1F5DD}\uFE0F " + nm + " let you out: every dose in you is lifted.");
+      checkIn(by);
+      onChange();
+      return true;
+    }
+    if (m.do === "end") {
+      checkIn(by);
+      return unlock(by, "ended by " + nm);
+    }
+    if (m.do === "extend") {
+      const d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(m.days) || 0)));
+      H.until = d ? Date.now() + d * DAY : 0;
+      H.checkAt = Date.now();
+      log(by, d ? "set the end to " + d + " day" + (d === 1 ? "" : "s") + " from now" : "took the end date away");
+      save();
+      local("\u{1F5DD}\uFE0F " + nm + " " + (d ? "set your hardcore to end in " + d + " day" + (d === 1 ? "" : "s") + "." : "took your end date away. A keyholder checks in every " + CHECK_DAYS + " days instead."));
+      onChange();
+      return true;
+    }
+    if (m.do === "set") {
+      const S2 = st(), said = [];
+      if (typeof m.who === "string" && LADDER.some((r) => r.id === m.who) && m.who !== S2.who) {
+        S2.who = m.who;
+        said.push("who can dose you: " + LADDER.find((r) => r.id === m.who).label);
+      }
+      if ((m.clock === "real" || m.clock === "online") && m.clock !== S2.clock) {
+        setClock(m.clock);
+        said.push("the clock: " + (m.clock === "real" ? "real time" : "while online"));
+      }
+      if (m.off && typeof m.off === "object") {
+        for (const id of doseIds()) if (typeof m.off[id] === "boolean" && !!S2.off[id] !== m.off[id]) {
+          if (m.off[id]) S2.off[id] = true;
+          else delete S2.off[id];
+          said.push(id + (m.off[id] ? " switched off" : " switched on"));
+        }
+      }
+      if (m.companion && typeof m.companion === "object" && companion()) {
+        try {
+          said.push(...companion().setHardPrefs(m.companion));
+        } catch (e) {
+        }
+      }
+      if (!said.length) return true;
+      log(by, "changed " + said.join(", "));
+      save();
+      checkIn(by);
+      onChange();
+      local("\u{1F5DD}\uFE0F " + nm + " changed your Dispensary: " + said.join("; ") + ".");
+      sendTo(by, "dispKeyState", stateFor());
+      return true;
+    }
+    return false;
+  }
+  function stateFor() {
+    const S2 = st();
+    let comp = null;
+    try {
+      comp = companion() ? companion().hardPrefs() : null;
+    } catch (e) {
+      comp = null;
+    }
+    return { who: S2.who, clock: S2.clock, off: Object.assign({}, S2.off), doses: doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })), until: S2.hard && S2.hard.until || 0, due: dueAt(), companion: comp };
+  }
+  var wards = () => st().wards || (st().wards = {});
+  function onWardHard(from, m) {
+    if (!Array.isArray(m.keys) || !m.keys.includes(me())) return;
+    const w = wards();
+    if (!m.on) {
+      if (w[from]) {
+        delete w[from];
+        save();
+        onChange();
+      }
+      return;
+    }
+    const was = w[from], now = Date.now();
+    w[from] = Object.assign({}, was, { name: String(m.name || "").slice(0, 40), until: Number(m.until) || 0, due: Number(m.due) || 0, seen: now });
+    save();
+    onChange();
+    if (!was || now - (was.checked || 0) > 36e5) {
+      w[from].checked = now;
+      sendTo(from, "dispKey", { do: "check" });
+    }
+  }
+  var wardStates = {};
+  var wardState = (mn) => wardStates[mn] || null;
+  function keyDo(mn, what, data) {
+    if (sendTo(mn, "dispKey", Object.assign({ do: what }, data || {}))) return "room";
+    const words = { check: "checked in on your hardcore", letout: "let you out: every dose lifted", end: "ended your hardcore" };
+    if (!words[what]) return null;
+    const nm = W4.Player && (W4.Player.Nickname || W4.Player.Name) || "Your keyholder";
+    return beepTo(mn, "\u{1F5DD}\uFE0F " + nm + " " + words[what] + ". [fd:" + what + "]") ? "beep" : null;
+  }
+  function initHardcore(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispKey") onKey(data.Sender, m);
+            else if (m && m.type === "dispHard") onWardHard(data.Sender, m);
+            else if (m && m.type === "dispKeyState") {
+              wardStates[data.Sender] = m;
+              onChange();
+            } else if (m && m.type === "dispAsk" && wards()[data.Sender]) {
+              wards()[data.Sender].asked = Date.now();
+              save();
+              onChange();
+              local("\u{1F5DD}\uFE0F " + who(data.Sender) + " is askin' to be let out of hardcore. Open the Dispensary's page (Keys you hold) to let them out.");
+            }
+          }
+        } catch (e) {
+          console.warn("[Dispensary] hardcore:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] keyholders can't reach you:", e);
+    }
+    try {
+      mod2.hookFunction("ServerAccountBeep", 11, (args, next) => {
+        try {
+          const d = args[0], t = d && typeof d.Message === "string" ? /\s*\[fd:(check|letout|end)\]\s*$/.exec(d.Message) : null;
+          if (t) {
+            if (isKey(d.MemberNumber)) onKey(d.MemberNumber, { do: t[1] });
+            d.Message = d.Message.slice(0, t.index);
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomSync", 11, (args, next) => {
+        const r = next(args);
+        setTimeout(() => {
+          if (hardOn()) announce();
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
+    }
+  }
+
+  // dispensary/src/lscg.js
+  var W5 = window;
   var api = null;
   var caps = null;
   var syncing = null;
@@ -462,9 +803,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ours = (id) => LSCG_ID + "." + id;
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
   function lscgPresent() {
-    if (W4.LSCG) return true;
+    if (W5.LSCG) return true;
     try {
-      const sdk = W4.bcModSdk;
+      const sdk = W5.bcModSdk;
       if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
     } catch (e) {
     }
@@ -540,7 +881,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (caps.has("events")) {
       try {
-        api.events.on("safeword", () => clearAll("safeword"));
+        api.events.on("safeword", () => {
+          if (hardOn()) askOut();
+          else clearAll("safeword");
+        });
       } catch (e) {
       }
       try {
@@ -557,7 +901,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function initLscg() {
-    const q = W4.LSCG_OnLoad = W4.LSCG_OnLoad || [];
+    const q = W5.LSCG_OnLoad = W5.LSCG_OnLoad || [];
     q.push((L) => {
       try {
         setUp(L);
@@ -568,7 +912,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/doses.js
-  var W5 = window;
+  var W6 = window;
   var MIN = 6e4;
   var CAP = 48 * 60 * MIN;
   var BOOK = {
@@ -690,7 +1034,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var face = (group, expr, secs) => {
     try {
-      if (typeof W5.CharacterSetFacialExpression === "function" && W5.Player) W5.CharacterSetFacialExpression(W5.Player, group, expr, secs);
+      if (typeof W6.CharacterSetFacialExpression === "function" && W6.Player) W6.CharacterSetFacialExpression(W6.Player, group, expr, secs);
     } catch (e) {
     }
   };
@@ -751,14 +1095,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/needle.js
-  var W6 = window;
-  var botHere = () => (W6.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
-  var charOf = (mn) => (W6.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W6.Player && W6.Player.MemberNumber === mn ? W6.Player : null);
+  var W7 = window;
+  var botHere = () => (W7.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf = (mn) => (W7.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W7.Player && W7.Player.MemberNumber === mn ? W7.Player : null);
   function craftText(item) {
     if (!item || !item.Craft) return "";
     let d = item.Craft.Description || "";
     try {
-      if (W6.CraftingDescription && typeof W6.CraftingDescription.Decode === "function") d = W6.CraftingDescription.Decode(d);
+      if (W7.CraftingDescription && typeof W7.CraftingDescription.Decode === "function") d = W7.CraftingDescription.Decode(d);
     } catch (e) {
     }
     return ((item.Craft.Name || "") + " | " + d).toLowerCase();
@@ -766,8 +1110,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var handOf = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
   function factsOf(data, sender) {
     try {
-      if (typeof W6.ChatRoomMessageRunExtractors === "function") {
-        const m = W6.ChatRoomMessageRunExtractors(data, sender).metadata;
+      if (typeof W7.ChatRoomMessageRunExtractors === "function") {
+        const m = W7.ChatRoomMessageRunExtractors(data, sender).metadata;
         if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
       }
     } catch (e) {
@@ -807,7 +1151,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ChatRoomMessage", 1, (args, next) => {
         try {
-          const data = args[0], P = W6.Player;
+          const data = args[0], P = W7.Player;
           if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
             const sender = charOf(data.Sender), f = factsOf(data, sender);
             if (f.name === "Inject" && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
@@ -822,27 +1166,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // shared/protocol.js
-  var FARM_MSG = "FarmhandMsg";
-  var PROTOCOL = 2;
-  function makeMsg(type, data = {}, target) {
-    const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
-    if (target) m.Target = target;
-    return m;
-  }
-  function readMsg(data) {
-    if (!data || data.Type !== "Hidden" || data.Content !== FARM_MSG) return null;
-    const d = data.Dictionary;
-    if (!d || typeof d !== "object" || Array.isArray(d) || typeof d.type !== "string") return null;
-    return { ...d, from: data.Sender };
-  }
-
   // dispensary/src/farm.js
-  var W7 = window;
+  var W8 = window;
   function send(type, data) {
     try {
-      if (botHere() && typeof W7.ServerSend === "function") {
-        W7.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
+      if (botHere() && typeof W8.ServerSend === "function") {
+        W8.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
         return true;
       }
     } catch (e) {
@@ -851,11 +1180,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var helloAt = 0;
   var helloSig = "";
-  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort()]);
+  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0]);
   function hello(force) {
     const now = Date.now(), sig = sigNow();
     if (!force && sig === helloSig && now - helloAt < 30 * 6e4) return false;
-    if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off) })) return false;
+    if (!send("dispHello", {
+      ver: VERSION,
+      farm: allowed(BOT),
+      lscg: lscgPresent(),
+      off: Object.keys(st().off),
+      hard: hardOn(),
+      due: hardOn() ? dueAt() : 0,
+      keys: hardOn() ? keyholders() : []
+    })) return false;
     helloAt = now;
     helloSig = sig;
     return true;
@@ -894,11 +1231,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (m.type === "dispWelcome") {
       const S2 = st();
       S2.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S2.farm;
+      if (typeof m.stock === "boolean") S2.stock = m.stock;
       S2.farmAt = Date.now();
       save();
       return;
     }
     if (m.type === "dispClear") {
+      if (hardOn()) {
+        local("\u{1F512} Hardcore: your doses stay. The farm's fetchin' help, and the proprietors can let you out.");
+        return;
+      }
       if (clearAll("safeword")) local(NOTES.safeword);
       return;
     }
@@ -936,6 +1278,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/safeword.js
   function safeword(from) {
+    if (hardOn()) {
+      askOut();
+      return 0;
+    }
     const n = clearAll("safeword");
     tellSafeword();
     local(NOTES.safeword, "#e0a0a0");
@@ -982,7 +1328,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/page.js
-  var W8 = window;
+  var W9 = window;
   var ID = "FarmhandDispensary";
   var box = null;
   var note = "";
@@ -1004,11 +1350,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
-    if (W8.document.getElementById("fd-style")) return;
-    const s = W8.document.createElement("style");
+    if (W9.document.getElementById("fd-style")) return;
+    const s = W9.document.createElement("style");
     s.id = "fd-style";
     s.textContent = CSS;
-    W8.document.head.appendChild(s);
+    W9.document.head.appendChild(s);
   }
   var clockTip = (mode) => {
     const p = st().penalty;
@@ -1018,19 +1364,206 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const m = Math.ceil(ms / 6e4);
     return m >= 120 ? Math.floor(m / 60) + " h " + (m % 60 ? m % 60 + " min" : "") : m >= 60 ? "1 h " + (m - 60 ? m - 60 + " min" : "") : m + " min";
   }
+  var DAY_MS = 864e5;
+  var dateOf = (t) => {
+    try {
+      return new Date(t).toLocaleDateString(void 0, { day: "numeric", month: "short" });
+    } catch (e) {
+      return "";
+    }
+  };
+  var inDays = (t) => {
+    const d = Math.ceil((t - Date.now()) / DAY_MS);
+    return d <= 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days (" + dateOf(t) + ")";
+  };
+  var keyName = (mn) => {
+    const P = W9.Player || {};
+    const own = P.Ownership && P.Ownership.MemberNumber === mn;
+    const c = (W9.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
+    return (c ? c.Nickname || c.Name : "#" + mn) + (own ? " (your owner)" : PROPRIETORS.includes(mn) ? " (proprietor)" : "");
+  };
+  var endPick = "7";
+  function hardWarning(days, keys) {
+    return "Hardcore. Until it ends, you can't change your Dispensary settings, and your safeword won't lift your doses: it asks your keyholders (" + keys.map(keyName).join(", ") + ") to let you out instead.\n\nIt ends " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "when a keyholder ends it, or after " + CHECK_DAYS + " days with no keyholder checkin' in (bein' in a room with you counts)") + ". Your keyholders can change your settings, let you out, or end it whenever they like.\n\nLock yourself in?";
+  }
+  var keyInput = "";
+  var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
+  function keyholdersCard() {
+    const S2 = st(), locked = hardOn(), P = W9.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
+    if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
+    if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
+    for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
+      removeKey(mn);
+      note = "";
+      draw();
+    } }, "Remove")));
+    if (!rows.length) rows.push(h("div", { class: "fd-muted" }, "Nobody yet."));
+    const input = h("input", {
+      type: "text",
+      inputmode: "numeric",
+      placeholder: "Member number",
+      "aria-label": "Add a keyholder by member number",
+      value: keyInput,
+      style: { width: "11em", padding: "4px 6px", borderRadius: "6px", background: "#1b151e", color: "#ecdfe8", border: "1px solid #6e5a78" },
+      oninput: (e) => {
+        keyInput = e.target.value;
+      }
+    });
+    return [h("h3", null, "Keyholders"), h(
+      "div",
+      { class: "fd-card" },
+      rows,
+      locked ? h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Locked in with you till hardcore's over.") : h(
+        "div",
+        { class: "fd-row", style: { marginTop: "8px" } },
+        input,
+        h("button", { onclick: () => {
+          const n = Number(String(keyInput).trim()), r = addKey(n);
+          note = r.ok ? "\u{1F5DD}\uFE0F " + keyName(n) + " holds your key now." : WHY_NOT[r.why] || "Couldn't add them.";
+          if (r.ok) keyInput = "";
+          draw();
+        } }, "Add")
+      ),
+      h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Keyholders can let you out of hardcore, change your settings while you're locked in, or end it. Your limits stay yours: nobody changes them while you're locked in, not even them.")
+    )];
+  }
+  function hardCard() {
+    const out = [h("h3", null, "Hardcore")];
+    const keys = keyholders();
+    if (!hardOn()) {
+      const endSel = h(
+        "select",
+        { "aria-label": "When hardcore ends", onchange: (e) => {
+          endPick = e.target.value;
+        } },
+        [["1", "1 day"], ["3", "3 days"], ["7", "7 days"], ["14", "14 days"], ["30", "30 days"], ["0", "No end date (a keyholder checks in every " + CHECK_DAYS + " days)"]].map(([v, t]) => h("option", { value: v, selected: v === endPick ? true : void 0 }, t))
+      );
+      out.push(h(
+        "div",
+        { class: "fd-card" },
+        h("div", { class: "fd-muted" }, "Lock yourself in. Your settings are your keyholders' to change, and your safeword asks them to let you out instead of liftin' your doses. Only you can switch it on."),
+        h("div", { style: { margin: "6px 0" } }, keys.length ? "Your keyholders: " + keys.map(keyName).join(", ") + "." : "You've no keyholder yet: add one above by member number, or have an owner, or be on the farm's books (the proprietors hold the key for farm stock)."),
+        h(
+          "div",
+          { class: "fd-row" },
+          endSel,
+          h("button", { disabled: keys.length ? void 0 : true, onclick: () => {
+            const days = Number(endPick) || 0;
+            if (typeof W9.confirm === "function" && !W9.confirm(hardWarning(days, keys))) return;
+            const r = lock(days);
+            note = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
+            draw();
+          } }, "\u{1F512} Lock me in")
+        )
+      ));
+      return out;
+    }
+    const H = st().hard;
+    out.push(h(
+      "div",
+      { class: "fd-card" },
+      h("div", null, "\u{1F512} Locked in since " + dateOf(H.since) + ". " + (H.until ? "It ends " + inDays(H.until) + "." : "No end date: it lets go " + inDays(dueAt()) + " unless a keyholder checks in before then.")),
+      h("div", { class: "fd-muted" }, "Your keyholders: " + keys.map(keyName).join(", ") + ". They can change your settings, let you out, or end it."),
+      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W9.Player && W9.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
+    ));
+    return out;
+  }
+  var editing = null;
+  function keysCard() {
+    const list = Object.entries(wards());
+    if (!list.length) return [];
+    const out = [h("h3", null, "Keys you hold")];
+    for (const [k, x] of list) {
+      const mn = Number(k), inRoom2 = (W9.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
+      const go = (what, data) => {
+        const how = keyDo(mn, what, data);
+        note = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
+        draw();
+      };
+      const kids = [
+        h("div", null, "\u{1F5DD}\uFE0F " + name + ": " + (x.until ? "ends " + inDays(x.until) : "lets go " + inDays(x.due) + " without a check-in") + (x.asked && Date.now() - x.asked < DAY_MS ? " \xB7 askin' to be let out" : "")),
+        h(
+          "div",
+          { class: "fd-row", style: { marginTop: "6px" } },
+          h("button", { onclick: () => go("check") }, "Check in"),
+          h("button", { onclick: () => go("letout") }, "Let out (lift every dose)"),
+          h("button", { onclick: () => {
+            if (typeof W9.confirm !== "function" || W9.confirm("End " + name + "'s hardcore?")) go("end");
+          } }, "End hardcore"),
+          inRoom2 ? h("button", { onclick: () => {
+            editing = { mn };
+            keyDo(mn, "state");
+            draw();
+          } }, "Their settings") : null
+        )
+      ];
+      const ws = editing && editing.mn === mn ? wardState(mn) : null;
+      if (editing && editing.mn === mn) {
+        if (!ws) kids.push(h("div", { class: "fd-muted" }, "Askin' their Dispensary..."));
+        else {
+          editing.who = editing.who || ws.who;
+          editing.clock = editing.clock || ws.clock;
+          editing.off = editing.off || Object.assign({}, ws.off);
+          if (ws.companion && !editing.comp) editing.comp = Object.fromEntries(Object.entries(ws.companion).map(([k2, v]) => [k2, !!(v && v.on)]));
+          kids.push(h(
+            "div",
+            { class: "fd-card" },
+            h("div", { class: "fd-muted" }, (ws.doses || []).length ? "In them now: " + ws.doses.map((d) => (BOOK[d.id] ? BOOK[d.id].label : d.id) + " (" + timeLeft(d.left) + ")").join(", ") : "No doses in them."),
+            h("select", { "aria-label": "Who can dose them", onchange: (e) => {
+              editing.who = e.target.value;
+            } }, LADDER.map((r) => h("option", { value: r.id, selected: r.id === editing.who ? true : void 0 }, r.label))),
+            h(
+              "div",
+              { class: "fd-row", style: { gap: "14px", margin: "6px 0" } },
+              ["online", "real"].map((c) => h("label", null, h("input", { type: "radio", name: "fd-ward-clock", checked: editing.clock === c ? true : void 0, onchange: () => {
+                editing.clock = c;
+              } }), c === "real" ? "Real time" : "While online"))
+            ),
+            doseIds().map((id) => h("label", null, h("input", { type: "checkbox", checked: !editing.off[id] ? true : void 0, onchange: (e) => {
+              editing.off[id] = !e.target.checked;
+            } }), BOOK[id].label)),
+            ws.companion ? [
+              h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Their Companion:"),
+              Object.entries(ws.companion).map(([k2, v]) => h("label", null, h("input", { type: "checkbox", checked: editing.comp[k2] ? true : void 0, onchange: (e) => {
+                editing.comp[k2] = e.target.checked;
+              } }), v && v.label || k2))
+            ] : null,
+            h(
+              "div",
+              { class: "fd-row", style: { marginTop: "6px" } },
+              h("button", { onclick: () => {
+                const off = {};
+                for (const id of doseIds()) off[id] = !!editing.off[id];
+                const e2 = editing;
+                editing = null;
+                go("set", Object.assign({ who: e2.who, clock: e2.clock, off }, e2.comp ? { companion: e2.comp } : {}));
+              } }, "Save their settings"),
+              h("button", { onclick: () => {
+                editing = null;
+                draw();
+              } }, "Close")
+            )
+          ));
+        }
+      }
+      out.push(h("div", { class: "fd-card" }, kids));
+    }
+    return out;
+  }
   function view() {
-    const S2 = st(), now = doseIds().filter(active);
+    const S2 = st(), now = doseIds().filter(active), locked = hardOn() ? true : void 0;
     const kids = [];
     kids.push(h(
       "div",
       { class: "fd-row", style: { marginBottom: "6px" } },
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
-        if (typeof W8.PreferenceSubscreenExtensionsClear === "function") W8.PreferenceSubscreenExtensionsClear();
+        if (typeof W9.PreferenceSubscreenExtensionsClear === "function") W9.PreferenceSubscreenExtensionsClear();
         else close();
       } }, "Back")
     ));
     if (note) kids.push(h("div", { class: "fd-note" }, note));
+    if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "\u{1F512} Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
     kids.push(h("h3", null, "In you now"));
     kids.push(h(
       "div",
@@ -1039,18 +1572,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         { class: "fd-row", style: { marginTop: "8px" } },
-        h("button", { class: "fd-safe", onclick: () => {
+        locked ? h("button", { class: "fd-safe", onclick: () => {
+          safeword("page");
+          note = "\u{1F5DD}\uFE0F Your keyholders have been asked to let you out.";
+          draw();
+        } }, "\u{1F5DD}\uFE0F Ask to be let out") : h("button", { class: "fd-safe", onclick: () => {
           safeword("page");
           note = "Safeword: every dose lifted.";
           draw();
         } }, "\u{1F534} Safeword: lift every dose"),
-        h("span", { class: "fd-muted" }, "Always works. The game's own safeword does it too, and so does /dispensary safeword.")
+        h("span", { class: "fd-muted" }, locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does." : "The game's own safeword does it too, and so does /dispensary safeword.")
       )
     ));
     kids.push(h("h3", null, "Who can dose you"));
     const sel = h(
       "select",
-      { "aria-label": "Who can dose you", onchange: (e) => {
+      { "aria-label": "Who can dose you", disabled: locked, onchange: (e) => {
         st().who = e.target.value;
         save();
         note = "";
@@ -1063,7 +1600,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const radio = (mode, label) => h(
       "label",
       { title: clockTip(mode) },
-      h("input", { type: "radio", name: "fd-clock", checked: S2.clock === mode ? true : void 0, onchange: () => {
+      h("input", { type: "radio", name: "fd-clock", disabled: locked, checked: S2.clock === mode ? true : void 0, onchange: () => {
         setClock(mode);
         draw();
       } }),
@@ -1088,7 +1625,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("input", {
             type: "checkbox",
             checked: !S2.off[id] ? true : void 0,
-            disabled: theirs ? true : void 0,
+            disabled: theirs || locked ? true : void 0,
             onchange: (e) => {
               if (e.target.checked) delete st().off[id];
               else st().off[id] = true;
@@ -1104,8 +1641,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ));
     }
     if (lscg) {
-      kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi() ? "LSCG is loaded. Its sedative, aphrodisiac, mind control and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left." : "LSCG is loaded. Its sedative, aphrodisiac, mind control and antidote are LSCG's."));
+      kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi() ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left." : "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's."));
     }
+    kids.push(...keyholdersCard(), ...hardCard(), ...keysCard());
     kids.push(h("div", { class: "fd-muted", style: { marginTop: "14px" } }, "The Farmhand's Dispensary v" + VERSION + " \xB7 B&B Farm. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest."));
     return kids;
   }
@@ -1115,9 +1653,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function open() {
     close();
     styles();
-    box = W8.document.createElement("div");
+    box = W9.document.createElement("div");
     box.id = "fd-page";
-    W8.document.body.appendChild(box);
+    W9.document.body.appendChild(box);
     draw();
   }
   function close() {
@@ -1128,13 +1666,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     note = "";
   }
   var pageOpen = () => !!box;
-  function redrawPage() {
+  function redrawPage(force) {
+    const a = W9.document.activeElement;
+    if (!force && box && a && box.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
     draw();
   }
   function initPage() {
-    if (typeof W8.PreferenceRegisterExtensionSetting !== "function") return false;
+    if (typeof W9.PreferenceRegisterExtensionSetting !== "function") return false;
     try {
-      W8.PreferenceRegisterExtensionSetting({
+      W9.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "The Farmhand's Dispensary",
         load: () => open(),
@@ -1156,8 +1696,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function openPage() {
     try {
-      if (typeof W8.PreferenceSubscreenExtensionsOpen === "function") {
-        W8.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W9.PreferenceSubscreenExtensionsOpen === "function") {
+        W9.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -1167,23 +1707,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/index.js
-  var W9 = window;
+  var W10 = window;
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  if (W9.__farmDispensary) {
+  if (W10.__farmDispensary) {
     console.warn("[Dispensary] Two copies of the Farmhand's Dispensary are installed. Delete the older one in Tampermonkey, then reload.");
     throw new Error("The Farmhand's Dispensary: another copy is already running");
   }
   var mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
-  W9.__farmDispensary = VERSION;
+  W10.__farmDispensary = VERSION;
   initLscg();
   function status() {
     const on = doseIds().filter(active);
     local((on.length ? "In you now: " + on.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
   }
   function commands() {
-    if (typeof W9.CommandCombine !== "function") return;
+    if (typeof W10.CommandCombine !== "function") return;
     try {
-      W9.CommandCombine([{
+      W10.CommandCombine([{
         Tag: "dispensary",
         Description: "[safeword | page]: The Farmhand's Dispensary. What's in you, the safeword, the settings",
         Action: (args) => {
@@ -1212,12 +1752,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initNeedle(mod);
     initFarm(mod);
     initSafeword(mod);
+    initHardcore(mod);
+    onHardChange(() => {
+      if (pageOpen()) redrawPage(true);
+    });
     initPage();
     commands();
     tick();
     setInterval(() => {
       try {
         tick();
+        tickHard();
         if (pageOpen()) redrawPage();
       } catch (e) {
         console.warn("[Dispensary] clock:", e);
@@ -1226,7 +1771,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => hello(true), 3e3);
   }
   var boot = setInterval(() => {
-    const P = W9.Player;
+    const P = W10.Player;
     if (!P || typeof P.MemberNumber !== "number" || !P.ExtensionSettings) return;
     clearInterval(boot);
     try {
@@ -1235,11 +1780,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
       console.warn("[Dispensary] didn't start:", e);
     }
   }, 1e3);
-  if (W9.__FARMHAND_TEST__) W9.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => tick(), setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started };
-  W9.FarmhandDispensary = Object.freeze({
+  if (W10.__FARMHAND_TEST__) W10.__disp = {
+    st: () => st(),
+    give: (...a) => give(...a),
+    tick: () => {
+      tick();
+      tickHard();
+    },
+    setClock: (m) => setClock(m),
+    active,
+    leftMs,
+    allowed: (mn) => allowed(mn),
+    started: () => started,
+    lock: (d) => lock(d),
+    hardOn: () => hardOn(),
+    keyholders: () => keyholders(),
+    dueAt: () => dueAt()
+  };
+  W10.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
-    who: () => st().who
+    who: () => st().who,
+    // hardcore, for the Companion (its own settings lock while yours is on)
+    hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null
   });
 })();

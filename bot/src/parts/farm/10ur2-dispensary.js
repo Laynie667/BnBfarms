@@ -4,8 +4,10 @@
      (dist/farmhand-dispensary.user.js, docs/DISPENSARY.md). When somebody runnin' it takes a farm shot, I still read the
      needle and keep the books (their deniedUntil, their sedate boost), but I don't narrate it: I send their game one
      hidden "dose", and it does what they feel and says the line from their own game. Without one, I do it all, as ever.
-       them → me   dispHello { ver, farm, lscg, off }    is the farm on their ladder, is LSCG there, what they've switched off
-       me → them   dispWelcome { farm }                  who the farm is (the proprietors and staff), for their ladder
+       them → me   dispHello { ver, farm, lscg, off, hard }   is the farm on their ladder, is LSCG there, what they've
+                                                         switched off, are they in hardcore
+       me → them   dispWelcome { farm, stock }           who the farm is (the proprietors and staff), for their ladder;
+                                                         are they on my books (then the proprietors hold their hardcore key)
        me → them   dose { id, dose, x, mins, by, line, hand, quiet }
        them → me   doseDone { id, ok, why }              didn't take (LSCG has it switched off): I take my side back off
        them → me   dispSafeword {}                       their safeword: the farm's side of their doses goes too
@@ -24,9 +26,18 @@
   function onDispHello(mn, m){
     const had = dispMap().has(mn);
     dispMap().set(mn, { ver: String(m.ver || "?").slice(0, 20), farm: m.farm !== false, lscg: !!m.lscg,
-                        off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], at: Date.now() });
+                        off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now() });
     if (!had) log("Dispensary hello from "+mn+" (v"+String(m.ver || "?").slice(0, 20)+")");
-    enqueue(makeMsg("dispWelcome", { farm: dispFarmList() }, mn));
+    const r = rec(mn);
+    // their hardcore, kept on their record: it holds even when their Dispensary isn't here to say so, till it lets go
+    if (r){
+      const was = JSON.stringify(r.dispHard || null);
+      if (m.hard === true) r.dispHard = { on: true, due: Math.min(Number(m.due) || 0, Date.now() + 31 * 86400000),
+        keys: Array.isArray(m.keys) ? m.keys.filter(x => Number.isInteger(x) && x > 0).slice(0, 12) : [], at: Date.now() };
+      else delete r.dispHard;
+      if (JSON.stringify(r.dispHard || null) !== was){ saveLedger(); audit(mn, "DISPHARD", m.hard === true ? "on" : "off"); }
+    }
+    enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length) }, mn));
   }
   const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
   // a dose for their Dispensary to give. Returns "sent", null (no Dispensary: do it yourself), or why it can't take
@@ -54,8 +65,50 @@
   // their safeword, from their Dispensary: the farm's side of its doses goes too
   function dispSafeSide(mn){ const p = prodOf(mn); if (!p) return; p.deniedUntil = 0; if (p.boosts) delete p.boosts.sedate; saveLedger(); syncCompanions(true); }
   function onDispSafeword(mn){ dispSafeSide(mn); audit(mn, "DISPSAFE", ""); }
-  // my safeword (?safeword): if they've a Dispensary, every dose in it is lifted, and its farm side with it
-  function dispSafe(mn){ if (!dispFor(mn)) return; enqueue(makeMsg("dispClear", {}, mn), true); dispSafeSide(mn); }
+  // my safeword (?safeword): if they've a Dispensary, every dose in it is lifted, and its farm side with it. In
+  // HARDCORE (they switched it on, for themselves) their doses stay till a keyholder lets them out: the proprietors are
+  // fetched like any safeword, and hold the key for farm stock.
+  function dispSafe(mn){
+    const d = dispFor(mn); if (!d) return;
+    enqueue(makeMsg("dispClear", {}, mn), true);
+    if (d.hard){ tell(mn, "🔒 Your Dispensary's in hardcore, sugar: your doses stay till a keyholder lets you out. Help's on its way all the same."); return; }
+    dispSafeSide(mn);
+  }
+  /* HARDCORE ON MY SIDE (Laynie, Nov 17: "hardcore would generally lock their settings how they want currently have them,
+     or have them set by someone else that is a keyholder. i think limits are theirs period, but hardcore locks them and
+     keeps them from being changed"). While somebody's Dispensary is in hardcore (they switched it on, for themselves):
+       - their own farm switches stay as they are: any "?<switch> on|off" from them is turned down
+       - their keyholders can set them for them: ?ward <who> <switch> on|off (their limits still rule, as ever)
+       - their limits are frozen: nobody changes them, staff and keyholders included
+     It lets go when their Dispensary says so, or on its own date (an end date, or 30 days without a check-in), so an
+     uninstalled Dispensary can't leave anybody frozen. Safety commands never wait on any of this. */
+  function hardFor(mn){ const r = rec(mn), h = r && r.dispHard; return !!(h && h.on && h.due > Date.now()); }
+  const hardKeys = (mn) => (hardFor(mn) && rec(mn).dispHard.keys) || [];
+  const HARD_NOTE = "🔒 You're in hardcore, sugar: your switches stay as they are till it's over. Your keyholders can change them (?ward), or ask to be let out from your Dispensary.";
+  // a command they sent about themselves that would flip one of their own switches
+  function hardGate(sender, cmd, args, entry, R){
+    if (!hardFor(sender) || state.hardBypass === sender) return false;
+    if (entry && (entry.safety || entry.now || entry.staff)) return false;
+    const v = String(args[0] || "").toLowerCase();
+    if (!/^(on|off|yes|no)$/.test(v)) return false;   // askin' what it's set to is fine
+    R(HARD_NOTE); audit(sender, "HARDGATE", cmd + " " + v);
+    return true;
+  }
+  function wardCommand(sender, args, R){
+    const t = resolveTarget(args[0] || ""), sw = String(args[1] || "").toLowerCase(), v = String(args[2] || "").toLowerCase();
+    if (!t || !sw || !/^(on|off)$/.test(v)) return R("?ward <who> <switch> on|off: set a farm switch for somebody whose hardcore key you hold. Their limits still rule.");
+    if (!hardFor(t)) return R(plainName(t) + " isn't in hardcore, sugar: their switches are theirs to flip.");
+    if (!hardKeys(t).includes(sender)) return R("You don't hold " + plainName(t) + "'s key, hon.");
+    const entry = commandOf(sw);
+    if (!entry || entry.staff || entry.safety) return R("That isn't one of their switches, sugar. Try one like breedable, traps, potions, dares.");
+    state.hardBypass = t; state.cooldowns.delete(t);
+    try { handleCommandInner(t, sw + " " + v, "whisper"); } catch(e){ warn("ward:", e); } finally { state.hardBypass = 0; }
+    audit(sender, "WARD", t + " " + sw + " " + v);
+    tell(t, "🗝️ " + plainName(sender) + " (your keyholder) set your " + sw + " " + v + ".");
+    R("🗝️ Done: " + plainName(t) + "'s " + sw + " is " + v + ", if their limits allow it (they've been told what came of it).");
+  }
+  addCommand("ward", { topic: "play", private: true, run: (c) => wardCommand(c.sender, c.args, c.R) });
+
   function onDispensaryMsg(mn, m){
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }
     if (m.type === "doseDone"){ onDoseDone(mn, m); return true; }

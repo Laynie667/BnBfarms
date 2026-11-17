@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.72.2
+// @version      0.72.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.72.2";
-  var COMPANION_VERSION = "0.54.6";
+  var VERSION = "0.72.3";
+  var COMPANION_VERSION = "0.54.7";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -25068,7 +25068,7 @@
       return FEED_WORDS.some((w) => f.includes(squash(w))) || FEED_RE.test(String(text || ""));
     }
     const FLAVORS = ["strawberry", "chocolate", "honey", "vanilla", "banana", "caramel"];
-    const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep/i;
+    const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep|suggest[ia]ble|intoxicat|compliance/i;
     const SHOT_WORDS = /\b(shot|serum|dose|vial|booster|tonic|inject|syringe|needle|elixir|draught)/i;
     Object.assign(SHOT_LINES, {
       aphro: [
@@ -25693,10 +25693,26 @@
         farm: m.farm !== false,
         lscg: !!m.lscg,
         off: Array.isArray(m.off) ? m.off.filter((x) => typeof x === "string").slice(0, 40) : [],
+        hard: m.hard === true,
         at: Date.now()
       });
       if (!had) log("Dispensary hello from " + mn + " (v" + String(m.ver || "?").slice(0, 20) + ")");
-      enqueue(makeMsg("dispWelcome", { farm: dispFarmList() }, mn));
+      const r = rec(mn);
+      if (r) {
+        const was = JSON.stringify(r.dispHard || null);
+        if (m.hard === true) r.dispHard = {
+          on: true,
+          due: Math.min(Number(m.due) || 0, Date.now() + 31 * 864e5),
+          keys: Array.isArray(m.keys) ? m.keys.filter((x) => Number.isInteger(x) && x > 0).slice(0, 12) : [],
+          at: Date.now()
+        };
+        else delete r.dispHard;
+        if (JSON.stringify(r.dispHard || null) !== was) {
+          saveLedger();
+          audit(mn, "DISPHARD", m.hard === true ? "on" : "off");
+        }
+      }
+      enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length) }, mn));
     }
     const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
     function dispCall(mn, dose, o) {
@@ -25738,10 +25754,51 @@
       audit(mn, "DISPSAFE", "");
     }
     function dispSafe(mn) {
-      if (!dispFor(mn)) return;
+      const d = dispFor(mn);
+      if (!d) return;
       enqueue(makeMsg("dispClear", {}, mn), true);
+      if (d.hard) {
+        tell(mn, "\u{1F512} Your Dispensary's in hardcore, sugar: your doses stay till a keyholder lets you out. Help's on its way all the same.");
+        return;
+      }
       dispSafeSide(mn);
     }
+    function hardFor(mn) {
+      const r = rec(mn), h = r && r.dispHard;
+      return !!(h && h.on && h.due > Date.now());
+    }
+    const hardKeys = (mn) => hardFor(mn) && rec(mn).dispHard.keys || [];
+    const HARD_NOTE = "\u{1F512} You're in hardcore, sugar: your switches stay as they are till it's over. Your keyholders can change them (?ward), or ask to be let out from your Dispensary.";
+    function hardGate(sender, cmd, args, entry2, R) {
+      if (!hardFor(sender) || state.hardBypass === sender) return false;
+      if (entry2 && (entry2.safety || entry2.now || entry2.staff)) return false;
+      const v = String(args[0] || "").toLowerCase();
+      if (!/^(on|off|yes|no)$/.test(v)) return false;
+      R(HARD_NOTE);
+      audit(sender, "HARDGATE", cmd + " " + v);
+      return true;
+    }
+    function wardCommand(sender, args, R) {
+      const t = resolveTarget(args[0] || ""), sw = String(args[1] || "").toLowerCase(), v = String(args[2] || "").toLowerCase();
+      if (!t || !sw || !/^(on|off)$/.test(v)) return R("?ward <who> <switch> on|off: set a farm switch for somebody whose hardcore key you hold. Their limits still rule.");
+      if (!hardFor(t)) return R(plainName(t) + " isn't in hardcore, sugar: their switches are theirs to flip.");
+      if (!hardKeys(t).includes(sender)) return R("You don't hold " + plainName(t) + "'s key, hon.");
+      const entry2 = commandOf(sw);
+      if (!entry2 || entry2.staff || entry2.safety) return R("That isn't one of their switches, sugar. Try one like breedable, traps, potions, dares.");
+      state.hardBypass = t;
+      state.cooldowns.delete(t);
+      try {
+        handleCommandInner(t, sw + " " + v, "whisper");
+      } catch (e) {
+        warn("ward:", e);
+      } finally {
+        state.hardBypass = 0;
+      }
+      audit(sender, "WARD", t + " " + sw + " " + v);
+      tell(t, "\u{1F5DD}\uFE0F " + plainName(sender) + " (your keyholder) set your " + sw + " " + v + ".");
+      R("\u{1F5DD}\uFE0F Done: " + plainName(t) + "'s " + sw + " is " + v + ", if their limits allow it (they've been told what came of it).");
+    }
+    addCommand("ward", { topic: "play", private: true, run: (c) => wardCommand(c.sender, c.args, c.R) });
     function onDispensaryMsg(mn, m) {
       if (m.type === "dispHello") {
         onDispHello(mn, m);
@@ -62770,6 +62827,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return "\u{1F4CB} Your application's in, sugar, and waitin' on the proprietors. Once you're approved that'll work for you. Till then, look around: ?help start, ?tour, ?rules.";
       };
       const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, waiting(txt), replyCh);
+      if (hardGate(sender, cmd, args, entry2, R)) return;
       if (addonCmd) {
         runAddonCommand(addonCmd, sender, args, rest, channel, R);
         return;
@@ -64895,6 +64953,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           let said;
+          if (key === "limits" && hardFor(t)) {
+            R("\u{1F512} " + plainName(t) + "'s in hardcore: their limits are frozen till it's over. They're theirs, and nobody changes them meanwhile.");
+            break;
+          }
           if (isApp) {
             if (!appKeys.includes(key)) {
               R("There's no application question called " + key + ", sugar. They're: " + appKeys.join(", ") + ".");

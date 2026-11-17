@@ -4,9 +4,10 @@
    denial, sentences): your game can't be trusted with those, and they cost her almost nothin'. What you feel, see and
    say is ours: she sends one hidden "dose", your Dispensary does it and says the line from your own game, and tells her
    whether it took. Without a Dispensary, she does it all herself, as ever.
-     you → her    dispHello { ver, farm, lscg, off }   who you are to her: is the farm on your ladder, is LSCG here,
-                                                       which doses you've switched off (so she counts it as a limit)
-     her → you    dispWelcome { farm }                 who the farm is (her staff), for your ladder
+     you → her    dispHello { ver, farm, lscg, off, hard }   who you are to her: is the farm on your ladder, is LSCG
+                                                       here, which doses you've switched off (a limit), hardcore
+     her → you    dispWelcome { farm, stock }          who the farm is (her staff), for your ladder; are you on her books
+                                                       (then the proprietors hold your hardcore key)
      her → you    dose { id, dose, x, mins, by, line, hand, quiet }
      you → her    doseDone { id, ok, why }             took, or why not (ladder, off, lscg-off)
      you → her    dispSafeword {}                      your safeword: she lifts the farm's side of your doses too
@@ -23,6 +24,7 @@ import { lscgPresent, lscgDose, lscgHas, lastLscgDose } from "./lscg.js";
 import { botHere } from "./needle.js";
 import { local, action } from "./say.js";
 import { NOTES } from "./lines.js";
+import { hardOn, keyholders, dueAt } from "./hardcore.js";
 
 const W = window;
 function send(type, data) {
@@ -30,11 +32,12 @@ function send(type, data) {
   return false;
 }
 let helloAt = 0, helloSig = "";
-const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort()]);
+const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0]);
 export function hello(force) {
   const now = Date.now(), sig = sigNow();
   if (!force && sig === helloSig && now - helloAt < 30 * 60000) return false;
-  if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off) })) return false;
+  if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off), hard: hardOn(),
+    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [] })) return false;
   helloAt = now; helloSig = sig;
   return true;
 }
@@ -66,11 +69,16 @@ function onFarmMsg(m) {
   if (m.type === "dispWelcome") {
     const S = st();
     S.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S.farm;
+    if (typeof m.stock === "boolean") S.stock = m.stock;   // on her books: the proprietors hold your hardcore key
     S.farmAt = Date.now();
     save();
     return;
   }
-  if (m.type === "dispClear") { if (clearAll("safeword")) local(NOTES.safeword); return; }
+  if (m.type === "dispClear") {
+    if (hardOn()) { local("🔒 Hardcore: your doses stay. The farm's fetchin' help, and the proprietors can let you out."); return; }
+    if (clearAll("safeword")) local(NOTES.safeword);
+    return;
+  }
 }
 
 export function initFarm(mod) {

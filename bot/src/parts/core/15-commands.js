@@ -178,6 +178,7 @@
       ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout })
       : (txt) => reply(sender, waiting(txt), replyCh);
 
+    if (hardGate(sender, cmd, args, entry, R)) return;   // hardcore: their own switches stay put (10ur2-dispensary.js)
     if (addonCmd){ runAddonCommand(addonCmd, sender, args, rest, channel, R); return; }
     if (entry.run){ entry.run({ cmd, sender, args, rest, channel, R, huh, raw }); return; }   // answered by its own part
 
@@ -1636,6 +1637,8 @@ Welcome to B&B Farm, hon. 🌾`);
         }
         if (!val){ R("What should it say, hon? ?edit "+t+" "+raw+" <new value>, or clear to empty it."); break; }
         let said;
+        // hardcore: their limits are theirs, and frozen till it's over (10ur2-dispensary.js)
+        if (key === "limits" && hardFor(t)){ R("🔒 " + plainName(t) + "'s in hardcore: their limits are frozen till it's over. They're theirs, and nobody changes them meanwhile."); break; }
         if (isApp){
           if (!appKeys.includes(key)){ R("There's no application question called "+key+", sugar. They're: "+appKeys.join(", ")+"."); break; }
           setApp(key, clear ? "" : val.slice(0, 1000));

@@ -4,8 +4,8 @@ A standalone add-on for Bondage Club: doses from crafted items. A crafted needle
 description carries the right words gives whoever it's used on that dose. It has its own userscript and its own page
 under Preferences → Extensions. It works without the farm and without the Farmhand Companion, and alongside both.
 
-Status: planned with Laynie Nov 16–17, 2026. Step 1 built Nov 17 (`dispensary/`, `dist/farmhand-dispensary.user.js`
-v0.1.0); not handed out to players yet.
+Status: planned with Laynie Nov 16–17, 2026. Step 1 out Nov 17 (`dispensary/`, `dist/farmhand-dispensary.user.js`).
+Step 2 (hardcore, keyholders, the Companion and the farm's switches frozen) built Nov 17.
 
 ## Decisions (Laynie, Nov 16–17)
 
@@ -15,7 +15,7 @@ v0.1.0); not handed out to players yet.
 | The farm's shots | Move into the Dispensary over time. On the farm, the farm girl keeps the farm's books (milk, heat, denial, eggs) and **calls on** the player's Dispensary to do what they feel, see and say (Laynie: "anything to make the farmgirls load a little lighter"). |
 | Who can dose you | A ladder you pick from: only me → my owner → + lovers → + the farm → + whitelist → + friends → everyone but my blacklist → everyone, blacklist too. The farm sits under lovers and above friends. |
 | The clock | A toggle: **while online** (timers only count while you're logged in) or **real time** (they run while you're away, but every timer runs a penalty longer, 50% to start). The hover tip says so plainly. |
-| LSCG | Done the way LSCG does it, and LSCG's own four drugs (sedative, aphrodisiac, mind control, antidote) stay LSCG's whenever LSCG is loaded. Ours plug into LSCG's extension API so they show up in its own drug list. |
+| LSCG | Done the way LSCG does it, and LSCG's own drugs (sedative, aphrodisiac, mind control, antidote, and Suggestible since LSCG 0.9.9) stay LSCG's whenever LSCG is loaded. Ours plug into LSCG's extension API so they show up in its own drug list. |
 | Drawing | The drawn body ships in the Dispensary too. Off the farm, other people's drawn bodies are off by default; with the Companion running, its setting wins. |
 | Hardcore | Only you can switch it on, for yourself, after a plain warning. You can't change your own settings, and your safeword asks to be let out instead of lifting your doses. Your keyholders (your owner; the proprietors too, for anyone on the farm's books) can always open your settings remotely, fix them, let you out or turn hardcore off. It needs a keyholder to switch on. It can have an end date (1 to 30 days) or none; with none, a keyholder's Companion or Dispensary has to check in at least once every 30 days, or it unlocks itself. |
 
@@ -58,7 +58,7 @@ and running timers follow you between your phone and your PC, and clearing the b
 1. **The bones** (built Nov 17): the userscript and its Extensions page, settings saved on the account, the dose
    ladder, the clock toggle, needles read from the giver's crafted item, the safeword, the LSCG hookup, the farm girl's
    call, and the first two doses: **Denial Serum** (held at the edge) and the **Sedative** (LSCG's, when it's loaded).
-2. **Hardcore and keyholders** (Laynie, Nov 17: "it can be set to have no end date, but a keyholder, owner,
+2. **Hardcore and keyholders** (built Nov 17; Laynie: "it can be set to have no end date, but a keyholder, owner,
    proprieters companion needs to ping the hardcore users dispensary and companion atleast once every 30 days,
    otherwise, it will unlock after 30 days without the ping"):
    - the lock on your own settings, in the Dispensary and the Companion alike;
@@ -67,13 +67,23 @@ and running timers follow you between your phone and your PC, and clearing the b
    - an end date (1 to 30 days) or none; the check-in: bein' in the same room as a keyholder counts by itself, and a
      keyholder can check in from anywhere with a button. 30 days without one, and hardcore unlocks;
    - a note to you on every change a keyholder makes: who, and what.
-3. **Kits, tongues and poses:** saved outfit kits put on for real with timer locks (Jane's set among them), animal
+   - the Companion holds keys too: it checks in by itself when you share a room with somebody whose key you hold, and
+     `/keys`, `/keys check|letout|end <who>` look after them without the Dispensary.
+   - keyholders by member number, too (up to ten); in hardcore, who holds your key is locked in with you.
+   - your settings freeze as they are when you lock in; only keyholders change them. That covers the Companion's
+     game-rule switches (privacy choices stay yours) and the farm's switches, which keyholders set with `?ward`.
+   - limits are yours and frozen: nobody changes them while you're locked in, keyholders and staff included.
+3. **LSCG's newer pieces** (LSCG 0.9.9, Nov 3) to build on: soaked and laced gear (our doses already work in it), its
+   Suggestible drug (the farm's obedience shot becomes it when LSCG is loaded), farm instructions in its hypnosis
+   suggestion editor, and our own screen touches for our doses. The farm's own hypno module targets LSCG's hypnosis first
+   (Laynie: "LSCG's hypno might be a better compatiblity focus").
+4. **Kits, tongues and poses:** saved outfit kits put on for real with timer locks (Jane's set among them), animal
    tongues for every species, kneel / all fours / can't stand.
-4. **Senses:** dim and blinder drops, cotton ears, tunnel vision, haze.
-5. **The drawn body moves in:** growth shots off the farm.
-6. **Every way to dose:** drinks, worn injectors, piercings, drips, triggers, roulette, the dosing collar, lip gloss,
+5. **Senses:** dim and blinder drops, cotton ears, tunnel vision, haze.
+6. **The drawn body moves in:** growth shots off the farm.
+7. **Every way to dose:** drinks, worn injectors, piercings, drips, triggers, roulette, the dosing collar, lip gloss,
    laced milk and feed.
-7. **Punishments by contract** dose through it.
+8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the
 game's own thread first, then a small pool of web workers for the fitting.

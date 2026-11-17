@@ -11,7 +11,7 @@ import sdkModule from "bondage-club-mod-sdk";
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
 import { speciesKeyOf } from "../../shared/species.js";
-import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
+import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
@@ -23,6 +23,8 @@ import { initBotScreen, screenNapping } from "./botscreen.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
+import { initKeys, onWardMsg } from "./keys.js";
+import { hardPrefsOf, setHardPrefsOn } from "./hardlock.js";
 import { initSettings } from "./settings.js";
 import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick, nurseryStatsNow } from "./nursery.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
@@ -211,6 +213,7 @@ function nurseryStatsSend(force) {
 function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
+  if (/^disp(Hard|Ask|KeyState)$/.test(m.type)) { try { onWardMsg(m.from, m); } catch (e) { console.warn("[Farmhand Companion] keys:", e); } return; }   // somebody's Dispensary hardcore names you a keyholder (keys.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (!/^(ping|state|stateDiff|store|roomlines)$/.test(m.type)) st.lastHeard = Date.now();   // (an answer to somethin' you sent)
   switch (m.type) {
@@ -548,6 +551,23 @@ function start() {
     });
   } catch (e) { console.warn("[Farmhand Companion] map clicks unavailable:", e); }
   window.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.pick) api.cancelPick(); });
+
+  // /keys: the hardcore keys you hold (keys.js; The Farmhand's Dispensary)
+  initKeys((t) => toChat(t, "#c79bd8"));
+  // your Dispensary in hardcore: the frozen switches for your keyholders' editor, and their word on them (hardlock.js)
+  window.FarmhandCompanion = Object.freeze({
+    version: VERSION,
+    hardPrefs: () => hardPrefsOf(st.panel.prefs),
+    setHardPrefs: (want) => {
+      const p = st.panel.prefs;
+      const said = setHardPrefsOn(p, want, (k, v) => { p[k] = v; }, (k) => {
+        if (k === "brandOff") api.brandSync();
+        if (/^no/.test(k)) api.rehello();
+      });
+      if (said.length) { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* fine */ } st.panel.render(); }
+      return said.map((x) => "Companion " + x);
+    },
+  });
 
   // /farm stats, /farm size... (BC eats lines that start with / otherwise)
   if (typeof window.CommandCombine === "function") {

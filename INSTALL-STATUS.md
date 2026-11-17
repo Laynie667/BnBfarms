@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.6** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.7** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,20 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.72.3 + Companion 0.54.7 + Dispensary 0.1.2: hardcore, and keyholders.** Laynie, Nov 16: "make sure that the owner level, and the proprietors of the farm can always access and change their settings". Then, Nov 17: "it can be set to have no end date, but a keyholder, owner, proprieters companion needs to ping the hardcore users dispensary and companion atleast once every 30 days, otherwise, it will unlock after 30 days without the ping."
+  - **Only you switch it on, for yourself:** on the Dispensary's page, after a plain warning. It needs a keyholder.
+  - **Keyholders:** your owner, the proprietors if you're on the farm's books, and anybody you add by member number (up to ten). Laynie: "there should be a way to add keyholders by id". Once you're locked in, who holds your key is locked in with you.
+  - **Locked in, as you are:** your settings stay exactly as they were when you locked in, and only your keyholders change them (Laynie: "lock their settings how they want currently have them, or have them set by someone else that is a keyholder"). You can see your settings but not change them. Your safeword becomes "Ask to be let out": it asks your keyholders in the room, and beeps the ones who aren't (in plain words they can read without any add-on). The game's own safeword and the farm's `?safeword` don't lift your doses either. The farm's still pauses and fetches help, as ever.
+  - **It ends** on its end date (1 to 30 days), or with no end date, after 30 days without a keyholder checking in.
+  - **Keyholders**, from their Dispensary's page ("Keys you hold"): check in, let you out (every dose lifted), end it, give it an end date, or change your settings (in the same room). From another room, check in, let out and end go by beep. Every change shows you who changed what, and the page keeps a short log.
+  - **Checking in by being there:** sharing a room with somebody whose key you hold checks in by itself, from the Dispensary or the Companion (at most once an hour).
+  - **The Companion holds keys too:** `/keys` lists who you hold keys for, and `/keys check|letout|end <who>` looks after them without the Dispensary.
+  - **The Companion in hardcore:** its game-rule switches stay put: real gear, marks, setting your face, body shape, stirring you up, stripping, the lead, slow walking, the trance haze, your brand, and switching the Companion off. Your keyholders set them from their Dispensary's editor. Your privacy choices (the record, the relay, private feelings) and how things look to you stay yours.
+  - **The farm's switches (bot):** in hardcore your own `?breedable on`, `?traps off` and so on are turned down (asking what they're set to still works). Your keyholders set them with `?ward <who> <switch> on|off`, and your limits still rule.
+  - **Limits are yours, and frozen (bot):** while you're in hardcore nobody changes them, not you, not staff, not your keyholders (Laynie: "limits are theirs period, but hardcore locks them and keeps them from being changed").
+  - **It can't outlive itself:** the farm girl keeps your hardcore's date on your record, so if your Dispensary goes quiet it still lets go on time.
+  - **The farm girl** tells the Dispensary whether you're on her books (so the proprietors hold your key). Her `?safeword` leaves her side of a hardcore player's doses alone, but never stops calling the pause and fetching help. She also leaves LSCG's new Suggestible drug to LSCG.
 
 - **Dispensary 0.1.1: the farm girl's calls reach it with the Companion installed too.** The Companion keeps the farm girl's messages to itself, so for anybody running both, her dose calls, her farm list and her `?safeword` never reached the Dispensary. She'd count a dose that was never felt. The Dispensary now reads her messages first and passes every one on. A new test loads both add-ons together.
 

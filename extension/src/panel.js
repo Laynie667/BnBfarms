@@ -6,6 +6,7 @@
 // The farm panel: a 🌾 button that opens a panel with a view for each hat you wear
 // (Livestock or Guest, Staff, Dashboard), tabs inside each, and a command box.
 import { HISTORY_MAX, PREFS_KEY } from "./config.js";
+import { prefLocked, LOCKED_NOTE } from "./hardlock.js";
 import { CSS, THEME } from "./styles.js";
 import { h, btn, chip } from "./dom.js";
 
@@ -202,7 +203,7 @@ export class Panel {
       hint: (msg) => this.add("👉 " + msg, "notice"),
       fillBox: (text) => { this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice"); const i = this.form.querySelector("#fhc-input"); if (i) { i.value = text; if (!touchScreen()) i.focus(); } },
       setUi: (patch, quiet) => { Object.assign(this.ui, patch); if (!quiet) this.render(); },
-      setPref: (k, v) => { this.prefs[k] = v; savePrefs(this.prefs); this.render(); },
+      setPref: (k, v) => { if (prefLocked(k)) { this.add(LOCKED_NOTE, "notice"); this.render(); return; } this.prefs[k] = v; savePrefs(this.prefs); this.render(); },   // (hardcore: hardlock.js)
       closeDoc: (id) => { this.docs = this.docs.filter((d) => d.id !== id); this.render(); },
       resetPlaces: () => { this.resetPlaces(); this.add("👉 The 🌾 button and panel are back in the corner, at their usual size.", "notice"); },
     };

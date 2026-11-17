@@ -1,7 +1,7 @@
 /* WHAT'S IN THIS FILE (lscg.js)
    LSCG, done LSCG's way (Laynie, Nov 16: "We should handle it like LSCG, and defer to LSCG for those when it that
    extension is detected").
-   - LSCG's own four (sedative, aphrodisiac, mind control, antidote) are LSCG's whenever LSCG is loaded. Our Sedative
+   - LSCG's own (sedative, aphrodisiac, mind control, suggestible since Nov 3, antidote) are LSCG's whenever LSCG is loaded. Our Sedative
      steps aside; a trap, an injector or the farm girl's call gives LSCG's own through its front door (api.drugs.dose).
    - Our doses go in LSCG's own list (its extension API, docs/api.md in LSCG): players switch each one on in LSCG's
      Drug Enhancements, like LSCG's own, and then LSCG players see a bar for it showin' the time left.
@@ -16,6 +16,7 @@ import { VERSION } from "./version.js";
 import { BOOK, give, end, active, leftMs, clearAll } from "./doses.js";
 import { allowed } from "./ladder.js";
 import { st } from "./store.js";
+import { hardOn, askOut } from "./hardcore.js";
 
 const W = window;
 let api = null, caps = null, syncing = null;
@@ -23,7 +24,7 @@ const REG = {}, lastLscg = {};
 const ours = (id) => LSCG_ID + "." + id;
 const minsLeft = (id) => Math.ceil(leftMs(id) / 60000);
 
-// is LSCG here at all (an old one without the extension API still owns its four)
+// is LSCG here at all (an old one without the extension API still owns its own)
 export function lscgPresent() {
   if (W.LSCG) return true;
   try { const sdk = W.bcModSdk; if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG"); } catch (e) { /* fine */ }
@@ -72,7 +73,7 @@ function setUp(L) {
     }
   }
   if (caps.has("events")) {
-    try { api.events.on("safeword", () => clearAll("safeword")); } catch (e) { /* fine */ }
+    try { api.events.on("safeword", () => { if (hardOn()) askOut(); else clearAll("safeword"); }); } catch (e) { /* fine */ }
     try {
       api.events.before("drug.beforeApply", (c) => {
         const p = c && c.payload;

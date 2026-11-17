@@ -17,6 +17,13 @@ window.ChatRoomSafewordRevert = function () {}; window.ChatRoomSafewordRelease =
 </script>
 <script src="../dist/farmhand-dispensary.user.js"></script>
 <script>
-setTimeout(() => { window.__disp.give("denial", { by: 700, x: 2, quiet: true }); window.__disp.give("sedative", { by: 700, quiet: true }); pg && pg.load(); }, 1300);
+// ?hard: locked in (no end date); ?keys: you hold somebody's key
+setTimeout(() => {
+  const D = window.__disp, q = location.search;
+  D.give("denial", { by: 700, x: 2, quiet: true }); D.give("sedative", { by: 700, quiet: true });
+  if (/hard/.test(q)) D.lock(0);
+  if (/keys/.test(q)) D.st().wards["601"] = { name: "Daisy", until: 0, due: Date.now() + 19 * 86400000, seen: Date.now(), checked: Date.now(), asked: Date.now() };
+  pg && pg.load();
+}, 1300);
 </script>
 </body></html>

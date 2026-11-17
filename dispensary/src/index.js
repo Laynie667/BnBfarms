@@ -13,6 +13,7 @@ import { initNeedle } from "./needle.js";
 import { initFarm, hello } from "./farm.js";
 import { initLscg } from "./lscg.js";
 import { initSafeword, safeword } from "./safeword.js";
+import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
 import { initPage, openPage, pageOpen, redrawPage, timeLeft } from "./page.js";
 import { ladderWho, allowed } from "./ladder.js";
 import { local } from "./say.js";
@@ -60,10 +61,12 @@ function start() {
   initNeedle(mod);
   initFarm(mod);
   initSafeword(mod);
+  initHardcore(mod);
+  onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); tickHard(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -75,7 +78,8 @@ const boot = setInterval(() => {
 }, 1000);
 
 // the tests reach in (only when a test page says so)
-if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => tick(), setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started };
+if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => { tick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
+  lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt() };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({
@@ -83,4 +87,6 @@ W.FarmhandDispensary = Object.freeze({
   active: (id) => active(String(id)),
   doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
   who: () => st().who,
+  // hardcore, for the Companion (its own settings lock while yours is on)
+  hard: () => (hardOn() ? { on: true, until: (st().hard && st().hard.until) || 0, due: dueAt() } : null),
 });

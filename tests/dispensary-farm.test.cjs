@@ -41,6 +41,7 @@ const roomText=(from)=>sent.slice(from||0).filter(([e,d])=>e==='ChatRoomChat'&&d
   await hid(600,'dispHello',{ver:'0.1.0',farm:true,lscg:false,off:[]});
   const wel=msgsTo(600,'dispWelcome',n).pop();
   ok(wel && wel.farm.includes(260239) && wel.farm.includes(221397) && wel.farm.includes(650) && !wel.farm.includes(500), "her welcome tells their Dispensary who the farm is: her, the proprietors, the staff (not the stock)");
+  ok(wel && wel.stock === true, "...and that they're on her books (so the proprietors hold their hardcore key)");
 
   // ---- a Denial Serum needle on somebody with a Dispensary
   n=sent.length; const before=Date.now();
@@ -85,6 +86,39 @@ const roomText=(from)=>sent.slice(from||0).filter(([e,d])=>e==='ChatRoomChat'&&d
   W.__applyShot(600,221397,'Denial Serum'); await wait(300);
   n=sent.length; await say(600,'?safeword',1200);
   ok(msgsTo(600,'dispClear',n).length===1 && !(prod(600).deniedUntil>Date.now()), "her ?safeword: their Dispensary's doses lifted, and her side of them");
+
+  // ---- hardcore (they switched it on, for themselves): her ?safeword fetches help, and their doses stay
+  await hid(600,'dispHello',{ver:'0.1.1',farm:true,lscg:false,off:[],hard:true});
+  W.__applyShot(600,221397,'Denial Serum'); await wait(300);
+  n=sent.length; await say(600,'?safeword',1200);
+  ok(msgsTo(600,'dispClear',n).length===1 && prod(600).deniedUntil>Date.now(), "in hardcore: her ?safeword still reaches their Dispensary, but the denial stays till a keyholder lets them out");
+  ok(/hardcore/.test(JSON.stringify(sent.slice(n))) && /PAUSE CALLED/.test(JSON.stringify(sent.slice(n))), "...she says so, and still calls the pause and fetches help");
+
+
+  // ---- hardcore on her side: their switches stay put, keyholders set them, limits frozen for everybody
+  const R0=()=>W.FarmhandLedger().people[600];
+  await hid(600,'dispHello',{ver:'0.1.2',farm:true,lscg:false,off:[],hard:true,due:Date.now()+30*86400000,keys:[221397,650]});
+  ok(R0().dispHard && R0().dispHard.on && R0().dispHard.keys.includes(650), "their hardcore goes on their record, with who holds the key");
+  const b0=!!R0().breedable;
+  n=sent.length; await say(600,'?breedable '+(b0?'off':'on'),900);
+  ok(!!R0().breedable===b0 && /You're in hardcore/.test(JSON.stringify(sent.slice(n))), "in hardcore their own ?breedable won't flip, and she says why");
+  n=sent.length; await say(600,'?breedable',900);
+  ok(!/You're in hardcore/.test(JSON.stringify(sent.slice(n))), "...askin' what it's set to still works");
+  n=sent.length; await say(650,'?ward Hana breedable '+(b0?'off':'on'),1200);
+  ok(!!R0().breedable===!b0 && /Done: Hana's breedable/.test(JSON.stringify(sent.slice(n))), "a keyholder sets it for them with ?ward");
+  ok(/your keyholder. set your breedable/.test(JSON.stringify(sent.slice(n))), "...and they're told who set what");
+  n=sent.length; await say(500,'?ward Hana breedable '+(b0?'on':'off'),1200);
+  ok(!!R0().breedable===!b0 && /don't hold Hana's key/.test(JSON.stringify(sent.slice(n))), "somebody who doesn't hold the key can't");
+  const lim0=R0().limits||'';
+  n=sent.length; await say(221397,'?edit 600 limits no needles at all',1200);
+  ok((R0().limits||'')===lim0 && /limits are frozen/.test(JSON.stringify(sent.slice(n))), "their limits are frozen: not even a proprietor changes them");
+  n=sent.length; await say(600,'?safeword',1200);
+  ok(/PAUSE CALLED/.test(JSON.stringify(sent.slice(n))), "the safeword's never frozen: the pause and the help still come");
+  R0().dispHard.due=Date.now()-1;
+  n=sent.length; await say(600,'?breedable '+(b0?'on':'off'),900);
+  ok(!!R0().breedable===b0, "past its date (their Dispensary gone quiet), it lets go by itself: their switch is theirs again");
+  await hid(600,'dispHello',{ver:'0.1.2',farm:true,lscg:false,off:[],hard:false});
+  ok(!R0().dispHard, "their Dispensary says hardcore's off: it comes off their record");
 
   out(fails?'FAILURES: '+fails:'all good'); process.exit(fails?1:0);
 })();

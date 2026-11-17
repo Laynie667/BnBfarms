@@ -84,7 +84,7 @@
   function isOvi(text){ const f = squash(text); return OVI_WORDS.some(w => f.includes(squash(w))) || OVI_RE.test(String(text || "")); }
   function isFeeder(text){ const f = squash(text); return FEED_WORDS.some(w => f.includes(squash(w))) || FEED_RE.test(String(text || "")); }
   const FLAVORS = ["strawberry", "chocolate", "honey", "vanilla", "banana", "caramel"];
-  const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep/i;
+  const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep|suggest[ia]ble|intoxicat|compliance/i;   // (LSCG's Suggestible, Nov 3)
   const SHOT_WORDS = /\b(shot|serum|dose|vial|booster|tonic|inject|syringe|needle|elixir|draught)/i;
   Object.assign(SHOT_LINES, {
     aphro: ["A warm, syrupy heat spreads out from the needle and %t starts to squirm. Everything itches. Everything wants.",

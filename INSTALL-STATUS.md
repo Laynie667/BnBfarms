@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.6** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.1.1: the farm girl's calls reach it with the Companion installed too.** The Companion keeps the farm girl's messages to itself, so for anybody running both, her dose calls, her farm list and her `?safeword` never reached the Dispensary. She'd count a dose that was never felt. The Dispensary now reads her messages first and passes every one on. A new test loads both add-ons together.
 
 - **Bot 0.72.2 + Dispensary 0.1.0: The Farmhand's Dispensary, step 1.** Laynie, Nov 16: "a add-on that doesnt rely on the farm, or farmhand companion, but would work in tandem with it". Then, Nov 17: "have the farm girl 'call' on the extension to apply shots", and "anything to make the farmgirls load a little lighter". The whole plan is in `docs/DISPENSARY.md`.
   - **A new add-on, `farmhand-dispensary.user.js`:** doses from crafted items, anywhere in the club. A needle whose name or description carries the right words gives that dose. It has its own page under Preferences → Extensions, and `/dispensary` too.

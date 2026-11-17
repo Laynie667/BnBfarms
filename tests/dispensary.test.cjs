@@ -7,6 +7,7 @@ const out = (...a) => process.stdout.write(a.join(" ") + "\n");
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0; const ok = (c, msg) => { out(msg + " -> " + (c ? "true" : "false")); if (!c) fails++; };
 const src = fs.readFileSync(path.join(__dirname, "../dist/farmhand-dispensary.user.js"), "utf8");
+const companionSrc = fs.readFileSync(path.join(__dirname, "../dist/farmhand-companion.user.js"), "utf8");
 const BOT = 260239, ME = 600, OWNER = 700, LOVER = 701, WHITE = 702, FRIEND = 703, BLACK = 704, STRANGER = 705;
 
 function page(opts) {
@@ -38,6 +39,7 @@ function page(opts) {
   w.ChatRoomSync = function () {};
   w.ChatRoomMessageRunExtractors = (data) => { const d = data.Dictionary || []; const a = d.find((x) => x.ActivityName); const t = d.find((x) => typeof x.TargetCharacter === "number"); return { metadata: { ActivityName: a && a.ActivityName, TargetMemberNumber: t && t.TargetCharacter } }; };
   if (opts.lscg) w.LSCG_OnLoad = { push: (cb) => cb(opts.lscg) }, w.LSCG = { version: "0.9.8" };
+  if (opts.companion) { w.ChatRoomData = { Name: "B&B Farm" }; w.eval(companionSrc); }   // the Companion first, as Tampermonkey might load it
   w.eval(src);
   const charOf = (mn) => w.ChatRoomCharacter.find((c) => c.MemberNumber === mn);
   // somebody uses the Inject activity on me, holding a crafted item
@@ -157,6 +159,13 @@ function page(opts) {
   f.fromBot("dose", { id: 11, dose: "denial", x: 1, mins: 120, by: OWNER, line: "y" });
   f.fromBot("dispClear", {});
   ok(!F.active("denial"), "her safeword (?safeword): every dose in you lifted");
+
+  // ---- with the Companion installed too (it keeps the farm girl's messages to itself)
+  const both = page({ bot: true, companion: true }); await wait(1500);
+  both.fromBot("dose", { id: 30, dose: "denial", x: 1, mins: 120, by: OWNER, line: "WITH THE COMPANION" });
+  ok(both.D().active("denial") && both.actions().includes("WITH THE COMPANION"), "with the Companion installed as well, her call still reaches the Dispensary");
+  both.fromBot("dispClear", {});
+  ok(!both.D().active("denial"), "...and so does her safeword");
 
   // ---- LSCG, done LSCG's way
   const reg = {}, doses = [], befores = [], ons = {};

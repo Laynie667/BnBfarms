@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.1.0
+// @version      0.1.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -215,7 +215,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.1.0";
+  var VERSION = "0.1.1";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -905,7 +905,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function initFarm(mod2) {
     try {
-      mod2.hookFunction("ChatRoomMessage", 2, (args, next) => {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next) => {
         try {
           const data = args[0];
           if (data && data.Type === "Hidden" && data.Sender === BOT) {

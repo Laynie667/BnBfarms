@@ -75,7 +75,9 @@ function onFarmMsg(m) {
 
 export function initFarm(mod) {
   try {
-    mod.hookFunction("ChatRoomMessage", 2, (args, next) => {
+    // ahead of the Companion (10), which keeps the farm girl's messages to itself: we read hers first, and always pass
+    // them on (Nov 17: with both installed, her calls never reached us)
+    mod.hookFunction("ChatRoomMessage", 11, (args, next) => {
       try {
         const data = args[0];
         if (data && data.Type === "Hidden" && data.Sender === BOT) { const m = readMsg(data); if (m) onFarmMsg(m); }

@@ -95,6 +95,30 @@ const roomText=(from)=>sent.slice(from||0).filter(([e,d])=>e==='ChatRoomChat'&&d
   ok(/hardcore/.test(JSON.stringify(sent.slice(n))) && /PAUSE CALLED/.test(JSON.stringify(sent.slice(n))), "...she says so, and still calls the pause and fetches help");
 
 
+  // ---- step 3: her potions and shots, handed to their Dispensary
+  await hid(600,'dispHello',{ver:'0.1.4',farm:true,lscg:false,off:[]});
+  n=sent.length; W.__givePotion(600,'hiccup',221397,'bought'); await wait(500);
+  const pc=msgsTo(600,'dose',n).pop();
+  ok(pc && pc.dose==='hiccup' && pc.mins===15 && /Hiccup Fizz|hic/i.test(pc.line||''), "a Hiccup Fizz: their Dispensary gets it, with her own drinkin' line");
+  const roomOnly=(from)=>sent.slice(from).filter(([e,d])=>e==='ChatRoomChat'&&d&&d.Content!=='FarmhandMsg'&&d.Type!=='Whisper').map(([,d])=>String(d.Content)).join(' | ');
+  ok(!/Hiccup Fizz|hic/i.test(roomOnly(n)), "...and she doesn't say it to the room herself (only the private note of what they drank)");
+  ok(W.__potionOn(600,'hiccup'), "...it's still the farm's potion, on her books");
+  const P600=W.FarmhandLedger().people[600]; P600.fx.hiccup.next=1;
+  n=sent.length; for (let i=0;i<5;i++){ W.__potionTick(); } await wait(300);
+  ok(!/hic/i.test(roomText(n)), "...and its moments every few minutes are their Dispensary's, not hers");
+  n=sent.length; W.__givePotion(500,'hiccup',221397,'bought'); await wait(500);
+  ok(msgsTo(500,'dose',n).length===0 && /hic|Hiccup/i.test(roomText(n)), "somebody without a Dispensary: she does it all herself, as ever");
+  n=sent.length; W.__applyShot(600,221397,'Hair Trigger Serum'); await wait(500);
+  ok(msgsTo(600,'dose',n).some(d=>d.dose==='hairtrigger' && d.mins===60), "a hair trigger shot: their Dispensary does it (every touch counts double)");
+  n=sent.length; W.__applyShot(600,221397,'Purge Serum'); await wait(500);
+  ok(msgsTo(600,'dose',n).some(d=>d.dose==='purge'), "a purge: every dose in their Dispensary too");
+  n=sent.length; W.__applyShot(600,221397,'Obedience Serum'); await wait(500);
+  ok(msgsTo(600,'dose',n).length===0, "an obedience shot without LSCG on their side: the farm's trance, as ever");
+  await hid(600,'dispHello',{ver:'0.1.4',farm:true,lscg:true,off:[]});
+  n=sent.length; W.__applyShot(600,221397,'Obedience Serum'); await wait(500);
+  ok(msgsTo(600,'dose',n).some(d=>d.dose==='suggestible' && d.hand===false), "...with LSCG on their side: LSCG's Suggestible instead");
+  await hid(600,'dispHello',{ver:'0.1.4',farm:true,lscg:false,off:[]});
+
   // ---- hardcore on her side: their switches stay put, keyholders set them, limits frozen for everybody
   const R0=()=>W.FarmhandLedger().people[600];
   await hid(600,'dispHello',{ver:'0.1.2',farm:true,lscg:false,off:[],hard:true,due:Date.now()+30*86400000,keys:[221397,650]});

@@ -51,6 +51,27 @@ export const LINES = {
   },
 };
 
+Object.assign(LINES, {
+  hairtrigger: {
+    take: [
+      "%t jumps as the sensitizer goes in. Even the air feels like a touch now.",
+      "Every nerve in %t lights up at once. A brush of fabric makes them gasp.",
+      "%t shivers all over. Whatever comes next is goin' to hit twice as hard, and they know it.",
+      "The serum spreads warm under %t's skin, and suddenly every inch of it is listenin'.",
+    ],
+    now: [
+      "Your clothes shift and you nearly whimper. Everything's too much, and you can't stop wantin' more of it.",
+      "A breath of air across your skin and your knees go weak. The serum's still got every nerve wide awake.",
+      "You hold very, very still. Moving at all feels like being touched.",
+      "Somebody brushes past and your whole body answers. You bite your lip to keep quiet.",
+    ],
+    off: [
+      "The Hair Trigger fades. Your skin is just skin again, and a touch is just a touch.",
+      "The buzzing under your skin quiets down. You can breathe without it feelin' like a caress.",
+    ],
+  },
+});
+
 export const NOTES = {
   notListed: "%b tried to give you %d, but they're not on your list, so nothin' happened.",
   switchedOff: "%d came your way, but you've switched it off, so nothin' happened.",

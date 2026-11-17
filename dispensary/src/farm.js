@@ -70,6 +70,7 @@ function onFarmMsg(m) {
     const S = st();
     S.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S.farm;
     if (typeof m.stock === "boolean") S.stock = m.stock;   // on her books: the proprietors hold your hardcore key
+    if (typeof m.species === "string" && /^[a-z]{2,20}$/.test(m.species)) S.speciesFarm = m.species;   // your animal, for Moo Juice
     S.farmAt = Date.now();
     save();
     return;

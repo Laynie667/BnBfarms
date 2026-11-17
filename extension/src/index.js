@@ -11,6 +11,7 @@ import sdkModule from "bondage-club-mod-sdk";
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
 import { speciesKeyOf } from "../../shared/species.js";
+import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
@@ -57,19 +58,7 @@ try {
 window.__farmhandCompanion = VERSION;
 
 const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
-// Moo Juice: about half the words turn into the noise your animal makes
-const NOISES = { cow: ["moo", "mooo", "mrrrm"], bull: ["moo", "hrrmph"], pony: ["neigh", "nicker", "whinny"], horse: ["neigh", "whinny", "nicker"],
-  pup: ["arf", "woof", "awoo"], dog: ["woof", "arf", "ruff"], kitty: ["mew", "nya", "mrrp"], cat: ["meow", "mrrp", "purr"], bunny: ["squeak", "eep"],
-  rabbit: ["squeak", "eep"], pig: ["oink", "snrk"], goat: ["baa", "maa"], sheep: ["baa", "baaa"], fox: ["yip", "ack"], wolf: ["awoo", "grr"],
-  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"], rat: ["squeak", "eek", "chitter"], dragon: ["rawr", "grr", "hsss"], kitt: ["mew", "nya", "mrrp"] };
-function mooify(text, species) {
-  const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;   // "catgirl", "ratslut" (shared/species.js)
-  return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
-    if (Math.random() < 0.5) return w;
-    const n = say[Math.floor(Math.random() * say.length)];
-    return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
-  });
-}
+// Moo Juice: about half the words turn into the noise your animal makes (shared/noises.js, the Dispensary uses it too)
 
 // simpler words for somebody who's gone under: depth 2 trims the longest words, 3 trims more and drops the capitals,
 // 4 and 5 leave short words and little sighs
@@ -536,7 +525,8 @@ function start() {
       try {
         const d = args[1], s = st.panel && st.panel.s;
         if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.fx) &&
-            s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content))
+            s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content) &&
+            !(window.FarmhandDispensary && window.FarmhandDispensary.active("moo")))   // (the Dispensary's doin' it: not twice)
           args = [args[0], Object.assign({}, d, { Content: mooify(d.Content, s.species) })];
       } catch (e) { console.warn("[Farmhand Companion] moo:", e); }
       return next(args);

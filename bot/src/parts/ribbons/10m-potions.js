@@ -110,31 +110,16 @@
       "%n knocks back a Broodmare Tonic. Their belly gives a low, warm flutter, and their hips start rollin' all on their own.",
       "The Broodmare Tonic goes down thick as molasses, and %n spreads their stance without thinkin', like a mare waitin' at the fence.",
       "%n finishes the Broodmare Tonic and rubs slow circles low on their belly. Any stud worth his salt can smell it from here."],
-    bitterroot: [
-      "%n gags on a Bitterroot and glares at the bottle. Everything that was building in 'em just went sour.",
-      "A swig of Bitterroot, and %n's face scrunches up. Whatever pleasure's comin' their way for the next half hour, it's comin' ruined.",
-      "%n swallows the Bitterroot like medicine. Then their thighs press together, and they whimper, because now it aches and it won't pay out.",
-      "The Bitterroot goes down mean. %n squirms, already frustrated, and they haven't even been touched yet."],
     heavy: [
       "{t}%n gulps the Heavy Udder Draught and their tits fill visibly, tight and hot, straining against whatever's holdin' them.",
       "{t}The Heavy Udder Draught hits %n's chest like a wave. They're full to aching inside a minute, and the stalls won't have 'em.",
       "{nt}%n drinks the Heavy Udder Draught, and their chest goes hot and puffy, nipples swelling, a bead of milk welling up on each.",
       "%n downs the Heavy Udder Draught and grabs the nearest rail. Something in 'em is fillin' fast and it isn't going to stop."],
-    moo: [
-      "%n drinks the Moo Juice, opens their mouth to say thank you, and lows like a heifer at feeding time.",
-      "One bottle of Moo Juice later, %n tries to complain. What comes out is a long, mournful mooooo.",
-      "%n swallows the Moo Juice and claps a hand over their mouth. Too late: the moo's out, and everyone heard it.",
-      "The Moo Juice goes down, and %n's next three words are all the same word, and that word is moo."],
     bell: [
       "%n drinks the Bell Tonic. They shift their weight, and CLANG. They freeze. CLANG.",
       "A Bell Tonic later, %n tries to sneak off. The cowbell that isn't there rings the whole way out of the yard.",
       "%n downs the Bell Tonic and takes one careful step. The bell goes off like the dinner gong.",
       "Every wiggle %n makes after that Bell Tonic rings out across the farm. Nobody's losin' track of 'em now."],
-    needy: [
-      "%n drinks the Needy Nectar, and within a minute they're rubbing their thighs together and biting their lip.",
-      "The Needy Nectar blooms in %n's belly, and they start squirmin' against whatever they're sitting on.",
-      "%n finishes the Needy Nectar and goes pink and fidgety. Their hands keep drifting down and getting caught halfway.",
-      "One sip of Needy Nectar and %n is leaning on things, pressing on things, aching for things. They might have to ask nicely."],
     danger: [
       "%n knocks back a Danger Draught and laughs, a little too loud. Somewhere out in the fields, something notices.",
       "The Danger Draught smokes on the way down. %n shivers, and every trap on the farm gets a little hungrier.",
@@ -165,16 +150,6 @@
       "%n rubs Sow's Slop into their belly and backside. The boar's already grunting their name, more or less.",
       "Sow's Slop, smeared on thick. %n smells like a sow in season and the whole sty knows it.",
       "%n reeks of the sty now. The boar's rails creak, then groan, then give a little."],
-    hiccup: [
-      "%n drinks a Hiccup Fizz. *Hic.* They try to look dignified. *Hic.*",
-      "The Hiccup Fizz goes down bubbly, and %n hiccups so hard their whole body jumps.",
-      "%n downs a Hiccup Fizz and hiccups through an apology. Then hiccups through the apology for the hiccup.",
-      "One Hiccup Fizz later, %n can't get through a sentence. Or a moan. *Hic.*"],
-    feather: [
-      "%n drinks a Featherlight and shrieks with laughter when their own sleeve brushes their arm.",
-      "The Featherlight goes down, and suddenly %n can't stand still: every breeze, every touch, sets them giggling.",
-      "%n swallows a Featherlight and dissolves into helpless giggles the second anybody breathes near their neck.",
-      "One Featherlight, and %n squirms at the brush of their own hair. Anyone with a feather is very much invited."],
     wrongbarn: [
       "%n drinks the Wrong Barn and sniffs the air like a different animal entirely. They look baffled.",
       "One sip of Wrong Barn and %n's noises change. Their stance changes. Even the way they flick their ears.",
@@ -195,11 +170,6 @@
       "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
       "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
       "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."],
-    heatmist: [
-      "%n breathes in the Heat Mist and goes flushed and slick and squirmy all at once.",
-      "One puff of Heat Mist, and %n's scent changes. Every stud in the yard lifts his head.",
-      "%n inhales the Heat Mist, shivers, and starts rubbing against the nearest post like a mare in season.",
-      "The Heat Mist settles on %n like a warm hand, and they come into heat right there in front of everybody."],
   };
   const potionDef = (id) => POTIONS.find(p => p.id === String(id || "").toLowerCase()) || null;
   function potionOn(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.until > Date.now()); }
@@ -245,7 +215,11 @@
     tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+bodyWords(mn, P.drink)+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
     // (breathed in off a trap's gas or spray, it wasn't drunk: the trap already told the room, and "drinks the Needy
     // Nectar" after a cloud of pink gas made no sense. Laynie, Oct 20. The same for a Halloween candy or the witch's brew)
-    if (onMap(mn) && !/^(gas|spray|from a trap)$/.test(how || "") && !/candy|brew|treat door/.test(how || "")) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
+    // (their Dispensary, if they run one, does the feelin' and says the line from their own game: 10ur2-dispensary.js)
+    const quietHow = /^(gas|spray|from a trap)$/.test(how || "") || /candy|brew|treat door/.test(how || "");
+    const seenLine = quietHow ? null : tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn);
+    let handed = false; try { handed = dispPotion(mn, P, r.fx[id], by, seenLine, quietHow); } catch(e){ warn("dispensary potion:", e); }
+    if (!handed && onMap(mn) && seenLine) emote("🧪 "+seenLine, mn);
     syncCompanions(true);
     return true;
   }
@@ -293,6 +267,7 @@
   function clearPotions(mn){ const r = rec(mn); if (!r || !r.fx) return; for (const id of Object.keys(r.fx)) endPotion(mn, id, true); }
 
   // ── what the bottles do while they last (every heartbeat) ──
+  // (the potions The Farmhand's Dispensary can take over keep their lines in shared/potion-voice.js: put back in below)
   const FX_LINES = {
     musk: [
       "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
@@ -309,30 +284,13 @@
       "\"Such a soft, obedient creature. The farm's lucky to have you, and so am I.\"",
       "\"Keep bein' this good and I'll make sure everybody hears about it.\""
     ],
-    needy: [
-      "The ache doesn't let up. Every shift of your hips makes it worse, and better, and worse.",
-      "You catch yourself rubbin' your thighs together and can't make yourself stop.",
-      "Every brush of fabric, every breeze through the barn, goes straight between your legs.",
-      "You'd beg. You'd beg anybody. The thought won't leave you alone.",
-      "It throbs, slow and patient and merciless, like it's got all day."
-    ],
-    hiccup: [
-      "%n lets out a loud *hic*, right in the middle of everything.",
-      "*HIC.* %n claps a hand over their mouth. Too late.",
-      "%n tries so hard to hold it in that the *hic* comes out as a squeak.",
-      "Three little *hics* in a row out of %n. The whole pen is grinnin'."
-    ],
-    feather: [
-      "A stray bit of straw brushes %n's side and they dissolve into helpless giggles.",
-      "%n squeaks and twists away from absolutely nothin'. The air tickled 'em.",
-      "Somebody breathes near %n's neck and they nearly fall over laughin'."
-    ],
     bell: [
       "CLANG. CLANG. Everybody knows exactly where %n is goin'.",
       "%n tries to sneak, and the bell says CLANG anyway.",
       "A brassy CLANG rings out across the yard as %n moves. Subtle as a dinner bell."
     ]
   };
+  for (const [id, v] of Object.entries(POTION_VOICE)){ if (v.seen.length) POTION_SEEN[id] = v.seen; if (v.now.length) FX_LINES[id] = v.now; }   // (shared/potion-voice.js)
   function fxLine(id, mn){ const a = FX_LINES[id]; const r = rec(mn); return fxFill(pickFresh("fx:"+id+":"+mn, a), mn, r && r.fx && r.fx[id]); }
   function potionTick(){
     const now = Date.now();
@@ -345,17 +303,17 @@
         const every = (a, b) => { if (!f.next) f.next = now + (a + Math.random()*(b-a))*60000; if (now < f.next) return false; f.next = now + (a + Math.random()*(b-a))*60000; return true; };
         if (id === "musk" && every(5, 9)) emote("💐 "+fxLine("musk", mn), mn);
         if (id === "honey" && every(5, 9)) privateTo(mn, "🍯 The farm girl leans in close to "+plainName(mn)+"'s ear: "+fxLine("honey", mn), "emote");
-        if (id === "needy" && every(4, 7)) privateTo(mn, "💗 "+fxLine("needy", mn), "emote");
-        if (id === "hiccup" && every(1, 3)) emote(fxLine("hiccup", mn), mn);
-        if (id === "feather" && every(2, 4)) emote(fxLine("feather", mn), mn);
+        if (id === "needy" && !dispTook(mn, id) && every(4, 7)) privateTo(mn, "💗 "+fxLine("needy", mn), "emote");
+        if (id === "hiccup" && !dispTook(mn, id) && every(1, 3)) emote(fxLine("hiccup", mn), mn);
+        if (id === "feather" && !dispTook(mn, id) && every(2, 4)) emote(fxLine("feather", mn), mn);
         if (id === "clover" && every(4, 7)) emote("🥛 "+fxLine("clover", mn), mn);
         if (id === "golden" && every(5, 8)) privateTo(mn, "✨ "+fxLine("golden", mn), "emote");
         if (id === "heavy" && every(3, 6)) emote("🥛 "+fxLine("heavy", mn), mn);
-        if (id === "bitterroot" && every(5, 8)) privateTo(mn, "🌿 "+fxLine("bitterroot", mn), "emote");
+        if (id === "bitterroot" && !dispTook(mn, id) && every(5, 8)) privateTo(mn, "🌿 "+fxLine("bitterroot", mn), "emote");
         if (id === "wrongbarn" && every(6, 10)) emote(fxLine("wrongbarn", mn), mn);
         if ((id === "bigbritches" || id === "shrink") && every(8, 14)) emote(fxLine(id, mn), mn);
-        if (id === "heatmist" && every(4, 6)) emote("🔥 "+fxLine("heatmist", mn), mn);
-        if (id === "moo" && every(6, 10)) emote(fxLine("moo", mn), mn);
+        if (id === "heatmist" && !dispTook(mn, id) && every(4, 6)) emote("🔥 "+fxLine("heatmist", mn), mn);
+        if (id === "moo" && !dispTook(mn, id) && every(6, 10)) emote(fxLine("moo", mn), mn);
         if (id === "brood" && every(8, 14)) privateTo(mn, "🥚 "+fxLine("brood", mn), "emote");
         if (id === "bell"){
           const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;

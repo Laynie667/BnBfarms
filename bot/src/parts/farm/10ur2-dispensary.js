@@ -37,7 +37,7 @@
       else delete r.dispHard;
       if (JSON.stringify(r.dispHard || null) !== was){ saveLedger(); audit(mn, "DISPHARD", m.hard === true ? "on" : "off"); }
     }
-    enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length) }, mn));
+    enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length), species: r ? String(speciesKey(mn) || "").toLowerCase() : "" }, mn));   // (species: their animal, for Moo Juice)
   }
   const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
   // a dose for their Dispensary to give. Returns "sent", null (no Dispensary: do it yourself), or why it can't take
@@ -108,6 +108,21 @@
     R("🗝️ Done: " + plainName(t) + "'s " + sw + " is " + v + ", if their limits allow it (they've been told what came of it).");
   }
   addCommand("ward", { topic: "play", private: true, run: (c) => wardCommand(c.sender, c.args, c.R) });
+
+  /* STEP 3 (Nov 17): the potions and shots that work anywhere. Their Dispensary does the feelin' and says the farm's
+     own lines for them (shared/potion-voice.js), the moment they drink and every few minutes after, so I don't have to.
+     A potion is still the farm's (its consent, its clock, its books): if their Dispensary won't take it (the farm off
+     their list, that dose switched off), I do it the old way. */
+  const DISP_POTIONS = { needy: "needy", hiccup: "hiccup", feather: "feather", heatmist: "heat", moo: "moo", bitterroot: "bitterroot" };
+  // a potion just given: true if their Dispensary took it (then don't say its line, or its moments)
+  function dispPotion(mn, P, f, by, line, quiet){
+    const dose = DISP_POTIONS[P.id]; if (!dose || !dispFor(mn)) return false;
+    const dc = dispCall(mn, dose, { mins: P.mins, x: 1, by: by || CFG.BOT_MEMBER, line: line || undefined, quiet: !!quiet, hand: false, undo: () => { f.disp = false; } });
+    if (dc === "sent"){ f.disp = true; return true; }
+    return false;
+  }
+  // is their Dispensary sayin' this potion's moments (so I don't)
+  function dispTook(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.disp && dispFor(mn)); }
 
   function onDispensaryMsg(mn, m){
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }

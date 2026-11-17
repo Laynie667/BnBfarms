@@ -9,7 +9,7 @@ const W = window;
 let S = null, saveT = null;
 const listeners = [];
 
-const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [] });
+const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true });
 const num = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
 // only what's expected, in range: what comes back from the server could be anything
@@ -33,6 +33,9 @@ export function clean(d) {
   s.farmAt = num(d.farmAt, 0, 1e14, 0);
   s.seen = num(d.seen, 0, 1e14, 0);
   s.stock = d.stock === true;
+  if (typeof d.species === "string" && /^[a-z]{2,12}$/.test(d.species)) s.species = d.species;            // your own pick
+  if (typeof d.speciesFarm === "string" && /^[a-z]{2,20}$/.test(d.speciesFarm)) s.speciesFarm = d.speciesFarm;   // the farm's word
+  s.screen = d.screen !== false;
   if (Array.isArray(d.keys)) s.keys = [...new Set(d.keys.filter((m) => Number.isInteger(m) && m > 0 && m < 1e9))].slice(0, 10);
   if (d.hard && typeof d.hard === "object") {
     const H = d.hard;

@@ -359,7 +359,10 @@
     if (tags.has("suppressant") && inHeat(p)){ p.heat = null; done.push("heat broken"); fx0.push("suppressant"); }
     if (tags.has("heat")){
       if (limitBlocks(target,"heat")) done.push("no heat, though, 'cause their limits rule it out");
-      else { startHeat(target, by, how && how.heatH); done.push("heat"); }
+      else {
+        startHeat(target, by, how && how.heatH); done.push("heat");
+        try { dispCall(target, "heat", { mins: Math.round(((how && how.heatH) || CFG.PROD.HEAT_H) * 60), by, hand: !how, quiet: true }); } catch(e){ warn("dispensary heat:", e); }   // (the simmer, in their Dispensary)
+      }
     }
     if (tags.has("temp") && fx.length) fx.push(shotLine("temp", target));
     saveLedger(); audit(by,"INJECT",target+" "+Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?"+":"-"))).join(" "));

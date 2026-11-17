@@ -27,18 +27,6 @@
       "The Heavy Udder Draught has %n leakin' in two thin streams, achin' for hands that won't come.",
       "%n's nipples are cracked-open taps. Every heartbeat pushes out more, and still they swell.",
     ],
-    bitterroot: [
-      "%n's thighs are slick and tremblin', and the Bitterroot won't let 'em anywhere near the edge.",
-      "Every time %n gets close the heat just drains away, mean and sudden. They whine through their teeth.",
-      "%n squirms, desperate, achin', and absolutely nothin' they do is gonna be enough.",
-      "The Bitterroot's got %n wound tight and leakin', ruined before they even start.",
-    ],
-    needy: [
-      "%n can't keep their hips still. They're grindin' against nothin', pantin' through their nose.",
-      "%n's pussy is soaked and swollen and so needy they'd climb anybody who stood still long enough.",
-      "%n keeps lookin' at every hand on the farm like it might be the one that finally helps.",
-      "A thin string of wet slides down the inside of %n's thigh. They don't even notice anymore.",
-    ],
     wrongbarn: [
       "%n lets out a %a's noise mid-sentence and goes red to the ears.",
       "%n paws at the dirt like a %a, catches themselves, and doesn't quite manage to stop.",
@@ -61,15 +49,6 @@
       "%n keeps eyein' every stud on the farm like they're measurin' how many they could carry.",
       "A slick, swollen heat sits low in %n's belly. Ripe. Ready for a clutch. Ready for a dozen.",
     ],
-    heatmist: [
-      "%n's skin is pink and hot, and they can't stop squeezin' their thighs together.",
-      "The heat's got %n swayin' their hips without meanin' to, presentin' to anyone in reach.",
-      "%n smells like heat, sweet and thick, and the studs nearby have noticed.",
-    ],
-    moo: [
-      "%n opens their mouth to argue and a long, low moo rolls out instead.",
-      "Every word %n tries comes out as somethin' a cow would say. They've stopped tryin'.",
-    ],
   };
   Object.assign(FX_LINES, Object.fromEntries(Object.entries(FX_MORE).map(([k, v]) => [k, (FX_LINES[k] || []).concat(v)])));
   // how each one wears off (to them, privately)
@@ -78,20 +57,15 @@
     golden: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"],
     musk: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."],
     honey: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."],
-    bitterroot: ["The Bitterroot loosens its grip, slow and grudgin'. You can cum again, if you can still remember how.", "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you."],
     heavy: ["The Heavy Udder Draught wears off, but you're still achin' and full. The stalls'll take you now. Run.", "The draught's done. Your udder isn't. Go get milked, cow, before you burst."],
-    moo: ["Your words come back. The first one you say is still a little bit of a moo."],
     bell: ["The cowbell clangs one last time and falls quiet. Sneak all you like now."],
-    needy: ["The ache finally fades to a dull, sticky throb. You're soaked, and you know it."],
-    hiccup: ["One last *hic*, and the Hiccup Fizz is spent."],
-    feather: ["Your skin stops tinglin'. The next breeze is just a breeze."],
     wrongbarn: ["You blink, and you're yourself again. Mostly. You still want to %a a little."],
     bigbritches: ["Your %p eases back to its own size. You'll miss the weight."],
     shrink: ["Your %p comes back to its proper size. What a relief."],
     echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
-    heatmist: ["The heat mist burns off, leavin' you damp and dazed."],
     brood: ["The Broodmare Tonic fades. Whatever got put in you while it lasted, though, stays put."],
   };
+  for (const [id, v] of Object.entries(POTION_VOICE)) if (v.off.length) FX_OFF[id] = v.off;   // (shared/potion-voice.js)
   function fxFill(t, mn, f){
     f = f || {};
     return String(t).replace(/%n/g, plainName(mn)).replace(/%p/g, f.part ? String((CFG.SIZES[f.part] || {}).label || f.part).toLowerCase() : "body")

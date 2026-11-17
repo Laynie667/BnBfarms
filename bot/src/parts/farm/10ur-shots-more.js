@@ -226,7 +226,11 @@
     const r = rec(target), p = prodOf(target), now = Date.now(), H = 3600000, lim = String(r.limits || "");
     const potion = (id, why) => { const P = potionDef(id); if (P && P.limit && P.limit.test(lim)){ done.push("no " + why + ", their limits rule it out"); return false; } givePotion(target, id, by, "from a shot"); return true; };
     if (tags.has("aphro") && potion("needy", "aphrodisiac")){ arouse(target, 30 * x); done.push("achin' and needy"); fx0.push("aphro"); }
-    if (tags.has("trigger")){ p.boosts.trigger = Math.max(p.boosts.trigger || 0, now) + H * x; done.push("hair trigger for " + (x > 1 ? x + " hours" : "an hour")); fx0.push("trigger"); }
+    if (tags.has("trigger")){
+      p.boosts.trigger = Math.max(p.boosts.trigger || 0, now) + H * x; done.push("hair trigger for " + (x > 1 ? x + " hours" : "an hour"));
+      const dc = dispCall(target, "hairtrigger", { x, mins: 60 * x, by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("trigger", target) });   // (their Dispensary: 10ur2-dispensary.js)
+      if (dc !== "sent") fx0.push("trigger");
+    }
     if (tags.has("denial")){
       if (/\b(denial|chast|orgasm|edg)/i.test(lim)) done.push("no denial, their limits rule it out");
       else {
@@ -247,7 +251,15 @@
         else { p.boosts.sedate = Math.max(was, now) + H * x; done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour")); if (dc !== "sent") fx0.push("sedative"); }
       }
     }
-    if (tags.has("obey")){ if (/\b(hypno|trance|mind)/i.test(lim)) done.push("no trance, their limits rule it out"); else { goUnder(target, 1 + x); done.push("a step deeper under"); fx0.push("obey"); } }
+    if (tags.has("obey")){
+      if (/\b(hypno|trance|mind)/i.test(lim)) done.push("no trance, their limits rule it out");
+      else {
+        // with LSCG loaded on their side, the obedience shot is LSCG's Suggestible (Laynie, Nov 17); otherwise the farm's trance
+        const d0 = dispFor(target), dc = d0 && d0.lscg ? dispCall(target, "suggestible", { x, mins: 30 * x, by, hand: false, quiet: !!(how && how.quiet), line: shotLine("obey", target) }) : null;
+        if (dc === "sent") done.push("suggestible (LSCG)");
+        else { goUnder(target, 1 + x); done.push("a step deeper under"); fx0.push("obey"); }
+      }
+    }
     if (tags.has("mooserum") && potion("moo", "moo serum")){ done.push("moo, moo"); fx0.push("mooserum"); }
     if (tags.has("futashot")){
       if (r.futa && !r.futaShot) done.push("already futa");
@@ -267,7 +279,8 @@
       p.boosts = {}; p.boostX = {}; p.deniedUntil = 0; p.milkFlavor = null;
       if (r.futaShot){ r.futaShot = null; r.futa = false; }
       tempSizeAll(target); kryptoEnd(target, "purge");
-      done.push("every shot in 'em flushed out"); fx0.push("purge");
+      done.push("every shot in 'em flushed out");
+      { const dc = dispCall(target, "purge", { by, hand: !how, quiet: !!(how && how.quiet), line: shotLine("purge", target) }); if (dc !== "sent") fx0.push("purge"); }   // (and every dose in their Dispensary)
     }
   }
   // the room line for a new effect (shotLine's own table, with the flavour put in)

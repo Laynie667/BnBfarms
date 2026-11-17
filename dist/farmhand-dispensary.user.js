@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.1.3
+// @version      0.1.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -215,7 +215,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.1.3";
+  var VERSION = "0.1.4";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -240,7 +240,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var S = null;
   var saveT = null;
   var listeners = [];
-  var fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [] });
+  var fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true });
   var num = (v, lo, hi, d) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
   function clean(d) {
     const s = fresh();
@@ -264,6 +264,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     s.farmAt = num(d.farmAt, 0, 1e14, 0);
     s.seen = num(d.seen, 0, 1e14, 0);
     s.stock = d.stock === true;
+    if (typeof d.species === "string" && /^[a-z]{2,12}$/.test(d.species)) s.species = d.species;
+    if (typeof d.speciesFarm === "string" && /^[a-z]{2,20}$/.test(d.speciesFarm)) s.speciesFarm = d.speciesFarm;
+    s.screen = d.screen !== false;
     if (Array.isArray(d.keys)) s.keys = [...new Set(d.keys.filter((m) => Number.isInteger(m) && m > 0 && m < 1e9))].slice(0, 10);
     if (d.hard && typeof d.hard === "object") {
       const H = d.hard;
@@ -384,11 +387,139 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ]
     }
   };
+  Object.assign(LINES, {
+    hairtrigger: {
+      take: [
+        "%t jumps as the sensitizer goes in. Even the air feels like a touch now.",
+        "Every nerve in %t lights up at once. A brush of fabric makes them gasp.",
+        "%t shivers all over. Whatever comes next is goin' to hit twice as hard, and they know it.",
+        "The serum spreads warm under %t's skin, and suddenly every inch of it is listenin'."
+      ],
+      now: [
+        "Your clothes shift and you nearly whimper. Everything's too much, and you can't stop wantin' more of it.",
+        "A breath of air across your skin and your knees go weak. The serum's still got every nerve wide awake.",
+        "You hold very, very still. Moving at all feels like being touched.",
+        "Somebody brushes past and your whole body answers. You bite your lip to keep quiet."
+      ],
+      off: [
+        "The Hair Trigger fades. Your skin is just skin again, and a touch is just a touch.",
+        "The buzzing under your skin quiets down. You can breathe without it feelin' like a caress."
+      ]
+    }
+  });
   var NOTES = {
     notListed: "%b tried to give you %d, but they're not on your list, so nothin' happened.",
     switchedOff: "%d came your way, but you've switched it off, so nothin' happened.",
     safeword: "Safeword: every dose in you is lifted. You're clear.",
     lscgOff: "%d came your way, but it's switched off in LSCG's Drug Enhancements, so LSCG let it pass. Switch it on there if you want it."
+  };
+
+  // shared/potion-voice.js
+  var POTION_VOICE = {
+    needy: {
+      seen: [
+        "%n drinks the Needy Nectar, and within a minute they're rubbing their thighs together and biting their lip.",
+        "The Needy Nectar blooms in %n's belly, and they start squirmin' against whatever they're sitting on.",
+        "%n finishes the Needy Nectar and goes pink and fidgety. Their hands keep drifting down and getting caught halfway.",
+        "One sip of Needy Nectar and %n is leaning on things, pressing on things, aching for things. They might have to ask nicely."
+      ],
+      now: [
+        "The ache doesn't let up. Every shift of your hips makes it worse, and better, and worse.",
+        "You catch yourself rubbin' your thighs together and can't make yourself stop.",
+        "Every brush of fabric, every breeze through the barn, goes straight between your legs.",
+        "You'd beg. You'd beg anybody. The thought won't leave you alone.",
+        "It throbs, slow and patient and merciless, like it's got all day.",
+        "%n can't keep their hips still. They're grindin' against nothin', pantin' through their nose.",
+        "%n's pussy is soaked and swollen and so needy they'd climb anybody who stood still long enough.",
+        "%n keeps lookin' at every hand on the farm like it might be the one that finally helps.",
+        "A thin string of wet slides down the inside of %n's thigh. They don't even notice anymore."
+      ],
+      off: [
+        "The ache finally fades to a dull, sticky throb. You're soaked, and you know it."
+      ]
+    },
+    hiccup: {
+      seen: [
+        "%n drinks a Hiccup Fizz. *Hic.* They try to look dignified. *Hic.*",
+        "The Hiccup Fizz goes down bubbly, and %n hiccups so hard their whole body jumps.",
+        "%n downs a Hiccup Fizz and hiccups through an apology. Then hiccups through the apology for the hiccup.",
+        "One Hiccup Fizz later, %n can't get through a sentence. Or a moan. *Hic.*"
+      ],
+      now: [
+        "%n lets out a loud *hic*, right in the middle of everything.",
+        "*HIC.* %n claps a hand over their mouth. Too late.",
+        "%n tries so hard to hold it in that the *hic* comes out as a squeak.",
+        "Three little *hics* in a row out of %n. The whole pen is grinnin'."
+      ],
+      off: [
+        "One last *hic*, and the Hiccup Fizz is spent."
+      ]
+    },
+    feather: {
+      seen: [
+        "%n drinks a Featherlight and shrieks with laughter when their own sleeve brushes their arm.",
+        "The Featherlight goes down, and suddenly %n can't stand still: every breeze, every touch, sets them giggling.",
+        "%n swallows a Featherlight and dissolves into helpless giggles the second anybody breathes near their neck.",
+        "One Featherlight, and %n squirms at the brush of their own hair. Anyone with a feather is very much invited."
+      ],
+      now: [
+        "A stray bit of straw brushes %n's side and they dissolve into helpless giggles.",
+        "%n squeaks and twists away from absolutely nothin'. The air tickled 'em.",
+        "Somebody breathes near %n's neck and they nearly fall over laughin'."
+      ],
+      off: [
+        "Your skin stops tinglin'. The next breeze is just a breeze."
+      ]
+    },
+    heatmist: {
+      seen: [
+        "%n breathes in the Heat Mist and goes flushed and slick and squirmy all at once.",
+        "One puff of Heat Mist, and %n's scent changes. Every stud in the yard lifts his head.",
+        "%n inhales the Heat Mist, shivers, and starts rubbing against the nearest post like a mare in season.",
+        "The Heat Mist settles on %n like a warm hand, and they come into heat right there in front of everybody."
+      ],
+      now: [
+        "%n's skin is pink and hot, and they can't stop squeezin' their thighs together.",
+        "The heat's got %n swayin' their hips without meanin' to, presentin' to anyone in reach.",
+        "%n smells like heat, sweet and thick, and the studs nearby have noticed."
+      ],
+      off: [
+        "The heat mist burns off, leavin' you damp and dazed."
+      ]
+    },
+    moo: {
+      seen: [
+        "%n drinks the Moo Juice, opens their mouth to say thank you, and lows like a heifer at feeding time.",
+        "One bottle of Moo Juice later, %n tries to complain. What comes out is a long, mournful mooooo.",
+        "%n swallows the Moo Juice and claps a hand over their mouth. Too late: the moo's out, and everyone heard it.",
+        "The Moo Juice goes down, and %n's next three words are all the same word, and that word is moo."
+      ],
+      now: [
+        "%n opens their mouth to argue and a long, low moo rolls out instead.",
+        "Every word %n tries comes out as somethin' a cow would say. They've stopped tryin'."
+      ],
+      off: [
+        "Your words come back. The first one you say is still a little bit of a moo."
+      ]
+    },
+    bitterroot: {
+      seen: [
+        "%n gags on a Bitterroot and glares at the bottle. Everything that was building in 'em just went sour.",
+        "A swig of Bitterroot, and %n's face scrunches up. Whatever pleasure's comin' their way for the next half hour, it's comin' ruined.",
+        "%n swallows the Bitterroot like medicine. Then their thighs press together, and they whimper, because now it aches and it won't pay out.",
+        "The Bitterroot goes down mean. %n squirms, already frustrated, and they haven't even been touched yet."
+      ],
+      now: [
+        "%n's thighs are slick and tremblin', and the Bitterroot won't let 'em anywhere near the edge.",
+        "Every time %n gets close the heat just drains away, mean and sudden. They whine through their teeth.",
+        "%n squirms, desperate, achin', and absolutely nothin' they do is gonna be enough.",
+        "The Bitterroot's got %n wound tight and leakin', ruined before they even start."
+      ],
+      off: [
+        "The Bitterroot loosens its grip, slow and grudgin'. You can cum again, if you can still remember how.",
+        "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you."
+      ]
+    }
   };
 
   // dispensary/src/say.js
@@ -844,7 +975,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     caps = L.capabilities || /* @__PURE__ */ new Set();
     if (caps.has("drugs")) {
       for (const [id, B] of Object.entries(BOOK)) {
-        if (B.lscg || REG[id]) continue;
+        if (B.lscg || B.instant || REG[id]) continue;
         try {
           api.drugs.register({
             name: id,
@@ -852,6 +983,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             description: B.desc,
             keywords: B.keywords,
             color: B.color,
+            soakKeywords: B.soak || void 0,
             max: 600,
             decayPerMinute: 0,
             tickSeconds: 20,
@@ -930,6 +1062,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       farm: true,
       words: /\b(denial serum|edge serum|orgasm (?:block\w*|denial)|held at the edge)\b/,
       keywords: ["denial serum", "edge serum", "orgasm block"],
+      soak: ["denial", "edging"],
       desc: "Held right at the edge: you can climb all you like, but you can't go over till it wears off. Two hours a dose."
     },
     sedative: {
@@ -942,6 +1075,123 @@ One of mods you are using is using an old version of SDK. It will work for now b
       words: /\b(sedat\w*|tranquili[sz]\w*|drowsy|sleepy serum)\b/,
       keywords: ["sedative", "tranquilizer"],
       desc: "Heavy, drowsy and slow: a sleepy face, slow feet, and eyes that keep wantin' to close. An hour a dose."
+    },
+    needy: {
+      label: "Needy Nectar",
+      icon: "\u{1F497}",
+      mins: 30,
+      color: "#e0607e",
+      farm: true,
+      lscg: "horny",
+      voice: "needy",
+      every: [4, 7],
+      words: /\b(aphrodisiac|horny|lust serum|libido|needy nectar)\b/,
+      keywords: ["needy nectar", "aphrodisiac", "lust serum"],
+      desc: "Achin' and squirmin': your arousal creeps up and won't settle, and your face gives you away. Half an hour a dose."
+    },
+    hairtrigger: {
+      label: "Hair Trigger",
+      icon: "\u26A1",
+      mins: 60,
+      color: "#e8b04a",
+      farm: true,
+      every: [6, 10],
+      words: /\b(hair[- ]?trigger|sensiti[sz]er|oversensitiv\w*)\b/,
+      keywords: ["hair trigger", "sensitizer"],
+      soak: ["sensitizer", "sensitizing"],
+      desc: "Every touch counts double: whatever anybody does to you works you up twice as fast. An hour a dose."
+    },
+    bitterroot: {
+      label: "Bitterroot",
+      icon: "\u{1F33F}",
+      mins: 30,
+      color: "#6f8f4a",
+      farm: true,
+      voice: "bitterroot",
+      every: [5, 8],
+      words: /\b(bitterroot|ruin(?:ing|ed)? (?:serum|draught|tonic|shot))\b/,
+      keywords: ["bitterroot"],
+      soak: ["bitterroot", "ruin"],
+      desc: "Every orgasm slips away ruined: you go over, and get none of the relief. Half an hour a dose."
+    },
+    moo: {
+      label: "Moo Juice",
+      icon: "\u{1F404}",
+      mins: 20,
+      color: "#c9a35b",
+      farm: true,
+      voice: "moo",
+      every: [6, 10],
+      room: true,
+      words: /\b(moo (?:serum|shot|juice))\b/,
+      keywords: ["moo juice", "moo serum"],
+      soak: ["moo"],
+      desc: "Your words keep comin' out as the noises your animal makes. Twenty minutes a dose."
+    },
+    hiccup: {
+      label: "Hiccup Fizz",
+      icon: "\u{1FAE7}",
+      mins: 15,
+      color: "#7ec8e3",
+      farm: true,
+      voice: "hiccup",
+      every: [1, 3],
+      room: true,
+      words: /\b(hiccup\w*)\b/,
+      keywords: ["hiccup fizz"],
+      soak: ["hiccup"],
+      desc: "Hiccups. In every other sentence. At the worst possible moments. Fifteen minutes a dose."
+    },
+    feather: {
+      label: "Featherlight",
+      icon: "\u{1FAB6}",
+      mins: 15,
+      color: "#d9c8f0",
+      farm: true,
+      voice: "feather",
+      every: [2, 4],
+      room: true,
+      words: /\b(featherlight|tickl\w* (?:serum|draught|potion|shot))\b/,
+      keywords: ["featherlight"],
+      soak: ["tickle", "tickling"],
+      desc: "Unbearably ticklish: giggles slip into everything you say. Fifteen minutes a dose."
+    },
+    heat: {
+      label: "Heat",
+      icon: "\u{1F525}",
+      mins: 60,
+      color: "#e0703a",
+      farm: true,
+      voice: "heatmist",
+      every: [4, 6],
+      room: true,
+      words: /\b(heat[- ]?inducer|heat mist|in heat serum)\b/,
+      keywords: ["heat inducer", "heat mist"],
+      soak: ["heat"],
+      desc: "In heat: your arousal won't drop below a simmer, and everybody near can tell. On the farm, the farm keeps the heat itself. An hour a dose."
+    },
+    suggestible: {
+      label: "Suggestible",
+      icon: "\u{1F300}",
+      mins: 30,
+      color: "#4cd964",
+      farm: true,
+      lscg: "suggestible",
+      lscgOnly: true,
+      words: /\b(obedien\w*|docile|compliance|suggest[ia]ble)\b/,
+      keywords: ["obedience", "docile"],
+      desc: "LSCG's Suggestible: the more of it in you, the more you want to do as you're told. Only with LSCG; without it, the farm's obedience shot is the farm's trance."
+    },
+    purge: {
+      label: "Purge",
+      icon: "\u{1F9FC}",
+      mins: 0,
+      color: "#9fc7c7",
+      farm: true,
+      instant: true,
+      words: /\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/,
+      keywords: ["purge serum", "antidote"],
+      desc: "Every dose in you flushed out at once (and LSCG's too, with its own antidote, when it's loaded)."
     }
   };
   var doseIds = () => Object.keys(BOOK);
@@ -953,6 +1203,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function dosesIn(text) {
     const t = String(text || "").toLowerCase(), x = stackOf(t);
     return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => ({ id, x }));
+  }
+  var voiceOf = (id) => BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice] || null;
+  var nameIn = (t) => String(t).replace(/%n/g, myName());
+  function takeLine(id) {
+    const v = voiceOf(id);
+    return v && v.seen.length ? nameIn(pick(v.seen)) : LINES[id] && LINES[id].take ? fill(pick(LINES[id].take)) : "";
+  }
+  function nowLine(id) {
+    const v = voiceOf(id);
+    return v && v.now.length ? nameIn(pick(v.now)) : LINES[id] && LINES[id].now ? fill(pick(LINES[id].now)) : "";
+  }
+  function offLine(id) {
+    const v = voiceOf(id);
+    return v && v.off.length ? nameIn(pick(v.off)) : LINES[id] && LINES[id].off ? fill(pick(LINES[id].off)) : "";
   }
   var penaltyF = () => 1 + st().penalty / 100;
   function active(id) {
@@ -969,25 +1233,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const B = BOOK[id], S2 = st();
     if (!B) return { ok: false, why: "unknown" };
     if (S2.off[id]) return { ok: false, why: "off" };
+    if (B.instant) return purge(o);
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
+    if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
     const dur = Math.max(MIN, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN));
     const was = active(id), d = S2.doses[id], by = Number(o.by) || 0;
+    const xNow = Math.max(x, was && d ? d.x || 1 : 1);
     if (S2.clock === "real") {
       const add2 = dur * penaltyF(), base = was && typeof d.until === "number" ? d.until : now;
-      S2.doses[id] = { x, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add2) : base + add2) };
+      S2.doses[id] = { x: xNow, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add2) : base + add2) };
     } else {
       const base = was && typeof d.left === "number" ? d.left : 0;
-      S2.doses[id] = { x, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
+      S2.doses[id] = { x: xNow, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
     }
     save();
     if (!was) start(id);
-    if (!o.quiet) action(fill(o.line || pick(LINES[id].take)));
+    if (!o.quiet) action(o.line || takeLine(id));
     try {
       lscgShow(id, by);
     } catch (e) {
     }
     return { ok: true };
+  }
+  function purge(o) {
+    const n = clearAll("purge");
+    let lscg = false;
+    if (lscgPresent()) {
+      try {
+        lscg = lscgDose("antidote", { by: o.by });
+      } catch (e) {
+      }
+    }
+    if (!o.quiet) action(o.line || fill("%t shudders as the purge hits, and every dose in them drains away, clean and cold."));
+    return { ok: true, n, lscg };
   }
   function end(id, why) {
     const S2 = st();
@@ -995,7 +1274,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     delete S2.doses[id];
     save();
     stop(id);
-    if ((why === "done" || why === "lscg") && LINES[id]) local(pick(LINES[id].off));
+    if (why === "done" || why === "lscg") {
+      const l = offLine(id);
+      if (l) local(l);
+    }
     return true;
   }
   function clearAll(why) {
@@ -1044,23 +1326,63 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
   };
+  var meter = () => {
+    const A = W6.Player && W6.Player.ArousalSettings;
+    return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
+  };
+  function setArousal(v) {
+    try {
+      const A = meter();
+      if (!A) return;
+      const n = Math.max(0, Math.min(100, Math.round(v)));
+      if (typeof W6.ActivitySetArousal === "function") W6.ActivitySetArousal(W6.Player, n);
+      else A.Progress = n;
+    } catch (e) {
+    }
+  }
+  var xOf = (id) => st().doses[id] && st().doses[id].x || 1;
   var felt = {};
   function start(id) {
     if (id === "sedative") face("Eyes", "Dazed", 180);
+    if (id === "needy" || id === "heat") face("Blush", "Medium", 120);
   }
   function stop(id) {
     if (id === "sedative") face("Eyes", null);
+    if ((id === "needy" || id === "heat") && !active("needy") && !active("heat")) face("Blush", null);
     delete felt[id];
   }
   function feel(id, now) {
-    if (id !== "sedative" || !inRoom()) return;
-    const f = felt[id] || (felt[id] = { face: now, drift: now + (3 + Math.random() * 4) * MIN });
-    if (now - f.face > 2 * MIN) {
+    const B = BOOK[id];
+    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN });
+    if (id === "sedative" && now - f.face > 2 * MIN) {
       f.face = now;
       face("Eyes", "Dazed", 180);
     }
-    if (now >= f.drift) {
-      f.drift = now + (8 + Math.random() * 6) * MIN;
+    if (id === "needy") {
+      const A = meter(), cap = Math.min(92, 60 + 10 * xOf(id));
+      if (A && (Number(A.Progress) || 0) < cap) setArousal((Number(A.Progress) || 0) + 2);
+      if (now - f.face > 2 * MIN) {
+        f.face = now;
+        face("Blush", "Medium", 120);
+      }
+    }
+    if (id === "heat") {
+      const A = meter(), floor = Math.min(70, 25 + 15 * xOf(id));
+      if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
+      if (now - f.face > 2 * MIN) {
+        f.face = now;
+        face("Blush", "Medium", 120);
+      }
+    }
+    if (B.every && now >= f.next && inRoom()) {
+      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN;
+      const l = nowLine(id);
+      if (l) {
+        if (B.room) action(l);
+        else local(l);
+      }
+    } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
+      f.next = now + (8 + Math.random() * 6) * MIN;
       local(pick(LINES.sedative.drift));
     }
   }
@@ -1085,6 +1407,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     } catch (e) {
       console.warn("[Dispensary] Denial Serum can't hold you:", e);
+    }
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 6, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W6.ActivityOrgasmRuined = true;
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] Bitterroot can't ruin you:", e);
+    }
+    try {
+      mod2.hookFunction("ActivitySetArousalTimer", 6, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("hairtrigger") && Number(args[3]) > 0) {
+            args[3] = Number(args[3]) * 2;
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] Hair Trigger can't reach you:", e);
     }
     try {
       mod2.hookFunction("ChatRoomMapViewCanEnterTile", 1, (args, next) => {
@@ -1238,6 +1586,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const S2 = st();
       S2.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S2.farm;
       if (typeof m.stock === "boolean") S2.stock = m.stock;
+      if (typeof m.species === "string" && /^[a-z]{2,20}$/.test(m.species)) S2.speciesFarm = m.species;
       S2.farmAt = Date.now();
       save();
       return;
@@ -1309,36 +1658,307 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // extension/src/dom.js
-  function h(tag, props, ...kids) {
-    const el = window.document.createElement(tag);
-    for (const [k, v] of Object.entries(props || {})) {
-      if (v === void 0 || v === null || v === false) continue;
-      if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
-      else if (k === "class") el.className = v;
-      else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
-      else if (k === "value") {
-        el.value = v;
-        el.setAttribute("value", v);
-      } else el.setAttribute(k, v === true ? "" : String(v));
+  // shared/species.js
+  var WORDS = {
+    cow: "cow",
+    cows: "cow",
+    cattle: "cow",
+    heifer: "cow",
+    hucow: "cow",
+    bovine: "cow",
+    calf: "cow",
+    dairy: "cow",
+    moo: "cow",
+    cowgirl: "cow",
+    bull: "bull",
+    ox: "bull",
+    steer: "bull",
+    pony: "pony",
+    filly: "pony",
+    foal: "pony",
+    colt: "pony",
+    ponygirl: "pony",
+    ponyboy: "pony",
+    horse: "horse",
+    mare: "horse",
+    stallion: "horse",
+    equine: "horse",
+    deer: "deer",
+    doe: "deer",
+    fawn: "deer",
+    stag: "deer",
+    reindeer: "deer",
+    pig: "pig",
+    piggy: "pig",
+    piglet: "pig",
+    sow: "pig",
+    hog: "pig",
+    swine: "pig",
+    oink: "pig",
+    boar: "pig",
+    pup: "pup",
+    puppy: "pup",
+    pupper: "pup",
+    pupgirl: "pup",
+    pupboy: "pup",
+    dog: "dog",
+    doggy: "dog",
+    doggie: "dog",
+    hound: "dog",
+    canine: "dog",
+    bitch: "dog",
+    kitt: "kitt",
+    kitty: "kitt",
+    kitten: "kitt",
+    kittie: "kitt",
+    kit: "kitt",
+    kitteh: "kitt",
+    neko: "kitt",
+    catgirl: "kitt",
+    catboy: "kitt",
+    cat: "cat",
+    feline: "cat",
+    tomcat: "cat",
+    pussycat: "kitt",
+    goblin: "goblin",
+    gob: "goblin",
+    gobbo: "goblin",
+    bunny: "bunny",
+    bun: "bunny",
+    bunbun: "bunny",
+    rabbit: "rabbit",
+    hare: "rabbit",
+    fox: "fox",
+    vixen: "fox",
+    foxy: "fox",
+    kitsune: "fox",
+    wolf: "wolf",
+    lupine: "wolf",
+    wolfie: "wolf",
+    goat: "goat",
+    nanny: "goat",
+    billy: "goat",
+    kid: "goat",
+    sheep: "sheep",
+    lamb: "sheep",
+    ewe: "sheep",
+    ram: "sheep",
+    dragon: "dragon",
+    dragoness: "dragon",
+    drake: "dragon",
+    wyrm: "dragon",
+    wyvern: "dragon",
+    draconic: "dragon",
+    drakeling: "dragon",
+    kobold: "dragon",
+    dragonborn: "dragon",
+    rat: "rat",
+    ratty: "rat",
+    rattie: "rat",
+    ratgirl: "rat",
+    ratboy: "rat",
+    ratslut: "rat",
+    rodent: "rat",
+    mouse: "rat",
+    mousey: "rat",
+    mice: "rat"
+  };
+  var ENDINGS = /(girl|boy|gal|guy|kin|slut|sluts|whore|toy|pet|bimbo|s)$/;
+  var known = (w) => {
+    if (WORDS[w]) return WORDS[w];
+    const cut = w.replace(ENDINGS, "");
+    if (cut !== w && cut.length > 1) {
+      if (WORDS[cut]) return WORDS[cut];
+      const again = cut.replace(ENDINGS, "");
+      if (WORDS[again]) return WORDS[again];
     }
-    add(el, kids);
+    if (/ves$/.test(w) && WORDS[w.replace(/ves$/, "f")]) return WORDS[w.replace(/ves$/, "f")];
+    return null;
+  };
+  var INSIDE = Object.keys(WORDS).filter((w) => w.length >= 3).sort((a, b) => b.length - a.length);
+  function speciesKeyOf(text) {
+    const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+    if (!low) return null;
+    const whole = low.replace(/[\s\/-]+/g, "");
+    if (known(whole)) return known(whole);
+    const words = low.split(/[\s\/-]+/).filter(Boolean);
+    for (const w of words) {
+      const k = known(w);
+      if (k) return k;
+    }
+    for (const w of words) {
+      const hit = INSIDE.find((x) => w.startsWith(x) || w.endsWith(x));
+      if (hit) return WORDS[hit];
+    }
+    return null;
+  }
+
+  // shared/noises.js
+  var NOISES = {
+    cow: ["moo", "mooo", "mrrrm"],
+    bull: ["moo", "hrrmph"],
+    pony: ["neigh", "nicker", "whinny"],
+    horse: ["neigh", "whinny", "nicker"],
+    pup: ["arf", "woof", "awoo"],
+    dog: ["woof", "arf", "ruff"],
+    kitty: ["mew", "nya", "mrrp"],
+    cat: ["meow", "mrrp", "purr"],
+    bunny: ["squeak", "eep"],
+    rabbit: ["squeak", "eep"],
+    pig: ["oink", "snrk"],
+    goat: ["baa", "maa"],
+    sheep: ["baa", "baaa"],
+    fox: ["yip", "ack"],
+    wolf: ["awoo", "grr"],
+    deer: ["bleat", "mweh"],
+    goblin: ["heh", "nngh"],
+    rat: ["squeak", "eek", "chitter"],
+    dragon: ["rawr", "grr", "hsss"],
+    kitt: ["mew", "nya", "mrrp"]
+  };
+  var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
+  function mooify(text, species, share) {
+    const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+    const keep = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
+    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+      if (Math.random() < keep) return w;
+      const n = say[Math.floor(Math.random() * say.length)];
+      return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
+    });
+  }
+
+  // dispensary/src/speech.js
+  var xOf2 = (id) => st().doses[id] && st().doses[id].x || 1;
+  var GIGGLES = ["hehe", "*giggle*", "hee", "*snrk*", "ahaha", "*giggles*"];
+  var pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+  function sprinkle(text, bits, every) {
+    const words = String(text).split(" ");
+    if (words.length < 2) return text + " " + pickOf(bits);
+    const out = [];
+    let since = 0;
+    words.forEach((w, i) => {
+      out.push(w);
+      since++;
+      if (i < words.length - 1 && since >= every && Math.random() < 0.5) {
+        out.push(pickOf(bits));
+        since = 0;
+      }
+    });
+    if (!out.some((w) => bits.includes(w))) out.splice(1 + Math.floor(Math.random() * (out.length - 1)), 0, pickOf(bits));
+    return out.join(" ");
+  }
+  function dosedSpeech(text) {
+    let t = String(text);
+    if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf2("moo")));
+    if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "\u2014hic\u2014"], 4);
+    if (active("feather")) t = sprinkle(t, GIGGLES, 5);
+    return t;
+  }
+  var touched = () => active("moo") || active("hiccup") || active("feather");
+  function initSpeech(mod2) {
+    try {
+      mod2.hookFunction("ServerSend", 6, (args, next) => {
+        try {
+          const d = args[1];
+          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && touched() && !/^\s*[(\[?!./\-*]/.test(d.Content))
+            args = [args[0], Object.assign({}, d, { Content: dosedSpeech(d.Content) })];
+        } catch (e) {
+          console.warn("[Dispensary] speech:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] what you say can't be dosed:", e);
+    }
+  }
+
+  // dispensary/src/screen.js
+  var W9 = window;
+  var el = null;
+  var styled = false;
+  var CSS = `
+#fd-screen{position:fixed;inset:0;pointer-events:none;z-index:2147482000;transition:opacity 1.5s ease}
+#fd-screen.breathe{animation:fd-breathe 7s ease-in-out infinite}
+#fd-screen.pulse{animation:fd-pulse 2.4s ease-in-out infinite}
+@keyframes fd-breathe{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes fd-pulse{0%,100%{opacity:.25}50%{opacity:.9}}
+@media (prefers-reduced-motion: reduce){#fd-screen.breathe,#fd-screen.pulse{animation:none;opacity:.6}}
+`;
+  function ensure() {
+    if (!styled) {
+      const s = W9.document.createElement("style");
+      s.textContent = CSS;
+      W9.document.head.appendChild(s);
+      styled = true;
+    }
+    if (!el) {
+      el = W9.document.createElement("div");
+      el.id = "fd-screen";
+      el.setAttribute("aria-hidden", "true");
+      W9.document.body.appendChild(el);
+    }
     return el;
   }
-  function add(el, kids) {
+  var arousal = () => {
+    const A = W9.Player && W9.Player.ArousalSettings;
+    return A ? Number(A.Progress) || 0 : 0;
+  };
+  function screenNow() {
+    if (st().screen === false || W9.CurrentScreen !== "ChatRoom") return null;
+    if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
+    if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
+    if (active("heat")) return { bg: "radial-gradient(ellipse at center, rgba(255,140,60,.06) 30%, rgba(255,110,40,.35) 100%)", cls: "breathe", id: "heat" };
+    if (active("needy")) return { bg: "radial-gradient(ellipse at center, rgba(255,120,170,.05) 40%, rgba(255,90,150,.3) 100%)", cls: "breathe", id: "needy" };
+    return null;
+  }
+  function screenTick() {
+    const s = screenNow();
+    if (!s) {
+      if (el) {
+        el.remove();
+        el = null;
+      }
+      return null;
+    }
+    const e = ensure();
+    if (e.dataset.id !== s.id) {
+      e.dataset.id = s.id;
+      e.style.background = s.bg;
+      e.className = s.cls;
+    }
+    return s.id;
+  }
+
+  // extension/src/dom.js
+  function h(tag, props, ...kids) {
+    const el2 = window.document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v === void 0 || v === null || v === false) continue;
+      if (k.startsWith("on") && typeof v === "function") el2.addEventListener(k.slice(2), v);
+      else if (k === "class") el2.className = v;
+      else if (k === "style" && typeof v === "object") Object.assign(el2.style, v);
+      else if (k === "value") {
+        el2.value = v;
+        el2.setAttribute("value", v);
+      } else el2.setAttribute(k, v === true ? "" : String(v));
+    }
+    add(el2, kids);
+    return el2;
+  }
+  function add(el2, kids) {
     for (const k of kids) {
       if (k === null || k === void 0 || k === false) continue;
-      if (Array.isArray(k)) add(el, k);
-      else el.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
+      if (Array.isArray(k)) add(el2, k);
+      else el2.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
     }
   }
 
   // dispensary/src/page.js
-  var W9 = window;
+  var W10 = window;
   var ID = "FarmhandDispensary";
   var box = null;
   var note = "";
-  var CSS = `
+  var CSS2 = `
 #fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(760px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;z-index:2147483000;padding:14px 18px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;
   border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
@@ -1356,11 +1976,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
-    if (W9.document.getElementById("fd-style")) return;
-    const s = W9.document.createElement("style");
+    if (W10.document.getElementById("fd-style")) return;
+    const s = W10.document.createElement("style");
     s.id = "fd-style";
-    s.textContent = CSS;
-    W9.document.head.appendChild(s);
+    s.textContent = CSS2;
+    W10.document.head.appendChild(s);
   }
   var clockTip = (mode) => {
     const p = st().penalty;
@@ -1383,9 +2003,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return d <= 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days (" + dateOf(t) + ")";
   };
   var keyName = (mn) => {
-    const P = W9.Player || {};
+    const P = W10.Player || {};
     const own = P.Ownership && P.Ownership.MemberNumber === mn;
-    const c = (W9.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
+    const c = (W10.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
     return (c ? c.Nickname || c.Name : "#" + mn) + (own ? " (your owner)" : PROPRIETORS.includes(mn) ? " (proprietor)" : "");
   };
   var endPick = "7";
@@ -1395,7 +2015,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var keyInput = "";
   var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
   function keyholdersCard() {
-    const S2 = st(), locked = hardOn(), P = W9.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
+    const S2 = st(), locked = hardOn(), P = W10.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
     if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
     if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
     for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
@@ -1455,7 +2075,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           endSel,
           h("button", { disabled: keys.length ? void 0 : true, onclick: () => {
             const days = Number(endPick) || 0;
-            if (typeof W9.confirm === "function" && !W9.confirm(hardWarning(days, keys))) return;
+            if (typeof W10.confirm === "function" && !W10.confirm(hardWarning(days, keys))) return;
             const r = lock(days);
             note = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
             draw();
@@ -1470,7 +2090,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-card" },
       h("div", null, "\u{1F512} Locked in since " + dateOf(H.since) + ". " + (H.until ? "It ends " + inDays(H.until) + "." : "No end date: it lets go " + inDays(dueAt()) + " unless a keyholder checks in before then.")),
       h("div", { class: "fd-muted" }, "Your keyholders: " + keys.map(keyName).join(", ") + ". They can change your settings, let you out, or end it."),
-      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W9.Player && W9.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
+      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W10.Player && W10.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
     ));
     return out;
   }
@@ -1480,7 +2100,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!list.length) return [];
     const out = [h("h3", null, "Keys you hold")];
     for (const [k, x] of list) {
-      const mn = Number(k), inRoom2 = (W9.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
+      const mn = Number(k), inRoom2 = (W10.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
       const go = (what, data) => {
         const how = keyDo(mn, what, data);
         note = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
@@ -1494,7 +2114,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { onclick: () => go("check") }, "Check in"),
           h("button", { onclick: () => go("letout") }, "Let out (lift every dose)"),
           h("button", { onclick: () => {
-            if (typeof W9.confirm !== "function" || W9.confirm("End " + name + "'s hardcore?")) go("end");
+            if (typeof W10.confirm !== "function" || W10.confirm("End " + name + "'s hardcore?")) go("end");
           } }, "End hardcore"),
           inRoom2 ? h("button", { onclick: () => {
             editing = { mn };
@@ -1564,7 +2184,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-row", style: { marginBottom: "6px" } },
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
-        if (typeof W9.PreferenceSubscreenExtensionsClear === "function") W9.PreferenceSubscreenExtensionsClear();
+        if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
         else close();
       } }, "Back")
     ));
@@ -1618,6 +2238,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S2.penalty + "%)")),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S2.clock))
     ));
+    kids.push(h("h3", null, "Touches"));
+    kids.push(h(
+      "div",
+      { class: "fd-card" },
+      h("label", null, h("input", { type: "checkbox", checked: S2.screen !== false ? true : void 0, onchange: (e) => {
+        st().screen = e.target.checked;
+        save();
+        draw();
+      } }), h("b", null, "Screen touches")),
+      h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it. Only you see them. With reduce motion set on your computer, they hold still."),
+      h(
+        "div",
+        { class: "fd-row", style: { marginTop: "8px" } },
+        h("span", null, "Your animal, for Moo Juice:"),
+        h(
+          "select",
+          { "aria-label": "Your animal", onchange: (e) => {
+            st().species = e.target.value;
+            save();
+            draw();
+          } },
+          [h("option", { value: "", selected: !S2.species ? true : void 0 }, S2.speciesFarm ? "The farm's word (" + S2.speciesFarm + ")" : "Cow, till the farm says")].concat(ANIMALS.map((a) => h("option", { value: a, selected: S2.species === a ? true : void 0 }, a)))
+        )
+      )
+    ));
     kids.push(h("h3", null, "Doses"));
     const lscg = lscgPresent();
     for (const id of doseIds()) {
@@ -1643,7 +2288,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ),
         h("div", { class: "fd-muted" }, B.desc),
         h("div", { class: "fd-muted" }, "Words on a crafted item: " + B.keywords.join(", ") + ". Add x2 to x5 for a stronger dose."),
-        theirs ? h("div", { class: "fd-note" }, "LSCG is loaded, so this one is LSCG's own sedative: LSCG's settings decide.") : null
+        theirs ? h("div", { class: "fd-note" }, "LSCG is loaded, so this one is LSCG's own: LSCG's settings decide.") : null,
+        B.lscgOnly && !lscg ? h("div", { class: "fd-muted" }, "Needs LSCG.") : null
       ));
     }
     if (lscg) {
@@ -1659,9 +2305,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function open() {
     close();
     styles();
-    box = W9.document.createElement("div");
+    box = W10.document.createElement("div");
     box.id = "fd-page";
-    W9.document.body.appendChild(box);
+    W10.document.body.appendChild(box);
     draw();
   }
   function close() {
@@ -1673,14 +2319,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var pageOpen = () => !!box;
   function redrawPage(force) {
-    const a = W9.document.activeElement;
+    const a = W10.document.activeElement;
     if (!force && box && a && box.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
     draw();
   }
   function initPage() {
-    if (typeof W9.PreferenceRegisterExtensionSetting !== "function") return false;
+    if (typeof W10.PreferenceRegisterExtensionSetting !== "function") return false;
     try {
-      W9.PreferenceRegisterExtensionSetting({
+      W10.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "The Farmhand's Dispensary",
         load: () => open(),
@@ -1702,8 +2348,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function openPage() {
     try {
-      if (typeof W9.PreferenceSubscreenExtensionsOpen === "function") {
-        W9.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
+        W10.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -1713,23 +2359,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/index.js
-  var W10 = window;
+  var W11 = window;
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  if (W10.__farmDispensary) {
+  if (W11.__farmDispensary) {
     console.warn("[Dispensary] Two copies of the Farmhand's Dispensary are installed. Delete the older one in Tampermonkey, then reload.");
     throw new Error("The Farmhand's Dispensary: another copy is already running");
   }
   var mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
-  W10.__farmDispensary = VERSION;
+  W11.__farmDispensary = VERSION;
   initLscg();
   function status() {
     const on = doseIds().filter(active);
     local((on.length ? "In you now: " + on.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
   }
   function commands() {
-    if (typeof W10.CommandCombine !== "function") return;
+    if (typeof W11.CommandCombine !== "function") return;
     try {
-      W10.CommandCombine([{
+      W11.CommandCombine([{
         Tag: "dispensary",
         Description: "[safeword | page]: The Farmhand's Dispensary. What's in you, the safeword, the settings",
         Action: (args) => {
@@ -1759,6 +2405,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initFarm(mod);
     initSafeword(mod);
     initHardcore(mod);
+    initSpeech(mod);
     onHardChange(() => {
       if (pageOpen()) redrawPage(true);
     });
@@ -1769,6 +2416,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       try {
         tick();
         tickHard();
+        screenTick();
         if (pageOpen()) redrawPage();
       } catch (e) {
         console.warn("[Dispensary] clock:", e);
@@ -1777,7 +2425,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => hello(true), 3e3);
   }
   var boot = setInterval(() => {
-    const P = W10.Player;
+    const P = W11.Player;
     if (!P || typeof P.MemberNumber !== "number" || !P.ExtensionSettings) return;
     clearInterval(boot);
     try {
@@ -1786,7 +2434,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       console.warn("[Dispensary] didn't start:", e);
     }
   }, 1e3);
-  if (W10.__FARMHAND_TEST__) W10.__disp = {
+  if (W11.__FARMHAND_TEST__) W11.__disp = {
     st: () => st(),
     give: (...a) => give(...a),
     tick: () => {
@@ -1801,9 +2449,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     lock: (d) => lock(d),
     hardOn: () => hardOn(),
     keyholders: () => keyholders(),
-    dueAt: () => dueAt()
+    dueAt: () => dueAt(),
+    speech: (t) => dosedSpeech(t),
+    screen: () => screenTick()
   };
-  W10.FarmhandDispensary = Object.freeze({
+  W11.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),

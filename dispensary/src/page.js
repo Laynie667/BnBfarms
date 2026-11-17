@@ -10,6 +10,7 @@ import { BOOK, doseIds, active, leftMs, setClock } from "./doses.js";
 import { ladderWho } from "./ladder.js";
 import { lscgPresent, lscgApi } from "./lscg.js";
 import { safeword } from "./safeword.js";
+import { ANIMALS } from "../../shared/noises.js";
 import { hardOn, keyholders, lock, dueAt, hardLog, wards, keyDo, wardState, CHECK_DAYS, addKey, removeKey } from "./hardcore.js";
 
 const W = window, ID = "FarmhandDispensary";
@@ -175,6 +176,17 @@ function view() {
     h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S.penalty + "%)")),
     h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S.clock))));
 
+  // what you see, and your animal
+  kids.push(h("h3", null, "Touches"));
+  kids.push(h("div", { class: "fd-card" },
+    h("label", null, h("input", { type: "checkbox", checked: S.screen !== false ? true : undefined, onchange: (e) => { st().screen = e.target.checked; save(); draw(); } }), h("b", null, "Screen touches")),
+    h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it. Only you see them. With reduce motion set on your computer, they hold still."),
+    h("div", { class: "fd-row", style: { marginTop: "8px" } },
+      h("span", null, "Your animal, for Moo Juice:"),
+      h("select", { "aria-label": "Your animal", onchange: (e) => { st().species = e.target.value; save(); draw(); } },
+        [h("option", { value: "", selected: !S.species ? true : undefined }, S.speciesFarm ? "The farm's word (" + S.speciesFarm + ")" : "Cow, till the farm says")]
+          .concat(ANIMALS.map((a) => h("option", { value: a, selected: S.species === a ? true : undefined }, a)))))));
+
   // the doses
   kids.push(h("h3", null, "Doses"));
   const lscg = lscgPresent();
@@ -187,7 +199,8 @@ function view() {
         h("b", null, B.icon + " " + B.label)),
       h("div", { class: "fd-muted" }, B.desc),
       h("div", { class: "fd-muted" }, "Words on a crafted item: " + B.keywords.join(", ") + ". Add x2 to x5 for a stronger dose."),
-      theirs ? h("div", { class: "fd-note" }, "LSCG is loaded, so this one is LSCG's own sedative: LSCG's settings decide.") : null));
+      theirs ? h("div", { class: "fd-note" }, "LSCG is loaded, so this one is LSCG's own: LSCG's settings decide.") : null,
+      B.lscgOnly && !lscg ? h("div", { class: "fd-muted" }, "Needs LSCG.") : null));
   }
   if (lscg) {
     kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi()

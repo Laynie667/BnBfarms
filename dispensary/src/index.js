@@ -14,6 +14,8 @@ import { initFarm, hello } from "./farm.js";
 import { initLscg } from "./lscg.js";
 import { initSafeword, safeword } from "./safeword.js";
 import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
+import { initSpeech, dosedSpeech } from "./speech.js";
+import { screenTick } from "./screen.js";
 import { initPage, openPage, pageOpen, redrawPage, timeLeft } from "./page.js";
 import { ladderWho, allowed } from "./ladder.js";
 import { local } from "./say.js";
@@ -62,11 +64,12 @@ function start() {
   initFarm(mod);
   initSafeword(mod);
   initHardcore(mod);
+  initSpeech(mod);
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); tickHard(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); tickHard(); screenTick(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -79,7 +82,8 @@ const boot = setInterval(() => {
 
 // the tests reach in (only when a test page says so)
 if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => { tick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
-  lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt() };
+  lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),
+  speech: (t) => dosedSpeech(t), screen: () => screenTick() };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({

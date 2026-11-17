@@ -73,7 +73,12 @@ and running timers follow you between your phone and your PC, and clearing the b
    - your settings freeze as they are when you lock in; only keyholders change them. That covers the Companion's
      game-rule switches (privacy choices stay yours) and the farm's switches, which keyholders set with `?ward`.
    - limits are yours and frozen: nobody changes them while you're locked in, keyholders and staff included.
-3. **LSCG's newer pieces** (LSCG 0.9.9, Nov 3) to build on: soaked and laced gear (our doses already work in it), its
+3. **The shots and potions that work anywhere** (built Nov 17):
+   - Needy Nectar (LSCG's aphrodisiac when loaded), Hair Trigger, Bitterroot, Moo Juice, Hiccup Fizz, Featherlight, Heat, the Purge, and Suggestible (LSCG's only).
+   - Speech changes, and screen touches with a switch.
+   - Every dose of ours goes in LSCG's list with its soak words.
+   - The farm girl hands these potions and shots to the Dispensary and stops narrating them. Her lines for them live in `shared/potion-voice.js`.
+   LSCG's newer pieces (LSCG 0.9.9, Nov 3) still to build on: soaked and laced gear (our doses already work in it), its
    Suggestible drug (the farm's obedience shot becomes it when LSCG is loaded), farm instructions in its hypnosis
    suggestion editor, and our own screen touches for our doses. The farm's own hypno module targets LSCG's hypnosis first
    (Laynie: "LSCG's hypno might be a better compatiblity focus").

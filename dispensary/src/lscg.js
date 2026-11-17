@@ -53,10 +53,10 @@ function setUp(L) {
   caps = L.capabilities || new Set();
   if (caps.has("drugs")) {
     for (const [id, B] of Object.entries(BOOK)) {
-      if (B.lscg || REG[id]) continue;   // LSCG's own are never ours to add
+      if (B.lscg || B.instant || REG[id]) continue;   // LSCG's own are never ours to add (nor the Purge: LSCG has its antidote)
       try {
         api.drugs.register({
-          name: id, label: B.label, description: B.desc, keywords: B.keywords, color: B.color,
+          name: id, label: B.label, description: B.desc, keywords: B.keywords, color: B.color, soakKeywords: B.soak || undefined,
           max: 600, decayPerMinute: 0, tickSeconds: 20,
           onDose(ctx) {
             if (syncing === id) { ctx.setLevel(minsLeft(id)); return; }

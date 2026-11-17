@@ -21,7 +21,7 @@ function page(opts) {
   w.LZString = { compressToBase64: (t) => Buffer.from(t).toString("base64"), decompressFromBase64: (t) => Buffer.from(t, "base64").toString() };
   const my = opts.me || ME;
   w.Player = { MemberNumber: my, Name: my === ME ? "Hana" : "Keeper" + my, ExtensionSettings: opts.ext || {}, Ownership: opts.noOwner ? null : { MemberNumber: OWNER }, Lovership: [{ MemberNumber: LOVER }],
-    WhiteList: [WHITE], FriendList: [FRIEND], BlackList: [BLACK], ArousalSettings: { Progress: 50 }, IsPlayer: () => true, Appearance: [] };
+    WhiteList: [WHITE], FriendList: [FRIEND], BlackList: [BLACK], ArousalSettings: { Active: "Hybrid", Progress: 50 }, IsPlayer: () => true, Appearance: [] };
   const C = (mn, name) => ({ MemberNumber: mn, Name: name, Appearance: [], IsPlayer: () => false });
   w.ChatRoomCharacter = [w.Player, ...(my !== ME ? [C(ME, "Hana")] : []), ...(my !== OWNER ? [C(OWNER, "Mistress")] : []), C(LOVER, "Lov"), C(WHITE, "Whit"), C(FRIEND, "Fren"), C(BLACK, "Blackie"), C(STRANGER, "Stranger"), C(221397, "Laynie")];
   if (opts.bot) w.ChatRoomCharacter.push(C(BOT, "Farm Girl"));
@@ -35,6 +35,9 @@ function page(opts) {
   const game = { orgasm: 0, msgs: 0 };
   w.ChatRoomMessage = function () { game.msgs++; };
   w.ActivityOrgasmPrepare = function () { game.orgasm++; };
+  w.ActivityOrgasmStart = function () { game.ruined = !!w.ActivityOrgasmRuined; };
+  w.ActivitySetArousalTimer = function (C, A, Z, P) { game.timer = P; };
+  w.ActivitySetArousal = function (C, v) { C.ArousalSettings.Progress = v; };
   w.ChatRoomMapViewCanEnterTile = function () { return 100; };
   w.ChatRoomSafewordRevert = function () {}; w.ChatRoomSafewordRelease = function () {};
   w.ChatRoomSync = function () {};
@@ -338,6 +341,63 @@ function page(opts) {
   ok(ck.to(ME, "dispKey").some((d) => d.do === "check"), "a keyholder with only the Companion: it checks in for them too");
   ck.cmds.find((c) => c.Tag === "keys").Action("end hana");
   ok(ck.to(ME, "dispKey").some((d) => d.do === "end"), "/keys end <name> from the Companion");
+
+  // ---- STEP 3: the shots and potions that work anywhere
+  const s3 = page(); await wait(1300);
+  const D3 = s3.D(), P3 = s3.w.Player;
+  const said = (t) => { const n = s3.sent.length; s3.w.ServerSend("ChatRoomChat", { Type: "Chat", Content: t }); const d = s3.sent[n] && s3.sent[n][1]; return d ? d.Content : ""; };
+  // Needy Nectar: in the farm girl's own words, and it creeps up
+  s3.needle(OWNER, "Needy Nectar");
+  ok(D3.active("needy") && s3.actions().some((t) => /Hana/.test(t)), "Needy Nectar takes, and the room hears it in the farm girl's own words");
+  P3.ArousalSettings.Progress = 10; D3.tick();
+  ok(P3.ArousalSettings.Progress > 10, "...your arousal creeps up and won't settle");
+  ok(s3.faces.some(([g, e]) => g === "Blush" && e === "Medium"), "...and your face gives you away");
+  // Hair Trigger: every touch counts double
+  s3.needle(OWNER, "Hair Trigger");
+  s3.w.ActivitySetArousalTimer(P3, {}, "ItemBreast", 5);
+  ok(D3.active("hairtrigger") && s3.game.timer === 10, "Hair Trigger: a touch worth 5 counts as 10");
+  // Bitterroot: ruined
+  s3.needle(OWNER, "Bitterroot Tonic");
+  s3.w.ActivityOrgasmRuined = false; s3.w.ActivityOrgasmStart(P3);
+  ok(D3.active("bitterroot") && s3.game.ruined === true, "Bitterroot: you go over, and it's ruined");
+  // what you say
+  D3.st().speciesFarm = "pup";
+  s3.needle(OWNER, "Moo Juice");
+  const m1 = said("hello there my lovely friends, how are you all doing tonight");
+  ok(/arf|woof|awoo|Arf|Woof|Awoo/.test(m1), "Moo Juice: your words come out as your animal's noise (the farm's word: a pup) (" + m1 + ")");
+  ok(said("(hello there out of character") === "(hello there out of character", "...never what you say out of character");
+  D3.st().species = "cow";
+  ok(/moo|mrrrm|Moo/.test(said("hello there my lovely friends, how are you all doing tonight")), "...or the animal you pick on the page");
+  s3.needle(OWNER, "Hiccup Fizz");
+  ok(/\*hic/.test(said("I really do not know what you mean by that")), "Hiccup Fizz: a *hic* breaks up what you say");
+  s3.needle(OWNER, "Featherlight");
+  ok(/hehe|giggle|hee|snrk|ahaha/.test(said("stop it right now please I mean it")), "Featherlight: giggles slip in");
+  // Heat: a simmer it won't drop below
+  s3.needle(OWNER, "Heat Inducer");
+  P3.ArousalSettings.Progress = 0; D3.tick();
+  ok(D3.active("heat") && P3.ArousalSettings.Progress >= 40, "Heat: your arousal won't drop below a simmer");
+  // the screen touches
+  s3.needle(LOVER, "Sedative");
+  ok(D3.screen() === "sedative" && s3.w.document.getElementById("fd-screen"), "a screen touch: the Sedative dims the edges of your screen");
+  D3.st().screen = false;
+  ok(D3.screen() === null && !s3.w.document.getElementById("fd-screen"), "...and the switch takes them away");
+  D3.st().screen = true;
+  // the Purge
+  s3.needle(OWNER, "Purge Serum");
+  ok(!["needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "sedative"].some((id) => D3.active(id)), "the Purge: every dose in you flushed out at once");
+  ok(D3.give("suggestible", { by: OWNER }).why === "nolscg", "Suggestible is LSCG's only: without LSCG, nothing of ours");
+  // with LSCG: Needy Nectar is LSCG's aphrodisiac, the Purge brings LSCG's antidote, our others go in its list with their soak words
+  const reg3 = {}, doses3 = [];
+  const L3 = { getModApi: () => ({ drugs: { register: (d) => { reg3[d.name] = d; return () => {}; }, dose: (type, o) => { doses3.push(type); return true; } }, events: { on() {}, before() {} } }), capabilities: new Set(["core", "events", "drugs"]) };
+  const s4 = page({ lscg: L3, bot: true }); await wait(1300);
+  ok(!reg3.needy && !reg3.suggestible && !reg3.purge && reg3.hiccup && reg3.moo && reg3.hairtrigger, "LSCG's list: ours go in (not LSCG's own aphrodisiac or Suggestible, nor the Purge)");
+  ok(reg3.hiccup.soakKeywords && reg3.hiccup.soakKeywords.includes("hiccup") && reg3.bitterroot.soakKeywords.includes("ruin"), "...each with the words that read right on soaked gear (a hiccup-laced bit, a ruin-soaked gag)");
+  s4.fromBot("dose", { id: 40, dose: "needy", x: 1, mins: 30, by: OWNER, line: "NEEDY LINE" });
+  ok(doses3.includes("horny") && !s4.D().active("needy"), "with LSCG, the farm girl's Needy Nectar goes through LSCG's own aphrodisiac");
+  s4.fromBot("dose", { id: 41, dose: "suggestible", x: 1, mins: 30, by: OWNER, line: "OBEY" });
+  ok(doses3.includes("suggestible"), "...and her obedience shot is LSCG's Suggestible");
+  s4.fromBot("dose", { id: 42, dose: "purge", by: OWNER, line: "PURGED" });
+  ok(doses3.includes("antidote") && s4.actions().includes("PURGED"), "...and her purge brings LSCG's antidote too");
 
   // ---- the page
   ok(p.pages.length === 1 && p.pages[0].Identifier === "FarmhandDispensary", "its own page in Preferences → Extensions");

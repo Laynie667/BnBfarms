@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.3** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.4** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.9** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.10** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,24 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.72.4 + Companion 0.54.10 + Dispensary 0.1.4: the shots and potions that work anywhere.** Laynie, Nov 17: "lets continue with the dispensary", and earlier, "the ones that need her voice, couldnt the voice be built into the dispensary too, so it triggers there?"
+  - **New in the Dispensary:**
+    - **Needy Nectar / aphrodisiac:** arousal that creeps up and won't settle, and a flushed face. LSCG's own aphrodisiac when LSCG is loaded.
+    - **Hair Trigger:** every touch counts double.
+    - **Bitterroot:** every orgasm ruined.
+    - **Moo Juice:** your words come out as your animal's noises. Your animal is the farm's word for you, or the one you pick on the page.
+    - **Hiccup Fizz:** hiccups in what you say.
+    - **Featherlight:** giggles slip in.
+    - **Heat:** arousal that won't drop below a simmer.
+    - **The Purge:** every dose out at once, plus LSCG's antidote when LSCG is loaded.
+    - **Suggestible:** LSCG's own, only with LSCG.
+  - **What you say:** speech changes only touch what you say out loud in the room, never commands, whispers, emotes or out-of-character lines.
+  - **Screen touches** (only you see them, with a switch on the page; with reduce motion set they hold still): the Sedative dims your screen's edges, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it.
+  - **LSCG:** every dose of ours is in LSCG's drug list with the words that read right on soaked gear (a hiccup-laced bit, a ruin-soaked gag).
+  - **One voice (bot):** the farm girl's lines for these six potions moved to `shared/potion-voice.js`, which she and the Dispensary both read. Moo Juice's noises moved to `shared/noises.js`, for the Companion and the Dispensary.
+  - **She hands them over (bot):** for anybody running the Dispensary, a Needy Nectar, Hiccup Fizz, Featherlight, Heat Mist, Moo Juice or Bitterroot is said and felt by their own game, the moment they drink it and every few minutes after. She stops narrating it. It's still the farm's potion, on her books. If their Dispensary won't take it, she does it the old way. Hair Trigger, Purge and heat shots go to the Dispensary too. With LSCG on their side, the obedience shot becomes LSCG's Suggestible instead of the farm's trance.
+  - **The Companion** stands aside for Moo Juice when the Dispensary is doing it, so it never comes out twice.
 
 - **Companion 0.54.9: the flight recorder names who asked.** Every crash of the farm girl's tab tonight ended at about 12 GB, some only 26 seconds after the page opened, so something grabs it all at once. When a count on her tab jumps past anything a normal few seconds need (20 million canvas or picture pixels, hundreds of pictures, blobs or sounds), the recorder now also writes down which script asked: its web address and line, or a userscript's name. The bot loads other club mods through FUSAM, and this names the one. After a crash, `/farmmem` shows it as **WHO:** in the last seconds before the crash.
 

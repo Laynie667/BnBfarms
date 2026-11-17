@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.54.9
+// @version      0.54.10
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.54.9";
+  var VERSION = "0.54.10";
 
   // shared/species.js
   var WORDS = {
@@ -365,6 +365,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (hit) return WORDS[hit];
     }
     return null;
+  }
+
+  // shared/noises.js
+  var NOISES = {
+    cow: ["moo", "mooo", "mrrrm"],
+    bull: ["moo", "hrrmph"],
+    pony: ["neigh", "nicker", "whinny"],
+    horse: ["neigh", "whinny", "nicker"],
+    pup: ["arf", "woof", "awoo"],
+    dog: ["woof", "arf", "ruff"],
+    kitty: ["mew", "nya", "mrrp"],
+    cat: ["meow", "mrrp", "purr"],
+    bunny: ["squeak", "eep"],
+    rabbit: ["squeak", "eep"],
+    pig: ["oink", "snrk"],
+    goat: ["baa", "maa"],
+    sheep: ["baa", "baaa"],
+    fox: ["yip", "ack"],
+    wolf: ["awoo", "grr"],
+    deer: ["bleat", "mweh"],
+    goblin: ["heh", "nngh"],
+    rat: ["squeak", "eek", "chitter"],
+    dragon: ["rawr", "grr", "hsss"],
+    kitt: ["mew", "nya", "mrrp"]
+  };
+  var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
+  function mooify(text, species, share) {
+    const say2 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+    const keep2 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
+    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+      if (Math.random() < keep2) return w;
+      const n = say2[Math.floor(Math.random() * say2.length)];
+      return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
+    });
   }
 
   // extension/src/config.js
@@ -12630,36 +12664,6 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   window.__farmhandCompanion = VERSION;
   var st = { panel: null, welcomed: false, lastHello: 0, parts: /* @__PURE__ */ new Map() };
-  var NOISES = {
-    cow: ["moo", "mooo", "mrrrm"],
-    bull: ["moo", "hrrmph"],
-    pony: ["neigh", "nicker", "whinny"],
-    horse: ["neigh", "whinny", "nicker"],
-    pup: ["arf", "woof", "awoo"],
-    dog: ["woof", "arf", "ruff"],
-    kitty: ["mew", "nya", "mrrp"],
-    cat: ["meow", "mrrp", "purr"],
-    bunny: ["squeak", "eep"],
-    rabbit: ["squeak", "eep"],
-    pig: ["oink", "snrk"],
-    goat: ["baa", "maa"],
-    sheep: ["baa", "baaa"],
-    fox: ["yip", "ack"],
-    wolf: ["awoo", "grr"],
-    deer: ["bleat", "mweh"],
-    goblin: ["heh", "nngh"],
-    rat: ["squeak", "eek", "chitter"],
-    dragon: ["rawr", "grr", "hsss"],
-    kitt: ["mew", "nya", "mrrp"]
-  };
-  function mooify(text, species) {
-    const say2 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
-    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
-      if (Math.random() < 0.5) return w;
-      const n = say2[Math.floor(Math.random() * say2.length)];
-      return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
-    });
-  }
   function dumbDown(text, depth) {
     const max = depth >= 4 ? 4 : depth === 3 ? 6 : 8, fillers = ["mm", "uh", "...", "nn"];
     let out = String(text).replace(/[A-Za-z']+/g, (w) => {
@@ -13333,7 +13337,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       mod.hookFunction("ServerSend", 5, (args, next) => {
         try {
           const d = args[1], s = st.panel && st.panel.s;
-          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.fx) && s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content))
+          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.fx) && s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content) && !(window.FarmhandDispensary && window.FarmhandDispensary.active("moo")))
             args = [args[0], Object.assign({}, d, { Content: mooify(d.Content, s.species) })];
         } catch (e) {
           console.warn("[Farmhand Companion] moo:", e);

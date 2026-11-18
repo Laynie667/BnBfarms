@@ -5,6 +5,7 @@
    Step 1 (Nov 17): the bones. Settings on your account, who can dose you, the clock, needles, the safeword, LSCG, the
    farm girl's call, and the first two doses (Denial Serum, the Sedative). docs/DISPENSARY.md has the whole plan.
 */
+import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
 import { load, st } from "./store.js";
@@ -29,6 +30,7 @@ if (W.__farmDispensary) {
 }
 const mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
 W.__farmDispensary = VERSION;
+registerInk(W, mod);   // the ink and brand slots, the same as the Companion's (whichever loads first adds them)
 
 // LSCG can load before or after us, and before login: its queue waits either way
 initLscg();

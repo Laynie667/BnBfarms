@@ -1,6 +1,6 @@
 # What to install (current versions)
 
-Updated 2026-11-17. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-18. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.10** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.1.4** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.55.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.2.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.55.0 + Dispensary 0.2.0: farm ink, tattoos and brands in the wardrobe.** Laynie, Nov 17: "add a few branding slots into the wardrobe too, like echoes adds wardrobe slots… then players can select tattoos and place them their selves", and "build it all". See docs/TATTOOS.md.
+  - **Five new wardrobe slots:** Farm Ink 1 to 4, and Farm Brand.
+  - **The designs:** 81 from the tattoo sheets in every ink slot, and 27 brands (the farm's mark, the species shields, the lewd brands) in the brand slot. All free.
+  - **Placing:** the game's own Layering button moves, scales, turns and layers each one. They start on the skin under clothes, at the spot they were drawn for, and save with outfits.
+  - **Colours:** the colour picker re-inks them. A brand's three layers (edge, core, shine) make it fresh or healed.
+  - **Stripping leaves ink on.**
+  - **Who sees it:** only people with the Companion or the Dispensary, like Echo's clothes. Whichever add-on loads first adds the slots.
+  - **The pictures** live in the repo (`ink/v1/`) and load from GitHub.
+  - **Coming next:**
+    - the 28 designs with live counts, names and your own words
+    - ink riding on the drawn belly and breasts (for now the drawn belly covers belly ink)
+    - the farm putting ink on: trap brands, species brands, trophies
 
 - **Bot 0.72.5 + Barn life 1.4.3: the auto-feeder feeds Barn Life by what's in the tube.** Laynie, Nov 17: "the auto-feeder needs to tap in to barn life, and actually feed or reduce thirst depending on whats coming down the tube".
   - **What's in the tube:** the farm girl reads it off how the feeder was crafted. Piss (only with ?watersports on), then cum (cum, seed, protein…), then milk (milk, cream), then water (water on its own; water with oats in it is still feed), then slop (mash, oats, the farm's feed, and anything that doesn't say).

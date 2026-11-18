@@ -5,9 +5,9 @@
   "type": "module",
   "versions": {
     "bot": "0.72.5",
-    "companion": "0.54.10",
+    "companion": "0.55.0",
     "watcher": "1.0.4",
-    "dispensary": "0.1.4"
+    "dispensary": "0.2.0"
   },
   "scripts": {
     "build": "node build.mjs",

@@ -1,0 +1,2511 @@
+{
+ "made": "2026-11-18T00:49:11.491Z",
+ "res": 2,
+ "groups": {
+  "FarmInk": [
+   {
+    "name": "KnotSlave",
+    "title": "Knot Slave",
+    "where": "lower belly or above the tail",
+    "desc": "blackletter, with a knot under it",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 465,
+    "w": 220,
+    "h": 126,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BreedingSow",
+    "title": "Breeding Sow",
+    "where": "tramp stamp",
+    "desc": "flowing script on a curve, a heart and a snout",
+    "sheet": 1,
+    "spot": "hip",
+    "left": 134,
+    "top": 515,
+    "w": 144,
+    "h": 66,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BreedingBitch",
+    "title": "Breeding Bitch",
+    "where": "thigh",
+    "desc": "drippin' graffiti, paw prints",
+    "sheet": 1,
+    "spot": "thigh",
+    "left": 148,
+    "top": 632,
+    "w": 120,
+    "h": 60,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FoalFactory",
+    "title": "Foal Factory",
+    "where": "lower belly",
+    "desc": "western, a horseshoe for luck",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 483,
+    "w": 220,
+    "h": 91,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#19151f",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "PuppyFactory",
+    "title": "Puppy Factory",
+    "where": "lower belly",
+    "desc": "bubble graffiti, paw prints",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 485,
+    "w": 220,
+    "h": 87,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "KittenFactory",
+    "title": "Kitten Factory",
+    "where": "lower belly",
+    "desc": "flowing script, a heart with ears",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 448,
+    "w": 220,
+    "h": 161,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "WombCrest",
+    "title": "Womb Crest",
+    "where": "over the womb",
+    "desc": "the lewd crest, glowin' pink",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 458,
+    "w": 220,
+    "h": 141,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#d4237a",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "CumHere",
+    "title": "Cum Here",
+    "where": "lower belly, pointin' down",
+    "desc": "marker scrawl and an arrow",
+    "sheet": 1,
+    "spot": "womb",
+    "left": 140,
+    "top": 458,
+    "w": 220,
+    "h": 141,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FreeUse",
+    "title": "Free Use",
+    "where": "tramp stamp",
+    "desc": "blackletter, with arrows",
+    "sheet": 1,
+    "spot": "hip",
+    "left": 134,
+    "top": 514,
+    "w": 144,
+    "h": 69,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TentacleBred",
+    "title": "Tentacle Bred",
+    "where": "a hip or the belly",
+    "desc": "graffiti, with a curl of tentacle",
+    "sheet": 1,
+    "spot": "hip",
+    "left": 134,
+    "top": 506,
+    "w": 144,
+    "h": 85,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#1b1720",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "WolfBredPackBitch",
+    "title": "Wolf Bred · Pack Bitch",
+    "where": "thigh",
+    "desc": "a wolf's paw and the pack's words",
+    "sheet": 1,
+    "spot": "thigh",
+    "left": 148,
+    "top": 609,
+    "w": 120,
+    "h": 106,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "QueenInHeat",
+    "title": "Queen In Heat",
+    "where": "lower back",
+    "desc": "a crown in flames",
+    "sheet": 1,
+    "spot": "hip",
+    "left": 134,
+    "top": 503,
+    "w": 144,
+    "h": 91,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "TrapBait",
+    "title": "Trap Bait",
+    "where": "a calf or a shoulder",
+    "desc": "a warning label",
+    "sheet": 1,
+    "spot": "thigh",
+    "left": 148,
+    "top": 633,
+    "w": 120,
+    "h": 58,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "MilkedAndBred",
+    "title": "Milked And Bred",
+    "where": "above a breast",
+    "desc": "a dairy-print badge",
+    "sheet": 1,
+    "spot": "chest",
+    "left": 154,
+    "top": 209,
+    "w": 192,
+    "h": 146,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "WombCrestSeeded",
+    "title": "Womb Crest, Seeded",
+    "where": "over the womb",
+    "desc": "the crest once you've taken: an egg in the heart",
+    "sheet": 2,
+    "spot": "womb",
+    "left": 140,
+    "top": 458,
+    "w": 220,
+    "h": 141,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#d4237a",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "GoblinLoot",
+    "title": "Goblin Loot",
+    "where": "anywhere they could reach",
+    "desc": "a crude stick-and-poke, crossed daggers",
+    "sheet": 2,
+    "spot": "hip",
+    "left": 134,
+    "top": 509,
+    "w": 144,
+    "h": 79,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "SlutStickAndPoke",
+    "title": "Slut (stick-and-poke)",
+    "where": "a cheek or a wrist",
+    "desc": "little hand-poked dots",
+    "sheet": 2,
+    "spot": "cheek",
+    "left": 202,
+    "top": 171,
+    "w": 48,
+    "h": 19,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MooCowPrint",
+    "title": "Moo (cow-print)",
+    "where": "a shoulder or a hip",
+    "desc": "inside a cow-print patch",
+    "sheet": 2,
+    "spot": "shoulder",
+    "left": 140,
+    "top": 272,
+    "w": 84,
+    "h": 56,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "UseMeFreshMarker",
+    "title": "Use Me (fresh marker)",
+    "where": "a thigh: wears off in a few hours",
+    "desc": "wet marker, still shiny",
+    "sheet": 2,
+    "spot": "thigh",
+    "left": 148,
+    "top": 648,
+    "w": 120,
+    "h": 28,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "GlowSlutGlowInk",
+    "title": "Glow Slut (glow ink)",
+    "where": "lower belly: only shows while you're dosed",
+    "desc": "UV ink, glowin'",
+    "sheet": 2,
+    "spot": "womb",
+    "left": 140,
+    "top": 475,
+    "w": 220,
+    "h": 106,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#4dfff0",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#4dfff0",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ForSize",
+    "title": "For Size",
+    "where": "an inner thigh",
+    "desc": "a ruler, inches, BIGGER at the top",
+    "sheet": 2,
+    "spot": "innerThigh",
+    "left": 182,
+    "top": 610,
+    "w": 96,
+    "h": 60,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "InsertHere",
+    "title": "Insert Here",
+    "where": "low on the belly or the small of the back",
+    "desc": "a bullseye and a slot",
+    "sheet": 2,
+    "spot": "womb",
+    "left": 140,
+    "top": 410,
+    "w": 220,
+    "h": 237,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ThisWayToTheStable",
+    "title": "This Way To The Stable",
+    "where": "from the belly button down",
+    "desc": "hoof prints trailin' down",
+    "sheet": 2,
+    "spot": "belly",
+    "left": 158,
+    "top": 366,
+    "w": 184,
+    "h": 192,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TheFullSign",
+    "title": "The Full Sign",
+    "where": "the small of the back",
+    "desc": "the whole sign: Farm · Dairy · Kennel",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 136,
+    "top": 465,
+    "w": 140,
+    "h": 166,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "PropertyOfBB",
+    "title": "Property Of B&B",
+    "where": "a butt cheek",
+    "desc": "stencil words round the BB",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 493,
+    "w": 144,
+    "h": 111,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "GradeABreeder",
+    "title": "Grade A Breeder",
+    "where": "a hip or a flank",
+    "desc": "a purple inspection stamp",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 476,
+    "w": 144,
+    "h": 144,
+    "layers": [
+     {
+      "name": "Stamp",
+      "color": "#5b2a86",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BBWombCrest",
+    "title": "B&B Womb Crest",
+    "where": "over the womb",
+    "desc": "the crest, with the BB in its heart",
+    "sheet": 3,
+    "spot": "womb",
+    "left": 140,
+    "top": 456,
+    "w": 220,
+    "h": 144,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#d4237a",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "RingForService",
+    "title": "Ring For Service",
+    "where": "just above the slit",
+    "desc": "the bell, an arrow, an invitation",
+    "sheet": 3,
+    "spot": "womb",
+    "left": 140,
+    "top": 445,
+    "w": 220,
+    "h": 166,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "DrippingBB",
+    "title": "Dripping B&B",
+    "where": "a thigh or the belly",
+    "desc": "the BB so wet it runs, still shinin'",
+    "sheet": 3,
+    "spot": "thigh",
+    "left": 148,
+    "top": 603,
+    "w": 120,
+    "h": 119,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     },
+     {
+      "name": "Wet",
+      "color": "#ffffff",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "GoodGirlKennelBone",
+    "title": "Good Girl (kennel bone)",
+    "where": "a collarbone",
+    "desc": "the sign's bone, with praise in it",
+    "sheet": 3,
+    "spot": "chest",
+    "left": 154,
+    "top": 229,
+    "w": 192,
+    "h": 106,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BreedingBitchKennelBone",
+    "title": "Breeding Bitch (kennel bone)",
+    "where": "a thigh",
+    "desc": "the bone, and the bell hung off it",
+    "sheet": 3,
+    "spot": "thigh",
+    "left": 148,
+    "top": 624,
+    "w": 120,
+    "h": 77,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FarmFreshMilkCap",
+    "title": "Farm Fresh (milk cap)",
+    "where": "above a breast",
+    "desc": "a dairy bottle cap in dairy blue",
+    "sheet": 3,
+    "spot": "chest",
+    "left": 154,
+    "top": 186,
+    "w": 192,
+    "h": 192,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#1d3f8f",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BestInShowRosette",
+    "title": "Best In Show (rosette)",
+    "where": "a thigh",
+    "desc": "a prize ribbon from the county fair",
+    "sheet": 3,
+    "spot": "thigh",
+    "left": 153,
+    "top": 593,
+    "w": 111,
+    "h": 138,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "BreedMeTrampStamp",
+    "title": "Breed Me (tramp stamp)",
+    "where": "the small of the back",
+    "desc": "curls, hearts and the BB",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 517,
+    "w": 144,
+    "h": 62,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "SpankedAtBBPaddleWelt",
+    "title": "Spanked At B&B (paddle welt)",
+    "where": "a butt cheek: fades in a day",
+    "desc": "a paddle with BB cut through it",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 466,
+    "w": 144,
+    "h": 165,
+    "layers": [
+     {
+      "name": "Welt",
+      "color": "#c22f3a",
+      "colorize": true
+     },
+     {
+      "name": "WeltCore",
+      "color": "#d8434c",
+      "colorize": true
+     },
+     {
+      "name": "WeltShine",
+      "color": "#ff8f8a",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TitsUp",
+    "title": "Tits Up",
+    "where": "the chest or a shoulder blade",
+    "desc": "our biggest cup out a porthole, a B seared on each",
+    "sheet": 3,
+    "spot": "chest",
+    "left": 156,
+    "top": 172,
+    "w": 189,
+    "h": 221,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     },
+     {
+      "name": "MarkEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Mark",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "MarkShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ReBreed",
+    "title": "Re-Breed",
+    "where": "a hip or a flank",
+    "desc": "a red inspection stamp: didn't take, go again",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 502,
+    "w": 144,
+    "h": 93,
+    "layers": [
+     {
+      "name": "Stamp",
+      "color": "#b3122e",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "CareInstructions",
+    "title": "Care Instructions",
+    "where": "the hip, by the waistband",
+    "desc": "a laundry tag: how to treat her",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 489,
+    "w": 144,
+    "h": 118,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ThisEndUp",
+    "title": "This End Up",
+    "where": "the small of the back",
+    "desc": "shipping arrows, handle roughly",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 492,
+    "w": 144,
+    "h": 113,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "SlipperyWhenWet",
+    "title": "Slippery When Wet",
+    "where": "an inner thigh",
+    "desc": "a yellow wet-floor sign",
+    "sheet": 4,
+    "spot": "innerThigh",
+    "left": 182,
+    "top": 589,
+    "w": 96,
+    "h": 102,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "25PerRide",
+    "title": "25¢ Per Ride",
+    "where": "just above the crack",
+    "desc": "an arcade coin slot",
+    "sheet": 4,
+    "spot": "womb",
+    "left": 143,
+    "top": 402,
+    "w": 215,
+    "h": 253,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "OutOfOrder",
+    "title": "Out Of Order",
+    "where": "a butt cheek",
+    "desc": "a sign taped on: use the other hole",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 494,
+    "w": 144,
+    "h": 109,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ScanToBreed",
+    "title": "Scan To Breed",
+    "where": "the back of a thigh",
+    "desc": "a made-up code: it scans as nothin'",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 487,
+    "w": 144,
+    "h": 122,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "PetCollar",
+    "title": "Pet (collar)",
+    "where": "round the neck",
+    "desc": "a collar inked on for good, a bone tag hangin'",
+    "sheet": 4,
+    "spot": "neck",
+    "left": 180,
+    "top": 205,
+    "w": 140,
+    "h": 70,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MissingHerDignity",
+    "title": "Missing: Her Dignity",
+    "where": "a hip",
+    "desc": "a milk carton notice",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 145,
+    "top": 465,
+    "w": 122,
+    "h": 166,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "FuckToyGraffiti",
+    "title": "Fuck Toy (graffiti)",
+    "where": "across the belly",
+    "desc": "a spray-painted tag, crown and drips",
+    "sheet": 4,
+    "spot": "belly",
+    "left": 158,
+    "top": 416,
+    "w": 184,
+    "h": 92,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "BredMare",
+    "title": "Bred Mare",
+    "where": "a hip or a flank",
+    "desc": "a steel horseshoe, a yellow banner",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 505,
+    "w": 144,
+    "h": 86,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "BitchInHeat",
+    "title": "Bitch In Heat",
+    "where": "a hip or the small of the back",
+    "desc": "a paw print in flames",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 504,
+    "w": 144,
+    "h": 89,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "CherryPopped",
+    "title": "Cherry Popped",
+    "where": "a hip",
+    "desc": "two cherries and a banner",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 490,
+    "w": 144,
+    "h": 116,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "DrippingPeach",
+    "title": "Dripping Peach",
+    "where": "a butt cheek",
+    "desc": "a ripe peach, crease and all, drippin' white",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 475,
+    "w": 144,
+    "h": 146,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     },
+     {
+      "name": "Wet",
+      "color": "#f7f2ea",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BredLikeARabbit",
+    "title": "Bred Like A Rabbit",
+    "where": "a hip or an ankle",
+    "desc": "a bunny with her ears up",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 501,
+    "w": 144,
+    "h": 95,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "LayingHen",
+    "title": "Laying Hen",
+    "where": "a hip",
+    "desc": "a nest of eggs, for the ovipositor girls",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 506,
+    "w": 144,
+    "h": 85,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "HelloMyNameIs",
+    "title": "Hello, My Name Is",
+    "where": "a breast or the belly",
+    "desc": "a name-tag sticker, filled in",
+    "sheet": 5,
+    "spot": "chest",
+    "left": 154,
+    "top": 218,
+    "w": 192,
+    "h": 128,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "PleaseDisturb",
+    "title": "Please Disturb",
+    "where": "a hip",
+    "desc": "a door hanger: breedin' in progress, walk right in",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 148,
+    "top": 465,
+    "w": 117,
+    "h": 166,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "Sold",
+    "title": "Sold",
+    "where": "a butt cheek",
+    "desc": "a price tag on a string",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 511,
+    "w": 144,
+    "h": 75,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "TipYourCow",
+    "title": "Tip Your Cow",
+    "where": "just above the crack",
+    "desc": "a tip jar, half full",
+    "sheet": 5,
+    "spot": "womb",
+    "left": 171,
+    "top": 402,
+    "w": 158,
+    "h": 253,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "StudParkingOnly",
+    "title": "Stud Parking Only",
+    "where": "the small of the back",
+    "desc": "a reserved sign: everyone else gets milked",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 479,
+    "w": 144,
+    "h": 138,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#1f4fa8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FillMeDotwork",
+    "title": "Fill Me (dotwork)",
+    "where": "round the belly button",
+    "desc": "a mandala in tiny dots",
+    "sheet": 5,
+    "spot": "belly",
+    "left": 158,
+    "top": 362,
+    "w": 184,
+    "h": 201,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "HennaTrail",
+    "title": "Henna Trail",
+    "where": "down a thigh: fades in a week",
+    "desc": "mehndi vines and paisleys",
+    "sheet": 5,
+    "spot": "thigh",
+    "left": 106,
+    "top": 596,
+    "w": 204,
+    "h": 133,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#7a3410",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FertileWatercolour",
+    "title": "Fertile (watercolour)",
+    "where": "low on the belly",
+    "desc": "a fine-line womb in a wash of colour",
+    "sheet": 5,
+    "spot": "womb",
+    "left": 140,
+    "top": 456,
+    "w": 220,
+    "h": 145,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "GoodGirlFineLine",
+    "title": "good girl (fine line)",
+    "where": "a hip bone",
+    "desc": "tiny script and a tiny heart",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 134,
+    "top": 525,
+    "w": 144,
+    "h": 47,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MooTheHeart",
+    "title": "Moo (the heart)",
+    "where": "an upper arm",
+    "desc": "the classic MOM heart, for a cow",
+    "sheet": 6,
+    "spot": "shoulder",
+    "left": 140,
+    "top": 274,
+    "w": 84,
+    "h": 52,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "Swallows",
+    "title": "Swallows",
+    "where": "the chest",
+    "desc": "two swallows, for the girls who do",
+    "sheet": 6,
+    "spot": "chest",
+    "left": 154,
+    "top": 225,
+    "w": 192,
+    "h": 115,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "HoldStill",
+    "title": "Hold Still",
+    "where": "a forearm",
+    "desc": "the sailor's anchor, rope and all",
+    "sheet": 6,
+    "spot": "forearm",
+    "left": 140,
+    "top": 299,
+    "w": 80,
+    "h": 63,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "BrokenIn",
+    "title": "Broken In",
+    "where": "over the heart",
+    "desc": "a heart with a dagger through it",
+    "sheet": 6,
+    "spot": "heart",
+    "left": 228,
+    "top": 251,
+    "w": 108,
+    "h": 83,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "RopeHarness",
+    "title": "Rope Harness",
+    "where": "the chest and belly",
+    "desc": "a shibari harness that never comes off",
+    "sheet": 6,
+    "spot": "chest",
+    "left": 106,
+    "top": 188,
+    "w": 288,
+    "h": 189,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ChainBand",
+    "title": "Chain Band",
+    "where": "round a thigh",
+    "desc": "a chain inked round, a padlock hangin' off it",
+    "sheet": 6,
+    "spot": "thigh",
+    "left": 130,
+    "top": 630,
+    "w": 156,
+    "h": 65,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#19151f",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Cuffs",
+    "title": "Cuffs",
+    "where": "wrists or ankles",
+    "desc": "leather cuffs inked on, D-ring and all",
+    "sheet": 6,
+    "spot": "wrist",
+    "left": 126,
+    "top": 331,
+    "w": 108,
+    "h": 39,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "UnzipForService",
+    "title": "Unzip For Service",
+    "where": "down the belly",
+    "desc": "a zipper inked down her front, half open",
+    "sheet": 6,
+    "spot": "belly",
+    "left": 140,
+    "top": 343,
+    "w": 221,
+    "h": 239,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MaximumLoad",
+    "title": "Maximum Load",
+    "where": "the belly",
+    "desc": "an elevator plate: this cow has no limit",
+    "sheet": 6,
+    "spot": "belly",
+    "left": 158,
+    "top": 399,
+    "w": 184,
+    "h": 127,
+    "layers": [
+     {
+      "name": "InkArt",
+      "color": null,
+      "colorize": false
+     }
+    ]
+   },
+   {
+    "name": "TearHere",
+    "title": "Tear Here",
+    "where": "on the panty line",
+    "desc": "a dotted line and scissors",
+    "sheet": 6,
+    "spot": "womb",
+    "left": 140,
+    "top": 489,
+    "w": 220,
+    "h": 78,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FreeRange",
+    "title": "Free Range",
+    "where": "a shoulder",
+    "desc": "a green farm-shop sticker",
+    "sheet": 6,
+    "spot": "shoulder",
+    "left": 140,
+    "top": 258,
+    "w": 84,
+    "h": 84,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#3f8a2e",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ThornedCrest",
+    "title": "Thorned Crest",
+    "where": "over the womb, glowin'",
+    "desc": "a rose in a heart, thorny vines",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 483,
+    "w": 220,
+    "h": 91,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "ButterflyCrest",
+    "title": "Butterfly Crest",
+    "where": "over the womb, glowin'",
+    "desc": "wings and a chain of hearts",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 452,
+    "w": 220,
+    "h": 153,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "SuccubusCrest",
+    "title": "Succubus Crest",
+    "where": "over the womb, glowin'",
+    "desc": "horns, bat wings, a spade tail",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 460,
+    "w": 220,
+    "h": 137,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TribalCrest",
+    "title": "Tribal Crest",
+    "where": "over the womb, glowin'",
+    "desc": "tribal blades round a heart",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 473,
+    "w": 220,
+    "h": 110,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "EggLayerCrest",
+    "title": "Egg-Layer Crest",
+    "where": "over the womb, glows with eggs in",
+    "desc": "a heart and a chain of eggs",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 465,
+    "w": 220,
+    "h": 127,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FarmPropertyCorrupted",
+    "title": "Farm Property (corrupted)",
+    "where": "where the parasite chose",
+    "desc": "its own words, veins creepin' out",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 134,
+    "top": 497,
+    "w": 144,
+    "h": 103,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#3a0d52",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "RuinedStockCorrupted",
+    "title": "Ruined Stock (corrupted)",
+    "where": "a thigh",
+    "desc": "the corruption's own words",
+    "sheet": 7,
+    "spot": "thigh",
+    "left": 148,
+    "top": 605,
+    "w": 120,
+    "h": 114,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#3a0d52",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FarmAnimalCorrupted",
+    "title": "Farm Animal (corrupted)",
+    "where": "the belly",
+    "desc": "the corruption's own words",
+    "sheet": 7,
+    "spot": "belly",
+    "left": 158,
+    "top": 387,
+    "w": 184,
+    "h": 151,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#3a0d52",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BredCorrupted",
+    "title": "Bred (corrupted)",
+    "where": "low on the belly",
+    "desc": "one word, spreadin'",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 140,
+    "top": 459,
+    "w": 220,
+    "h": 138,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#3a0d52",
+      "colorize": true
+     }
+    ]
+   }
+  ],
+  "FarmBrand": [
+   {
+    "name": "TentacleRingBrand",
+    "title": "Tentacle Ring Brand",
+    "where": "a thigh, seared",
+    "desc": "a tentacle in a ring: the pond had you",
+    "sheet": 2,
+    "spot": "thigh",
+    "left": 148,
+    "top": 602,
+    "w": 120,
+    "h": 120,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MoonPawBrand",
+    "title": "Moon Paw Brand",
+    "where": "a hip, seared",
+    "desc": "a paw under a moon: the pack's",
+    "sheet": 2,
+    "spot": "hip",
+    "left": 134,
+    "top": 476,
+    "w": 144,
+    "h": 145,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "SnoutRingBrand",
+    "title": "Snout Ring Brand",
+    "where": "a butt cheek, seared",
+    "desc": "a snout in a ring",
+    "sheet": 2,
+    "spot": "hip",
+    "left": 134,
+    "top": 476,
+    "w": 144,
+    "h": 144,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TheFarmsMark",
+    "title": "The Farm's Mark",
+    "where": "a hip or a butt cheek",
+    "desc": "the BB and its bell, seared in",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 472,
+    "w": 144,
+    "h": 153,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TheBarnsBrand",
+    "title": "The Barn's Brand",
+    "where": "a thigh, seared",
+    "desc": "a lucky horseshoe round the BB",
+    "sheet": 3,
+    "spot": "thigh",
+    "left": 148,
+    "top": 617,
+    "w": 120,
+    "h": 91,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TheKennelsBrand",
+    "title": "The Kennel's Brand",
+    "where": "a hip, seared",
+    "desc": "a bone in a ring, a paw cut through",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 476,
+    "w": 144,
+    "h": 144,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "RockingBb",
+    "title": "Rocking Bb",
+    "where": "a flank, seared",
+    "desc": "a cattle brand: the BB on a rocker",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 495,
+    "w": 144,
+    "h": 107,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "BreedingStock",
+    "title": "Breeding Stock",
+    "where": "across the ass, seared",
+    "desc": "iron letters in a frame",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 134,
+    "top": 511,
+    "w": 144,
+    "h": 75,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "FreeUse",
+    "title": "Free Use",
+    "where": "a butt cheek, seared",
+    "desc": "an oval brand: no need to ask",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 504,
+    "w": 144,
+    "h": 89,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "CumHere",
+    "title": "Cum Here",
+    "where": "just above the slit, seared",
+    "desc": "the words and an arrow, burned in",
+    "sheet": 4,
+    "spot": "womb",
+    "left": 140,
+    "top": 454,
+    "w": 220,
+    "h": 149,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "MilkMe",
+    "title": "Milk Me",
+    "where": "above a breast, seared",
+    "desc": "an udder in a ring",
+    "sheet": 4,
+    "spot": "chest",
+    "left": 154,
+    "top": 186,
+    "w": 192,
+    "h": 192,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "StudService",
+    "title": "Stud Service",
+    "where": "a hip, seared",
+    "desc": "a knot in a ring, for the farm's studs",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 476,
+    "w": 144,
+    "h": 144,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "TripleXBar",
+    "title": "Triple X Bar",
+    "where": "a flank, seared",
+    "desc": "a cattle brand: rated for the rough stuff",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 134,
+    "top": 504,
+    "w": 144,
+    "h": 89,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Hucow",
+    "title": "Hucow",
+    "where": "a flank, seared",
+    "desc": "horns and a muzzle",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Mare",
+    "title": "Mare",
+    "where": "a flank, seared",
+    "desc": "a horseshoe; STALLION for studs",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Bitch",
+    "title": "Bitch",
+    "where": "a hip, seared",
+    "desc": "a paw; STUD DOG for studs",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Sow",
+    "title": "Sow",
+    "where": "a butt cheek, seared",
+    "desc": "a snout; BOAR for studs",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Vixen",
+    "title": "Vixen",
+    "where": "a hip, seared",
+    "desc": "a brush of a tail",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Bunny",
+    "title": "Bunny",
+    "where": "a hip, seared",
+    "desc": "ears up; BUCK for studs",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Kitten",
+    "title": "Kitten",
+    "where": "a hip, seared",
+    "desc": "ears and whiskers; TOM for studs",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Dragoness",
+    "title": "Dragoness",
+    "where": "a shoulder, seared",
+    "desc": "a wing",
+    "sheet": 6,
+    "spot": "shoulder",
+    "left": 141,
+    "top": 252,
+    "w": 83,
+    "h": 97,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Nanny",
+    "title": "Nanny",
+    "where": "a flank, seared",
+    "desc": "horns and a beard; BILLY for studs",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Ewe",
+    "title": "Ewe",
+    "where": "a flank, seared",
+    "desc": "a curly fleece; RAM for studs",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "SheWolf",
+    "title": "She-Wolf",
+    "where": "a hip, seared",
+    "desc": "ears up and a long muzzle",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Doe",
+    "title": "Doe",
+    "where": "a hip, seared",
+    "desc": "big soft ears and a spotted brow; BUCK for studs",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Rat",
+    "title": "Rat",
+    "where": "a shoulder, seared",
+    "desc": "round ears and a long tail",
+    "sheet": 7,
+    "spot": "shoulder",
+    "left": 141,
+    "top": 252,
+    "w": 83,
+    "h": 97,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   },
+   {
+    "name": "Goblins",
+    "title": "Goblin's",
+    "where": "a butt cheek, seared",
+    "desc": "a goblin's ear, earring and all: their plunder",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 135,
+    "top": 465,
+    "w": 142,
+    "h": 166,
+    "layers": [
+     {
+      "name": "BrandEdge",
+      "color": "#5e1414",
+      "colorize": true
+     },
+     {
+      "name": "Brand",
+      "color": "#b4524a",
+      "colorize": true
+     },
+     {
+      "name": "BrandShine",
+      "color": "#f2b9a8",
+      "colorize": true
+     }
+    ]
+   }
+  ]
+ },
+ "live": [
+  {
+   "sheet": 1,
+   "title": "FARM PROPERTY"
+  },
+  {
+   "sheet": 1,
+   "title": "USED BY STRANGERS"
+  },
+  {
+   "sheet": 2,
+   "title": "TIMES BRED (keeps count)"
+  },
+  {
+   "sheet": 2,
+   "title": "LITTERS (keeps count)"
+  },
+  {
+   "sheet": 2,
+   "title": "LITRES MILKED (keeps count)"
+  },
+  {
+   "sheet": 2,
+   "title": "EGGS LAID (keeps count)"
+  },
+  {
+   "sheet": 2,
+   "title": "DAYS SINCE LAST ORGASM"
+  },
+  {
+   "sheet": 2,
+   "title": "OWNED BY (the crafter signs it)"
+  },
+  {
+   "sheet": 2,
+   "title": "STOCK NUMBER"
+  },
+  {
+   "sheet": 2,
+   "title": "LOCKED (keyholder's name)"
+  },
+  {
+   "sheet": 3,
+   "title": "BRED BY B&B"
+  },
+  {
+   "sheet": 3,
+   "title": "B&B EAR TAG"
+  },
+  {
+   "sheet": 4,
+   "title": "CUM TANK (keeps count)"
+  },
+  {
+   "sheet": 4,
+   "title": "BREEDING FACTS (keeps count)"
+  },
+  {
+   "sheet": 4,
+   "title": "LOADING (keeps count)"
+  },
+  {
+   "sheet": 4,
+   "title": "LIPSTICK KISSES"
+  },
+  {
+   "sheet": 4,
+   "title": "★★★★★ WOULD BREED AGAIN"
+  },
+  {
+   "sheet": 5,
+   "title": "BRED BY (keeps count)"
+  },
+  {
+   "sheet": 5,
+   "title": "BREEDING CARD (keeps count)"
+  },
+  {
+   "sheet": 5,
+   "title": "TRAP PASSPORT (keeps count)"
+  },
+  {
+   "sheet": 5,
+   "title": "HIGH SCORES (keeps count)"
+  },
+  {
+   "sheet": 5,
+   "title": "TIED ×7 (keeps count)"
+  },
+  {
+   "sheet": 6,
+   "title": "BRED ON"
+  },
+  {
+   "sheet": 7,
+   "title": "HEAT CREST (keeps count)"
+  },
+  {
+   "sheet": 7,
+   "title": "YOUR WORDS: blackletter"
+  },
+  {
+   "sheet": 7,
+   "title": "YOUR WORDS: script"
+  },
+  {
+   "sheet": 7,
+   "title": "YOUR WORDS: typewriter"
+  },
+  {
+   "sheet": 7,
+   "title": "YOUR WORDS: graffiti"
+  }
+ ]
+}

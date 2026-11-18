@@ -8,6 +8,7 @@
 // (roles, keys, switches, numbers), its answers, yes/no questions, and staff lookups as hidden
 // messages, and the panel shows them in the right place instead of whispers and beeps.
 import sdkModule from "bondage-club-mod-sdk";
+import { registerInk } from "../../shared/ink/ink.js";
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
 import { speciesKeyOf } from "../../shared/species.js";
@@ -56,6 +57,7 @@ try {
   throw e;
 }
 window.__farmhandCompanion = VERSION;
+registerInk(window, mod);   // the ink and brand slots in the wardrobe (shared/ink/ink.js): before anyone's outfit loads
 
 const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
 // Moo Juice: about half the words turn into the noise your animal makes (shared/noises.js, the Dispensary uses it too)

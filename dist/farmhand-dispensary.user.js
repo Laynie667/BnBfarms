@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.9.0
+// @version      0.10.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7463,7 +7463,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W16, list, on2, now) {
+  function farmInkSync(W16, list, on2, now, opts) {
+    const hard = !!(opts && opts.hard);
     const P = W16.Player;
     if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W16.InventoryWear !== "function") return null;
     now = now || Date.now();
@@ -7495,7 +7496,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const e of want) {
       if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-      if (done[e.id] && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
+      if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
       if (e.slot === "brand") {
@@ -7547,6 +7548,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const id = farmOf(itemIn(W16.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
+  var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
+  var dosed = (W16, C) => {
+    try {
+      const D = W16.FarmhandDispensary;
+      return !!(D && typeof D.dosedOf === "function" && C && D.dosedOf(C.MemberNumber));
+    } catch (e) {
+      return false;
+    }
+  };
+  var wearsDosedOnly = (C) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+    const it = itemIn(C, s);
+    return !!(it && DOSED_ONLY.has(it.Asset.Name));
+  });
   var stillChanging = (C, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
     const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
     return !!(a && a.still);
@@ -7634,7 +7648,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       write: (slot, v) => write(W16, slot, v, true),
       command: (a) => inkCommand(W16, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on2) => farmInkSync(W16, list, on2),
+      farm: (list, on2, opts) => farmInkSync(W16, list, on2, void 0, opts),
       farmBrandWorn: () => farmBrandWorn(W16),
       worn: () => wornLive(W16).map(({ slot, name }) => ({ slot, name }))
     };
@@ -7726,6 +7740,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W16, C)) return void 0;
               const it = stillItem(C, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -7809,6 +7824,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     }, 10 * 6e4);
+    try {
+      W16.addEventListener("farmhand-dispensary", (e) => {
+        const d = e && e.detail;
+        if (!d || !(d.type === "dose" || d.type === "icons")) return;
+        const mn = d.type === "icons" ? d.from : W16.Player && W16.Player.MemberNumber;
+        const C = (W16.Player && W16.Player.MemberNumber === mn ? W16.Player : (W16.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C && wearsDosedOnly(C) && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C);
+      });
+    } catch (e) {
+    }
     setInterval(() => {
       try {
         const now = Date.now();
@@ -7839,7 +7864,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.9.0";
+  var VERSION = "0.10.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -10744,8 +10769,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function onIcons(from, m) {
     const ids = Array.isArray(m.ids) ? m.ids.filter((id) => typeof id === "string" && BOOK[id]).slice(0, 8) : [];
+    const was = iconsDosed(from);
     if (!ids.length && !m.para) others.delete(from);
     else others.set(from, { ids, para: !!m.para, at: Date.now() });
+    if (was !== iconsDosed(from)) {
+      try {
+        W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } }));
+      } catch (e) {
+      }
+    }
+  }
+  function iconsDosed(mn) {
+    const e = mn === me4() ? mineNow() : others.get(mn);
+    return !!(e && e.ids.length);
   }
   function iconsFor(mn) {
     const e = mn === me4() ? mineNow() : others.get(mn);
@@ -12167,6 +12203,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   W15.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
+    dosedOf: (mn) => iconsDosed(Number(mn)),
+    // anythin' in them now (glow ink, shared/ink/ink.js)
     doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
     // one dose, if it's in you: how strong, its part or spot (Fill-Out: cup, belly, ass · Tender: the spot), time left.
     // The Companion's drawn body reads Fill-Out from here.

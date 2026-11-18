@@ -25,8 +25,13 @@ export function iconsTell(force) {
 }
 function onIcons(from, m) {
   const ids = Array.isArray(m.ids) ? m.ids.filter((id) => typeof id === "string" && BOOK[id]).slice(0, 8) : [];
+  const was = iconsDosed(from);
   if (!ids.length && !m.para) others.delete(from); else others.set(from, { ids, para: !!m.para, at: Date.now() });
+  // dosed or not changed: their glow ink lights up or goes dark (shared/ink/ink.js listens)
+  if (was !== iconsDosed(from)) { try { W.dispatchEvent(new W.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } })); } catch (e) { /* fine */ } }
 }
+// is anythin' in them right now (yours from your own doses; anybody else's from their icons)
+export function iconsDosed(mn) { const e = mn === me() ? mineNow() : others.get(mn); return !!(e && e.ids.length); }
 export function iconsFor(mn) {
   const e = mn === me() ? mineNow() : others.get(mn);
   if (!e) return "";

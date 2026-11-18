@@ -15,7 +15,7 @@ import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS } from "./parasites.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
-import { initIcons, iconsTell, iconsFor, iconsReset } from "./icons.js";
+import { initIcons, iconsTell, iconsFor, iconsReset, iconsDosed } from "./icons.js";
 import "./lines-para.js";
 import { initNeedle } from "./needle.js";
 import { initFarm, hello } from "./farm.js";
@@ -116,6 +116,7 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a)
 W.FarmhandDispensary = Object.freeze({
   version: VERSION,
   active: (id) => active(String(id)),
+  dosedOf: (mn) => iconsDosed(Number(mn)),   // anythin' in them now (glow ink, shared/ink/ink.js)
   doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
   // one dose, if it's in you: how strong, its part or spot (Fill-Out: cup, belly, ass · Tender: the spot), time left.
   // The Companion's drawn body reads Fill-Out from here.

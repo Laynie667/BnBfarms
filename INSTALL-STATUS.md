@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.61.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.9.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.62.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.10.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.62.0 + Dispensary 0.10.0: glow ink while you're dosed, and hardcore keeps the farm's ink on** Both from the ink list Laynie approved Nov 17.
+  - **Glow Slut's UV ink only shows while you're dosed:** it lights up while somethin' from The Farmhand's Dispensary is in you, and goes dark as it wears off.
+    - Everybody with the Dispensary sees it on you, from your dose icons. If you've switched off lettin' others see your icons, it stays dark for them.
+    - Without a Dispensary nobody can tell what's in you, so it stays hidden.
+  - **In hardcore,** the farm's ink pulled off goes straight back on, within the minute. Outside hardcore, a brand you take off still stays off.
+  - Tests: more in `tests/farm-ink.test.cjs` and `tests/dispensary-gear.test.cjs`.
 
 - **Bot 0.78.0 + Companion 0.61.0 + Dispensary 0.9.0: the farm's own ink** Approved Nov 17; Laynie, Nov 18: its own switch ("separate"), studs "either", and the healing and fading times "seems good to me".
   - **"Farm can ink me"**, a new switch in the Companion's Toggles (On your character). It's off till you turn it on, and apart from "Farm can mark my body", so splatters and permanent ink are separate choices. Hardcore locks it like the others.

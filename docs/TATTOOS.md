@@ -51,6 +51,11 @@ better sizing options", and "as long as it layers properly".
     **henna** in a week, then they come off by themselves.
   - Take one off yourself and it stays off (except the corruption's). Switch "Farm can ink me" off and the farm's ink comes
     off; yours stays.
+  - **In hardcore** (The Farmhand's Dispensary), the farm's ink pulled off goes straight back on, within the minute.
+- **Glow ink that only shows while you're dosed** (Nov 18): Glow Slut's UV ink is there all the time and lights up only
+  while somethin' from The Farmhand's Dispensary is in you. Your own Dispensary knows what's in you, and everybody else's
+  reads it off your dose icons, so it shows for people with the Dispensary, and stays dark if you've switched off lettin'
+  others see your icons. It lights up and goes dark as the dose goes in and wears off.
 - **Who sees it:** only people running the Companion or the Dispensary, the same as Echo's clothes only show for
   people with Echo's mod. Everyone else sees plain skin, and nothing breaks.
 - **Spots:** the game draws the front only. Designs meant for the back (a tramp stamp, a butt cheek, a shoulder
@@ -147,7 +152,6 @@ for; the hip and cheek moved on Nov 18):
 - **More of the farm's own ink** (approved Nov 17; the brands, the species brand and corruption 50 went in Nov 18):
   - trap brands land in the brand slot
   - trophies earned as they happen
-  - ink a contract or hardcore says stays is put back if someone takes it off
+  - ink a contract says stays, put back if someone takes it off (hardcore's went in Nov 18)
   - body writing, and a crafted tattoo gun
-  - glow ink that only shows while you're dosed
 - **The sheets' own fonts** for the live designs, carried in the repo.

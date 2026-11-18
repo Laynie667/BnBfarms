@@ -167,8 +167,11 @@ function cleanEntry(e) {
   return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
 }
 // make what you wear match the farm's list. list: the farm girl's (null: she's said nothin', leave it be); on: "Farm can ink me".
+// opts.hard: in hardcore (The Farmhand's Dispensary), the farm's ink pulled off goes straight back on (approved Nov 17:
+// "ink a contract or hardcore says stays is put back if someone takes it off").
 // Gives { put, off, full, taken } (designs), or null when nothin' could be done (not in the game yet).
-export function farmInkSync(W, list, on, now) {
+export function farmInkSync(W, list, on, now, opts) {
+  const hard = !!(opts && opts.hard);
   const P = W.Player; if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W.InventoryWear !== "function") return null;
   now = now || Date.now();
   const want = on ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed = [];
@@ -183,7 +186,7 @@ export function farmInkSync(W, list, on, now) {
   // on: what it wants that isn't on you
   for (const e of want) {
     if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-    if (done[e.id] && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off
+    if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off (not in hardcore)
     if (e.fade && e.at && now - e.at >= e.fade) continue;                      // worn off already
     let slot = null;
     if (e.slot === "brand") { const it = itemIn(P, BRAND_SLOT); if (!it || farmOf(it)) slot = BRAND_SLOT; else { out.taken.push(e.design); continue; } }
@@ -206,6 +209,13 @@ export function farmInkSync(W, list, on, now) {
 }
 // is the farm's brand in your brand slot (then it isn't drawn a second time by the Companion's old way)
 export const farmBrandWorn = (W) => { const id = farmOf(itemIn(W.Player, BRAND_SLOT)); return !!(id && /^brand:/.test(id)); };
+// GLOW INK THAT ONLY SHOWS WHILE YOU'RE DOSED (approved Nov 17, "conditional glow"): the UV ink is there all the time and
+// shows only while somethin' from The Farmhand's Dispensary is in you. Your own Dispensary knows what's in you, and
+// everybody else's from your dose icons (so it shows for people with the Dispensary, and not if you've switched off
+// lettin' others see your icons). Without a Dispensary nobody can tell, and it stays hidden.
+export const DOSED_ONLY = new Set(["GlowSlutGlowInk"]);
+const dosed = (W, C) => { try { const D = W.FarmhandDispensary; return !!(D && typeof D.dosedOf === "function" && C && D.dosedOf(C.MemberNumber)); } catch (e) { return false; } };
+const wearsDosedOnly = (C) => [...INK_SLOTS, BRAND_SLOT].some((s) => { const it = itemIn(C, s); return !!(it && DOSED_ONLY.has(it.Asset.Name)); });
 // somebody whose farm ink is still healin' or fadin': drawn again now and then, so it moves along on every screen
 const stillChanging = (C, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => { const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now); return !!(a && a.still); });
 
@@ -270,7 +280,7 @@ export function registerInk(W, mod) {
     write: (slot, v) => write(W, slot, v, true),
     command: (a) => inkCommand(W, a),
     // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-    farm: (list, on) => farmInkSync(W, list, on),
+    farm: (list, on, opts) => farmInkSync(W, list, on, undefined, opts),
     farmBrandWorn: () => farmBrandWorn(W),
     worn: () => wornLive(W).map(({ slot, name }) => ({ slot, name })) });
   const hooks = () => {
@@ -320,7 +330,8 @@ export function registerInk(W, mod) {
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
           if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
-          if (sm) { const it = stillItem(C, sm[1], sm[2]); o = aged(sized(o, it), it, sm[3]); if (o.Alpha === 0) return undefined; seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
+          if (sm) { if (DOSED_ONLY.has(sm[2]) && !dosed(W, C)) return undefined;   // (glow ink: only while dosed)
+            const it = stillItem(C, sm[1], sm[2]); o = aged(sized(o, it), it, sm[3]); if (o.Alpha === 0) return undefined; seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
         }
         return f.call(this, src, x, y, o);
       });
@@ -360,6 +371,15 @@ export function registerInk(W, mod) {
   }, 50);
   // the counts that change on their own (days without cummin')
   setInterval(() => { try { if (W.Player && W.Player.Appearance) refreshAuto(W); } catch (e) { /* fine */ } }, 10 * 60000);
+  // a dose in or out (yours, or somebody's icons): anybody wearin' glow ink drawn again, so it lights up or goes dark
+  try {
+    W.addEventListener("farmhand-dispensary", (e) => {
+      const d = e && e.detail; if (!d || !(d.type === "dose" || d.type === "icons")) return;
+      const mn = d.type === "icons" ? d.from : W.Player && W.Player.MemberNumber;
+      const C = (W.Player && W.Player.MemberNumber === mn ? W.Player : (W.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+      if (C && wearsDosedOnly(C) && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C);
+    });
+  } catch (e) { /* fine */ }
   // the farm's ink healin' and fadin': anybody whose is still on its way drawn again every half hour
   setInterval(() => { try { const now = Date.now(); for (const C of W.ChatRoomCharacter || []) if (stillChanging(C, now) && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { /* fine */ } }, 30 * 60000);
   return st;

@@ -91,7 +91,8 @@ const direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand
 function inkSync() {
   try {
     const I = window.__farmInk, s = st.lastState; if (!I || typeof I.farm !== "function" || !s || !st.gotState) return;
-    const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink));
+    let hard = false; try { const D = window.FarmhandDispensary; hard = !!(D && typeof D.hard === "function" && D.hard()); } catch (e) { /* fine */ }
+    const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink), { hard });
     if (!r) return;
     const name = (d) => String(d).replace(/([a-z])([A-Z])/g, "$1 $2");
     if (r.put.length) toChat("🔥 The farm's ink is on you now: " + r.put.map(name).join(", ") + ". It's in your wardrobe's Farm Brand and Farm Ink slots.", "#c79bd8");
@@ -105,7 +106,9 @@ function brandShown(b) {
   try { if (window.__farmInk && typeof window.__farmInk.farmBrandWorn === "function" && window.__farmInk.farmBrandWorn()) return null; } catch (e) { /* fine */ }
   return b;
 }
-setInterval(() => { if (st.gotState) inkSync(); }, 5 * 60000);
+// (every five minutes; in hardcore every minute, so the farm's ink pulled off is back on at once)
+let inkTicks = 0;
+setInterval(() => { inkTicks++; if (!st.gotState) return; let hard = false; try { const D = window.FarmhandDispensary; hard = !!(D && typeof D.hard === "function" && D.hard()); } catch (e) { /* fine */ } if (hard || inkTicks % 5 === 0) inkSync(); }, 60000);
 
 function toBot(type, data) {
   if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;

@@ -255,7 +255,10 @@ function page(opts) {
   ok(D.icons(ME).includes("🐂"), "dose icons: yours show what's in you");
   let nIc = s.sent.length; D.iconsTell(true);
   ok(s.sent.slice(nIc).some(([e, d]) => d.Content === "FarmhandMsg" && d.Dictionary.type === "dispIcons" && d.Dictionary.ids.includes("rut")), "...your Dispensary tells the room");
+  const iconEv = []; w.addEventListener("farmhand-dispensary", (e) => { if (e.detail && e.detail.type === "icons") iconEv.push(e.detail.from); });
+  ok(w.FarmhandDispensary.dosedOf(ME) === true && w.FarmhandDispensary.dosedOf(LOVER) === false, "dosed or not (for glow ink): you with Rut in you, yes; them, not yet");
   s.fromBot("dispIcons", { ids: ["needy", "moo"], para: true }, LOVER);
+  ok(w.FarmhandDispensary.dosedOf(LOVER) === true && iconEv.join() === String(LOVER), "...their icons say they're dosed now, and the page is told (their glow ink lights up)");
   const lovC = w.ChatRoomCharacter.find((x) => x.MemberNumber === LOVER); s.drawnText.length = 0;
   w.ChatRoomDrawCharacterStatusIcons(lovC, 100, 100, 1);
   ok(s.drawnText.includes("💗🐄🪱"), "...and theirs are drawn by them (Needy Nectar, Moo Juice, a parasite)");

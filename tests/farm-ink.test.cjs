@@ -14,8 +14,8 @@ const H = 3600000, DAY = 24 * H;
     const esbuild = require('esbuild'), tmp = path.join(os.tmpdir(), 'fh-farmink-' + process.pid + '.cjs');
     await esbuild.build({ entryPoints: [path.join(__dirname, '../shared/ink/ink.js')], bundle: true, format: 'cjs', outfile: tmp, logLevel: 'silent' });
     const INK = require(tmp); fs.unlinkSync(tmp);
-    const store = {};
-    const W = { AssetGroupMap: new Map(), AssetGroup: [], AssetFemale3DCGExtended: {}, localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => (store[k] = String(v)) } };
+    const store = {}, listeners = [];
+    const W = { addEventListener: (t, f) => { if (t === 'farmhand-dispensary') listeners.push(f); }, AssetGroupMap: new Map(), AssetGroup: [], AssetFemale3DCGExtended: {}, localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => (store[k] = String(v)) } };
     for (let i = 0; i < 40; i++) { const g = { Name: 'G' + i, Asset: [] }; W.AssetGroupMap.set(g.Name, g); W.AssetGroup.push(g); }
     W.AssetGroupAdd = (fam, def) => { const g = { Family: fam, Name: def.Group, Description: def.Group, Asset: [], def }; W.AssetGroupMap.set(g.Name, g); W.AssetGroup.push(g); return g; };
     W.AssetAdd = (G, def) => { const a = { Name: def.Name, Description: def.Name, Group: G, Layer: def.Layer, DefaultColor: def.DefaultColor }; G.Asset.push(a); return a; };
@@ -114,6 +114,34 @@ const H = 3600000, DAY = 24 * H;
     P.Appearance = []; store['farmink-done-500'] = '{}';
     st.farm([brand], true); st.write('FarmBrand', { sz: 1.5 });
     ok(inSlot('FarmBrand').Property.FarmInk.farm === brand.id && inSlot('FarmBrand').Property.FarmInk.sz === 1.5, 'sized in the ink panel: still the farm\'s');
+
+    // hardcore: pulled off, straight back on
+    P.Appearance = []; store['farmink-done-500'] = '{}';
+    st.farm([brand], true); W.InventoryRemove(P, 'FarmBrand');
+    r = st.farm([brand], true);
+    ok(!inSlot('FarmBrand'), 'not in hardcore: taken off, it stays off');
+    r = st.farm([brand], true, { hard: true });
+    ok(inSlot('FarmBrand') && inSlot('FarmBrand').Asset.Name === 'Hucow' && r.put.join() === 'Hucow', 'in hardcore: the farm\'s brand pulled off goes straight back on');
+    r = st.farm([brand], false, { hard: true });
+    ok(!inSlot('FarmBrand'), '...though the switch off still takes it off (hardcore locks the switch, so only a keyholder can)');
+
+    // glow ink: only while dosed
+    P.Appearance = []; wear('FarmInk1', 'GlowSlutGlowInk');
+    toDraw = [['https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/GlowSlutGlowInk_Glow.png', { HexColor: '#4dfff0' }],
+              ['https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/GlowSlutGlowInk_GlowInk.png', { HexColor: '#4dfff0' }]];
+    const glowDraws = () => { const g2 = []; W.CommonDrawAppearanceBuild(P, { drawImage: () => {}, drawImageColorize: (s) => g2.push(s) }); return g2.length; };
+    ok(glowDraws() === 0, 'glow ink with no Dispensary to say what\'s in you: hidden');
+    let isDosed = false; W.FarmhandDispensary = { dosedOf: (mn) => mn === 500 && isDosed };
+    ok(glowDraws() === 0, '...with nothin\' in you: hidden');
+    isDosed = true;
+    ok(glowDraws() === 2, '...dosed: it lights up, both layers');
+    let redrawn = 0; W.CharacterLoadCanvas = (C) => { if (C === P) redrawn++; };
+    const ev = (detail) => { for (const f of listeners) f({ detail }); };
+    ev({ type: 'dose', id: 'needy', on: true });
+    ok(redrawn === 1, 'a dose goin\' in draws them again, so it shows straight away');
+    P.Appearance = []; ev({ type: 'dose', id: 'needy', on: false });
+    ok(redrawn === 1, '...nobody wearin\' glow ink: no drawin\' again for it');
+    delete W.FarmhandDispensary;
   }
 
   // ── the farm girl: what she says should be inked on who ──

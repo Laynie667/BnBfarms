@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.61.0
+// @version      0.62.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7466,7 +7466,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W17, list, on3, now) {
+  function farmInkSync(W17, list, on3, now, opts) {
+    const hard = !!(opts && opts.hard);
     const P5 = W17.Player;
     if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W17.InventoryWear !== "function") return null;
     now = now || Date.now();
@@ -7498,7 +7499,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const e of want) {
       if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P5, s)) === e.id)) continue;
-      if (done[e.id] && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
+      if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
       if (e.slot === "brand") {
@@ -7550,6 +7551,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const id = farmOf(itemIn(W17.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
+  var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
+  var dosed = (W17, C2) => {
+    try {
+      const D = W17.FarmhandDispensary;
+      return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
+    } catch (e) {
+      return false;
+    }
+  };
+  var wearsDosedOnly = (C2) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+    const it = itemIn(C2, s);
+    return !!(it && DOSED_ONLY.has(it.Asset.Name));
+  });
   var stillChanging = (C2, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
     const it = itemIn(C2, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
     return !!(a && a.still);
@@ -7637,7 +7651,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       write: (slot, v) => write(W17, slot, v, true),
       command: (a) => inkCommand(W17, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on3) => farmInkSync(W17, list, on3),
+      farm: (list, on3, opts) => farmInkSync(W17, list, on3, void 0, opts),
       farmBrandWorn: () => farmBrandWorn(W17),
       worn: () => wornLive(W17).map(({ slot, name }) => ({ slot, name }))
     };
@@ -7729,6 +7743,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W17, C2)) return void 0;
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -7812,6 +7827,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     }, 10 * 6e4);
+    try {
+      W17.addEventListener("farmhand-dispensary", (e) => {
+        const d = e && e.detail;
+        if (!d || !(d.type === "dose" || d.type === "icons")) return;
+        const mn = d.type === "icons" ? d.from : W17.Player && W17.Player.MemberNumber;
+        const C2 = (W17.Player && W17.Player.MemberNumber === mn ? W17.Player : (W17.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+      });
+    } catch (e) {
+    }
     setInterval(() => {
       try {
         const now = Date.now();
@@ -7854,7 +7879,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.61.0";
+  var VERSION = "0.62.0";
 
   // shared/species.js
   var WORDS = {
@@ -21298,7 +21323,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const I = window.__farmInk, s = st.lastState;
       if (!I || typeof I.farm !== "function" || !s || !st.gotState) return;
-      const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink));
+      let hard = false;
+      try {
+        const D = window.FarmhandDispensary;
+        hard = !!(D && typeof D.hard === "function" && D.hard());
+      } catch (e) {
+      }
+      const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink), { hard });
       if (!r) return;
       const name = (d) => String(d).replace(/([a-z])([A-Z])/g, "$1 $2");
       if (r.put.length) toChat("\u{1F525} The farm's ink is on you now: " + r.put.map(name).join(", ") + ". It's in your wardrobe's Farm Brand and Farm Ink slots.", "#c79bd8");
@@ -21316,9 +21347,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     return b;
   }
+  var inkTicks = 0;
   setInterval(() => {
-    if (st.gotState) inkSync();
-  }, 5 * 6e4);
+    inkTicks++;
+    if (!st.gotState) return;
+    let hard = false;
+    try {
+      const D = window.FarmhandDispensary;
+      hard = !!(D && typeof D.hard === "function" && D.hard());
+    } catch (e) {
+    }
+    if (hard || inkTicks % 5 === 0) inkSync();
+  }, 6e4);
   function toBot(type, data) {
     if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
     window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));

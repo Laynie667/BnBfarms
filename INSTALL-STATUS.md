@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.57.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.4.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.57.1** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.4.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.57.1 + Dispensary 0.4.1: farm ink starts the right size.** Laynie, Nov 18: "the default starting size is too big on most of them in relation to the body".
+  - **Sizes:** every design starts fitted to its spot in proportion to the body. A lower-belly piece is about half the waist across, a hip piece a third. 121 of 136 come down, and none goes up.
+  - **Spots:** the hip spot moved off the groin crease onto the hip, and the cheek spot onto the cheek, under the eye.
+  - **Your words:** the four "your words" designs start on the lower belly.
+  - **Unchanged:** the pictures, and anyone's own size setting or Layering.
 
 - **Bot 0.74.0 + Companion 0.57.0 + Dispensary 0.4.0: farm ink: recolourable, sized, live designs, layered over the drawn belly**
 - **Companion 0.57.0 + Dispensary 0.4.0 + Bot 0.74.0: farm ink, recolourable and sized, the live designs, and layered right.** Laynie, Nov 18: "the tattoos need to be recolorable and have better sizing options", and "as long as it layers properly".

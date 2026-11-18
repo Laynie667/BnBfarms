@@ -35,8 +35,11 @@ const stillItem = (C, kind, name) => (C && Array.isArray(C.Appearance) ? C.Appea
 const PRIORITY = 11;   // on the skin (the body and the game's own body markings are under 11), under socks, underwear and clothes
 const kindOf = (slot) => (slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null);
 export const isInkSlot = (slot) => !!kindOf(slot);
-const TITLES = {}, MANIFEST = {};
-for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) { TITLES[kind + ":" + a.name] = a.title; if (a.live) MANIFEST[a.name] = a; }
+// K: each design's starting size (Nov 18, Laynie: "does that tattoos sizing and placement seem esthetically and visibly the
+// right scale per tattoo for the defaults?"): fitted to a box for its spot, width and height, so long lettering gets room
+const TITLES = {}, MANIFEST = {}, K = {};
+for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) { TITLES[kind + ":" + a.name] = a.title; if (a.live) MANIFEST[a.name] = a; if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k; }
+const kOf = (it) => (it && it.Asset && it.Asset.Group && K[kindOf(it.Asset.Group.Name) + ":" + it.Asset.Name]) || 1;
 
 function assetDef(a) {
   return {
@@ -203,7 +206,7 @@ export function registerInk(W, mod) {
     hook("CommonDrawAppearanceBuild", 5, (args, next) => {
       const C = args[0], cb = args[1]; if (!cb || typeof cb !== "object") return next(args);
       const sized = (o, it) => {
-        const f = (it && it.Property && it.Property.FarmInk) || {}, sz = f.sz || 1, kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
+        const f = (it && it.Property && it.Property.FarmInk) || {}, sz = (f.sz || 1) * kOf(it), kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
         o = Object.assign({}, o); o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) * kx; o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) * ky; return o;
       };
       const seen = new Set(), notReady = [];

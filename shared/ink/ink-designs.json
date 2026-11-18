@@ -27,7 +27,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "BreedingSow",
@@ -36,8 +37,8 @@
     "desc": "flowing script on a curve, a heart and a snout",
     "sheet": 1,
     "spot": "hip",
-    "left": 98,
-    "top": 499,
+    "left": 96,
+    "top": 531,
     "w": 216,
     "h": 99,
     "layers": [
@@ -53,7 +54,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "BreedingBitch",
@@ -79,7 +81,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "FoalFactory",
@@ -105,7 +108,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "PuppyFactory",
@@ -151,7 +155,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "KittenFactory",
@@ -177,7 +182,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.7
    },
    {
     "name": "WombCrest",
@@ -203,7 +209,8 @@
       35,
       122
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "CumHere",
@@ -229,7 +236,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "FreeUse",
@@ -238,8 +246,8 @@
     "desc": "blackletter, with arrows",
     "sheet": 1,
     "spot": "hip",
-    "left": 98,
-    "top": 497,
+    "left": 96,
+    "top": 529,
     "w": 216,
     "h": 103,
     "layers": [
@@ -255,7 +263,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "TentacleBred",
@@ -264,8 +273,8 @@
     "desc": "graffiti, with a curl of tentacle",
     "sheet": 1,
     "spot": "hip",
-    "left": 98,
-    "top": 485,
+    "left": 96,
+    "top": 517,
     "w": 216,
     "h": 127,
     "layers": [
@@ -281,7 +290,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "WolfBredPackBitch",
@@ -307,7 +317,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "QueenInHeat",
@@ -316,8 +327,8 @@
     "desc": "a crown in flames",
     "sheet": 1,
     "spot": "hip",
-    "left": 98,
-    "top": 480,
+    "left": 96,
+    "top": 512,
     "w": 216,
     "h": 136,
     "layers": [
@@ -343,7 +354,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "TrapBait",
@@ -379,7 +391,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "MilkedAndBred",
@@ -425,7 +438,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.68
    },
    {
     "name": "WombCrestSeeded",
@@ -451,7 +465,8 @@
       35,
       122
      ]
-    ]
+    ],
+    "k": 0.73
    },
    {
     "name": "GoblinLoot",
@@ -460,8 +475,8 @@
     "desc": "crude stick-and-poke, daggers",
     "sheet": 2,
     "spot": "hip",
-    "left": 98,
-    "top": 462,
+    "left": 96,
+    "top": 494,
     "w": 216,
     "h": 173,
     "layers": [
@@ -477,7 +492,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "SlutStickAndPoke",
@@ -486,8 +502,8 @@
     "desc": "little hand-poked dots",
     "sheet": 2,
     "spot": "cheek",
-    "left": 190,
-    "top": 166,
+    "left": 195,
+    "top": 169,
     "w": 72,
     "h": 28,
     "layers": [
@@ -503,7 +519,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 1
    },
    {
     "name": "MooCowPrint",
@@ -539,7 +556,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.86
    },
    {
     "name": "UseMeFreshMarker",
@@ -575,7 +593,8 @@
       28,
       60
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "GlowSlutGlowInk",
@@ -599,7 +618,8 @@
       "color": "#4dfff0",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "ForSize",
@@ -625,7 +645,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.88
    },
    {
     "name": "InsertHere",
@@ -651,7 +672,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.48
    },
    {
     "name": "ThisWayToTheStable",
@@ -677,7 +699,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.6
    },
    {
     "name": "TheFullSign",
@@ -686,8 +709,8 @@
     "desc": "the whole sign: Farm · Dairy · Kennel",
     "sheet": 3,
     "spot": "hip",
-    "left": 102,
-    "top": 424,
+    "left": 100,
+    "top": 456,
     "w": 209,
     "h": 248,
     "layers": [
@@ -703,7 +726,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "PropertyOfBB",
@@ -712,8 +736,8 @@
     "desc": "stencil words round the BB",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 465,
+    "left": 96,
+    "top": 497,
     "w": 216,
     "h": 166,
     "layers": [
@@ -729,7 +753,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "GradeABreeder",
@@ -738,8 +763,8 @@
     "desc": "a purple inspection stamp",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 440,
+    "left": 96,
+    "top": 472,
     "w": 216,
     "h": 216,
     "layers": [
@@ -748,7 +773,8 @@
       "color": "#5b2a86",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.67
    },
    {
     "name": "BBWombCrest",
@@ -774,7 +800,8 @@
       35,
       122
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "RingForService",
@@ -800,7 +827,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.68
    },
    {
     "name": "DrippingBB",
@@ -831,7 +859,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "GoodGirlKennelBone",
@@ -857,7 +886,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "BreedingBitchKennelBone",
@@ -883,7 +913,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "FarmFreshMilkCap",
@@ -909,7 +940,8 @@
       63,
       143
      ]
-    ]
+    ],
+    "k": 0.52
    },
    {
     "name": "BestInShowRosette",
@@ -955,7 +987,8 @@
       20,
       30
      ]
-    ]
+    ],
+    "k": 0.9
    },
    {
     "name": "BreedMeTrampStamp",
@@ -964,8 +997,8 @@
     "desc": "curls, hearts and the BB",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 502,
+    "left": 96,
+    "top": 534,
     "w": 216,
     "h": 92,
     "layers": [
@@ -981,7 +1014,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "SpankedAtBBPaddleWelt",
@@ -990,8 +1024,8 @@
     "desc": "a paddle with BB cut through it",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 424,
+    "left": 96,
+    "top": 456,
     "w": 216,
     "h": 248,
     "layers": [
@@ -1010,7 +1044,8 @@
       "color": "#ff8f8a",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "TitsUp",
@@ -1051,7 +1086,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.45
    },
    {
     "name": "ReBreed",
@@ -1060,8 +1096,8 @@
     "desc": "a red inspection stamp: didn't take, go again",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 479,
+    "left": 96,
+    "top": 511,
     "w": 216,
     "h": 139,
     "layers": [
@@ -1070,7 +1106,8 @@
       "color": "#b3122e",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "CareInstructions",
@@ -1079,8 +1116,8 @@
     "desc": "a laundry tag: how to treat her",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 460,
+    "left": 96,
+    "top": 492,
     "w": 216,
     "h": 176,
     "layers": [
@@ -1096,7 +1133,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "ThisEndUp",
@@ -1105,8 +1143,8 @@
     "desc": "shipping arrows, handle roughly",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 464,
+    "left": 96,
+    "top": 496,
     "w": 216,
     "h": 169,
     "layers": [
@@ -1132,7 +1170,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "SlipperyWhenWet",
@@ -1168,7 +1207,8 @@
       19,
       28
      ]
-    ]
+    ],
+    "k": 0.88
    },
    {
     "name": "25PerRide",
@@ -1194,7 +1234,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.44
    },
    {
     "name": "OutOfOrder",
@@ -1203,8 +1244,8 @@
     "desc": "a sign taped on: use the other hole",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 466,
+    "left": 96,
+    "top": 498,
     "w": 216,
     "h": 164,
     "layers": [
@@ -1220,7 +1261,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "ScanToBreed",
@@ -1229,8 +1271,8 @@
     "desc": "a made-up code: it scans as nothin'",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 457,
+    "left": 96,
+    "top": 489,
     "w": 216,
     "h": 182,
     "layers": [
@@ -1246,7 +1288,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "PetCollar",
@@ -1272,7 +1315,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.66
    },
    {
     "name": "MissingHerDignity",
@@ -1281,8 +1325,8 @@
     "desc": "a milk carton notice",
     "sheet": 4,
     "spot": "hip",
-    "left": 115,
-    "top": 424,
+    "left": 113,
+    "top": 456,
     "w": 183,
     "h": 248,
     "layers": [
@@ -1318,7 +1362,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "FuckToyGraffiti",
@@ -1354,7 +1399,8 @@
       19,
       33
      ]
-    ]
+    ],
+    "k": 0.76
    },
    {
     "name": "BredMare",
@@ -1363,8 +1409,8 @@
     "desc": "a steel horseshoe, a yellow banner",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 484,
+    "left": 96,
+    "top": 516,
     "w": 216,
     "h": 128,
     "layers": [
@@ -1410,7 +1456,8 @@
       20,
       29
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "BitchInHeat",
@@ -1419,8 +1466,8 @@
     "desc": "a paw print in flames",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 482,
+    "left": 96,
+    "top": 514,
     "w": 216,
     "h": 133,
     "layers": [
@@ -1456,7 +1503,8 @@
       21,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "CherryPopped",
@@ -1465,8 +1513,8 @@
     "desc": "two cherries and a banner",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 462,
+    "left": 96,
+    "top": 494,
     "w": 216,
     "h": 173,
     "layers": [
@@ -1512,7 +1560,8 @@
       20,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "DrippingPeach",
@@ -1521,8 +1570,8 @@
     "desc": "a ripe peach, crease and all, drippin' white",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 439,
+    "left": 96,
+    "top": 471,
     "w": 216,
     "h": 218,
     "layers": [
@@ -1573,7 +1622,8 @@
       20,
       29
      ]
-    ]
+    ],
+    "k": 0.66
    },
    {
     "name": "BredLikeARabbit",
@@ -1582,8 +1632,8 @@
     "desc": "a bunny with her ears up",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 477,
+    "left": 96,
+    "top": 509,
     "w": 216,
     "h": 143,
     "layers": [
@@ -1619,7 +1669,8 @@
       19,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "LayingHen",
@@ -1628,8 +1679,8 @@
     "desc": "a nest of eggs, for the ovipositor girls",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 484,
+    "left": 96,
+    "top": 516,
     "w": 216,
     "h": 128,
     "layers": [
@@ -1675,7 +1726,8 @@
       20,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "HelloMyNameIs",
@@ -1711,7 +1763,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "PleaseDisturb",
@@ -1720,8 +1773,8 @@
     "desc": "a door hanger: breedin' in progress, walk right in",
     "sheet": 5,
     "spot": "hip",
-    "left": 118,
-    "top": 424,
+    "left": 116,
+    "top": 456,
     "w": 176,
     "h": 248,
     "layers": [
@@ -1747,7 +1800,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Sold",
@@ -1756,8 +1810,8 @@
     "desc": "a price tag on a string",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 492,
+    "left": 96,
+    "top": 524,
     "w": 216,
     "h": 113,
     "layers": [
@@ -1783,7 +1837,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "TipYourCow",
@@ -1819,7 +1874,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.44
    },
    {
     "name": "StudParkingOnly",
@@ -1828,8 +1884,8 @@
     "desc": "a reserved sign: everyone else gets milked",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 445,
+    "left": 96,
+    "top": 477,
     "w": 216,
     "h": 207,
     "layers": [
@@ -1845,7 +1901,8 @@
       79,
       168
      ]
-    ]
+    ],
+    "k": 0.7
    },
    {
     "name": "FillMeDotwork",
@@ -1871,7 +1928,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "HennaTrail",
@@ -1897,7 +1955,8 @@
       52,
       16
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "FertileWatercolour",
@@ -1923,7 +1982,8 @@
       20,
       32
      ]
-    ]
+    ],
+    "k": 0.77
    },
    {
     "name": "GoodGirlFineLine",
@@ -1932,8 +1992,8 @@
     "desc": "tiny script and a tiny heart",
     "sheet": 5,
     "spot": "hip",
-    "left": 98,
-    "top": 513,
+    "left": 96,
+    "top": 545,
     "w": 216,
     "h": 70,
     "layers": [
@@ -1949,7 +2009,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "MooTheHeart",
@@ -1995,7 +2056,8 @@
       23,
       29
      ]
-    ]
+    ],
+    "k": 0.86
    },
    {
     "name": "Swallows",
@@ -2051,7 +2113,8 @@
       19,
       29
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "HoldStill",
@@ -2107,7 +2170,8 @@
       20,
       30
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "BrokenIn",
@@ -2163,7 +2227,8 @@
       19,
       28
      ]
-    ]
+    ],
+    "k": 0.74
    },
    {
     "name": "RopeHarness",
@@ -2189,7 +2254,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.79
    },
    {
     "name": "ChainBand",
@@ -2215,7 +2281,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "Cuffs",
@@ -2241,7 +2308,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 1.04
    },
    {
     "name": "UnzipForService",
@@ -2267,7 +2335,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "MaximumLoad",
@@ -2303,7 +2372,8 @@
       19,
       29
      ]
-    ]
+    ],
+    "k": 0.76
    },
    {
     "name": "TearHere",
@@ -2329,7 +2399,8 @@
       18,
       28
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "FreeRange",
@@ -2355,7 +2426,8 @@
       138,
       46
      ]
-    ]
+    ],
+    "k": 0.86
    },
    {
     "name": "ThornedCrest",
@@ -2379,7 +2451,8 @@
       "color": "#ff4fd8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "ButterflyCrest",
@@ -2403,7 +2476,8 @@
       "color": "#ff4fd8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.73
    },
    {
     "name": "SuccubusCrest",
@@ -2427,7 +2501,8 @@
       "color": "#ff4fd8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "TribalCrest",
@@ -2451,7 +2526,8 @@
       "color": "#ff4fd8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "EggLayerCrest",
@@ -2475,7 +2551,8 @@
       "color": "#ff4fd8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "FarmPropertyCorrupted",
@@ -2484,8 +2561,8 @@
     "desc": "its own words, veins creepin' out",
     "sheet": 7,
     "spot": "hip",
-    "left": 98,
-    "top": 471,
+    "left": 96,
+    "top": 503,
     "w": 216,
     "h": 154,
     "layers": [
@@ -2501,7 +2578,8 @@
       13,
       82
      ]
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "RuinedStockCorrupted",
@@ -2527,7 +2605,8 @@
       13,
       82
      ]
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "FarmAnimalCorrupted",
@@ -2553,7 +2632,8 @@
       13,
       82
      ]
-    ]
+    ],
+    "k": 0.76
    },
    {
     "name": "BredCorrupted",
@@ -2579,7 +2659,8 @@
       13,
       82
      ]
-    ]
+    ],
+    "k": 0.78
    },
    {
     "name": "LiveFarmProperty",
@@ -2612,7 +2693,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.66
    },
    {
     "name": "LiveUsedByStrangers",
@@ -2645,7 +2727,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.91
    },
    {
     "name": "LiveTimesBred",
@@ -2678,7 +2761,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.88
    },
    {
     "name": "LiveLitters",
@@ -2711,7 +2795,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.78
    },
    {
     "name": "LiveLitresMilked",
@@ -2744,7 +2829,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.83
    },
    {
     "name": "LiveEggsLaid",
@@ -2752,8 +2838,8 @@
     "where": "a hip",
     "sheet": 2,
     "spot": "hip",
-    "left": 74,
-    "top": 500,
+    "left": 72,
+    "top": 532,
     "w": 265,
     "h": 96,
     "box": [
@@ -2777,7 +2863,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveDaysDenied",
@@ -2820,7 +2907,8 @@
       58
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.78
    },
    {
     "name": "LiveOwnedBy",
@@ -2828,8 +2916,8 @@
     "where": "a hip or above the heart",
     "sheet": 2,
     "spot": "hip",
-    "left": 69,
-    "top": 459,
+    "left": 67,
+    "top": 491,
     "w": 273,
     "h": 179,
     "box": [
@@ -2853,7 +2941,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveStockNumber",
@@ -2886,7 +2975,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.66
    },
    {
     "name": "LiveLocked",
@@ -2929,7 +3019,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.74
    },
    {
     "name": "LiveBredByBB",
@@ -2962,7 +3053,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.6
    },
    {
     "name": "LiveEarTag",
@@ -2970,8 +3062,8 @@
     "where": "a hip",
     "sheet": 3,
     "spot": "hip",
-    "left": 68,
-    "top": 432,
+    "left": 66,
+    "top": 464,
     "w": 277,
     "h": 232,
     "box": [
@@ -3005,7 +3097,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.68
    },
    {
     "name": "LiveCumTank",
@@ -3038,7 +3131,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.76
    },
    {
     "name": "LiveBreedingFacts",
@@ -3046,8 +3140,8 @@
     "where": "the small of the back",
     "sheet": 4,
     "spot": "hip",
-    "left": 68,
-    "top": 413,
+    "left": 66,
+    "top": 445,
     "w": 276,
     "h": 270,
     "box": [
@@ -3071,7 +3165,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.58
    },
    {
     "name": "LiveLoading",
@@ -3104,7 +3199,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.76
    },
    {
     "name": "LiveLipstickKisses",
@@ -3112,8 +3208,8 @@
     "where": "a butt cheek",
     "sheet": 4,
     "spot": "hip",
-    "left": 71,
-    "top": 457,
+    "left": 69,
+    "top": 489,
     "w": 269,
     "h": 182,
     "box": [
@@ -3137,7 +3233,8 @@
       58
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveWouldBreedAgain",
@@ -3190,7 +3287,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.83
    },
    {
     "name": "LiveGuestbook",
@@ -3223,7 +3321,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.88
    },
    {
     "name": "LiveBreedingCard",
@@ -3231,8 +3330,8 @@
     "where": "a butt cheek",
     "sheet": 5,
     "spot": "hip",
-    "left": 77,
-    "top": 471,
+    "left": 75,
+    "top": 503,
     "w": 258,
     "h": 154,
     "box": [
@@ -3256,7 +3355,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveTrapPassport",
@@ -3264,8 +3364,8 @@
     "where": "a shoulder blade",
     "sheet": 5,
     "spot": "hip",
-    "left": 78,
-    "top": 469,
+    "left": 76,
+    "top": 501,
     "w": 245,
     "h": 158,
     "box": [
@@ -3319,7 +3419,8 @@
       143
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.79
    },
    {
     "name": "LiveHighScores",
@@ -3352,7 +3453,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.83
    },
    {
     "name": "LiveTied",
@@ -3360,8 +3462,8 @@
     "where": "a hip",
     "sheet": 5,
     "spot": "hip",
-    "left": 75,
-    "top": 475,
+    "left": 73,
+    "top": 507,
     "w": 262,
     "h": 146,
     "box": [
@@ -3405,7 +3507,8 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveBredOn",
@@ -3413,8 +3516,8 @@
     "where": "a hip",
     "sheet": 6,
     "spot": "hip",
-    "left": 72,
-    "top": 466,
+    "left": 70,
+    "top": 498,
     "w": 269,
     "h": 163,
     "box": [
@@ -3431,7 +3534,8 @@
       "colorize": true
      }
     ],
-    "live": true
+    "live": true,
+    "k": 0.75
    },
    {
     "name": "LiveHeatCrest",
@@ -3462,16 +3566,17 @@
       "colorize": true
      }
     ],
-    "live": true
+    "live": true,
+    "k": 0.51
    },
    {
     "name": "LiveWordsBlackletter",
     "title": "Your Words: Blackletter",
-    "where": "anywhere",
+    "where": "low on the belly",
     "sheet": 7,
-    "spot": "hip",
-    "left": 43,
-    "top": 518,
+    "spot": "womb",
+    "left": 87,
+    "top": 498,
     "w": 325,
     "h": 60,
     "box": [
@@ -3495,16 +3600,17 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.94
    },
    {
     "name": "LiveWordsScript",
     "title": "Your Words: Script",
-    "where": "anywhere",
+    "where": "low on the belly",
     "sheet": 7,
-    "spot": "hip",
-    "left": 39,
-    "top": 491,
+    "spot": "womb",
+    "left": 83,
+    "top": 471,
     "w": 330,
     "h": 115,
     "box": [
@@ -3528,16 +3634,17 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.93
    },
    {
     "name": "LiveWordsTypewriter",
     "title": "Your Words: Typewriter",
-    "where": "anywhere",
+    "where": "low on the belly",
     "sheet": 7,
-    "spot": "hip",
-    "left": 52,
-    "top": 509,
+    "spot": "womb",
+    "left": 96,
+    "top": 489,
     "w": 309,
     "h": 78,
     "box": [
@@ -3561,16 +3668,17 @@
       28
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 1
    },
    {
     "name": "LiveWordsGraffiti",
     "title": "Your Words: Graffiti",
-    "where": "anywhere",
+    "where": "low on the belly",
     "sheet": 7,
-    "spot": "hip",
-    "left": 38,
-    "top": 484,
+    "spot": "womb",
+    "left": 82,
+    "top": 464,
     "w": 336,
     "h": 127,
     "box": [
@@ -3594,7 +3702,8 @@
       143
      ]
     ],
-    "live": true
+    "live": true,
+    "k": 0.92
    }
   ],
   "FarmBrand": [
@@ -3625,7 +3734,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "MoonPawBrand",
@@ -3634,8 +3744,8 @@
     "desc": "a paw under a moon: the pack's",
     "sheet": 2,
     "spot": "hip",
-    "left": 98,
-    "top": 440,
+    "left": 96,
+    "top": 472,
     "w": 216,
     "h": 217,
     "layers": [
@@ -3654,7 +3764,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.66
    },
    {
     "name": "SnoutRingBrand",
@@ -3663,8 +3774,8 @@
     "desc": "a snout in a ring",
     "sheet": 2,
     "spot": "hip",
-    "left": 98,
-    "top": 440,
+    "left": 96,
+    "top": 472,
     "w": 216,
     "h": 216,
     "layers": [
@@ -3683,7 +3794,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.67
    },
    {
     "name": "TheFarmsMark",
@@ -3692,8 +3804,8 @@
     "desc": "the BB and its bell, seared in",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 434,
+    "left": 96,
+    "top": 466,
     "w": 216,
     "h": 229,
     "layers": [
@@ -3712,7 +3824,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.63
    },
    {
     "name": "TheBarnsBrand",
@@ -3741,7 +3854,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.83
    },
    {
     "name": "TheKennelsBrand",
@@ -3750,8 +3864,8 @@
     "desc": "a bone in a ring, a paw cut through",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 440,
+    "left": 96,
+    "top": 472,
     "w": 216,
     "h": 216,
     "layers": [
@@ -3770,7 +3884,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.67
    },
    {
     "name": "RockingBb",
@@ -3779,8 +3894,8 @@
     "desc": "a cattle brand: the BB on a rocker",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 468,
+    "left": 96,
+    "top": 500,
     "w": 216,
     "h": 161,
     "layers": [
@@ -3799,7 +3914,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "BreedingStock",
@@ -3808,8 +3924,8 @@
     "desc": "iron letters in a frame",
     "sheet": 3,
     "spot": "hip",
-    "left": 98,
-    "top": 492,
+    "left": 96,
+    "top": 524,
     "w": 216,
     "h": 112,
     "layers": [
@@ -3828,7 +3944,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "FreeUse",
@@ -3837,8 +3954,8 @@
     "desc": "an oval brand: no need to ask",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 482,
+    "left": 96,
+    "top": 514,
     "w": 216,
     "h": 133,
     "layers": [
@@ -3857,7 +3974,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "CumHere",
@@ -3886,7 +4004,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "MilkMe",
@@ -3915,7 +4034,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.52
    },
    {
     "name": "StudService",
@@ -3924,8 +4044,8 @@
     "desc": "a knot in a ring, for the farm's studs",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 440,
+    "left": 96,
+    "top": 472,
     "w": 216,
     "h": 216,
     "layers": [
@@ -3944,7 +4064,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.67
    },
    {
     "name": "TripleXBar",
@@ -3953,8 +4074,8 @@
     "desc": "a cattle brand: rated for the rough stuff",
     "sheet": 4,
     "spot": "hip",
-    "left": 98,
-    "top": 482,
+    "left": 96,
+    "top": 514,
     "w": 216,
     "h": 133,
     "layers": [
@@ -3973,7 +4094,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.75
    },
    {
     "name": "Hucow",
@@ -3982,8 +4104,8 @@
     "desc": "horns and a muzzle",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4002,7 +4124,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Mare",
@@ -4011,8 +4134,8 @@
     "desc": "a horseshoe; STALLION for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4031,7 +4154,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Bitch",
@@ -4040,8 +4164,8 @@
     "desc": "a paw; STUD DOG for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4060,7 +4184,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Sow",
@@ -4069,8 +4194,8 @@
     "desc": "a snout; BOAR for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4089,7 +4214,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Vixen",
@@ -4098,8 +4224,8 @@
     "desc": "a brush of a tail",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4118,7 +4244,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Bunny",
@@ -4127,8 +4254,8 @@
     "desc": "ears up; BUCK for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4147,7 +4274,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Kitten",
@@ -4156,8 +4284,8 @@
     "desc": "ears and whiskers; TOM for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4176,7 +4304,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Dragoness",
@@ -4205,7 +4334,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.79
    },
    {
     "name": "Nanny",
@@ -4214,8 +4344,8 @@
     "desc": "horns and a beard; BILLY for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4234,7 +4364,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Ewe",
@@ -4243,8 +4374,8 @@
     "desc": "a curly fleece; RAM for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4263,7 +4394,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "SheWolf",
@@ -4272,8 +4404,8 @@
     "desc": "ears up and a long muzzle",
     "sheet": 7,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4292,7 +4424,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Doe",
@@ -4301,8 +4434,8 @@
     "desc": "big soft ears and a spotted brow; BUCK for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4321,7 +4454,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    },
    {
     "name": "Rat",
@@ -4350,7 +4484,8 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.79
    },
    {
     "name": "Goblins",
@@ -4359,8 +4494,8 @@
     "desc": "a goblin's ear, earring and all: their plunder",
     "sheet": 7,
     "spot": "hip",
-    "left": 100,
-    "top": 424,
+    "left": 98,
+    "top": 456,
     "w": 213,
     "h": 248,
     "layers": [
@@ -4379,8 +4514,10 @@
       "color": "#f2b9a8",
       "colorize": true
      }
-    ]
+    ],
+    "k": 0.58
    }
   ]
- }
+ },
+ "spotsMoved": "Nov 18: hip 206,548 → 204,580; cheek 226,180 → 231,183"
 }

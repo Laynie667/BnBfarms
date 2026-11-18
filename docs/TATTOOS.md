@@ -97,7 +97,15 @@ To re-export:
    group, and save that as `shared/ink/ink-designs.json`.
 6. When pictures change, move to a new `vN` folder and update `INK_HOST`, so nobody's browser keeps the old ones.
 
-**Spots**, measured on the live game's body (centre x, y on the 500×1000 body picture, width shown):
+**Starting sizes** (Nov 18, Laynie: "the default starting size is too big on most of them in relation to the body"): each
+design starts fitted to a box for its spot, in proportion to the body (the waist is about 170 across). The box is
+width × height on the 500-wide body: neck 46×30, chest 80×50, heart 40×38, belly 70×58, womb 86×56, hip 54×48,
+thigh 50×64, inner thigh 42×56, shoulder 36×38, forearm 30×42, wrist 40×20, cheek 24×16, ankle 36×26. Each design's `k`
+in the list is that starting scale, multiplied in when it's drawn. The pictures don't change.
+`resize_defaults.cjs` (in `_refs/tattoos`) works them out. The four "your words" designs start on the lower belly.
+
+**Spots**, measured on the live game's body (centre x, y on the 500×1000 body picture, the width the pictures were made
+for; the hip and cheek moved on Nov 18):
 
 | Spot | x | y | Width |
 |---|---|---|---|
@@ -106,11 +114,11 @@ To re-export:
 | heart | 282 | 292 | 54 |
 | belly | 250 | 462 | 92 |
 | womb | 250 | 528 | 110 |
-| hip | 206 | 548 | 72 |
+| hip | 204 | 580 | 72 |
 | thigh | 208 | 662 | 60 |
 | inner thigh | 230 | 640 | 48 |
 | shoulder | 182 | 300 | 42 |
-| cheek | 226 | 180 | 24 |
+| cheek | 231 | 183 | 24 |
 | ankle | 206 | 878 | 40 |
 
 ## Next

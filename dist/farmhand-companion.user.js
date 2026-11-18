@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.57.0
+// @version      0.57.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -248,7 +248,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "BreedingSow",
@@ -257,8 +258,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "flowing script on a curve, a heart and a snout",
           sheet: 1,
           spot: "hip",
-          left: 98,
-          top: 499,
+          left: 96,
+          top: 531,
           w: 216,
           h: 99,
           layers: [
@@ -274,7 +275,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "BreedingBitch",
@@ -300,7 +302,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "FoalFactory",
@@ -326,7 +329,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "PuppyFactory",
@@ -372,7 +376,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "KittenFactory",
@@ -398,7 +403,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.7
         },
         {
           name: "WombCrest",
@@ -424,7 +430,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               35,
               122
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "CumHere",
@@ -450,7 +457,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "FreeUse",
@@ -459,8 +467,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "blackletter, with arrows",
           sheet: 1,
           spot: "hip",
-          left: 98,
-          top: 497,
+          left: 96,
+          top: 529,
           w: 216,
           h: 103,
           layers: [
@@ -476,7 +484,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "TentacleBred",
@@ -485,8 +494,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "graffiti, with a curl of tentacle",
           sheet: 1,
           spot: "hip",
-          left: 98,
-          top: 485,
+          left: 96,
+          top: 517,
           w: 216,
           h: 127,
           layers: [
@@ -502,7 +511,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "WolfBredPackBitch",
@@ -528,7 +538,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "QueenInHeat",
@@ -537,8 +548,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a crown in flames",
           sheet: 1,
           spot: "hip",
-          left: 98,
-          top: 480,
+          left: 96,
+          top: 512,
           w: 216,
           h: 136,
           layers: [
@@ -564,7 +575,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "TrapBait",
@@ -600,7 +612,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "MilkedAndBred",
@@ -646,7 +659,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.68
         },
         {
           name: "WombCrestSeeded",
@@ -672,7 +686,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               35,
               122
             ]
-          ]
+          ],
+          k: 0.73
         },
         {
           name: "GoblinLoot",
@@ -681,8 +696,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "crude stick-and-poke, daggers",
           sheet: 2,
           spot: "hip",
-          left: 98,
-          top: 462,
+          left: 96,
+          top: 494,
           w: 216,
           h: 173,
           layers: [
@@ -698,7 +713,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "SlutStickAndPoke",
@@ -707,8 +723,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "little hand-poked dots",
           sheet: 2,
           spot: "cheek",
-          left: 190,
-          top: 166,
+          left: 195,
+          top: 169,
           w: 72,
           h: 28,
           layers: [
@@ -724,7 +740,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 1
         },
         {
           name: "MooCowPrint",
@@ -760,7 +777,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.86
         },
         {
           name: "UseMeFreshMarker",
@@ -796,7 +814,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28,
               60
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "GlowSlutGlowInk",
@@ -820,7 +839,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#4dfff0",
               colorize: true
             }
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "ForSize",
@@ -846,7 +866,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.88
         },
         {
           name: "InsertHere",
@@ -872,7 +893,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.48
         },
         {
           name: "ThisWayToTheStable",
@@ -898,7 +920,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.6
         },
         {
           name: "TheFullSign",
@@ -907,8 +930,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the whole sign: Farm \xB7 Dairy \xB7 Kennel",
           sheet: 3,
           spot: "hip",
-          left: 102,
-          top: 424,
+          left: 100,
+          top: 456,
           w: 209,
           h: 248,
           layers: [
@@ -924,7 +947,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "PropertyOfBB",
@@ -933,8 +957,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "stencil words round the BB",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 465,
+          left: 96,
+          top: 497,
           w: 216,
           h: 166,
           layers: [
@@ -950,7 +974,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "GradeABreeder",
@@ -959,8 +984,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a purple inspection stamp",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 440,
+          left: 96,
+          top: 472,
           w: 216,
           h: 216,
           layers: [
@@ -969,7 +994,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#5b2a86",
               colorize: true
             }
-          ]
+          ],
+          k: 0.67
         },
         {
           name: "BBWombCrest",
@@ -995,7 +1021,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               35,
               122
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "RingForService",
@@ -1021,7 +1048,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.68
         },
         {
           name: "DrippingBB",
@@ -1052,7 +1080,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "GoodGirlKennelBone",
@@ -1078,7 +1107,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "BreedingBitchKennelBone",
@@ -1104,7 +1134,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "FarmFreshMilkCap",
@@ -1130,7 +1161,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               63,
               143
             ]
-          ]
+          ],
+          k: 0.52
         },
         {
           name: "BestInShowRosette",
@@ -1176,7 +1208,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               30
             ]
-          ]
+          ],
+          k: 0.9
         },
         {
           name: "BreedMeTrampStamp",
@@ -1185,8 +1218,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "curls, hearts and the BB",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 502,
+          left: 96,
+          top: 534,
           w: 216,
           h: 92,
           layers: [
@@ -1202,7 +1235,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "SpankedAtBBPaddleWelt",
@@ -1211,8 +1245,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paddle with BB cut through it",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 424,
+          left: 96,
+          top: 456,
           w: 216,
           h: 248,
           layers: [
@@ -1231,7 +1265,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff8f8a",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "TitsUp",
@@ -1272,7 +1307,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.45
         },
         {
           name: "ReBreed",
@@ -1281,8 +1317,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a red inspection stamp: didn't take, go again",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 479,
+          left: 96,
+          top: 511,
           w: 216,
           h: 139,
           layers: [
@@ -1291,7 +1327,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#b3122e",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "CareInstructions",
@@ -1300,8 +1337,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a laundry tag: how to treat her",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 460,
+          left: 96,
+          top: 492,
           w: 216,
           h: 176,
           layers: [
@@ -1317,7 +1354,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "ThisEndUp",
@@ -1326,8 +1364,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "shipping arrows, handle roughly",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 464,
+          left: 96,
+          top: 496,
           w: 216,
           h: 169,
           layers: [
@@ -1353,7 +1391,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "SlipperyWhenWet",
@@ -1389,7 +1428,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               28
             ]
-          ]
+          ],
+          k: 0.88
         },
         {
           name: "25PerRide",
@@ -1415,7 +1455,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.44
         },
         {
           name: "OutOfOrder",
@@ -1424,8 +1465,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a sign taped on: use the other hole",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 466,
+          left: 96,
+          top: 498,
           w: 216,
           h: 164,
           layers: [
@@ -1441,7 +1482,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "ScanToBreed",
@@ -1450,8 +1492,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a made-up code: it scans as nothin'",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 457,
+          left: 96,
+          top: 489,
           w: 216,
           h: 182,
           layers: [
@@ -1467,7 +1509,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "PetCollar",
@@ -1493,7 +1536,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.66
         },
         {
           name: "MissingHerDignity",
@@ -1502,8 +1546,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a milk carton notice",
           sheet: 4,
           spot: "hip",
-          left: 115,
-          top: 424,
+          left: 113,
+          top: 456,
           w: 183,
           h: 248,
           layers: [
@@ -1539,7 +1583,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "FuckToyGraffiti",
@@ -1575,7 +1620,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               33
             ]
-          ]
+          ],
+          k: 0.76
         },
         {
           name: "BredMare",
@@ -1584,8 +1630,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a steel horseshoe, a yellow banner",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 484,
+          left: 96,
+          top: 516,
           w: 216,
           h: 128,
           layers: [
@@ -1631,7 +1677,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               29
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "BitchInHeat",
@@ -1640,8 +1687,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw print in flames",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 482,
+          left: 96,
+          top: 514,
           w: 216,
           h: 133,
           layers: [
@@ -1677,7 +1724,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               21,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "CherryPopped",
@@ -1686,8 +1734,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "two cherries and a banner",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 462,
+          left: 96,
+          top: 494,
           w: 216,
           h: 173,
           layers: [
@@ -1733,7 +1781,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "DrippingPeach",
@@ -1742,8 +1791,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a ripe peach, crease and all, drippin' white",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 439,
+          left: 96,
+          top: 471,
           w: 216,
           h: 218,
           layers: [
@@ -1794,7 +1843,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               29
             ]
-          ]
+          ],
+          k: 0.66
         },
         {
           name: "BredLikeARabbit",
@@ -1803,8 +1853,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bunny with her ears up",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 477,
+          left: 96,
+          top: 509,
           w: 216,
           h: 143,
           layers: [
@@ -1840,7 +1890,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "LayingHen",
@@ -1849,8 +1900,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a nest of eggs, for the ovipositor girls",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 484,
+          left: 96,
+          top: 516,
           w: 216,
           h: 128,
           layers: [
@@ -1896,7 +1947,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "HelloMyNameIs",
@@ -1932,7 +1984,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "PleaseDisturb",
@@ -1941,8 +1994,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a door hanger: breedin' in progress, walk right in",
           sheet: 5,
           spot: "hip",
-          left: 118,
-          top: 424,
+          left: 116,
+          top: 456,
           w: 176,
           h: 248,
           layers: [
@@ -1968,7 +2021,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Sold",
@@ -1977,8 +2031,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a price tag on a string",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 492,
+          left: 96,
+          top: 524,
           w: 216,
           h: 113,
           layers: [
@@ -2004,7 +2058,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "TipYourCow",
@@ -2040,7 +2095,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.44
         },
         {
           name: "StudParkingOnly",
@@ -2049,8 +2105,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a reserved sign: everyone else gets milked",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 445,
+          left: 96,
+          top: 477,
           w: 216,
           h: 207,
           layers: [
@@ -2066,7 +2122,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               79,
               168
             ]
-          ]
+          ],
+          k: 0.7
         },
         {
           name: "FillMeDotwork",
@@ -2092,7 +2149,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "HennaTrail",
@@ -2118,7 +2176,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               52,
               16
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "FertileWatercolour",
@@ -2144,7 +2203,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               32
             ]
-          ]
+          ],
+          k: 0.77
         },
         {
           name: "GoodGirlFineLine",
@@ -2153,8 +2213,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "tiny script and a tiny heart",
           sheet: 5,
           spot: "hip",
-          left: 98,
-          top: 513,
+          left: 96,
+          top: 545,
           w: 216,
           h: 70,
           layers: [
@@ -2170,7 +2230,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "MooTheHeart",
@@ -2216,7 +2277,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               23,
               29
             ]
-          ]
+          ],
+          k: 0.86
         },
         {
           name: "Swallows",
@@ -2272,7 +2334,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               29
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "HoldStill",
@@ -2328,7 +2391,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               20,
               30
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "BrokenIn",
@@ -2384,7 +2448,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               28
             ]
-          ]
+          ],
+          k: 0.74
         },
         {
           name: "RopeHarness",
@@ -2410,7 +2475,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.79
         },
         {
           name: "ChainBand",
@@ -2436,7 +2502,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "Cuffs",
@@ -2462,7 +2529,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 1.04
         },
         {
           name: "UnzipForService",
@@ -2488,7 +2556,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "MaximumLoad",
@@ -2524,7 +2593,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               19,
               29
             ]
-          ]
+          ],
+          k: 0.76
         },
         {
           name: "TearHere",
@@ -2550,7 +2620,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               18,
               28
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "FreeRange",
@@ -2576,7 +2647,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               138,
               46
             ]
-          ]
+          ],
+          k: 0.86
         },
         {
           name: "ThornedCrest",
@@ -2600,7 +2672,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff4fd8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "ButterflyCrest",
@@ -2624,7 +2697,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff4fd8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.73
         },
         {
           name: "SuccubusCrest",
@@ -2648,7 +2722,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff4fd8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "TribalCrest",
@@ -2672,7 +2747,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff4fd8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "EggLayerCrest",
@@ -2696,7 +2772,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#ff4fd8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "FarmPropertyCorrupted",
@@ -2705,8 +2782,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "its own words, veins creepin' out",
           sheet: 7,
           spot: "hip",
-          left: 98,
-          top: 471,
+          left: 96,
+          top: 503,
           w: 216,
           h: 154,
           layers: [
@@ -2722,7 +2799,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               13,
               82
             ]
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "RuinedStockCorrupted",
@@ -2748,7 +2826,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               13,
               82
             ]
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "FarmAnimalCorrupted",
@@ -2774,7 +2853,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               13,
               82
             ]
-          ]
+          ],
+          k: 0.76
         },
         {
           name: "BredCorrupted",
@@ -2800,7 +2880,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               13,
               82
             ]
-          ]
+          ],
+          k: 0.78
         },
         {
           name: "LiveFarmProperty",
@@ -2833,7 +2914,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.66
         },
         {
           name: "LiveUsedByStrangers",
@@ -2866,7 +2948,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.91
         },
         {
           name: "LiveTimesBred",
@@ -2899,7 +2982,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.88
         },
         {
           name: "LiveLitters",
@@ -2932,7 +3016,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.78
         },
         {
           name: "LiveLitresMilked",
@@ -2965,7 +3050,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.83
         },
         {
           name: "LiveEggsLaid",
@@ -2973,8 +3059,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a hip",
           sheet: 2,
           spot: "hip",
-          left: 74,
-          top: 500,
+          left: 72,
+          top: 532,
           w: 265,
           h: 96,
           box: [
@@ -2998,7 +3084,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveDaysDenied",
@@ -3041,7 +3128,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               58
             ]
           ],
-          live: true
+          live: true,
+          k: 0.78
         },
         {
           name: "LiveOwnedBy",
@@ -3049,8 +3137,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a hip or above the heart",
           sheet: 2,
           spot: "hip",
-          left: 69,
-          top: 459,
+          left: 67,
+          top: 491,
           w: 273,
           h: 179,
           box: [
@@ -3074,7 +3162,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveStockNumber",
@@ -3107,7 +3196,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.66
         },
         {
           name: "LiveLocked",
@@ -3150,7 +3240,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.74
         },
         {
           name: "LiveBredByBB",
@@ -3183,7 +3274,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.6
         },
         {
           name: "LiveEarTag",
@@ -3191,8 +3283,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a hip",
           sheet: 3,
           spot: "hip",
-          left: 68,
-          top: 432,
+          left: 66,
+          top: 464,
           w: 277,
           h: 232,
           box: [
@@ -3226,7 +3318,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.68
         },
         {
           name: "LiveCumTank",
@@ -3259,7 +3352,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.76
         },
         {
           name: "LiveBreedingFacts",
@@ -3267,8 +3361,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "the small of the back",
           sheet: 4,
           spot: "hip",
-          left: 68,
-          top: 413,
+          left: 66,
+          top: 445,
           w: 276,
           h: 270,
           box: [
@@ -3292,7 +3386,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.58
         },
         {
           name: "LiveLoading",
@@ -3325,7 +3420,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.76
         },
         {
           name: "LiveLipstickKisses",
@@ -3333,8 +3429,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a butt cheek",
           sheet: 4,
           spot: "hip",
-          left: 71,
-          top: 457,
+          left: 69,
+          top: 489,
           w: 269,
           h: 182,
           box: [
@@ -3358,7 +3454,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               58
             ]
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveWouldBreedAgain",
@@ -3411,7 +3508,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.83
         },
         {
           name: "LiveGuestbook",
@@ -3444,7 +3542,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.88
         },
         {
           name: "LiveBreedingCard",
@@ -3452,8 +3551,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a butt cheek",
           sheet: 5,
           spot: "hip",
-          left: 77,
-          top: 471,
+          left: 75,
+          top: 503,
           w: 258,
           h: 154,
           box: [
@@ -3477,7 +3576,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveTrapPassport",
@@ -3485,8 +3585,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a shoulder blade",
           sheet: 5,
           spot: "hip",
-          left: 78,
-          top: 469,
+          left: 76,
+          top: 501,
           w: 245,
           h: 158,
           box: [
@@ -3540,7 +3640,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               143
             ]
           ],
-          live: true
+          live: true,
+          k: 0.79
         },
         {
           name: "LiveHighScores",
@@ -3573,7 +3674,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.83
         },
         {
           name: "LiveTied",
@@ -3581,8 +3683,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a hip",
           sheet: 5,
           spot: "hip",
-          left: 75,
-          top: 475,
+          left: 73,
+          top: 507,
           w: 262,
           h: 146,
           box: [
@@ -3626,7 +3728,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveBredOn",
@@ -3634,8 +3737,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           where: "a hip",
           sheet: 6,
           spot: "hip",
-          left: 72,
-          top: 466,
+          left: 70,
+          top: 498,
           w: 269,
           h: 163,
           box: [
@@ -3652,7 +3755,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               colorize: true
             }
           ],
-          live: true
+          live: true,
+          k: 0.75
         },
         {
           name: "LiveHeatCrest",
@@ -3683,16 +3787,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               colorize: true
             }
           ],
-          live: true
+          live: true,
+          k: 0.51
         },
         {
           name: "LiveWordsBlackletter",
           title: "Your Words: Blackletter",
-          where: "anywhere",
+          where: "low on the belly",
           sheet: 7,
-          spot: "hip",
-          left: 43,
-          top: 518,
+          spot: "womb",
+          left: 87,
+          top: 498,
           w: 325,
           h: 60,
           box: [
@@ -3716,16 +3821,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.94
         },
         {
           name: "LiveWordsScript",
           title: "Your Words: Script",
-          where: "anywhere",
+          where: "low on the belly",
           sheet: 7,
-          spot: "hip",
-          left: 39,
-          top: 491,
+          spot: "womb",
+          left: 83,
+          top: 471,
           w: 330,
           h: 115,
           box: [
@@ -3749,16 +3855,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 0.93
         },
         {
           name: "LiveWordsTypewriter",
           title: "Your Words: Typewriter",
-          where: "anywhere",
+          where: "low on the belly",
           sheet: 7,
-          spot: "hip",
-          left: 52,
-          top: 509,
+          spot: "womb",
+          left: 96,
+          top: 489,
           w: 309,
           h: 78,
           box: [
@@ -3782,16 +3889,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               28
             ]
           ],
-          live: true
+          live: true,
+          k: 1
         },
         {
           name: "LiveWordsGraffiti",
           title: "Your Words: Graffiti",
-          where: "anywhere",
+          where: "low on the belly",
           sheet: 7,
-          spot: "hip",
-          left: 38,
-          top: 484,
+          spot: "womb",
+          left: 82,
+          top: 464,
           w: 336,
           h: 127,
           box: [
@@ -3815,7 +3923,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               143
             ]
           ],
-          live: true
+          live: true,
+          k: 0.92
         }
       ],
       FarmBrand: [
@@ -3846,7 +3955,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "MoonPawBrand",
@@ -3855,8 +3965,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw under a moon: the pack's",
           sheet: 2,
           spot: "hip",
-          left: 98,
-          top: 440,
+          left: 96,
+          top: 472,
           w: 216,
           h: 217,
           layers: [
@@ -3875,7 +3985,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.66
         },
         {
           name: "SnoutRingBrand",
@@ -3884,8 +3995,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout in a ring",
           sheet: 2,
           spot: "hip",
-          left: 98,
-          top: 440,
+          left: 96,
+          top: 472,
           w: 216,
           h: 216,
           layers: [
@@ -3904,7 +4015,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.67
         },
         {
           name: "TheFarmsMark",
@@ -3913,8 +4025,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the BB and its bell, seared in",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 434,
+          left: 96,
+          top: 466,
           w: 216,
           h: 229,
           layers: [
@@ -3933,7 +4045,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.63
         },
         {
           name: "TheBarnsBrand",
@@ -3962,7 +4075,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.83
         },
         {
           name: "TheKennelsBrand",
@@ -3971,8 +4085,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bone in a ring, a paw cut through",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 440,
+          left: 96,
+          top: 472,
           w: 216,
           h: 216,
           layers: [
@@ -3991,7 +4105,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.67
         },
         {
           name: "RockingBb",
@@ -4000,8 +4115,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: the BB on a rocker",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 468,
+          left: 96,
+          top: 500,
           w: 216,
           h: 161,
           layers: [
@@ -4020,7 +4135,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "BreedingStock",
@@ -4029,8 +4145,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "iron letters in a frame",
           sheet: 3,
           spot: "hip",
-          left: 98,
-          top: 492,
+          left: 96,
+          top: 524,
           w: 216,
           h: 112,
           layers: [
@@ -4049,7 +4165,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "FreeUse",
@@ -4058,8 +4175,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an oval brand: no need to ask",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 482,
+          left: 96,
+          top: 514,
           w: 216,
           h: 133,
           layers: [
@@ -4078,7 +4195,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "CumHere",
@@ -4107,7 +4225,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "MilkMe",
@@ -4136,7 +4255,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.52
         },
         {
           name: "StudService",
@@ -4145,8 +4265,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a knot in a ring, for the farm's studs",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 440,
+          left: 96,
+          top: 472,
           w: 216,
           h: 216,
           layers: [
@@ -4165,7 +4285,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.67
         },
         {
           name: "TripleXBar",
@@ -4174,8 +4295,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: rated for the rough stuff",
           sheet: 4,
           spot: "hip",
-          left: 98,
-          top: 482,
+          left: 96,
+          top: 514,
           w: 216,
           h: 133,
           layers: [
@@ -4194,7 +4315,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.75
         },
         {
           name: "Hucow",
@@ -4203,8 +4325,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a muzzle",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4223,7 +4345,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Mare",
@@ -4232,8 +4355,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a horseshoe; STALLION for studs",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4252,7 +4375,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Bitch",
@@ -4261,8 +4385,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw; STUD DOG for studs",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4281,7 +4405,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Sow",
@@ -4290,8 +4415,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout; BOAR for studs",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4310,7 +4435,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Vixen",
@@ -4319,8 +4445,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a brush of a tail",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4339,7 +4465,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Bunny",
@@ -4348,8 +4475,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up; BUCK for studs",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4368,7 +4495,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Kitten",
@@ -4377,8 +4505,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears and whiskers; TOM for studs",
           sheet: 6,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4397,7 +4525,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Dragoness",
@@ -4426,7 +4555,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.79
         },
         {
           name: "Nanny",
@@ -4435,8 +4565,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a beard; BILLY for studs",
           sheet: 7,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4455,7 +4585,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Ewe",
@@ -4464,8 +4595,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a curly fleece; RAM for studs",
           sheet: 7,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4484,7 +4615,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "SheWolf",
@@ -4493,8 +4625,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up and a long muzzle",
           sheet: 7,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4513,7 +4645,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Doe",
@@ -4522,8 +4655,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "big soft ears and a spotted brow; BUCK for studs",
           sheet: 7,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4542,7 +4675,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         },
         {
           name: "Rat",
@@ -4571,7 +4705,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.79
         },
         {
           name: "Goblins",
@@ -4580,8 +4715,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a goblin's ear, earring and all: their plunder",
           sheet: 7,
           spot: "hip",
-          left: 100,
-          top: 424,
+          left: 98,
+          top: 456,
           w: 213,
           h: 248,
           layers: [
@@ -4600,10 +4735,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
-          ]
+          ],
+          k: 0.58
         }
       ]
-    }
+    },
+    spotsMoved: "Nov 18: hip 206,548 \u2192 204,580; cheek 226,180 \u2192 231,183"
   };
 
   // shared/ink/live-art.js
@@ -7148,10 +7285,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var TITLES = {};
   var MANIFEST = {};
+  var K = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) {
     TITLES[kind + ":" + a.name] = a.title;
     if (a.live) MANIFEST[a.name] = a;
+    if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
   }
+  var kOf = (it) => it && it.Asset && it.Asset.Group && K[kindOf(it.Asset.Group.Name) + ":" + it.Asset.Name] || 1;
   function assetDef(a) {
     return {
       Name: a.name,
@@ -7391,7 +7531,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const C2 = args[0], cb = args[1];
         if (!cb || typeof cb !== "object") return next(args);
         const sized = (o, it) => {
-          const f = it && it.Property && it.Property.FarmInk || {}, sz = f.sz || 1, kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
+          const f = it && it.Property && it.Property.FarmInk || {}, sz = (f.sz || 1) * kOf(it), kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
           o = Object.assign({}, o);
           o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) * kx;
           o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) * ky;
@@ -7536,7 +7676,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.57.0";
+  var VERSION = "0.57.1";
 
   // shared/species.js
   var WORDS = {
@@ -12310,18 +12450,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       ctx3.closePath();
     }
-    function wet(ctx3, K, a) {
-      ctx3.globalAlpha = K.alpha * (a || 1);
-      ctx3.fillStyle = K.base;
+    function wet(ctx3, K2, a) {
+      ctx3.globalAlpha = K2.alpha * (a || 1);
+      ctx3.fillStyle = K2.base;
       ctx3.fill();
-      ctx3.globalAlpha = Math.min(1, K.alpha * 0.8);
-      ctx3.strokeStyle = K.edge;
+      ctx3.globalAlpha = Math.min(1, K2.alpha * 0.8);
+      ctx3.strokeStyle = K2.edge;
       ctx3.lineWidth = 0.9;
       ctx3.stroke();
     }
-    function shine(ctx3, K, side, from, to) {
+    function shine(ctx3, K2, side, from, to) {
       ctx3.globalAlpha = 0.7;
-      ctx3.strokeStyle = K.gloss;
+      ctx3.strokeStyle = K2.gloss;
       ctx3.lineWidth = 1.1;
       ctx3.lineCap = "round";
       ctx3.beginPath();
@@ -12346,18 +12486,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       return pts;
     }
-    function strandDraw(ctx3, K, pts) {
+    function strandDraw(ctx3, K2, pts) {
       const wide = pts.map((p) => [p[0], p[1], p[2] + 1.8]);
       ribbon(ctx3, wide);
-      ctx3.globalAlpha = Math.min(1, K.alpha + 0.05);
-      ctx3.fillStyle = K.edge;
+      ctx3.globalAlpha = Math.min(1, K2.alpha + 0.05);
+      ctx3.fillStyle = K2.edge;
       ctx3.fill();
       const side = ribbon(ctx3, pts);
-      ctx3.globalAlpha = K.alpha;
-      ctx3.fillStyle = K.base;
+      ctx3.globalAlpha = K2.alpha;
+      ctx3.fillStyle = K2.base;
       ctx3.fill();
       ctx3.globalAlpha = 0.85;
-      ctx3.strokeStyle = K.gloss;
+      ctx3.strokeStyle = K2.gloss;
       ctx3.lineWidth = 1;
       ctx3.lineCap = "round";
       ctx3.beginPath();
@@ -12369,28 +12509,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       });
       ctx3.stroke();
     }
-    function strand(ctx3, r, K, x, y, size, ang0) {
-      const len = size * (0.25 + r() * 0.55) * (0.6 + K.run * 0.4), w = Math.max(1.6, size * 0.032 * K.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
+    function strand(ctx3, r, K2, x, y, size, ang0) {
+      const len = size * (0.25 + r() * 0.55) * (0.6 + K2.run * 0.4), w = Math.max(1.6, size * 0.032 * K2.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
       const pts = strandPts(r, x, y, len, w, ang);
       if (r() < 0.3) {
         const cut2 = 4 + Math.floor(r() * 4);
-        strandDraw(ctx3, K, pts.slice(0, cut2));
-        strandDraw(ctx3, K, pts.slice(cut2 + 2));
-      } else strandDraw(ctx3, K, pts);
+        strandDraw(ctx3, K2, pts.slice(0, cut2));
+        strandDraw(ctx3, K2, pts.slice(cut2 + 2));
+      } else strandDraw(ctx3, K2, pts);
       {
         const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
-        strandDraw(ctx3, K, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
+        strandDraw(ctx3, K2, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
       }
       for (let b = 0, nb = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0; b < nb; b++) {
         const p = pts[2 + Math.floor(r() * 7)], side = r() < 0.5 ? -1 : 1;
-        strandDraw(ctx3, K, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
+        strandDraw(ctx3, K2, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
       }
       for (let d = 0, nd = Math.floor(r() * 3); d < nd; d++) {
         const p = pts[Math.floor(r() * pts.length)], bx = p[0] + (r() - 0.5) * size * 0.5, by = p[1] + (r() - 0.5) * size * 0.3, bw = w * (0.8 + r() * 0.6);
-        strandDraw(ctx3, K, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
+        strandDraw(ctx3, K2, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
       }
     }
-    function run(ctx3, r, K, x, y, len, w) {
+    function run(ctx3, r, K2, x, y, len, w) {
       const steps = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
       let px = x;
       for (let i = 0; i <= steps; i++) {
@@ -12400,61 +12540,61 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         pts.push([px, y + t * len, Math.max(1.2, ww)]);
       }
       const side = ribbon(ctx3, pts);
-      wet(ctx3, K);
-      shine(ctx3, K, side.L, 1, Math.floor(steps * 0.7));
+      wet(ctx3, K2);
+      shine(ctx3, K2, side.L, 1, Math.floor(steps * 0.7));
       const end = pts[pts.length - 1];
       if (r() < 0.55) {
         puddle(ctx3, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
-        wet(ctx3, K);
+        wet(ctx3, K2);
       } else {
         ctx3.beginPath();
         ctx3.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
-        wet(ctx3, K);
+        wet(ctx3, K2);
       }
       ctx3.globalAlpha = 0.85;
-      ctx3.fillStyle = K.gloss;
+      ctx3.fillStyle = K2.gloss;
       ctx3.beginPath();
       ctx3.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
       ctx3.fill();
     }
-    function splash(ctx3, r, K, x, y, size, amount) {
-      const w = size * (0.11 + r() * 0.12) * K.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
+    function splash(ctx3, r, K2, x, y, size, amount) {
+      const w = size * (0.11 + r() * 0.12) * K2.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
       ctx3.save();
       ctx3.translate(x, y);
       ctx3.rotate(ang);
       puddle(ctx3, r, 0, 0, w, h2, 0.55);
       ctx3.restore();
-      wet(ctx3, K);
-      const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K.run));
+      wet(ctx3, K2);
+      const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K2.run));
       for (let i = 0; i < n; i++) {
-        const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
-        run(ctx3, r, K, sx, y + h2 * 0.3, len, sw);
+        const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K2.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
+        run(ctx3, r, K2, sx, y + h2 * 0.3, len, sw);
       }
     }
-    function rope2(ctx3, r, K, x, y, size) {
+    function rope2(ctx3, r, K2, x, y, size) {
       const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
       for (let i = 0; i <= 10; i++) {
         const t = i / 10;
-        pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K.width]);
+        pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K2.width]);
       }
       const side = ribbon(ctx3, pts);
-      wet(ctx3, K);
-      shine(ctx3, K, side.L, 2, 8);
+      wet(ctx3, K2);
+      shine(ctx3, K2, side.L, 2, 8);
       if (r() < 0.6) {
         const p = pts[3 + Math.floor(r() * 5)];
-        run(ctx3, r, K, p[0], p[1], size * (0.3 + r() * 0.6) * K.run, Math.max(2, p[2] * 1.3));
+        run(ctx3, r, K2, p[0], p[1], size * (0.3 + r() * 0.6) * K2.run, Math.max(2, p[2] * 1.3));
       }
     }
-    function smear(ctx3, r, K, x, y, size) {
-      const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K.width, pts = [];
+    function smear(ctx3, r, K2, x, y, size) {
+      const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K2.width, pts = [];
       for (let i = 0; i <= 12; i++) {
         const t = i / 12;
         pts.push([x + Math.cos(a) * l * (t - 0.5) + (r() - 0.5) * 2, y + Math.sin(a) * l * (t - 0.5) * 0.6 + (r() - 0.5) * 2, w0 * (0.4 + Math.sin(t * Math.PI) * 0.8) * (0.8 + r() * 0.4)]);
       }
       const side = ribbon(ctx3, pts);
-      wet(ctx3, K);
+      wet(ctx3, K2);
       ctx3.globalAlpha = 0.45;
-      ctx3.strokeStyle = K.gloss;
+      ctx3.strokeStyle = K2.gloss;
       ctx3.lineWidth = 0.9;
       for (let s = 0; s < 3; s++) {
         const off = (r() - 0.5) * w0 * 0.6;
@@ -12462,8 +12602,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         pts.forEach((p, i) => i ? ctx3.lineTo(p[0], p[1] + off) : ctx3.moveTo(p[0], p[1] + off));
         ctx3.stroke();
       }
-      if (K.patches) {
-        ctx3.fillStyle = K.patches;
+      if (K2.patches) {
+        ctx3.fillStyle = K2.patches;
         for (let s = 0; s < 6; s++) {
           const p = (r() < 0.5 ? side.L : side.R)[Math.floor(r() * side.L.length)];
           ctx3.globalAlpha = 0.9;
@@ -12471,9 +12611,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           ctx3.fill();
         }
       }
-      if (r() < K.run) {
+      if (r() < K2.run) {
         const p = pts[Math.floor(r() * pts.length)];
-        run(ctx3, r, K, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K.run, Math.max(2.5, p[2] * 0.4));
+        run(ctx3, r, K2, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K2.run, Math.max(2.5, p[2] * 0.4));
       }
     }
     const STAMP_FILES = ["Chest1", "Chest2", "Chest3", "Chest4", "Face1", "Face2", "Face3", "Forehead1", "Forehead2", "Forehead3", "Tummy1", "Tummy2", "Tummy3", "Tummy4"];
@@ -12535,9 +12675,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return STAMPS.length;
     }
     const tintCache = /* @__PURE__ */ new Map();
-    function tinted2(st2, K) {
-      if (!K.tint) return st2;
-      const key2 = STAMPS.indexOf(st2) + K.tint;
+    function tinted2(st2, K2) {
+      if (!K2.tint) return st2;
+      const key2 = STAMPS.indexOf(st2) + K2.tint;
       if (tintCache.has(key2)) return tintCache.get(key2);
       const c = document.createElement("canvas");
       c.width = st2.width;
@@ -12545,13 +12685,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const x = c.getContext("2d");
       x.drawImage(st2, 0, 0);
       x.globalCompositeOperation = "multiply";
-      x.fillStyle = K.tint;
+      x.fillStyle = K2.tint;
       x.fillRect(0, 0, c.width, c.height);
       x.globalCompositeOperation = "destination-in";
       x.drawImage(st2, 0, 0);
-      if (K.texture) {
+      if (K2.texture) {
         x.globalCompositeOperation = "source-atop";
-        TEXTURES[K.texture](x, c.width, c.height, rng2(st2.width * 31 + st2.height));
+        TEXTURES[K2.texture](x, c.width, c.height, rng2(st2.width * 31 + st2.height));
       }
       tintCache.set(key2, c);
       return c;
@@ -12629,108 +12769,108 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       }
     };
-    function stamp2(ctx3, r, K, x, y, size) {
-      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted2(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
-      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
+    function stamp2(ctx3, r, K2, x, y, size) {
+      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted2(st2, K2), sc = size / 60 * (0.75 + r() * 0.5);
+      const flip = r() < 0.5 ? -1 : 1, narrow = K2.narrow ? K2.narrow[0] + r() * (K2.narrow[1] - K2.narrow[0]) : 0.85 + r() * 0.3, long = (K2.long || 1) * (K2.runX || 1);
       ctx3.save();
       ctx3.translate(x, y);
-      ctx3.rotate((r() - 0.5) * (K.turn || 0.6));
+      ctx3.rotate((r() - 0.5) * (K2.turn || 0.6));
       ctx3.scale(sc * flip * narrow, sc * long);
-      ctx3.globalAlpha = K.stampAlpha || 1;
+      ctx3.globalAlpha = K2.stampAlpha || 1;
       ctx3.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
       ctx3.restore();
     }
     function paint(ctx3, kind, opt) {
-      const K0 = KINDS2[kind] || KINDS2.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng2(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      const K0 = KINDS2[kind] || KINDS2.cum, K2 = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng2(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
       ctx3.save();
       ctx3.lineJoin = "round";
       for (const [ax, ay, size] of at) {
         const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];
-        if (K.style === "smear") {
+        if (K2.style === "smear") {
           for (let i = 0, n = Math.round((2 + r() * 2) * amount); i < n; i++) {
             const [x, y] = spot();
-            smear(ctx3, r, K, x, y, size);
+            smear(ctx3, r, K2, x, y, size);
           }
-          if (K.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
+          if (K2.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx3, r, K, x, y, size * 0.8, amount);
+            splash(ctx3, r, K2, x, y, size * 0.8, amount);
           }
-          if (K.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
+          if (K2.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
             const [x, y] = spot();
-            stamp2(ctx3, r, K, x, y, size);
+            stamp2(ctx3, r, K2, x, y, size);
           }
-        } else if (STAMPS.length && K.stamp !== false) {
+        } else if (STAMPS.length && K2.stamp !== false) {
           for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
             const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
-            stamp2(ctx3, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
+            stamp2(ctx3, r, K2, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
           }
-          for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K.run - 0.2)); i < n; i++) {
+          for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K2.run - 0.2)); i < n; i++) {
             const [x, y] = spot();
             const p = [x, y];
-            run(ctx3, r, K, p[0], p[1], size * (0.4 + r() * 0.9) * K.run, Math.max(2, size * 0.05));
+            run(ctx3, r, K2, p[0], p[1], size * (0.4 + r() * 0.9) * K2.run, Math.max(2, size * 0.05));
           }
-        } else if (K.strands !== false) {
+        } else if (K2.strands !== false) {
           for (let i = 0, n = Math.round((7 + r() * 6) * amount); i < n; i++) {
             const a = r() * Math.PI * 2, d = size * (0.1 + r() * 0.75), x = ax + Math.cos(a) * d, y = ay + Math.sin(a) * d * 0.7;
             const out = Math.atan2(Math.cos(a), Math.sin(a) * 0.7) * 0.6;
-            strand(ctx3, r, K, x, y, size, out + (r() - 0.5) * 0.4);
+            strand(ctx3, r, K2, x, y, size, out + (r() - 0.5) * 0.4);
           }
-          for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K.run)); i < n; i++) {
+          for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K2.run)); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx3, r, K, x, y, size * 0.8, amount);
+            splash(ctx3, r, K2, x, y, size * 0.8, amount);
           }
         } else {
           for (let i = 0, n = Math.round((1.5 + r() * 2) * amount); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx3, r, K, x, y, size, amount);
+            splash(ctx3, r, K2, x, y, size, amount);
           }
-          for (let i = 0, n = K.ropes ? Math.round(r() * 2 * K.ropes * amount) : 0; i < n; i++) {
+          for (let i = 0, n = K2.ropes ? Math.round(r() * 2 * K2.ropes * amount) : 0; i < n; i++) {
             const [x, y] = spot();
-            rope2(ctx3, r, K, x, y, size);
+            rope2(ctx3, r, K2, x, y, size);
           }
         }
-        for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K.droplets || 0.5)); i < n; i++) {
+        for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K2.droplets || 0.5)); i < n; i++) {
           const a = r() * Math.PI * 2, d = size * (0.5 + r() * 0.8);
           ctx3.beginPath();
           ctx3.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
-          wet(ctx3, K, 0.9);
+          wet(ctx3, K2, 0.9);
         }
-        if (K.bubbles) for (let i = 0; i < 6 * amount; i++) {
+        if (K2.bubbles) for (let i = 0; i < 6 * amount; i++) {
           const [x, y] = spot();
           ctx3.globalAlpha = 0.55;
-          ctx3.strokeStyle = K.gloss;
+          ctx3.strokeStyle = K2.gloss;
           ctx3.lineWidth = 0.9;
           ctx3.beginPath();
           ctx3.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
           ctx3.stroke();
         }
-        if (K.seeds) for (let i = 0; i < 8 * amount; i++) {
+        if (K2.seeds) for (let i = 0; i < 8 * amount; i++) {
           const [x, y] = spot();
           ctx3.globalAlpha = 0.9;
-          ctx3.fillStyle = K.seeds;
+          ctx3.fillStyle = K2.seeds;
           ctx3.beginPath();
           ctx3.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
           ctx3.fill();
         }
-        if (K.specks) for (let i = 0; i < 16 * amount; i++) {
+        if (K2.specks) for (let i = 0; i < 16 * amount; i++) {
           const [x, y] = spot();
           ctx3.globalAlpha = 0.75;
-          ctx3.fillStyle = K.specks;
+          ctx3.fillStyle = K2.specks;
           ctx3.beginPath();
           ctx3.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
           ctx3.fill();
         }
-        if (K.crumbs) for (let i = 0; i < 14 * amount; i++) {
+        if (K2.crumbs) for (let i = 0; i < 14 * amount; i++) {
           const [x, y] = spot();
           ctx3.globalAlpha = 1;
           puddle(ctx3, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
-          ctx3.fillStyle = K.crumbs[Math.floor(r() * K.crumbs.length)];
+          ctx3.fillStyle = K2.crumbs[Math.floor(r() * K2.crumbs.length)];
           ctx3.fill();
         }
-        if (K.sprinkles) for (let i = 0; i < (K.sprinkleN || 12) * amount; i++) {
+        if (K2.sprinkles) for (let i = 0; i < (K2.sprinkleN || 12) * amount; i++) {
           const [x, y] = spot(), a = r() * Math.PI;
           ctx3.globalAlpha = 1;
-          ctx3.strokeStyle = K.sprinkles[Math.floor(r() * K.sprinkles.length)];
+          ctx3.strokeStyle = K2.sprinkles[Math.floor(r() * K2.sprinkles.length)];
           ctx3.lineWidth = 1.6;
           ctx3.lineCap = "round";
           ctx3.beginPath();

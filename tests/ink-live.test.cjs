@@ -87,8 +87,12 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
     { Asset: { Name: 'LiveOwnedBy', Group: { Name: 'FarmInk4' } } },
     { Asset: { Name: 'KnotSlave', Group: { Name: 'FarmInk1' } } }] };
   const d1 = draw(her);
+  // each design's starting size (Nov 18: k, fitted to its spot on the body)
+  const kOf = (name) => (LIST.groups.FarmInk.concat(LIST.groups.FarmBrand).find((a) => a.name === name) || {}).k || 1;
+  const kTB = kOf('LiveTimesBred'), kKS = kOf('KnotSlave');
   ok(d1[0].src.startsWith('data:image/png') && d1[0].words.includes('31'), 'TIMES BRED drawn with the count written on it (31)');
-  ok(Math.abs(d1[0].o.ScaleX - 1 / 3) < 1e-9, '...at a third of the size it was made, like the rest of the ink');
+  ok(Math.abs(d1[0].o.ScaleX - kTB / 3) < 1e-9, '...at a third of the size it was made, times its starting size (' + kTB + ')');
+  ok(LIST.groups.FarmInk.concat(LIST.groups.FarmBrand).filter((a) => a.k < 1).length > 100 && Math.max(...LIST.groups.FarmInk.map((a) => a.k || 1)) <= 1.2, 'the starting sizes are in proportion to the body: most come down, none is blown up');
   ok(/Nº 4242/.test(d1[1].words), 'STOCK NUMBER, nothin\' written: the wearer\'s own number');
   ok(/Miss Rosa/.test(d1[2].words), 'OWNED BY, nothin\' written: their owner\'s name');
   ok(/\/ink\/v2\/FarmInk\/KnotSlave_Ink\.png$/.test(d1[3].src), '...and a still design drawn from the repo, untouched');
@@ -139,15 +143,15 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ink.Action('2 size 150');
   ok(W.Player.Appearance[1].Property.FarmInk.sz === 1.5, '/ink 2 size 150: half again as big, written on the item');
   const pl = draw({ MemberNumber: 600, Appearance: [W.Player.Appearance[1]] })[0];
-  ok(Math.abs(pl.o.ScaleX - 0.5) < 1e-9 && Math.abs(pl.o.ScaleY - 0.5) < 1e-9, '...drawn half again as big (' + pl.o.ScaleX.toFixed(3) + ')');
+  ok(Math.abs(pl.o.ScaleX - 0.5 * kTB) < 1e-9 && Math.abs(pl.o.ScaleY - 0.5 * kTB) < 1e-9, '...drawn half again as big (' + pl.o.ScaleX.toFixed(3) + ')');
   ink.Action('2 wide 200'); ink.Action('2 tall 50');
   const p2 = draw({ MemberNumber: 600, Appearance: [W.Player.Appearance[1]] })[0];
-  ok(Math.abs(p2.o.ScaleX - 1) < 1e-9 && Math.abs(p2.o.ScaleY - 0.25) < 1e-9, '...and width and height on their own (wide 200, tall 50)');
+  ok(Math.abs(p2.o.ScaleX - kTB) < 1e-9 && Math.abs(p2.o.ScaleY - 0.25 * kTB) < 1e-9, '...and width and height on their own (wide 200, tall 50)');
   ink.Action('4 size 300');
   const still = W.Player.Appearance[3];
   ok(still.Property && still.Property.FarmInk.sz === 3, 'a still design takes a size too');
   const p3 = draw({ MemberNumber: 600, Appearance: [still] })[0];
-  ok(Math.abs(p3.o.ScaleX - 1) < 1e-9 && /KnotSlave_Ink\.png$/.test(p3.src), '...three times its size, from its own picture (stored at three times, so still crisp)');
+  ok(Math.abs(p3.o.ScaleX - kKS) < 1e-9 && /KnotSlave_Ink\.png$/.test(p3.src), '...three times its size, from its own picture (stored at three times, so still crisp)');
   ink.Action('4 size 900');
   ok(still.Property.FarmInk.sz === 4, '...four times at the most');
   // A TATTOO STAYS ON: the game's naked, and strip a layer

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.79.0
+// @version      0.80.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.79.0";
-  var COMPANION_VERSION = "0.63.0";
+  var VERSION = "0.80.0";
+  var COMPANION_VERSION = "0.64.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -7293,9 +7293,10 @@
       }
       if (hole === "butt" && !mpregOn(mother)) return null;
       const now = Date.now();
+      const sure = dispOn(mother, "surecatch");
       if (p.preg) {
-        if (now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return null;
-        if (p.preg.sires.includes(stud)) return null;
+        if (!sure && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return null;
+        if (!sure && p.preg.sires.includes(stud)) return null;
         if (p.preg.claimed && p.preg.claimed !== stud) return null;
       }
       let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert * (0.5 + Math.min(1, (p.held[hole] || 0) / capacity(mother)));
@@ -7313,9 +7314,10 @@
       if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
       chance *= dangerX(mother).chance;
       chance *= openX(mother);
-      chance = boosted(p, "ripe") ? 1 : Math.min(0.95, chance);
+      chance = boosted(p, "ripe") || sure ? 1 : Math.min(0.95, chance);
       if (Math.random() >= chance) return null;
-      if (p.boosts && p.boosts.ripe) delete p.boosts.ripe;
+      if (!sure && p.boosts && p.boosts.ripe) delete p.boosts.ripe;
+      if (p.preg && sure) return sureMore(mother, stud);
       if (p.preg) {
         p.preg.sires.push(stud);
         return "extra";
@@ -8008,6 +8010,7 @@
       if (caught === "new" && !makesMilk(t) && !limitBlocks(t, "milk"))
         tell(t, "\u{1F37C} You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
       if (caught === "extra") emote("\u{1F37C} " + plainName(stud) + " got one in too! " + plainName(t) + " is carryin' for two sires now.");
+      if (caught === "more") emote(sureLine(t, stud));
       if (caught) {
         for (const h of herdsOf(t)) beep(h.leader, "\u{1F37C} Guess what, sugar: " + plainName(t) + " caught from " + plainName(stud) + "!");
       }
@@ -26150,9 +26153,43 @@
       golden: "Golden Hour",
       musk: "Blue Ribbon Musk",
       echo: "Echo Elixir",
-      statue: "Statue Serum"
+      statue: "Statue Serum",
+      surecatch: "Sure-Catch Serum",
+      dilator: "Nipple Dilator"
     };
-    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
+    const SURE_STEP = 0.06;
+    function sureMore(mother, stud) {
+      const p = prodOf(mother), g = p && p.preg;
+      if (!g) return null;
+      const now = Date.now(), hyper = wornTags(mother).has("hyper") || boosted(p, "hyper");
+      g.full = (g.count || 1) >= CFG.HYPER_MAX;
+      g.count = Math.min(CFG.HYPER_MAX, (g.count || 1) + (hyper ? 2 : 1));
+      if (!g.sires.includes(stud)) g.sires.push(stud);
+      const step = (g.due - g.since) * SURE_STEP;
+      if (g.due - step > now + 2 * 36e5) {
+        g.since -= step;
+        g.due -= step;
+      }
+      g.sure = (g.sure || 0) + 1;
+      return "more";
+    }
+    const SURE_LINES = [
+      "\u{1F37C} It takes, again. %t's belly gives a little push outward as %s's load settles in with the rest. The litter's %c strong now, and growin'.",
+      "\u{1F37C} Another one catches. %t can feel it, a warm swell low down, and the litter's %c now.",
+      "\u{1F37C} Every drop of %s's load takes. %t's belly rounds out a little more: %c in there now.",
+      "\u{1F37C} %t's womb grabs %s's load and keeps it. One more in the litter, %c all told, and %t's belly's showin' it.",
+      "\u{1F37C} %s's seed takes on top of what's already there. %t's carryin' %c now, and still hungry for more."
+    ];
+    const SURE_FULL = [
+      "\u{1F37C} %s's load takes too, but %t's as full as a body can get: %c in there, and not one more will fit. It only brings 'em on sooner.",
+      "\u{1F37C} %t's packed full, %c deep, and still the load catches. There's no more room, so it just hurries the litter along."
+    ];
+    function sureLine(t, stud) {
+      const g = (prodOf(t) || {}).preg || {};
+      return pickFresh("sure:" + (g.full ? "full" : "more"), g.full ? SURE_FULL : SURE_LINES).replace(/%t/g, plainName(t)).replace(/%s/g, plainName(stud)).replace(/%c/g, String(g.count || 1));
+    }
+    if (W.__FARMHAND_TEST__) W.__sureLine = (t, s) => sureLine(t, s);
+    const DISP_WORDS = /sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener|nipple[- ](?:dilat|stretch|opener|spreader)|teat[- ](?:dilat|opener|stretch)|let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
     const CRAVE_OFFER_MS = 45 * 6e4;
     const CRAVE_OFFERS = [
       "\u{1F489} You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

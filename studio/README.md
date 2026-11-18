@@ -32,7 +32,8 @@ From the `farmhand` folder:
 node studio/server.mjs live
 ```
 
-`node studio/server.mjs live:R132` picks a version. With nothing after `server.mjs` it uses the developers' newer copy
+`node studio/server.mjs live:R134` picks a version (with just `live`, the newest the site has: it asks after a range, so
+a version the site has taken down doesn't stop it, as R132 did on Nov 18). With nothing after `server.mjs` it uses the developers' newer copy
 in `reference/`, and any other copy works too:
 
 ```bash
@@ -233,6 +234,12 @@ the game's pictures into the drawing.
 
 ## Good to know
 
+- **BC R134's map** (Nov 18): a placed object can be turned, sized and coloured (the room's `ObjectSettings`), and a
+  tile's object can be a teleport pad or a tether point as well as a sign. The map studio keeps all of it, from the room
+  or a pasted string through to the string it gives back, and shows them in the square's details.
+- **Reference copies:** `studio/local.json` can say `"ref": "C:/…/farmref"`, the fresh copies of the game and the add-ons
+  kept outside OneDrive (Nov 18; OneDrive was keeping the old ones in the cloud, where git couldn't read them). The Echo
+  pictures come from there.
 - The game copy in `reference/` is the developers' newest work (R133 at the time of writing). The live game is a
   version behind, so with that copy the studio can show an item or a feature that is not live yet. The Echo mod is
   made for the live version: with the newer copy the studio draws the plain way once Echo is loaded (its fast drawing

@@ -181,6 +181,26 @@ and running timers follow you between your phone and your PC, and clearing the b
    **Dose icons** (built Nov 18, icons.js): a small row of icons by anybody in the room with doses in them, and 🪱 for a
    parasite. Each Dispensary tells the room what's in its wearer (`dispIcons { ids, para }`, `dispIconsAsk`). There are
    two switches, both on to start: show them, and let others see mine.
+   **Every load takes, and nipples that open up** (built Nov 18; Laynie, Nov 17: "a effect that makes every load take ~
+   for hyper pregnancy reasons. and maybe a nipple dialator effect and parasite that makes nipples fuckable as a real
+   action?"):
+   - **Sure-Catch Serum:** every load takes. On the farm any load that can catch does (the Fertile switch, a
+     contraceptive, breedin' rights and a sire's claim still count). Already carryin', every load after adds one to the
+     litter (two with a hyper item or shot), from any stud, the same one again too, up to the farm's hyper sizes, and
+     brings the litter on a little (6% a load, never closer than two hours to due), so the belly swells with each. The
+     farm girl reads it off the hello (`on`), like Rut. Off the farm the womb only aches for it.
+   - **Nipple Dilator:** the nipples stretch open while it's in you, one to three wide with the dose. Crafted nipple gear
+     that says dilator or stretcher keeps it in while it's worn. Touches there count double while they're open.
+   - **Nipple leeches** (a crafted parasite, off till you switch it on): they hold the nipples open for a day, wider once
+     fed three times. Each time somethin' goes in, they feed (a day more, three at most) and pass their strain; starved
+     eight hours, they drop off. Somebody who suckles you can pick them up. An item that says "nipple parasite" is the
+     leeches, not the parasite lips.
+   - **The real actions** (nipples.js): while the nipples are open, the game's own action menu offers **Fuck nipple**
+     (to somebody with a cock) and **Finger nipple** (anybody with free hands, yourself too), on bare, reachable nipples.
+     With LSCG they're LSCG extension activities; without it the Dispensary adds them to the game the way LSCG does,
+     and the chat line travels with the message, names filled in, so people without either still read it. Each
+     Dispensary tells the room whose nipples are open (`dispNips { n }`, and again for `dispIconsAsk`).
+   - Still to come: the opened nipple drawn on the drawn body (a picture for Laynie to look at first).
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

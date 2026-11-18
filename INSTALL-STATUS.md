@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.79.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.80.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.63.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.11.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.64.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.12.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.80.0 + Companion 0.64.0 + Dispensary 0.12.0: ready for BC R134, every load takes, and nipples that open up**
+  - **Fixed for BC R134** (out Nov 18), which broke the farm's ink in two ways:
+    - Ink picked in the wardrobe came out plain grey: R134 reads starting colours off each layer now, and ours are there too.
+    - The ink's own settings never reached anybody else, and a relog lost them: sizes, live counts, healin' brands, the farm's marks and trophies. R134 sends and keeps only the properties it knows; ours is on its list now.
+  - **Sure-Catch Serum** (Laynie: "a effect that makes every load take ~ for hyper pregnancy reasons"): on the farm every load that can catch does, and once you're carryin', every load after adds to the litter and brings it on, so you swell bigger with each one, up to the hyper sizes. Your Fertile switch still counts.
+  - **Nipple Dilator** and **nipple leeches** (Laynie: "a nipple dialator effect and parasite that makes nipples fuckable as a real action"):
+    - The dilator stretches your nipples open while it's in you; crafted nipple gear that says dilator keeps them open while it's worn.
+    - The leeches are a crafted parasite (off till you switch it on): a day of open nipples, wider once they're fed, and whoever suckles you can catch them.
+    - While they're open, the game's own action menu has a real **Fuck nipple** and **Finger nipple** on you, for anybody with the Dispensary. LSCG's activities when LSCG's loaded, the Dispensary's own when not; the chat line reads right for everybody.
+  - The map studio keeps R134's turned, sized and coloured objects, teleport pads and tether points. It also found the live game again (the site took R132 down).
+  - Tests: `tests/r134-ink.test.cjs`, `tests/dispensary-nipples.test.cjs`.
 
 - **Bot 0.79.0 + Companion 0.63.0 + Dispensary 0.11.0: trophies, the farm's marks, and a belly switch** Laynie's three answers, Nov 18.
   - **Trophies:** live ink the farm hands out the first time somethin' happens to you: your first load (Breeding Card), first knot, the first trap that let you go (Trap Passport), three studs, a stud who's bred you five times, twenty-five loads, your first litter, your first eggs, ten litres milked.

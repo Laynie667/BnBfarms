@@ -65,9 +65,10 @@ const kOf = (it) => { const g = it && it.Asset && it.Asset.Group && it.Asset.Gro
 function assetDef(a) {
   return {
     Name: a.name, Random: false, Value: 0, Left: a.left, Top: a.top,
-    DefaultColor: a.layers.filter((l) => l.colorize).map((l) => l.color),
+    DefaultColor: a.layers.filter((l) => l.colorize).map((l) => l.color),   // (the game up to R133 reads the starting colours here...)
     PoseMapping: { AllFours: "Hide", Hogtied: "Hide" },   // (the body's drawn another way in those: the ink would float)
-    Layer: a.layers.map((l) => ({ Name: l.name, AllowColorize: !!l.colorize })),
+    // (...and from R134 on, off each layer: without its own Color every layer started "Default", plain grey. Nov 18)
+    Layer: a.layers.map((l) => (l.colorize ? { Name: l.name, AllowColorize: true, Color: [l.color] } : { Name: l.name, AllowColorize: false })),
   };
 }
 function groupDef(slot) {
@@ -338,6 +339,25 @@ export function inkCommand(W, args) {
   say(W, "Written on " + d.title + ".");
 }
 
+// R134's entry for our property (see the hooks below). The game's PropertyDataEntry is a plain class declaration, so it's
+// reached by its bare name, not on window.
+/* global PropertyDataEntry */
+export function farmInkEntry(W) {
+  const PD = W.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W.PropertyDataEntry;
+  if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
+  const same = (a, b) => { try { return JSON.stringify(a) === JSON.stringify(b); } catch (e) { return false; } };
+  PD.FarmInk = new PDE("FarmInk", undefined, {
+    validate(prop, itemData) {
+      const g = itemData && itemData.asset && itemData.asset.Group && itemData.asset.Group.Name;
+      if (!ours(g) || !prop || typeof prop !== "object" || Array.isArray(prop)) return { status: "criticalError", value: undefined, errorDescription: "FarmInk belongs on the farm's ink slots" };
+      const v = cleanValues(prop); if (prop.manual === true) v.manual = true;
+      return { status: "ok", value: v };
+    },
+    compare(a, b) { return same(a, b); },
+  });
+  return true;
+}
+
 // Whichever add-on loads first calls this; the second finds it done. `mod` is that add-on's ModSDK handle.
 export function registerInk(W, mod) {
   if (W.__farmInk) return W.__farmInk;
@@ -441,6 +461,18 @@ export function registerInk(W, mod) {
       return r;
     });
     hook("AssetLoadAll", 0, (args, next) => { const r = next(args); try { addSlots(W); } catch (e) { console.warn("[Farm ink] couldn't add the slots again", e); } return r; });
+    // R134 (Nov 18): what's sent to the server about an item is only the properties the game knows (it keeps LSCG's
+    // and WCE's own on a list of its own). Ours (FarmInk: the size, a live design's words and counts, the farm's healin'
+    // brands and marks, a trophy) were dropped on the way: nobody else saw them, and a relog lost them. Kept, on our
+    // slots only.
+    if (typeof W.ItemPropertiesGetBundleProperties === "function") hook("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+      const r = next(args);
+      try { const it = args[0]; if (it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name) && r && r.properties && typeof r.properties.add === "function") r.properties.add("FarmInk"); } catch (e) { /* fine */ }
+      return r;
+    });
+    // ...and on the way in, the game keeps only properties it has an entry for (PropertyData) and drops the rest. So
+    // FarmInk gets one: kept on our slots, cleaned the same way we clean it ourselves, compared by what's in it.
+    farmInkEntry(W);
     // days without cummin': your own game counts it (a ruined one doesn't count as cummin')
     hook("ActivityOrgasmStart", 0, (args, next) => {
       try { const C = args[0]; if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W.ActivityOrgasmRuined) { W.localStorage.setItem(cumKey(W), String(Date.now())); setTimeout(() => refreshAuto(W), 1000); } } catch (e) { /* fine */ }

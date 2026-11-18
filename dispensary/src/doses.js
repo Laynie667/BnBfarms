@@ -23,6 +23,7 @@ import { settle } from "./senses.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
+import { nipsOpen } from "./nipples.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -239,6 +240,20 @@ export const BOOK = {
     words: /\b(statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot))\b/,
     keywords: ["statue serum", "petrifying draught"], soak: ["petrifying"],
     desc: "Half an hour as a statue: your skin and hair turn to stone, or porcelain, gold, black latex, marble or bronze if the bottle says. Your eyes are glass set in it, still your own colour; your ink turns with your skin, and your arousal stops right where it is. Everybody with the Companion sees it.",
+  },
+  // ── Nov 18 (Laynie, Nov 17: "a effect that makes every load take ~ for hyper pregnancy reasons. and maybe a nipple
+  // dialator effect and parasite that makes nipples fuckable as a real action?") ──
+  surecatch: {
+    label: "Sure-Catch Serum", icon: "🤰", mins: 120, color: "#d58fb0", every: [8, 12],
+    words: /\b(sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener)\b/,
+    keywords: ["sure-catch serum", "womb opener"], soak: ["sure-catch"],
+    desc: "Every load takes. On the farm any load that can catch does (your Fertile switch still has to be on), and once you're carryin', every load after adds to the litter and brings it on, so you swell bigger with each one, up to the farm's hyper sizes. Off the farm your womb just aches for it. Two hours a dose.",
+  },
+  dilator: {
+    label: "Nipple Dilator", icon: "⭕", mins: 60, color: "#e0809a", every: [7, 11],
+    words: /\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/,
+    keywords: ["nipple dilator", "nipple stretcher"], soak: ["dilating"],
+    desc: "Your nipples stretch open while it's in you, wider for a stronger dose. While they're open, the game's action menu has a real Fuck nipple and Finger nipple on you, for anybody with the Dispensary, and touches there count double. Crafted nipple gear that says dilator or stretcher keeps them open while it's worn. An hour a dose.",
   },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
@@ -549,6 +564,7 @@ export function initDoses(mod) {
           if (active("hairtrigger")) f *= 2;
           if (active("deepthroat") && /^ItemMouth/.test(zone)) { f *= 2; feltOnce("deepthroat", "used", 90000); }
           if (active("tender") && tenderZones().includes(zone)) { f *= 3; feltOnce("tender", "touched", 120000); }
+          if (/^ItemNipples/.test(zone) && nipsOpen() > 0) f *= 2;   // open nipples (the Dilator, the leeches: nipples.js)
           if (f > 1) args[3] = Number(args[3]) * f;
         }
       } catch (e) { /* fine */ }

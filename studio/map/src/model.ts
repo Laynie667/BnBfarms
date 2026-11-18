@@ -36,7 +36,7 @@ export function mendLayout(raw: any, name: string): Layout {
   if (m && Array.isArray(m.tiles) && m.tiles.length === N && Array.isArray(m.objects) && m.objects.length === N) {
     L.map = { tiles: m.tiles.map(Number), objects: m.objects.map(Number),
       effects: Array.isArray(m.effects) && m.effects.length === N ? m.effects.map((l: any) => (Array.isArray(l) ? l.map(Number) : [])) : L.map.effects,
-      cells: m.cells && typeof m.cells === "object" ? m.cells : {}, fog: !!m.fog };
+      cells: m.cells && typeof m.cells === "object" ? m.cells : {}, settings: m.settings && typeof m.settings === "object" ? m.settings : {}, fog: !!m.fog };
   }
   if (raw.farm && typeof raw.farm === "object") {
     for (const [k, p] of Object.entries(raw.farm.spots || {})) if (p && typeof (p as Pt).X === "number") L.farm.spots[k] = { X: (p as Pt).X, Y: (p as Pt).Y };

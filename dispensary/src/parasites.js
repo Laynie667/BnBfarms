@@ -18,6 +18,11 @@
                                     map). It never stops you leavin' a room
        the mouthpiece               while it's worn its crafter can put words in your mouth: you see them first and
                                     choose to say them, or let that crafter's words straight through (your switch)
+       nipple leeches (Nov 18)      they hold your nipples open for a day (nipples.js: the real Fuck nipple and Finger
+                                    nipple actions), wider once fed three times. Every time somethin' goes in, they
+                                    feed and pass you their strain; starved eight hours, they drop off. Somebody who
+                                    suckles you can pick them up (Laynie, Nov 17: "parasite that makes nipples fuckable
+                                    as a real action")
    • THE STRAIN: the doses named on the item are what a parasite feeds you (its crafter's DNA). None named: the farm's
      own brew, Needy Nectar, Heat and Hair Trigger in turn.
    • The SAFEWORD takes any parasite off at once (in hardcore it's your keyholders who let you out), and the Purge does.
@@ -44,6 +49,7 @@ export const KINDS = {
   brood: { label: "The brood mother", icon: "🥚", words: /\bbrood ?mother\b|\bbrood queen\b/, hours: 24, every: 45 },
   vine: { label: "The leash vine", icon: "🌿", words: /\bleash vine\b|\bvine leash\b/, worn: true, tiles: 3 },
   mouth: { label: "The mouthpiece", icon: "🗣️", words: /\bmouthpiece\b/, worn: true },
+  nips: { label: "Nipple leeches", icon: "🍒", words: /\b(?:nipple|teat)[- ]?(?:leech|parasit|worm|tick)\w*|\bleech\w* (?:on|for) (?:the |your |her |his |their )?(?:nipples?|teats?)\b/, hours: 24, starve: 8 },
 };
 export const kindIds = () => Object.keys(KINDS);
 const DEFAULT_STRAIN = ["needy", "heat", "hairtrigger"];
@@ -86,7 +92,9 @@ export function wornParasites() {
   for (const item of P.Appearance) {
     if (!item || !item.Craft) continue;
     const text = craftText(item);
-    for (const kind of kindIds()) if (KINDS[kind].words.test(text)) out.push({ kind, item, text, by: Number(item.Craft.MemberNumber) || 0, name: String(item.Craft.MemberName || "") });
+    // (the lips answer to any "parasite": not when the item names a kind of its own, like nipple leeches)
+    const kinds = kindIds().filter((kind) => KINDS[kind].words.test(text)), own = kinds.filter((k) => k !== "lips");
+    for (const kind of own.length ? own : kinds) out.push({ kind, item, text, by: Number(item.Craft.MemberNumber) || 0, name: String(item.Craft.MemberName || "") });
   }
   return out;
 }
@@ -122,6 +130,31 @@ export function paraClimax() {
 }
 // let-down (the moss feeds on it)
 export function paraLetDown() { const P = mine(); if (P.moss) { P.moss.fed = Date.now(); save(); } }
+
+// NIPPLE LEECHES: somethin' went in your nipple (nipples.js). They feed: a day more (three at most), wider after three,
+// and their strain at most every ten minutes
+export function nipsFed(from, kind) {
+  const p = mine().nips; if (!p) return false;
+  const now = Date.now();
+  p.fed = now; p.n = (p.n || 0) + 1;
+  p.until = Math.min(p.since + 72 * HOUR, Math.max(p.until || 0, now + KINDS.nips.hours * HOUR));
+  if (now - (p.gave || 0) > 10 * MIN && inRoom()) {
+    p.gave = now;
+    const id = p.strain[(p.n - 1) % Math.max(1, p.strain.length)] || "needy";
+    give(id, { by: p.by, line: fill(line("nips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
+  }
+  if (p.n === 3) local(line("nips", "wider"));
+  save();
+  return true;
+}
+// somebody suckled you while they're on: the leeches can go across to them (once in ten minutes each)
+const suckledAt = {};
+export function paraSuckled(from) {
+  const p = mine().nips; if (!p || !from || from === me() || Date.now() - (suckledAt[from] || 0) < 10 * MIN) return false;
+  suckledAt[from] = Date.now();
+  send("dispPara", { kind: "nips", strain: p.strain, by: p.by || me(), name: myName() }, from);
+  return true;
+}
 
 // a kiss YOU gave: the parasite lips spread, and the brood mother's little ones go across
 export function paraKissGiven(to) {

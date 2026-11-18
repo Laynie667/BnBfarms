@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.63.0
+// @version      0.64.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7324,9 +7324,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Left: a.left,
       Top: a.top,
       DefaultColor: a.layers.filter((l) => l.colorize).map((l) => l.color),
+      // (the game up to R133 reads the starting colours here...)
       PoseMapping: { AllFours: "Hide", Hogtied: "Hide" },
       // (the body's drawn another way in those: the ink would float)
-      Layer: a.layers.map((l) => ({ Name: l.name, AllowColorize: !!l.colorize }))
+      // (...and from R134 on, off each layer: without its own Color every layer started "Default", plain grey. Nov 18)
+      Layer: a.layers.map((l) => l.colorize ? { Name: l.name, AllowColorize: true, Color: [l.color] } : { Name: l.name, AllowColorize: false })
     };
   }
   function groupDef(slot) {
@@ -7739,6 +7741,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (/^auto$/i.test(rest)) refreshAuto(W18);
     say(W18, "Written on " + d.title + ".");
   }
+  function farmInkEntry(W18) {
+    const PD = W18.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W18.PropertyDataEntry;
+    if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
+    const same = (a, b) => {
+      try {
+        return JSON.stringify(a) === JSON.stringify(b);
+      } catch (e) {
+        return false;
+      }
+    };
+    PD.FarmInk = new PDE("FarmInk", void 0, {
+      validate(prop, itemData) {
+        const g = itemData && itemData.asset && itemData.asset.Group && itemData.asset.Group.Name;
+        if (!ours(g) || !prop || typeof prop !== "object" || Array.isArray(prop)) return { status: "criticalError", value: void 0, errorDescription: "FarmInk belongs on the farm's ink slots" };
+        const v = cleanValues(prop);
+        if (prop.manual === true) v.manual = true;
+        return { status: "ok", value: v };
+      },
+      compare(a, b) {
+        return same(a, b);
+      }
+    });
+    return true;
+  }
   function registerInk(W18, mod2) {
     if (W18.__farmInk) return W18.__farmInk;
     const st2 = W18.__farmInk = {
@@ -7931,6 +7957,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
+      if (typeof W18.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+        const r = next(args);
+        try {
+          const it = args[0];
+          if (it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name) && r && r.properties && typeof r.properties.add === "function") r.properties.add("FarmInk");
+        } catch (e) {
+        }
+        return r;
+      });
+      farmInkEntry(W18);
       hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
@@ -8022,7 +8058,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.63.0";
+  var VERSION = "0.64.0";
 
   // shared/species.js
   var WORDS = {

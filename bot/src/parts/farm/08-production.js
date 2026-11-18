@@ -536,10 +536,11 @@
     { const sc = secondCarry(mother, stud, amount, bonus, hole); if (sc !== undefined) return sc; }   // a second litter in the other hole (10y7-udders.js)
     if (hole === "butt" && !mpregOn(mother)) return null;
     const now = Date.now();
+    const sure = dispOn(mother, "surecatch");   // the Sure-Catch Serum, from their Dispensary: every load takes (10ur2-dispensary.js)
     if (p.preg){
-      // a second father can join only in the first day, and never the same stud twice
-      if (now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H*3600000) return null;
-      if (p.preg.sires.includes(stud)) return null;
+      // a second father can join only in the first day, and never the same stud twice (not on Sure-Catch: every load)
+      if (!sure && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H*3600000) return null;
+      if (!sure && p.preg.sires.includes(stud)) return null;
       if (p.preg.claimed && p.preg.claimed !== stud) return null;   // claimed by one sire (10y9l-tile-care.js)
     }
     let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert *
@@ -560,9 +561,10 @@
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
     chance *= dangerX(mother).chance;
     chance *= openX(mother);            // wide open for an hour after a birth or a layin' (10y7-udders.js)   // a Danger Draught (10z-trap-variants.js)
-    chance = boosted(p, "ripe") ? 1 : Math.min(0.95, chance);   // ripe from a shot: the next load that can take, takes (10ur-shots-more.js)
+    chance = boosted(p, "ripe") || sure ? 1 : Math.min(0.95, chance);   // ripe from a shot: the next load that can take, takes (10ur-shots-more.js)
     if (Math.random() >= chance) return null;
-    if (p.boosts && p.boosts.ripe) delete p.boosts.ripe;
+    if (!sure && p.boosts && p.boosts.ripe) delete p.boosts.ripe;
+    if (p.preg && sure) return sureMore(mother, stud);   // already carryin': it adds to the litter (10ur2-dispensary.js)
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
@@ -1166,6 +1168,7 @@
     if (caught === "new" && !makesMilk(t) && !limitBlocks(t,"milk"))
       tell(t, "🍼 You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
     if (caught === "extra") emote("🍼 "+plainName(stud)+" got one in too! "+plainName(t)+" is carryin' for two sires now.");
+    if (caught === "more") emote(sureLine(t, stud));   // Sure-Catch: another one took (10ur2-dispensary.js)
     if (caught){ for (const h of herdsOf(t)) beep(h.leader, "🍼 Guess what, sugar: "+plainName(t)+" caught from "+plainName(stud)+"!"); }
     return { load, rest, pent };
   }

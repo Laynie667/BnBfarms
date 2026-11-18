@@ -12,7 +12,9 @@ import { load, st } from "./store.js";
 import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown } from "./doses.js";
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
-import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS } from "./parasites.js";
+import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
+import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle } from "./nipples.js";
+import "./lines-nips.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
 import { initIcons, iconsTell, iconsFor, iconsReset, iconsDosed } from "./icons.js";
@@ -90,11 +92,12 @@ function start() {
   initSenses(mod);
   initIcons(mod);
   initParasites(mod);
+  initNipples(mod); nipsOnSuckle(paraSuckled);
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -110,7 +113,8 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a)
   lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),
   speech: (t) => dosedSpeech(t), screen: () => screenTick(),
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },
-  worn: () => wornGear(), wornTick: () => wornTick(), wornReset: () => wornReset(), trigger: (k, f) => trigger(k, f), para: () => paraMine(), paraTick: () => paraTick(), latch: (k, o) => latch(k, o), climax: () => paraClimax(), haze: () => hazeTick(), icons: (mn) => iconsFor(mn), iconsTell: (f) => iconsTell(f) };
+  worn: () => wornGear(), wornTick: () => wornTick(), wornReset: () => wornReset(), trigger: (k, f) => trigger(k, f), para: () => paraMine(), paraTick: () => paraTick(), latch: (k, o) => latch(k, o), climax: () => paraClimax(), haze: () => hazeTick(), icons: (mn) => iconsFor(mn), iconsTell: (f) => iconsTell(f),
+  nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({
@@ -128,4 +132,7 @@ W.FarmhandDispensary = Object.freeze({
   // the crafted parasites in you (Nov 18): [{ kind, label, by, until }]
   parasites: () => Object.entries(paraMine()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
   hard: () => (hardOn() ? { on: true, until: (st().hard && st().hard.until) || 0, due: dueAt() } : null),
+  // open nipples (Nov 18, nipples.js): 0 shut, 1 to 3 open, yours or what somebody's Dispensary told the room. The
+  // Companion's drawn breasts can read it.
+  nipples: (mn) => openOf(mn == null ? (W.Player && W.Player.MemberNumber) : Number(mn)),
 });

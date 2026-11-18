@@ -27,18 +27,23 @@ const PORT = Number(process.argv[3] || process.env.PORT || 4780);
 const WEB = join(HERE, "web");
 const FITS = join(HERE, "fits");                                  // what the sliders save: one small JSON file per body part
 const BELLY_SRC = join(HERE, "../extension/src/belly.js");
-const ECHO_RES = (() => { const p = join(HOME, "reference/addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
+// (Nov 18) the reference copies: studio/local.json "ref" when it says (fresh copies outside OneDrive), else HOME/reference
+const REF = (() => { try { const r = JSON.parse(readFileSync(join(HERE, "local.json"), "utf8")).ref; if (r && existsSync(r)) return r; } catch (e) { /* none */ } return join(HOME, "reference"); })();
+const ECHO_RES = (() => { const p = join(REF, "addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json",
   ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
   ".csv": "text/csv; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".ttf": "font/ttf", ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon" };
 
 if (/^live/i.test(ARG)) {
-  // which version: the one asked for, or the newest the site has (old versions stay up, so: count up till one isn't there)
+  // which version: the one asked for, or the newest the site has. (Nov 18, R134: the site dropped R132 while R133 and
+  // R134 stayed up, and counting up till one wasn't there stopped at the gap. So: ask after a range, take the newest.)
   let ver = (/^live:(R\d+)$/i.exec(ARG) || [])[1];
   if (!ver) {
-    for (let n = 132; n < 160; n++) {
-      try { const r = await fetch(LIVE_SITE + "R" + n + "/BondageClub/index.html"); if (!r.ok) break; await r.arrayBuffer(); ver = "R" + n; } catch (e) { break; }
-    }
+    const range = []; for (let n = 128; n < 152; n++) range.push(n);
+    const up = await Promise.all(range.map(async (n) => {
+      try { const r = await fetch(LIVE_SITE + "R" + n + "/BondageClub/index.html"); await r.arrayBuffer(); return r.ok ? n : 0; } catch (e) { return 0; }
+    }));
+    const best = Math.max(0, ...up); if (best) ver = "R" + best;
   }
   if (!ver) { console.error("I couldn't reach the game's site (" + LIVE_SITE + "). Is this computer online? Or use a copy of the game: node studio/server.mjs \"C:\\path\\to\\BondageClub\""); process.exit(1); }
   ver = ver.toUpperCase();

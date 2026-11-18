@@ -69,7 +69,9 @@ export function wornGear() {
     const roulette = ROULETTE_WORDS.test(text);
     if (!list.length && !roulette) continue;
     const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text));
-    const drip = DRIP_WORDS.test(text) && !(lscgPresent() && LSCG_SOAKED.test(text) && !/\bdrip|\biv\b/.test(text));
+    // (Nov 18) crafted nipple gear that says dilator or stretcher: the Nipple Dilator stays in you while it's worn
+    const nipGear = /^ItemNipples/.test(String(item.Asset && item.Asset.Group && item.Asset.Group.Name)) && list.some((d) => d.id === "dilator");
+    const drip = nipGear || (DRIP_WORDS.test(text) && !(lscgPresent() && LSCG_SOAKED.test(text) && !/\bdrip|\biv\b/.test(text)));
     const inject = INJECT_WORDS.test(text);
     if (!drip && !inject && !trig.length) continue;   // (a dose's words on a worn thing that doesn't say how: nothin')
     const every = EVERY.exec(text);

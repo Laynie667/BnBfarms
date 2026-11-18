@@ -27,6 +27,11 @@
      (on) and, if they've switched cravings on, what they're cravin' (crave). I read two of them on the farm:
        Deep Throat Drops   a dosed throat takes a load without gaggin', and the trainin' counts twice (08-production.js)
        Rut                 a stud in rut loads half again as big, and doesn't run dry from a busy hour
+       Sure-Catch Serum    (Nov 18; Laynie, Nov 17: "a effect that makes every load take ~ for hyper pregnancy reasons")
+                           every load that can catch, does (08-production.js rollConception; the Fertile switch, a
+                           contraceptive, breedin' rights and a sire's claim still count). Already carryin', every load
+                           after adds to the litter (two with a hyper item or shot), any stud, the same one again too, up
+                           to the farm's hyper sizes, and brings the litter on a little, so the belly swells with each.
      Cravings: when somebody's cravin', I notice (at most every 45 minutes) and offer; ?fix and I call their Dispensary
      for it, like any of my calls. Only ever for somebody who switched cravings on, for themselves. */
   const DISP_LABEL = { denial: "Denial Serum", sedative: "Sedative", needy: "Needy Nectar", hairtrigger: "Hair Trigger", bitterroot: "Bitterroot",
@@ -34,9 +39,40 @@
     airhead: "Airhead Elixir", babble: "Babble Brew", deepthroat: "Deep Throat Drops", rut: "Rut", tender: "Tender",
     // (Nov 18) the poses and senses, and my own four voice potions from a crafted bottle (bought at my store, they're mine)
     weakknees: "Weak Knees", allfours: "Down Girl", blinder: "Blinder Drops", cotton: "Cotton Ears", tunnel: "Tunnel Vision", haze: "Haze",
-    honey: "Honey Tongue", golden: "Golden Hour", musk: "Blue Ribbon Musk", echo: "Echo Elixir", statue: "Statue Serum" };
+    honey: "Honey Tongue", golden: "Golden Hour", musk: "Blue Ribbon Musk", echo: "Echo Elixir", statue: "Statue Serum",
+    surecatch: "Sure-Catch Serum", dilator: "Nipple Dilator" };
+  // SURE-CATCH: already carryin', another load took. One more in the litter (two for a hyper one), its stud a sire too,
+  // and the litter brought on a little (never past two hours from due), so the belly shows it
+  const SURE_STEP = 0.06;
+  function sureMore(mother, stud){
+    const p = prodOf(mother), g = p && p.preg; if (!g) return null;
+    const now = Date.now(), hyper = wornTags(mother).has("hyper") || boosted(p, "hyper");
+    g.full = (g.count || 1) >= CFG.HYPER_MAX;
+    g.count = Math.min(CFG.HYPER_MAX, (g.count || 1) + (hyper ? 2 : 1));
+    if (!g.sires.includes(stud)) g.sires.push(stud);
+    const step = (g.due - g.since) * SURE_STEP;
+    if (g.due - step > now + 2 * 3600000){ g.since -= step; g.due -= step; }
+    g.sure = (g.sure || 0) + 1;
+    return "more";
+  }
+  const SURE_LINES = [
+    "🍼 It takes, again. %t's belly gives a little push outward as %s's load settles in with the rest. The litter's %c strong now, and growin'.",
+    "🍼 Another one catches. %t can feel it, a warm swell low down, and the litter's %c now.",
+    "🍼 Every drop of %s's load takes. %t's belly rounds out a little more: %c in there now.",
+    "🍼 %t's womb grabs %s's load and keeps it. One more in the litter, %c all told, and %t's belly's showin' it.",
+    "🍼 %s's seed takes on top of what's already there. %t's carryin' %c now, and still hungry for more.",
+  ];
+  const SURE_FULL = [
+    "🍼 %s's load takes too, but %t's as full as a body can get: %c in there, and not one more will fit. It only brings 'em on sooner.",
+    "🍼 %t's packed full, %c deep, and still the load catches. There's no more room, so it just hurries the litter along.",
+  ];
+  function sureLine(t, stud){
+    const g = (prodOf(t) || {}).preg || {};
+    return pickFresh("sure:" + (g.full ? "full" : "more"), g.full ? SURE_FULL : SURE_LINES).replace(/%t/g, plainName(t)).replace(/%s/g, plainName(stud)).replace(/%c/g, String(g.count || 1));
+  }
+  if (W.__FARMHAND_TEST__) W.__sureLine = (t, s) => sureLine(t, s);
   // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me)
-  const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
+  const DISP_WORDS = /sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener|nipple[- ](?:dilat|stretch|opener|spreader)|teat[- ](?:dilat|opener|stretch)|let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
   const CRAVE_OFFER_MS = 45 * 60000;
   const CRAVE_OFFERS = [
     "💉 You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

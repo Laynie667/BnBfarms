@@ -193,7 +193,10 @@ export function Inspector() {
       <div>Can stand here: {ed.standable(p) ? "yes" : <b class="bad">no</b>}</div>
       {zone && <div>Zone: {zone}</div>}
       {spots.length > 0 && <div>Spots: {spots.join(", ")}</div>}
-      {m.cells[i] && <div>Sign: "{m.cells[i].Text}"</div>}
+      {m.cells[i] && m.cells[i].Type === "Sign" && <div>Sign: "{(m.cells[i] as { Text: string }).Text}"</div>}
+      {m.cells[i] && m.cells[i].Type === "Teleporter" && <div>Teleport pad{(m.cells[i] as { Destination?: { X: number; Y: number } }).Destination ? " to " + (m.cells[i] as { Destination: { X: number; Y: number } }).Destination.X + ", " + (m.cells[i] as { Destination: { X: number; Y: number } }).Destination.Y : ""}</div>}
+      {m.cells[i] && m.cells[i].Type === "Tether" && <div>Tether point</div>}
+      {m.settings && m.settings[i] && m.settings[i].ID === m.objects[i] && <div>Turned, sized or coloured in the game</div>}
     </div>
   );
 }

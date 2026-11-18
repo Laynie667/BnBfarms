@@ -17,11 +17,18 @@ export interface Doodad {
 }
 export interface MapEffect { ID: number; Type: string; TypeId?: number; Color?: number[] }
 export interface SignCell { Type: "Sign"; Text: string }
+// (R134, Nov 18) a tile's object can also be a teleport pad (where it goes, its colour, shared) or a tether point
+export interface TeleporterCell { Type: "Teleporter"; Destination?: { X: number; Y: number }; Color?: string; Shared?: boolean }
+export interface TetherCell { Type: "Tether" }
+export type CellConfig = SignCell | TeleporterCell | TetherCell;
+// (R134) how an admin turned, sized and coloured the object on a tile; it only applies while that object (ID) is there
+export interface ObjectSettings { ID: number; Rotation?: number; Size?: number; Colors?: string[]; Decal?: string; DecalColor?: string }
 export interface MapModel {
   tiles: number[];               // a tile id per square, N of them
   objects: number[];             // a furniture id per square (BLANK for none)
   effects: number[][];           // the effect ids on each square
-  cells: Record<number, SignCell>;
+  cells: Record<number, CellConfig>;
+  settings?: Record<number, ObjectSettings>;   // (R134; older layouts have none)
   fog: boolean;
 }
 
@@ -101,7 +108,7 @@ export const effectName = (e: MapEffect | undefined): string => !e ? "none" : LI
 
 // ── models in and out ──
 export function emptyModel(): MapModel {
-  return { tiles: new Array(N).fill(BLANK), objects: new Array(N).fill(BLANK), effects: Array.from({ length: N }, () => []), cells: {}, fog: false };
+  return { tiles: new Array(N).fill(BLANK), objects: new Array(N).fill(BLANK), effects: Array.from({ length: N }, () => []), cells: {}, settings: {}, fog: false };
 }
 function readFromGame(): MapModel {
   const M = MapManager.Map, m = emptyModel();
@@ -109,7 +116,10 @@ function readFromGame(): MapModel {
     m.tiles[i] = M.getTileId(i) ?? BLANK;
     m.objects[i] = M.getObjectId(i) ?? BLANK;
     m.effects[i] = ((M.getEffectsByIndex(i) || []) as MapEffect[]).map((e) => e.ID).filter((id) => id !== BLANK_EFFECT);
-    const c = M.getObjectConfig(i); if (c && c.Type === "Sign") m.cells[i] = { Type: "Sign", Text: String(c.Text || "") };
+    const c = M.getObjectConfig(i);
+    if (c && c.Type === "Sign") m.cells[i] = { Type: "Sign", Text: String(c.Text || "") };
+    else if (c && (c.Type === "Teleporter" || c.Type === "Tether")) m.cells[i] = JSON.parse(JSON.stringify(c));   // (R134: kept as they are)
+    if (typeof M.getObjectSettings === "function") { const s = M.getObjectSettings(i); if (s && typeof s.ID === "number") m.settings![i] = JSON.parse(JSON.stringify(s)); }
   }
   m.fog = !!M.hasFogEnabled;
   return m;
@@ -139,6 +149,14 @@ export function pushToGame(m: MapModel): void {
   MapManager.Map.loadGlobalMapData(data);
   const list = m.effects.map((ids) => { const l = ids.map((id) => MapDataEffects.get(id)).filter(Boolean); return l.length ? l : [MapDataEffects.get(BLANK_EFFECT)]; });
   MapManager.Map.replaceAllEffects(list);
+  // (R134) each object turned, sized and coloured as it was: only where the same object is still on that tile
+  if (typeof MapManager.Map.setObjectSettings === "function") {
+    for (const [k, s] of Object.entries(m.settings || {})) {
+      const i = Number(k); if (!s || s.ID !== m.objects[i]) continue;
+      const { ID: _id, ...rest } = s;
+      try { MapManager.Map.setObjectSettings(i, rest, false); } catch (e) { /* the game says no */ }
+    }
+  }
 }
 // the model → the string for /mappaste in the farm room
 export function exportString(m: MapModel): string {

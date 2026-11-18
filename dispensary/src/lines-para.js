@@ -95,5 +95,30 @@ Object.assign(LINES, {
       ],
       off: ["The mouthpiece goes quiet. Your words are your own again."],
     },
+    // (Nov 18) the nipple leeches: they hold the nipples open, and feed on what goes in
+    nips: {
+      latch: [
+        "Two slick little leeches wriggle out of the gear and fasten onto %t's nipples, one each. %t gasps as they suck, and suck, and their nipples open up round them, soft and wide.",
+        "Somethin' cold and eager latches onto each of %t's nipples. %b's leeches. They burrow in, just a little, and when %t looks down their nipples are standin' open like they're waitin' for somethin'.",
+        "%t squirms as a pair of leeches settles over their nipples and starts to pulse. Each nipple gapes a little wider with every pull.",
+        "The leeches find %t's nipples and seal on tight. A warm, stretchin' ache, and then both nipples are open, slick and wantin'.",
+      ],
+      feed: [
+        "The leeches on %t's nipples swell with what they just got, and pump somethin' back: %d.",
+        "%t shivers as the leech in their nipple drinks its fill and gives back a hot little rush of %d.",
+        "A slow pulse runs through both leeches. They've been fed, and %t's feelin' it: %d.",
+      ],
+      wider: [
+        "The leeches are fat and happy now, and your nipples have stretched to fit them. Wider than ever.",
+        "Fed three times over, the leeches have opened your nipples right up. Anything fits now.",
+      ],
+      off: [
+        "The leeches have had their fill. They let go, one and then the other, and your nipples slowly close up again, tender and puffy.",
+        "The nipple leeches drop off, done, and your nipples ache as they shrink back to how they were. Mostly.",
+      ],
+      starved: [
+        "Nobody's fed them in hours. The leeches go limp and slide off, and your nipples close up, achin' and empty.",
+      ],
+    },
   },
 });

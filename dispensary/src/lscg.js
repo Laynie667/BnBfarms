@@ -19,6 +19,7 @@ import { isLater, queue } from "./later.js";
 import { allowed } from "./ladder.js";
 import { st } from "./store.js";
 import { hardOn, askOut } from "./hardcore.js";
+import { nipsLscg } from "./nipples.js";
 
 const W = window;
 let api = null, caps = null, syncing = null;
@@ -86,6 +87,8 @@ function setUp(L) {
       } catch (e) { console.warn("[Dispensary] LSCG wouldn't take " + id + ":", e); }
     }
   }
+  // the nipple actions, as LSCG extension activities (nipples.js)
+  try { nipsLscg(api, caps); } catch (e) { console.warn("[Dispensary] LSCG nipple actions:", e); }
   if (caps.has("events")) {
     try { api.events.on("safeword", () => { if (hardOn()) askOut(); else clearAll("safeword"); }); } catch (e) { /* fine */ }
     try {

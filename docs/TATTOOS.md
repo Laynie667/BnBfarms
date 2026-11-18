@@ -121,6 +121,13 @@ better sizing options", and "as long as it layers properly".
   healing (the brand's three layers, BrandEdge, Brand and BrandShine, eased toward pale) and the fading (opacity, held
   for three fifths of the time) are worked out in the draw hook from `at`, so nothin' goes round the room for them; anybody
   whose is still on its way is drawn again every half hour. The Companion's hello says `off.ink` when the switch is off.
+- **BC R134** (Nov 18): two changes in the game broke the ink, both fixed (`tests/r134-ink.test.cjs`):
+  - the starting colours moved off the item onto each layer: each layer now carries its own `Color` (the item's
+    `DefaultColor` stays, for older games). Without it, ink picked in the wardrobe came out plain grey.
+  - only the properties the game knows go to the server, and only ones with an entry in its property list (`PropertyData`)
+    survive comin' back in. `FarmInk` is added to what's sent for our slots (`ItemPropertiesGetBundleProperties`) and has
+    an entry of its own (`farmInkEntry`): kept on our slots, cleaned like ours, dropped anywhere else. Without them
+    nobody else saw sizes, live counts, healin' brands, the farm's marks or trophies, and a relog lost them.
 - **The farm's marks:** three more slots, `FarmMark1` to `3`, added with the game's own `AllowCustomize: false` (the way
   it keeps the arms and hands out of the wardrobe). They hold the brand designs, each moved to its slot's spot: the other
   hip (296, 580), the other thigh (292, 662) and the other shoulder (318, 300), sized to that spot's box. Their address is

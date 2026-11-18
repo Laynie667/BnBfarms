@@ -86,6 +86,28 @@ Object.assign(LINES, {
       "The Fill-Out's done with your rear. It shrinks back, one jiggle at a time.",
     ],
   },
+  // the Animal Tongue (%a: the animal it makes them)
+  tongue: {
+    take: [
+      "%t's tongue goes thick and strange as the drops take. When they try to speak, a little %a noise comes out first.",
+      "Somethin' shifts in %t's throat. Words feel slippery now, and the noises under them feel easy, like a %a's.",
+      "%t licks their lips, and it feels all wrong, all %a. The next thing they say is goin' to come out funny.",
+      "The Animal Tongue settles in. %t tries to say \"no\" and it comes out as somethin' a %a would say.",
+      "%t's mouth tingles. They can feel the words driftin' further off, and the %a sounds comin' closer.",
+    ],
+    now: [
+      "%t starts to answer and stops, flustered: only a %a noise came out.",
+      "%t covers their mouth after that last one. That wasn't a word. That was pure %a.",
+      "%t's tryin' so hard to talk properly. Their tongue's havin' none of it.",
+      "Every time %t opens their mouth now, there's a little %a in it.",
+      "%t gives up on words for a moment and just makes the noise. It's easier.",
+      "%t's cheeks go pink. They meant to say somethin' clever, and a %a's noise came out instead.",
+    ],
+    off: [
+      "Your tongue feels like yours again. Words come out the way you mean them, mostly.",
+      "The Animal Tongue wears off. You can talk properly again, though the noises still feel awful close.",
+    ],
+  },
   airhead: {
     take: [
       "%t blinks, slow and sweet, as the elixir takes. Whatever they were thinkin' about just sort of... floats off.",

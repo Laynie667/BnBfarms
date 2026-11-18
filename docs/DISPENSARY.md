@@ -109,7 +109,12 @@ and running timers follow you between your phone and your PC, and clearing the b
    **Poses built Nov 18** (senses.js):
    - **Weak Knees:** down on your knees, and standing needs somebody's help (the game's own "with help").
    - **Down Girl:** on all fours, staying down the same way.
-   Kits and tongues are still to come.
+   - **Animal Tongue** (built Nov 18; Laynie, on each animal's noises: "Those suit just fine"): Moo Juice's big sister.
+     The bottle names the animal ("Kitty Tongue", "Puppy Tongue", "Pony Tongue", cow, bunny, fox, goat, lamb, piggy,
+     wolf, dragon, rat), and "Animal Tongue" is your own. One dose, noises slip in between your words; two, about half
+     your words are noises; three, nothin' but. Thirty minutes a dose. Moo Juice stays as it was; the bimbo speak is
+     the Airhead Elixir ("Bimbo Serum" works too).
+   Kits are still to come.
 5. **Senses** (built Nov 18, senses.js):
    - **Blinder Drops:** the game's own blindness, up to three levels.
    - **Cotton Ears:** the game's own deafness, up to four.

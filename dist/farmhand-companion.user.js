@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.66.0
+// @version      0.67.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8064,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.66.0";
+  var VERSION = "0.67.0";
 
   // shared/species.js
   var WORDS = {
@@ -8207,9 +8207,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     bull: ["moo", "hrrmph"],
     pony: ["neigh", "nicker", "whinny"],
     horse: ["neigh", "whinny", "nicker"],
-    pup: ["arf", "woof", "awoo"],
-    dog: ["woof", "arf", "ruff"],
-    kitty: ["mew", "nya", "mrrp"],
+    pup: ["arf", "woof", "awoo", "whine"],
+    dog: ["woof", "arf", "ruff", "whine"],
+    kitty: ["mew", "nya", "mrrp", "purr"],
     cat: ["meow", "mrrp", "purr"],
     bunny: ["squeak", "eep"],
     rabbit: ["squeak", "eep"],
@@ -8217,16 +8217,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     goat: ["baa", "maa"],
     sheep: ["baa", "baaa"],
     fox: ["yip", "ack"],
-    wolf: ["awoo", "grr"],
+    wolf: ["awoo", "grr", "growl", "howl"],
     deer: ["bleat", "mweh"],
     goblin: ["heh", "nngh"],
     rat: ["squeak", "eek", "chitter"],
-    dragon: ["rawr", "grr", "hsss"],
-    kitt: ["mew", "nya", "mrrp"]
+    dragon: ["rawr", "grr", "hsss", "rumble"],
+    kitt: ["mew", "nya", "mrrp", "purr"]
   };
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
+  var noisesOf = (species) => NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
   function mooify(text3, species, share) {
-    const say3 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+    const say3 = noisesOf(species);
     const keep3 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
     return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep3) return w;

@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.66.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.15.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.67.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.16.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.67.0 + Dispensary 0.16.0: the Animal Tongue** Laynie, Nov 18, on each animal's noises: "Those suit just fine".
+  - A new dose, the Animal Tongue: the bottle names the animal ("Kitty Tongue", "Puppy Tongue", "Pony Tongue", cow, bunny, fox, goat, lamb, piggy, wolf, dragon, rat), or "Animal Tongue" for your own.
+  - One dose and noises slip in between your words; two, about half your words are noises; three, nothin' but. Thirty minutes a dose.
+  - The noises got a few more: pups whine, kitties purr, wolves growl and howl, dragons rumble (Moo Juice gets them too). The bimbo speak is the Airhead Elixir ("Bimbo Serum" works too).
+  - Tests: `tests/dispensary-tongue.test.cjs` (new).
 
 - **Dispensary 0.15.0: nipple toys** Laynie, Nov 18: "maybe make them plug able with certain toys? like beads, dildos, vibrators, etc?", "I mean art for existing items", "the dildos could look more like how the plugs do".
   - Fifteen of the game's own toys, made for an open nipple, in the game's nipple slot: beads (silver and black), plugs (black, heart, demon tail, lock, vibrating, pump-up), eggs (vibrating, wired), Ben Wa balls, dildos (plain, vibrating, pump-up; drawn front-on like the plugs), and the sound.

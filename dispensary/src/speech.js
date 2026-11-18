@@ -7,9 +7,9 @@
      the Airhead Elixir and Babble Brew (Nov 17): speech-more.js
    Your animal is the farm's word for you (it tells your Dispensary when you're there), or the one you pick on its page.
 */
-import { mooify } from "../../shared/noises.js";
+import { mooify, tongueSpeak } from "../../shared/noises.js";
 import { st } from "./store.js";
-import { active } from "./doses.js";
+import { active, partOf, tongueAnimal } from "./doses.js";
 import { airhead, babble } from "./speech-more.js";
 import { LINES } from "./lines.js";
 import { action, myName } from "./say.js";
@@ -29,13 +29,14 @@ function sprinkle(text, bits, every) {
 export function dosedSpeech(text) {
   let t = String(text);
   if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf("moo")));
+  if (active("tongue")) t = tongueSpeak(t, tongueAnimal(partOf("tongue")), xOf("tongue"));   // (the Animal Tongue: the bottle's animal, or yours)
   if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "—hic—"], 4);
   if (active("feather")) t = sprinkle(t, GIGGLES, 5);
   if (active("airhead")) t = airhead(t, xOf("airhead"));
   if (active("babble")) t = babble(t, xOf("babble"));
   return t;
 }
-const touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
+const touched = () => ["moo", "tongue", "hiccup", "feather", "airhead", "babble"].some(active);
 
 // the ECHO ELIXIR (the Dispensary's; one bought at the farm girl's store she does herself): twice a dose, at least three minutes apart, half
 // the time, somethin' you said comes back to the room

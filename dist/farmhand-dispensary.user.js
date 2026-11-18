@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.15.0
+// @version      0.16.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8049,7 +8049,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.15.0";
+  var VERSION = "0.16.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -8408,6 +8408,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
       off: [
         "Your hips and ass slowly settle back down. Your clothes fit again.",
         "The Fill-Out's done with your rear. It shrinks back, one jiggle at a time."
+      ]
+    },
+    // the Animal Tongue (%a: the animal it makes them)
+    tongue: {
+      take: [
+        "%t's tongue goes thick and strange as the drops take. When they try to speak, a little %a noise comes out first.",
+        "Somethin' shifts in %t's throat. Words feel slippery now, and the noises under them feel easy, like a %a's.",
+        "%t licks their lips, and it feels all wrong, all %a. The next thing they say is goin' to come out funny.",
+        `The Animal Tongue settles in. %t tries to say "no" and it comes out as somethin' a %a would say.`,
+        "%t's mouth tingles. They can feel the words driftin' further off, and the %a sounds comin' closer."
+      ],
+      now: [
+        "%t starts to answer and stops, flustered: only a %a noise came out.",
+        "%t covers their mouth after that last one. That wasn't a word. That was pure %a.",
+        "%t's tryin' so hard to talk properly. Their tongue's havin' none of it.",
+        "Every time %t opens their mouth now, there's a little %a in it.",
+        "%t gives up on words for a moment and just makes the noise. It's easier.",
+        "%t's cheeks go pink. They meant to say somethin' clever, and a %a's noise came out instead."
+      ],
+      off: [
+        "Your tongue feels like yours again. Words come out the way you mean them, mostly.",
+        "The Animal Tongue wears off. You can talk properly again, though the noises still feel awful close."
       ]
     },
     airhead: {
@@ -10635,6 +10657,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
       soak: ["airhead", "bimbo"],
       desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose."
     },
+    // THE ANIMAL TONGUE (Nov 18; Laynie: "Those suit just fine"): Moo Juice's big sister. The bottle names the animal
+    // ("Kitty Tongue" makes anybody a kitty; "Animal Tongue" is your own), and it gets stronger dose by dose: noises slip
+    // in, then half the words go, then nothin' but noises
+    tongue: {
+      label: "Animal Tongue",
+      icon: "\u{1F445}",
+      mins: 30,
+      color: "#e07a9a",
+      every: [6, 10],
+      room: true,
+      words: /\b((?:animal|beast|puppy|pup|doggy|dog|kitty|kitten|cat|pony|horse|cow|bovine|bunny|rabbit|fox|vixen|goat|sheep|lamb|piggy|pig|wolf|dragon|rat)[- ]?tongue)\b/,
+      keywords: ["animal tongue", "puppy tongue", "kitty tongue", "pony tongue"],
+      soak: ["tongue"],
+      desc: "Your words come out as an animal's noises: the one on the bottle (Kitty Tongue, Puppy Tongue, Pony Tongue...) or your own. One dose and noises slip in between your words; two, half your words are noises; three, nothin' but. Thirty minutes a dose."
+    },
     babble: {
       label: "Babble Brew",
       icon: "\u{1F4AC}",
@@ -10954,10 +10991,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     t = String(t || "").toLowerCase();
     return /porcelain|china doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
   }
+  var TONGUE_RE = [
+    ["pup", /\b(puppy|pup|doggy|dog)[- ]?tongue/],
+    ["kitty", /\b(kitty|kitten|cat)[- ]?tongue/],
+    ["pony", /\b(pony|horse)[- ]?tongue/],
+    ["cow", /\b(cow|bovine)[- ]?tongue/],
+    ["bunny", /\b(bunny|rabbit)[- ]?tongue/],
+    ["fox", /\b(fox|vixen)[- ]?tongue/],
+    ["goat", /\bgoat[- ]?tongue/],
+    ["sheep", /\b(sheep|lamb)[- ]?tongue/],
+    ["pig", /\b(piggy|pig)[- ]?tongue/],
+    ["wolf", /\bwolf[- ]?tongue/],
+    ["dragon", /\bdragon[- ]?tongue/],
+    ["rat", /\brat[- ]?tongue/]
+  ];
+  var TONGUE_NOUN = { pup: "puppy", kitty: "kitty", pony: "pony", cow: "cow", bunny: "bunny", fox: "fox", goat: "goat", sheep: "lamb", pig: "piggy", wolf: "wolf", dragon: "dragon", rat: "rat" };
   function partFor(id, text3) {
     const t = String(text3 || "").toLowerCase();
     if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
     if (id === "statue") return statueMat(t);
+    if (id === "tongue") {
+      for (const [k, re] of TONGUE_RE) if (re.test(t)) return k;
+      return "";
+    }
     if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
     if (id === "tender") {
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
@@ -10976,6 +11032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const d = st().doses[id];
     if (id === "fillout") return d && d.p || "cup";
     if (id === "statue") return d && d.p || "stone";
+    if (id === "tongue") return d && d.p || "";
     if (id === "tender") {
       const p = d && d.p || st().tenderSpot;
       return TENDER_SPOTS[p] ? p : TENDER_DEFAULT;
@@ -10986,7 +11043,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var voiceOf = (id) => BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice] || null;
   var nameIn = (t) => String(t).replace(/%n/g, myName());
   var poolOf = (id, p) => id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id];
-  var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : t;
+  var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : id === "tongue" ? String(t).replace(/%a/g, tongueNoun(p || partOf(id))) : t;
+  var tongueAnimal = (p) => p || st().species || st().speciesFarm || "cow";
+  var tongueNoun = (p) => TONGUE_NOUN[p] || TONGUE_NOUN[String(tongueAnimal(p)).toLowerCase()] || String(tongueAnimal(p)).toLowerCase();
   var ours5 = (id, kind, p) => {
     const L = poolOf(id, p);
     return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : "";
@@ -12167,9 +12226,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     bull: ["moo", "hrrmph"],
     pony: ["neigh", "nicker", "whinny"],
     horse: ["neigh", "whinny", "nicker"],
-    pup: ["arf", "woof", "awoo"],
-    dog: ["woof", "arf", "ruff"],
-    kitty: ["mew", "nya", "mrrp"],
+    pup: ["arf", "woof", "awoo", "whine"],
+    dog: ["woof", "arf", "ruff", "whine"],
+    kitty: ["mew", "nya", "mrrp", "purr"],
     cat: ["meow", "mrrp", "purr"],
     bunny: ["squeak", "eep"],
     rabbit: ["squeak", "eep"],
@@ -12177,22 +12236,37 @@ One of mods you are using is using an old version of SDK. It will work for now b
     goat: ["baa", "maa"],
     sheep: ["baa", "baaa"],
     fox: ["yip", "ack"],
-    wolf: ["awoo", "grr"],
+    wolf: ["awoo", "grr", "growl", "howl"],
     deer: ["bleat", "mweh"],
     goblin: ["heh", "nngh"],
     rat: ["squeak", "eek", "chitter"],
-    dragon: ["rawr", "grr", "hsss"],
-    kitt: ["mew", "nya", "mrrp"]
+    dragon: ["rawr", "grr", "hsss", "rumble"],
+    kitt: ["mew", "nya", "mrrp", "purr"]
   };
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
+  var noisesOf = (species) => NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
   function mooify(text3, species, share) {
-    const say3 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+    const say3 = noisesOf(species);
     const keep = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
     return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep) return w;
       const n = say3[Math.floor(Math.random() * say3.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
+  }
+  function tongueSpeak(text3, species, x) {
+    const say3 = noisesOf(species), n = () => say3[Math.floor(Math.random() * say3.length)];
+    const cap = (w, v) => /[A-Z]/.test(w[0]) ? v[0].toUpperCase() + v.slice(1) : v;
+    x = Math.max(1, Math.round(Number(x) || 1));
+    if (x >= 3) return String(text3).replace(/[A-Za-z][A-Za-z']*/g, (w) => cap(w, n()));
+    if (x === 2) return mooify(text3, species, 0.5);
+    const words = String(text3).split(" "), out = [];
+    words.forEach((w, i) => {
+      out.push(w);
+      if (i < words.length - 1 && Math.random() < 0.25) out.push("*" + n() + "*");
+    });
+    if (out.length === words.length) out.splice(words.length > 1 ? 1 + Math.floor(Math.random() * (words.length - 1)) : 1, 0, "*" + n() + "*");
+    return out.join(" ");
   }
 
   // dispensary/src/speech-more.js
@@ -12379,13 +12453,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function dosedSpeech(text3) {
     let t = String(text3);
     if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf2("moo")));
+    if (active("tongue")) t = tongueSpeak(t, tongueAnimal(partOf("tongue")), xOf2("tongue"));
     if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "\u2014hic\u2014"], 4);
     if (active("feather")) t = sprinkle(t, GIGGLES, 5);
     if (active("airhead")) t = airhead(t, xOf2("airhead"));
     if (active("babble")) t = babble(t, xOf2("babble"));
     return t;
   }
-  var touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
+  var touched = () => ["moo", "tongue", "hiccup", "feather", "airhead", "babble"].some(active);
   var echoN = 0;
   var echoAt = 0;
   var echoSince = 0;

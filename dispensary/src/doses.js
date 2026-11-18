@@ -111,6 +111,15 @@ export const BOOK = {
     keywords: ["airhead elixir", "bimbo serum"], soak: ["airhead", "bimbo"],
     desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose.",
   },
+  // THE ANIMAL TONGUE (Nov 18; Laynie: "Those suit just fine"): Moo Juice's big sister. The bottle names the animal
+  // ("Kitty Tongue" makes anybody a kitty; "Animal Tongue" is your own), and it gets stronger dose by dose: noises slip
+  // in, then half the words go, then nothin' but noises
+  tongue: {
+    label: "Animal Tongue", icon: "👅", mins: 30, color: "#e07a9a", every: [6, 10], room: true,
+    words: /\b((?:animal|beast|puppy|pup|doggy|dog|kitty|kitten|cat|pony|horse|cow|bovine|bunny|rabbit|fox|vixen|goat|sheep|lamb|piggy|pig|wolf|dragon|rat)[- ]?tongue)\b/,
+    keywords: ["animal tongue", "puppy tongue", "kitty tongue", "pony tongue"], soak: ["tongue"],
+    desc: "Your words come out as an animal's noises: the one on the bottle (Kitty Tongue, Puppy Tongue, Pony Tongue...) or your own. One dose and noises slip in between your words; two, half your words are noises; three, nothin' but. Thirty minutes a dose.",
+  },
   babble: {
     label: "Babble Brew", icon: "💬", mins: 20, color: "#c0508a", every: [6, 10], room: true,
     words: /\b(babble (?:brew|potion|tonic|shot|serum)|potty[- ]?mouth (?:potion|tonic|brew|serum))\b/,
@@ -300,10 +309,16 @@ export function statueMat(t) {
   t = String(t || "").toLowerCase();
   return /porcelain|china doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
 }
+// the Animal Tongue's animal, off the bottle (none: your own)
+const TONGUE_RE = [["pup", /\b(puppy|pup|doggy|dog)[- ]?tongue/], ["kitty", /\b(kitty|kitten|cat)[- ]?tongue/], ["pony", /\b(pony|horse)[- ]?tongue/], ["cow", /\b(cow|bovine)[- ]?tongue/],
+  ["bunny", /\b(bunny|rabbit)[- ]?tongue/], ["fox", /\b(fox|vixen)[- ]?tongue/], ["goat", /\bgoat[- ]?tongue/], ["sheep", /\b(sheep|lamb)[- ]?tongue/], ["pig", /\b(piggy|pig)[- ]?tongue/],
+  ["wolf", /\bwolf[- ]?tongue/], ["dragon", /\bdragon[- ]?tongue/], ["rat", /\brat[- ]?tongue/]];
+export const TONGUE_NOUN = { pup: "puppy", kitty: "kitty", pony: "pony", cow: "cow", bunny: "bunny", fox: "fox", goat: "goat", sheep: "lamb", pig: "piggy", wolf: "wolf", dragon: "dragon", rat: "rat" };
 export function partFor(id, text) {
   const t = String(text || "").toLowerCase();
   if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "statue") return statueMat(t);
+  if (id === "tongue") { for (const [k, re] of TONGUE_RE) if (re.test(t)) return k; return ""; }
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   return "";
@@ -317,6 +332,7 @@ export function partOf(id) {
   const d = st().doses[id];
   if (id === "fillout") return (d && d.p) || "cup";
   if (id === "statue") return (d && d.p) || "stone";
+  if (id === "tongue") return (d && d.p) || "";   // ("": your own animal)
   if (id === "tender") { const p = (d && d.p) || st().tenderSpot; return TENDER_SPOTS[p] ? p : TENDER_DEFAULT; }
   return "";
 }
@@ -326,7 +342,10 @@ export const tenderZones = () => TENDER_SPOTS[partOf("tender")].zones;
 const voiceOf = (id) => (BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice]) || null;
 const nameIn = (t) => String(t).replace(/%n/g, myName());
 const poolOf = (id, p) => (id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id]);
-const spotIn = (t, id, p) => (id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : t);
+const spotIn = (t, id, p) => (id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : id === "tongue" ? String(t).replace(/%a/g, tongueNoun(p || partOf(id))) : t);
+// the animal an Animal Tongue makes you: the bottle's, or yours (the farm's word for you, else a cow)
+export const tongueAnimal = (p) => p || st().species || st().speciesFarm || "cow";
+const tongueNoun = (p) => TONGUE_NOUN[p] || TONGUE_NOUN[String(tongueAnimal(p)).toLowerCase()] || String(tongueAnimal(p)).toLowerCase();
 const ours = (id, kind, p) => { const L = poolOf(id, p); return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : ""; };
 export function takeLine(id) { const v = voiceOf(id); return v && v.seen.length ? nameIn(pick(v.seen)) : ours(id, "take"); }
 function nowLine(id) { const v = voiceOf(id); return v && v.now.length ? nameIn(pick(v.now)) : ours(id, "now"); }

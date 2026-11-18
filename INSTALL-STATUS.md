@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.57.1** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.4.1** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.5.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,29 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.5.0: gear that doses, crafted parasites, poses and senses, dose icons.** Laynie, Nov 18: "keep going with everything for the dispensary".
+  - **Gear that doses:** crafted gear doses its wearer when its words name a dose and say how.
+    - drip, IV, laced or soaked: the dose stays in while it's worn
+    - injector or dosing collar: every 30 minutes, or "every N minutes"
+    - on climax, when kissed, when touched, when spanked
+    - roulette or mystery dose: a different allowed dose each time
+    - drinks and treats fed to you (the game's Sip and Eat)
+    - lip gloss with a dose in it doses whoever its wearer kisses
+    The crafter has to be on your list. The safeword clears it all and rests the gear 15 minutes.
+  - **Crafted parasites:** parasite lips, livin' latex, milk moss, the nestling, the brood mother, the leash vine and the mouthpiece.
+    - Each kind is off till you switch it on, and only takes from somebody on your list.
+    - Their strain is the doses named on the item.
+    - Some spread by a kiss, and only to people who switched that kind on.
+    - The safeword takes them all off.
+  - **Poses and senses:**
+    - Weak Knees: on your knees, and standing needs a hand
+    - Down Girl: on all fours
+    - Blinder Drops and Cotton Ears: the game's own blindness and deafness
+    - Tunnel Vision
+    - Haze
+  - **Dose icons:** a row of icons by people with doses in them, for other Dispensary users. Two switches: show them, and let others see yours.
+  - Tests: `tests/dispensary-gear.test.cjs`.
 
 - **Companion 0.57.1 + Dispensary 0.4.1: farm ink starts the right size.** Laynie, Nov 18: "the default starting size is too big on most of them in relation to the body".
   - **Sizes:** every design starts fitted to its spot in proportion to the body. A lower-belly piece is about half the waist across, a hip piece a third. 121 of 136 come down, and none goes up.

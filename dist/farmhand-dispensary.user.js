@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.4.1
+// @version      0.5.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5748,8 +5748,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W12, H) {
-    const t = cy - H / 2, L = cx - W12 / 2, R = cx + W12 / 2;
+  function shield(g, cx, cy, W16, H) {
+    const t = cy - H / 2, L = cx - W16 / 2, R = cx + W16 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6584,9 +6584,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W12 = 192, H = 226;
+        const x0 = 94, y0 = 12, W16 = 192, H = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W12, H);
+        g.strokeRect(x0, y0, W16, H);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6594,20 +6594,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W12 - 8, yy);
+            g.fillText(right, x0 + W16 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W12 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W16 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W12 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W16 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W12 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W16 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W12 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W16 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7078,8 +7078,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W12, d, V) {
-    doc = W12.document;
+  function drawCard(W16, d, V) {
+    doc = W16.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7107,7 +7107,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W12, d, m, layer, V) {
+  function picture(W16, d, m, layer, V) {
     const key2 = d.name + "|" + JSON.stringify(V);
     let set2 = cache.get(key2);
     if (set2) {
@@ -7116,30 +7116,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W12, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W16, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key2, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W12, u);
+      for (const u of Object.values(os)) forget(W16, u);
     }
     return set2[layer] || null;
   }
-  function forget(W12, url) {
+  function forget(W16, url) {
     try {
-      const m = W12.GLDrawImageCache;
+      const m = W16.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W12.DrawImageCache;
+      const m = W16.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W12.GLDrawCanvas && W12.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W16.GLDrawCanvas && W16.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7243,19 +7243,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W12, a) {
-    Wd = W12;
+  function openInkPanel(W16, a) {
+    Wd = W16;
     api = a;
     close();
-    if (!W12.document.getElementById("fi-style")) {
-      const s = W12.document.createElement("style");
+    if (!W16.document.getElementById("fi-style")) {
+      const s = W16.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W12.document.head.appendChild(s);
+      W16.document.head.appendChild(s);
     }
-    box = W12.document.createElement("div");
+    box = W16.document.createElement("div");
     box.id = "fi-panel";
-    W12.document.body.appendChild(box);
+    W16.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7315,9 +7315,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[kindOf(slot)].map(assetDef)
     };
   }
-  function describe(W12) {
+  function describe(W16) {
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const G = W12.AssetGroupMap && W12.AssetGroupMap.get(slot);
+      const G = W16.AssetGroupMap && W16.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7326,33 +7326,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W12) => typeof W12.AssetGroupAdd === "function" && typeof W12.AssetAdd === "function" && W12.AssetGroupMap && W12.AssetGroupMap.size > 30;
-  function addSlots(W12) {
-    if (W12.AssetGroupMap.has(INK_SLOTS[0])) {
-      describe(W12);
+  var gameReady = (W16) => typeof W16.AssetGroupAdd === "function" && typeof W16.AssetAdd === "function" && W16.AssetGroupMap && W16.AssetGroupMap.size > 30;
+  function addSlots(W16) {
+    if (W16.AssetGroupMap.has(INK_SLOTS[0])) {
+      describe(W16);
       return false;
     }
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const def = groupDef(slot), G = W12.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W12.AssetAdd(G, a, W12.AssetFemale3DCGExtended || {}, def);
+      const def = groupDef(slot), G = W16.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W16.AssetAdd(G, a, W16.AssetFemale3DCGExtended || {}, def);
     }
-    describe(W12);
+    describe(W16);
     return true;
   }
   var itemIn = (C, slot) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C) => ({ num: C && C.MemberNumber, owner: C && C.Ownership && typeof C.Ownership.Name === "string" ? C.Ownership.Name : "" });
-  function liveSrc(W12, C, slot, name, layer) {
+  function liveSrc(W16, C, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W12, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
+      return picture(W16, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W12) {
-    const P = W12.Player, out = [];
+  function wornLive(W16) {
+    const P = W16.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7360,8 +7360,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W12, slot, values, now) {
-    const it = itemIn(W12.Player, slot);
+  function write(W16, slot, values, now) {
+    const it = itemIn(W16.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7371,17 +7371,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W12), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W16), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W12.CharacterRefresh === "function") W12.CharacterRefresh(W12.Player);
+      if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(W16.Player);
     } catch (e) {
     }
     try {
-      if (typeof W12.ChatRoomCharacterItemUpdate === "function") W12.ChatRoomCharacterItemUpdate(W12.Player, slot);
+      if (typeof W16.ChatRoomCharacterItemUpdate === "function") W16.ChatRoomCharacterItemUpdate(W16.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7389,97 +7389,97 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var retry = {};
   var counts = {};
   var DAY = 864e5;
-  var cumKey = (W12) => "farmink-lastcum-" + (W12.Player && W12.Player.MemberNumber);
-  function daysDenied(W12) {
+  var cumKey = (W16) => "farmink-lastcum-" + (W16.Player && W16.Player.MemberNumber);
+  function daysDenied(W16) {
     let t = 0;
     try {
-      t = Number(W12.localStorage.getItem(cumKey(W12))) || 0;
+      t = Number(W16.localStorage.getItem(cumKey(W16))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W12, auto) {
-    if (auto === "denied") return { n: daysDenied(W12) };
+  function autoOf(W16, auto) {
+    if (auto === "denied") return { n: daysDenied(W16) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W12) {
-    for (const { slot, name, item } of wornLive(W12)) {
+  function refreshAuto(W16) {
+    for (const { slot, name, item } of wornLive(W16)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W12, d.auto);
-      if (v) write(W12, slot, v);
+      const v = autoOf(W16, d.auto);
+      if (v) write(W16, slot, v);
     }
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W12, t) => {
+  var say = (W16, t) => {
     try {
-      if (typeof W12.ChatRoomSendLocal === "function") {
-        const d = W12.document.createElement("div");
+      if (typeof W16.ChatRoomSendLocal === "function") {
+        const d = W16.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W12.ChatRoomSendLocal(d.outerHTML);
+        W16.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W12) {
+  function wornAll(W16) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W12.Player, slot);
+      const it = itemIn(W16.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W12) => ({ worn: () => wornAll(W12), write: (slot, v) => write(W12, slot, v, true), command: (a) => inkCommand(W12, a) });
-  function inkCommand(W12, args) {
+  var panelApi = (W16) => ({ worn: () => wornAll(W16), write: (slot, v) => write(W16, slot, v, true), command: (a) => inkCommand(W16, a) });
+  function inkCommand(W16, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W12);
-    if (!a && W12.document && W12.document.body) {
-      openInkPanel(W12, panelApi(W12));
+    const worn = wornLive(W16);
+    if (!a && W16.document && W16.document.body) {
+      openInkPanel(W16, panelApi(W16));
       return;
     }
-    if (/^why$/i.test(a)) return say(W12, whyText());
+    if (/^why$/i.test(a)) return say(W16, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W12.Player, slot2)) return say(W12, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W12, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W12, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W16.Player, slot2)) return say(W16, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W16, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W16, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W12, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W12, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W16, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W16, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W12.Player, slot);
-    if (!it) return say(W12, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W12, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W16.Player, slot);
+    if (!it) return say(W16, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W16, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W12, "");
+    if (!rest) return inkCommand(W16, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W12, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W12, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W12);
-    say(W12, "Written on " + d.title + ".");
+    else return say(W16, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W16, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W16);
+    say(W16, "Written on " + d.title + ".");
   }
-  function registerInk(W12, mod2) {
-    if (W12.__farmInk) return W12.__farmInk;
-    const st2 = W12.__farmInk = {
+  function registerInk(W16, mod2) {
+    if (W16.__farmInk) return W16.__farmInk;
+    const st2 = W16.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7489,19 +7489,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W12);
+            refreshAuto(W16);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W12, slot, v, true),
-      command: (a) => inkCommand(W12, a),
-      worn: () => wornLive(W12).map(({ slot, name }) => ({ slot, name }))
+      write: (slot, v) => write(W16, slot, v, true),
+      command: (a) => inkCommand(W16, a),
+      worn: () => wornLive(W16).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook = (name, pri, fn) => {
         try {
-          if (typeof W12[name] === "function") mod2.hookFunction(name, pri, fn);
+          if (typeof W16[name] === "function") mod2.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7519,7 +7519,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W12);
+          describe(W16);
         } catch (e) {
         }
         return r;
@@ -7537,7 +7537,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen = /* @__PURE__ */ new Set(), notReady = [];
         const ready = (u) => {
           try {
-            const c = W12.GLDrawImageCache;
+            const c = W16.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
@@ -7547,7 +7547,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (typeof src === "string") {
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W12, C, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W16, C, lm[1], lm[2], lm[3]);
               seen.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
@@ -7567,7 +7567,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
         try {
-          note2(W12, C, seen, notReady);
+          note2(W16, C, seen, notReady);
         } catch (e) {
         }
         return out;
@@ -7583,7 +7583,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W12.CharacterLoadCanvas === "function") W12.CharacterLoadCanvas(C);
+          if (back && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C);
         } catch (e) {
         }
         return r;
@@ -7593,7 +7593,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W12);
+          addSlots(W16);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
@@ -7602,9 +7602,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W12.ActivityOrgasmRuined) {
-            W12.localStorage.setItem(cumKey(W12), String(Date.now()));
-            setTimeout(() => refreshAuto(W12), 1e3);
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W16.ActivityOrgasmRuined) {
+            W16.localStorage.setItem(cumKey(W16), String(Date.now()));
+            setTimeout(() => refreshAuto(W16), 1e3);
           }
         } catch (e) {
         }
@@ -7612,36 +7612,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W12)) return;
+      if (!gameReady(W16)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W12);
+        addSlots(W16);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C of W12.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W12.CharacterLoadCanvas === "function") W12.CharacterLoadCanvas(C);
+          for (const C of W16.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C);
         } catch (e) {
         }
       });
       try {
-        if (typeof W12.CommandCombine === "function") W12.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W12, a) }]);
+        if (typeof W16.CommandCombine === "function") W16.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W16, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W12.Player && W12.Player.Appearance) refreshAuto(W12);
+        if (W16.Player && W16.Player.Appearance) refreshAuto(W16);
       } catch (e) {
       }
     }, 10 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W12, C, seen, notReady) {
+  function note2(W16, C, seen, notReady) {
     if (!C || !Array.isArray(C.Appearance)) return;
     const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
@@ -7661,7 +7661,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.4.1";
+  var VERSION = "0.5.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -7707,7 +7707,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     cravings: 0,
     taken: {},
     later: [],
-    tenderSpot: ""
+    tenderSpot: "",
+    // (Nov 18: crafted parasites, each kind off till you switch it on; what's in you; the mouthpiece lettin' words straight
+    // through; worn gear's pause after a safeword)
+    parasites: {},
+    para: {},
+    mouthAuto: false,
+    wornPause: 0,
+    iconsShow: true,
+    iconsShare: true
   });
   var num = (v, lo, hi, d) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
   function clean(d) {
@@ -7739,6 +7747,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (l.length) s.taken[k] = l;
       }
     }
+    if (d.parasites && typeof d.parasites === "object") {
+      for (const [k, v] of Object.entries(d.parasites).slice(0, 20)) if (/^[a-z]{2,12}$/.test(k) && v === true) s.parasites[k] = true;
+    }
+    if (d.para && typeof d.para === "object") {
+      for (const [k, x] of Object.entries(d.para).slice(0, 10)) {
+        if (!/^[a-z]{2,12}$/.test(k) || !x || typeof x !== "object") continue;
+        s.para[k] = {
+          by: Math.round(num(x.by, 0, 1e9, 0)),
+          name: String(x.name || "").slice(0, 30),
+          since: num(x.since, 0, 1e14, 0),
+          until: num(x.until, 0, 1e14, 0),
+          strain: Array.isArray(x.strain) ? x.strain.filter((i) => typeof i === "string" && /^[a-z]{2,20}$/.test(i)).slice(0, 4) : [],
+          fed: num(x.fed, 0, 1e14, 0),
+          stage: Math.round(num(x.stage, 0, 9, 0)),
+          n: Math.round(num(x.n, 0, 1e6, 0)),
+          eggs: Math.round(num(x.eggs, 0, 9, 0)),
+          next: num(x.next, 0, 1e14, 0)
+        };
+      }
+    }
+    s.mouthAuto = d.mouthAuto === true;
+    s.iconsShow = d.iconsShow !== false;
+    s.iconsShare = d.iconsShare !== false;
+    s.wornPause = num(d.wornPause, 0, 1e14, 0);
     if (Array.isArray(d.later)) {
       s.later = d.later.filter((c) => c && typeof c === "object" && /^[a-z]{2,20}$/.test(c.id)).slice(0, 5).map((c) => {
         const o = { id: c.id, x: Math.round(num(c.x, 1, 5, 1)), by: Math.round(num(c.by, 0, 1e9, 0)) };
@@ -8129,6 +8161,139 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
   var TOLERANCE_NOTE = "Your body's gettin' used to %d: this one only takes %p% as long.";
 
+  // dispensary/src/lines-senses.js
+  Object.assign(LINES, {
+    weakknees: {
+      take: [
+        "%t's knees give out all at once. Down they go, and their legs won't take their weight again.",
+        "The draught turns %t's legs to jelly. They fold onto their knees with a soft little gasp, and stay there.",
+        "%t sways, wobbles, and sinks to their knees. Standin' up is somebody else's job now."
+      ],
+      now: [
+        "Your legs still won't hold you. You'll need a hand to get up.",
+        "You try to stand and your knees just laugh at you."
+      ],
+      off: ["Strength creeps back into your legs. You could stand up now, if you wanted to."]
+    },
+    allfours: {
+      take: [
+        "%t drops onto their hands and knees like it's the most natural thing in the world, and finds they can't get up again.",
+        "Down, girl: %t goes down on all fours, and that's where their body wants to stay.",
+        "%t's arms and legs decide for them. All fours. Good pet."
+      ],
+      now: [
+        "Your body likes it down here. Gettin' up needs a hand.",
+        "You shift on your hands and knees. Down's where you belong right now."
+      ],
+      off: ["The pull to stay down fades. You can stand on your own again."]
+    },
+    blinder: {
+      take: [
+        "%t blinks as the drops take. The room goes dim at the edges, then dimmer.",
+        "The drops sting, then everything blurs into shadow. %t's eyes are open, and it doesn't help much.",
+        "%t's sight fades like somebody's turnin' down the lights."
+      ],
+      now: ["You squint into the gloom. Shapes, and not much else."],
+      off: ["The dark lifts. You blink, and the room comes back."]
+    },
+    cotton: {
+      take: [
+        "%t's ears go full and muffled, like they've been stuffed with cotton.",
+        "Sound goes far away for %t. Voices turn to murmurs."
+      ],
+      now: ["Everyone sounds a long way off, and very soft."],
+      off: ["Your ears pop, and the room's loud again."]
+    },
+    tunnel: {
+      take: [
+        "%t's sight narrows down to a small bright circle. Everything else just isn't there.",
+        "The edges of the world fold in on %t till only what's straight ahead is left."
+      ],
+      now: ["Only what's right in front of you. Turnin' your head is the only way to see anything else."],
+      off: ["The world opens back out. You can see the edges again."]
+    },
+    haze: {
+      take: [
+        "A warm haze rolls over %t's eyes. Everything goes soft and blurry and dreamy.",
+        "%t's sight swims. The room's all soft edges now."
+      ],
+      now: ["Everything's soft and smudged. It's hard to tell who's who."],
+      off: ["The haze clears. Everything's sharp again."]
+    }
+  });
+
+  // dispensary/src/senses.js
+  var W2 = window;
+  var STANDING = () => Array.isArray(W2.PoseAllStanding) ? W2.PoseAllStanding : ["BaseLower", "LegsClosed", "LegsOpen", "Spread"];
+  var isMe = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer());
+  function poseNow() {
+    return active("allfours") ? "AllFours" : active("weakknees") ? "Kneel" : null;
+  }
+  function settle() {
+    const pose = poseNow();
+    if (!pose || !W2.Player) return false;
+    try {
+      const now = [].concat(W2.Player.ActivePose || []);
+      if (now.includes(pose)) return false;
+      if (typeof W2.PoseSetActive === "function") {
+        W2.PoseSetActive(W2.Player, pose);
+        if (typeof W2.ServerSend === "function" && W2.CurrentScreen === "ChatRoom" && typeof W2.ChatRoomCharacterUpdate === "function") W2.ChatRoomCharacterUpdate(W2.Player);
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+  var hazed = false;
+  function hazeTick() {
+    const want = active("haze") && W2.CurrentScreen === "ChatRoom";
+    const cv = W2.document && W2.document.getElementById("MainCanvas");
+    if (!cv) return;
+    if (want && !hazed) {
+      cv.style.filter = "blur(" + (1 + Math.min(4, xOfDose("haze"))) + "px)";
+      hazed = true;
+    } else if (!want && hazed) {
+      cv.style.filter = "";
+      hazed = false;
+    }
+  }
+  function initSenses(mod2) {
+    try {
+      mod2.hookFunction("PoseCanChangeUnaidedStatus", 4, (args, next) => {
+        const r = next(args);
+        try {
+          const [C, poseName] = args, PCS = W2.PoseChangeStatus;
+          if (isMe(C) && poseNow() && PCS && STANDING().includes(poseName) && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
+          if (isMe(C) && active("allfours") && PCS && poseName === "Kneel" && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
+        } catch (e) {
+        }
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Dispensary] Weak Knees can't hold you down:", e);
+    }
+    const wrapPlayer = () => {
+      const P = W2.Player;
+      if (!P || P.__fdSenses) return !!P;
+      const blind = P.GetBlindLevel, deaf = P.GetDeafLevel;
+      if (typeof blind === "function") P.GetBlindLevel = function(...a) {
+        const v = blind.apply(this, a);
+        return active("blinder") ? Math.max(v, Math.min(3, xOfDose("blinder"))) : v;
+      };
+      if (typeof deaf === "function") P.GetDeafLevel = function(...a) {
+        const v = deaf.apply(this, a);
+        return active("cotton") ? Math.max(v, Math.min(4, 1 + xOfDose("cotton"))) : v;
+      };
+      P.__fdSenses = true;
+      return true;
+    };
+    if (!wrapPlayer()) {
+      const t = setInterval(() => {
+        if (wrapPlayer()) clearInterval(t);
+      }, 1e3);
+    }
+  }
+
   // shared/potion-voice.js
   var POTION_VOICE = {
     needy: {
@@ -8238,25 +8403,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
 
   // dispensary/src/say.js
-  var W2 = window;
-  var inRoom = () => W2.CurrentScreen === "ChatRoom" && typeof W2.ServerSend === "function";
+  var W3 = window;
+  var inRoom = () => W3.CurrentScreen === "ChatRoom" && typeof W3.ServerSend === "function";
   var myName = () => {
-    const P = W2.Player || {};
+    const P = W3.Player || {};
     return String(P.Nickname || P.Name || "Somebody");
   };
   function nameOf(mn) {
-    const C = (W2.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+    const C = (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
     return C ? String(C.Nickname || C.Name || "somebody") : "somebody";
   }
   var pick = (a) => a[Math.floor(Math.random() * a.length)];
   var fill = (t, v) => String(t).replace(/%t/g, myName()).replace(/%b/g, v && v.by || "somebody").replace(/%d/g, v && v.dose || "a dose");
   function local(text3, color) {
     try {
-      if (typeof W2.ChatRoomSendLocal !== "function" || W2.CurrentScreen !== "ChatRoom") return false;
-      const d = W2.document.createElement("div");
+      if (typeof W3.ChatRoomSendLocal !== "function" || W3.CurrentScreen !== "ChatRoom") return false;
+      const d = W3.document.createElement("div");
       d.style.cssText = "color:" + (color || "#c79bd8") + ";white-space:pre-wrap";
       d.textContent = "\u{1F489} " + text3;
-      W2.ChatRoomSendLocal(d.outerHTML);
+      W3.ChatRoomSendLocal(d.outerHTML);
       return true;
     } catch (e) {
       return false;
@@ -8266,7 +8431,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!inRoom() || !text3) return false;
     const msg = String(text3).slice(0, 900);
     try {
-      W2.ServerSend("ChatRoomChat", { Content: "Beep", Type: "Action", Dictionary: [
+      W3.ServerSend("ChatRoomChat", { Content: "Beep", Type: "Action", Dictionary: [
         { Tag: "Beep", Text: "msg" },
         { Tag: "\u53D1\u9001\u79C1\u804A", Text: "msg" },
         { Tag: "Biep", Text: "msg" },
@@ -8280,11 +8445,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/ladder.js
-  var W3 = window;
+  var W4 = window;
   var has = (list, mn) => Array.isArray(list) && list.some((x) => (typeof x === "object" && x ? x.MemberNumber : x) === mn);
   var isFarm = (mn) => mn === BOT || PROPRIETORS.includes(mn) || st().farm.includes(mn);
   function isOwner(mn) {
-    const P = W3.Player;
+    const P = W4.Player;
     try {
       if (P && typeof P.IsOwnedByMemberNumber === "function" && P.IsOwnedByMemberNumber(mn)) return true;
     } catch (e) {
@@ -8292,7 +8457,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return !!(P && P.Ownership && P.Ownership.MemberNumber === mn);
   }
   function isLover(mn) {
-    const P = W3.Player;
+    const P = W4.Player;
     try {
       if (P && typeof P.IsLoverOfMemberNumber === "function" && P.IsLoverOfMemberNumber(mn)) return true;
     } catch (e) {
@@ -8300,7 +8465,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return has(P && P.Lovership, mn);
   }
   function rungOf(mn) {
-    const P = W3.Player;
+    const P = W4.Player;
     if (!P || mn === P.MemberNumber) return 0;
     if (has(P.BlackList, mn)) return 7;
     if (isOwner(mn)) return 1;
@@ -8400,25 +8565,463 @@ One of mods you are using is using an old version of SDK. It will work for now b
     craveNext = 1;
   }
 
+  // dispensary/src/worn.js
+  var W5 = window;
+  var MIN2 = 6e4;
+  var DRIP_MINS = 10;
+  var INJECT_EVERY = 30;
+  var TRIGGER_GAP = 2 * MIN2;
+  var PAUSE_MINS = 15;
+  var DRIP_WORDS = /\b(drip\w*|iv|i\.v\.|laced|coated|soaked|infused|seeping)\b/;
+  var INJECT_WORDS = /\b(injector|auto[- ]?inject\w*|dosing|dispenser|pump)\b/;
+  var EVERY = /\bevery\s+(\d{1,3})\s*(?:min|minutes?)\b/;
+  var TRIGGERS = {
+    climax: /\b(on|when|whenever|every)\s+(?:she |he |they |you )?(climax\w*|cum\w*|orgasm\w*)\b/,
+    kissed: /\bwhen\s+kiss\w*\b/,
+    touched: /\bwhen\s+(touch\w*|groped|caressed|fondled)\b/,
+    spanked: /\bwhen\s+(spank\w*|slapped|paddled)\b/
+  };
+  var ROULETTE_WORDS = /\b(roulette|mystery (?:dose|shot|serum|drink)|surprise (?:dose|shot))\b/;
+  var GLOSS_WORDS = /\b(lip ?gloss|lipstick|lip balm|lip stain)\b/;
+  var LSCG_SOAKED = /\b(soaked|laced)\b/;
+  function dosesOf(text3) {
+    const t = String(text3 || "").toLowerCase();
+    const list = dosesIn(t);
+    if (ROULETTE_WORDS.test(t)) {
+      const S2 = st(), ok = doseIds().filter((id) => {
+        const B = BOOK[id];
+        return !B.instant && !S2.off[id] && !B.lscgOnly && !(B.lscg && lscgPresent());
+      });
+      if (ok.length) return [{ id: ok[Math.floor(Math.random() * ok.length)], x: list[0] ? list[0].x : 1, roulette: true }];
+    }
+    return list;
+  }
+  var crafterOf = (item) => {
+    const n = item && item.Craft && Number(item.Craft.MemberNumber);
+    return Number.isInteger(n) && n > 0 ? n : 0;
+  };
+  var me = () => W5.Player && W5.Player.MemberNumber || 0;
+  var okFrom = (by) => !by || by === me() || allowed(by);
+  var keyOf = (item) => (item.Asset && item.Asset.Group ? item.Asset.Group.Name : "?") + ":" + (item.Craft && item.Craft.Name || "");
+  function ours2(id) {
+    const B = BOOK[id];
+    return !!B && !(B.farm && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id];
+  }
+  function wornGear() {
+    const P = W5.Player, out = [];
+    if (!P || !Array.isArray(P.Appearance)) return out;
+    for (const item of P.Appearance) {
+      if (!item || !item.Craft) continue;
+      const text3 = craftText(item);
+      if (!text3) continue;
+      const list = dosesOf(text3).filter((d) => ours2(d.id));
+      const roulette = ROULETTE_WORDS.test(text3);
+      if (!list.length && !roulette) continue;
+      const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text3));
+      const drip = DRIP_WORDS.test(text3) && !(lscgPresent() && LSCG_SOAKED.test(text3) && !/\bdrip|\biv\b/.test(text3));
+      const inject = INJECT_WORDS.test(text3);
+      if (!drip && !inject && !trig.length) continue;
+      const every = EVERY.exec(text3);
+      out.push({
+        item,
+        key: keyOf(item),
+        text: text3,
+        list,
+        by: crafterOf(item),
+        drip,
+        inject,
+        trig,
+        roulette,
+        every: Math.max(5, Math.min(240, every ? Number(every[1]) : INJECT_EVERY)),
+        gloss: GLOSS_WORDS.test(text3)
+      });
+    }
+    return out;
+  }
+  var told = {};
+  function notAllowed(g) {
+    if (Date.now() - (told[g.key] || 0) < 36e5) return;
+    told[g.key] = Date.now();
+    local(fill(NOTES.notListed, { by: nameOf(g.by) || "#" + g.by, dose: itemName(g.item) }));
+  }
+  var itemName = (it) => it && it.Craft && it.Craft.Name || it && it.Asset && (it.Asset.Description || it.Asset.Name) || "gear";
+  var paused = () => (st().wornPause || 0) > Date.now();
+  var lastShot = {};
+  function wornTick() {
+    if (paused()) return;
+    const now = Date.now();
+    for (const g of wornGear()) {
+      if (!okFrom(g.by)) {
+        notAllowed(g);
+        continue;
+      }
+      if (g.drip) for (const d of g.list) {
+        const was = active(d.id);
+        if (was && leftMs(d.id) > (DRIP_MINS - 2) * MIN2) continue;
+        const r = give(d.id, { by: g.by, x: d.x, p: d.p, mins: DRIP_MINS, upto: true, quiet: was, line: was ? void 0 : fill(pick(LINES.worn.drip), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
+        if (!r.ok && r.why === "off") continue;
+      }
+      if (g.inject) {
+        const last = lastShot[g.key] || 0;
+        if (!last) {
+          lastShot[g.key] = now;
+          continue;
+        }
+        if (now - last < g.every * MIN2) continue;
+        lastShot[g.key] = now;
+        const list = g.roulette ? dosesOf(g.text).filter((d) => ours2(d.id)) : g.list;
+        for (const d of list) {
+          if (isLater(g.text)) queue(d.id, { by: g.by, x: d.x, p: d.p });
+          else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
+        }
+      }
+    }
+    const on2 = new Set(wornGear().map((g) => g.key));
+    for (const k of Object.keys(lastShot)) if (!on2.has(k)) delete lastShot[k];
+  }
+  var lastTrig = {};
+  function trigger(kind, from) {
+    if (paused()) return 0;
+    let n = 0;
+    for (const g of wornGear()) {
+      if (!g.trig.includes(kind)) continue;
+      if (!okFrom(g.by)) {
+        notAllowed(g);
+        continue;
+      }
+      const k = g.key + "|" + kind;
+      if (Date.now() - (lastTrig[k] || 0) < TRIGGER_GAP) continue;
+      lastTrig[k] = Date.now();
+      const list = g.roulette ? dosesOf(g.text).filter((d) => ours2(d.id)) : g.list;
+      for (const d of list) {
+        const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)) });
+        if (r.ok) n++;
+      }
+    }
+    return n;
+  }
+  var glossAt = {};
+  function kissedBy(mn) {
+    const C = (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+    if (!C || !Array.isArray(C.Appearance) || paused()) return 0;
+    let n = 0;
+    for (const item of C.Appearance) {
+      if (!item || !item.Craft) continue;
+      const text3 = craftText(item);
+      if (!GLOSS_WORDS.test(text3)) continue;
+      const by = crafterOf(item) || mn;
+      if (!allowed(by) && !allowed(mn)) {
+        local(fill(NOTES.notListed, { by: nameOf(mn), dose: itemName(item) }));
+        continue;
+      }
+      const k = mn + ":" + keyOf(item);
+      if (Date.now() - (glossAt[k] || 0) < TRIGGER_GAP) continue;
+      glossAt[k] = Date.now();
+      for (const d of dosesOf(text3).filter((x) => ours2(x.id))) {
+        const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }) });
+        if (r.ok) n++;
+      }
+    }
+    return n;
+  }
+  var KISS = /^(Kiss|FrenchKiss|PoliteKiss|GaggedKiss|SiblingsCheekKiss|GagKiss)$/;
+  var TOUCH = /^(Caress|Grope|Pinch|Tickle|Rub|MassageHands|Pet|Cuddle|RubItem|TickleItem|SqueezeItem|RollItem|BrushItem|Lick|Nibble|Suck)$/;
+  var SPANK = /^(Spank|Slap|SpankItem)$/;
+  function onActivity(name, from) {
+    if (!name || from === me()) return;
+    if (KISS.test(name)) {
+      trigger("kissed", from);
+      kissedBy(from);
+    } else if (SPANK.test(name)) {
+      trigger("spanked", from);
+      trigger("touched", from);
+    } else if (TOUCH.test(name)) trigger("touched", from);
+  }
+  function initWorn(mod2) {
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 4, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => trigger("climax"), 500);
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] gear can't feel you cum:", e);
+    }
+  }
+  function wornReset() {
+    for (const o of [lastShot, lastTrig, glossAt, told]) for (const k of Object.keys(o)) delete o[k];
+  }
+
+  // shared/protocol.js
+  var FARM_MSG = "FarmhandMsg";
+  var PROTOCOL = 2;
+  function makeMsg(type, data = {}, target2) {
+    const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
+    if (target2) m.Target = target2;
+    return m;
+  }
+  function readMsg(data) {
+    if (!data || data.Type !== "Hidden" || data.Content !== FARM_MSG) return null;
+    const d = data.Dictionary;
+    if (!d || typeof d !== "object" || Array.isArray(d) || typeof d.type !== "string") return null;
+    return { ...d, from: data.Sender };
+  }
+
+  // dispensary/src/parasites.js
+  var W6 = window;
+  var MIN3 = 6e4;
+  var HOUR = 36e5;
+  var KINDS = {
+    lips: { label: "Parasite lips", icon: "\u{1F444}", words: /\bparasit\w*|\bparasite lips\b/, hours: 12, every: 30 },
+    latex: { label: "Livin' latex", icon: "\u{1F5A4}", words: /\bliv(?:ing|in'?) latex\b|\bliving rubber\b|\blatex symbiote\b/, hours: 24, starve: 6 },
+    moss: { label: "Milk moss", icon: "\u{1F331}", words: /\bmilk moss\b/, hours: 24, every: 40 },
+    nestling: { label: "The nestling", icon: "\u{1F41B}", words: /\bnestling\b/, hours: 24, stages: 3 },
+    brood: { label: "The brood mother", icon: "\u{1F95A}", words: /\bbrood ?mother\b|\bbrood queen\b/, hours: 24, every: 45 },
+    vine: { label: "The leash vine", icon: "\u{1F33F}", words: /\bleash vine\b|\bvine leash\b/, worn: true, tiles: 3 },
+    mouth: { label: "The mouthpiece", icon: "\u{1F5E3}\uFE0F", words: /\bmouthpiece\b/, worn: true }
+  };
+  var kindIds = () => Object.keys(KINDS);
+  var DEFAULT_STRAIN = ["needy", "heat", "hairtrigger"];
+  var me2 = () => W6.Player && W6.Player.MemberNumber || 0;
+  var charOf = (mn) => (W6.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+  var send = (type, data, to) => {
+    try {
+      if (typeof W6.ServerSend === "function") W6.ServerSend("ChatRoomChat", makeMsg(type, data, to));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  var on = (kind) => !!(st().parasites && st().parasites[kind]);
+  var usable = (id) => {
+    const B = BOOK[id];
+    return !!B && !B.instant && !B.lscgOnly && !(B.lscg && lscgPresent()) && !st().off[id];
+  };
+  function strainOf(text3) {
+    const ids = dosesIn(text3).map((d) => d.id).filter((id) => usable(id));
+    return ids.length ? ids.slice(0, 4) : DEFAULT_STRAIN.filter(usable);
+  }
+  var mine = () => st().para || (st().para = {});
+  var line = (kind, which, v) => {
+    const L = LINES.para && LINES.para[kind] && LINES.para[kind][which];
+    return L && L.length ? fill(pick(L), v).replace(/%k/g, KINDS[kind].label.toLowerCase()) : "";
+  };
+  function latch(kind, o) {
+    const K2 = KINDS[kind];
+    if (!K2 || !on(kind)) return false;
+    if (o.by && o.by !== me2() && !allowed(o.by)) return false;
+    const P = mine();
+    if (P[kind]) return false;
+    const now = Date.now();
+    P[kind] = { by: o.by || 0, name: String(o.name || "").slice(0, 30), since: now, until: K2.worn ? 0 : now + K2.hours * HOUR, strain: (o.strain || DEFAULT_STRAIN).filter((id) => BOOK[id]).slice(0, 4), fed: now, stage: 0, n: 0, eggs: 0, next: now + (K2.every || 30) * MIN3 };
+    save();
+    action(line(kind, "latch", { by: P[kind].name || "somebody" }));
+    return true;
+  }
+  function letGo(kind, why) {
+    const P = mine();
+    if (!P[kind]) return false;
+    delete P[kind];
+    save();
+    if (why !== "quiet") {
+      const l = line(kind, why === "starved" ? "starved" : "off");
+      if (l) local(l);
+    }
+    return true;
+  }
+  function wornParasites() {
+    const P = W6.Player, out = [];
+    if (!P || !Array.isArray(P.Appearance)) return out;
+    for (const item of P.Appearance) {
+      if (!item || !item.Craft) continue;
+      const text3 = craftText(item);
+      for (const kind of kindIds()) if (KINDS[kind].words.test(text3)) out.push({ kind, item, text: text3, by: Number(item.Craft.MemberNumber) || 0, name: String(item.Craft.MemberName || "") });
+    }
+    return out;
+  }
+  function paraTick() {
+    const now = Date.now(), P = mine(), worn = wornParasites();
+    if ((st().wornPause || 0) <= now) {
+      for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text) });
+    }
+    if (P.moss && active("letdown")) P.moss.fed = now;
+    for (const kind of ["vine", "mouth"]) if (P[kind] && !worn.some((w) => w.kind === kind)) letGo(kind, "off");
+    for (const [kind, p] of Object.entries(P)) {
+      const K2 = KINDS[kind];
+      if (!K2) {
+        delete P[kind];
+        continue;
+      }
+      if (p.until && now > p.until) {
+        letGo(kind, "done");
+        continue;
+      }
+      if (K2.starve && now - p.fed > K2.starve * HOUR) {
+        letGo(kind, "starved");
+        continue;
+      }
+      if (!K2.every || now < p.next) continue;
+      p.next = now + K2.every * MIN3;
+      if (!inRoom()) continue;
+      if (kind === "lips") {
+        const id = p.strain[p.n++ % Math.max(1, p.strain.length)] || "needy";
+        give(id, { by: p.by, line: fill(line("lips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
+        local(line("lips", "crave"));
+      }
+      if (kind === "moss") give("letdown", { by: p.by, line: line("moss", "feed") });
+      if (kind === "brood") {
+        p.eggs = Math.min(5, (p.eggs || 0) + 1);
+        local(fill(line("brood", "lay"), {}).replace(/%n/g, String(p.eggs)));
+      }
+      save();
+    }
+  }
+  function paraClimax() {
+    const P = mine(), now = Date.now();
+    if (P.latex) {
+      P.latex.fed = now;
+      P.latex.until = Math.min(P.latex.since + 72 * HOUR, Math.max(P.latex.until, now + KINDS.latex.hours * HOUR));
+      give("hairtrigger", { by: P.latex.by, mins: 30, upto: true, quiet: active("hairtrigger"), line: line("latex", "feed") });
+    }
+    if (P.nestling) {
+      const n = P.nestling;
+      n.fed = now;
+      if (n.stage < KINDS.nestling.stages) {
+        n.stage++;
+        give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, line: line("nestling", "grow").replace(/%n/g, String(n.stage)) });
+      } else give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, upto: true, quiet: true });
+    }
+    save();
+  }
+  function paraKissGiven(to) {
+    const P = mine();
+    if (!to || to === me2()) return;
+    if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me2(), name: myName() }, to);
+    if (P.brood && P.brood.eggs > 0) {
+      P.brood.eggs--;
+      save();
+      send("dispPara", { kind: "lips", strain: P.brood.strain, by: me2(), name: myName(), brood: true }, to);
+      local(line("brood", "pass").replace(/%b/g, nameOf(to)));
+    }
+  }
+  function onPara(from, m) {
+    const kind = String(m.kind || "");
+    if (!KINDS[kind] || KINDS[kind].worn) return;
+    if (!on(kind) || !allowed(from)) return;
+    const strain = Array.isArray(m.strain) ? m.strain.filter((id) => typeof id === "string" && BOOK[id]) : DEFAULT_STRAIN;
+    latch(kind, { by: from, name: nameOf(from), strain });
+  }
+  function vineOk(X, Y) {
+    const p = mine().vine;
+    if (!p) return true;
+    const C = charOf(p.by), pos = C && C.MapData && C.MapData.Pos;
+    if (!pos || typeof pos.X !== "number") return true;
+    return Math.max(Math.abs(X - pos.X), Math.abs(Y - pos.Y)) <= KINDS.vine.tiles;
+  }
+  var vineTold = 0;
+  var asked = null;
+  function onSay(from, m) {
+    const p = mine().mouth;
+    if (!p || p.by !== from) return;
+    const text3 = String(m.text || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 300);
+    if (!text3 || /^[\/(\[]/.test(text3)) return;
+    if (st().mouthAuto === true) {
+      say2(text3);
+      send("dispSaid", { ok: true }, from);
+      return;
+    }
+    asked = { from, text: text3 };
+    local("\u{1F5E3}\uFE0F " + nameOf(from) + `'s mouthpiece wants you to say: "` + text3 + '"\nSay it: /dispensary say \xB7 let it pass: /dispensary nope');
+  }
+  function say2(text3) {
+    try {
+      W6.ServerSend("ChatRoomChat", { Content: text3, Type: "Chat" });
+    } catch (e) {
+    }
+  }
+  function sayAsked(yes) {
+    if (!asked) return false;
+    const a = asked;
+    asked = null;
+    if (yes) say2(a.text);
+    send("dispSaid", { ok: !!yes }, a.from);
+    return true;
+  }
+  function mouthSend(to, text3) {
+    return send("dispSay", { text: String(text3).slice(0, 300) }, to);
+  }
+  function initParasites(mod2) {
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 3, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => paraClimax(), 600);
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomMapViewCanEnterTile", 2, (args, next) => {
+        const t = next(args);
+        try {
+          if (t > 0 && !vineOk(args[0], args[1])) {
+            if (Date.now() - vineTold > 2e4) {
+              vineTold = Date.now();
+              local(line("vine", "tug"));
+            }
+            return 0;
+          }
+        } catch (e) {
+        }
+        return t;
+      });
+    } catch (e) {
+      console.warn("[Dispensary] the leash vine can't hold you:", e);
+    }
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me2()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispPara") onPara(data.Sender, m);
+            else if (m && m.type === "dispSay") onSay(data.Sender, m);
+            else if (m && m.type === "dispSaid") local(nameOf(data.Sender) + (m.ok ? " said it." : " let it pass."));
+          }
+        } catch (e) {
+          console.warn("[Dispensary] parasites:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] parasites can't hear:", e);
+    }
+  }
+
   // dispensary/src/needle.js
-  var W4 = window;
-  var botHere = () => (W4.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
-  var charOf = (mn) => (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W4.Player && W4.Player.MemberNumber === mn ? W4.Player : null);
+  var W7 = window;
+  var botHere = () => (W7.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf2 = (mn) => (W7.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W7.Player && W7.Player.MemberNumber === mn ? W7.Player : null);
   function craftText(item) {
     if (!item || !item.Craft) return "";
     let d = item.Craft.Description || "";
     try {
-      if (W4.CraftingDescription && typeof W4.CraftingDescription.Decode === "function") d = W4.CraftingDescription.Decode(d);
+      if (W7.CraftingDescription && typeof W7.CraftingDescription.Decode === "function") d = W7.CraftingDescription.Decode(d);
     } catch (e) {
     }
     return ((item.Craft.Name || "") + " | " + d).toLowerCase();
   }
   var handOf = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
-  var handTextOf = (mn) => craftText(handOf(charOf(mn)));
+  var handTextOf = (mn) => craftText(handOf(charOf2(mn)));
   function factsOf(data, sender) {
     try {
-      if (typeof W4.ChatRoomMessageRunExtractors === "function") {
-        const m = W4.ChatRoomMessageRunExtractors(data, sender).metadata;
+      if (typeof W7.ChatRoomMessageRunExtractors === "function") {
+        const m = W7.ChatRoomMessageRunExtractors(data, sender).metadata;
         if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
       }
     } catch (e) {
@@ -8430,7 +9033,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var LSCG_WAIT_MS = 1500;
   function onNeedle(by, item) {
-    const text3 = craftText(item), list = dosesIn(text3), at = Date.now(), done = [], later = isLater(text3);
+    const text3 = craftText(item), list = dosesOf(text3), at = Date.now(), done = [], later = isLater(text3);
     for (const { id, x, p } of list) {
       const B = BOOK[id];
       if (B.farm && botHere()) continue;
@@ -8465,10 +9068,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ChatRoomMessage", 1, (args, next) => {
         try {
-          const data = args[0], P = W4.Player;
+          const data = args[0], P = W7.Player;
           if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
-            const sender = charOf(data.Sender), f = factsOf(data, sender);
-            if (f.name === "Inject" && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+            const sender = charOf2(data.Sender) || (data.Sender === P.MemberNumber ? P : null), f = factsOf(data, sender);
+            if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+            if (f.target === P.MemberNumber && data.Sender !== P.MemberNumber) onActivity(f.name, data.Sender);
+            if (data.Sender === P.MemberNumber && typeof f.target === "number" && f.target !== P.MemberNumber && /^(Kiss|FrenchKiss|PoliteKiss|GaggedKiss|SiblingsCheekKiss)$/.test(f.name || "")) paraKissGiven(f.target);
           }
         } catch (e) {
           console.warn("[Dispensary] needle:", e);
@@ -8480,27 +9085,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // shared/protocol.js
-  var FARM_MSG = "FarmhandMsg";
-  var PROTOCOL = 2;
-  function makeMsg(type, data = {}, target2) {
-    const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
-    if (target2) m.Target = target2;
-    return m;
-  }
-  function readMsg(data) {
-    if (!data || data.Type !== "Hidden" || data.Content !== FARM_MSG) return null;
-    const d = data.Dictionary;
-    if (!d || typeof d !== "object" || Array.isArray(d) || typeof d.type !== "string") return null;
-    return { ...d, from: data.Sender };
-  }
-
   // dispensary/src/hardcore.js
-  var W5 = window;
+  var W8 = window;
   var DAY3 = 864e5;
   var CHECK_DAYS = 30;
-  var me = () => W5.Player && W5.Player.MemberNumber || 0;
-  var here = (mn) => (W5.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var me3 = () => W8.Player && W8.Player.MemberNumber || 0;
+  var here = (mn) => (W8.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
   var who = (mn) => here(mn) ? nameOf(mn) : "#" + mn;
   var onChange = () => {
   };
@@ -8509,13 +9099,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var hardOn = () => !!(st().hard && st().hard.on);
   function keyholders() {
-    const P = W5.Player, out = [];
+    const P = W8.Player, out = [];
     const own = P && P.Ownership && P.Ownership.MemberNumber;
-    if (typeof own === "number" && own > 0 && own !== me()) out.push(own);
+    if (typeof own === "number" && own > 0 && own !== me3()) out.push(own);
     if (st().stock) {
-      for (const m of PROPRIETORS) if (m !== me() && !out.includes(m)) out.push(m);
+      for (const m of PROPRIETORS) if (m !== me3() && !out.includes(m)) out.push(m);
     }
-    for (const m of st().keys || []) if (m !== me() && !out.includes(m)) out.push(m);
+    for (const m of st().keys || []) if (m !== me3() && !out.includes(m)) out.push(m);
     return out;
   }
   var MAX_KEYS = 10;
@@ -8523,7 +9113,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     mn = Math.round(Number(mn));
     if (hardOn()) return { ok: false, why: "locked" };
     if (!Number.isInteger(mn) || mn <= 0 || mn >= 1e9) return { ok: false, why: "number" };
-    if (mn === me()) return { ok: false, why: "self" };
+    if (mn === me3()) return { ok: false, why: "self" };
     const S2 = st();
     S2.keys = S2.keys || [];
     if (S2.keys.includes(mn) || keyholders().includes(mn)) return { ok: false, why: "already" };
@@ -8544,7 +9134,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var companion = () => {
     try {
-      const C = W5.FarmhandCompanion;
+      const C = W8.FarmhandCompanion;
       return C && typeof C.hardPrefs === "function" ? C : null;
     } catch (e) {
       return null;
@@ -8562,8 +9152,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var hardLog = () => (st().hard && st().hard.log || []).slice();
   function sendTo(mn, type, data) {
     try {
-      if (here(mn) && typeof W5.ServerSend === "function") {
-        W5.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
+      if (here(mn) && typeof W8.ServerSend === "function") {
+        W8.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
         return true;
       }
     } catch (e) {
@@ -8572,8 +9162,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function beepTo(mn, text3) {
     try {
-      if (typeof W5.ServerSend === "function") {
-        W5.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text3).slice(0, 900) });
+      if (typeof W8.ServerSend === "function") {
+        W8.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text3).slice(0, 900) });
         return true;
       }
     } catch (e) {
@@ -8582,14 +9172,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function announce() {
     const H = st().hard || {}, keys = keyholders();
-    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W5.Player && (W5.Player.Nickname || W5.Player.Name) || "" });
+    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W8.Player && (W8.Player.Nickname || W8.Player.Name) || "" });
   }
   function lock(days) {
     if (hardOn()) return { ok: false, why: "on" };
     if (!keyholders().length) return { ok: false, why: "nokey" };
     const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
     st().hard = { on: true, since: now, until: d ? now + d * DAY3 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
-    log(me(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
+    log(me3(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
     save(true);
     announce();
     onChange();
@@ -8619,12 +9209,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function tickHard() {
     if (!hardOn()) return;
     const H = st().hard, now = Date.now();
-    if (H.until && now >= H.until) unlock(me(), "the end date came");
+    if (H.until && now >= H.until) unlock(me3(), "the end date came");
     else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY3) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
   }
   var askedAt = 0;
   function askOut() {
-    const now = Date.now(), keys = keyholders(), name = W5.Player && (W5.Player.Nickname || W5.Player.Name) || "Somebody";
+    const now = Date.now(), keys = keyholders(), name = W8.Player && (W8.Player.Nickname || W8.Player.Name) || "Somebody";
     if (now - askedAt < 5 * 6e4) {
       local("\u{1F5DD}\uFE0F Your keyholders have already been asked. Your doses stay till one of them lets you out.");
       return 0;
@@ -8633,9 +9223,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let n = 0;
     for (const k of keys) {
       if (sendTo(k, "dispAsk", { name })) n++;
-      else if (beepTo(k, "\u{1F5DD}\uFE0F " + name + " (" + me() + ") is askin' to be let out of hardcore in The Farmhand's Dispensary. If you've the Dispensary, open its page (Keys you hold); with the Companion, /keys letout " + me() + ".")) n++;
+      else if (beepTo(k, "\u{1F5DD}\uFE0F " + name + " (" + me3() + ") is askin' to be let out of hardcore in The Farmhand's Dispensary. If you've the Dispensary, open its page (Keys you hold); with the Companion, /keys letout " + me3() + ".")) n++;
     }
-    log(me(), "asked to be let out");
+    log(me3(), "asked to be let out");
     save();
     local("\u{1F5DD}\uFE0F Hardcore: your doses stay. " + (n ? "Your keyholders have been asked to let you out: " + keys.map(who).join(", ") + "." : "None of your keyholders could be reached just now."));
     return n;
@@ -8644,7 +9234,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!isKey(by) || !m || typeof m !== "object") return false;
     const H = st().hard, nm = who(by);
     if (m.do === "check") {
-      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H.until || 0, due: dueAt(), keys: keyholders(), name: W5.Player && (W5.Player.Nickname || W5.Player.Name) || "" });
+      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H.until || 0, due: dueAt(), keys: keyholders(), name: W8.Player && (W8.Player.Nickname || W8.Player.Name) || "" });
       return true;
     }
     if (!hardOn()) return false;
@@ -8722,7 +9312,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var wards = () => st().wards || (st().wards = {});
   function onWardHard(from, m) {
-    if (!Array.isArray(m.keys) || !m.keys.includes(me())) return;
+    if (!Array.isArray(m.keys) || !m.keys.includes(me3())) return;
     const w = wards();
     if (!m.on) {
       if (w[from]) {
@@ -8747,7 +9337,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (sendTo(mn, "dispKey", Object.assign({ do: what }, data || {}))) return "room";
     const words = { check: "checked in on your hardcore", letout: "let you out: every dose lifted", end: "ended your hardcore" };
     if (!words[what]) return null;
-    const nm = W5.Player && (W5.Player.Nickname || W5.Player.Name) || "Your keyholder";
+    const nm = W8.Player && (W8.Player.Nickname || W8.Player.Name) || "Your keyholder";
     return beepTo(mn, "\u{1F5DD}\uFE0F " + nm + " " + words[what] + ". [fd:" + what + "]") ? "beep" : null;
   }
   function initHardcore(mod2) {
@@ -8755,7 +9345,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mod2.hookFunction("ChatRoomMessage", 11, (args, next) => {
         try {
           const data = args[0];
-          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me()) {
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me3()) {
             const m = readMsg(data);
             if (m && m.type === "dispKey") onKey(data.Sender, m);
             else if (m && m.type === "dispHard") onWardHard(data.Sender, m);
@@ -8804,19 +9394,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/lscg.js
-  var W6 = window;
+  var W9 = window;
   var api2 = null;
   var caps = null;
   var syncing = null;
   var REG = {};
   var lastLscg = {};
-  var ours2 = (id) => LSCG_ID + "." + id;
+  var ours3 = (id) => LSCG_ID + "." + id;
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
   var BREATH_MINS = 10;
   function lscgPresent() {
-    if (W6.LSCG) return true;
+    if (W9.LSCG) return true;
     try {
-      const sdk = W6.bcModSdk;
+      const sdk = W9.bcModSdk;
       if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
     } catch (e) {
     }
@@ -8838,7 +9428,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!lscgHas(id) || syncing) return;
     syncing = id;
     try {
-      api2.drugs.dose(ours2(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
+      api2.drugs.dose(ours3(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
     } catch (e) {
     } finally {
       syncing = null;
@@ -8924,7 +9514,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function initLscg() {
-    const q = W6.LSCG_OnLoad = W6.LSCG_OnLoad || [];
+    const q = W9.LSCG_OnLoad = W9.LSCG_OnLoad || [];
     q.push((L) => {
       try {
         setUp(L);
@@ -8935,9 +9525,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/doses.js
-  var W7 = window;
-  var MIN2 = 6e4;
-  var CAP = 48 * 60 * MIN2;
+  var W10 = window;
+  var MIN4 = 6e4;
+  var CAP = 48 * 60 * MIN4;
   var BOOK = {
     denial: {
       label: "Denial Serum",
@@ -9150,6 +9740,73 @@ One of mods you are using is using an old version of SDK. It will work for now b
       soak: ["tender"],
       desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose."
     },
+    // ── Nov 18: poses and senses (senses.js) ──
+    weakknees: {
+      label: "Weak Knees",
+      icon: "\u{1F9B5}",
+      mins: 20,
+      color: "#c9a0dc",
+      every: [6, 10],
+      words: /\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/,
+      keywords: ["weak knees", "jelly legs"],
+      soak: ["weak knees"],
+      desc: `Down on your knees, and you can't get up on your own: somebody has to help you up (the game's own "with help"). Twenty minutes a dose.`
+    },
+    allfours: {
+      label: "Down Girl",
+      icon: "\u{1F43E}",
+      mins: 20,
+      color: "#a0785a",
+      every: [6, 10],
+      words: /\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/,
+      keywords: ["down girl serum", "all fours tonic"],
+      soak: ["all fours"],
+      desc: "Down on all fours, and you stay down there: gettin' up needs a hand. Twenty minutes a dose."
+    },
+    blinder: {
+      label: "Blinder Drops",
+      icon: "\u{1F576}\uFE0F",
+      mins: 15,
+      color: "#3a3550",
+      every: [6, 10],
+      words: /\b(blind(?:er|ing)? drops?|dim(?:ming)? drops?|darkness drops?)\b/,
+      keywords: ["blinder drops", "dimming drops"],
+      soak: ["blinding"],
+      desc: "Your sight dims: the game's own blindness, darker with a stronger dose. Fifteen minutes a dose."
+    },
+    cotton: {
+      label: "Cotton Ears",
+      icon: "\u{1F9BB}",
+      mins: 15,
+      color: "#e8e2d0",
+      every: [6, 10],
+      words: /\b(cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|muffl\w* drops?)\b/,
+      keywords: ["cotton ears", "deafening drops"],
+      soak: ["deafening"],
+      desc: "Everything muffled: the game's own deafness, deafer with a stronger dose. Fifteen minutes a dose."
+    },
+    tunnel: {
+      label: "Tunnel Vision",
+      icon: "\u{1F52D}",
+      mins: 15,
+      color: "#202030",
+      every: [6, 10],
+      words: /\b(tunnel[- ]?vision(?: (?:drops?|serum|draught|tonic))?|blinker (?:drops?|serum))\b/,
+      keywords: ["tunnel vision", "blinker drops"],
+      soak: ["tunnel vision"],
+      desc: "Only a small circle in the middle of your screen; the rest is dark. It's the dose itself, so the screen-touches switch doesn't take it away. Fifteen minutes a dose."
+    },
+    haze: {
+      label: "Haze",
+      icon: "\u{1F32B}\uFE0F",
+      mins: 15,
+      color: "#c8c0d8",
+      every: [6, 10],
+      words: /\b(haze (?:drops?|serum|potion|mist|tonic)|hazy (?:drops?|serum|potion)|daze (?:drops?|serum))\b/,
+      keywords: ["haze drops", "haze mist"],
+      soak: ["haze"],
+      desc: "Everything soft and blurry: the game's picture goes hazy (not the chat). Fifteen minutes a dose."
+    },
     purge: {
       label: "Purge",
       icon: "\u{1F9FC}",
@@ -9213,25 +9870,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var nameIn = (t) => String(t).replace(/%n/g, myName());
   var poolOf = (id, p) => id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id];
   var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : t;
-  var ours3 = (id, kind, p) => {
+  var ours4 = (id, kind, p) => {
     const L = poolOf(id, p);
     return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : "";
   };
   function takeLine(id) {
     const v = voiceOf(id);
-    return v && v.seen.length ? nameIn(pick(v.seen)) : ours3(id, "take");
+    return v && v.seen.length ? nameIn(pick(v.seen)) : ours4(id, "take");
   }
   function nowLine(id) {
     const v = voiceOf(id);
-    return v && v.now.length ? nameIn(pick(v.now)) : ours3(id, "now");
+    return v && v.now.length ? nameIn(pick(v.now)) : ours4(id, "now");
   }
   function offLine(id, p) {
     const v = voiceOf(id);
-    return v && v.off.length ? nameIn(pick(v.off)) : ours3(id, "off", p);
+    return v && v.off.length ? nameIn(pick(v.off)) : ours4(id, "off", p);
   }
   function tellPage(detail) {
     try {
-      W7.dispatchEvent(new W7.CustomEvent("farmhand-dispensary", { detail }));
+      W10.dispatchEvent(new W10.CustomEvent("farmhand-dispensary", { detail }));
     } catch (e) {
     }
   }
@@ -9264,7 +9921,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
     const tol = o.upto ? 1 : toleranceOf(id, now);
-    const dur = Math.max(MIN2, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN2 * tol));
+    const dur = Math.max(MIN4, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN4 * tol));
     const was = active(id), d = S2.doses[id], by = Number(o.by) || 0;
     const xNow = Math.max(x, was && d ? d.x || 1 : 1);
     const p = typeof o.p === "string" && o.p ? o.p : was && d && d.p ? d.p : "";
@@ -9322,6 +9979,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       st().later = [];
       save();
     }
+    if (st().para && Object.keys(st().para).length) {
+      n += Object.keys(st().para).length;
+      st().para = {};
+    }
+    st().wornPause = Date.now() + 15 * MIN4;
+    save();
     return n;
   }
   var lastTick = 0;
@@ -9338,7 +10001,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!active(id)) end(id, "done");
       else feel(id, now);
     }
-    if (now - lastSave > MIN2) {
+    if (now - lastSave > MIN4) {
       lastSave = now;
       if (Object.keys(S2.doses).length) save();
     }
@@ -9361,12 +10024,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var face = (group, expr, secs) => {
     try {
-      if (typeof W7.CharacterSetFacialExpression === "function" && W7.Player) W7.CharacterSetFacialExpression(W7.Player, group, expr, secs);
+      if (typeof W10.CharacterSetFacialExpression === "function" && W10.Player) W10.CharacterSetFacialExpression(W10.Player, group, expr, secs);
     } catch (e) {
     }
   };
   var meter = () => {
-    const A = W7.Player && W7.Player.ArousalSettings;
+    const A = W10.Player && W10.Player.ArousalSettings;
     return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
   };
   function setArousal(v) {
@@ -9374,7 +10037,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const A = meter();
       if (!A) return;
       const n = Math.max(0, Math.min(100, Math.round(v)));
-      if (typeof W7.ActivitySetArousal === "function") W7.ActivitySetArousal(W7.Player, n);
+      if (typeof W10.ActivitySetArousal === "function") W10.ActivitySetArousal(W10.Player, n);
       else A.Progress = n;
     } catch (e) {
     }
@@ -9382,12 +10045,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var xOf = (id) => st().doses[id] && st().doses[id].x || 1;
   var felt = {};
   var FLUSHED = ["needy", "heat", "rut", "letdown"];
+  var xOfDose = (id) => st().doses[id] && st().doses[id].x || 1;
   var leak = () => tellPage({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
   function start(id) {
     if (id === "sedative") face("Eyes", "Dazed", 180);
     if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
     if (id === "airhead") face("Eyes", "Dazed", 120);
     if (id === "letdown") leak();
+    if (id === "weakknees" || id === "allfours") setTimeout(settle, 300);
   }
   function stop(id) {
     if (id === "sedative" && !active("airhead") || id === "airhead" && !active("sedative")) face("Eyes", null);
@@ -9401,15 +10066,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function feel(id, now) {
     const B = BOOK[id];
-    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN2 });
-    if (id === "sedative" && now - f.face > 2 * MIN2) {
+    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN4 });
+    if (id === "sedative" && now - f.face > 2 * MIN4) {
       f.face = now;
       face("Eyes", "Dazed", 180);
     }
     if (id === "needy") {
       const A = meter(), cap = Math.min(92, 60 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < cap) setArousal((Number(A.Progress) || 0) + 2);
-      if (now - f.face > 2 * MIN2) {
+      if (now - f.face > 2 * MIN4) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -9417,7 +10082,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "heat") {
       const A = meter(), floor = Math.min(70, 25 + 15 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN2) {
+      if (now - f.face > 2 * MIN4) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -9425,17 +10090,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "rut") {
       const A = meter(), floor = Math.min(60, 20 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN2) {
+      if (now - f.face > 2 * MIN4) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
     }
-    if (id === "airhead" && now - f.face > 2 * MIN2) {
+    if (id === "airhead" && now - f.face > 2 * MIN4) {
       f.face = now;
       face("Eyes", "Dazed", 120);
     }
     if (B.every && now >= f.next && inRoom()) {
-      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN2;
+      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN4;
       const l = nowLine(id);
       if (l) {
         if (B.room) action(l);
@@ -9443,7 +10108,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       if (id === "letdown") leak();
     } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
-      f.next = now + (8 + Math.random() * 6) * MIN2;
+      f.next = now + (8 + Math.random() * 6) * MIN4;
       local(pick(LINES.sedative.drift));
     }
   }
@@ -9453,7 +10118,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const now = Date.now(), k = id + ":" + kind;
     if (now - (toldAt[k] || 0) < gap) return;
     toldAt[k] = now;
-    const l = ours3(id, kind);
+    const l = ours4(id, kind);
     if (l) local(l);
   }
   function initDoses(mod2) {
@@ -9464,7 +10129,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("denial")) {
             if (C.ArousalSettings) C.ArousalSettings.Progress = 94;
             face("Blush", "High", 20);
-            if (Date.now() - heldTold > MIN2) {
+            if (Date.now() - heldTold > MIN4) {
               heldTold = Date.now();
               local(pick(LINES.denial.held));
             }
@@ -9481,7 +10146,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mod2.hookFunction("ActivityOrgasmStart", 6, (args, next) => {
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W7.ActivityOrgasmRuined = true;
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W10.ActivityOrgasmRuined = true;
         } catch (e) {
         }
         return next(args);
@@ -9521,7 +10186,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const back = Math.min(80, 40 + 8 * xOf("rut"));
             if ((Number(args[1]) || 0) < back) {
               args = [args[0], back].concat(args.slice(2));
-              feltOnce("rut", "again", MIN2);
+              feltOnce("rut", "again", MIN4);
             }
           }
         } catch (e) {
@@ -9545,12 +10210,227 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // dispensary/src/farm.js
-  var W8 = window;
-  function send(type, data) {
+  // dispensary/src/lines-worn.js
+  Object.assign(LINES, {
+    worn: {
+      drip: [
+        "The %g starts to seep. %t can feel %d creepin' into them, slow and steady, and it isn't goin' to stop while it's on.",
+        "Somethin' in the %g warms against %t's skin and starts to leak %d into them, a little at a time.",
+        "%t shivers as the %g settles. It's drippin' %d into them now, patient as anything.",
+        "The %g has been soaked in %d, and it gives it up to %t's skin bit by bit."
+      ],
+      inject: [
+        "The %g clicks. A little sting, and %t gets another dose of %d.",
+        "Right on time, the %g gives %t a sharp little pinch: %d, straight in.",
+        "%t jumps as the %g goes off. More %d, whether they were ready or not.",
+        "There's a soft hiss from the %g, and %d floods into %t all over again."
+      ],
+      climax: [
+        "%t's %g goes off right as they cum: %d, pumped in while they're still shakin'.",
+        "The moment %t goes over, the %g answers with a dose of %d.",
+        "%t cums, and the %g rewards them for it: %d, straight in."
+      ],
+      kissed: [
+        "%b kisses %t, and the %g notices: a dose of %d slides in.",
+        "The %g on %t answers %b's kiss with a pinch of %d."
+      ],
+      touched: [
+        "%b's touch sets the %g off: %t gets a dose of %d.",
+        "The %g on %t wakes up under %b's hands and gives them %d."
+      ],
+      spanked: [
+        "The smack sets the %g off: %t yelps, and a dose of %d goes in with it.",
+        "%b's hand lands, and the %g on %t answers with %d."
+      ],
+      gloss: [
+        "%b's lips are slick with somethin' sweet. %t tastes it a moment too late: %d.",
+        "%b kisses %t and leaves a sticky shine behind. It tingles. It's %d.",
+        "There's %d in %b's lip gloss, and now there's some in %t too.",
+        "%t licks their lips after %b's kiss and finds them sweet and tinglin'. %d."
+      ]
+    }
+  });
+
+  // dispensary/src/icons.js
+  var W11 = window;
+  var others = /* @__PURE__ */ new Map();
+  var me4 = () => W11.Player && W11.Player.MemberNumber || 0;
+  var inRoom2 = () => W11.CurrentScreen === "ChatRoom" && typeof W11.ServerSend === "function";
+  var mineNow = () => ({ ids: doseIds().filter(active).slice(0, 8), para: Object.keys(st().para || {}).length > 0 });
+  var lastSig = "";
+  var lastAt2 = 0;
+  function iconsTell(force) {
+    if (!inRoom2()) return false;
+    const S2 = st(), m = S2.iconsShare === false ? { ids: [], para: false } : mineNow(), sig = JSON.stringify(m);
+    if (!force && (sig === lastSig || Date.now() - lastAt2 < 4e3)) return false;
+    lastSig = sig;
+    lastAt2 = Date.now();
     try {
-      if (botHere() && typeof W8.ServerSend === "function") {
-        W8.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
+      W11.ServerSend("ChatRoomChat", makeMsg("dispIcons", m));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function onIcons(from, m) {
+    const ids = Array.isArray(m.ids) ? m.ids.filter((id) => typeof id === "string" && BOOK[id]).slice(0, 8) : [];
+    if (!ids.length && !m.para) others.delete(from);
+    else others.set(from, { ids, para: !!m.para, at: Date.now() });
+  }
+  function iconsFor(mn) {
+    const e = mn === me4() ? mineNow() : others.get(mn);
+    if (!e) return "";
+    return e.ids.slice(0, 5).map((id) => BOOK[id].icon).join("") + (e.para ? "\u{1FAB1}" : "");
+  }
+  function initIcons(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomDrawCharacterStatusIcons", 0, (args, next) => {
+        const r = next(args);
+        try {
+          const [C, X, Y, Z] = args;
+          if (st().iconsShow === false || !C) return r;
+          const t = iconsFor(C.MemberNumber);
+          if (t && typeof W11.DrawTextFit === "function") W11.DrawTextFit(t, X + 250 * Z, Y + 22 * Z, 200 * Z, "White", "Black");
+        } catch (e) {
+        }
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Dispensary] dose icons can't be drawn:", e);
+    }
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me4()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispIcons") onIcons(data.Sender, m);
+            else if (m && m.type === "dispIconsAsk") iconsTell(true);
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomSync", 3, (args, next) => {
+        const r = next(args);
+        others.clear();
+        setTimeout(() => {
+          iconsTell(true);
+          try {
+            W11.ServerSend("ChatRoomChat", makeMsg("dispIconsAsk", {}));
+          } catch (e) {
+          }
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
+    }
+  }
+
+  // dispensary/src/lines-para.js
+  Object.assign(LINES, {
+    para: {
+      lips: {
+        latch: [
+          "Somethin' wet and eager wriggles free of the gear and seals itself over %t's mouth. A pair of livin' lips, %b's strain, and they're not lettin' go.",
+          "The parasite finds %t's mouth and latches on with a soft, greedy pop. Its tendril slides down their throat and settles in.",
+          "%t gasps, and that's all the parasite needed: it's on their lips now, warm and pulsin', and it's hungry."
+        ],
+        feed: [
+          "The parasite on %t's mouth shivers and pumps somethin' sweet down their throat: %d.",
+          "%t feels the parasite swallow, then give back: a warm mouthful of %d.",
+          "A slow pulse runs through the parasite's lips, and %t's throat fills with %d."
+        ],
+        crave: [
+          "Your mouth aches. The parasite wants a load, and so, now, do you.",
+          "You catch yourself starin' at somebody's lap. The parasite's hungry.",
+          "Your throat keeps swallowin' on nothin'. Somethin' thick would settle it."
+        ],
+        off: [
+          "The parasite loosens, slides off your lips with a wet little sound, and goes still. Your mouth tingles for a while after.",
+          "It's done with you. The parasite peels away, sated, and leaves you swallowin' on the memory."
+        ]
+      },
+      latex: {
+        latch: [
+          "The gear's shine spreads. It crawls off the edges and over %t's skin, glossy and black and alive: livin' latex, %b's.",
+          "%t watches the latex creep up their thighs and settle, cool at first, then warm. It's on them now, and it's thirsty."
+        ],
+        feed: [
+          "The latex drinks %t's climax and tightens, pleased. Everything it covers feels twice as much.",
+          "A ripple runs over the latex as %t cums: it's fed, and it's makin' them feel every inch it hugs."
+        ],
+        starved: [
+          "The latex has gone dull and cold. Nobody's fed it: it peels away to find a better host."
+        ],
+        off: [
+          "The latex loosens and slides off you in one glossy sheet. Your skin feels very bare.",
+          "Its time's up. The latex lets go, and leaves you a little sorry it did."
+        ]
+      },
+      moss: {
+        latch: [
+          "Soft green moss spreads over %t's chest from the gear, warm and damp. It nuzzles their nipples. It wants their milk.",
+          "The milk moss settles over %t's tits and starts to hum. It's hungry, and it knows where the food is."
+        ],
+        feed: [
+          "The milk moss squeezes, gentle and insistent, and %t's tits let down for it.",
+          "%t's chest prickles under the moss. It's coaxin' the milk out of them again."
+        ],
+        starved: ["The moss has dried and gone brittle. Nobody's let down for it: it crumbles away."],
+        off: ["The milk moss lets go, a soft green shed, and your chest feels light and tender without it."]
+      },
+      nestling: {
+        latch: [
+          "Somethin' small and warm slips from the gear into %t and curls up low in their belly. The nestling's found its nest.",
+          "%t feels it settle inside: the nestling, %b's, warm and content and already growin'."
+        ],
+        grow: [
+          "%t cums, and the nestling drinks it in. It grows: stage %n, and %t's belly rounds out with it.",
+          "The nestling stirs and swells as %t comes down. Stage %n. Their belly's fuller for it."
+        ],
+        starved: ["The nestling's gone quiet and cold. It slips away in the night, lookin' for a better-fed nest."],
+        off: ["The nestling leaves, its time done, and your belly settles back down. You miss the weight of it."]
+      },
+      brood: {
+        latch: [
+          "The brood mother takes up residence in %t: big and patient and fertile, %b's. She'll be layin' soon."
+        ],
+        lay: [
+          "Somethin' shifts inside you. The brood mother's laid a little one (%n now). Kiss somebody who'd take it.",
+          "Another tiny parasite, ready to go (%n waitin'). It'll pass on the next kiss."
+        ],
+        pass: ["Your kiss carries one of the brood mother's little ones across to %b."],
+        off: ["The brood mother's done. She lets go, and any little ones go with her."]
+      },
+      vine: {
+        latch: [
+          "The vine in %t's gear uncurls and finds %b. A green tether, and it isn't lettin' %t wander far."
+        ],
+        tug: [
+          "The leash vine goes taut. You can't go any further from whoever grew it.",
+          "A tug at your gear: the vine says that's far enough."
+        ],
+        off: ["The leash vine goes slack and withers. You can wander again."]
+      },
+      mouth: {
+        latch: [
+          "Somethin' in %t's gear settles against their tongue. The mouthpiece: %b can put words there now."
+        ],
+        off: ["The mouthpiece goes quiet. Your words are your own again."]
+      }
+    }
+  });
+
+  // dispensary/src/farm.js
+  var W12 = window;
+  function send2(type, data) {
+    try {
+      if (botHere() && typeof W12.ServerSend === "function") {
+        W12.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
         return true;
       }
     } catch (e) {
@@ -9564,7 +10444,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function hello(force) {
     const now = Date.now(), sig = sigNow();
     if (!force && sig === helloSig && now - helloAt < 30 * 6e4) return false;
-    if (!send("dispHello", {
+    if (!send2("dispHello", {
       ver: VERSION,
       farm: allowed(BOT),
       lscg: lscgPresent(),
@@ -9579,26 +10459,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     helloSig = sig;
     return true;
   }
-  var tellSafeword = () => send("dispSafeword", {});
+  var tellSafeword = () => send2("dispSafeword", {});
   function onDoseCall(m) {
     const id = String(m.dose || ""), B = BOOK[id];
     const reply = (ok, why) => {
-      send("doseDone", { id: m.id, dose: id, ok: !!ok, why: why || "" });
+      send2("doseDone", { id: m.id, dose: id, ok: !!ok, why: why || "" });
       return { ok: !!ok, why: why || "" };
     };
     if (!B) return reply(false, "unknown");
     if (!allowed(BOT)) return reply(false, "ladder");
     if (st().off[id]) return reply(false, "off");
     const by = Number(m.by) || BOT, x = Math.max(1, Math.min(5, Math.round(Number(m.x) || 1)));
-    const mins = Number(m.mins) > 0 ? Math.min(48 * 60, Number(m.mins)) : void 0, line = m.line ? String(m.line).slice(0, 900) : void 0;
+    const mins = Number(m.mins) > 0 ? Math.min(48 * 60, Number(m.mins)) : void 0, line2 = m.line ? String(m.line).slice(0, 900) : void 0;
     if (B.lscg && lscgPresent()) {
       if (m.hand) return reply(true, "lscg");
       const ok = lscgDose(B.lscg, { x, by });
-      if (ok && line && !m.quiet) action(line);
+      if (ok && line2 && !m.quiet) action(line2);
       return reply(ok, ok ? "lscg" : "lscg-off");
     }
     const twice = lscgHas(id) && Date.now() - lastLscgDose(id) < 8e3;
-    const r = give(id, { by, x, mins, line, upto: twice, quiet: twice || !!m.quiet });
+    const r = give(id, { by, x, mins, line: line2, upto: twice, quiet: twice || !!m.quiet });
     return reply(r.ok, r.why);
   }
   function onFarmMsg(m) {
@@ -9846,11 +10726,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
   function mooify(text3, species, share) {
-    const say2 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+    const say3 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
     const keep = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
     return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep) return w;
-      const n = say2[Math.floor(Math.random() * say2.length)];
+      const n = say3[Math.floor(Math.random() * say3.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
   }
@@ -10064,7 +10944,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/screen.js
-  var W9 = window;
+  var W13 = window;
   var el2 = null;
   var styled = false;
   var CSS2 = `
@@ -10077,25 +10957,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
 `;
   function ensure() {
     if (!styled) {
-      const s = W9.document.createElement("style");
+      const s = W13.document.createElement("style");
       s.textContent = CSS2;
-      W9.document.head.appendChild(s);
+      W13.document.head.appendChild(s);
       styled = true;
     }
     if (!el2) {
-      el2 = W9.document.createElement("div");
+      el2 = W13.document.createElement("div");
       el2.id = "fd-screen";
       el2.setAttribute("aria-hidden", "true");
-      W9.document.body.appendChild(el2);
+      W13.document.body.appendChild(el2);
     }
     return el2;
   }
   var arousal = () => {
-    const A = W9.Player && W9.Player.ArousalSettings;
+    const A = W13.Player && W13.Player.ArousalSettings;
     return A ? Number(A.Progress) || 0 : 0;
   };
   function screenNow() {
-    if (st().screen === false || W9.CurrentScreen !== "ChatRoom") return null;
+    if (active("tunnel") && W13.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
+    if (st().screen === false || W13.CurrentScreen !== "ChatRoom") return null;
     if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
     if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
     if (active("rut")) return { bg: "radial-gradient(ellipse at center, transparent 45%, rgba(170,40,20,.42) 100%)", cls: "breathe", id: "rut" };
@@ -10147,7 +11028,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/page.js
-  var W10 = window;
+  var W14 = window;
   var ID = "FarmhandDispensary";
   var box2 = null;
   var note3 = "";
@@ -10169,11 +11050,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
-    if (W10.document.getElementById("fd-style")) return;
-    const s = W10.document.createElement("style");
+    if (W14.document.getElementById("fd-style")) return;
+    const s = W14.document.createElement("style");
     s.id = "fd-style";
     s.textContent = CSS3;
-    W10.document.head.appendChild(s);
+    W14.document.head.appendChild(s);
   }
   var clockTip = (mode) => {
     const p = st().penalty;
@@ -10197,9 +11078,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return d <= 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days (" + dateOf(t) + ")";
   };
   var keyName = (mn) => {
-    const P = W10.Player || {};
+    const P = W14.Player || {};
     const own = P.Ownership && P.Ownership.MemberNumber === mn;
-    const c = (W10.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
+    const c = (W14.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
     return (c ? c.Nickname || c.Name : "#" + mn) + (own ? " (your owner)" : PROPRIETORS.includes(mn) ? " (proprietor)" : "");
   };
   var endPick = "7";
@@ -10209,7 +11090,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var keyInput = "";
   var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
   function keyholdersCard() {
-    const S2 = st(), locked = hardOn(), P = W10.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
+    const S2 = st(), locked = hardOn(), P = W14.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
     if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
     if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
     for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
@@ -10269,7 +11150,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           endSel,
           h("button", { disabled: keys.length ? void 0 : true, onclick: () => {
             const days = Number(endPick) || 0;
-            if (typeof W10.confirm === "function" && !W10.confirm(hardWarning(days, keys))) return;
+            if (typeof W14.confirm === "function" && !W14.confirm(hardWarning(days, keys))) return;
             const r = lock(days);
             note3 = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
             draw2();
@@ -10284,7 +11165,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-card" },
       h("div", null, "\u{1F512} Locked in since " + dateOf(H.since) + ". " + (H.until ? "It ends " + inDays(H.until) + "." : "No end date: it lets go " + inDays(dueAt()) + " unless a keyholder checks in before then.")),
       h("div", { class: "fd-muted" }, "Your keyholders: " + keys.map(keyName).join(", ") + ". They can change your settings, let you out, or end it."),
-      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W10.Player && W10.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
+      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W14.Player && W14.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
     ));
     return out;
   }
@@ -10294,7 +11175,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!list.length) return [];
     const out = [h("h3", null, "Keys you hold")];
     for (const [k, x] of list) {
-      const mn = Number(k), inRoom2 = (W10.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
+      const mn = Number(k), inRoom3 = (W14.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
       const go = (what, data) => {
         const how = keyDo(mn, what, data);
         note3 = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
@@ -10308,9 +11189,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { onclick: () => go("check") }, "Check in"),
           h("button", { onclick: () => go("letout") }, "Let out (lift every dose)"),
           h("button", { onclick: () => {
-            if (typeof W10.confirm !== "function" || W10.confirm("End " + name + "'s hardcore?")) go("end");
+            if (typeof W14.confirm !== "function" || W14.confirm("End " + name + "'s hardcore?")) go("end");
           } }, "End hardcore"),
-          inRoom2 ? h("button", { onclick: () => {
+          inRoom3 ? h("button", { onclick: () => {
             editing = { mn };
             keyDo(mn, "state");
             draw2();
@@ -10378,7 +11259,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-row", style: { marginBottom: "6px" } },
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
-        if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
+        if (typeof W14.PreferenceSubscreenExtensionsClear === "function") W14.PreferenceSubscreenExtensionsClear();
         else close2();
       } }, "Back")
     ));
@@ -10443,6 +11324,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         draw2();
       } }), h("b", null, "Screen touches")),
       h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", checked: S2.iconsShow !== false ? true : void 0, onchange: (e) => {
+        st().iconsShow = e.target.checked;
+        save();
+        draw2();
+      } }), h("b", null, "Dose icons by people")),
+      h("label", null, h("input", { type: "checkbox", checked: S2.iconsShare !== false ? true : void 0, onchange: (e) => {
+        st().iconsShare = e.target.checked;
+        save();
+        draw2();
+      } }), h("b", null, "Let others see mine")),
+      h("div", { class: "fd-muted" }, "A small row of icons by anybody with doses in them (each dose's own icon), the way the game shows a friend. Only people with the Dispensary see them, and only if they let them show."),
       h(
         "div",
         { class: "fd-row", style: { marginTop: "8px" } },
@@ -10519,6 +11411,54 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } }), h("b", null, "Cravings")),
       h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")
     ));
+    kids.push(h("h3", null, "Gear, drinks and kisses"));
+    kids.push(h(
+      "div",
+      { class: "fd-card fd-muted" },
+      h("div", null, "Crafted gear you wear doses you when its words say a dose and how:"),
+      h("div", null, "\u2022 drip, IV, laced, coated or soaked: keeps it in you while it's on (" + DRIP_MINS + " minutes' worth, topped up)"),
+      h("div", null, "\u2022 injector, auto-inject, dosing or pump: a dose every " + INJECT_EVERY + ' minutes ("every 10 minutes" sets its own)'),
+      h("div", null, "\u2022 on climax, when kissed, when touched, when spanked: a dose each time"),
+      h("div", null, "\u2022 roulette or mystery dose: a different one of the doses you allow, each time"),
+      h("div", null, "\u2022 a drink or a treat somebody feeds you (Sip, Eat), and lip gloss or lipstick with a dose in it, on a kiss"),
+      h("div", { style: { marginTop: "4px" } }, "Whoever crafted it has to be on your list. Your safeword clears what's in you and rests your gear " + PAUSE_MINS + " minutes.")
+    ));
+    kids.push(h("h3", null, "Parasites"));
+    const inMe = mine();
+    kids.push(h(
+      "div",
+      { class: "fd-card" },
+      h("div", { class: "fd-muted" }, "Crafted parasites, anywhere: put on you in a crafted item that names them, by somebody on your list. Each kind only takes if you switch it on. Your safeword takes them off."),
+      kindIds().map((k) => {
+        const K2 = KINDS[k], p = inMe[k];
+        return h(
+          "label",
+          { style: { marginTop: "4px" } },
+          h("input", { type: "checkbox", disabled: locked, checked: S2.parasites && S2.parasites[k] ? true : void 0, onchange: (e) => {
+            const P = st().parasites || (st().parasites = {});
+            if (e.target.checked) P[k] = true;
+            else {
+              delete P[k];
+              letGo(k, "quiet");
+            }
+            save();
+            draw2();
+          } }),
+          h("span", null, K2.icon + " " + K2.label + (p ? " \xB7 in you" + (p.until ? ", " + timeLeft(Math.max(0, p.until - Date.now())) + " left" : "") + (p.name ? " (" + p.name + "'s)" : "") : ""))
+        );
+      }),
+      h(
+        "label",
+        { style: { marginTop: "8px" } },
+        h("input", { type: "checkbox", disabled: locked, checked: S2.mouthAuto ? true : void 0, onchange: (e) => {
+          st().mouthAuto = e.target.checked;
+          save();
+          draw2();
+        } }),
+        h("span", null, "The mouthpiece's words go straight out, without askin' me first")
+      ),
+      h("div", { class: "fd-muted" }, "What each does: parasite lips feed you their crafter's strain and spread by a kiss; livin' latex drinks your climaxes; milk moss keeps you leakin'; the nestling grows your belly every time you cum; the brood mother lays little ones you pass on by a kiss; the leash vine keeps you near its crafter on a map; the mouthpiece lets its crafter put words in your mouth (/dispensary say, or nope).")
+    ));
     if (lscg) {
       kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi() ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left." : "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's."));
     }
@@ -10532,9 +11472,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function open() {
     close2();
     styles();
-    box2 = W10.document.createElement("div");
+    box2 = W14.document.createElement("div");
     box2.id = "fd-page";
-    W10.document.body.appendChild(box2);
+    W14.document.body.appendChild(box2);
     draw2();
   }
   function close2() {
@@ -10546,14 +11486,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var pageOpen = () => !!box2;
   function redrawPage(force) {
-    const a = W10.document.activeElement;
+    const a = W14.document.activeElement;
     if (!force && box2 && a && box2.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
     draw2();
   }
   function initPage() {
-    if (typeof W10.PreferenceRegisterExtensionSetting !== "function") return false;
+    if (typeof W14.PreferenceRegisterExtensionSetting !== "function") return false;
     try {
-      W10.PreferenceRegisterExtensionSetting({
+      W14.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "The Farmhand's Dispensary",
         load: () => open(),
@@ -10575,8 +11515,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function openPage() {
     try {
-      if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
-        W10.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W14.PreferenceSubscreenExtensionsOpen === "function") {
+        W14.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -10586,26 +11526,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/index.js
-  var W11 = window;
+  var W15 = window;
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  if (W11.__farmDispensary) {
+  if (W15.__farmDispensary) {
     console.warn("[Dispensary] Two copies of the Farmhand's Dispensary are installed. Delete the older one in Tampermonkey, then reload.");
     throw new Error("The Farmhand's Dispensary: another copy is already running");
   }
   var mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
-  W11.__farmDispensary = VERSION;
-  registerInk(W11, mod);
+  W15.__farmDispensary = VERSION;
+  registerInk(W15, mod);
   initLscg();
   function status() {
-    const on = doseIds().filter(active);
-    local((on.length ? "In you now: " + on.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
+    const on2 = doseIds().filter(active);
+    local((on2.length ? "In you now: " + on2.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
   }
   function commands() {
-    if (typeof W11.CommandCombine !== "function") return;
+    if (typeof W15.CommandCombine !== "function") return;
     try {
-      W11.CommandCombine([{
+      W15.CommandCombine([{
         Tag: "dispensary",
-        Description: "[safeword | page]: The Farmhand's Dispensary. What's in you, the safeword, the settings",
+        Description: "[safeword | page | say | nope | mouth <who> <words>]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece",
         Action: (args) => {
           const a = String(args || "").trim().toLowerCase();
           if (/^(safe|safeword|red)$/.test(a)) {
@@ -10616,12 +11556,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
             openPage();
             return;
           }
+          if (/^say$/.test(a)) {
+            if (!sayAsked(true)) local("Nobody's asked you to say anything.");
+            return;
+          }
+          if (/^(nope|no|pass)$/.test(a)) {
+            if (!sayAsked(false)) local("Nobody's asked you to say anything.");
+            return;
+          }
+          const mm = /^mouth\s+(\S+)\s+(.+)$/i.exec(String(args || "").trim());
+          if (mm) {
+            const t = mouthTarget(mm[1]);
+            if (!t) {
+              local("Who? Their name or member number, in this room.");
+              return;
+            }
+            local(mouthSend(t, mm[2]) ? "\u{1F5E3}\uFE0F Sent to " + mm[1] + "'s mouthpiece. If it's yours, they'll see it." : "Couldn't reach them.");
+            return;
+          }
           status();
         }
       }]);
     } catch (e) {
       console.warn("[Dispensary] /dispensary unavailable:", e);
     }
+  }
+  function mouthTarget(w) {
+    if (/^\d+$/.test(w)) return Number(w);
+    const low = String(w).toLowerCase(), C = (W15.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W15.Player && W15.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
+    return C ? C.MemberNumber : 0;
   }
   var started = false;
   function start2() {
@@ -10634,6 +11597,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initSafeword(mod);
     initHardcore(mod);
     initSpeech(mod);
+    initWorn(mod);
+    initSenses(mod);
+    initIcons(mod);
+    initParasites(mod);
     onHardChange(() => {
       if (pageOpen()) redrawPage(true);
     });
@@ -10644,8 +11611,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       try {
         tick();
         laterTick();
+        wornTick();
+        paraTick();
         tickHard();
         screenTick();
+        hazeTick();
+        iconsTell(false);
         if (pageOpen()) redrawPage();
       } catch (e) {
         console.warn("[Dispensary] clock:", e);
@@ -10654,7 +11625,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => hello(true), 3e3);
   }
   var boot = setInterval(() => {
-    const P = W11.Player;
+    const P = W15.Player;
     if (!P || typeof P.MemberNumber !== "number" || !P.ExtensionSettings) return;
     clearInterval(boot);
     try {
@@ -10663,7 +11634,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       console.warn("[Dispensary] didn't start:", e);
     }
   }, 1e3);
-  if (W11.__FARMHAND_TEST__) W11.__disp = {
+  if (W15.__FARMHAND_TEST__) W15.__disp = {
     st: () => st(),
     give: (...a) => give(...a),
     tick: () => {
@@ -10688,9 +11659,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
     craveNow: () => {
       craveSoon();
       laterTick();
-    }
+    },
+    worn: () => wornGear(),
+    wornTick: () => wornTick(),
+    wornReset: () => wornReset(),
+    trigger: (k, f) => trigger(k, f),
+    para: () => mine(),
+    paraTick: () => paraTick(),
+    latch: (k, o) => latch(k, o),
+    climax: () => paraClimax(),
+    haze: () => hazeTick(),
+    icons: (mn) => iconsFor(mn),
+    iconsTell: (f) => iconsTell(f)
   };
-  W11.FarmhandDispensary = Object.freeze({
+  W15.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
@@ -10702,6 +11684,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     },
     who: () => st().who,
     // hardcore, for the Companion (its own settings lock while yours is on)
+    // the crafted parasites in you (Nov 18): [{ kind, label, by, until }]
+    parasites: () => Object.entries(mine()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null
   });
 })();

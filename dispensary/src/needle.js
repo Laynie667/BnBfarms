@@ -17,6 +17,8 @@ import { lscgPresent, lscgHas, lastLscgDose } from "./lscg.js";
 import { local, fill, nameOf } from "./say.js";
 import { NOTES } from "./lines.js";
 import { isLater, queue } from "./later.js";
+import { dosesOf, onActivity } from "./worn.js";
+import { paraKissGiven } from "./parasites.js";
 import { st as st0 } from "./store.js";
 
 const W = window;
@@ -45,7 +47,7 @@ function factsOf(data, sender) {
 export const LSCG_WAIT_MS = 1500;
 // a needle went into you: what's on it, and what you let through
 export function onNeedle(by, item) {
-  const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [], later = isLater(text);
+  const text = craftText(item), list = dosesOf(text), at = Date.now(), done = [], later = isLater(text);   // (dosesOf: a roulette is a dose of its own)
   for (const { id, x, p } of list) {
     const B = BOOK[id];
     if (B.farm && botHere()) continue;              // the farm girl's (farm.js)
@@ -69,8 +71,13 @@ export function initNeedle(mod) {
       try {
         const data = args[0], P = W.Player;
         if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
-          const sender = charOf(data.Sender), f = factsOf(data, sender);
-          if (f.name === "Inject" && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+          const sender = charOf(data.Sender) || (data.Sender === P.MemberNumber ? P : null), f = factsOf(data, sender);
+          // a needle, or a drink or a treat fed to you from somebody's hand (Nov 18): the words on it are the dose
+          if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+          // anything done to you: gear that answers to a kiss, a touch or a spank, and lip gloss (worn.js)
+          if (f.target === P.MemberNumber && data.Sender !== P.MemberNumber) onActivity(f.name, data.Sender);
+          // a kiss YOU gave: parasites spread (parasites.js)
+          if (data.Sender === P.MemberNumber && typeof f.target === "number" && f.target !== P.MemberNumber && /^(Kiss|FrenchKiss|PoliteKiss|GaggedKiss|SiblingsCheekKiss)$/.test(f.name || "")) paraKissGiven(f.target);
         }
       } catch (e) { console.warn("[Dispensary] needle:", e); }
       return next(args);

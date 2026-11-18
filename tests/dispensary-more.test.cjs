@@ -152,7 +152,7 @@ function page(opts) {
   ok(!D.active("hiccup") && D.st().later.length === 1 && s.actions().slice(na).some((t) => /capsule|small and slow|Not yet|sweet time/.test(t)), "a time-release capsule: nothin' yet, and the room knows somethin's waitin'");
   ok(D.st().later[0].in >= 5 * 60000 && D.st().later[0].in <= 40 * 60000, "...it goes off 5 to 40 minutes on (" + Math.round(D.st().later[0].in / 60000) + " min)");
   D.st().later[0].in = 0; na = s.actions().length; D.tick();
-  ok(D.active("hiccup") && D.st().later.length === 0 && s.actions().slice(na).some((t) => /capsule/.test(t)), "...and when it goes off, the dose hits");
+  ok(D.active("hiccup") && D.st().later.length === 0 && s.actions().slice(na).some((t) => /capsule|took its time/.test(t)), "...and when it goes off, the dose hits");
   D.end("hiccup");
   s.needle(OWNER, "Rut Serum, slow-release");
   ok(D.st().later.length === 1, "...slow-release works the same");

@@ -17,6 +17,8 @@
 import { st, save } from "./store.js";
 import { LINES } from "./lines.js";
 import { TOLERANCE_NOTE } from "./lines-more.js";
+import "./lines-senses.js";
+import { settle } from "./senses.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
@@ -129,6 +131,43 @@ export const BOOK = {
     words: /\b(tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er)\b/,
     keywords: ["tender drops", "tenderizer"], soak: ["tender"],
     desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose.",
+  },
+  // ── Nov 18: poses and senses (senses.js) ──
+  weakknees: {
+    label: "Weak Knees", icon: "🦵", mins: 20, color: "#c9a0dc", every: [6, 10],
+    words: /\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/,
+    keywords: ["weak knees", "jelly legs"], soak: ["weak knees"],
+    desc: "Down on your knees, and you can't get up on your own: somebody has to help you up (the game's own \"with help\"). Twenty minutes a dose.",
+  },
+  allfours: {
+    label: "Down Girl", icon: "🐾", mins: 20, color: "#a0785a", every: [6, 10],
+    words: /\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/,
+    keywords: ["down girl serum", "all fours tonic"], soak: ["all fours"],
+    desc: "Down on all fours, and you stay down there: gettin' up needs a hand. Twenty minutes a dose.",
+  },
+  blinder: {
+    label: "Blinder Drops", icon: "🕶️", mins: 15, color: "#3a3550", every: [6, 10],
+    words: /\b(blind(?:er|ing)? drops?|dim(?:ming)? drops?|darkness drops?)\b/,
+    keywords: ["blinder drops", "dimming drops"], soak: ["blinding"],
+    desc: "Your sight dims: the game's own blindness, darker with a stronger dose. Fifteen minutes a dose.",
+  },
+  cotton: {
+    label: "Cotton Ears", icon: "🦻", mins: 15, color: "#e8e2d0", every: [6, 10],
+    words: /\b(cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|muffl\w* drops?)\b/,
+    keywords: ["cotton ears", "deafening drops"], soak: ["deafening"],
+    desc: "Everything muffled: the game's own deafness, deafer with a stronger dose. Fifteen minutes a dose.",
+  },
+  tunnel: {
+    label: "Tunnel Vision", icon: "🔭", mins: 15, color: "#202030", every: [6, 10],
+    words: /\b(tunnel[- ]?vision(?: (?:drops?|serum|draught|tonic))?|blinker (?:drops?|serum))\b/,
+    keywords: ["tunnel vision", "blinker drops"], soak: ["tunnel vision"],
+    desc: "Only a small circle in the middle of your screen; the rest is dark. It's the dose itself, so the screen-touches switch doesn't take it away. Fifteen minutes a dose.",
+  },
+  haze: {
+    label: "Haze", icon: "🌫️", mins: 15, color: "#c8c0d8", every: [6, 10],
+    words: /\b(haze (?:drops?|serum|potion|mist|tonic)|hazy (?:drops?|serum|potion)|daze (?:drops?|serum))\b/,
+    keywords: ["haze drops", "haze mist"], soak: ["haze"],
+    desc: "Everything soft and blurry: the game's picture goes hazy (not the chat). Fifteen minutes a dose.",
   },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
@@ -275,6 +314,9 @@ export function end(id, why) {
 export function clearAll(why) {
   let n = 0; for (const id of Object.keys(st().doses)) if (end(id, why)) n++;
   if (st().later && st().later.length) { n += st().later.length; st().later = []; save(); }
+  // (Nov 18) parasites let go, and worn gear rests 15 minutes so it doesn't dose you straight back up (worn.js, parasites.js)
+  if (st().para && Object.keys(st().para).length) { n += Object.keys(st().para).length; st().para = {}; }
+  st().wornPause = Date.now() + 15 * MIN; save();
   return n;
 }
 
@@ -314,6 +356,7 @@ function setArousal(v) {
 const xOf = (id) => (st().doses[id] && st().doses[id].x) || 1;
 const felt = {};   // id → { face, next } (when its face was last set, when its next moment is)
 const FLUSHED = ["needy", "heat", "rut", "letdown"];
+export const xOfDose = (id) => (st().doses[id] && st().doses[id].x) || 1;
 // Let-Down: a leak, for the Companion to draw (milk on the chest, a little more for a stronger dose)
 const leak = () => tellPage({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
 function start(id) {
@@ -321,6 +364,7 @@ function start(id) {
   if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
   if (id === "airhead") face("Eyes", "Dazed", 120);
   if (id === "letdown") leak();
+  if (id === "weakknees" || id === "allfours") setTimeout(settle, 300);   // (down you go)
 }
 function stop(id) {
   if ((id === "sedative" && !active("airhead")) || (id === "airhead" && !active("sedative"))) face("Eyes", null);

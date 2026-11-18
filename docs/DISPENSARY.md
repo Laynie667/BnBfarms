@@ -106,10 +106,50 @@ and running timers follow you between your phone and your PC, and clearing the b
    - Your hello also tells her what's in you (`on`), and `?myshots` lists it.
 4. **Kits, tongues and poses:** saved outfit kits put on for real with timer locks (Jane's set among them), animal
    tongues for every species, kneel / all fours / can't stand.
-5. **Senses:** dim and blinder drops, cotton ears, tunnel vision, haze.
+   **Poses built Nov 18** (senses.js):
+   - **Weak Knees:** down on your knees, and standing needs somebody's help (the game's own "with help").
+   - **Down Girl:** on all fours, staying down the same way.
+   Kits and tongues are still to come.
+5. **Senses** (built Nov 18, senses.js):
+   - **Blinder Drops:** the game's own blindness, up to three levels.
+   - **Cotton Ears:** the game's own deafness, up to four.
+   - **Tunnel Vision:** only a circle in the middle of the screen. It's the dose itself, so it shows even with the
+     screen touches switched off.
+   - **Haze:** the game's picture blurred, not the chat.
 6. **The drawn body moves in:** growth shots off the farm.
-7. **Every way to dose:** drinks, worn injectors, piercings, drips, triggers, roulette, the dosing collar, lip gloss,
-   laced milk and feed.
+7. **Every way to dose** (built Nov 18, worn.js). Crafted gear you wear doses you when its words name a dose and say
+   how. Whoever crafted it (the game keeps their number on the item) has to be on your list. LSCG's own soaked and laced
+   gear stays LSCG's.
+   - **Drip, IV, laced, coated, soaked:** the dose stays in you while it's on (10 minutes' worth, topped up every couple
+     of minutes).
+   - **Injector, auto-inject, dosing, pump:** a dose every 30 minutes. "Every 10 minutes" on the item sets its own.
+   - **Triggers:** "on climax", "when kissed", "when touched" and "when spanked" each give a dose, at most every two
+     minutes.
+   - **Roulette or mystery dose:** a different one of the doses you allow, each time. Works on needles too.
+   - **Drinks and treats:** fed to you from somebody's hand (the game's Sip and Eat), read like a needle.
+   - **Lip gloss or lipstick** with a dose's words: it doses whoever its wearer kisses.
+   - **The safeword:** clears what's in you and rests your gear for 15 minutes.
+   Still to come: laced milk and feed (on the farm, through the farm girl).
+   **Crafted parasites** (built Nov 18, parasites.js). Each kind is off till you switch it on, on the page. One goes on in
+   a crafted item that names it, made by somebody on your list. The doses named on the item are its strain (the crafter's
+   DNA); with none named, Needy Nectar, Heat and Hair Trigger in turn.
+   - **Parasite lips:** 12 hours, even after the gear comes off. It feeds its strain every half hour, leaves you cravin',
+     and spreads by a kiss you give.
+   - **Livin' latex:** drinks every climax (Hair Trigger while fed). It stays up to three days if fed, and leaves after
+     six hours starved.
+   - **Milk moss:** keeps you leakin' (Let-Down) and feeds on it.
+   - **The nestling:** grows a stage every time you cum, and your belly fills out with it (Fill-Out, belly).
+   - **The brood mother:** lays a little one every 45 minutes, which your next kiss passes on.
+   - **The leash vine** (only while worn): no step more than three tiles from its crafter, on a map. It never stops you
+     leaving a room.
+   - **The mouthpiece** (only while worn): its crafter's words (`/dispensary mouth <who> <words>`) are shown to you
+     first. Say them with `/dispensary say`, or `nope`. A switch lets them straight through.
+   - **The safeword** takes every one off.
+   Messages: `dispPara { kind, strain, by, name }` (a kiss carrying one), `dispSay { text }`, `dispSaid { ok }`. Each is
+   only acted on if you switched that kind on and the sender's on your list.
+   **Dose icons** (built Nov 18, icons.js): a small row of icons by anybody in the room with doses in them, and 🪱 for a
+   parasite. Each Dispensary tells the room what's in its wearer (`dispIcons { ids, para }`, `dispIconsAsk`). There are
+   two switches, both on to start: show them, and let others see mine.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

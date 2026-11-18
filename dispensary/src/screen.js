@@ -29,6 +29,8 @@ function ensure() {
 const arousal = () => { const A = W.Player && W.Player.ArousalSettings; return A ? Number(A.Progress) || 0 : 0; };
 // which touch shows now (the strongest wins), or none
 export function screenNow() {
+  // Tunnel Vision is the dose itself, not a touch: it shows even with the touches switched off (Nov 18)
+  if (active("tunnel") && W.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
   if (st().screen === false || W.CurrentScreen !== "ChatRoom") return null;
   if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
   if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };

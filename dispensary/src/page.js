@@ -8,6 +8,8 @@ import { VERSION } from "./version.js";
 import { st, save } from "./store.js";
 import { BOOK, doseIds, active, leftMs, setClock, TENDER_SPOTS, TENDER_DEFAULT, TOLERANCE_HOURS, partOf } from "./doses.js";
 import { LATER_MAX, FUSE_MINS, CRAVE_AFTER, CRAVE_DAYS } from "./later.js";
+import { KINDS, kindIds, mine as paraIn, letGo } from "./parasites.js";
+import { DRIP_MINS, INJECT_EVERY, PAUSE_MINS } from "./worn.js";
 import { ladderWho } from "./ladder.js";
 import { lscgPresent, lscgApi } from "./lscg.js";
 import { safeword } from "./safeword.js";
@@ -185,6 +187,9 @@ function view() {
   kids.push(h("div", { class: "fd-card" },
     h("label", null, h("input", { type: "checkbox", checked: S.screen !== false ? true : undefined, onchange: (e) => { st().screen = e.target.checked; save(); draw(); } }), h("b", null, "Screen touches")),
     h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
+    h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", checked: S.iconsShow !== false ? true : undefined, onchange: (e) => { st().iconsShow = e.target.checked; save(); draw(); } }), h("b", null, "Dose icons by people")),
+    h("label", null, h("input", { type: "checkbox", checked: S.iconsShare !== false ? true : undefined, onchange: (e) => { st().iconsShare = e.target.checked; save(); draw(); } }), h("b", null, "Let others see mine")),
+    h("div", { class: "fd-muted" }, "A small row of icons by anybody with doses in them (each dose's own icon), the way the game shows a friend. Only people with the Dispensary see them, and only if they let them show."),
     h("div", { class: "fd-row", style: { marginTop: "8px" } },
       h("span", null, "Your animal, for Moo Juice:"),
       h("select", { "aria-label": "Your animal", onchange: (e) => { st().species = e.target.value; save(); draw(); } },
@@ -217,6 +222,27 @@ function view() {
     h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
     h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.cravings ? true : undefined, onchange: (e) => { st().cravings = e.target.checked ? Date.now() : 0; save(); draw(); } }), h("b", null, "Cravings")),
     h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")));
+  // gear that doses (Nov 18, worn.js)
+  kids.push(h("h3", null, "Gear, drinks and kisses"));
+  kids.push(h("div", { class: "fd-card fd-muted" },
+    h("div", null, "Crafted gear you wear doses you when its words say a dose and how:"),
+    h("div", null, "• drip, IV, laced, coated or soaked: keeps it in you while it's on (" + DRIP_MINS + " minutes' worth, topped up)"),
+    h("div", null, "• injector, auto-inject, dosing or pump: a dose every " + INJECT_EVERY + " minutes (\"every 10 minutes\" sets its own)"),
+    h("div", null, "• on climax, when kissed, when touched, when spanked: a dose each time"),
+    h("div", null, "• roulette or mystery dose: a different one of the doses you allow, each time"),
+    h("div", null, "• a drink or a treat somebody feeds you (Sip, Eat), and lip gloss or lipstick with a dose in it, on a kiss"),
+    h("div", { style: { marginTop: "4px" } }, "Whoever crafted it has to be on your list. Your safeword clears what's in you and rests your gear " + PAUSE_MINS + " minutes.")));
+  // crafted parasites (Nov 18, parasites.js): each kind yours to switch on
+  kids.push(h("h3", null, "Parasites"));
+  const inMe = paraIn();
+  kids.push(h("div", { class: "fd-card" },
+    h("div", { class: "fd-muted" }, "Crafted parasites, anywhere: put on you in a crafted item that names them, by somebody on your list. Each kind only takes if you switch it on. Your safeword takes them off."),
+    kindIds().map((k) => { const K = KINDS[k], p = inMe[k]; return h("label", { style: { marginTop: "4px" } },
+      h("input", { type: "checkbox", disabled: locked, checked: S.parasites && S.parasites[k] ? true : undefined, onchange: (e) => { const P = st().parasites || (st().parasites = {}); if (e.target.checked) P[k] = true; else { delete P[k]; letGo(k, "quiet"); } save(); draw(); } }),
+      h("span", null, K.icon + " " + K.label + (p ? " · in you" + (p.until ? ", " + timeLeft(Math.max(0, p.until - Date.now())) + " left" : "") + (p.name ? " (" + p.name + "'s)" : "") : ""))); }),
+    h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.mouthAuto ? true : undefined, onchange: (e) => { st().mouthAuto = e.target.checked; save(); draw(); } }),
+      h("span", null, "The mouthpiece's words go straight out, without askin' me first")),
+    h("div", { class: "fd-muted" }, "What each does: parasite lips feed you their crafter's strain and spread by a kiss; livin' latex drinks your climaxes; milk moss keeps you leakin'; the nestling grows your belly every time you cum; the brood mother lays little ones you pass on by a kiss; the leash vine keeps you near its crafter on a map; the mouthpiece lets its crafter put words in your mouth (/dispensary say, or nope).")));
   if (lscg) {
     kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi()
       ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left."

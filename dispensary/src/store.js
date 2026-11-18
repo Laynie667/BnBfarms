@@ -12,7 +12,10 @@ const listeners = [];
 // (Nov 17, more: tolerance and cravings are yours to switch on; taken is the record they read; later holds the
 // time-release capsules waitin' in you; tenderSpot is where Tender goes when the bottle doesn't say)
 const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true,
-  tolerance: false, cravings: 0, taken: {}, later: [], tenderSpot: "" });
+  tolerance: false, cravings: 0, taken: {}, later: [], tenderSpot: "",
+  // (Nov 18: crafted parasites, each kind off till you switch it on; what's in you; the mouthpiece lettin' words straight
+  // through; worn gear's pause after a safeword)
+  parasites: {}, para: {}, mouthAuto: false, wornPause: 0, iconsShow: true, iconsShare: true });
 const num = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
 // only what's expected, in range: what comes back from the server could be anything
@@ -43,6 +46,18 @@ export function clean(d) {
       if (l.length) s.taken[k] = l;
     }
   }
+  if (d.parasites && typeof d.parasites === "object") for (const [k, v] of Object.entries(d.parasites).slice(0, 20)) if (/^[a-z]{2,12}$/.test(k) && v === true) s.parasites[k] = true;
+  if (d.para && typeof d.para === "object") {
+    for (const [k, x] of Object.entries(d.para).slice(0, 10)) {
+      if (!/^[a-z]{2,12}$/.test(k) || !x || typeof x !== "object") continue;
+      s.para[k] = { by: Math.round(num(x.by, 0, 1e9, 0)), name: String(x.name || "").slice(0, 30), since: num(x.since, 0, 1e14, 0), until: num(x.until, 0, 1e14, 0),
+        strain: Array.isArray(x.strain) ? x.strain.filter((i) => typeof i === "string" && /^[a-z]{2,20}$/.test(i)).slice(0, 4) : [], fed: num(x.fed, 0, 1e14, 0),
+        stage: Math.round(num(x.stage, 0, 9, 0)), n: Math.round(num(x.n, 0, 1e6, 0)), eggs: Math.round(num(x.eggs, 0, 9, 0)), next: num(x.next, 0, 1e14, 0) };
+    }
+  }
+  s.mouthAuto = d.mouthAuto === true;
+  s.iconsShow = d.iconsShow !== false; s.iconsShare = d.iconsShare !== false;   // (dose icons: both on till you switch them off)
+  s.wornPause = num(d.wornPause, 0, 1e14, 0);
   if (Array.isArray(d.later)) {
     s.later = d.later.filter((c) => c && typeof c === "object" && /^[a-z]{2,20}$/.test(c.id)).slice(0, 5).map((c) => {
       const o = { id: c.id, x: Math.round(num(c.x, 1, 5, 1)), by: Math.round(num(c.by, 0, 1e9, 0)) };

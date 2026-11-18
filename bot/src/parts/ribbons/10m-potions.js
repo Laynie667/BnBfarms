@@ -90,21 +90,6 @@
       "%n sips a Clover Cream like it's dessert, licks the rim, and goes soft-eyed and warm all over.",
       "A bottle of Clover Cream goes down %n's throat, and they settle back like a cow in good grass, sleepy and full and leakin' a little already.",
       "%n tips up the Clover Cream, and the smell of sweet hay and cream drifts off 'em for a good minute after."],
-    golden: [
-      "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
-      "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
-      "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
-      "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."],
-    musk: [
-      "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
-      "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
-      "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
-      "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."],
-    honey: [
-      "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
-      "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
-      "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
-      "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."],
     brood: [
       "{v}%n drinks a Broodmare Tonic, and their pussy clenches on nothin' as it hits. They look ready for anybody.",
       "%n knocks back a Broodmare Tonic. Their belly gives a low, warm flutter, and their hips start rollin' all on their own.",
@@ -165,11 +150,6 @@
       "The Shrinking Violet takes hold, and %n looks down at somethin' that's suddenly a good deal smaller.",
       "%n swallows a Shrinking Violet and blushes. Smaller, tighter, and somehow more sensitive than ever.",
       "One cool sip of Shrinking Violet, and %n is a size or two less of somethin' important for an hour."],
-    echo: [
-      "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
-      "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
-      "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
-      "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."],
   };
   const potionDef = (id) => POTIONS.find(p => p.id === String(id || "").toLowerCase()) || null;
   function potionOn(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.until > Date.now()); }
@@ -269,21 +249,6 @@
   // ── what the bottles do while they last (every heartbeat) ──
   // (the potions The Farmhand's Dispensary can take over keep their lines in shared/potion-voice.js: put back in below)
   const FX_LINES = {
-    musk: [
-      "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
-      "A farmhand walks past %n, stops, and walks past again, slower this time.",
-      "%n catches somebody starin'. They don't even pretend they weren't.",
-      "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
-      "The farm girl leans close to %n and breathes in. \"Lord, sugar. You're gonna cause a stampede.\""
-    ],
-    honey: [
-      "\"Look at you, standin' so pretty for me. Best little animal on the property.\"",
-      "\"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em.\"",
-      "\"You know what you are? You're a good, good thing, and you look so sweet bein' kept.\"",
-      "\"I could watch you all day. Them hips, that face, the way you just take it. Perfect.\"",
-      "\"Such a soft, obedient creature. The farm's lucky to have you, and so am I.\"",
-      "\"Keep bein' this good and I'll make sure everybody hears about it.\""
-    ],
     bell: [
       "CLANG. CLANG. Everybody knows exactly where %n is goin'.",
       "%n tries to sneak, and the bell says CLANG anyway.",

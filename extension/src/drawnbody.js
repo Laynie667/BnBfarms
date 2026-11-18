@@ -74,6 +74,8 @@ function bellyAt(base, stage) {
 function eff() {
   const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
   if (S.cupSet) e.cup = S.cup; else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+  const gc = grownCup();
+  if (gc) e.cup = Math.max(0, Math.min(20, (Number(e.cup) || 12) + gc));
   const f = fillOut();
   if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
   const mode = bellyMode();
@@ -92,6 +94,12 @@ function fillOut() {
     return { p: d.p === "belly" || d.p === "ass" ? d.p : "cup", x: Math.max(1, Math.min(5, Math.round(Number(d.x) || 1))), half: Number(d.left) < FILL_EASE_MS };
   } catch (e) { return null; }
 }
+/* GROWTH OFF THE FARM (The Farmhand's Dispensary, Nov 18): Udder Growth taken anywhere but the farm stays, cup by cup,
+   in the Dispensary's own book (on the farm it's the farm girl's, in the farm's cup above). It goes on top of whatever
+   cup you'd have, yours or the farm's, and goes out with it like any cup, so every Companion draws it. */
+function grownCup() {
+  try { const D = W.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null; return g ? Math.round(Number(g.cup) || 0) : 0; } catch (e) { return 0; }
+}
 function cupWithFill(cup, f) { const add = Math.min(6, 2 * f.x); return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add / 2) : add)); }
 function bellyWithFill(stage, f) {
   if (f.half) return Math.min(4, Math.max(stage + 1, 1));
@@ -100,7 +108,7 @@ function bellyWithFill(stage, f) {
 let fillSig = "";
 // every few seconds (index.js), and when the Dispensary says Fill-Out started or ended: redraw if it changed
 export function drawnBodyFillCheck() {
-  const f = fillOut(), sig = f ? f.p + f.x + (f.half ? "h" : "") : "";
+  const f = fillOut(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + grownCup();   // (and growth off the farm)
   if (sig === fillSig) return false;
   fillSig = sig;
   if (!S.on) return false;

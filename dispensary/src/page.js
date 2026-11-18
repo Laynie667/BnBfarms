@@ -160,6 +160,7 @@ function view() {
   kids.push(h("h3", null, "In you now"));
   kids.push(h("div", { class: "fd-card" },
     now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " ×" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+    Object.values(S.grow || {}).some((v) => v) ? h("div", null, "📏 Grown (it stays): " + Object.entries(S.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
     S.later.length ? h("div", null, "💊 " + (S.later.length === 1 ? "A time-release capsule's" : S.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
     h("div", { class: "fd-row", style: { marginTop: "8px" } },
       locked

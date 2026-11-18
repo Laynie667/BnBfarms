@@ -88,5 +88,12 @@ const roomText=(from)=>sent.slice(from||0).filter(([e,d])=>e==='ChatRoomChat'&&d
   n=sent.length; handlers.ChatRoomMessage({Sender:700,Type:'Activity',Content:'ChatOther-ItemArms-Inject',Dictionary:[{SourceCharacter:700},{TargetCharacter:221397},{Tag:'FocusAssetGroup',FocusGroupName:'ItemArms'},{ActivityName:'Inject'}]}); await wait(900);
   const said3=sent.slice(n).map(([e,d])=>String(d&&(d.Content||d.Message)||'')).join(' | ');
   ok(/one of the Dispensary's doses/.test(said3), "...and on somebody without one, she says it needs the Dispensary ("+said3.slice(0,140)+")");
+  // (Nov 18) the newer ones too: a crafted voice potion, a sense
+  for (const nm of ['Echo Elixir Shot','Haze Serum']){
+    C(700).Appearance=[{Asset:{Name:'MedicalInjector',Group:{Name:'ItemHandheld'}},Craft:{Name:nm,Description:''}}];
+    n=sent.length; handlers.ChatRoomMessage({Sender:700,Type:'Activity',Content:'ChatOther-ItemArms-Inject',Dictionary:[{SourceCharacter:700},{TargetCharacter:600},{Tag:'FocusAssetGroup',FocusGroupName:'ItemArms'},{ActivityName:'Inject'}]}); await wait(900);
+    const s4=sent.slice(n).map(([e,d])=>String(d&&(d.Content||d.Message)||'')).join(' | ');
+    ok(!/couldn't read a farm word/.test(s4), "...and "+nm+" is the Dispensary's too: she stays out of it");
+  }
   out(fails ? fails+" FAILED" : "ALL PASSED"); process.exit(fails?1:0);
 })();

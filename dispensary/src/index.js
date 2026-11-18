@@ -9,7 +9,7 @@ import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
 import { load, st } from "./store.js";
-import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment } from "./doses.js";
+import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown } from "./doses.js";
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS } from "./parasites.js";
@@ -122,6 +122,8 @@ W.FarmhandDispensary = Object.freeze({
   dose: (id) => { const d = st().doses[String(id)]; return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null; },
   who: () => st().who,
   // hardcore, for the Companion (its own settings lock while yours is on)
+  // growth off the farm (Nov 18): { cup, ass, cock, balls } sizes up (or down) from your own. The Companion's drawn body reads it.
+  grow: () => grown(),
   // the crafted parasites in you (Nov 18): [{ kind, label, by, until }]
   parasites: () => Object.entries(paraMine()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
   hard: () => (hardOn() ? { on: true, until: (st().hard && st().hard.until) || 0, due: dueAt() } : null),

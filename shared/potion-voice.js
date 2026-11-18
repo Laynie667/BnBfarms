@@ -110,4 +110,59 @@ export const POTION_VOICE = {
       "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you.",
     ],
   },
+  // ── Nov 18: the four the farm girl says to you herself, moved here so the Dispensary can say them off the farm ──
+  honey: {
+    seen: [
+      "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
+      "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
+      "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
+      "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."],
+    now: [
+      "\"Look at you, standin' so pretty for me. Best little animal on the property.\"",
+      "\"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em.\"",
+      "\"You know what you are? You're a good, good thing, and you look so sweet bein' kept.\"",
+      "\"I could watch you all day. Them hips, that face, the way you just take it. Perfect.\"",
+      "\"Such a soft, obedient creature. The farm's lucky to have you, and so am I.\"",
+      "\"Keep bein' this good and I'll make sure everybody hears about it.\""
+    ],
+    off: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."],
+  },
+  golden: {
+    seen: [
+      "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
+      "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
+      "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
+      "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."],
+    now: [
+      "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
+      "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
+      "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
+      "There's a honey-slow heat pooled low in %n, and every touch stirs it.",
+    ],
+    off: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"],
+  },
+  musk: {
+    seen: [
+      "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
+      "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
+      "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
+      "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."],
+    now: [
+      "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
+      "A farmhand walks past %n, stops, and walks past again, slower this time.",
+      "%n catches somebody starin'. They don't even pretend they weren't.",
+      "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
+      "The farm girl leans close to %n and breathes in. \"Lord, sugar. You're gonna cause a stampede.\""
+    ],
+    off: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."],
+  },
+  echo: {
+    seen: [
+      "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
+      "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
+      "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
+      "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."],
+    now: [],
+    off: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
+  },
 };

@@ -11,6 +11,8 @@ import { mooify } from "../../shared/noises.js";
 import { st } from "./store.js";
 import { active } from "./doses.js";
 import { airhead, babble } from "./speech-more.js";
+import { LINES } from "./lines.js";
+import { action, myName } from "./say.js";
 
 const xOf = (id) => (st().doses[id] && st().doses[id].x) || 1;
 const GIGGLES = ["hehe", "*giggle*", "hee", "*snrk*", "ahaha", "*giggles*"];
@@ -35,6 +37,19 @@ export function dosedSpeech(text) {
 }
 const touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
 
+// the ECHO ELIXIR (the Dispensary's; one bought at the farm girl's store she does herself): twice a dose, at least three minutes apart, half
+// the time, somethin' you said comes back to the room
+let echoN = 0, echoAt = 0, echoSince = 0;
+export function echoHeard(text, now) {
+  const d = st().doses.echo; if (!active("echo") || !d) return false;
+  if (d.at !== echoSince) { echoSince = d.at; echoN = 0; echoAt = 0; }
+  const t = String(text).trim(); now = now || Date.now();
+  if (echoN >= 2 || now - echoAt < 180000 || t.length < 4 || t.length > 140 || /^[?!.\-\/(*]/.test(t) || Math.random() < 0.5) return false;
+  echoN++; echoAt = now;
+  const line = LINES.echo[Math.floor(Math.random() * LINES.echo.length)].replace(/%t/g, myName()).replace(/%s/g, t.replace(/[()'"]/g, ""));
+  setTimeout(() => action(line), 2500);
+  return true;
+}
 export function initSpeech(mod) {
   try {
     mod.hookFunction("ServerSend", 6, (args, next) => {
@@ -42,6 +57,7 @@ export function initSpeech(mod) {
         const d = args[1];
         if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && touched() && !/^\s*[(\[?!./\-*]/.test(d.Content))
           args = [args[0], Object.assign({}, d, { Content: dosedSpeech(d.Content) })];
+        if (args[0] === "ChatRoomChat" && args[1] && args[1].Type === "Chat" && typeof args[1].Content === "string") echoHeard(args[1].Content);
       } catch (e) { console.warn("[Dispensary] speech:", e); }
       return next(args);
     });

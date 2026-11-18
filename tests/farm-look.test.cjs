@@ -77,6 +77,16 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
     t2 = mine(n, "body").pop();
     ok(t2 && t2.Dictionary.cup === 16 && t2.Dictionary.bs === 0, "emptied out: the belly goes");
+    // Nov 18: Udder Growth taken off the farm (The Farmhand's Dispensary keeps it) goes on top of the farm's cup
+    w.FarmhandDispensary = { grow: () => ({ cup: 3, ass: 0, cock: 0, balls: 0 }), dose: () => null };
+    n = sent.length; w.dispatchEvent(new w.CustomEvent("farmhand-dispensary", { detail: { type: "grow", part: "cup", n: 3 } })); await wait(300);
+    t2 = mine(n, "body").pop();
+    ok(t2 && t2.Dictionary.cup === 19, "growth off the farm: three cups on top of the farm's, and the room's told (" + JSON.stringify(t2 && t2.Dictionary) + ")");
+    w.FarmhandDispensary = { grow: () => ({ cup: 0, ass: 0, cock: 0, balls: 0 }), dose: () => null };
+    n = sent.length; w.dispatchEvent(new w.CustomEvent("farmhand-dispensary", { detail: { type: "grow", part: "cup", n: 0 } })); await wait(300);
+    t2 = mine(n, "body").pop();
+    ok(t2 && t2.Dictionary.cup === 16, "...and reduced back off again");
+    delete w.FarmhandDispensary;
     n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
     ok(!mine(n, "body").length, "the same size again: nothing new said");
     n = sent.length; bot({ type: "bodyFarm", at: 3333, body: { cup: 3 } }); await wait(300);

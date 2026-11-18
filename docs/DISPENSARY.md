@@ -116,7 +116,24 @@ and running timers follow you between your phone and your PC, and clearing the b
    - **Tunnel Vision:** only a circle in the middle of the screen. It's the dose itself, so it shows even with the
      screen touches switched off.
    - **Haze:** the game's picture blurred, not the chat.
-6. **The drawn body moves in:** growth shots off the farm.
+6. **The drawn body moves in:** growth shots off the farm (built Nov 18, doses.js).
+   - **Udder Growth, Ass Growth, Cock Growth, Balls Growth:** a size up for every dose, and it stays. The farm's own
+     words work too (Breast Enlarger, Ball Enlarger...).
+   - **Reducers:** Udder Reducer, Cock Reducer and the like take a size back off what they name. A plain Reducing Serum
+     takes it off the tits. "Shrinking" is left to LSCG, whose shrink potion makes all of you smaller.
+   - **Limits:** 10 cups up and 6 down; 6 up and 3 down for the rest.
+   - On the farm with the farm girl in the room, growth is hers, on her own books. Anywhere else the Dispensary keeps
+     it, and the Purge doesn't undo it.
+   - The cup goes on top of whatever cup the Companion draws, yours or the farm's, and goes round the room with it. The
+     rest is counted for now and drawn once the drawn cock and hips are in.
+   **The farm girl's four voice potions** (built Nov 18): Honey Tongue, Golden Hour, Blue Ribbon Musk and Echo Elixir,
+   from a crafted bottle, anywhere (on the farm too). Bought at her store, they're still hers.
+   - **Honey Tongue:** her praise in your ear every few minutes, for 45 minutes. Only you hear it.
+   - **Golden Hour:** an hour of her dotin' on you every time you cum. Only her store's earns ribbons.
+   - **Blue Ribbon Musk:** for 45 minutes the room hears about you now and then.
+   - **Echo Elixir:** twice in 20 minutes (at least three apart, half the time), somethin' you said is said back to the
+     room. Never OOC or commands.
+   - Her lines for these four now live in shared/potion-voice.js, so the farm and the Dispensary say the same.
 7. **Every way to dose** (built Nov 18, worn.js). Crafted gear you wear doses you when its words name a dose and say
    how. Whoever crafted it (the game keeps their number on the item) has to be on your list. LSCG's own soaked and laced
    gear stays LSCG's.

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.57.1
+// @version      0.58.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7676,7 +7676,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.57.1";
+  var VERSION = "0.58.0";
 
   // shared/species.js
   var WORDS = {
@@ -11813,6 +11813,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const base = S2.saved || !farm ? S2 : farm.body, e = Object.assign({}, base, { on: S2.on });
     if (S2.cupSet) e.cup = S2.cup;
     else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+    const gc = grownCup();
+    if (gc) e.cup = Math.max(0, Math.min(20, (Number(e.cup) || 12) + gc));
     const f = fillOut();
     if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
     const mode = bellyMode();
@@ -11829,6 +11831,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return null;
     }
   }
+  function grownCup() {
+    try {
+      const D = W5.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null;
+      return g ? Math.round(Number(g.cup) || 0) : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
   function cupWithFill(cup, f) {
     const add3 = Math.min(6, 2 * f.x);
     return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add3 / 2) : add3));
@@ -11839,7 +11849,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   var fillSig = "";
   function drawnBodyFillCheck() {
-    const f = fillOut(), sig2 = f ? f.p + f.x + (f.half ? "h" : "") : "";
+    const f = fillOut(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + grownCup();
     if (sig2 === fillSig) return false;
     fillSig = sig2;
     if (!S2.on) return false;
@@ -20917,7 +20927,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!d || typeof d !== "object") return;
       try {
         if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
-        if (d.type === "dose" && d.id === "fillout") drawnBodyFillCheck();
+        if (d.type === "dose" && d.id === "fillout" || d.type === "grow") drawnBodyFillCheck();
       } catch (err) {
         console.warn("[Farmhand Companion] the Dispensary's doses:", err);
       }

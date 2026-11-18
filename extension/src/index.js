@@ -572,7 +572,7 @@ function start() {
     const d = e && e.detail; if (!d || typeof d !== "object") return;
     try {
       if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
-      if (d.type === "dose" && d.id === "fillout") drawnBodyFillCheck();
+      if ((d.type === "dose" && d.id === "fillout") || d.type === "grow") drawnBodyFillCheck();   // (Fill-Out, and growth off the farm)
     } catch (err) { console.warn("[Farmhand Companion] the Dispensary's doses:", err); }
   });
 

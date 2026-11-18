@@ -13,12 +13,6 @@
       "%n sways, dreamy and heavy, every let-down a warm little rush that makes their knees soft.",
       "You can hear it: a faint wet patter in the straw under %n where the Clover's makin' 'em overflow.",
     ],
-    golden: [
-      "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
-      "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
-      "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
-      "There's a honey-slow heat pooled low in %n, and every touch stirs it.",
-    ],
     heavy: [
       "%n's udder is swollen tight as a drum, shiny and hot, and the stalls just turn 'em away.",
       "%n whimpers and cups their breasts. They're so full it hurts to breathe, and nobody's allowed to empty 'em.",
@@ -54,15 +48,11 @@
   // how each one wears off (to them, privately)
   const FX_OFF = {
     clover: ["The Clover Cream fades. Your breasts are still heavy, but the rush is gone. You'll miss it.", "The sweet clover warmth drains out of your chest. Back to fillin' at the usual pace, sugar."],
-    golden: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"],
-    musk: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."],
-    honey: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."],
     heavy: ["The Heavy Udder Draught wears off, but you're still achin' and full. The stalls'll take you now. Run.", "The draught's done. Your udder isn't. Go get milked, cow, before you burst."],
     bell: ["The cowbell clangs one last time and falls quiet. Sneak all you like now."],
     wrongbarn: ["You blink, and you're yourself again. Mostly. You still want to %a a little."],
     bigbritches: ["Your %p eases back to its own size. You'll miss the weight."],
     shrink: ["Your %p comes back to its proper size. What a relief."],
-    echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
     brood: ["The Broodmare Tonic fades. Whatever got put in you while it lasted, though, stays put."],
   };
   for (const [id, v] of Object.entries(POTION_VOICE)) if (v.off.length) FX_OFF[id] = v.off;   // (shared/potion-voice.js)

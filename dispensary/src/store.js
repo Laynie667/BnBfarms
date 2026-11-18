@@ -15,7 +15,7 @@ const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALT
   tolerance: false, cravings: 0, taken: {}, later: [], tenderSpot: "",
   // (Nov 18: crafted parasites, each kind off till you switch it on; what's in you; the mouthpiece lettin' words straight
   // through; worn gear's pause after a safeword)
-  parasites: {}, para: {}, mouthAuto: false, wornPause: 0, iconsShow: true, iconsShare: true });
+  parasites: {}, para: {}, mouthAuto: false, wornPause: 0, iconsShow: true, iconsShare: true, grow: {} });
 const num = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
 // only what's expected, in range: what comes back from the server could be anything
@@ -55,6 +55,7 @@ export function clean(d) {
         stage: Math.round(num(x.stage, 0, 9, 0)), n: Math.round(num(x.n, 0, 1e6, 0)), eggs: Math.round(num(x.eggs, 0, 9, 0)), next: num(x.next, 0, 1e14, 0) };
     }
   }
+  if (d.grow && typeof d.grow === "object") for (const k of ["cup", "ass", "cock", "balls"]) { const v = num(d.grow[k], -10, 10, 0); if (v) s.grow[k] = Math.round(v); }   // (growth off the farm)
   s.mouthAuto = d.mouthAuto === true;
   s.iconsShow = d.iconsShow !== false; s.iconsShare = d.iconsShare !== false;   // (dose icons: both on till you switch them off)
   s.wornPause = num(d.wornPause, 0, 1e14, 0);

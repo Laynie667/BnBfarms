@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.74.0
+// @version      0.75.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2863,6 +2863,65 @@
         "The Bitterroot loosens its grip, slow and grudgin'. You can cum again, if you can still remember how.",
         "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you."
       ]
+    },
+    // ── Nov 18: the four the farm girl says to you herself, moved here so the Dispensary can say them off the farm ──
+    honey: {
+      seen: [
+        "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
+        "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
+        "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
+        "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."
+      ],
+      now: [
+        `"Look at you, standin' so pretty for me. Best little animal on the property."`,
+        `"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em."`,
+        `"You know what you are? You're a good, good thing, and you look so sweet bein' kept."`,
+        '"I could watch you all day. Them hips, that face, the way you just take it. Perfect."',
+        `"Such a soft, obedient creature. The farm's lucky to have you, and so am I."`,
+        `"Keep bein' this good and I'll make sure everybody hears about it."`
+      ],
+      off: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."]
+    },
+    golden: {
+      seen: [
+        "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
+        "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
+        "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
+        "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."
+      ],
+      now: [
+        "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
+        "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
+        "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
+        "There's a honey-slow heat pooled low in %n, and every touch stirs it."
+      ],
+      off: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"]
+    },
+    musk: {
+      seen: [
+        "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
+        "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
+        "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
+        "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."
+      ],
+      now: [
+        "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
+        "A farmhand walks past %n, stops, and walks past again, slower this time.",
+        "%n catches somebody starin'. They don't even pretend they weren't.",
+        "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
+        `The farm girl leans close to %n and breathes in. "Lord, sugar. You're gonna cause a stampede."`
+      ],
+      off: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."]
+    },
+    echo: {
+      seen: [
+        "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
+        "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
+        "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
+        "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."
+      ],
+      now: [],
+      off: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."]
     }
   };
 
@@ -2901,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.74.0";
-  var COMPANION_VERSION = "0.57.1";
+  var VERSION = "0.75.0";
+  var COMPANION_VERSION = "0.58.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -12563,24 +12622,6 @@
         "A bottle of Clover Cream goes down %n's throat, and they settle back like a cow in good grass, sleepy and full and leakin' a little already.",
         "%n tips up the Clover Cream, and the smell of sweet hay and cream drifts off 'em for a good minute after."
       ],
-      golden: [
-        "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
-        "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
-        "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
-        "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."
-      ],
-      musk: [
-        "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
-        "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
-        "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
-        "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."
-      ],
-      honey: [
-        "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
-        "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
-        "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
-        "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."
-      ],
       brood: [
         "{v}%n drinks a Broodmare Tonic, and their pussy clenches on nothin' as it hits. They look ready for anybody.",
         "%n knocks back a Broodmare Tonic. Their belly gives a low, warm flutter, and their hips start rollin' all on their own.",
@@ -12652,12 +12693,6 @@
         "The Shrinking Violet takes hold, and %n looks down at somethin' that's suddenly a good deal smaller.",
         "%n swallows a Shrinking Violet and blushes. Smaller, tighter, and somehow more sensitive than ever.",
         "One cool sip of Shrinking Violet, and %n is a size or two less of somethin' important for an hour."
-      ],
-      echo: [
-        "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
-        "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
-        "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
-        "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."
       ]
     };
     const potionDef = (id) => POTIONS.find((p) => p.id === String(id || "").toLowerCase()) || null;
@@ -12801,21 +12836,6 @@
       for (const id of Object.keys(r.fx)) endPotion(mn, id, true);
     }
     const FX_LINES = {
-      musk: [
-        "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
-        "A farmhand walks past %n, stops, and walks past again, slower this time.",
-        "%n catches somebody starin'. They don't even pretend they weren't.",
-        "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
-        `The farm girl leans close to %n and breathes in. "Lord, sugar. You're gonna cause a stampede."`
-      ],
-      honey: [
-        `"Look at you, standin' so pretty for me. Best little animal on the property."`,
-        `"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em."`,
-        `"You know what you are? You're a good, good thing, and you look so sweet bein' kept."`,
-        '"I could watch you all day. Them hips, that face, the way you just take it. Perfect."',
-        `"Such a soft, obedient creature. The farm's lucky to have you, and so am I."`,
-        `"Keep bein' this good and I'll make sure everybody hears about it."`
-      ],
       bell: [
         "CLANG. CLANG. Everybody knows exactly where %n is goin'.",
         "%n tries to sneak, and the bell says CLANG anyway.",
@@ -13177,12 +13197,6 @@
         "%n sways, dreamy and heavy, every let-down a warm little rush that makes their knees soft.",
         "You can hear it: a faint wet patter in the straw under %n where the Clover's makin' 'em overflow."
       ],
-      golden: [
-        "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
-        "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
-        "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
-        "There's a honey-slow heat pooled low in %n, and every touch stirs it."
-      ],
       heavy: [
         "%n's udder is swollen tight as a drum, shiny and hot, and the stalls just turn 'em away.",
         "%n whimpers and cups their breasts. They're so full it hurts to breathe, and nobody's allowed to empty 'em.",
@@ -13217,15 +13231,11 @@
     Object.assign(FX_LINES, Object.fromEntries(Object.entries(FX_MORE).map(([k, v]) => [k, (FX_LINES[k] || []).concat(v)])));
     const FX_OFF = {
       clover: ["The Clover Cream fades. Your breasts are still heavy, but the rush is gone. You'll miss it.", "The sweet clover warmth drains out of your chest. Back to fillin' at the usual pace, sugar."],
-      golden: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"],
-      musk: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."],
-      honey: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."],
       heavy: ["The Heavy Udder Draught wears off, but you're still achin' and full. The stalls'll take you now. Run.", "The draught's done. Your udder isn't. Go get milked, cow, before you burst."],
       bell: ["The cowbell clangs one last time and falls quiet. Sneak all you like now."],
       wrongbarn: ["You blink, and you're yourself again. Mostly. You still want to %a a little."],
       bigbritches: ["Your %p eases back to its own size. You'll miss the weight."],
       shrink: ["Your %p comes back to its proper size. What a relief."],
-      echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
       brood: ["The Broodmare Tonic fades. Whatever got put in you while it lasted, though, stays put."]
     };
     for (const [id, v] of Object.entries(POTION_VOICE)) if (v.off.length) FX_OFF[id] = v.off;
@@ -25839,9 +25849,20 @@
       babble: "Babble Brew",
       deepthroat: "Deep Throat Drops",
       rut: "Rut",
-      tender: "Tender"
+      tender: "Tender",
+      // (Nov 18) the poses and senses, and my own four voice potions from a crafted bottle (bought at my store, they're mine)
+      weakknees: "Weak Knees",
+      allfours: "Down Girl",
+      blinder: "Blinder Drops",
+      cotton: "Cotton Ears",
+      tunnel: "Tunnel Vision",
+      haze: "Haze",
+      honey: "Honey Tongue",
+      golden: "Golden Hour",
+      musk: "Blue Ribbon Musk",
+      echo: "Echo Elixir"
     };
-    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er/i;
+    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir/i;
     const CRAVE_OFFER_MS = 45 * 6e4;
     const CRAVE_OFFERS = [
       "\u{1F489} You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

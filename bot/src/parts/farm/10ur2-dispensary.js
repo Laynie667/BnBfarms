@@ -31,9 +31,12 @@
      for it, like any of my calls. Only ever for somebody who switched cravings on, for themselves. */
   const DISP_LABEL = { denial: "Denial Serum", sedative: "Sedative", needy: "Needy Nectar", hairtrigger: "Hair Trigger", bitterroot: "Bitterroot",
     moo: "Moo Juice", hiccup: "Hiccup Fizz", feather: "Featherlight", heat: "Heat", letdown: "Let-Down", fillout: "Fill-Out",
-    airhead: "Airhead Elixir", babble: "Babble Brew", deepthroat: "Deep Throat Drops", rut: "Rut", tender: "Tender" };
+    airhead: "Airhead Elixir", babble: "Babble Brew", deepthroat: "Deep Throat Drops", rut: "Rut", tender: "Tender",
+    // (Nov 18) the poses and senses, and my own four voice potions from a crafted bottle (bought at my store, they're mine)
+    weakknees: "Weak Knees", allfours: "Down Girl", blinder: "Blinder Drops", cotton: "Cotton Ears", tunnel: "Tunnel Vision", haze: "Haze",
+    honey: "Honey Tongue", golden: "Golden Hour", musk: "Blue Ribbon Musk", echo: "Echo Elixir" };
   // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me)
-  const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er/i;
+  const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir/i;
   const CRAVE_OFFER_MS = 45 * 60000;
   const CRAVE_OFFERS = [
     "💉 You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

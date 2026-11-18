@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.5.0
+// @version      0.6.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7661,7 +7661,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.5.0";
+  var VERSION = "0.6.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -7715,7 +7715,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     mouthAuto: false,
     wornPause: 0,
     iconsShow: true,
-    iconsShare: true
+    iconsShare: true,
+    grow: {}
   });
   var num = (v, lo, hi, d) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
   function clean(d) {
@@ -7766,6 +7767,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           next: num(x.next, 0, 1e14, 0)
         };
       }
+    }
+    if (d.grow && typeof d.grow === "object") for (const k of ["cup", "ass", "cock", "balls"]) {
+      const v = num(d.grow[k], -10, 10, 0);
+      if (v) s.grow[k] = Math.round(v);
     }
     s.mouthAuto = d.mouthAuto === true;
     s.iconsShow = d.iconsShow !== false;
@@ -7931,6 +7936,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     notListed: "%b tried to give you %d, but they're not on your list, so nothin' happened.",
     switchedOff: "%d came your way, but you've switched it off, so nothin' happened.",
     safeword: "Safeword: every dose in you is lifted. You're clear.",
+    growMax: "%d can't take you any further that way.",
     lscgOff: "%d came your way, but it's switched off in LSCG's Drug Enhancements, so LSCG let it pass. Switch it on there if you want it."
   };
 
@@ -8159,6 +8165,39 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ]
     }
   });
+  LINES.goldenDote = [
+    `\u2728 The farm girl's voice, warm in your ear while you come down: "There it is. That's my good thing. Look how pretty you are when you let go."`,
+    '\u2728 "Oh, listen to you. Every one of those is golden, sugar. Every last one."',
+    `\u2728 "Good. So good. You've earned every bit of that glow."`
+  ];
+  LINES.echo = [
+    `\u{1F5E3}\uFE0F A sweet voice puts a hand to its heart: "Did y'all hear that? %t just said, and I quote: '%s'. Ain't that just the sweetest thing."`,
+    `\u{1F5E3}\uFE0F Somebody sighs, fond as anything: "'%s'. That's what %t said. Precious."`,
+    `\u{1F5E3}\uFE0F The room hears it again, sweeter this time: "%t said '%s', and I think we should all remember it."`
+  ];
+  LINES.grow = {
+    cup: [
+      "%t gasps as their chest swells. A whole cup bigger, heavy and warm, and it isn't goin' anywhere.",
+      "The growth serum floods %t's tits. They round out, fill out, settle heavier, and stay that way.",
+      "%t's top goes tight as their breasts grow a size. They'll need new clothes."
+    ],
+    ass: [
+      "%t's hips widen and their ass plumps up a size, round and soft, for good.",
+      "The serum goes straight to %t's rear. It swells, jiggles, and stays bigger."
+    ],
+    cock: [
+      "%t groans as their cock grows a size, thicker and longer, and stays that way.",
+      "Heat pours into %t's cock. It swells a size bigger, and it's keepin' it."
+    ],
+    balls: [
+      "%t's balls swell a size, heavy and full, and they stay that way.",
+      "The serum drops straight into %t's balls. Bigger, heavier, achin' to be emptied."
+    ],
+    less: [
+      "%t's %p shrinks back a size, a little tender for the trip.",
+      "A cool tingle, and %t's %p settles a size smaller."
+    ]
+  };
   var TOLERANCE_NOTE = "Your body's gettin' used to %d: this one only takes %p% as long.";
 
   // dispensary/src/lines-senses.js
@@ -8399,6 +8438,65 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "The Bitterroot loosens its grip, slow and grudgin'. You can cum again, if you can still remember how.",
         "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you."
       ]
+    },
+    // ── Nov 18: the four the farm girl says to you herself, moved here so the Dispensary can say them off the farm ──
+    honey: {
+      seen: [
+        "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
+        "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
+        "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
+        "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."
+      ],
+      now: [
+        `"Look at you, standin' so pretty for me. Best little animal on the property."`,
+        `"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em."`,
+        `"You know what you are? You're a good, good thing, and you look so sweet bein' kept."`,
+        '"I could watch you all day. Them hips, that face, the way you just take it. Perfect."',
+        `"Such a soft, obedient creature. The farm's lucky to have you, and so am I."`,
+        `"Keep bein' this good and I'll make sure everybody hears about it."`
+      ],
+      off: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."]
+    },
+    golden: {
+      seen: [
+        "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
+        "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
+        "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
+        "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."
+      ],
+      now: [
+        "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
+        "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
+        "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
+        "There's a honey-slow heat pooled low in %n, and every touch stirs it."
+      ],
+      off: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"]
+    },
+    musk: {
+      seen: [
+        "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
+        "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
+        "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
+        "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."
+      ],
+      now: [
+        "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
+        "A farmhand walks past %n, stops, and walks past again, slower this time.",
+        "%n catches somebody starin'. They don't even pretend they weren't.",
+        "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
+        `The farm girl leans close to %n and breathes in. "Lord, sugar. You're gonna cause a stampede."`
+      ],
+      off: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."]
+    },
+    echo: {
+      seen: [
+        "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
+        "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
+        "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
+        "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."
+      ],
+      now: [],
+      off: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."]
     }
   };
 
@@ -9740,6 +9838,125 @@ One of mods you are using is using an old version of SDK. It will work for now b
       soak: ["tender"],
       desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose."
     },
+    // ── Nov 18: the farm girl's four voice potions, anywhere, from a crafted needle, drink or gear (her lines:
+    // shared/potion-voice.js). Bought at her store on the farm, they're hers as ever: she says them herself (and Golden
+    // Hour earns ribbons there) ──
+    honey: {
+      label: "Honey Tongue",
+      icon: "\u{1F36F}",
+      mins: 45,
+      color: "#e8b04a",
+      farm: false,
+      voice: "honey",
+      every: [5, 9],
+      words: /\bhoney[- ]tongue\b/,
+      keywords: ["honey tongue"],
+      soak: ["honey tongue"],
+      desc: "Forty-five minutes of the farm girl's sweet, filthy praise in your ear, every few minutes. Only you hear it."
+    },
+    golden: {
+      label: "Golden Hour",
+      icon: "\u2728",
+      mins: 60,
+      color: "#f0c040",
+      farm: false,
+      voice: "golden",
+      every: [5, 8],
+      words: /\bgolden[- ]hour\b/,
+      keywords: ["golden hour"],
+      soak: ["golden"],
+      desc: "An hour of glowin' easy, and every time you cum you're doted on for it. On the farm it earns ribbons too."
+    },
+    musk: {
+      label: "Blue Ribbon Musk",
+      icon: "\u{1F490}",
+      mins: 45,
+      color: "#5a7fd0",
+      farm: false,
+      voice: "musk",
+      every: [5, 9],
+      room: true,
+      words: /\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/,
+      keywords: ["blue ribbon musk"],
+      soak: ["musk"],
+      desc: "For 45 minutes everybody nearby keeps noticin' you, and the room hears about it now and then."
+    },
+    echo: {
+      label: "Echo Elixir",
+      icon: "\u{1F5E3}\uFE0F",
+      mins: 20,
+      color: "#a0d0e0",
+      farm: false,
+      voice: "echo",
+      words: /\becho[- ]elixir\b/,
+      keywords: ["echo elixir"],
+      soak: ["echo"],
+      desc: "Twice in twenty minutes, somethin' you said is repeated back to the room. Sweetly."
+    },
+    // ── Nov 18: GROWTH OFF THE FARM (Laynie: "seems good"). The farm's own growth shots, anywhere: on the farm with
+    // the farm girl in the room they're hers (her books); anywhere else your Dispensary keeps the size, and it stays.
+    // Your cup shows on the Companion's drawn breasts; the rest is counted till they're drawn too. ──
+    growcup: {
+      label: "Udder Growth",
+      icon: "\u{1F348}",
+      mins: 0,
+      color: "#f2b6c6",
+      farm: true,
+      instant: true,
+      grow: "cup",
+      words: /\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/,
+      keywords: ["udder growth", "breast growth"],
+      desc: "A cup bigger for every dose, and it stays. Your Companion's drawn breasts show it. A reducing serum takes one back off."
+    },
+    growass: {
+      label: "Ass Growth",
+      icon: "\u{1F351}",
+      mins: 0,
+      color: "#f0a080",
+      farm: true,
+      instant: true,
+      grow: "ass",
+      words: /\b(ass|butt|booty|hips?) (growth|enlarger)\b/,
+      keywords: ["ass growth"],
+      desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips)."
+    },
+    growcock: {
+      label: "Cock Growth",
+      icon: "\u{1F346}",
+      mins: 0,
+      color: "#c07090",
+      farm: true,
+      instant: true,
+      grow: "cock",
+      words: /\b(cock|penis|dick|shaft) (growth|enlarger)\b/,
+      keywords: ["cock growth"],
+      desc: "A size longer for every dose, and it stays (counted now; drawn with the drawn cock)."
+    },
+    growballs: {
+      label: "Balls Growth",
+      icon: "\u{1F95A}",
+      mins: 0,
+      color: "#d8a0b0",
+      farm: true,
+      instant: true,
+      grow: "balls",
+      words: /\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/,
+      keywords: ["balls growth"],
+      desc: "A size heavier for every dose, and it stays (counted now; drawn with the drawn cock)."
+    },
+    reducing: {
+      label: "Reducing Serum",
+      icon: "\u{1F53B}",
+      mins: 0,
+      color: "#90a0c0",
+      farm: true,
+      instant: true,
+      grow: "less",
+      words: /\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/,
+      // (not "shrinking": that's LSCG's, and it shrinks all of you)
+      keywords: ["reducing serum"],
+      desc: "Takes a size back off whatever the bottle names (Udder Reducer, Cock Reducer, Reducing Serum (ass)...; tits if it doesn't say)."
+    },
     // ── Nov 18: poses and senses (senses.js) ──
     weakknees: {
       label: "Weak Knees",
@@ -9843,6 +10060,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function partFor(id, text3) {
     const t = String(text3 || "").toLowerCase();
     if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+    if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
     if (id === "tender") {
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
       return "";
@@ -9916,7 +10134,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const B = BOOK[id], S2 = st();
     if (!B) return { ok: false, why: "unknown" };
     if (S2.off[id]) return { ok: false, why: "off" };
-    if (B.instant) return purge(o);
+    if (B.instant) return B.grow ? grow(id, o) : purge(o);
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
@@ -9945,6 +10163,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return { ok: true };
   }
+  var GROW_LIMITS = { cup: [-6, 10], ass: [-3, 6], cock: [-3, 6], balls: [-3, 6] };
+  function grow(id, o) {
+    const B = BOOK[id], S2 = st(), g = S2.grow || (S2.grow = {}), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
+    const part = B.grow === "less" ? o.p && GROW_LIMITS[o.p] ? o.p : "cup" : B.grow, sign = B.grow === "less" ? -1 : 1;
+    const [lo, hi] = GROW_LIMITS[part], was = g[part] || 0, now = Math.max(lo, Math.min(hi, was + sign * x));
+    if (now === was) {
+      if (!o.quiet) local(fill(NOTES.growMax, { dose: B.label }));
+      return { ok: false, why: "max" };
+    }
+    g[part] = now;
+    save();
+    if (!o.quiet) action(o.line || fill(pick(LINES.grow[sign > 0 ? part : "less"])).replace(/%p/g, { cup: "tits", ass: "ass", cock: "cock", balls: "balls" }[part]));
+    tellPage({ type: "grow", part, n: now });
+    return { ok: true, part, n: now };
+  }
+  var grown = () => Object.assign({ cup: 0, ass: 0, cock: 0, balls: 0 }, st().grow || {});
   function purge(o) {
     const n = clearAll("purge");
     let lscg = false;
@@ -10104,7 +10338,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const l = nowLine(id);
       if (l) {
         if (B.room) action(l);
-        else local(l);
+        else local(id === "honey" ? "\u{1F36F} The farm girl leans in close to your ear: " + l : id === "golden" ? "\u2728 " + l : l);
       }
       if (id === "letdown") leak();
     } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
@@ -10147,6 +10381,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         try {
           const C = args[0];
           if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W10.ActivityOrgasmRuined = true;
+        } catch (e) {
+        }
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("golden") && !W10.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500);
         } catch (e) {
         }
         return next(args);
@@ -10926,6 +11165,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return t;
   }
   var touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
+  var echoN = 0;
+  var echoAt = 0;
+  var echoSince = 0;
+  function echoHeard(text3, now) {
+    const d = st().doses.echo;
+    if (!active("echo") || !d) return false;
+    if (d.at !== echoSince) {
+      echoSince = d.at;
+      echoN = 0;
+      echoAt = 0;
+    }
+    const t = String(text3).trim();
+    now = now || Date.now();
+    if (echoN >= 2 || now - echoAt < 18e4 || t.length < 4 || t.length > 140 || /^[?!.\-\/(*]/.test(t) || Math.random() < 0.5) return false;
+    echoN++;
+    echoAt = now;
+    const line2 = LINES.echo[Math.floor(Math.random() * LINES.echo.length)].replace(/%t/g, myName()).replace(/%s/g, t.replace(/[()'"]/g, ""));
+    setTimeout(() => action(line2), 2500);
+    return true;
+  }
   function initSpeech(mod2) {
     try {
       mod2.hookFunction("ServerSend", 6, (args, next) => {
@@ -10933,6 +11192,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const d = args[1];
           if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && touched() && !/^\s*[(\[?!./\-*]/.test(d.Content))
             args = [args[0], Object.assign({}, d, { Content: dosedSpeech(d.Content) })];
+          if (args[0] === "ChatRoomChat" && args[1] && args[1].Type === "Chat" && typeof args[1].Content === "string") echoHeard(args[1].Content);
         } catch (e) {
           console.warn("[Dispensary] speech:", e);
         }
@@ -11270,6 +11530,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       "div",
       { class: "fd-card" },
       now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S2.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+      Object.values(S2.grow || {}).some((v) => v) ? h("div", null, "\u{1F4CF} Grown (it stays): " + Object.entries(S2.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
       S2.later.length ? h("div", null, "\u{1F48A} " + (S2.later.length === 1 ? "A time-release capsule's" : S2.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
       h(
         "div",
@@ -11684,6 +11945,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     },
     who: () => st().who,
     // hardcore, for the Companion (its own settings lock while yours is on)
+    // growth off the farm (Nov 18): { cup, ass, cock, balls } sizes up (or down) from your own. The Companion's drawn body reads it.
+    grow: () => grown(),
     // the crafted parasites in you (Nov 18): [{ kind, label, by, until }]
     parasites: () => Object.entries(mine()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null

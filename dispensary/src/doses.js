@@ -15,7 +15,7 @@
    Fill-Out swells your drawn body.
 */
 import { st, save } from "./store.js";
-import { LINES } from "./lines.js";
+import { LINES, NOTES } from "./lines.js";
 import { TOLERANCE_NOTE } from "./lines-more.js";
 import "./lines-senses.js";
 import { settle } from "./senses.js";
@@ -132,6 +132,66 @@ export const BOOK = {
     keywords: ["tender drops", "tenderizer"], soak: ["tender"],
     desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose.",
   },
+  // ── Nov 18: the farm girl's four voice potions, anywhere, from a crafted needle, drink or gear (her lines:
+  // shared/potion-voice.js). Bought at her store on the farm, they're hers as ever: she says them herself (and Golden
+  // Hour earns ribbons there) ──
+  honey: {
+    label: "Honey Tongue", icon: "🍯", mins: 45, color: "#e8b04a", farm: false, voice: "honey", every: [5, 9],
+    words: /\bhoney[- ]tongue\b/,
+    keywords: ["honey tongue"], soak: ["honey tongue"],
+    desc: "Forty-five minutes of the farm girl's sweet, filthy praise in your ear, every few minutes. Only you hear it.",
+  },
+  golden: {
+    label: "Golden Hour", icon: "✨", mins: 60, color: "#f0c040", farm: false, voice: "golden", every: [5, 8],
+    words: /\bgolden[- ]hour\b/,
+    keywords: ["golden hour"], soak: ["golden"],
+    desc: "An hour of glowin' easy, and every time you cum you're doted on for it. On the farm it earns ribbons too.",
+  },
+  musk: {
+    label: "Blue Ribbon Musk", icon: "💐", mins: 45, color: "#5a7fd0", farm: false, voice: "musk", every: [5, 9], room: true,
+    words: /\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/,
+    keywords: ["blue ribbon musk"], soak: ["musk"],
+    desc: "For 45 minutes everybody nearby keeps noticin' you, and the room hears about it now and then.",
+  },
+  echo: {
+    label: "Echo Elixir", icon: "🗣️", mins: 20, color: "#a0d0e0", farm: false, voice: "echo",
+    words: /\becho[- ]elixir\b/,
+    keywords: ["echo elixir"], soak: ["echo"],
+    desc: "Twice in twenty minutes, somethin' you said is repeated back to the room. Sweetly.",
+  },
+  // ── Nov 18: GROWTH OFF THE FARM (Laynie: "seems good"). The farm's own growth shots, anywhere: on the farm with
+  // the farm girl in the room they're hers (her books); anywhere else your Dispensary keeps the size, and it stays.
+  // Your cup shows on the Companion's drawn breasts; the rest is counted till they're drawn too. ──
+  growcup: {
+    label: "Udder Growth", icon: "🍈", mins: 0, color: "#f2b6c6", farm: true, instant: true, grow: "cup",
+    words: /\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/,
+    keywords: ["udder growth", "breast growth"],
+    desc: "A cup bigger for every dose, and it stays. Your Companion's drawn breasts show it. A reducing serum takes one back off.",
+  },
+  growass: {
+    label: "Ass Growth", icon: "🍑", mins: 0, color: "#f0a080", farm: true, instant: true, grow: "ass",
+    words: /\b(ass|butt|booty|hips?) (growth|enlarger)\b/,
+    keywords: ["ass growth"],
+    desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips).",
+  },
+  growcock: {
+    label: "Cock Growth", icon: "🍆", mins: 0, color: "#c07090", farm: true, instant: true, grow: "cock",
+    words: /\b(cock|penis|dick|shaft) (growth|enlarger)\b/,
+    keywords: ["cock growth"],
+    desc: "A size longer for every dose, and it stays (counted now; drawn with the drawn cock).",
+  },
+  growballs: {
+    label: "Balls Growth", icon: "🥚", mins: 0, color: "#d8a0b0", farm: true, instant: true, grow: "balls",
+    words: /\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/,
+    keywords: ["balls growth"],
+    desc: "A size heavier for every dose, and it stays (counted now; drawn with the drawn cock).",
+  },
+  reducing: {
+    label: "Reducing Serum", icon: "🔻", mins: 0, color: "#90a0c0", farm: true, instant: true, grow: "less",
+    words: /\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/,   // (not "shrinking": that's LSCG's, and it shrinks all of you)
+    keywords: ["reducing serum"],
+    desc: "Takes a size back off whatever the bottle names (Udder Reducer, Cock Reducer, Reducing Serum (ass)...; tits if it doesn't say).",
+  },
   // ── Nov 18: poses and senses (senses.js) ──
   weakknees: {
     label: "Weak Knees", icon: "🦵", mins: 20, color: "#c9a0dc", every: [6, 10],
@@ -204,6 +264,7 @@ const PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum
 export function partFor(id, text) {
   const t = String(text || "").toLowerCase();
   if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+  if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   return "";
 }
@@ -263,7 +324,7 @@ export function give(id, o) {
   const B = BOOK[id], S = st();
   if (!B) return { ok: false, why: "unknown" };
   if (S.off[id]) return { ok: false, why: "off" };
-  if (B.instant) return purge(o);
+  if (B.instant) return B.grow ? grow(id, o) : purge(o);
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
   const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
@@ -290,6 +351,19 @@ export function give(id, o) {
   try { lscgShow(id, by); } catch (e) { /* fine */ }
   return { ok: true };
 }
+// GROWTH: a size up (or, reducin', down) that stays. o.p: the part a reducing serum names
+export const GROW_LIMITS = { cup: [-6, 10], ass: [-3, 6], cock: [-3, 6], balls: [-3, 6] };
+function grow(id, o) {
+  const B = BOOK[id], S = st(), g = S.grow || (S.grow = {}), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
+  const part = B.grow === "less" ? (o.p && GROW_LIMITS[o.p] ? o.p : "cup") : B.grow, sign = B.grow === "less" ? -1 : 1;
+  const [lo, hi] = GROW_LIMITS[part], was = g[part] || 0, now = Math.max(lo, Math.min(hi, was + sign * x));
+  if (now === was) { if (!o.quiet) local(fill(NOTES.growMax, { dose: B.label })); return { ok: false, why: "max" }; }
+  g[part] = now; save();
+  if (!o.quiet) action(o.line || fill(pick(LINES.grow[sign > 0 ? part : "less"])).replace(/%p/g, ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[part]));
+  tellPage({ type: "grow", part, n: now });
+  return { ok: true, part, n: now };
+}
+export const grown = () => Object.assign({ cup: 0, ass: 0, cock: 0, balls: 0 }, st().grow || {});
 // the Purge: everything out at once, ours and (with LSCG) LSCG's own through its antidote
 function purge(o) {
   const n = clearAll("purge");
@@ -398,7 +472,7 @@ function feel(id, now) {
   if (B.every && now >= f.next && inRoom()) {
     f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN;
     const l = nowLine(id);
-    if (l) { if (B.room) action(l); else local(l); }
+    if (l) { if (B.room) action(l); else local(id === "honey" ? "🍯 The farm girl leans in close to your ear: " + l : id === "golden" ? "✨ " + l : l); }
     if (id === "letdown") leak();
   } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
     f.next = now + (8 + Math.random() * 6) * MIN; local(pick(LINES.sedative.drift));
@@ -434,6 +508,8 @@ export function initDoses(mod) {
   try {
     mod.hookFunction("ActivityOrgasmStart", 6, (args, next) => {
       try { const C = args[0]; if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W.ActivityOrgasmRuined = true; } catch (e) { /* fine */ }
+      // Golden Hour: you're doted on for it, every time (off the farm; on it the farm girl does it herself)
+      try { const C = args[0]; if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("golden") && !W.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500); } catch (e) { /* fine */ }
       return next(args);
     });
   } catch (e) { console.warn("[Dispensary] Bitterroot can't ruin you:", e); }

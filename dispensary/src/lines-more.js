@@ -230,5 +230,43 @@ Object.assign(LINES, {
   },
 });
 
+// Golden Hour off the farm: doted on after every climax (the farm girl's own words, as she says them on the farm)
+LINES.goldenDote = [
+  "✨ The farm girl's voice, warm in your ear while you come down: \"There it is. That's my good thing. Look how pretty you are when you let go.\"",
+  "✨ \"Oh, listen to you. Every one of those is golden, sugar. Every last one.\"",
+  "✨ \"Good. So good. You've earned every bit of that glow.\"",
+];
+// the Echo Elixir off the farm: somethin' you said, sweetly back to the room. %t you, %s what you said
+LINES.echo = [
+  "🗣️ A sweet voice puts a hand to its heart: \"Did y'all hear that? %t just said, and I quote: '%s'. Ain't that just the sweetest thing.\"",
+  "🗣️ Somebody sighs, fond as anything: \"'%s'. That's what %t said. Precious.\"",
+  "🗣️ The room hears it again, sweeter this time: \"%t said '%s', and I think we should all remember it.\"",
+];
+
+// growth off the farm: %t them, %p the part (for a reducing serum)
+LINES.grow = {
+  cup: [
+    "%t gasps as their chest swells. A whole cup bigger, heavy and warm, and it isn't goin' anywhere.",
+    "The growth serum floods %t's tits. They round out, fill out, settle heavier, and stay that way.",
+    "%t's top goes tight as their breasts grow a size. They'll need new clothes.",
+  ],
+  ass: [
+    "%t's hips widen and their ass plumps up a size, round and soft, for good.",
+    "The serum goes straight to %t's rear. It swells, jiggles, and stays bigger.",
+  ],
+  cock: [
+    "%t groans as their cock grows a size, thicker and longer, and stays that way.",
+    "Heat pours into %t's cock. It swells a size bigger, and it's keepin' it.",
+  ],
+  balls: [
+    "%t's balls swell a size, heavy and full, and they stay that way.",
+    "The serum drops straight into %t's balls. Bigger, heavier, achin' to be emptied.",
+  ],
+  less: [
+    "%t's %p shrinks back a size, a little tender for the trip.",
+    "A cool tingle, and %t's %p settles a size smaller.",
+  ],
+};
+
 // tolerance, a note only you see
 export const TOLERANCE_NOTE = "Your body's gettin' used to %d: this one only takes %p% as long.";

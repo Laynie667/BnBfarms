@@ -76,5 +76,6 @@ export const NOTES = {
   notListed: "%b tried to give you %d, but they're not on your list, so nothin' happened.",
   switchedOff: "%d came your way, but you've switched it off, so nothin' happened.",
   safeword: "Safeword: every dose in you is lifted. You're clear.",
+  growMax: "%d can't take you any further that way.",
   lscgOff: "%d came your way, but it's switched off in LSCG's Drug Enhancements, so LSCG let it pass. Switch it on there if you want it.",
 };

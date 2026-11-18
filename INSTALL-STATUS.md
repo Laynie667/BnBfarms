@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.81.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.82.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.64.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.12.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.65.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.13.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.82.0 + Companion 0.65.0 + Dispensary 0.13.0: nipples that stay open, creampies, and the drawn opened nipple** Laynie's answers, Nov 18.
+  - **Drawn:** the Companion's drawn breasts show them open, one to three wide, with a puffy pink rim round the opening (the look Laynie okayed). It's drawn under anything worn on them.
+  - **The stretch stays:** held open by the Nipple Dilator or the leeches, and every time they're used, they train. When the dose wears off or the leeches drop they stay as stretched as they've been trained, still open, still there for Fuck nipple and Finger nipple.
+  - **Your switch:** "They close up slowly on their own" (on to start): half a step a day once they've been left alone twelve hours. Off: they stay till somebody closes them up.
+  - **Close them up:** a button on the Dispensary's page, `/dispensary nips close`, or a **Tightening Balm** anybody on your list can give you (in hardcore, a keyholder's balm). `/dispensary nips` tells you how they are.
+  - **Creampies:** whoever cums right after fuckin' your nipple fills it. It wells back out for the room to see, runs down your chest as cum for everybody with the Companion, and gets its own count.
+  - **On the farm:** the farm girl keeps her own count of loads taken in the tits (`?stats`), and it comes back out creamy with your milk next time you're milked.
+  - The outfit studio's body sizes work again on BC R134.
+  - Tests: `tests/dispensary-nipples-2.test.cjs`.
 
 - **Bot 0.81.0: hitchin' posts** BC R134's tether points (Laynie, Nov 18: the game's own leash setting decides, "any staff or owner", "until the time's up, or milked according to their settings").
   - `?hitch <who> [post] [minutes|milk]`: staff, their owner or their herd's leader. The farm girl brings them to the post (their Companion walks them over) and ties their lead to it. Two steps from it and no further.

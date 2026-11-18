@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.81.0
+// @version      0.82.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.81.0";
-  var COMPANION_VERSION = "0.64.0";
+  var VERSION = "0.82.0";
+  var COMPANION_VERSION = "0.65.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -7238,6 +7238,13 @@
           p.leakAcc = 0;
         }
       }
+      if (!nursing && take >= 20 && p.nipCream) {
+        try {
+          creamedMilk(mn);
+        } catch (e) {
+          warn("creamed milk:", e);
+        }
+      }
       return take;
     }
     function drainSemen(mn, amount) {
@@ -9221,6 +9228,7 @@
       sec("\u{1FAD9} HOLDING \xB7 " + Math.round(100 * held / cap) + "% full", [
         holding,
         "Total " + ml(held) + " of " + ml(cap),
+        p.totals && p.totals.nipLoads && "Loads taken in the tits: " + p.totals.nipLoads + (p.nipCream ? " (one's still in there, for the milk)" : ""),
         p.pin && "\u{1F388} " + (sizePinned(mn) ? "Too big to move" : "Too full to move")
       ]);
       sec("\u{1F402} BREEDING", [
@@ -26361,7 +26369,33 @@
       const r = rec(mn), f = r && r.fx && r.fx[id];
       return !!(f && f.disp && dispFor(mn));
     }
+    function onNipLoad(mn, m) {
+      const p = prodOf(mn), by = Number(m.by) || 0;
+      if (!p || !rec(mn)) return;
+      p.totals.nipLoads = (p.totals.nipLoads || 0) + 1;
+      const nb = p.totals.nipBy = p.totals.nipBy || {};
+      if (by) nb[by] = (nb[by] || 0) + 1;
+      const ks = Object.keys(nb);
+      if (ks.length > 40) delete nb[ks[0]];
+      p.nipCream = { by: by || p.nipCream && p.nipCream.by || 0, n: (p.nipCream && p.nipCream.n || 0) + 1, at: Date.now() };
+      saveLedger();
+    }
+    const CREAMED_MILK = [
+      "\u{1F95B} The first squirts out of %n's tits come out thick and streaky: %s seed, pumped in earlier, comin' back out with the milk.",
+      "\u{1F95B} %n's milk runs creamy-white and stringy for the first few pulls. That's %s load, still in there, gettin' milked out with the rest.",
+      "\u{1F95B} Whoever drinks %n's milk today's gettin' it creamed: %s seed's mixed right in."
+    ];
+    function creamedMilk(mn) {
+      const p = prodOf(mn), c = p && p.nipCream;
+      if (!c) return;
+      p.nipCream = null;
+      if (charFor(mn)) emote(pickFresh("creamedmilk", CREAMED_MILK).replace(/%n/g, plainName(mn)).replace(/%s/g, c.by ? plainName(c.by) + "'s" : "somebody's"), mn);
+    }
     function onDispensaryMsg(mn, m) {
+      if (m.type === "dispNipLoad") {
+        onNipLoad(mn, m);
+        return true;
+      }
       if (m.type === "dispHello") {
         onDispHello(mn, m);
         return true;

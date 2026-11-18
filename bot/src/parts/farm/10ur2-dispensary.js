@@ -201,7 +201,29 @@
   // is their Dispensary sayin' this potion's moments (so I don't)
   function dispTook(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.disp && dispFor(mn)); }
 
+  // NIPPLE LOADS (Nov 18; Laynie: "its own count"): somebody came in their stretched nipple, and their Dispensary says
+  // so. I keep the count (loads in the tits, and whose), and it comes back out with their milk the next time they're milked.
+  function onNipLoad(mn, m){
+    const p = prodOf(mn), by = Number(m.by) || 0; if (!p || !rec(mn)) return;
+    p.totals.nipLoads = (p.totals.nipLoads || 0) + 1;
+    const nb = p.totals.nipBy = p.totals.nipBy || {}; if (by) nb[by] = (nb[by] || 0) + 1;
+    const ks = Object.keys(nb); if (ks.length > 40) delete nb[ks[0]];
+    p.nipCream = { by: by || (p.nipCream && p.nipCream.by) || 0, n: ((p.nipCream && p.nipCream.n) || 0) + 1, at: Date.now() };
+    saveLedger();
+  }
+  const CREAMED_MILK = [
+    "🥛 The first squirts out of %n's tits come out thick and streaky: %s seed, pumped in earlier, comin' back out with the milk.",
+    "🥛 %n's milk runs creamy-white and stringy for the first few pulls. That's %s load, still in there, gettin' milked out with the rest.",
+    "🥛 Whoever drinks %n's milk today's gettin' it creamed: %s seed's mixed right in.",
+  ];
+  // they're bein' milked, and there's seed in their tits: it comes out (08-production.js drainMilk)
+  function creamedMilk(mn){
+    const p = prodOf(mn), c = p && p.nipCream; if (!c) return;
+    p.nipCream = null;
+    if (charFor(mn)) emote(pickFresh("creamedmilk", CREAMED_MILK).replace(/%n/g, plainName(mn)).replace(/%s/g, c.by ? plainName(c.by) + "'s" : "somebody's"), mn);
+  }
   function onDispensaryMsg(mn, m){
+    if (m.type === "dispNipLoad"){ onNipLoad(mn, m); return true; }
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }
     if (m.type === "doseDone"){ onDoseDone(mn, m); return true; }
     if (m.type === "dispSafeword"){ onDispSafeword(mn); return true; }

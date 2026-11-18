@@ -444,7 +444,27 @@ window.FarmBodyEngine = function (host) {
     v = acc.map((a) => (a[2] ? [a[0] / a[2], a[1] / a[2]] : null)); BREAST.halves.set(key, v); return v;
   }
   // ── between the legs ── (the studio's drawn cock; drawn: false leaves the game's own)
-  const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };   // drawn: ours (cock-drawing.js) in place of the game's picture; style and pent pick among its stamps
+  const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };
+  // OPENED NIPPLES (Nov 18; Laynie: "looks good on the dialator"): how open (0 shut, 1 to 3) comes from the host
+  // (host.nipOpen: the Dispensary's Nipple Dilator, its leeches, or a trained stretch). A puffy, darker areola, a pink rim,
+  // the openin' and a wet glint, from her own skin; made once per size, skin and how open.
+  function openNip(level, rad, sk) {
+    const key = level + "|" + rad.toFixed(2) + "|" + sk.join(",");
+    if (BREAST.oc && BREAST.ocKey === key) return BREAST.oc;
+    const R = rad * (1.15 + 0.2 * level), size = Math.ceil(R * 2 + 4), c = document.createElement("canvas"); c.width = c.height = size;
+    const g = c.getContext("2d"), m = size / 2;
+    const tone = (k, a) => "rgba(" + Math.round(Math.min(255, sk[0] * k * 0.95)) + "," + Math.round(sk[1] * 0.6 * k) + "," + Math.round(sk[2] * 0.62 * k) + "," + a + ")";
+    let gr = g.createRadialGradient(m, m, 0, m, m, R); gr.addColorStop(0, tone(0.92, 1)); gr.addColorStop(0.55, tone(1, 0.92)); gr.addColorStop(0.85, tone(1.04, 0.55)); gr.addColorStop(1, tone(1.05, 0));
+    g.fillStyle = gr; g.beginPath(); g.arc(m, m, R, 0, Math.PI * 2); g.fill();
+    const hole = rad * (0.2 + 0.16 * level), rim = hole * 1.8;
+    gr = g.createRadialGradient(m, m - hole * 0.1, hole * 0.75, m, m, rim); gr.addColorStop(0, "rgba(228,118,138,0.95)"); gr.addColorStop(0.65, tone(1.06, 0.85)); gr.addColorStop(1, tone(1, 0));
+    g.fillStyle = gr; g.beginPath(); g.arc(m, m, rim, 0, Math.PI * 2); g.fill();
+    gr = g.createRadialGradient(m, m + hole * 0.2, 0, m, m, hole); gr.addColorStop(0, "rgba(38,6,14,1)"); gr.addColorStop(0.55, "rgba(105,20,38,1)"); gr.addColorStop(0.9, "rgba(185,66,92,1)"); gr.addColorStop(1, "rgba(205,92,112,0.85)");
+    g.fillStyle = gr; g.beginPath(); g.ellipse(m, m, hole * 0.86, hole * 1.06, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(255,255,255,0.8)"; g.beginPath(); g.ellipse(m - hole * 0.7, m - hole * 0.95, Math.max(0.8, hole * 0.3), Math.max(0.5, hole * 0.14), -0.6, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(255,255,255,0.35)"; g.beginPath(); g.ellipse(m + hole * 0.55, m + hole, Math.max(0.6, hole * 0.2), Math.max(0.4, hole * 0.08), 0.4, 0, Math.PI * 2); g.fill();
+    BREAST.oc = c; BREAST.ocKey = key; return c;
+  }   // drawn: ours (cock-drawing.js) in place of the game's picture; style and pent pick among its stamps
 
   // step into the game's drawing of our character: lay the belly in (after all the skin, or before the upper body), and
   // redraw any moulded piece to the new outline
@@ -538,6 +558,12 @@ window.FarmBodyEngine = function (host) {
                 for (const p of B.nips) if (p[1] + rad < B.ground) { put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}, "skin"); }
               }
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) put(h[0], h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[studio] nipples:", e); } }
+              // opened nipples: over her own nipple, under whatever's worn on it (those come later, through nipDraw)
+              try {
+                const lv = typeof host.nipOpen === "function" ? Math.max(0, Math.min(3, Math.round(Number(host.nipOpen()) || 0))) : 0;
+                if (lv > 0) { const B = ctx.breast, sk2 = bellySkin(upper[2], upper[3], bpose), r0 = 7 * B.kN, oc = openNip(lv, r0, sk2);
+                  for (const p of B.nips) if (p[1] + r0 < B.ground) { put("drawImage", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin"); if (typeof real.drawImageBlink === "function") put("drawImageBlink", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin"); } }
+              } catch (e) { warnSome("[body] opened nipples:", e); }
             }
           };
           // the game's nipples, and what's worn on them, set down on the drawn breasts: each side of the picture is

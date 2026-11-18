@@ -23,7 +23,7 @@ import { settle } from "./senses.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
-import { nipsOpen } from "./nipples.js";
+import { nipsOpen, nipsClose } from "./nipples.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -255,6 +255,12 @@ export const BOOK = {
     keywords: ["nipple dilator", "nipple stretcher"], soak: ["dilating"],
     desc: "Your nipples stretch open while it's in you, wider for a stronger dose. While they're open, the game's action menu has a real Fuck nipple and Finger nipple on you, for anybody with the Dispensary, and touches there count double. Crafted nipple gear that says dilator or stretcher keeps them open while it's worn. An hour a dose.",
   },
+  balm: {
+    label: "Tightening Balm", icon: "🧴", mins: 0, color: "#f0d8c0", instant: true,
+    words: /\b(tightening (?:balm|cream|gel|serum|salve)|nipple (?:tightener|closer|balm))\b/,
+    keywords: ["tightening balm", "nipple tightener"],
+    desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone.",
+  },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
     words: /\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/,
@@ -358,7 +364,7 @@ export function give(id, o) {
   const B = BOOK[id], S = st();
   if (!B) return { ok: false, why: "unknown" };
   if (S.off[id]) return { ok: false, why: "off" };
-  if (B.instant) return B.grow ? grow(id, o) : purge(o);
+  if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : purge(o);
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
   const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
@@ -406,6 +412,12 @@ function purge(o) {
   return { ok: true, n, lscg };
 }
 
+// the Tightening Balm: stretched nipples closed back up (nipples.js)
+function balm(o) {
+  const was = nipsClose(true);
+  if (!o.quiet) action(o.line || fill(was ? "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were." : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
+  return { ok: true, was };
+}
 // a dose ends: worn off ("done"), LSCG's antidote ("lscg"), a safeword ("safeword"), the Purge, or quietly ("quiet")
 export function end(id, why) {
   const S = st();

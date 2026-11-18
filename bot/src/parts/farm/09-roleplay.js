@@ -439,6 +439,7 @@
     sec("🫙 HOLDING · "+Math.round(100*held/cap)+"% full", [
       holding,
       "Total "+ml(held)+" of "+ml(cap),
+      p.totals && p.totals.nipLoads && "Loads taken in the tits: "+p.totals.nipLoads+(p.nipCream ? " (one's still in there, for the milk)" : ""),
       p.pin && "🎈 "+(sizePinned(mn) ? "Too big to move" : "Too full to move")
     ]);
     sec("🐂 BREEDING", [

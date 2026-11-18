@@ -8,19 +8,19 @@
 import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
-import { load, st } from "./store.js";
+import { load, st, save } from "./store.js";
 import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown } from "./doses.js";
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
-import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle } from "./nipples.js";
+import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel } from "./nipples.js";
 import "./lines-nips.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
 import { initIcons, iconsTell, iconsFor, iconsReset, iconsDosed } from "./icons.js";
 import "./lines-para.js";
 import { initNeedle } from "./needle.js";
-import { initFarm, hello } from "./farm.js";
+import { initFarm, hello, tellNipLoad } from "./farm.js";
 import { initLscg } from "./lscg.js";
 import { initSafeword, safeword } from "./safeword.js";
 import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
@@ -54,9 +54,17 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[safeword | page | say | nope | mouth <who> <words>]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece",
+      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off]]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
+        // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
+        const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
+        if (nm) {
+          if (nm[1] === "close" || nm[1] === "reset") { if (hardOn()) { local("🔒 Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it)."); return; } local(nipsClose(true) ? "Your nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar."); return; }
+          if (nm[1] === "heal" && nm[2]) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().nipsHeal = nm[2] === "on"; save(); local(nm[2] === "on" ? "Your nipples will close up slowly on their own, once they've been left be a while." : "Your nipples stay as stretched as they're trained, till somebody closes them up."); return; }
+          const L2 = nipLoads(); local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " +
+            (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close · /dispensary nips heal on|off"); return;
+        }
         if (/^(safe|safeword|red)$/.test(a)) { safeword("command"); return; }
         if (/^(page|settings|open)$/.test(a)) { openPage(); return; }
         // the mouthpiece: say what its crafter asked, or let it pass; or, as the crafter, send some words
@@ -92,12 +100,12 @@ function start() {
   initSenses(mod);
   initIcons(mod);
   initParasites(mod);
-  initNipples(mod); nipsOnSuckle(paraSuckled);
+  initNipples(mod); nipsOnSuckle(paraSuckled); nipsOnFarmLoad(tellNipLoad);
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -114,7 +122,7 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a)
   speech: (t) => dosedSpeech(t), screen: () => screenTick(),
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },
   worn: () => wornGear(), wornTick: () => wornTick(), wornReset: () => wornReset(), trigger: (k, f) => trigger(k, f), para: () => paraMine(), paraTick: () => paraTick(), latch: (k, o) => latch(k, o), climax: () => paraClimax(), haze: () => hazeTick(), icons: (mn) => iconsFor(mn), iconsTell: (f) => iconsTell(f),
-  nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
+  nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({

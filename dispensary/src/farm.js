@@ -47,6 +47,8 @@ export function hello(force) {
   return true;
 }
 export const tellSafeword = () => send("dispSafeword", {});
+// a load in your nipple (nipples.js): the farm girl keeps her own count of those, and it comes back out with your milk
+export const tellNipLoad = (by) => send("dispNipLoad", { by: Number(by) || 0 });
 
 export function onDoseCall(m) {
   const id = String(m.dose || ""), B = BOOK[id];

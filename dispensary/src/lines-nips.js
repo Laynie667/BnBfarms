@@ -59,6 +59,19 @@ Object.assign(LINES, {
       "%b works a finger in and out of your nipple, and your whole chest tingles.",
       "Your stretched nipple swallows %b's finger whole. You didn't know it could feel like that.",
     ],
+    // you came in somebody's nipple (only you see it)
+    came: [
+      "You cum deep in %b's stretched nipple, and feel it take every pulse.",
+      "You bury yourself to the hilt in %b's nipple and empty out, and their tit swallows the lot.",
+      "You fill %b's nipple till it can't hold any more.",
+    ],
+    // somebody came in yours (the room sees this one)
+    creamed: [
+      "%b cums deep in %t's nipple. A moment later it wells back out, a thick white bead that runs down the curve of %t's tit.",
+      "%t's nipple is stuffed with %b's load, and it starts leakin' back out the moment %b pulls free.",
+      "%b empties into %t's tit. The stretched nipple twitches, and cream drips from it in slow strings.",
+      "%t gasps as %b's load floods their nipple, warm and heavy. It doesn't stay in long: it's runnin' down their chest.",
+    ],
     self: [
       "Your own finger slides right into your open nipple. It's so strange, and so good.",
       "You can't help testin' how deep your nipple goes now. Deeper than you'd think.",

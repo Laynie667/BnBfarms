@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.12.0
+// @version      0.13.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8043,7 +8043,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.12.0";
+  var VERSION = "0.13.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -9929,11 +9929,45 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var charOf3 = (mn) => (mn === me4() ? W9.Player : (W9.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
   var inRoom2 = () => W9.CurrentScreen === "ChatRoom" && typeof W9.ServerSend === "function";
   var others = /* @__PURE__ */ new Map();
-  function nipsOpen() {
+  function heldOpen() {
     let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
     const p = mine().nips;
     if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
     return n;
+  }
+  var MIN4 = 6e4;
+  var HOUR2 = 36e5;
+  var DAY4 = 864e5;
+  var TRAIN = { step: 0.1, every: 30 * MIN4, cock: 0.15, finger: 0.05, grace: 12 * HOUR2, perDay: 0.5 };
+  var trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 });
+  var trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
+  function nipsOpen() {
+    return Math.max(heldOpen(), trainedLevel());
+  }
+  function nipsTrainTick(now) {
+    now = now || Date.now();
+    const T = trainOf(), held = heldOpen(), dt = Math.max(0, Math.min(now - (T.at || now), 15 * MIN4));
+    T.at = now;
+    if (held > 0) {
+      T.open = now;
+      if (T.lvl < held) T.lvl = Math.min(held, T.lvl + TRAIN.step * dt / TRAIN.every);
+    } else if (st().nipsHeal !== false && T.lvl > 0 && now - Math.max(T.open || 0, T.used || 0) > TRAIN.grace) T.lvl = Math.max(0, T.lvl - TRAIN.perDay * dt / DAY4);
+  }
+  function nipsClose(quiet) {
+    const was = nipsOpen();
+    st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 };
+    try {
+      if (active("dilator")) end("dilator", "quiet");
+    } catch (e) {
+    }
+    try {
+      if (mine().nips) letGo("nips", "quiet");
+    } catch (e) {
+    }
+    save();
+    nipsTell(false);
+    if (!quiet && was) local("Your nipples close up again, snug and tender, as if they'd never been stretched.");
+    return was;
   }
   function openOf(mn) {
     mn = Number(mn);
@@ -9942,8 +9976,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return e && Date.now() - e.at < 6 * 36e5 ? e.n : 0;
   }
   var told2 = 0;
+  var tellPage = (detail) => {
+    try {
+      W9.dispatchEvent(new W9.CustomEvent("farmhand-dispensary", { detail }));
+    } catch (e) {
+    }
+  };
+  var shown = -1;
   function nipsTell(force) {
     const n = nipsOpen();
+    if (n !== shown) {
+      shown = n;
+      tellPage({ type: "nips", from: me4(), n });
+    }
     if (!inRoom2() || !force && n === told2 || force && !n) return false;
     told2 = n;
     try {
@@ -9954,9 +9999,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function onNips(from, m) {
-    const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0)));
+    const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0))), was = openOf(from);
     if (n) others.set(from, { n, at: Date.now() });
     else others.delete(from);
+    if (was !== n) tellPage({ type: "nips", from, n });
   }
   var ACTS = {
     cock: {
@@ -9988,15 +10034,68 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var gameName = (k) => mode === "lscg" ? "LSCG_" + LSCG_ID + "." + ACTS[k].name.toLowerCase() : "FarmDisp_" + ACTS[k].name;
   var kindOfName = (n) => Object.keys(ACTS).find((k) => gameName(k) === n) || null;
   var usedAt = 0;
+  var lastIn = /* @__PURE__ */ new Map();
   function nipsUsed(from, kind) {
     if (from && from !== me4()) nipsFed(from, kind);
     const now = Date.now();
+    {
+      const T = trainOf();
+      T.used = now;
+      T.lvl = Math.min(3, T.lvl + (kind === "cock" ? TRAIN.cock : TRAIN.finger));
+      save();
+    }
+    if (kind === "cock" && from && from !== me4()) lastIn.set(from, now);
     if (now - usedAt > 3 * 6e4) {
       usedAt = now;
       const L = LINES.nips && LINES.nips[!from || from === me4() ? "self" : kind === "cock" ? "fucked" : "fingered"];
       if (L && L.length) local(fill(pick(L), { by: from && from !== me4() ? nameOf(from) : "you" }));
     }
   }
+  var CREAM_WINDOW = 90 * 1e3;
+  var lastFuck = null;
+  function fucked(target2) {
+    if (target2 && target2 !== me4()) lastFuck = { target: Number(target2), at: Date.now() };
+  }
+  function onMyClimax() {
+    const f = lastFuck;
+    lastFuck = null;
+    if (!f || Date.now() - f.at > CREAM_WINDOW || W9.ActivityOrgasmRuined) return;
+    if (!hasCock(W9.Player) || !charOf3(f.target)) return;
+    try {
+      W9.ServerSend("ChatRoomChat", makeMsg("dispCream", {}, f.target));
+    } catch (e) {
+      return;
+    }
+    local(fill(pick(LINES.nips.came), { by: nameOf(f.target) }));
+  }
+  var onFarmLoad = null;
+  function nipsOnFarmLoad(f) {
+    onFarmLoad = f;
+  }
+  function onCream(from) {
+    const at = lastIn.get(from);
+    if (!at || Date.now() - at > 3 * 6e4) return;
+    lastIn.delete(from);
+    const S2 = st();
+    S2.nipLoads = (S2.nipLoads || 0) + 1;
+    const by = S2.nipLoadsBy || (S2.nipLoadsBy = {});
+    by[from] = (by[from] || 0) + 1;
+    const keys = Object.keys(by);
+    if (keys.length > 40) delete by[keys[0]];
+    save();
+    action(fill(pick(LINES.nips.creamed), { by: nameOf(from) }));
+    try {
+      W9.dispatchEvent(new W9.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["chest"], amount: 1 } }));
+    } catch (e) {
+    }
+    if (onFarmLoad) {
+      try {
+        onFarmLoad(from);
+      } catch (e) {
+      }
+    }
+  }
+  var nipLoads = () => ({ n: st().nipLoads || 0, by: Object.assign({}, st().nipLoadsBy || {}) });
   function nipsLscg(api3, caps2) {
     if (!api3 || !caps2 || !caps2.has("activities") || mode) return false;
     try {
@@ -10011,6 +10110,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
           image: A.image,
           prerequisites: k === "cock" ? ["ZoneAccessible", "ZoneNaked", "CanUsePenis", "hascock", "nipsopen"] : ["ZoneAccessible", "ZoneNaked", "UseHands", "nipsopen"],
           targets: [Object.assign({ group: "ItemNipples", label: A.label, action: A.action }, A.selfAction ? { selfAllowed: true, selfLabel: A.selfLabel, selfAction: A.selfAction } : {})],
+          onSend: ({ target: target2 }) => {
+            try {
+              if (k === "cock") fucked(target2);
+            } catch (e) {
+            }
+          },
           onReceive: ({ sender }) => {
             try {
               nipsUsed(Number(sender) || 0, k);
@@ -10100,6 +10205,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           };
           const text3 = String(TEXT[d.Content] || "").replace(/SourceCharacter/g, nm(src)).replace(/TargetCharacter/g, nm(tgt)).replace(/PronounPossessive/g, "their");
           if (text3) d.Dictionary.push({ Tag: 'MISSING TEXT IN "ActivityDictionary.csv": ' + d.Content, Text: text3 });
+          if (/FarmDisp_NippleFuck$/.test(String(d.Content)) && src === me4()) fucked(tgt);
         }
       } catch (e) {
       }
@@ -10141,6 +10247,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me4()) {
             const m = readMsg(data);
             if (m && m.type === "dispNips") onNips(data.Sender, m);
+            else if (m && m.type === "dispCream") onCream(data.Sender);
             else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
           }
         } catch (e) {
@@ -10151,8 +10258,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
       console.warn("[Dispensary] nipples can't hear:", e);
     }
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 2, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => onMyClimax(), 300);
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+    }
   }
-  var nipsState = () => ({ mode, others: [...others.entries()], told: told2, names: Object.keys(ACTS).map(gameName), text: Object.assign({}, TEXT), lscg: !!lscgApi });
+  var nipsState = () => ({ mode, others: [...others.entries()], told: told2, names: Object.keys(ACTS).map(gameName), text: Object.assign({}, TEXT), lscg: !!lscgApi, train: Object.assign({}, st().nipTrain || {}), lastFuck });
+  var nipsCream = (from) => onCream(from);
+  var nipsClimax = () => onMyClimax();
   var nipsAddOwn = (mod2) => addOwn(mod2);
 
   // dispensary/src/lscg.js
@@ -10293,8 +10413,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/doses.js
   var W11 = window;
-  var MIN4 = 6e4;
-  var CAP = 48 * 60 * MIN4;
+  var MIN5 = 6e4;
+  var CAP = 48 * 60 * MIN5;
   var BOOK = {
     denial: {
       label: "Denial Serum",
@@ -10732,6 +10852,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       soak: ["dilating"],
       desc: "Your nipples stretch open while it's in you, wider for a stronger dose. While they're open, the game's action menu has a real Fuck nipple and Finger nipple on you, for anybody with the Dispensary, and touches there count double. Crafted nipple gear that says dilator or stretcher keeps them open while it's worn. An hour a dose."
     },
+    balm: {
+      label: "Tightening Balm",
+      icon: "\u{1F9F4}",
+      mins: 0,
+      color: "#f0d8c0",
+      instant: true,
+      words: /\b(tightening (?:balm|cream|gel|serum|salve)|nipple (?:tightener|closer|balm))\b/,
+      keywords: ["tightening balm", "nipple tightener"],
+      desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone."
+    },
     purge: {
       label: "Purge",
       icon: "\u{1F9FC}",
@@ -10819,7 +10949,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const v = voiceOf(id);
     return v && v.off.length ? nameIn(pick(v.off)) : ours5(id, "off", p);
   }
-  function tellPage(detail) {
+  function tellPage2(detail) {
     try {
       W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail }));
     } catch (e) {
@@ -10849,12 +10979,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const B = BOOK[id], S2 = st();
     if (!B) return { ok: false, why: "unknown" };
     if (S2.off[id]) return { ok: false, why: "off" };
-    if (B.instant) return B.grow ? grow(id, o) : purge(o);
+    if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : purge(o);
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
     const tol = o.upto ? 1 : toleranceOf(id, now);
-    const dur = Math.max(MIN4, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN4 * tol));
+    const dur = Math.max(MIN5, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN5 * tol));
     const was = active(id), d = S2.doses[id], by = Number(o.by) || 0;
     const xNow = Math.max(x, was && d ? d.x || 1 : 1);
     const p = typeof o.p === "string" && o.p ? o.p : was && d && d.p ? d.p : "";
@@ -10871,7 +11001,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!was) start(id);
     if (!o.quiet) action(o.line || takeLine(id));
     if (tol < 1) local(fill(TOLERANCE_NOTE, { dose: B.label }).replace("%p", String(Math.round(tol * 100))));
-    if (!was || p && d && d.p !== p || xNow !== (d && d.x)) tellPage({ type: "dose", id, on: true, x: xNow, p });
+    if (!was || p && d && d.p !== p || xNow !== (d && d.x)) tellPage2({ type: "dose", id, on: true, x: xNow, p });
     try {
       lscgShow(id, by);
     } catch (e) {
@@ -10890,7 +11020,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g[part] = now;
     save();
     if (!o.quiet) action(o.line || fill(pick(LINES.grow[sign > 0 ? part : "less"])).replace(/%p/g, { cup: "tits", ass: "ass", cock: "cock", balls: "balls" }[part]));
-    tellPage({ type: "grow", part, n: now });
+    tellPage2({ type: "grow", part, n: now });
     return { ok: true, part, n: now };
   }
   var grown = () => Object.assign({ cup: 0, ass: 0, cock: 0, balls: 0 }, st().grow || {});
@@ -10906,6 +11036,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!o.quiet) action(o.line || fill("%t shudders as the purge hits, and every dose in them drains away, clean and cold."));
     return { ok: true, n, lscg };
   }
+  function balm(o) {
+    const was = nipsClose(true);
+    if (!o.quiet) action(o.line || fill(was ? "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were." : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
+    return { ok: true, was };
+  }
   function end(id, why) {
     const S2 = st();
     if (!S2.doses[id]) return false;
@@ -10913,7 +11048,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     delete S2.doses[id];
     save();
     stop(id);
-    tellPage({ type: "dose", id, on: false });
+    tellPage2({ type: "dose", id, on: false });
     if (why === "done" || why === "lscg") {
       const l = offLine(id, p);
       if (l) local(l);
@@ -10932,7 +11067,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       n += Object.keys(st().para).length;
       st().para = {};
     }
-    st().wornPause = Date.now() + 15 * MIN4;
+    st().wornPause = Date.now() + 15 * MIN5;
     save();
     return n;
   }
@@ -10950,7 +11085,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!active(id)) end(id, "done");
       else feel(id, now);
     }
-    if (now - lastSave > MIN4) {
+    if (now - lastSave > MIN5) {
       lastSave = now;
       if (Object.keys(S2.doses).length) save();
     }
@@ -10995,7 +11130,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var felt = {};
   var FLUSHED = ["needy", "heat", "rut", "letdown"];
   var xOfDose = (id) => st().doses[id] && st().doses[id].x || 1;
-  var leak = () => tellPage({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
+  var leak = () => tellPage2({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
   function start(id) {
     if (id === "sedative") face("Eyes", "Dazed", 180);
     if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
@@ -11015,15 +11150,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function feel(id, now) {
     const B = BOOK[id];
-    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN4 });
-    if (id === "sedative" && now - f.face > 2 * MIN4) {
+    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN5 });
+    if (id === "sedative" && now - f.face > 2 * MIN5) {
       f.face = now;
       face("Eyes", "Dazed", 180);
     }
     if (id === "needy") {
       const A = meter(), cap = Math.min(92, 60 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < cap) setArousal((Number(A.Progress) || 0) + 2);
-      if (now - f.face > 2 * MIN4) {
+      if (now - f.face > 2 * MIN5) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -11031,7 +11166,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "heat") {
       const A = meter(), floor = Math.min(70, 25 + 15 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN4) {
+      if (now - f.face > 2 * MIN5) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -11039,17 +11174,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "rut") {
       const A = meter(), floor = Math.min(60, 20 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN4) {
+      if (now - f.face > 2 * MIN5) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
     }
-    if (id === "airhead" && now - f.face > 2 * MIN4) {
+    if (id === "airhead" && now - f.face > 2 * MIN5) {
       f.face = now;
       face("Eyes", "Dazed", 120);
     }
     if (B.every && now >= f.next && inRoom()) {
-      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN4;
+      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN5;
       const l = nowLine(id);
       if (l) {
         if (B.room) action(l);
@@ -11057,7 +11192,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       if (id === "letdown") leak();
     } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
-      f.next = now + (8 + Math.random() * 6) * MIN4;
+      f.next = now + (8 + Math.random() * 6) * MIN5;
       local(pick(LINES.sedative.drift));
     }
   }
@@ -11086,7 +11221,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("denial")) {
             if (C.ArousalSettings) C.ArousalSettings.Progress = 94;
             face("Blush", "High", 20);
-            if (Date.now() - heldTold > MIN4) {
+            if (Date.now() - heldTold > MIN5) {
               heldTold = Date.now();
               local(pick(LINES.denial.held));
             }
@@ -11149,7 +11284,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const back = Math.min(80, 40 + 8 * xOf("rut"));
             if ((Number(args[1]) || 0) < back) {
               args = [args[0], back].concat(args.slice(2));
-              feltOnce("rut", "again", MIN4);
+              feltOnce("rut", "again", MIN5);
             }
           }
         } catch (e) {
@@ -11227,6 +11362,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "A finger in your open nipple, curlin' and pressin'. %b's explorin' how deep it goes.",
         "%b works a finger in and out of your nipple, and your whole chest tingles.",
         "Your stretched nipple swallows %b's finger whole. You didn't know it could feel like that."
+      ],
+      // you came in somebody's nipple (only you see it)
+      came: [
+        "You cum deep in %b's stretched nipple, and feel it take every pulse.",
+        "You bury yourself to the hilt in %b's nipple and empty out, and their tit swallows the lot.",
+        "You fill %b's nipple till it can't hold any more."
+      ],
+      // somebody came in yours (the room sees this one)
+      creamed: [
+        "%b cums deep in %t's nipple. A moment later it wells back out, a thick white bead that runs down the curve of %t's tit.",
+        "%t's nipple is stuffed with %b's load, and it starts leakin' back out the moment %b pulls free.",
+        "%b empties into %t's tit. The stretched nipple twitches, and cream drips from it in slow strings.",
+        "%t gasps as %b's load floods their nipple, warm and heavy. It doesn't stay in long: it's runnin' down their chest."
       ],
       self: [
         "Your own finger slides right into your open nipple. It's so strange, and so good.",
@@ -11522,6 +11670,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return true;
   }
   var tellSafeword = () => send2("dispSafeword", {});
+  var tellNipLoad = (by) => send2("dispNipLoad", { by: Number(by) || 0 });
   function onDoseCall(m) {
     const id = String(m.dose || ""), B = BOOK[id];
     const reply = (ok, why) => {
@@ -12507,6 +12656,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("div", null, "\u2022 a drink or a treat somebody feeds you (Sip, Eat), and lip gloss or lipstick with a dose in it, on a kiss"),
       h("div", { style: { marginTop: "4px" } }, "Whoever crafted it has to be on your list. Your safeword clears what's in you and rests your gear " + PAUSE_MINS + " minutes.")
     ));
+    kids.push(h("h3", null, "Nipples"));
+    {
+      const n = nipsOpen(), t = trainedLevel(), loads = nipLoads();
+      kids.push(h(
+        "div",
+        { class: "fd-card" },
+        h("div", null, (n ? "\u2B55 Open, " + n + " wide" : "Closed") + (t ? " \xB7 trained to stay " + t + " wide" : "") + (loads.n ? " \xB7 loads taken in them: " + loads.n : "")),
+        h(
+          "label",
+          { style: { marginTop: "6px" } },
+          h("input", { type: "checkbox", disabled: locked, checked: S2.nipsHeal !== false ? true : void 0, onchange: (e) => {
+            st().nipsHeal = e.target.checked;
+            save();
+            draw2();
+          } }),
+          h("b", null, "They close up slowly on their own")
+        ),
+        h("div", { class: "fd-muted" }, "Held open (the Nipple Dilator, the leeches) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
+        h(
+          "div",
+          { class: "fd-row", style: { marginTop: "6px" } },
+          h("button", { disabled: locked || !n ? true : void 0, onclick: () => {
+            nipsClose(true);
+            note3 = "Your nipples are closed back up, snug as they ever were.";
+            draw2();
+          } }, "Close them up"),
+          h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : "The Dilator out, the leeches off, the stretch undone. A Tightening Balm does it too.")
+        )
+      ));
+    }
     kids.push(h("h3", null, "Parasites"));
     const inMe = mine();
     kids.push(h(
@@ -12629,9 +12808,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       W16.CommandCombine([{
         Tag: "dispensary",
-        Description: "[safeword | page | say | nope | mouth <who> <words>]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece",
+        Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off]]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples",
         Action: (args) => {
           const a = String(args || "").trim().toLowerCase();
+          const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
+          if (nm) {
+            if (nm[1] === "close" || nm[1] === "reset") {
+              if (hardOn()) {
+                local("\u{1F512} Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it).");
+                return;
+              }
+              local(nipsClose(true) ? "Your nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar.");
+              return;
+            }
+            if (nm[1] === "heal" && nm[2]) {
+              if (hardOn()) {
+                local("\u{1F512} Hardcore: your keyholders hold that switch.");
+                return;
+              }
+              st().nipsHeal = nm[2] === "on";
+              save();
+              local(nm[2] === "on" ? "Your nipples will close up slowly on their own, once they've been left be a while." : "Your nipples stay as stretched as they're trained, till somebody closes them up.");
+              return;
+            }
+            const L2 = nipLoads();
+            local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " + (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close \xB7 /dispensary nips heal on|off");
+            return;
+          }
           if (/^(safe|safeword|red)$/.test(a)) {
             safeword("command");
             return;
@@ -12687,6 +12890,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initParasites(mod);
     initNipples(mod);
     nipsOnSuckle(paraSuckled);
+    nipsOnFarmLoad(tellNipLoad);
     onHardChange(() => {
       if (pageOpen()) redrawPage(true);
     });
@@ -12699,6 +12903,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         laterTick();
         wornTick();
         paraTick();
+        nipsTrainTick();
         nipsTell(false);
         tickHard();
         screenTick();
@@ -12760,6 +12965,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     iconsTell: (f) => iconsTell(f),
     nips: () => nipsOpen(),
     nipsOf: (mn) => openOf(mn),
+    nipsTrain: (now) => nipsTrainTick(now),
+    nipsClose: () => nipsClose(),
+    nipLoads: () => nipLoads(),
+    nipsCream: (f) => nipsCream(f),
+    nipsClimax: () => nipsClimax(),
+    trained: () => trainedLevel(),
     nipsState: () => nipsState(),
     nipsAddOwn: () => nipsAddOwn(mod),
     nipsUsed: (from, k) => nipsUsed(from, k),

@@ -200,7 +200,21 @@ and running timers follow you between your phone and your PC, and clearing the b
      With LSCG they're LSCG extension activities; without it the Dispensary adds them to the game the way LSCG does,
      and the chat line travels with the message, names filled in, so people without either still read it. Each
      Dispensary tells the room whose nipples are open (`dispNips { n }`, and again for `dispIconsAsk`).
-   - Still to come: the opened nipple drawn on the drawn body (a picture for Laynie to look at first).
+   - **Drawn** (Laynie: "looks good on the dialator"): the Companion's drawn breasts draw them open, one to three wide, a
+     puffy pink rim round the openin', over her own nipple and under anything worn on it (body-engine.js openNip; the
+     engine asks `host.nipOpen`, the Companion's drawn body asks the Dispensary, `FarmhandDispensary.nipples(mn)`).
+   - **The stretch stays** (Laynie: "if the stretching persist after the leeches are removed, it would make since to be
+     able to use and fuck them, or creampie them too"): held open they train, a tenth of a level every half hour toward
+     how wide they're held, and more with every fuckin'. What's trained stays when the dose wears off or the leeches drop,
+     and stays usable. **"They close up slowly on their own"** is each player's switch (Laynie: "up to the individual
+     player with a toggle"), on to start: half a step a day once they've been left be twelve hours.
+   - **Closin' them back up** (Laynie: "need to have a way to reset them"): "Close them up" on the page,
+     `/dispensary nips close`, or a **Tightening Balm** anybody on your list doses you with (in hardcore, the balm from a
+     keyholder). `/dispensary nips` says how they are; `/dispensary nips heal on|off` is the switch.
+   - **Creampies:** whoever cums within a minute and a half of fuckin' your nipple, their Dispensary tells yours
+     (`dispCream`). It wells back out (a line for the room, cum on your chest for the Companion) and is counted, its own
+     count (Laynie: "its own count"). On the farm the farm girl's told (`dispNipLoad`): her own count on `?stats`, and it
+     comes back out creamy with the next milkin'.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.64.0
+// @version      0.65.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8058,7 +8058,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.64.0";
+  var VERSION = "0.65.0";
 
   // shared/species.js
   var WORDS = {
@@ -9838,6 +9838,52 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return v;
       }
       const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };
+      function openNip(level, rad, sk) {
+        const key3 = level + "|" + rad.toFixed(2) + "|" + sk.join(",");
+        if (BREAST.oc && BREAST.ocKey === key3) return BREAST.oc;
+        const R = rad * (1.15 + 0.2 * level), size = Math.ceil(R * 2 + 4), c = document.createElement("canvas");
+        c.width = c.height = size;
+        const g = c.getContext("2d"), m = size / 2;
+        const tone = (k, a) => "rgba(" + Math.round(Math.min(255, sk[0] * k * 0.95)) + "," + Math.round(sk[1] * 0.6 * k) + "," + Math.round(sk[2] * 0.62 * k) + "," + a + ")";
+        let gr = g.createRadialGradient(m, m, 0, m, m, R);
+        gr.addColorStop(0, tone(0.92, 1));
+        gr.addColorStop(0.55, tone(1, 0.92));
+        gr.addColorStop(0.85, tone(1.04, 0.55));
+        gr.addColorStop(1, tone(1.05, 0));
+        g.fillStyle = gr;
+        g.beginPath();
+        g.arc(m, m, R, 0, Math.PI * 2);
+        g.fill();
+        const hole = rad * (0.2 + 0.16 * level), rim = hole * 1.8;
+        gr = g.createRadialGradient(m, m - hole * 0.1, hole * 0.75, m, m, rim);
+        gr.addColorStop(0, "rgba(228,118,138,0.95)");
+        gr.addColorStop(0.65, tone(1.06, 0.85));
+        gr.addColorStop(1, tone(1, 0));
+        g.fillStyle = gr;
+        g.beginPath();
+        g.arc(m, m, rim, 0, Math.PI * 2);
+        g.fill();
+        gr = g.createRadialGradient(m, m + hole * 0.2, 0, m, m, hole);
+        gr.addColorStop(0, "rgba(38,6,14,1)");
+        gr.addColorStop(0.55, "rgba(105,20,38,1)");
+        gr.addColorStop(0.9, "rgba(185,66,92,1)");
+        gr.addColorStop(1, "rgba(205,92,112,0.85)");
+        g.fillStyle = gr;
+        g.beginPath();
+        g.ellipse(m, m, hole * 0.86, hole * 1.06, 0, 0, Math.PI * 2);
+        g.fill();
+        g.fillStyle = "rgba(255,255,255,0.8)";
+        g.beginPath();
+        g.ellipse(m - hole * 0.7, m - hole * 0.95, Math.max(0.8, hole * 0.3), Math.max(0.5, hole * 0.14), -0.6, 0, Math.PI * 2);
+        g.fill();
+        g.fillStyle = "rgba(255,255,255,0.35)";
+        g.beginPath();
+        g.ellipse(m + hole * 0.55, m + hole, Math.max(0.6, hole * 0.2), Math.max(0.4, hole * 0.08), 0.4, 0, Math.PI * 2);
+        g.fill();
+        BREAST.oc = c;
+        BREAST.ocKey = key3;
+        return c;
+      }
       function draw3(C2, cb, game) {
         trim();
         {
@@ -10011,6 +10057,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     } catch (e) {
                       warnSome2("[studio] nipples:", e);
                     }
+                  }
+                  try {
+                    const lv = typeof host.nipOpen === "function" ? Math.max(0, Math.min(3, Math.round(Number(host.nipOpen()) || 0))) : 0;
+                    if (lv > 0) {
+                      const B = ctx3.breast, sk2 = bellySkin(upper[2], upper[3], bpose), r0 = 7 * B.kN, oc = openNip(lv, r0, sk2);
+                      for (const p of B.nips) if (p[1] + r0 < B.ground) {
+                        put2("drawImage", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin");
+                        if (typeof real.drawImageBlink === "function") put2("drawImageBlink", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin");
+                      }
+                    }
+                  } catch (e) {
+                    warnSome2("[body] opened nipples:", e);
                   }
                 }
               };
@@ -12583,6 +12641,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return Math.min(4, Math.max(stage + (f.x >= 2 ? 2 : 1), f.x >= 2 ? 3 : 2));
   }
   var fillSig = "";
+  function drawnBodyRedrawFor(mn) {
+    if (W4.Player && Number(mn) === W4.Player.MemberNumber) redraw(60);
+    else if (others.has(Number(mn))) redrawMn(Number(mn), 60);
+  }
   function drawnBodyFillCheck() {
     const f = fillOut(), g = grownAll(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;
     if (sig2 === fillSig) return false;
@@ -12737,6 +12799,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       picture: picture2,
       overBreast: bcrOverBreast,
       // BCR's marks on the drawn breasts (bcr.js)
+      // how open their nipples are (The Farmhand's Dispensary: the Nipple Dilator, its leeches, a trained stretch; Nov 18)
+      nipOpen: () => {
+        try {
+          const D = W4.FarmhandDispensary;
+          return D && typeof D.nipples === "function" ? D.nipples(mn == null ? W4.Player && W4.Player.MemberNumber : mn) : 0;
+        } catch (e) {
+          return 0;
+        }
+      },
       budget: mn == null ? 192e6 : 96e6
       // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
     });
@@ -22444,6 +22515,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
         if (d.type === "dose" && d.id === "fillout" || d.type === "grow") drawnBodyFillCheck();
         if (d.type === "dose" && d.id === "statue") statueCheck();
+        if (d.type === "nips") drawnBodyRedrawFor(d.from);
       } catch (err) {
         console.warn("[Farmhand Companion] the Dispensary's doses:", err);
       }

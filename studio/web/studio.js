@@ -60,9 +60,12 @@
   const bodyItem = (group) => S.C.Appearance.find((a) => a.Asset.Group.Name === group);
   function setBody(group, name) {
     stashFits();
-    const b = ServerAppearanceBundle(S.C.Appearance), it = b.find((x) => x.Group === group);
-    if (it) it.Name = name;
-    ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); applyAllSaved(); redraw();
+    // (Nov 18, BC R134: rebuildin' the outfit for a body change is refused now, since a body part may only be changed by
+    // its owner and the studio's character isn't anybody. So the body part is swapped straight in, its colour kept.)
+    const A = AssetGet(S.C.AssetFamily, group, name), was = S.C.Appearance.find((x) => x.Asset && x.Asset.Group && x.Asset.Group.Name === group);
+    if (A && typeof CharacterAppearanceSetItem === "function") CharacterAppearanceSetItem(S.C, group, A, was && was.Color, 0, undefined, false);
+    else { const b = ServerAppearanceBundle(S.C.Appearance), it = b.find((x) => x.Group === group); if (it) it.Name = name; ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); }
+    applyAllSaved(); redraw();
   }
   function setSkin(tone) {
     const b = ServerAppearanceBundle(S.C.Appearance);
@@ -85,7 +88,8 @@
     p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 }; made.set(cv, p); if (!used.has(p.src)) fresh = true; used.set(p.src, Date.now()); return p;   // (the same picture again: no new drawing needed)
   }
   if (window.__studioLive) setInterval(() => { const old = Date.now() - 30000; for (const [src, t] of used) if (t < old) { used.delete(src); try { if (window.GLDrawImageCache) GLDrawImageCache.delete(src); if (window.DrawImageCache) DrawImageCache.delete(src); const gl = window.GLDrawCanvas && GLDrawCanvas.GL, tc = gl && gl.textureCache, t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ } } }, 20000);
-  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined });
+  // (nipOpen: how open her nipples are drawn, 0 to 3, for lookin' at the Dispensary's opened nipples here: S.nipOpen)
+  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined, nipOpen: () => S.nipOpen || 0 });
   window.__studioEngine = E;   // (for looking in from the console: how much it keeps, E.keptBytes())
   const { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
     BREAST, BREAST_SLIDERS, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN } = E;

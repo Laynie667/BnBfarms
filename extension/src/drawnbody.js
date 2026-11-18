@@ -128,6 +128,8 @@ function bellyWithFill(stage, f) {
 }
 let fillSig = "";
 // every few seconds (index.js), and when the Dispensary says Fill-Out started or ended: redraw if it changed
+// somebody's nipples opened or closed (the Dispensary says): them drawn again
+export function drawnBodyRedrawFor(mn) { if (W.Player && Number(mn) === W.Player.MemberNumber) redraw(60); else if (others.has(Number(mn))) redrawMn(Number(mn), 60); }
 export function drawnBodyFillCheck() {
   const f = fillOut(), g = grownAll(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;   // (and growth off the farm)
   if (sig === fillSig) return false;
@@ -225,6 +227,8 @@ function makeEngine(mn) {
     redraw: () => (mn == null ? redraw(60) : redrawMn(mn, 60)),
     picture,
     overBreast: bcrOverBreast,   // BCR's marks on the drawn breasts (bcr.js)
+    // how open their nipples are (The Farmhand's Dispensary: the Nipple Dilator, its leeches, a trained stretch; Nov 18)
+    nipOpen: () => { try { const D = W.FarmhandDispensary; return D && typeof D.nipples === "function" ? D.nipples(mn == null ? (W.Player && W.Player.MemberNumber) : mn) : 0; } catch (e) { return 0; } },
     budget: mn == null ? 192e6 : 96e6,   // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
   });
 }

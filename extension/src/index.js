@@ -20,7 +20,7 @@ import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
-import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck } from "./drawnbody.js";
+import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
@@ -613,6 +613,7 @@ function start() {
       if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
       if ((d.type === "dose" && d.id === "fillout") || d.type === "grow") drawnBodyFillCheck();   // (Fill-Out, and growth off the farm)
       if (d.type === "dose" && d.id === "statue") statueCheck();   // (the Statue Serum)
+      if (d.type === "nips") drawnBodyRedrawFor(d.from);   // (nipples opened or closed: drawn again, Nov 18)
     } catch (err) { console.warn("[Farmhand Companion] the Dispensary's doses:", err); }
   });
 

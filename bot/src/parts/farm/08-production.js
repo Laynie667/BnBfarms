@@ -490,13 +490,14 @@
       const out = Math.min(over, take * CFG.MILK_LEAK_SHARE), tot = heldTotal(p);
       for (const h of HOLES) p.held[h] = Math.max(0, (p.held[h]||0) - out * (p.held[h]||0) / tot);
       p.leakAcc = (p.leakAcc||0) + out;
-      if (charFor(mn) && now - (p.leakSaid||0) > 60000 && p.leakAcc >= 5){
+      if (charFor(mn) && now - (p.leakSaid||0) > 60000 && p.leakAcc >= 5){   // (seed in their tits comes out below: creamedMilk)
         p.leakSaid = now;
         const whose = p.lastStud ? plainName(p.lastStud)+"'s" : "somebody's";
         emote("💦 "+bodyWords(mn, pickFor(mn, "milkleak", MILK_LEAK)).replace(/%n/g, plainName(mn)).replace(/%s/g, whose).replace(/%a/g, ml(p.leakAcc)));
         p.leakAcc = 0;
       }
     }
+    if (!nursing && take >= 20 && p.nipCream){ try { creamedMilk(mn); } catch(e){ warn("creamed milk:", e); } }   // a load in their nipples comes back out with the milk (10ur2-dispensary.js)
     return take;
   }
   function drainSemen(mn, amount){

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.65.0
+// @version      0.66.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7284,19 +7284,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
   var MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
-  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
-  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
+  var TAT_SLOTS = ["FarmTat1", "FarmTat2"];
+  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS, ...TAT_SLOTS];
+  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3", FarmTat1: "Farm Tattoo 1", FarmTat2: "Farm Tattoo 2" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
-  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
+  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand|Tat[12]))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
   var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
-  var MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
+  var MARK_SRC = /\/(Farm(?:Mark[1-3]|Tat[12]))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var stillItem = (C2, kind, name) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var isMark = (slot) => MARK_SLOTS.includes(slot);
-  var ours = (slot) => !!kindOf(slot) || isMark(slot);
-  var picKind = (slot) => isMark(slot) ? "FarmBrand" : kindOf(slot);
+  var isTat = (slot) => TAT_SLOTS.includes(slot);
+  var isHid = (slot) => isMark(slot) || isTat(slot);
+  var ours = (slot) => !!kindOf(slot) || isHid(slot);
+  var picKind = (slot) => isMark(slot) ? "FarmBrand" : isTat(slot) ? "FarmInk" : kindOf(slot);
   var TITLES = {};
   var MANIFEST = {};
   var K = {};
@@ -7305,16 +7308,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (a.live) MANIFEST[a.name] = a;
     if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
   }
-  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38], FarmTat1: [250, 246, 100, 22], FarmTat2: [250, 492, 84, 30] };
   var MK = {};
-  for (const slot of MARK_SLOTS) for (const a of ink_designs_default.groups.FarmBrand) {
+  for (const slot of [...MARK_SLOTS, ...TAT_SLOTS]) for (const a of ink_designs_default.groups[picKind(slot)]) {
     const [, , bw, bh] = MARK_AT[slot];
     MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100;
   }
   var kOf = (it) => {
     const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name;
     if (!g) return 1;
-    return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
+    return (isHid(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
   };
   function assetDef(a) {
     return {
@@ -7356,7 +7359,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       AllowNone: true,
       AllowCustomize: false,
       Color: ["Default"],
-      Asset: ink_designs_default.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
+      Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
   function describe(W18) {
@@ -7375,7 +7378,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let added = false;
     for (const slot of ALL_SLOTS) {
       if (W18.AssetGroupMap.has(slot)) continue;
-      const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W18.AssetGroupAdd("Female3DCG", def);
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W18.AssetGroupAdd("Female3DCG", def);
       for (const a of def.Asset) W18.AssetAdd(G, a, W18.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
@@ -7483,6 +7486,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var DESIGNS = { brand: new Set(ink_designs_default.groups.FarmBrand.map((a) => a.name)), ink: new Set(ink_designs_default.groups.FarmInk.map((a) => a.name)) };
   DESIGNS.mark = DESIGNS.brand;
+  DESIGNS.tat = DESIGNS.ink;
   var LAYERS_OF = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
   var farmOf = (it) => {
@@ -7493,7 +7497,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null;
+    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : e.slot === "tat" ? "tat" : null;
     if (!slot || !DESIGNS[slot].has(e.design)) return null;
     const n = (v, max) => {
       const x = Number(v);
@@ -7535,11 +7539,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const e of want) {
       if (ALL_SLOTS.some((s) => farmOf(itemIn(P5, s)) === e.id)) continue;
-      const mark = e.slot === "mark";
+      const mark = e.slot === "mark" || e.slot === "tat";
       if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
-      if (mark) {
+      if (e.slot === "tat") slot = isLive(e.design) ? TAT_SLOTS[0] : TAT_SLOTS[1];
+      else if (mark) {
         const atOf = (s) => {
           const f = farmOf(itemIn(P5, s)) && itemIn(P5, s).Property.FarmInk;
           return f && f.at || 0;
@@ -7804,6 +7809,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
       hook4("AssetBaseURL", 0, (args, next) => {
         const slot = args[2] || args[1] && args[1].Name;
+        if (isTat(slot)) return (args[6] && isLive(args[6].Name) ? LIVE_HOST : INK_HOST) + slot + "/";
         if (isMark(slot)) return INK_HOST + slot + "/";
         const kind = kindOf(slot);
         if (!kind) return next(args);
@@ -7867,11 +7873,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const wrap = (f, plain2) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
-            const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
+            const mm = (src.indexOf("/FarmMark") > 0 || src.indexOf("/FarmTat") > 0) && src.indexOf("/live/") < 0 ? MARK_SRC.exec(src) : null;
             if (mm) {
               const it = itemIn(C2, mm[1]);
               if (!it || it.Asset.Name !== mm[2]) return void 0;
-              const u = src.replace("/" + mm[1] + "/", "/FarmBrand/");
+              const u = src.replace("/" + mm[1] + "/", "/" + picKind(mm[1]) + "/");
               const o3 = aged(sized(o, it), it, mm[3]);
               if (o3.Alpha === 0) return void 0;
               seen3.add(mm[2]);
@@ -7932,7 +7938,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
       hook4("WardrobeFastLoad", 0, (args, next) => {
-        const C2 = args[0], keep3 = C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+        const C2 = args[0], keep3 = C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isHid(it.Asset.Group.Name) && farmOf(it)) : [];
         const r = next(args);
         try {
           let back = 0;
@@ -8058,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.65.0";
+  var VERSION = "0.66.0";
 
   // shared/species.js
   var WORDS = {
@@ -11225,7 +11231,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 return true;
               };
               const held = [];
-              const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;
+              const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3]|Tat[12])\//;
               const flushInk = () => {
                 for (const h2 of inkHeld.splice(0)) {
                   try {
@@ -12352,7 +12358,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
               if (src.includes("/BodyLower/")) lower = true;
             };
-            const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;
+            const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3]|Tat[12])\//;
             const flushInk = () => {
               for (const h2 of inkHeld.splice(0)) {
                 try {

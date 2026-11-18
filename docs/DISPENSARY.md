@@ -180,7 +180,9 @@ and running timers follow you between your phone and your PC, and clearing the b
    only acted on if you switched that kind on and the sender's on your list.
    **Dose icons** (built Nov 18, icons.js): a small row of icons by anybody in the room with doses in them, and 🪱 for a
    parasite. Each Dispensary tells the room what's in its wearer (`dispIcons { ids, para }`, `dispIconsAsk`). There are
-   two switches, both on to start: show them, and let others see mine.
+   two switches, both on to start: show them, and let others see mine. Nov 18, Laynie: "they are just big": they're
+   drawn the size of the game's own icons, in its free spots on that top row (on the map, half size by the name of
+   whoever you hover). Three at most, then "+n"; hover them for every dose by name.
    **Every load takes, and nipples that open up** (built Nov 18; Laynie, Nov 17: "a effect that makes every load take ~
    for hyper pregnancy reasons. and maybe a nipple dialator effect and parasite that makes nipples fuckable as a real
    action?"):

@@ -47,6 +47,11 @@ function page(opts) {
   const drawnText = [];
   w.ChatRoomDrawCharacterStatusIcons = function () {};
   w.DrawTextFit = function (t) { drawnText.push(String(t)); };
+  // the game's canvas (the dose icons draw on it): what's written, where, and how big
+  const drawnAt = [];
+  w.MainCanvas = { save() {}, restore() {}, strokeText() {}, fillRect() {}, strokeRect() {}, measureText: (t) => ({ width: String(t).length * 10 }),
+    fillText(t, x, y) { drawnText.push(String(t)); drawnAt.push([String(t), x, y, this.font]); } };
+  w.MouseIn = function (x, y, ww, hh) { return !!w.__mouse && w.__mouse[0] >= x && w.__mouse[0] <= x + ww && w.__mouse[1] >= y && w.__mouse[1] <= y + hh; };
   { const mc = w.document.createElement("canvas"); mc.id = "MainCanvas"; w.document.body.appendChild(mc); }
   w.ActivitySetArousalTimer = function (C, A, Z, P) { game.timer = P; };
   w.ActivitySetArousal = function (C, v) { C.ArousalSettings.Progress = v; };
@@ -72,7 +77,7 @@ function page(opts) {
   const toBot = (type) => sent.filter(([e, d]) => e === "ChatRoomChat" && d.Content === "FarmhandMsg" && d.Target === BOT && d.Dictionary.type === type).map(([, d]) => d.Dictionary);
   const actions = () => sent.filter(([e, d]) => e === "ChatRoomChat" && d.Type === "Action").map(([, d]) => d.Dictionary.find((x) => x.Tag === "msg").Text);
   const marks = () => { try { return (JSON.parse(w.localStorage.getItem("farmhand-messes")) || []).length; } catch (e) { return 0; } };
-  return { drawnText, marks, w, sent, local, cmds, synced, faces, pages, game, beeps, needle, fromBot, toBot, to, actions, D: () => w.__disp };
+  return { drawnText, drawnAt, marks, w, sent, local, cmds, synced, faces, pages, game, beeps, needle, fromBot, toBot, to, actions, D: () => w.__disp };
 }
 
 (async () => {
@@ -261,7 +266,18 @@ function page(opts) {
   ok(w.FarmhandDispensary.dosedOf(LOVER) === true && iconEv.join() === String(LOVER), "...their icons say they're dosed now, and the page is told (their glow ink lights up)");
   const lovC = w.ChatRoomCharacter.find((x) => x.MemberNumber === LOVER); s.drawnText.length = 0;
   w.ChatRoomDrawCharacterStatusIcons(lovC, 100, 100, 1);
-  ok(s.drawnText.includes("💗🐄🪱"), "...and theirs are drawn by them (Needy Nectar, Moo Juice, a parasite)");
+  ok(["💗", "🐄", "🪱"].every((t) => s.drawnText.includes(t)), "...and theirs are drawn by them (Needy Nectar, Moo Juice, a parasite)");
+  // Laynie, Nov 18: "they are just big": the size of the game's own icons, in its free spots on that top row
+  const at = s.drawnAt.filter(([t]) => ["💗", "🐄", "🪱"].includes(t));
+  ok(at.length === 3 && at.every(([, x, y, f]) => /\b30px/.test(f) && y === 120) && at[0][1] === 100 + 190 + 20 && at[2][1] === 100 + 190 + 100, "...each the game's icon size, in a row where the game's own leave room (" + at.map((a) => a[1]).join(",") + ")");
+  s.drawnText.length = 0; s.drawnAt.length = 0; w.ChatRoomDrawCharacterStatusIcons(lovC, 1000, 0, 0.5);
+  ok(s.drawnAt.length === 3 && s.drawnAt.every(([, , , f]) => /\b15px/.test(f)), "...half that on the map, where the game draws its own at half size by the name");
+  s.fromBot("dispIcons", { ids: ["needy", "moo", "rut", "heat"], para: true }, LOVER);
+  s.drawnText.length = 0; w.ChatRoomDrawCharacterStatusIcons(lovC, 100, 100, 1);
+  ok(s.drawnText.join("|") === "💗|🐄|+3", "five things in them: two icons and \"+3\", not a long row (" + s.drawnText.join("|") + ")");
+  w.__mouse = [100 + 190 + 10, 110]; s.drawnText.length = 0; w.ChatRoomDrawCharacterStatusIcons(lovC, 100, 100, 1); w.__mouse = null;
+  ok(s.drawnText.some((t) => /Needy Nectar/.test(t)) && s.drawnText.some((t) => /🪱 A parasite/.test(t)) && s.drawnText.filter((t) => /^\S+ [A-Z]/.test(t)).length === 5, "...hover them: every one, by name");
+  s.fromBot("dispIcons", { ids: ["needy", "moo"], para: true }, LOVER);
   D.st().iconsShow = false; s.drawnText.length = 0; w.ChatRoomDrawCharacterStatusIcons(lovC, 100, 100, 1);
   ok(!s.drawnText.length, "...not if you've switched the icons off");
   D.st().iconsShow = true; D.st().iconsShare = false; nIc = s.sent.length; D.iconsTell(true);

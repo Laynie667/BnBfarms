@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.13.0
+// @version      0.14.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7281,19 +7281,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
   var MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
-  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
-  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
+  var TAT_SLOTS = ["FarmTat1", "FarmTat2"];
+  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS, ...TAT_SLOTS];
+  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3", FarmTat1: "Farm Tattoo 1", FarmTat2: "Farm Tattoo 2" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
-  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
+  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand|Tat[12]))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
   var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
-  var MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
+  var MARK_SRC = /\/(Farm(?:Mark[1-3]|Tat[12]))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var stillItem = (C, kind, name) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var isMark = (slot) => MARK_SLOTS.includes(slot);
-  var ours = (slot) => !!kindOf(slot) || isMark(slot);
-  var picKind = (slot) => isMark(slot) ? "FarmBrand" : kindOf(slot);
+  var isTat = (slot) => TAT_SLOTS.includes(slot);
+  var isHid = (slot) => isMark(slot) || isTat(slot);
+  var ours = (slot) => !!kindOf(slot) || isHid(slot);
+  var picKind = (slot) => isMark(slot) ? "FarmBrand" : isTat(slot) ? "FarmInk" : kindOf(slot);
   var TITLES = {};
   var MANIFEST = {};
   var K = {};
@@ -7302,16 +7305,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (a.live) MANIFEST[a.name] = a;
     if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
   }
-  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38], FarmTat1: [250, 246, 100, 22], FarmTat2: [250, 492, 84, 30] };
   var MK = {};
-  for (const slot of MARK_SLOTS) for (const a of ink_designs_default.groups.FarmBrand) {
+  for (const slot of [...MARK_SLOTS, ...TAT_SLOTS]) for (const a of ink_designs_default.groups[picKind(slot)]) {
     const [, , bw, bh] = MARK_AT[slot];
     MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100;
   }
   var kOf = (it) => {
     const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name;
     if (!g) return 1;
-    return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
+    return (isHid(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
   };
   function assetDef(a) {
     return {
@@ -7353,7 +7356,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       AllowNone: true,
       AllowCustomize: false,
       Color: ["Default"],
-      Asset: ink_designs_default.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
+      Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
   function describe(W17) {
@@ -7372,7 +7375,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let added = false;
     for (const slot of ALL_SLOTS) {
       if (W17.AssetGroupMap.has(slot)) continue;
-      const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W17.AssetGroupAdd("Female3DCG", def);
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W17.AssetGroupAdd("Female3DCG", def);
       for (const a of def.Asset) W17.AssetAdd(G, a, W17.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
@@ -7480,6 +7483,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var DESIGNS = { brand: new Set(ink_designs_default.groups.FarmBrand.map((a) => a.name)), ink: new Set(ink_designs_default.groups.FarmInk.map((a) => a.name)) };
   DESIGNS.mark = DESIGNS.brand;
+  DESIGNS.tat = DESIGNS.ink;
   var LAYERS_OF = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
   var farmOf = (it) => {
@@ -7490,7 +7494,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null;
+    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : e.slot === "tat" ? "tat" : null;
     if (!slot || !DESIGNS[slot].has(e.design)) return null;
     const n = (v, max) => {
       const x = Number(v);
@@ -7532,11 +7536,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const e of want) {
       if (ALL_SLOTS.some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-      const mark = e.slot === "mark";
+      const mark = e.slot === "mark" || e.slot === "tat";
       if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
-      if (mark) {
+      if (e.slot === "tat") slot = isLive(e.design) ? TAT_SLOTS[0] : TAT_SLOTS[1];
+      else if (mark) {
         const atOf = (s) => {
           const f = farmOf(itemIn(P, s)) && itemIn(P, s).Property.FarmInk;
           return f && f.at || 0;
@@ -7801,6 +7806,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
       hook("AssetBaseURL", 0, (args, next) => {
         const slot = args[2] || args[1] && args[1].Name;
+        if (isTat(slot)) return (args[6] && isLive(args[6].Name) ? LIVE_HOST : INK_HOST) + slot + "/";
         if (isMark(slot)) return INK_HOST + slot + "/";
         const kind = kindOf(slot);
         if (!kind) return next(args);
@@ -7864,11 +7870,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const wrap = (f, plain) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
-            const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
+            const mm = (src.indexOf("/FarmMark") > 0 || src.indexOf("/FarmTat") > 0) && src.indexOf("/live/") < 0 ? MARK_SRC.exec(src) : null;
             if (mm) {
               const it = itemIn(C, mm[1]);
               if (!it || it.Asset.Name !== mm[2]) return void 0;
-              const u = src.replace("/" + mm[1] + "/", "/FarmBrand/");
+              const u = src.replace("/" + mm[1] + "/", "/" + picKind(mm[1]) + "/");
               const o3 = aged(sized(o, it), it, mm[3]);
               if (o3.Alpha === 0) return void 0;
               seen.add(mm[2]);
@@ -7929,7 +7935,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
       hook("WardrobeFastLoad", 0, (args, next) => {
-        const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+        const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isHid(it.Asset.Group.Name) && farmOf(it)) : [];
         const r = next(args);
         try {
           let back = 0;
@@ -8043,7 +8049,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.13.0";
+  var VERSION = "0.14.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -11467,6 +11473,56 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!e) return "";
     return e.ids.slice(0, 5).map((id) => BOOK[id].icon).join("") + (e.para ? "\u{1FAB1}" : "");
   }
+  var canvas = () => typeof MainCanvas !== "undefined" && MainCanvas || W12.MainCanvas || null;
+  var fontOf2 = (px) => {
+    try {
+      if (typeof CommonGetFont === "function") return CommonGetFont(px);
+    } catch (e) {
+    }
+    return px + "px Arial";
+  };
+  function iconsItems(mn) {
+    const e = mn === me5() ? mineNow() : others2.get(mn);
+    if (!e) return [];
+    return e.ids.filter((id) => BOOK[id]).map((id) => ({ icon: BOOK[id].icon, label: BOOK[id].label })).concat(e.para ? [{ icon: "\u{1FAB1}", label: "A parasite" }] : []);
+  }
+  function drawIcons(C, X, Y, Z) {
+    const items = iconsItems(C.MemberNumber), M = canvas();
+    if (!items.length || !M) return 0;
+    const shown2 = items.length > 3 ? items.slice(0, 2).concat({ icon: "+" + (items.length - 2) }) : items;
+    const s = 40 * Z, x0 = X + 190 * Z;
+    M.save();
+    try {
+      M.textAlign = "center";
+      M.textBaseline = "middle";
+      M.font = fontOf2(Math.max(8, Math.round(30 * Z)));
+      M.lineWidth = Math.max(1, 3 * Z);
+      M.strokeStyle = "black";
+      M.fillStyle = "white";
+      shown2.forEach((it, i) => {
+        const x = x0 + s * i + s / 2, y = Y + s / 2;
+        if (it.icon[0] === "+") M.strokeText(it.icon, x, y);
+        M.fillText(it.icon, x, y);
+      });
+      if (typeof W12.MouseIn === "function" && W12.MouseIn(x0, Y, s * shown2.length, s)) {
+        const px = 22, lh = px + 8;
+        M.font = fontOf2(px);
+        M.textAlign = "left";
+        const lines = items.map((it) => it.icon + " " + it.label), w = Math.max(...lines.map((l) => M.measureText(l).width)) + 20, h2 = lines.length * lh + 10;
+        const bx = Math.max(4, Math.min(x0, 2e3 - w - 4)), by = Y + s + 4;
+        M.fillStyle = "rgba(20,14,24,0.88)";
+        M.fillRect(bx, by, w, h2);
+        M.strokeStyle = "rgba(255,255,255,0.35)";
+        M.lineWidth = 1;
+        M.strokeRect(bx, by, w, h2);
+        M.fillStyle = "white";
+        lines.forEach((l, i) => M.fillText(l, bx + 10, by + 5 + lh * i + lh / 2));
+      }
+    } finally {
+      M.restore();
+    }
+    return shown2.length;
+  }
   function initIcons(mod2) {
     try {
       mod2.hookFunction("ChatRoomDrawCharacterStatusIcons", 0, (args, next) => {
@@ -11474,8 +11530,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         try {
           const [C, X, Y, Z] = args;
           if (st().iconsShow === false || !C) return r;
-          const t = iconsFor(C.MemberNumber);
-          if (t && typeof W12.DrawTextFit === "function") W12.DrawTextFit(t, X + 250 * Z, Y + 22 * Z, 200 * Z, "White", "Black");
+          drawIcons(C, X, Y, Z || 1);
         } catch (e) {
         }
         return r;

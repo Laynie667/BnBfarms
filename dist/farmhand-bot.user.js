@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.82.0
+// @version      0.83.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.82.0";
-  var COMPANION_VERSION = "0.65.0";
+  var VERSION = "0.83.0";
+  var COMPANION_VERSION = "0.66.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -16426,7 +16426,7 @@
         const word = BRAND_WORDS[Math.floor(Math.random() * BRAND_WORDS.length)], v = { x: word };
         trapHold(mn, 2, "the brandin' arm");
         trapRun(mn, "brand", MORE_LINES.brand.beats, () => {
-          const ok = bodyMark(mn, { write: { line: word, area: ["hips", "chest", "waist", "ribs"][Math.floor(Math.random() * 4)] } });
+          const ok = trapWords(mn, word, "neat", ["hips", "chest", "waist", "ribs"][Math.floor(Math.random() * 4)]);
           rec(mn).branded = word;
           emote("\u{1F58B}\uFE0F " + moreLine("brand", "end", mn, v), mn);
           if (!ok) tell(mn, "\u{1F58B}\uFE0F It wrote " + word + ` on you, sugar. With the Companion and "Farm can mark my body" on, it'd be there for everybody to read.`);
@@ -16558,7 +16558,7 @@
         const price = 1 + Math.floor(Math.random() * 9), v = { x: String(price) };
         trapHold(mn, 3, "the sale block");
         trapRun(mn, "pricetag", MORE_LINES.pricetag.beats, () => {
-          bodyMark(mn, { write: { line: "FOR SALE " + price + " RIBBONS", area: "hips" } });
+          trapWords(mn, "FOR SALE " + price + " RIBBONS", "red", "hips");
           rec(mn).priced = { at: Date.now(), price };
           announce("\u{1F3F7}\uFE0F " + moreLine("pricetag", "call", mn, v));
           emote("\u{1F3F7}\uFE0F " + moreLine("pricetag", "end", mn, v), mn);
@@ -19255,7 +19255,7 @@
       stamp(mn) {
         themedRun(mn, "stamp", 3, "the office", () => {
           const w = ["APPROVED", "INSPECTED", "GRADE A", "FILED", "PROPERTY"][Math.floor(Math.random() * 5)];
-          bodyMark(mn, { write: { line: w, area: ["hips", "chest", "waist"][Math.floor(Math.random() * 3)] } });
+          trapWords(mn, w, "stamp", ["hips", "chest", "waist"][Math.floor(Math.random() * 3)]);
         });
       }
     });
@@ -25288,8 +25288,71 @@
       if (!th) th = Object.keys(TRAP_THEMES).find((k) => (TRAP_THEMES[k].kinds || []).includes(kind)) || null;
       return STAMP[th] || (th && TRAP_THEMES[th] ? String(TRAP_THEMES[th].label).toUpperCase().slice(0, 16) : "B&B FARM");
     }
-    const TRAP_MARK = { tentacle: "TentacleRingBrand", wolves: "MoonPawBrand", boar: "SnoutRingBrand" };
-    const MARK_OF = { TentacleRingBrand: { who: "the pond", name: "tentacle ring" }, MoonPawBrand: { who: "the pack", name: "moon paw" }, SnoutRingBrand: { who: "the boar", name: "snout ring" } };
+    const TRAP_MARK = {
+      tentacle: "TentacleRingBrand",
+      wolves: "MoonPawBrand",
+      werewolf: "MoonPawBrand",
+      boar: "SnoutRingBrand",
+      sow: "SnoutRingBrand",
+      stallion: "Mare",
+      ponycart: "Mare",
+      bull: "Hucow",
+      minotaur: "Hucow",
+      warren: "Bunny",
+      foxden: "Vixen",
+      ramstud: "Ewe",
+      stag: "Doe",
+      goat: "Nanny",
+      drake: "Dragoness",
+      toms: "Kitten",
+      lionpride: "Kitten",
+      kennel: "TheKennelsBrand",
+      whelping: "TheKennelsBrand",
+      goblinraid: "Goblins",
+      goblinpit: "Goblins",
+      goblinmarket: "Goblins",
+      goblincart: "Goblins",
+      warband: "Goblins",
+      breeder: "BreedingStock",
+      studchair: "BreedingStock"
+    };
+    const MARK_OF = {
+      TentacleRingBrand: { who: "the pond", name: "tentacle ring" },
+      MoonPawBrand: { who: "the pack", name: "moon paw" },
+      SnoutRingBrand: { who: "the boar", name: "snout ring" },
+      Mare: { who: "the stable", name: "mare brand" },
+      Hucow: { who: "the bull", name: "hucow brand" },
+      Bunny: { who: "the warren", name: "bunny brand" },
+      Vixen: { who: "the fox den", name: "vixen brand" },
+      Ewe: { who: "the ram", name: "ewe brand" },
+      Doe: { who: "the stag", name: "doe brand" },
+      Nanny: { who: "the billy goat", name: "nanny brand" },
+      Dragoness: { who: "the drake", name: "dragoness brand" },
+      Kitten: { who: "the cats", name: "kitten brand" },
+      TheKennelsBrand: { who: "the kennels", name: "kennels' brand" },
+      Goblins: { who: "the goblins", name: "goblin brand" },
+      BreedingStock: { who: "the breedin' shed", name: "breeding stock brand" }
+    };
+    const KIND_WHO = { werewolf: "the werewolf", sow: "the matron", ponycart: "the stable", minotaur: "the minotaur", lionpride: "the pride", whelping: "the kennels", warband: "the warband", studchair: "the breedin' chair" };
+    const TRAP_TAT = {
+      tentacle: "TentacleBred",
+      wolves: "WolfBredPackBitch",
+      werewolf: "WolfBredPackBitch",
+      stallion: "BredMare",
+      warren: "BredLikeARabbit",
+      goblinraid: "GoblinLoot",
+      goblinpit: "GoblinLoot",
+      goblinmarket: "GoblinLoot",
+      goblincart: "GoblinLoot",
+      warband: "GoblinLoot",
+      hive: "EggLayerCrest",
+      eggs: "EggLayerCrest",
+      clutch: "EggLayerCrest",
+      incubator: "EggLayerCrest",
+      drake: "EggLayerCrest"
+    };
+    const TAT_NAME = { TentacleBred: "TENTACLE BRED", WolfBredPackBitch: "PACK BITCH", BredMare: "BRED MARE", BredLikeARabbit: "BRED LIKE A RABBIT", GoblinLoot: "GOBLIN LOOT", EggLayerCrest: "the egg-layer's crest" };
+    const TAT_FADE = 24 * 36e5;
     const markName = (d) => MARK_OF[d] ? MARK_OF[d].name : String(d).replace(/Brand$/, "").replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
     const markWho = (d) => MARK_OF[d] ? MARK_OF[d].who : "the farm";
     const MARKS_HELD = 3;
@@ -25298,10 +25361,44 @@
       const c = state.companions.get(mn);
       return inkable(mn) && !!(c && verAtLeast(c.ver, "0.63.0"));
     }
+    function tattable(mn) {
+      const c = state.companions.get(mn);
+      return markable(mn) && !!(c && verAtLeast(c.ver, "0.66.0")) && !/\b(tattoo|ink|writ)/i.test((rec(mn) || {}).limits || "");
+    }
+    const tatsNow = (r) => Array.isArray(r && r.tats) ? r.tats.filter((x) => x && Date.now() - x.at < TAT_FADE) : [];
     function marksInk(mn) {
       const r = rec(mn);
-      if (!r || !Array.isArray(r.marks) || !r.marks.length || noMarks(mn)) return [];
-      return r.marks.map((m) => ({ id: "mark:" + m.d + ":" + m.at, slot: "mark", design: m.d, at: m.at, heal: INK_HEAL_MS }));
+      if (!r) return [];
+      const out = Array.isArray(r.marks) && !noMarks(mn) ? r.marks.map((m) => ({ id: "mark:" + m.d + ":" + m.at, slot: "mark", design: m.d, at: m.at, heal: INK_HEAL_MS })) : [];
+      const tats = tatsNow(r);
+      if (Array.isArray(r.tats) && tats.length !== r.tats.length) r.tats = tats.length ? tats : null;
+      if (tats.length && tattable(mn)) for (const x of tats) out.push({ id: "tat:" + x.d + ":" + x.at, slot: "tat", design: x.d, at: x.at, fade: TAT_FADE, values: x.t ? { t: x.t } : null, color: x.c ? [x.c] : null });
+      return out;
+    }
+    const WORD_HOW = {
+      neat: { d: "LiveWordsTypewriter", c: "#16121c" },
+      stamp: { d: "LiveWordsTypewriter", c: "#b3161b" },
+      marker: { d: "LiveWordsBlackletter", c: "#16121c" },
+      red: { d: "LiveWordsBlackletter", c: "#b3161b" },
+      old: { d: "LiveWordsBlackletter", c: "#2a1630" }
+    };
+    function trapWords(mn, words, how, area) {
+      const r = rec(mn);
+      if (!r) return false;
+      const w = String(words || "").toUpperCase().replace(/\s+/g, " ").trim().slice(0, 24), h = WORD_HOW[how] || WORD_HOW.marker;
+      if (!w) return false;
+      if (tattable(mn)) {
+        r.tats = tatsNow(r).filter((x) => !/^LiveWords/.test(x.d)).concat({ d: h.d, at: Date.now(), t: w, c: h.c });
+        saveLedger();
+        syncCompanions(true);
+        return true;
+      }
+      return bodyMark(mn, { write: { line: w, area: area || "hips" } });
+    }
+    function tatPut(mn, d) {
+      const r = rec(mn);
+      if (!r) return;
+      r.tats = tatsNow(r).filter((x) => /^LiveWords/.test(x.d)).concat({ d, at: Date.now() });
     }
     const MARK_LINES = {
       TentacleRingBrand: [
@@ -25318,6 +25415,112 @@
         "\u{1F417} The boar grunts and shoves his ringed snout hard against %n, and it comes away hot: a snout and a ring burned into their hide. The sty's mark.",
         "\u{1F417} When the boar's done he roots at %n one last time, and his snout ring burns like a brandin' iron. They carry the boar's mark now, raised and red under the mud.",
         "\u{1F417} %n climbs out of the wallow with the boar's ring seared into their hide, angry red under the muck. He marks what he's bred."
+      ],
+      Mare: [
+        "\u{1F434} Before %n's let out, a stable hand brings the iron over from the forge and holds it to their flank: a horseshoe round MARE, hissin' and red. Stable stock.",
+        "\u{1F434} The iron's been heatin' the whole time. When it's done with %n it presses in, slow and firm: MARE, in a horseshoe, seared into their hip.",
+        "\u{1F434} %n gets walked out with the stable's brand fresh on their hip, a horseshoe and MARE, stingin' with every step. Broke to harness and branded for it."
+      ],
+      Hucow: [
+        "\u{1F402} The gate stays shut on %n's neck a moment longer while a hot iron comes down on their hip: HUCOW, steamin' and raised. The bull marks his cows.",
+        "\u{1F402} A heavy hand holds %n down and somethin' hot as a coal presses into their hip. When it lifts, HUCOW is burned there under a pair of horns.",
+        "\u{1F402} %n is let up with a fresh brand smartin' on their hip: HUCOW, red and raised, the herd's own. Bred, milked and branded."
+      ],
+      Bunny: [
+        "\u{1F407} The bucks thump the burrow floor like a drumroll, and somethin' hot kisses %n's hip on the way out: a little bunny, burned pink into the skin. The warren's mark.",
+        "\u{1F407} %n crawls out of the warren with a sting on their hip and finds a bunny brand there, small and neat and red. They counted. They marked.",
+        "\u{1F407} The last buck noses %n's hip and it flares up hot: a bunny's mark, seared in. Every hole in the warren knows them now."
+      ],
+      Vixen: [
+        "\u{1F98A} The fox-brothers send %n off with a nip each and a hot brand on the hip: VIXEN, curled round a brush tail. Theirs to share.",
+        "\u{1F98A} A sly grin, an iron out of the den's fire, and %n's hip says VIXEN now, red and raised under a fox's tail.",
+        "\u{1F98A} %n stumbles out of the den teased raw and branded: a vixen's mark, seared on their hip. The brothers keep track of their toys."
+      ],
+      Ewe: [
+        "\u{1F40F} Before the paddock gate opens, the ram's keeper takes a hot iron to %n's hip: EWE, raised and red. Tupped and tallied.",
+        "\u{1F40F} The ram leans his weight on %n one last time while the iron goes on: EWE, burned in under a curl of horn.",
+        "\u{1F40F} %n leaves the paddock with the season's brand on their hip, EWE, still smokin' a little. The ram's flock gets bigger."
+      ],
+      Doe: [
+        "\u{1F98C} The stag drags his antlers along %n's hip as he goes, and where the velvet scrapes, the skin burns: DOE, under a crown of tines. The woods' mark.",
+        "\u{1F98C} %n is left in the leaves with a brand on their hip that wasn't there before: a doe's mark, red and raised. His season, his doe.",
+        "\u{1F98C} Somethin' hot as a coal follows the stag's last thrust into %n's hip: DOE, seared there for the rest of the rut to see."
+      ],
+      Nanny: [
+        "\u{1F410} The billy butts %n over one last time and somethin' hot presses into their hip: NANNY, under a pair of little horns. The goat pen's mark.",
+        "\u{1F410} %n gets up off their knees with a sting on their hip: NANNY, burned in, raised and red. The billy keeps his mouths marked.",
+        "\u{1F410} The goat pen's iron hisses on %n's hip: a nanny's mark. Their jaw aches, and now their hip does too."
+      ],
+      Dragoness: [
+        "\u{1F409} The drake breathes slow and hot across %n's hip, and the skin sears: DRAGONESS, coiled in a dragon's tail, glowin' red as coals. He marks his nest.",
+        "\u{1F409} %n wakes on the nest with a brand on their hip, still warm: a dragon wrapped round DRAGONESS. His hoard, his brood mother.",
+        "\u{1F409} One claw, heated in his own breath, traces a mark into %n's hip: DRAGONESS. It glows a while before it settles red."
+      ],
+      Kitten: [
+        "\u{1F408} A rough tongue, a hot paw pressed to the hip, and %n's marked: KITTEN, with a pair of little ears, burned pink.",
+        "\u{1F408} %n gets a last swat on the hip on the way out, and it stings far too much for a paw: KITTEN, seared in. The cats keep what they've had.",
+        "\u{1F408} There's a brand on %n's hip when they finally get up, small and pink: a kitten's mark. Somebody's purrin' about it."
+      ],
+      TheKennelsBrand: [
+        "\u{1F415} The kennel master's iron comes down on %n's hip while they're still tied: the kennels' brand, seared in and smokin'. Kennel bitch, on the books.",
+        "\u{1F415} %n is unlatched with a fresh brand on their hip, the kennels' own, red and raised. Every dog in there will know whose they are.",
+        "\u{1F415} Before the latch lifts, a hot iron from the kennel stove presses into %n's hip: the kennels' mark. Trained, bred and branded."
+      ],
+      Goblins: [
+        "\u{1F47A} The goblins hold %n down, cacklin', and one of 'em burns their mark in with a heated spoon: crude, ugly and very much there. Goblin loot.",
+        "\u{1F47A} %n is let go with a goblin brand scorched into their hip, all crooked lines and a grinnin' face. They'll be back for what's theirs.",
+        "\u{1F47A} A red-hot hoop of iron, a lot of shriekin' laughter, and %n's hip carries the goblins' mark now, raised and angry."
+      ],
+      BreedingStock: [
+        "\u{1F525} Somethin' clicks, a hot plate swings in and presses %n's hip: BREEDING STOCK, stamped in red. Logged and branded.",
+        "\u{1F525} Before it lets %n go, it holds them still for one last thing: the farm's iron, BREEDING STOCK, seared on their hip.",
+        "\u{1F525} %n is let up with a fresh brand on their hip, BREEDING STOCK in neat letters, stingin'. That's what the farm calls them now."
+      ]
+    };
+    const KIND_MARK_LINES = {
+      werewolf: [
+        "\u{1F315} Under the full moon the werewolf pulls free of %n and bites down on their hip, hard. When the sting fades there's a paw under a moon left there, red and raised.",
+        "\u{1F315} Before he lopes off into the trees, the werewolf presses a burnin' paw to %n's hip. A print under a crescent moon, seared in. His."
+      ],
+      sow: [
+        "\u{1F416} The matron hums and pats %n's hip, then presses somethin' hot there from under her apron: a snout and a ring, burned in. The sty's mark.",
+        "\u{1F416} %n wakes from the drowsy nursin' with a brand smartin' on their hip: the snout ring, seared in red. The matron keeps her piglets marked."
+      ],
+      warband: [
+        "\u{1FA93} The warchief's own iron goes on %n's hip before he lets them crawl out of the tent: the warband's mark. Tribute, paid in full.",
+        "\u{1FA93} The orcs roar as the brand goes on: a hot iron to %n's hip, the warband's tally. Spoils of war."
+      ]
+    };
+    const TAT_LINES = {
+      TentacleBred: [
+        "\u{1F419} There's ink on %n's belly when they drag themself out of the water: TENTACLE BRED, curlin' letters that weren't there before. It'll wear off in a day. Probably.",
+        "\u{1F419} Somethin' in the pond leaves its words on %n as well: TENTACLE BRED, inked dark across their belly, slick and still wet.",
+        "\u{1F419} %n finds TENTACLE BRED written on their belly in the pond's own ink, with a little tentacle curled round it."
+      ],
+      WolfBredPackBitch: [
+        "\u{1F43A} Somebody's got a marker: PACK BITCH scrawled on %n's belly, with a wolf's head over it. It'll wash off in a day or so.",
+        "\u{1F43A} %n is let go with WOLF BRED PACK BITCH inked across their belly, and a howl of laughter behind them.",
+        "\u{1F43A} The wolves sign their work: PACK BITCH, in black ink across %n's belly."
+      ],
+      BredMare: [
+        "\u{1F434} BRED MARE, inked on %n's belly in neat stable letterin', with a little horseshoe. It'll wear off in a day.",
+        "\u{1F434} Somebody at the stable takes a pen to %n before they're let go: BRED MARE, across their belly. Stud's work, signed for.",
+        "\u{1F434} %n finds BRED MARE written on their belly in stable ink. The stud book says the same."
+      ],
+      BredLikeARabbit: [
+        "\u{1F407} BRED LIKE A RABBIT, in pink, right across %n's belly. The bucks' little joke. Gone in a day.",
+        "\u{1F407} The warren signs off on %n in pink ink: BRED LIKE A RABBIT, with a little tally of bucks underneath.",
+        "\u{1F407} %n crawls out of the burrow with BRED LIKE A RABBIT written on their belly. Every word of it's true."
+      ],
+      GoblinLoot: [
+        "\u{1F47A} The goblins scrawl on %n before they let 'em go: GOBLIN LOOT, with a crude little coin. It'll fade in a day.",
+        "\u{1F47A} GOBLIN LOOT, in smudgy goblin ink, right across %n's belly. Somebody's drawn a lot of little hearts round it.",
+        "\u{1F47A} %n's been labelled like any other haul: GOBLIN LOOT, inked across their belly in a wobbly hand."
+      ],
+      EggLayerCrest: [
+        "\u{1F95A} A crest blooms on %n's belly where the eggs went in, glowin' faint pink: the egg-layer's mark. It fades in a day.",
+        "\u{1F95A} %n's belly tingles, and a pink crest draws itself across it, curlin' round where the clutch sits. Egg layer.",
+        "\u{1F95A} Low on %n's belly a glowin' crest rises up out of the skin, pretty and pink and very obvious: there's a clutch in there."
       ]
     };
     const MARK_AGAIN = [
@@ -25331,28 +25534,43 @@
       if (!r) return;
       const last = (r.trapLog || []).slice(-1)[0];
       r.passport = (r.passport || []).concat(stampOf(last && last.kind === kind ? last.spot : "", kind)).slice(-4);
-      const d = TRAP_MARK[kind];
-      if (!d || !markable(mn) || noMarks(mn)) {
-        saveLedger();
-        return;
+      const d = TRAP_MARK[kind], who = KIND_WHO[kind] || (d ? markWho(d) : "the farm");
+      const branded = !!(d && markable(mn) && !noMarks(mn) && !(r.brand && r.brand.ink === d));
+      const had = branded && (r.marks || []).find((m) => m.d === d);
+      if (branded) r.marks = (r.marks || []).filter((m) => m.d !== d).concat({ d, at: Date.now(), keep: had && had.keep ? 1 : 0 }).slice(-MARKS_HELD);
+      const tat = TRAP_TAT[kind] && tattable(mn) ? TRAP_TAT[kind] : null, tatFirst = !!(tat && !(r.tatSeen && r.tatSeen[tat]));
+      if (tat) {
+        tatPut(mn, tat);
+        if (tatFirst) r.tatSeen = Object.assign({}, r.tatSeen, { [tat]: 1 });
       }
-      const had = (r.marks || []).find((m) => m.d === d);
-      r.marks = (r.marks || []).filter((m) => m.d !== d).concat({ d, at: Date.now(), keep: had && had.keep ? 1 : 0 }).slice(-MARKS_HELD);
       saveLedger();
-      syncCompanions(true);
-      later(() => {
+      if (branded || tat) syncCompanions(true);
+      if (branded) later(() => {
         if (!charFor(mn)) return;
-        emote(markFill(pickFresh("mark:" + (had ? "again" : d), had ? MARK_AGAIN : MARK_LINES[d]), mn, d), mn);
-        if (!had) tell(mn, "\u{1F525} " + markWho(d).replace(/^./, (x) => x.toUpperCase()) + " left its mark on you: the " + markName(d) + ", on your skin under your clothes, for everybody with the Companion to see. It heals pale over three days. ?wash scrubs it off, unless it's seared on for good (?marks keep does that).");
+        const pool = had ? MARK_AGAIN : KIND_MARK_LINES[kind] || MARK_LINES[d];
+        emote(markFill(pickFresh("mark:" + (had ? "again" : KIND_MARK_LINES[kind] ? kind : d), pool), mn, d), mn);
+        if (!had) tell(mn, "\u{1F525} " + who.replace(/^./, (x) => x.toUpperCase()) + " left its mark on you: the " + markName(d) + ", on your skin under your clothes, for everybody with the Companion to see. It heals pale over three days. ?wash scrubs it off, unless it's seared on for good (?marks keep does that).");
       }, 6e3);
+      if (tat) later(() => {
+        if (!charFor(mn)) return;
+        emote(pickFresh("tat:" + tat, TAT_LINES[tat]).replace(/%n/g, plainName(mn)), mn);
+        if (tatFirst) tell(mn, "\u{1F58B}\uFE0F " + who.replace(/^./, (x) => x.toUpperCase()) + " left its ink on you too: " + TAT_NAME[tat] + ", on your belly, for everybody with the Companion to see. It wears off in a day; ?wash scrubs it off sooner.");
+      }, branded ? 11e3 : 6e3);
     }
     function marksWash(mn) {
       const r = rec(mn);
-      if (!r || !Array.isArray(r.marks) || !r.marks.length) return { off: [], kept: [] };
+      if (!r) return { off: [], kept: [], tats: 0 };
+      const tats = tatsNow(r).length;
+      r.tats = null;
+      if (!Array.isArray(r.marks) || !r.marks.length) return { off: [], kept: [], tats };
       const off = r.marks.filter((m) => !m.keep).map((m) => m.d), kept = r.marks.filter((m) => m.keep).map((m) => m.d);
       r.marks = kept.length ? r.marks.filter((m) => m.keep) : null;
-      return { off, kept };
+      return { off, kept, tats };
     }
+    const WASH_TAT_OFF = [
+      "\u{1F6BF} The ink the traps left on %n comes off with the soap, letters and all.",
+      "\u{1F6BF} A good hard scrub, and the traps' ink on %n runs grey and rinses away down the drain."
+    ];
     const WASH_MARK_OFF = [
       "\u{1F6BF} The scrubbin' takes the %m off %n too. Never burned in for good, so off it comes.",
       "\u{1F6BF} A hard scrub with the brush, and the last of %w's markin' on %n comes away with the muck: the %m, gone."
@@ -25370,6 +25588,7 @@
       const out = [];
       if (w && w.off.length) out.push(fill2("mark:wash", WASH_MARK_OFF, w.off));
       if (w && w.kept.length) out.push(fill2("mark:kept", WASH_MARK_KEPT, w.kept));
+      if (w && w.tats) out.push(pickFresh("tat:wash", WASH_TAT_OFF).replace(/%n/g, plainName(mn)));
       return out;
     }
     const KEEP_SEAR = [
@@ -25392,7 +25611,7 @@
       }
       const marks = Array.isArray(r.marks) ? r.marks : [];
       if (!marks.length) {
-        R((t === by ? "You've" : plainName(t) + " has") + ` none of the farm's marks to keep, sugar. The pond, the wolf pack and the boar leave theirs, with "Farm can ink me" on.`);
+        R((t === by ? "You've" : plainName(t) + " has") + ` none of the farm's marks to keep, sugar. The beasts in the traps leave theirs, with "Farm can ink me" on.`);
         return;
       }
       const fresh = marks.filter((m) => !m.keep);
@@ -25416,28 +25635,37 @@
     }
     function marksClear(mn) {
       const r = rec(mn);
-      const n = r && Array.isArray(r.marks) ? r.marks.length : 0;
-      if (r) r.marks = null;
+      const n = (r && Array.isArray(r.marks) ? r.marks.length : 0) + tatsNow(r).length;
+      if (r) {
+        r.marks = null;
+        r.tats = null;
+      }
       return n;
     }
+    const tatLabel = (x) => x.t ? x.t : TAT_NAME[x.d] || x.d;
+    const tatLeft = (x) => {
+      const h = Math.max(1, Math.round((x.at + TAT_FADE - Date.now()) / 36e5));
+      return h + (h === 1 ? " hour" : " hours");
+    };
     function marksNow(mn) {
       const r = rec(mn);
-      return r && Array.isArray(r.marks) ? r.marks.map((m) => ({ icon: "\u{1F525}", text: markWho(m.d).replace(/^./, (x) => x.toUpperCase()) + "'s mark" + (m.keep ? ", for good" : "") })) : [];
+      return (r && Array.isArray(r.marks) ? r.marks.map((m) => ({ icon: "\u{1F525}", text: markWho(m.d).replace(/^./, (x) => x.toUpperCase()) + "'s mark" + (m.keep ? ", for good" : "") })) : []).concat(tatsNow(r).map((x) => ({ icon: "\u{1F58B}\uFE0F", text: tatLabel(x) + " (wears off in " + tatLeft(x) + ")" })));
     }
     function marksCommand(sender, args, R) {
-      const r = rec(sender), marks = r && Array.isArray(r.marks) ? r.marks : [];
+      const r = rec(sender), marks = r && Array.isArray(r.marks) ? r.marks : [], tats = tatsNow(r);
       if (/^keep$/i.test(args[0] || "")) {
         brandKeep(sender, sender, R);
         return;
       }
+      const inked = tats.length ? " \u{1F58B}\uFE0F The traps' ink on you: " + tats.map((x) => tatLabel(x) + " (wears off in " + tatLeft(x) + ")").join(", ") + ". ?wash scrubs it off sooner." : "";
       if (!marks.length) {
-        R(`You've none of the farm's marks on you, sugar. The pond, the wolf pack and the boar leave theirs, with "Farm can ink me" on in your Companion.`);
+        R((tats.length ? "None of the farm's brands on you, sugar." : `You've none of the farm's marks on you, sugar. The beasts in the traps leave theirs, with "Farm can ink me" on in your Companion.`) + inked);
         return;
       }
-      R("\u{1F525} The farm's marks on you: " + marks.map((m) => "the " + markName(m.d) + " (" + markWho(m.d) + "'s" + (m.keep ? ", on for good" : ", ?wash scrubs it off") + ")").join(", ") + "." + (marks.some((m) => !m.keep) ? " ?marks keep sears yours on for good." : ""));
+      R("\u{1F525} The farm's marks on you: " + marks.map((m) => "the " + markName(m.d) + " (" + markWho(m.d) + "'s" + (m.keep ? ", on for good" : ", ?wash scrubs it off") + ")").join(", ") + "." + (marks.some((m) => !m.keep) ? " ?marks keep sears yours on for good." : "") + inked);
     }
     addCommand("marks", { topic: "milk", run: (c) => marksCommand(c.sender, c.args, c.R) });
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __trophies: TROPHIES, __stampOf: (s, k) => stampOf(s, k), __trapMarkAfter: (m, k) => trapMarkAfter(m, k) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __trophies: TROPHIES, __stampOf: (s, k) => stampOf(s, k), __trapMarkAfter: (m, k) => trapMarkAfter(m, k), __trapWords: (m, w, h) => trapWords(m, w, h), __marksInk: (m) => marksInk(m), __trapMarkSets: () => ({ TRAP_MARK, TRAP_TAT, MARK_LINES, KIND_MARK_LINES, TAT_LINES }) });
     CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 1, DRIP_HOLD_MIN: 10, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
     Object.assign(CFG.TAG_WORDS, {
       aphro: ["aphrodisiac", "horny", "lust serum", "libido"],
@@ -30222,7 +30450,7 @@
       if (words && Math.random() < CFG.TRAP_WRITE_CHANCE) {
         const w = words[Math.floor(Math.random() * words.length)];
         later(() => {
-          if (bodyMark(mn, { write: { line: w, area: ["hips", "waist", "chest", "ribs"][Math.floor(Math.random() * 4)] } })) {
+          if (trapWords(mn, w, "marker", ["hips", "waist", "chest", "ribs"][Math.floor(Math.random() * 4)])) {
             const r2 = rec(mn);
             r2.dirt = r2.dirt || {};
             r2.dirt.brand = w;
@@ -40448,7 +40676,7 @@
         hyperX: 2,
         tell: "That was the mother of the pond herself. Folk go years without seein' her.",
         after: (mn) => {
-          later(() => bodyMark(mn, { write: { line: "MOTHER'S BROOD", area: "waist" } }), 3e3);
+          later(() => trapWords(mn, "MOTHER'S BROOD", "old", "waist"), 3e3);
           face(mn, "afterglow", 300);
         },
         lines: {

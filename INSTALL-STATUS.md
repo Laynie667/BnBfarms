@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.82.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.83.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.65.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.13.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.66.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.14.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.83.0 + Companion 0.66.0 + Dispensary 0.14.0: every beast brands its own, the traps' tattoos, and smaller dose icons** Laynie, Nov 18: "need to make sure the traps use the proper brands and tattoos, plus the badges ... look noisey", then "looks good, add the tattoos, and its the dozen icons, ther are just big".
+  - **Brands:** every beast that breeds them sears its own brand from the farm's brands (its animal's, or its keeper's), in the hidden Farm Mark slots, with its own lines. Not when they already wear that brand as their own.
+  - **Tattoos:** two more hidden slots, Farm Tattoo 1 and 2. A trap's words (the brandin' arm, the sale block, the office stamps, a beast's scrawl) go on across the chest in the farm's own ink; the big breeders leave a picture across the belly. They wear off in a day; `?wash` scrubs them off sooner; `?marks` lists them. Limits that mention tattoos, ink or writin' keep them off. Older Companions still get the words the old way.
+  - **Dose icons:** the game's own icon size, three at most then "+n", and hover them for every dose by name. On the map they were drawn full size by a half-size name; that's what looked so big.
+  - Tests: `tests/trap-tattoos.test.cjs` (new), `tests/dispensary-gear.test.cjs`, `tests/ink.test.cjs`.
 
 - **Bot 0.82.0 + Companion 0.65.0 + Dispensary 0.13.0: nipples that stay open, creampies, and the drawn opened nipple** Laynie's answers, Nov 18.
   - **Drawn:** the Companion's drawn breasts show them open, one to three wide, with a puffy pink rim round the opening (the look Laynie okayed). It's drawn under anything worn on them.

@@ -361,6 +361,6 @@
     inspection(mn){ themedRun(mn, "inspection", 4, "the inspection mark", () => { arouse(mn, 15); }); },
     stamp(mn){ themedRun(mn, "stamp", 3, "the office", () => {
       const w = ["APPROVED", "INSPECTED", "GRADE A", "FILED", "PROPERTY"][Math.floor(Math.random()*5)];
-      bodyMark(mn, { write: { line: w, area: ["hips", "chest", "waist"][Math.floor(Math.random()*3)] } });
+      trapWords(mn, w, "stamp", ["hips", "chest", "waist"][Math.floor(Math.random()*3)]);
     }); },
   });

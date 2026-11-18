@@ -64,7 +64,7 @@
       const word = BRAND_WORDS[Math.floor(Math.random()*BRAND_WORDS.length)], v = { x: word };
       trapHold(mn, 2, "the brandin' arm");
       trapRun(mn, "brand", MORE_LINES.brand.beats, () => {
-        const ok = bodyMark(mn, { write: { line: word, area: ["hips", "chest", "waist", "ribs"][Math.floor(Math.random()*4)] } });
+        const ok = trapWords(mn, word, "neat", ["hips", "chest", "waist", "ribs"][Math.floor(Math.random()*4)]);   // (the farm's own ink, 10uq3-trophies.js)
         rec(mn).branded = word;
         emote("🖋️ "+moreLine("brand", "end", mn, v), mn);
         if (!ok) tell(mn, "🖋️ It wrote "+word+" on you, sugar. With the Companion and \"Farm can mark my body\" on, it'd be there for everybody to read.");
@@ -177,7 +177,7 @@
       const price = 1 + Math.floor(Math.random()*9), v = { x: String(price) };
       trapHold(mn, 3, "the sale block");
       trapRun(mn, "pricetag", MORE_LINES.pricetag.beats, () => {
-        bodyMark(mn, { write: { line: "FOR SALE "+price+" RIBBONS", area: "hips" } });
+        trapWords(mn, "FOR SALE "+price+" RIBBONS", "red", "hips");
         rec(mn).priced = { at: Date.now(), price };
         announce("🏷️ "+moreLine("pricetag", "call", mn, v));
         emote("🏷️ "+moreLine("pricetag", "end", mn, v), mn);

@@ -245,7 +245,7 @@ function hookBelly(mod) {
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };
           // farm ink (shared/ink, Nov 18) waits for the belly and goes on top of it, under anything worn
-          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;   // (the repo's or a local copy; a live one has its slot)
+          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3]|Tat[12])\//;   // (the repo's or a local copy; a live one has its slot)
           const flushInk = () => { for (const h of inkHeld.splice(0)) { try { cb[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[Farmhand Companion] ink:", e); } } };
           const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => {
             if (!done && typeof src === "string" && INK_SRC.test(src)) { inkHeld.push([name, src, x, y, o]); return; }

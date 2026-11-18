@@ -1141,7 +1141,7 @@ window.FarmBodyEngine = function (host) {
           // FARM INK (shared/ink, Nov 18): a tattoo is on the skin, so it waits till the drawn belly and breasts are on and
           // goes on top of them, under anything worn (it used to go first and the drawn belly covered it). Laynie, Nov 17:
           // "as long as it layers properly".
-          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;   // (the repo's or a local copy; a live one has its slot)
+          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3]|Tat[12])\//;   // (the repo's or a local copy; a live one has its slot)
           const flushInk = () => { for (const h of inkHeld.splice(0)) { try { real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[studio] ink:", e); } } };
           // The lactation pump is one picture: two cups, a Y of tube, a long hose, and the pump with its bottle down by her
           // leg. Moved and grown as a whole, like other nipple gear, the bottle went with one breast and grew, and the

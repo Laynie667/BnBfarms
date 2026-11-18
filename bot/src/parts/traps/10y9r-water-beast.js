@@ -91,7 +91,7 @@
       } },
     mother: { name: "the mother of the pond", w: 4, hold: 9, eggsX: 2, hyperX: 2,
       tell: "That was the mother of the pond herself. Folk go years without seein' her.",
-      after: (mn) => { later(() => bodyMark(mn, { write: { line: "MOTHER'S BROOD", area: "waist" } }), 3000); face(mn, "afterglow", 300); },
+      after: (mn) => { later(() => trapWords(mn, "MOTHER'S BROOD", "old", "waist"), 3000); face(mn, "afterglow", 300); },
       lines: {
         grab: [
           "The whole pond rises. Somethin' vast and old comes up out of the deep, its arms thick as tree trunks, and it closes round %n the way a hand closes round an egg.",

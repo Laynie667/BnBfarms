@@ -23,6 +23,10 @@
      permanently branded"): three more slots, Farm Mark 1 to 3, that the wardrobe doesn't show (the game's own
      AllowCustomize: false, the way it keeps the arms and hands out of it). What a trap leaves on you goes there, never
      in your own slots. Each sits at its own spot on your other side (hip, thigh, shoulder), so it isn't on your brand.
+   • THE TRAPS' TATTOOS (Nov 18, Laynie: "add the tattoos"): two more hidden slots, Farm Tattoo 1 and 2, for the ink a
+     trap leaves that isn't a brand. Farm Tattoo 1 runs across the chest above the breasts, for the words a trap writes on
+     you (in one of the live word designs); Farm Tattoo 2 sits across the upper belly, for a picture (Tentacle Bred, Pack Bitch, Goblin Loot,
+     the egg-layer's crest...). They wear off in a day, and ?wash scrubs them off sooner.
    • TROPHIES (Nov 18, Laynie: "it should be offered, and if its a permanent trophy, have a way to equip or take it off
      at any time"): live ink the farm hands out when somethin' first happens to you. The Companion offers it; on, it's
      in a free Farm Ink slot (or one you pick), marked a trophy, and keeps the farm's count. Off and on again any time.
@@ -36,20 +40,23 @@ const LIVE_HOST = INK_HOST + "live/";   // (no pictures there: a live design's a
 export const INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
 export const BRAND_SLOT = "FarmBrand";
 export const MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
-const ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
-const SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
+export const TAT_SLOTS = ["FarmTat1", "FarmTat2"];   // (a trap's tattoo: its words, then a picture)
+const ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS, ...TAT_SLOTS];
+const SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3", FarmTat1: "Farm Tattoo 1", FarmTat2: "Farm Tattoo 2" };
 const RES = LIST.res || 1;
 const OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;   // one of our pictures (from the repo, or a local copy in a test)
-const LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;   // a live design, drawn here
+const LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand|Tat[12]))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;   // a live design, drawn here
 const STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;   // one of the still ones: its kind, its name and the layer
-const MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;          // one of the farm's marks: an address of our own, drawn from the brand's picture
+const MARK_SRC = /\/(Farm(?:Mark[1-3]|Tat[12]))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;   // one of the farm's marks or a trap's tattoo: an address of our own, drawn from the design's picture
 // the item a still picture belongs to (the same design in two slots shares the first one's size)
 const stillItem = (C, kind, name) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null);
 const PRIORITY = 11;   // on the skin (the body and the game's own body markings are under 11), under socks, underwear and clothes
 const kindOf = (slot) => (slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null);
 const isMark = (slot) => MARK_SLOTS.includes(slot);
-const ours = (slot) => !!kindOf(slot) || isMark(slot);
-const picKind = (slot) => (isMark(slot) ? "FarmBrand" : kindOf(slot));   // the folder its pictures are in (a mark: the brands')
+const isTat = (slot) => TAT_SLOTS.includes(slot);
+const isHid = (slot) => isMark(slot) || isTat(slot);   // the farm's own hidden slots (not in the wardrobe; only ?wash)
+const ours = (slot) => !!kindOf(slot) || isHid(slot);
+const picKind = (slot) => (isMark(slot) ? "FarmBrand" : isTat(slot) ? "FarmInk" : kindOf(slot));   // the folder its pictures are in (a mark: the brands'; a tattoo: the ink's)
 export const isInkSlot = (slot) => !!kindOf(slot);
 // K: each design's starting size (Nov 18, Laynie: "does that tattoos sizing and placement seem esthetically and visibly the
 // right scale per tattoo for the defaults?"): fitted to a box for its spot, width and height, so long lettering gets room
@@ -57,10 +64,12 @@ const TITLES = {}, MANIFEST = {}, K = {};
 for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) { TITLES[kind + ":" + a.name] = a.title; if (a.live) MANIFEST[a.name] = a; if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k; }
 // where the farm's marks sit (centre x, y on the 500-wide body, and the spot's box, like the wardrobe's own): on your
 // other side from where your own ink starts, so a mark is never on your brand
-const MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+// (a trap's tattoos: its words across the chest above the breasts, a picture across the upper belly under them; clear
+// of the marks and of where most of your own ink starts: the belly's middle, the hip, thigh and shoulder on the other side)
+const MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38], FarmTat1: [250, 246, 100, 22], FarmTat2: [250, 492, 84, 30] };
 const MK = {};
-for (const slot of MARK_SLOTS) for (const a of LIST.groups.FarmBrand) { const [, , bw, bh] = MARK_AT[slot]; MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100; }
-const kOf = (it) => { const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name; if (!g) return 1; return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1; };
+for (const slot of [...MARK_SLOTS, ...TAT_SLOTS]) for (const a of LIST.groups[picKind(slot)]) { const [, , bw, bh] = MARK_AT[slot]; MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100; }
+const kOf = (it) => { const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name; if (!g) return 1; return (isHid(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1; };
 
 function assetDef(a) {
   return {
@@ -75,11 +84,12 @@ function groupDef(slot) {
   return { Group: slot, Priority: PRIORITY, Default: false, Random: false, BodyCosplay: true, Clothing: false, AllowNone: true,
     Color: ["Default"], Asset: LIST.groups[kindOf(slot)].map(assetDef) };
 }
-// a farm's mark slot: the brands, each moved to this slot's spot; not in the wardrobe (AllowCustomize: false)
+// a farm's mark slot (the brands) or a trap's tattoo slot (the ink designs), each design moved to this slot's spot;
+// not in the wardrobe (AllowCustomize: false)
 function markDef(slot) {
   const [cx, cy] = MARK_AT[slot];
   return { Group: slot, Priority: PRIORITY, Default: false, Random: false, BodyCosplay: true, Clothing: false, AllowNone: true, AllowCustomize: false,
-    Color: ["Default"], Asset: LIST.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) })) };
+    Color: ["Default"], Asset: LIST.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) })) };
 }
 // the slots' and designs' names in the wardrobe (the game sets "MISSING DESCRIPTION" on anything its own list doesn't have)
 function describe(W) {
@@ -94,7 +104,7 @@ function addSlots(W) {
   let added = false;
   for (const slot of ALL_SLOTS) {
     if (W.AssetGroupMap.has(slot)) continue;   // (the other add-on, or an older copy of this, put it there already)
-    const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W.AssetGroupAdd("Female3DCG", def);
+    const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W.AssetGroupAdd("Female3DCG", def);
     for (const a of def.Asset) W.AssetAdd(G, a, W.AssetFemale3DCGExtended || {}, def);
     added = true;
   }
@@ -184,13 +194,14 @@ export function healedHex(hex, layer, p) {
 }
 const DESIGNS = { brand: new Set(LIST.groups.FarmBrand.map((a) => a.name)), ink: new Set(LIST.groups.FarmInk.map((a) => a.name)) };
 DESIGNS.mark = DESIGNS.brand;   // (a farm's mark is one of the brands)
+DESIGNS.tat = DESIGNS.ink;      // (a trap's tattoo is one of the ink designs)
 const LAYERS_OF = {}; for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
 const farmOf = (it) => { const f = it && it.Property && it.Property.FarmInk; return f && typeof f.farm === "string" ? f.farm : null; };
 const doneKey = (W) => "farmink-done-" + (W.Player && W.Player.MemberNumber);
 const KEEP_AGAIN = 20 * 3600000;   // the farm's kept ink, taken off: back by mornin'
 function cleanEntry(e) {
   if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-  const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null; if (!slot || !DESIGNS[slot].has(e.design)) return null;
+  const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : e.slot === "tat" ? "tat" : null; if (!slot || !DESIGNS[slot].has(e.design)) return null;
   const n = (v, max) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? Math.min(max, Math.round(x)) : 0; };
   const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
   return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
@@ -200,7 +211,8 @@ function cleanEntry(e) {
 // "ink a contract or hardcore says stays is put back if someone takes it off").
 // A mark (slot "mark", what a trap leaves) goes in the farm's own hidden slots, never yours: the first empty one, else in
 // place of the oldest. You can't take one off yourself (only ?wash, through the farm girl), so one that's gone missin'
-// (an outfit put on over it) just goes back.
+// (an outfit put on over it) just goes back. A trap's tattoo (slot "tat") goes the same way in its own hidden slots:
+// words in Farm Tattoo 1, a picture in Farm Tattoo 2, the newest in place of what's there.
 // Gives { put, off, full, taken, marked } (designs), or null when nothin' could be done (not in the game yet).
 export function farmInkSync(W, list, on, now, opts) {
   const hard = !!(opts && opts.hard);
@@ -218,11 +230,12 @@ export function farmInkSync(W, list, on, now, opts) {
   // on: what it wants that isn't on you
   for (const e of want) {
     if (ALL_SLOTS.some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-    const mark = e.slot === "mark";
+    const mark = e.slot === "mark" || e.slot === "tat";
     if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off (not in hardcore)
     if (e.fade && e.at && now - e.at >= e.fade) continue;                      // worn off already
     let slot = null;
-    if (mark) { const atOf = (s) => { const f = farmOf(itemIn(P, s)) && itemIn(P, s).Property.FarmInk; return (f && f.at) || 0; }; slot = MARK_SLOTS.find((s) => !itemIn(P, s)) || MARK_SLOTS.slice().sort((a, b) => atOf(a) - atOf(b))[0]; }
+    if (e.slot === "tat") slot = isLive(e.design) ? TAT_SLOTS[0] : TAT_SLOTS[1];
+    else if (mark) { const atOf = (s) => { const f = farmOf(itemIn(P, s)) && itemIn(P, s).Property.FarmInk; return (f && f.at) || 0; }; slot = MARK_SLOTS.find((s) => !itemIn(P, s)) || MARK_SLOTS.slice().sort((a, b) => atOf(a) - atOf(b))[0]; }
     else if (e.slot === "brand") { const it = itemIn(P, BRAND_SLOT); if (!it || farmOf(it)) slot = BRAND_SLOT; else { out.taken.push(e.design); continue; } }
     else { slot = INK_SLOTS.find((s) => !itemIn(P, s)) || null; if (!slot) { out.full.push(e.design); continue; } }
     if (itemIn(P, slot)) remove(slot);
@@ -378,6 +391,7 @@ export function registerInk(W, mod) {
     // is an address of our own, drawn below)
     hook("AssetBaseURL", 0, (args, next) => {
       const slot = args[2] || (args[1] && args[1].Name);
+      if (isTat(slot)) return (args[6] && isLive(args[6].Name) ? LIVE_HOST : INK_HOST) + slot + "/";   // (a trap's tattoo: the same, from the ink's pictures, or drawn live)
       if (isMark(slot)) return INK_HOST + slot + "/";   // (a farm's mark: our own address, drawn from the brand's picture below)
       const kind = kindOf(slot); if (!kind) return next(args);
       return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
@@ -419,8 +433,8 @@ export function registerInk(W, mod) {
       const wrap = (f, plain) => (typeof f !== "function" ? f : function (src, x, y, o) {
         if (typeof src === "string") {
           // a farm's mark: the brand's own picture, at this slot's size, healin' like any of the farm's
-          const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
-          if (mm) { const it = itemIn(C, mm[1]); if (!it || it.Asset.Name !== mm[2]) return undefined; const u = src.replace("/" + mm[1] + "/", "/FarmBrand/"); const o3 = aged(sized(o, it), it, mm[3]); if (o3.Alpha === 0) return undefined; seen.add(mm[2]); if (!ready(u)) notReady.push(mm[2]); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
+          const mm = (src.indexOf("/FarmMark") > 0 || src.indexOf("/FarmTat") > 0) && src.indexOf("/live/") < 0 ? MARK_SRC.exec(src) : null;
+          if (mm) { const it = itemIn(C, mm[1]); if (!it || it.Asset.Name !== mm[2]) return undefined; const u = src.replace("/" + mm[1] + "/", "/" + picKind(mm[1]) + "/"); const o3 = aged(sized(o, it), it, mm[3]); if (o3.Alpha === 0) return undefined; seen.add(mm[2]); if (!ready(u)) notReady.push(mm[2]); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
           if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
@@ -451,7 +465,7 @@ export function registerInk(W, mod) {
     // ...and the farm's marks stay on through an outfit put on from the wardrobe (only ?wash takes them off). Your own
     // ink goes with the outfit, as it always has.
     hook("WardrobeFastLoad", 0, (args, next) => {
-      const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+      const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isHid(it.Asset.Group.Name) && farmOf(it)) : [];
       const r = next(args);
       try {
         let back = 0;

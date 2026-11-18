@@ -58,7 +58,9 @@ better sizing options", and "as long as it layers properly".
   others see your icons. It lights up and goes dark as the dose goes in and wears off.
 - **The farm's marks** (Nov 18; Laynie: "we can include hidden slots the farm uses, that can be removed with ?wash
   unless permanently branded"): a trap that marks its own sears its brand on when it lets you go. The pond leaves its
-  tentacle ring, the wolf pack its moon paw, the boar its snout ring.
+  tentacle ring, the wolf pack its moon paw, the boar its snout ring, and (Nov 18, Laynie: "need to make sure the traps
+  use the proper brands") every other beast that breeds you its own, from the farm's brands: its animal's brand, or
+  its keeper's. Not when you already wear that one as your own brand.
   - They go in three **Farm Mark** slots of the farm's own, which the wardrobe doesn't show, so they never push out ink
     you picked and never sit on your own brand. They're on your other side: hip, thigh, then shoulder.
   - **Newest wins:** the same trap again sears its mark fresh, in the same place.
@@ -67,6 +69,17 @@ better sizing options", and "as long as it layers properly".
     for good. Staff: `?brand <who> keep` (proprietors and the herd's owner), and `?brand <who> clear` takes the brand and
     every mark off, kept ones too.
   - Only with "Farm can ink me" on, and never if your limits rule out brands or marks.
+- **The traps' tattoos** (Nov 18; Laynie: "looks good, add the tattoos"): ink a trap leaves that isn't a brand, in two
+  more hidden slots of the farm's own, **Farm Tattoo 1 and 2** (Companion 0.66.0).
+  - **Words** a trap writes on you (the brandin' arm, the sale block, the office stamps, a beast's scrawl) go across
+    your chest above the breasts, in one of the live word designs: a typewriter label, a red rubber stamp, or blackletter
+    marker. Newer words go on in place of the old.
+  - **A picture** from the big breeders (TENTACLE BRED, PACK BITCH, BRED MARE, GOBLIN LOOT, the egg-layer's crest...)
+    goes across the belly, above where your own ink starts. The newest in place of the last.
+  - They **wear off in a day**, fading out at the end, and **`?wash`** scrubs them off sooner. `?marks` lists them with
+    how long they've left.
+  - Only with "Farm can ink me" on, and never if your limits mention tattoos, ink or writin'. Without the Companion's
+    tattoo slots, a trap's words go on the old way, as marker writin'.
 - **Trophies** (Nov 18; Laynie: "it should be offered, and if its a permanent trophy, have a way to equip or take it off
   at any time"): live ink the farm hands out the first time somethin' happens to you.
   - Breeding Card (your first load), Tied × (your first knot), Trap Passport (the first trap that let you go), Bred By

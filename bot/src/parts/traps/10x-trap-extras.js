@@ -46,7 +46,7 @@
     const words = TRAP_WRITES[kind];
     if (words && Math.random() < CFG.TRAP_WRITE_CHANCE){
       const w = words[Math.floor(Math.random()*words.length)];
-      later(() => { if (bodyMark(mn, { write: { line: w, area: ["hips", "waist", "chest", "ribs"][Math.floor(Math.random()*4)] } })){ const r2 = rec(mn); r2.dirt = r2.dirt || {}; r2.dirt.brand = w; saveLedger(); } }, 4000);
+      later(() => { if (trapWords(mn, w, "marker", ["hips", "waist", "chest", "ribs"][Math.floor(Math.random()*4)])){ const r2 = rec(mn); r2.dirt = r2.dirt || {}; r2.dirt.brand = w; saveLedger(); } }, 4000);
     }
   }
   const TRAP_WRITES = {

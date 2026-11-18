@@ -69,6 +69,8 @@ export function cleanValues(v) {
   if (typeof v.farm === "string" && /^[\w:.-]{1,48}$/.test(v.farm)) o.farm = v.farm;
   for (const f of ["at", "heal", "fade"]) if (v[f] != null) { const n = num0(v[f], null, 4e12); if (n) o[f] = n; }
   if (v.keep) o.keep = 1;
+  // a trophy (Nov 18): which one, so the Companion's Trophies row knows it's on
+  if (typeof v.trophy === "string" && /^[a-z0-9-]{1,24}$/.test(v.trophy)) o.trophy = v.trophy;
   return o;
 }
 
@@ -134,7 +136,7 @@ export const LIVE = [
       text(g, "B&B BREEDING CARD", cx, 54, "Black Ops One", 22); text(g, "every tenth load's on the house", cx, 80, "Special Elite", 15);
       const k = Math.min(10, V.n);
       for (let i = 0; i < 10; i++) { const x = 96 + (i % 5) * 47, y = 126 + Math.floor(i / 5) * 54; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 18, 0, Math.PI * 2); g.stroke(); if (i < k) { A.heart(g, x, y + 4, 12); g.fill(); } else if (i === 9) text(g, "FREE", x, y, "Black Ops One", 12); } } },
-  { name: "LiveTrapPassport", title: "Trap Passport (a stamp a trap)", sheet: 5, where: "a shoulder blade", fields: ["list"], sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
+  { name: "LiveTrapPassport", title: "Trap Passport (a stamp a trap)", sheet: 5, where: "a shoulder blade", fields: ["list"], auto: "passport", sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
     draw: (g, w, h, V) => { const L = (V.list || []).map((x) => String(x).toUpperCase());
       if (L[0]) { g.fillStyle = "#5b2a86"; g.strokeStyle = "#5b2a86"; g.lineWidth = 4; g.beginPath(); g.arc(104, 92, 62, 0, Math.PI * 2); g.stroke(); g.lineWidth = 2; g.beginPath(); g.arc(104, 92, 40, 0, Math.PI * 2); g.stroke(); A.arcText(g, L[0], 104, 41, 51, "Black Ops One", 15); A.arcTextLow(g, "SURVIVED", 104, 143, 51, "Black Ops One", 14); text(g, "B&B", 104, 92, "Black Ops One", 15); }
       if (L[1]) { g.fillStyle = "#b3122e"; g.strokeStyle = "#b3122e"; g.save(); g.translate(276, 74); g.rotate(0.14); g.lineWidth = 4; g.strokeRect(-82, -40, 164, 80); text(g, L[1], 0, -12, "Black Ops One", 24, { max: 150 }); text(g, "ENTERED · TAKEN", 0, 18, "Black Ops One", 13); g.restore(); }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.10.0
+// @version      0.11.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -6328,6 +6328,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (n) o[f] = n;
     }
     if (v.keep) o.keep = 1;
+    if (typeof v.trophy === "string" && /^[a-z0-9-]{1,24}$/.test(v.trophy)) o.trophy = v.trophy;
     return o;
   }
   var text2 = text;
@@ -6736,6 +6737,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       sheet: 5,
       where: "a shoulder blade",
       fields: ["list"],
+      auto: "passport",
       sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
       draw: (g, w, h2, V) => {
         const L = (V.list || []).map((x) => String(x).toUpperCase());
@@ -7278,14 +7280,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var LIVE_HOST = INK_HOST + "live/";
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
-  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand" };
+  var MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
+  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
+  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
   var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
   var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
+  var MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var stillItem = (C, kind, name) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
+  var isMark = (slot) => MARK_SLOTS.includes(slot);
+  var ours = (slot) => !!kindOf(slot) || isMark(slot);
+  var picKind = (slot) => isMark(slot) ? "FarmBrand" : kindOf(slot);
   var TITLES = {};
   var MANIFEST = {};
   var K = {};
@@ -7294,7 +7302,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (a.live) MANIFEST[a.name] = a;
     if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
   }
-  var kOf = (it) => it && it.Asset && it.Asset.Group && K[kindOf(it.Asset.Group.Name) + ":" + it.Asset.Name] || 1;
+  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+  var MK = {};
+  for (const slot of MARK_SLOTS) for (const a of ink_designs_default.groups.FarmBrand) {
+    const [, , bw, bh] = MARK_AT[slot];
+    MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100;
+  }
+  var kOf = (it) => {
+    const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name;
+    if (!g) return 1;
+    return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
+  };
   function assetDef(a) {
     return {
       Name: a.name,
@@ -7321,29 +7339,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[kindOf(slot)].map(assetDef)
     };
   }
+  function markDef(slot) {
+    const [cx, cy] = MARK_AT[slot];
+    return {
+      Group: slot,
+      Priority: PRIORITY,
+      Default: false,
+      Random: false,
+      BodyCosplay: true,
+      Clothing: false,
+      AllowNone: true,
+      AllowCustomize: false,
+      Color: ["Default"],
+      Asset: ink_designs_default.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
+    };
+  }
   function describe(W16) {
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+    for (const slot of ALL_SLOTS) {
       const G = W16.AssetGroupMap && W16.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
-        const t = TITLES[kindOf(slot) + ":" + A.Name];
+        const t = TITLES[picKind(slot) + ":" + A.Name];
         if (t) A.Description = t;
       }
     }
   }
   var gameReady = (W16) => typeof W16.AssetGroupAdd === "function" && typeof W16.AssetAdd === "function" && W16.AssetGroupMap && W16.AssetGroupMap.size > 30;
   function addSlots(W16) {
-    if (W16.AssetGroupMap.has(INK_SLOTS[0])) {
-      describe(W16);
-      return false;
-    }
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const def = groupDef(slot), G = W16.AssetGroupAdd("Female3DCG", def);
+    let added = false;
+    for (const slot of ALL_SLOTS) {
+      if (W16.AssetGroupMap.has(slot)) continue;
+      const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W16.AssetGroupAdd("Female3DCG", def);
       for (const a of def.Asset) W16.AssetAdd(G, a, W16.AssetFemale3DCGExtended || {}, def);
+      added = true;
     }
     describe(W16);
-    return true;
+    return added;
   }
   var itemIn = (C, slot) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C) => ({ num: C && C.MemberNumber, owner: C && C.Ownership && typeof C.Ownership.Name === "string" ? C.Ownership.Name : "" });
@@ -7410,6 +7442,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
+    if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
     return typeof c === "number" ? { n: c } : null;
   }
   function refreshAuto(W16) {
@@ -7444,6 +7477,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return toHex(c.map((v, i) => v + (to[i] - v) * e));
   }
   var DESIGNS = { brand: new Set(ink_designs_default.groups.FarmBrand.map((a) => a.name)), ink: new Set(ink_designs_default.groups.FarmInk.map((a) => a.name)) };
+  DESIGNS.mark = DESIGNS.brand;
   var LAYERS_OF = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
   var farmOf = (it) => {
@@ -7454,7 +7488,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : null;
+    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null;
     if (!slot || !DESIGNS[slot].has(e.design)) return null;
     const n = (v, max) => {
       const x = Number(v);
@@ -7468,7 +7502,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const P = W16.Player;
     if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W16.InventoryWear !== "function") return null;
     now = now || Date.now();
-    const want = on2 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed = [];
+    const want = on2 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed = [];
     let done = {};
     try {
       done = JSON.parse(W16.localStorage.getItem(doneKey(W16))) || {};
@@ -7485,7 +7519,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       changed.push(slot);
       return true;
     };
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+    for (const slot of ALL_SLOTS) {
       const it = itemIn(P, slot), id = farmOf(it);
       if (!id) continue;
       const a = ageOf(it.Property.FarmInk, now);
@@ -7495,11 +7529,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
     for (const e of want) {
-      if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-      if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
+      if (ALL_SLOTS.some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
+      const mark = e.slot === "mark";
+      if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
-      if (e.slot === "brand") {
+      if (mark) {
+        const atOf = (s) => {
+          const f = farmOf(itemIn(P, s)) && itemIn(P, s).Property.FarmInk;
+          return f && f.at || 0;
+        };
+        slot = MARK_SLOTS.find((s) => !itemIn(P, s)) || MARK_SLOTS.slice().sort((a, b) => atOf(a) - atOf(b))[0];
+      } else if (e.slot === "brand") {
         const it2 = itemIn(P, BRAND_SLOT);
         if (!it2 || farmOf(it2)) slot = BRAND_SLOT;
         else {
@@ -7514,7 +7555,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       }
       if (itemIn(P, slot)) remove(slot);
-      const kind = kindOf(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
+      const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
         W16.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false);
       } catch (err) {
@@ -7523,9 +7564,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const it = itemIn(P, slot);
       if (!it || it.Asset.Name !== e.design) continue;
       it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, e.values || {}, { farm: e.id, at: e.at || now, heal: e.heal || null, fade: e.fade || null, keep: e.keep || null })) });
+      if (mark) {
+        if (!done[e.id]) out.marked.push(e.design);
+      } else out.put.push(e.design);
       done[e.id] = now;
       changed.push(slot);
-      out.put.push(e.design);
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
@@ -7557,14 +7600,79 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   };
-  var wearsDosedOnly = (C) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+  var wearsDosedOnly = (C) => ALL_SLOTS.some((s) => {
     const it = itemIn(C, s);
     return !!(it && DOSED_ONLY.has(it.Asset.Name));
   });
-  var stillChanging = (C, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+  var stillChanging = (C, now) => ALL_SLOTS.some((s) => {
     const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
     return !!(a && a.still);
   });
+  var trophyOf = (it) => {
+    const f = it && it.Property && it.Property.FarmInk;
+    return f && typeof f.trophy === "string" ? f.trophy : null;
+  };
+  function trophyWorn(W16) {
+    const o = {};
+    for (const s of INK_SLOTS) {
+      const id = trophyOf(itemIn(W16.Player, s));
+      if (id) o[id] = s;
+    }
+    return o;
+  }
+  var roomSees = (W16, P) => {
+    try {
+      if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(P);
+    } catch (e) {
+    }
+    try {
+      if (typeof W16.ChatRoomCharacterUpdate === "function") W16.ChatRoomCharacterUpdate(P);
+    } catch (e) {
+    }
+  };
+  function trophyWear(W16, t, slot) {
+    const P = W16.Player;
+    if (!P || !Array.isArray(P.Appearance) || typeof W16.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+    if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
+    const worn = trophyWorn(W16);
+    if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
+    if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
+    slot = slot || INK_SLOTS.find((s) => !itemIn(P, s));
+    if (!slot) return { ok: false, full: true, why: "your four Farm Ink slots are full", slots: INK_SLOTS.map((s) => {
+      const it2 = itemIn(P, s);
+      return { slot: s, name: SLOT_NAMES[s], title: it2 ? TITLES["FarmInk:" + it2.Asset.Name] || it2.Asset.Name : "" };
+    }) };
+    if (itemIn(P, slot)) {
+      try {
+        W16.InventoryRemove(P, slot, false);
+      } catch (e) {
+        return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
+      }
+    }
+    try {
+      W16.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false);
+    } catch (e) {
+      return { ok: false, why: "the game wouldn't take it" };
+    }
+    const it = itemIn(P, slot);
+    if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W16, d.auto) : null;
+    it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
+    roomSees(W16, P);
+    return { ok: true, slot, name: SLOT_NAMES[slot] };
+  }
+  function trophyOff(W16, id) {
+    const P = W16.Player, slot = P && trophyWorn(W16)[id];
+    if (!slot) return { ok: true, already: true };
+    try {
+      if (typeof W16.InventoryRemove === "function") W16.InventoryRemove(P, slot, false);
+      else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
+    } catch (e) {
+      return { ok: false, why: "it wouldn't come off" };
+    }
+    roomSees(W16, P);
+    return { ok: true, slot, name: SLOT_NAMES[slot] };
+  }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
   var say = (W16, t) => {
     try {
@@ -7650,6 +7758,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
       farm: (list, on2, opts) => farmInkSync(W16, list, on2, void 0, opts),
       farmBrandWorn: () => farmBrandWorn(W16),
+      // trophies (the Companion's 🏆 Trophies row)
+      trophyWear: (t2, slot) => trophyWear(W16, t2, slot),
+      trophyOff: (id) => trophyOff(W16, id),
+      trophyWorn: () => trophyWorn(W16),
       worn: () => wornLive(W16).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
@@ -7662,12 +7774,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       };
       hook("AssetBaseURL", 0, (args, next) => {
-        const slot = args[2] || args[1] && args[1].Name, kind = kindOf(slot);
+        const slot = args[2] || args[1] && args[1].Name;
+        if (isMark(slot)) return INK_HOST + slot + "/";
+        const kind = kindOf(slot);
         if (!kind) return next(args);
         return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
       });
       hook("AssetGetPreviewPath", 0, (args, next) => {
-        const A = args[0], kind = A && A.Group && kindOf(A.Group.Name);
+        const A = args[0], kind = A && A.Group && picKind(A.Group.Name);
         return kind ? INK_HOST + kind + "/Preview" : next(args);
       });
       hook("AssetBuildDescription", 0, (args, next) => {
@@ -7724,6 +7838,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const wrap = (f, plain) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
+            const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
+            if (mm) {
+              const it = itemIn(C, mm[1]);
+              if (!it || it.Asset.Name !== mm[2]) return void 0;
+              const u = src.replace("/" + mm[1] + "/", "/FarmBrand/");
+              const o3 = aged(sized(o, it), it, mm[3]);
+              if (o3.Alpha === 0) return void 0;
+              seen.add(mm[2]);
+              if (!ready(u)) notReady.push(mm[2]);
+              if (statue(plain, this, u, x, y, o3)) return void 0;
+              return f.call(this, u, x, y, o3);
+            }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
               const u = liveSrc(W16, C, lm[1], lm[2], lm[3]);
@@ -7759,7 +7885,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return out;
       });
       const keepInk = (name) => hook(name, 0, (args, next) => {
-        const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
+        const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)) : [];
         const r = next(args);
         try {
           let back = 0;
@@ -7776,6 +7902,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
+      hook("WardrobeFastLoad", 0, (args, next) => {
+        const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+        const r = next(args);
+        try {
+          let back = 0;
+          for (const it of keep) if (!itemIn(C, it.Asset.Group.Name)) {
+            C.Appearance.push(it);
+            back++;
+          }
+          if (back) {
+            if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(C, false);
+            if (args[2] && typeof W16.ChatRoomCharacterUpdate === "function") W16.ChatRoomCharacterUpdate(C);
+          }
+        } catch (e) {
+        }
+        return r;
+      });
       hook("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
@@ -7848,7 +7991,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!C || !Array.isArray(C.Appearance)) return;
     const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
-    const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+    const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)).map((it) => it.Asset.Name);
     const missing = worn.filter((n) => !seen.has(n));
     if (!missing.length && !notReady.length) return;
     DIAG.push({ t: Date.now(), who: C.MemberNumber, name: String(C.Nickname || C.Name || ""), missing, notReady: [...new Set(notReady)] });
@@ -7864,7 +8007,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.10.0";
+  var VERSION = "0.11.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -8859,7 +9002,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return out;
   }
-  var ours = (id) => {
+  var ours2 = (id) => {
     const B = BOOK[id];
     return !!B && !B.instant && !st().off[id] && !(B.lscg && lscgPresent()) && !B.lscgOnly;
   };
@@ -8868,7 +9011,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!S2.cravings) return "";
     const n = since(), total = Object.values(n).reduce((a, b) => a + b, 0);
     if (total < CRAVE_AFTER || doseIds().some(active)) return "";
-    const fav = Object.keys(n).filter(ours).sort((a, b) => n[b] - n[a])[0];
+    const fav = Object.keys(n).filter(ours2).sort((a, b) => n[b] - n[a])[0];
     return fav || "";
   }
   function craveTick(now) {
@@ -8927,7 +9070,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var me = () => W5.Player && W5.Player.MemberNumber || 0;
   var okFrom = (by) => !by || by === me() || allowed(by);
   var keyOf = (item) => (item.Asset && item.Asset.Group ? item.Asset.Group.Name : "?") + ":" + (item.Craft && item.Craft.Name || "");
-  function ours2(id) {
+  function ours3(id) {
     const B = BOOK[id];
     return !!B && !(B.farm && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id];
   }
@@ -8938,7 +9081,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!item || !item.Craft) continue;
       const text3 = craftText(item);
       if (!text3) continue;
-      const list = dosesOf(text3).filter((d) => ours2(d.id));
+      const list = dosesOf(text3).filter((d) => ours3(d.id));
       const roulette = ROULETTE_WORDS.test(text3);
       if (!list.length && !roulette) continue;
       const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text3));
@@ -8993,7 +9136,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         if (now - last < g.every * MIN2) continue;
         lastShot[g.key] = now;
-        const list = g.roulette ? dosesOf(g.text).filter((d) => ours2(d.id)) : g.list;
+        const list = g.roulette ? dosesOf(g.text).filter((d) => ours3(d.id)) : g.list;
         for (const d of list) {
           if (isLater(g.text)) queue(d.id, { by: g.by, x: d.x, p: d.p });
           else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
@@ -9016,7 +9159,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const k = g.key + "|" + kind;
       if (Date.now() - (lastTrig[k] || 0) < TRIGGER_GAP) continue;
       lastTrig[k] = Date.now();
-      const list = g.roulette ? dosesOf(g.text).filter((d) => ours2(d.id)) : g.list;
+      const list = g.roulette ? dosesOf(g.text).filter((d) => ours3(d.id)) : g.list;
       for (const d of list) {
         const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)) });
         if (r.ok) n++;
@@ -9041,7 +9184,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const k = mn + ":" + keyOf(item);
       if (Date.now() - (glossAt[k] || 0) < TRIGGER_GAP) continue;
       glossAt[k] = Date.now();
-      for (const d of dosesOf(text3).filter((x) => ours2(x.id))) {
+      for (const d of dosesOf(text3).filter((x) => ours3(x.id))) {
         const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }) });
         if (r.ok) n++;
       }
@@ -9724,7 +9867,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var syncing = null;
   var REG = {};
   var lastLscg = {};
-  var ours3 = (id) => LSCG_ID + "." + id;
+  var ours4 = (id) => LSCG_ID + "." + id;
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
   var BREATH_MINS = 10;
   function lscgPresent() {
@@ -9752,7 +9895,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!lscgHas(id) || syncing) return;
     syncing = id;
     try {
-      api2.drugs.dose(ours3(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
+      api2.drugs.dose(ours4(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
     } catch (e) {
     } finally {
       syncing = null;
@@ -10336,21 +10479,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var nameIn = (t) => String(t).replace(/%n/g, myName());
   var poolOf = (id, p) => id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id];
   var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : t;
-  var ours4 = (id, kind, p) => {
+  var ours5 = (id, kind, p) => {
     const L = poolOf(id, p);
     return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : "";
   };
   function takeLine(id) {
     const v = voiceOf(id);
-    return v && v.seen.length ? nameIn(pick(v.seen)) : ours4(id, "take");
+    return v && v.seen.length ? nameIn(pick(v.seen)) : ours5(id, "take");
   }
   function nowLine(id) {
     const v = voiceOf(id);
-    return v && v.now.length ? nameIn(pick(v.now)) : ours4(id, "now");
+    return v && v.now.length ? nameIn(pick(v.now)) : ours5(id, "now");
   }
   function offLine(id, p) {
     const v = voiceOf(id);
-    return v && v.off.length ? nameIn(pick(v.off)) : ours4(id, "off", p);
+    return v && v.off.length ? nameIn(pick(v.off)) : ours5(id, "off", p);
   }
   function tellPage(detail) {
     try {
@@ -10600,7 +10743,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const now = Date.now(), k = id + ":" + kind;
     if (now - (toldAt[k] || 0) < gap) return;
     toldAt[k] = now;
-    const l = ours4(id, kind);
+    const l = ours5(id, kind);
     if (l) local(l);
   }
   function initDoses(mod2) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.62.0
+// @version      0.63.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -37,9 +37,9 @@
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
-      for (let key2 of __getOwnPropNames(from))
-        if (!__hasOwnProp.call(to, key2) && key2 !== except)
-          __defProp(to, key2, { get: () => from[key2], enumerable: !(desc = __getOwnPropDesc(from, key2)) || desc.enumerable });
+      for (let key3 of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key3) && key3 !== except)
+          __defProp(to, key3, { get: () => from[key3], enumerable: !(desc = __getOwnPropDesc(from, key3)) || desc.enumerable });
     }
     return to;
   };
@@ -5079,14 +5079,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.fill();
     }
   }
-  function scar(g, ink, x0, y0) {
-    const w = ink.width, h2 = ink.height, tint = (col, blur, dx, dy, a) => {
+  function scar(g, ink2, x0, y0) {
+    const w = ink2.width, h2 = ink2.height, tint = (col, blur, dx, dy, a) => {
       const c = document.createElement("canvas");
       c.width = w;
       c.height = h2;
       const cg = c.getContext("2d");
       cg.filter = blur ? "blur(" + blur + "px)" : "none";
-      cg.drawImage(ink, 0, 0);
+      cg.drawImage(ink2, 0, 0);
       cg.filter = "none";
       cg.globalCompositeOperation = "source-in";
       cg.fillStyle = col;
@@ -5099,12 +5099,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     tint("#b4524a", 0.6, 0, 0, 0.95);
     tint("#f2b9a8", 0.8, -1, -1.4, 0.45);
   }
-  function glow(g, ink, x0, y0, col) {
+  function glow(g, ink2, x0, y0, col) {
     const c = document.createElement("canvas");
-    c.width = ink.width;
-    c.height = ink.height;
+    c.width = ink2.width;
+    c.height = ink2.height;
     const cg = c.getContext("2d");
-    cg.drawImage(ink, 0, 0);
+    cg.drawImage(ink2, 0, 0);
     cg.globalCompositeOperation = "source-in";
     cg.fillStyle = col;
     cg.fillRect(0, 0, c.width, c.height);
@@ -5442,12 +5442,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x + d * s * 1.62, y + s * 0.2, s * 0.06, 0, Math.PI * 2);
     g.fill();
   }
-  function stamp(g, ink, x0, y0, col, seed) {
+  function stamp(g, ink2, x0, y0, col, seed) {
     const c = document.createElement("canvas");
-    c.width = ink.width;
-    c.height = ink.height;
+    c.width = ink2.width;
+    c.height = ink2.height;
     const cg = c.getContext("2d");
-    cg.drawImage(ink, 0, 0);
+    cg.drawImage(ink2, 0, 0);
     cg.globalCompositeOperation = "source-in";
     cg.fillStyle = col;
     cg.fillRect(0, 0, c.width, c.height);
@@ -5469,14 +5469,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.globalCompositeOperation = "source-over";
     g.globalAlpha = 1;
   }
-  function welt(g, ink, x0, y0) {
-    const w = ink.width, h2 = ink.height, tint = (col, blur, a, op) => {
+  function welt(g, ink2, x0, y0) {
+    const w = ink2.width, h2 = ink2.height, tint = (col, blur, a, op) => {
       const c = document.createElement("canvas");
       c.width = w;
       c.height = h2;
       const cg = c.getContext("2d");
       cg.filter = blur ? "blur(" + blur + "px)" : "none";
-      cg.drawImage(ink, 0, 0);
+      cg.drawImage(ink2, 0, 0);
       cg.filter = "none";
       cg.globalCompositeOperation = "source-in";
       cg.fillStyle = col;
@@ -5751,8 +5751,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W17, H) {
-    const t = cy - H / 2, L = cx - W17 / 2, R = cx + W17 / 2;
+  function shield(g, cx, cy, W18, H) {
+    const t = cy - H / 2, L = cx - W18 / 2, R = cx + W18 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6331,6 +6331,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (n) o[f] = n;
     }
     if (v.keep) o.keep = 1;
+    if (typeof v.trophy === "string" && /^[a-z0-9-]{1,24}$/.test(v.trophy)) o.trophy = v.trophy;
     return o;
   }
   var text2 = text;
@@ -6593,9 +6594,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W17 = 192, H = 226;
+        const x0 = 94, y0 = 12, W18 = 192, H = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W17, H);
+        g.strokeRect(x0, y0, W18, H);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6603,20 +6604,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W17 - 8, yy);
+            g.fillText(right, x0 + W18 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W17 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W18 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W17 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W18 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W17 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W18 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W17 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W18 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -6739,6 +6740,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       sheet: 5,
       where: "a shoulder blade",
       fields: ["list"],
+      auto: "passport",
       sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
       draw: (g, w, h2, V) => {
         const L = (V.list || []).map((x) => String(x).toUpperCase());
@@ -7087,8 +7089,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W17, d, V) {
-    doc = W17.document;
+  function drawCard(W18, d, V) {
+    doc = W18.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7116,39 +7118,39 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W17, d, m, layer, V) {
-    const key2 = d.name + "|" + JSON.stringify(V);
-    let set2 = cache.get(key2);
+  function picture(W18, d, m, layer, V) {
+    const key3 = d.name + "|" + JSON.stringify(V);
+    let set2 = cache.get(key3);
     if (set2) {
-      cache.delete(key2);
-      cache.set(key2, set2);
+      cache.delete(key3);
+      cache.set(key3, set2);
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W17, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W18, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
-    cache.set(key2, set2);
+    cache.set(key3, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W17, u);
+      for (const u of Object.values(os)) forget(W18, u);
     }
     return set2[layer] || null;
   }
-  function forget(W17, url) {
+  function forget(W18, url) {
     try {
-      const m = W17.GLDrawImageCache;
+      const m = W18.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W17.DrawImageCache;
+      const m = W18.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W17.GLDrawCanvas && W17.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W18.GLDrawCanvas && W18.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7252,19 +7254,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W17, a) {
-    Wd = W17;
+  function openInkPanel(W18, a) {
+    Wd = W18;
     api = a;
     close();
-    if (!W17.document.getElementById("fi-style")) {
-      const s = W17.document.createElement("style");
+    if (!W18.document.getElementById("fi-style")) {
+      const s = W18.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W17.document.head.appendChild(s);
+      W18.document.head.appendChild(s);
     }
-    box = W17.document.createElement("div");
+    box = W18.document.createElement("div");
     box.id = "fi-panel";
-    W17.document.body.appendChild(box);
+    W18.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7281,14 +7283,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var LIVE_HOST = INK_HOST + "live/";
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
-  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand" };
+  var MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
+  var ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
+  var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
   var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
   var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
+  var MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var stillItem = (C2, kind, name) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
+  var isMark = (slot) => MARK_SLOTS.includes(slot);
+  var ours = (slot) => !!kindOf(slot) || isMark(slot);
+  var picKind = (slot) => isMark(slot) ? "FarmBrand" : kindOf(slot);
   var TITLES = {};
   var MANIFEST = {};
   var K = {};
@@ -7297,7 +7305,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (a.live) MANIFEST[a.name] = a;
     if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
   }
-  var kOf = (it) => it && it.Asset && it.Asset.Group && K[kindOf(it.Asset.Group.Name) + ":" + it.Asset.Name] || 1;
+  var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+  var MK = {};
+  for (const slot of MARK_SLOTS) for (const a of ink_designs_default.groups.FarmBrand) {
+    const [, , bw, bh] = MARK_AT[slot];
+    MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100;
+  }
+  var kOf = (it) => {
+    const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name;
+    if (!g) return 1;
+    return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1;
+  };
   function assetDef(a) {
     return {
       Name: a.name,
@@ -7324,44 +7342,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[kindOf(slot)].map(assetDef)
     };
   }
-  function describe(W17) {
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const G = W17.AssetGroupMap && W17.AssetGroupMap.get(slot);
+  function markDef(slot) {
+    const [cx, cy] = MARK_AT[slot];
+    return {
+      Group: slot,
+      Priority: PRIORITY,
+      Default: false,
+      Random: false,
+      BodyCosplay: true,
+      Clothing: false,
+      AllowNone: true,
+      AllowCustomize: false,
+      Color: ["Default"],
+      Asset: ink_designs_default.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
+    };
+  }
+  function describe(W18) {
+    for (const slot of ALL_SLOTS) {
+      const G = W18.AssetGroupMap && W18.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
-        const t = TITLES[kindOf(slot) + ":" + A.Name];
+        const t = TITLES[picKind(slot) + ":" + A.Name];
         if (t) A.Description = t;
       }
     }
   }
-  var gameReady = (W17) => typeof W17.AssetGroupAdd === "function" && typeof W17.AssetAdd === "function" && W17.AssetGroupMap && W17.AssetGroupMap.size > 30;
-  function addSlots(W17) {
-    if (W17.AssetGroupMap.has(INK_SLOTS[0])) {
-      describe(W17);
-      return false;
+  var gameReady = (W18) => typeof W18.AssetGroupAdd === "function" && typeof W18.AssetAdd === "function" && W18.AssetGroupMap && W18.AssetGroupMap.size > 30;
+  function addSlots(W18) {
+    let added = false;
+    for (const slot of ALL_SLOTS) {
+      if (W18.AssetGroupMap.has(slot)) continue;
+      const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W18.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W18.AssetAdd(G, a, W18.AssetFemale3DCGExtended || {}, def);
+      added = true;
     }
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const def = groupDef(slot), G = W17.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W17.AssetAdd(G, a, W17.AssetFemale3DCGExtended || {}, def);
-    }
-    describe(W17);
-    return true;
+    describe(W18);
+    return added;
   }
   var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
-  function liveSrc(W17, C2, slot, name, layer) {
+  function liveSrc(W18, C2, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W17, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+      return picture(W18, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W17) {
-    const P5 = W17.Player, out = [];
+  function wornLive(W18) {
+    const P5 = W18.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P5, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7369,8 +7401,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W17, slot, values, now) {
-    const it = itemIn(W17.Player, slot);
+  function write(W18, slot, values, now) {
+    const it = itemIn(W18.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7380,17 +7412,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W17), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W18), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(W17.Player);
+      if (typeof W18.CharacterRefresh === "function") W18.CharacterRefresh(W18.Player);
     } catch (e) {
     }
     try {
-      if (typeof W17.ChatRoomCharacterItemUpdate === "function") W17.ChatRoomCharacterItemUpdate(W17.Player, slot);
+      if (typeof W18.ChatRoomCharacterItemUpdate === "function") W18.ChatRoomCharacterItemUpdate(W18.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7398,29 +7430,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var retry = {};
   var counts = {};
   var DAY = 864e5;
-  var cumKey = (W17) => "farmink-lastcum-" + (W17.Player && W17.Player.MemberNumber);
-  function daysDenied(W17) {
+  var cumKey = (W18) => "farmink-lastcum-" + (W18.Player && W18.Player.MemberNumber);
+  function daysDenied(W18) {
     let t = 0;
     try {
-      t = Number(W17.localStorage.getItem(cumKey(W17))) || 0;
+      t = Number(W18.localStorage.getItem(cumKey(W18))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W17, auto) {
-    if (auto === "denied") return { n: daysDenied(W17) };
+  function autoOf(W18, auto) {
+    if (auto === "denied") return { n: daysDenied(W18) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
+    if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W17) {
-    for (const { slot, name, item } of wornLive(W17)) {
+  function refreshAuto(W18) {
+    for (const { slot, name, item } of wornLive(W18)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W17, d.auto);
-      if (v) write(W17, slot, v);
+      const v = autoOf(W18, d.auto);
+      if (v) write(W18, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7447,17 +7480,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return toHex(c.map((v, i) => v + (to[i] - v) * e));
   }
   var DESIGNS = { brand: new Set(ink_designs_default.groups.FarmBrand.map((a) => a.name)), ink: new Set(ink_designs_default.groups.FarmInk.map((a) => a.name)) };
+  DESIGNS.mark = DESIGNS.brand;
   var LAYERS_OF = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
   var farmOf = (it) => {
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W17) => "farmink-done-" + (W17.Player && W17.Player.MemberNumber);
+  var doneKey = (W18) => "farmink-done-" + (W18.Player && W18.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : null;
+    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null;
     if (!slot || !DESIGNS[slot].has(e.design)) return null;
     const n = (v, max) => {
       const x = Number(v);
@@ -7466,21 +7500,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W17, list, on3, now, opts) {
+  function farmInkSync(W18, list, on3, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P5 = W17.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W17.InventoryWear !== "function") return null;
+    const P5 = W18.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W18.InventoryWear !== "function") return null;
     now = now || Date.now();
-    const want = on3 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed2 = [];
+    const want = on3 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed2 = [];
     let done = {};
     try {
-      done = JSON.parse(W17.localStorage.getItem(doneKey(W17))) || {};
+      done = JSON.parse(W18.localStorage.getItem(doneKey(W18))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W17.InventoryRemove === "function") W17.InventoryRemove(P5, slot, false);
+        if (typeof W18.InventoryRemove === "function") W18.InventoryRemove(P5, slot, false);
         else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7488,7 +7522,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       changed2.push(slot);
       return true;
     };
-    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+    for (const slot of ALL_SLOTS) {
       const it = itemIn(P5, slot), id = farmOf(it);
       if (!id) continue;
       const a = ageOf(it.Property.FarmInk, now);
@@ -7498,11 +7532,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
     for (const e of want) {
-      if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P5, s)) === e.id)) continue;
-      if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
+      if (ALL_SLOTS.some((s) => farmOf(itemIn(P5, s)) === e.id)) continue;
+      const mark = e.slot === "mark";
+      if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
       if (e.fade && e.at && now - e.at >= e.fade) continue;
       let slot = null;
-      if (e.slot === "brand") {
+      if (mark) {
+        const atOf = (s) => {
+          const f = farmOf(itemIn(P5, s)) && itemIn(P5, s).Property.FarmInk;
+          return f && f.at || 0;
+        };
+        slot = MARK_SLOTS.find((s) => !itemIn(P5, s)) || MARK_SLOTS.slice().sort((a, b) => atOf(a) - atOf(b))[0];
+      } else if (e.slot === "brand") {
         const it2 = itemIn(P5, BRAND_SLOT);
         if (!it2 || farmOf(it2)) slot = BRAND_SLOT;
         else {
@@ -7517,123 +7558,190 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       }
       if (itemIn(P5, slot)) remove(slot);
-      const kind = kindOf(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
+      const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W17.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
+        W18.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
       const it = itemIn(P5, slot);
       if (!it || it.Asset.Name !== e.design) continue;
       it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, e.values || {}, { farm: e.id, at: e.at || now, heal: e.heal || null, fade: e.fade || null, keep: e.keep || null })) });
+      if (mark) {
+        if (!done[e.id]) out.marked.push(e.design);
+      } else out.put.push(e.design);
       done[e.id] = now;
       changed2.push(slot);
-      out.put.push(e.design);
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W17.localStorage.setItem(doneKey(W17), JSON.stringify(done));
+      W18.localStorage.setItem(doneKey(W18), JSON.stringify(done));
     } catch (e) {
     }
     if (changed2.length) {
       try {
-        if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(P5);
+        if (typeof W18.CharacterRefresh === "function") W18.CharacterRefresh(P5);
       } catch (e) {
       }
       try {
-        if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(P5);
+        if (typeof W18.ChatRoomCharacterUpdate === "function") W18.ChatRoomCharacterUpdate(P5);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W17) => {
-    const id = farmOf(itemIn(W17.Player, BRAND_SLOT));
+  var farmBrandWorn = (W18) => {
+    const id = farmOf(itemIn(W18.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W17, C2) => {
+  var dosed = (W18, C2) => {
     try {
-      const D = W17.FarmhandDispensary;
+      const D = W18.FarmhandDispensary;
       return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
     } catch (e) {
       return false;
     }
   };
-  var wearsDosedOnly = (C2) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+  var wearsDosedOnly = (C2) => ALL_SLOTS.some((s) => {
     const it = itemIn(C2, s);
     return !!(it && DOSED_ONLY.has(it.Asset.Name));
   });
-  var stillChanging = (C2, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+  var stillChanging = (C2, now) => ALL_SLOTS.some((s) => {
     const it = itemIn(C2, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
     return !!(a && a.still);
   });
-  var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W17, t) => {
+  var trophyOf = (it) => {
+    const f = it && it.Property && it.Property.FarmInk;
+    return f && typeof f.trophy === "string" ? f.trophy : null;
+  };
+  function trophyWorn(W18) {
+    const o = {};
+    for (const s of INK_SLOTS) {
+      const id = trophyOf(itemIn(W18.Player, s));
+      if (id) o[id] = s;
+    }
+    return o;
+  }
+  var roomSees = (W18, P5) => {
     try {
-      if (typeof W17.ChatRoomSendLocal === "function") {
-        const d = W17.document.createElement("div");
+      if (typeof W18.CharacterRefresh === "function") W18.CharacterRefresh(P5);
+    } catch (e) {
+    }
+    try {
+      if (typeof W18.ChatRoomCharacterUpdate === "function") W18.ChatRoomCharacterUpdate(P5);
+    } catch (e) {
+    }
+  };
+  function trophyWear(W18, t, slot) {
+    const P5 = W18.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || typeof W18.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+    if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
+    const worn = trophyWorn(W18);
+    if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
+    if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
+    slot = slot || INK_SLOTS.find((s) => !itemIn(P5, s));
+    if (!slot) return { ok: false, full: true, why: "your four Farm Ink slots are full", slots: INK_SLOTS.map((s) => {
+      const it2 = itemIn(P5, s);
+      return { slot: s, name: SLOT_NAMES[s], title: it2 ? TITLES["FarmInk:" + it2.Asset.Name] || it2.Asset.Name : "" };
+    }) };
+    if (itemIn(P5, slot)) {
+      try {
+        W18.InventoryRemove(P5, slot, false);
+      } catch (e) {
+        return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
+      }
+    }
+    try {
+      W18.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
+    } catch (e) {
+      return { ok: false, why: "the game wouldn't take it" };
+    }
+    const it = itemIn(P5, slot);
+    if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W18, d.auto) : null;
+    it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
+    roomSees(W18, P5);
+    return { ok: true, slot, name: SLOT_NAMES[slot] };
+  }
+  function trophyOff(W18, id) {
+    const P5 = W18.Player, slot = P5 && trophyWorn(W18)[id];
+    if (!slot) return { ok: true, already: true };
+    try {
+      if (typeof W18.InventoryRemove === "function") W18.InventoryRemove(P5, slot, false);
+      else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
+    } catch (e) {
+      return { ok: false, why: "it wouldn't come off" };
+    }
+    roomSees(W18, P5);
+    return { ok: true, slot, name: SLOT_NAMES[slot] };
+  }
+  var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
+  var say = (W18, t) => {
+    try {
+      if (typeof W18.ChatRoomSendLocal === "function") {
+        const d = W18.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W17.ChatRoomSendLocal(d.outerHTML);
+        W18.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W17) {
+  function wornAll(W18) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W17.Player, slot);
+      const it = itemIn(W18.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W17) => ({ worn: () => wornAll(W17), write: (slot, v) => write(W17, slot, v, true), command: (a) => inkCommand(W17, a) });
-  function inkCommand(W17, args) {
+  var panelApi = (W18) => ({ worn: () => wornAll(W18), write: (slot, v) => write(W18, slot, v, true), command: (a) => inkCommand(W18, a) });
+  function inkCommand(W18, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W17);
-    if (!a && W17.document && W17.document.body) {
-      openInkPanel(W17, panelApi(W17));
+    const worn = wornLive(W18);
+    if (!a && W18.document && W18.document.body) {
+      openInkPanel(W18, panelApi(W18));
       return;
     }
-    if (/^why$/i.test(a)) return say(W17, whyText());
+    if (/^why$/i.test(a)) return say(W18, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W17.Player, slot2)) return say(W17, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W17, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W17, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W18.Player, slot2)) return say(W18, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W18, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W18, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W17, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W17, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W18, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W18, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W17.Player, slot);
-    if (!it) return say(W17, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W17, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W18.Player, slot);
+    if (!it) return say(W18, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W18, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W17, "");
+    if (!rest) return inkCommand(W18, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W17, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W17, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W17);
-    say(W17, "Written on " + d.title + ".");
+    else return say(W18, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W18, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W18);
+    say(W18, "Written on " + d.title + ".");
   }
-  function registerInk(W17, mod2) {
-    if (W17.__farmInk) return W17.__farmInk;
-    const st2 = W17.__farmInk = {
+  function registerInk(W18, mod2) {
+    if (W18.__farmInk) return W18.__farmInk;
+    const st2 = W18.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7643,40 +7751,46 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W17);
+            refreshAuto(W18);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W17, slot, v, true),
-      command: (a) => inkCommand(W17, a),
+      write: (slot, v) => write(W18, slot, v, true),
+      command: (a) => inkCommand(W18, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on3, opts) => farmInkSync(W17, list, on3, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W17),
-      worn: () => wornLive(W17).map(({ slot, name }) => ({ slot, name }))
+      farm: (list, on3, opts) => farmInkSync(W18, list, on3, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W18),
+      // trophies (the Companion's 🏆 Trophies row)
+      trophyWear: (t2, slot) => trophyWear(W18, t2, slot),
+      trophyOff: (id) => trophyOff(W18, id),
+      trophyWorn: () => trophyWorn(W18),
+      worn: () => wornLive(W18).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook4 = (name, pri, fn) => {
         try {
-          if (typeof W17[name] === "function") mod2.hookFunction(name, pri, fn);
+          if (typeof W18[name] === "function") mod2.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
         }
       };
       hook4("AssetBaseURL", 0, (args, next) => {
-        const slot = args[2] || args[1] && args[1].Name, kind = kindOf(slot);
+        const slot = args[2] || args[1] && args[1].Name;
+        if (isMark(slot)) return INK_HOST + slot + "/";
+        const kind = kindOf(slot);
         if (!kind) return next(args);
         return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
       });
       hook4("AssetGetPreviewPath", 0, (args, next) => {
-        const A = args[0], kind = A && A.Group && kindOf(A.Group.Name);
+        const A = args[0], kind = A && A.Group && picKind(A.Group.Name);
         return kind ? INK_HOST + kind + "/Preview" : next(args);
       });
       hook4("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W17);
+          describe(W18);
         } catch (e) {
         }
         return r;
@@ -7691,17 +7805,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) * ky;
           return o;
         };
-        const seen2 = /* @__PURE__ */ new Set(), notReady = [];
+        const seen3 = /* @__PURE__ */ new Set(), notReady = [];
         const ready2 = (u) => {
           try {
-            const c = W17.GLDrawImageCache;
+            const c = W18.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain2, self, u, x, y, o) => {
-          const T2 = W17.__farmInkTint;
+          const T2 = W18.__farmInkTint;
           if (typeof T2 !== "function") return false;
           let t2;
           try {
@@ -7727,10 +7841,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const wrap = (f, plain2) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
+            const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
+            if (mm) {
+              const it = itemIn(C2, mm[1]);
+              if (!it || it.Asset.Name !== mm[2]) return void 0;
+              const u = src.replace("/" + mm[1] + "/", "/FarmBrand/");
+              const o3 = aged(sized(o, it), it, mm[3]);
+              if (o3.Alpha === 0) return void 0;
+              seen3.add(mm[2]);
+              if (!ready2(u)) notReady.push(mm[2]);
+              if (statue(plain2, this, u, x, y, o3)) return void 0;
+              return f.call(this, u, x, y, o3);
+            }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W17, C2, lm[1], lm[2], lm[3]);
-              seen2.add(lm[2]);
+              const u = liveSrc(W18, C2, lm[1], lm[2], lm[3]);
+              seen3.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
                 return void 0;
@@ -7743,11 +7869,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W17, C2)) return void 0;
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W18, C2)) return void 0;
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
-              seen2.add(sm[2]);
+              seen3.add(sm[2]);
               if (!ready2(src)) notReady.push(sm[2]);
               if (statue(plain2, this, src, x, y, o)) return void 0;
             }
@@ -7756,33 +7882,50 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W17, C2, seen2, notReady);
+          note2(W18, C2, seen3, notReady);
         } catch (e) {
         }
         return out;
       });
       const keepInk = (name) => hook4(name, 0, (args, next) => {
-        const C2 = args[0], keep2 = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
+        const C2 = args[0], keep3 = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)) : [];
         const r = next(args);
         try {
           let back = 0;
-          if (keep2.length && C2 && Array.isArray(C2.Appearance)) {
-            for (const it of keep2) if (!C2.Appearance.includes(it) && !itemIn(C2, it.Asset.Group.Name)) {
+          if (keep3.length && C2 && Array.isArray(C2.Appearance)) {
+            for (const it of keep3) if (!C2.Appearance.includes(it) && !itemIn(C2, it.Asset.Group.Name)) {
               C2.Appearance.push(it);
               back++;
             }
           }
-          if (back && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+          if (back && typeof W18.CharacterLoadCanvas === "function") W18.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
       });
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
+      hook4("WardrobeFastLoad", 0, (args, next) => {
+        const C2 = args[0], keep3 = C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+        const r = next(args);
+        try {
+          let back = 0;
+          for (const it of keep3) if (!itemIn(C2, it.Asset.Group.Name)) {
+            C2.Appearance.push(it);
+            back++;
+          }
+          if (back) {
+            if (typeof W18.CharacterRefresh === "function") W18.CharacterRefresh(C2, false);
+            if (args[2] && typeof W18.ChatRoomCharacterUpdate === "function") W18.ChatRoomCharacterUpdate(C2);
+          }
+        } catch (e) {
+        }
+        return r;
+      });
       hook4("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W17);
+          addSlots(W18);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
@@ -7791,9 +7934,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
-          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W17.ActivityOrgasmRuined) {
-            W17.localStorage.setItem(cumKey(W17), String(Date.now()));
-            setTimeout(() => refreshAuto(W17), 1e3);
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W18.ActivityOrgasmRuined) {
+            W18.localStorage.setItem(cumKey(W18), String(Date.now()));
+            setTimeout(() => refreshAuto(W18), 1e3);
           }
         } catch (e) {
         }
@@ -7801,58 +7944,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W17)) return;
+      if (!gameReady(W18)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W17);
+        addSlots(W18);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C2 of W17.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+          for (const C2 of W18.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W18.CharacterLoadCanvas === "function") W18.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W17.CommandCombine === "function") W17.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W17, a) }]);
+        if (typeof W18.CommandCombine === "function") W18.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W18, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W17.Player && W17.Player.Appearance) refreshAuto(W17);
+        if (W18.Player && W18.Player.Appearance) refreshAuto(W18);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W17.addEventListener("farmhand-dispensary", (e) => {
+      W18.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W17.Player && W17.Player.MemberNumber;
-        const C2 = (W17.Player && W17.Player.MemberNumber === mn ? W17.Player : (W17.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C2 && wearsDosedOnly(C2) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+        const mn = d.type === "icons" ? d.from : W18.Player && W18.Player.MemberNumber;
+        const C2 = (W18.Player && W18.Player.MemberNumber === mn ? W18.Player : (W18.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W18.CharacterLoadCanvas === "function") W18.CharacterLoadCanvas(C2);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C2 of W17.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+        for (const C2 of W18.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W18.CharacterLoadCanvas === "function") W18.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W17, C2, seen2, notReady) {
+  function note2(W18, C2, seen3, notReady) {
     if (!C2 || !Array.isArray(C2.Appearance)) return;
     const pose = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
-    const worn = C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)).map((it) => it.Asset.Name);
-    const missing2 = worn.filter((n) => !seen2.has(n));
+    const worn = C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+    const missing2 = worn.filter((n) => !seen3.has(n));
     if (!missing2.length && !notReady.length) return;
     DIAG.push({ t: Date.now(), who: C2.MemberNumber, name: String(C2.Nickname || C2.Name || ""), missing: missing2, notReady: [...new Set(notReady)] });
     if (DIAG.length > 40) DIAG.shift();
@@ -7879,7 +8022,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.62.0";
+  var VERSION = "0.63.0";
 
   // shared/species.js
   var WORDS = {
@@ -8042,9 +8185,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
   function mooify(text3, species, share) {
     const say3 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
-    const keep2 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
+    const keep3 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
     return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
-      if (Math.random() < keep2) return w;
+      if (Math.random() < keep3) return w;
       const n = say3[Math.floor(Math.random() * say3.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
@@ -8293,8 +8436,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const box3 = h("div", { class: "fhc-box" }, ...kids);
     const first = box3.firstElementChild, t = first && (first.classList.contains("fhc-h") ? first : first.querySelector(":scope > .fhc-h"));
     if (!t || box3.children.length < 2) return box3;
-    const key2 = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
-    if (!key2) return box3;
+    const key3 = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
+    if (!key3) return box3;
     t.classList.add("fhc-fold");
     t.setAttribute("role", "button");
     t.setAttribute("tabindex", "0");
@@ -8302,12 +8445,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       box3.classList.toggle("fold", on3);
       t.setAttribute("aria-expanded", on3 ? "false" : "true");
     };
-    set2(foldSet().has(key2));
+    set2(foldSet().has(key3));
     const flip = (e) => {
       e.preventDefault();
       const on3 = !box3.classList.contains("fold");
-      if (on3) foldSet().add(key2);
-      else foldSet().delete(key2);
+      if (on3) foldSet().add(key3);
+      else foldSet().delete(key3);
       foldSave();
       set2(on3);
     };
@@ -8348,8 +8491,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h("div", { class: "fhc-m-t" }, h("div", { class: m.kind ? "fhc-fill-" + m.kind : "", style: { width: Math.max(0, Math.min(100, m.pct || 0)) + "%" } }))
     ))) : null;
   };
-  function rows(ctx3, key2, list) {
-    const items = list.filter(Boolean), openId = ctx3.ui["open_" + key2];
+  function rows(ctx3, key3, list) {
+    const items = list.filter(Boolean), openId = ctx3.ui["open_" + key3];
     if (!items.length) return null;
     return h("div", { class: "fhc-rows" }, items.map((r) => {
       const open2 = r.id === openId && r.body;
@@ -8359,7 +8502,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           type: "button",
           class: "fhc-r" + (open2 ? " open" : ""),
           "aria-expanded": r.body ? open2 ? "true" : "false" : null,
-          onclick: () => r.go ? r.go() : ctx3.setUi({ ["open_" + key2]: open2 ? null : r.id })
+          onclick: () => r.go ? r.go() : ctx3.setUi({ ["open_" + key3]: open2 ? null : r.id })
         },
         h("span", { class: "fhc-r-k" }, r.label, r.dot ? h("span", { class: "fhc-dot", "aria-label": "new" }) : null),
         r.sum ? h("span", { class: "fhc-r-s" }, r.sum) : null,
@@ -8368,8 +8511,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return open2 ? [head, h("div", { class: "fhc-open" }, r.body())] : head;
     }));
   }
-  function quick(ctx3, key2, list, more) {
-    const isOpen = !!ctx3.ui["more_" + key2];
+  function quick(ctx3, key3, list, more) {
+    const isOpen = !!ctx3.ui["more_" + key3];
     return h(
       "div",
       null,
@@ -8381,11 +8524,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           type: "button",
           class: "fhc-b" + (isOpen ? " on" : ""),
           "aria-expanded": isOpen ? "true" : "false",
-          onclick: () => ctx3.setUi({ ["more_" + key2]: !isOpen })
+          onclick: () => ctx3.setUi({ ["more_" + key3]: !isOpen })
         }, isOpen ? "More \u25B4" : "More \u25BE") : null
       ),
       isOpen ? h("div", { class: "fhc-menu", role: "menu", "aria-label": "More" }, more.filter(Boolean).map(([label, fn]) => h("button", { type: "button", role: "menuitem", class: "fhc-b", onclick: () => {
-        ctx3.setUi({ ["more_" + key2]: false }, true);
+        ctx3.setUi({ ["more_" + key3]: false }, true);
         fn();
       } }, label))) : null
     );
@@ -8625,7 +8768,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return { bars, chips, cards, labels: [...new Set(labels)] };
   }
   function drawCard2(ctx3, name, c, i) {
-    const key2 = "x_" + name + "_" + i;
+    const key3 = "x_" + name + "_" + i;
     return card(
       c.title && title(String(c.title)),
       c.text && h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, String(c.text)),
@@ -8636,12 +8779,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.input && h(
         "div",
         null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }),
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key3] || "", oninput: (e) => ctx3.setUi({ [key3]: e.target.value }, true) }),
         btn(String(c.input.label || "Send"), () => {
-          const v = (ctx3.ui[key2] || "").trim();
+          const v = (ctx3.ui[key3] || "").trim();
           if (!v) return ctx3.hint("Type somethin' in the box first.");
           ctx3.send(String(c.input.cmd) + " " + v);
-          ctx3.setUi({ [key2]: "" });
+          ctx3.setUi({ [key3]: "" });
         }, true)
       ),
       Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx3.send(String(b.cmd)), !!b.accent))) : null,
@@ -8710,162 +8853,6 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     "Living Suit (mouth)": "The last of it: a smooth black sheath over your face from the nose down, and a tongue of itself in your mouth, fillin' it. Every inch of you is inside it now. It walks you where it likes, and you go."
   };
   var gearLore = (name) => GEAR_LORE[name] || "";
-
-  // extension/src/localsave.js
-  var W2 = window;
-  var MINE = /^(fhc-|farmhand-)/;
-  var S = { db: null, dir: null, perm: "none", at: 0, last: "", err: "" };
-  var onChange = () => {
-  };
-  function db() {
-    if (S.db) return S.db;
-    S.db = new Promise((ok2, no) => {
-      try {
-        const rq = W2.indexedDB.open("farmhand-companion", 1);
-        rq.onupgradeneeded = () => {
-          try {
-            rq.result.createObjectStore("kv");
-          } catch (e) {
-          }
-        };
-        rq.onsuccess = () => ok2(rq.result);
-        rq.onerror = () => no(rq.error);
-      } catch (e) {
-        no(e);
-      }
-    });
-    S.db.catch(() => {
-      S.db = null;
-    });
-    return S.db;
-  }
-  async function get(k) {
-    const d = await db();
-    return new Promise((ok2, no) => {
-      const rq = d.transaction("kv").objectStore("kv").get(k);
-      rq.onsuccess = () => ok2(rq.result);
-      rq.onerror = () => no(rq.error);
-    });
-  }
-  async function put(k, v) {
-    const d = await db();
-    return new Promise((ok2, no) => {
-      const tx = d.transaction("kv", "readwrite");
-      tx.objectStore("kv").put(v, k);
-      tx.oncomplete = () => ok2(true);
-      tx.onerror = () => no(tx.error);
-    });
-  }
-  var me = () => W2.Player && W2.Player.MemberNumber || 0;
-  var fileName = () => "farmhand-companion-" + (me() || "player") + ".json";
-  function snapshot(version) {
-    const data = {};
-    try {
-      for (let i = 0; i < W2.localStorage.length; i++) {
-        const k = W2.localStorage.key(i);
-        if (k && MINE.test(k)) data[k] = W2.localStorage.getItem(k);
-      }
-    } catch (e) {
-    }
-    return { kind: "farmhand-companion", v: 1, member: me(), version, data };
-  }
-  async function writeNow(version, force) {
-    if (!S.dir || S.perm !== "granted" || !me()) return;
-    const snap2 = snapshot(version), body2 = JSON.stringify(snap2.data);
-    if (!force && body2 === S.last) return;
-    const errWas = S.err;
-    try {
-      const fh = await S.dir.getFileHandle(fileName(), { create: true }), w = await fh.createWritable();
-      await w.write(JSON.stringify(Object.assign(snap2, { savedAt: (/* @__PURE__ */ new Date()).toISOString() }), null, 1));
-      await w.close();
-      S.last = body2;
-      S.at = Date.now();
-      S.err = "";
-    } catch (e) {
-      S.err = String(e && e.message || e);
-      if (/permission|not allowed/i.test(S.err)) S.perm = "prompt";
-    }
-    if (force || S.err !== errWas) onChange();
-  }
-  function localSaveState() {
-    return { can: typeof W2.showDirectoryPicker === "function", folder: S.dir ? S.dir.name : "", perm: S.perm, at: S.at, err: S.err, file: fileName() };
-  }
-  async function localSavePick(version) {
-    try {
-      const d = await W2.showDirectoryPicker({ id: "bnb-farm", mode: "readwrite" });
-      S.dir = d;
-      S.perm = "granted";
-      await put("dir", d);
-      await writeNow(version, true);
-    } catch (e) {
-      if (!/abort/i.test(String(e && e.name))) S.err = String(e && e.message || e);
-    }
-    onChange();
-  }
-  async function localSaveReconnect(version) {
-    try {
-      S.perm = await S.dir.requestPermission({ mode: "readwrite" });
-      if (S.perm === "granted") await writeNow(version, true);
-    } catch (e) {
-      S.err = String(e && e.message || e);
-    }
-    onChange();
-  }
-  function localSaveNow(version) {
-    return writeNow(version, true);
-  }
-  function localSaveLoad(say3) {
-    const inp = W2.document.createElement("input");
-    inp.type = "file";
-    inp.accept = ".json,application/json";
-    inp.onchange = () => {
-      const f = inp.files && inp.files[0];
-      if (!f) return;
-      f.text().then((t) => {
-        let d = null;
-        try {
-          d = JSON.parse(t);
-        } catch (e) {
-        }
-        if (!d || d.kind !== "farmhand-companion" || !d.data || typeof d.data !== "object") {
-          say3 && say3("That file isn't a Farmhand Companion save.");
-          return;
-        }
-        const keys = Object.keys(d.data).filter((k) => MINE.test(k) && typeof d.data[k] === "string");
-        if (!W2.confirm("Load these settings?\n\n" + f.name + (d.savedAt ? "\nsaved " + new Date(d.savedAt).toLocaleString() : "") + "\n" + keys.length + " things in it.\n\nWhat this browser has now is replaced, and the page reloads.")) return;
-        try {
-          for (let i = W2.localStorage.length - 1; i >= 0; i--) {
-            const k = W2.localStorage.key(i);
-            if (k && MINE.test(k) && !(k in d.data)) W2.localStorage.removeItem(k);
-          }
-          for (const k of keys) W2.localStorage.setItem(k, d.data[k]);
-        } catch (e) {
-          say3 && say3("Couldn't load it: " + (e && e.message || e));
-          return;
-        }
-        W2.location.reload();
-      });
-    };
-    inp.click();
-  }
-  function initLocalSave(version, changed2) {
-    if (typeof changed2 === "function") onChange = changed2;
-    get("dir").then(async (d) => {
-      if (!d) return;
-      S.dir = d;
-      try {
-        S.perm = await d.queryPermission({ mode: "readwrite" });
-      } catch (e) {
-        S.perm = "prompt";
-      }
-      onChange();
-      if (S.perm === "granted") writeNow(version, true);
-    }).catch(() => {
-    });
-    setInterval(() => {
-      writeNow(version, false);
-    }, 6e4);
-  }
 
   // studio/web/breasts-drawing.js
   (() => {
@@ -9150,11 +9137,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const fitNow = () => BELLY.fits[poseKey()];
       function bellySkin(src, hex, pose) {
-        const key2 = src + "|" + (hex || ""), v = BELLY.skin.get(key2);
+        const key3 = src + "|" + (hex || ""), v = BELLY.skin.get(key3);
         if (Array.isArray(v)) return v;
         const guess = /_Black\./.test(src) ? FarmBelly.FALLBACK.Black : /_Asian\./.test(src) ? FarmBelly.FALLBACK.Asian : FarmBelly.FALLBACK.White;
         if (!v) {
-          BELLY.skin.set(key2, "loading");
+          BELLY.skin.set(key3, "loading");
           const img2 = new Image();
           img2.onload = () => {
             let c = guess;
@@ -9173,30 +9160,30 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               }
             } catch (e) {
             }
-            BELLY.skin.set(key2, c);
+            BELLY.skin.set(key3, c);
             bellyDraw();
           };
-          img2.onerror = () => BELLY.skin.set(key2, guess);
+          img2.onerror = () => BELLY.skin.set(key3, guess);
           img2.src = src;
         }
         return guess;
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W17 = window;
-      const takesDrawings = () => typeof W17.GLDrawLoadTransient === "function";
+      const W18 = window;
+      const takesDrawings = () => typeof W18.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W17.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W17.DrawCacheImage, W17.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W18.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W18.DrawCacheImage, W18.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
-        let seen2 = null;
+        let seen3 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
         try {
           for (const [c] of kept2) c.get = function(k) {
-            if (seen2 == null) seen2 = k;
+            if (seen3 == null) seen3 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W17.DrawGetImage(src);
+          W18.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -9204,7 +9191,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             else delete c.get;
           }
         }
-        return typeof seen2 === "string" && seen2 ? seen2 : src;
+        return typeof seen3 === "string" && seen3 ? seen3 : src;
       });
       function mouldImg(src) {
         let e = MOULD.img.get(src);
@@ -9297,8 +9284,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       function bellyCover(src, x, y, ctx3) {
         const im = mouldImg(src);
         if (!im) return 0;
-        const b = ctx3.belly, key2 = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
-        let v = MOULD.cover.get(key2);
+        const b = ctx3.belly, key3 = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
+        let v = MOULD.cover.get(key3);
         if (v != null) return v;
         const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
         c.width = w;
@@ -9315,7 +9302,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         v = all ? hit / all : 0;
         if (MOULD.cover.size > 400) MOULD.cover.clear();
-        MOULD.cover.set(key2, v);
+        MOULD.cover.set(key3, v);
         return v;
       }
       function bellyAuto(src, x, y, ctx3, behind, pieceKey) {
@@ -9455,8 +9442,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       function bellyUnder(cv, dx, dy, src, ux, uy) {
         const u = gameUnder(src);
         if (!u) return cv;
-        const key2 = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|");
-        if (cv.underKey === key2) return cv.under;
+        const key3 = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|");
+        if (cv.underKey === key3) return cv.under;
         const c = document.createElement("canvas");
         c.width = cv.width;
         c.height = cv.height;
@@ -9468,7 +9455,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           const cut2 = Math.round(uy + u[px] + 1 - dy);
           if (cut2 > 0) g.clearRect(cx, 0, 1, cut2);
         }
-        cv.underKey = key2;
+        cv.underKey = key3;
         cv.under = c;
         return c;
       }
@@ -9480,9 +9467,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!fm) return null;
         const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
         if (!w || !h2) return null;
-        const key2 = Math.round(sx) + "," + Math.round(sy) + "|" + ctx3.sig + "|" + (ctx3.breast ? ctx3.breast.sig : "");
+        const key3 = Math.round(sx) + "," + Math.round(sy) + "|" + ctx3.sig + "|" + (ctx3.breast ? ctx3.breast.sig : "");
         let e = shadeSeen.get(img2);
-        if (e && e.key === key2) return e.out;
+        if (e && e.key === key3) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
         let out = null;
         if (x1 > x0 && y1 > y0) {
@@ -9520,7 +9507,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             out = c;
           }
         }
-        shadeSeen.set(img2, { key: key2, out });
+        shadeSeen.set(img2, { key: key3, out });
         return out;
       }
       function bellyRows(ctx3) {
@@ -9555,10 +9542,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
           }
         }
-        const key2 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
-        if (MOULD.out.has(key2)) return MOULD.out.get(key2);
-        const keep2 = (res) => {
-          keepIn(MOULD.out, key2, res);
+        const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
+        if (MOULD.out.has(key3)) return MOULD.out.get(key3);
+        const keep3 = (res) => {
+          keepIn(MOULD.out, key3, res);
           return res;
         };
         if (mode === "under") {
@@ -9569,7 +9556,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g2.drawImage(im, M, 0);
           g2.globalCompositeOperation = "destination-out";
           g2.drawImage(ctx3.belly.cv, ctx3.belly.dx - x + M, ctx3.belly.dy - y);
-          return keep2(c2);
+          return keep3(c2);
         }
         const ol = ctx3.outline || (ctx3.outline = outline(ctx3));
         if (!ol) return null;
@@ -9646,7 +9633,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             clearTimeout(MOULD.t);
             MOULD.t = setTimeout(bellyDraw, 60);
           }
-          const key22 = key2 + "|span" + span.v;
+          const key22 = key3 + "|span" + span.v;
           if (MOULD.out.has(key22)) return MOULD.out.get(key22);
           const rowOf = (yy) => {
             if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null;
@@ -9700,7 +9687,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);
           if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);
         }
-        return keep2(changed2 ? c : false);
+        return keep3(changed2 ? c : false);
       }
       const BUDGET = host && host.budget || 256e6;
       const bytesOf = (v) => {
@@ -9713,9 +9700,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return n;
       };
-      function keepIn(map, key2, v) {
-        map.delete(key2);
-        map.set(key2, v);
+      function keepIn(map, key3, v) {
+        map.delete(key3);
+        map.set(key3, v);
         return v;
       }
       function trim() {
@@ -9793,8 +9780,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return n < 0 ? 3 : n;
       }
       function nipHalves(src, split) {
-        const key2 = src + "|" + split;
-        let v = BREAST.halves.get(key2);
+        const key3 = src + "|" + split;
+        let v = BREAST.halves.get(key3);
         if (v) return v;
         const im = mouldImg(src);
         if (!im) return null;
@@ -9811,7 +9798,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           a[2]++;
         }
         v = acc.map((a) => a[2] ? [a[0] / a[2], a[1] / a[2]] : null);
-        BREAST.halves.set(key2, v);
+        BREAST.halves.set(key3, v);
         return v;
       }
       const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };
@@ -9884,15 +9871,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (br) {
                   const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S32 = isHeld ? FarmBreasts.held(freeS) : freeS;
-                  const key2 = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
-                  if (BREAST.cvKey !== key2) {
+                  const key3 = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
+                  if (BREAST.cvKey !== key3) {
                     BREAST.cv = FarmBreasts.canvas(S32, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
-                    BREAST.cvKey = key2;
+                    BREAST.cvKey = key3;
                   }
                   const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
                   let bc = BREAST.cv;
                   if (bpose === "AllFours" && ry - bc.ay + bc.height > ground) {
-                    if (BREAST.flatKey !== key2 + "|" + Math.round(ry)) {
+                    if (BREAST.flatKey !== key3 + "|" + Math.round(ry)) {
                       const fc = document.createElement("canvas");
                       fc.width = bc.width;
                       fc.height = bc.height;
@@ -9941,7 +9928,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       fc.nips = bc.nips;
                       fc.mask = bc.mask;
                       BREAST.flat = fc;
-                      BREAST.flatKey = key2 + "|" + Math.round(ry);
+                      BREAST.flatKey = key3 + "|" + Math.round(ry);
                     }
                     bc = BREAST.flat;
                   }
@@ -9958,7 +9945,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] over the breasts:", e);
                     }
                   }
-                  ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key2 + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key3 + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
                     const B = ctx3.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
                     let nc = BREAST.nc;
@@ -9994,8 +9981,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               const handHidden = (src, x, y) => {
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return null;
-                const key2 = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let v = BREAST.cover.get(key2);
+                const key3 = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let v = BREAST.cover.get(key3);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -10013,7 +10000,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 g.drawImage(B.mask, B.mx - x, B.my - y);
                 const under = count();
                 v = all ? under / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
@@ -10027,8 +10014,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key2 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
-                let c = BREAST.out.get(key2);
+                const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   c = document.createElement("canvas");
                   c.width = base.naturalWidth || base.width;
@@ -10045,24 +10032,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] belly form:", e);
                     }
                   }
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - ox, y, o, src);
                 return true;
               };
               const frameCover = (src, im, x, y, B) => {
-                const key2 = "fr|" + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key2);
+                const key3 = "fr|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key3);
                 if (v != null) return v;
                 const fm = frameMeasure(src, im, x, y, B);
                 v = fm ? fm.share : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const FRAME_N = 96;
               const frameMeasure = (src, im, x, y, B) => {
-                const key2 = "fm|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
-                let v = BREAST.out.get(key2);
+                const key3 = "fm|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.out.get(key3);
                 if (v !== void 0) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -10136,7 +10123,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   for (const [p, q2] of [[0, 1], [1, 0]]) if (!sides[p].att.length && sides[q2].att.length) sides[p].att = sides[q2].att.map((at) => ({ a: at.a, x: 2 * (B.mid - x) - at.x, y: at.y }));
                 }
                 if (!runs.length) {
-                  BREAST.out.set(key2, null);
+                  BREAST.out.set(key3, null);
                   return null;
                 }
                 runs.sort((p, q2) => p - q2);
@@ -10156,12 +10143,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                 }
                 v = { sides, width: runs[runs.length >> 1] + 1, col: [rr / n, gg / n, bb / n], hi: hiC, share: tAll ? top / tAll : 0, all: hits / all };
-                BREAST.out.set(key2, v);
+                BREAST.out.set(key3, v);
                 return v;
               };
               const herOutline = (B) => {
-                const key2 = "ho|" + B.sig;
-                let v = BREAST.out.get(key2);
+                const key3 = "ho|" + B.sig;
+                let v = BREAST.out.get(key3);
                 if (v) return v;
                 const m = B.mask, w = m.width, h2 = m.height, d = m.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h2).data, mid = B.mid - B.mx, cs = [];
                 for (const sd of [-1, 1]) {
@@ -10195,7 +10182,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge });
                 }
                 v = cs;
-                keepIn(BREAST.out, key2, v);
+                keepIn(BREAST.out, key3, v);
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
@@ -10203,8 +10190,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;
                 const fm = frameMeasure(src, im, x, y, B);
                 if (!fm) return false;
-                const key2 = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key2);
+                const key3 = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -10228,7 +10215,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W18 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W19 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -10237,7 +10224,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on3 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on3) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W18 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W19 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -10256,38 +10243,38 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W18 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W19 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W18 + 1.5;
+                      g.lineWidth = W19 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W18;
+                      g.lineWidth = W19;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W18 * 0.18, p[1] + dx / L * W18 * 0.18];
+                        return [p[0] - dy / L * W19 * 0.18, p[1] + dx / L * W19 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W18 * 0.22);
+                      g.lineWidth = Math.max(1, W19 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
                   }
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const underBand = (src, im, x, y, B) => {
-                const key2 = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key2);
+                const key3 = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key3);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -10310,14 +10297,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   if (any) hit++;
                 }
                 v = all ? hit / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const bandDraw = (name, src, x, y, o) => {
                 const B = ctx3.breast, im = mouldImg(src);
                 if (!B || !im) return false;
-                const key2 = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key2);
+                const key3 = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -10338,14 +10325,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                     g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0);
                   }
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const chestCover = (src, im, x, y, B, wide) => {
-                const key2 = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key2);
+                const key3 = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key3);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -10364,7 +10351,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                 }
                 v = all ? hit / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const distMap = (alpha, w, h2) => {
@@ -10397,8 +10384,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 return d;
               };
               const strapHalf = (src, im, x, y, B) => {
-                const key2 = "thin|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
-                let v = BREAST.cover.get(key2);
+                const key3 = "thin|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.cover.get(key3);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -10421,7 +10408,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 ridge.sort((m, n) => m - n);
                 v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };
@@ -10447,8 +10434,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-                const key2 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
-                let c = BREAST.out.get(key2);
+                const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
                   c = document.createElement("canvas");
@@ -10756,7 +10743,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         return a[a.length >> 1];
                       });
                       const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW3 - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH3 - 2, Math.round(uyc + G.y3 + 90));
-                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean3 = new Uint8Array(RW * RH);
+                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean4 = new Uint8Array(RW * RH);
                       let nC = 0, sD = 0, bl = 0;
                       for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
                         const p = (yy * CW3 + xx) * 4;
@@ -10765,7 +10752,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
                         const gr = Math.abs(lum2(spL, p + 4) - lum2(spL, p - 4)) + Math.abs(lum2(spL, p + CW3 * 4) - lum2(spL, p - CW3 * 4));
                         if (gr > 9) continue;
-                        clean3[(yy - ry0) * RW + (xx - rx0)] = 1;
+                        clean4[(yy - ry0) * RW + (xx - rx0)] = 1;
                         nC++;
                         sD += Math.abs(lum2(sp, p) - lum2(spL, p));
                         bl += lum2(spL, p);
@@ -10777,7 +10764,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       for (let yy = 0; yy < RH; yy++) {
                         let row = 0;
                         for (let xx = 0; xx < RW; xx++) {
-                          row += clean3[yy * RW + xx];
+                          row += clean4[yy * RW + xx];
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
@@ -10786,11 +10773,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box3(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean4[yy * RW + xx] && box3(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S4, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
-                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean3[yy * RW + xx] === 1;
+                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean4[yy * RW + xx] === 1;
                       } };
                     })();
                     if (texOf) {
@@ -11004,14 +10991,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] belly form:", e);
                     }
                   }
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const ownColour = (src, im) => {
-                const key2 = "col|" + src;
-                let v = BREAST.cover.get(key2);
+                const key3 = "col|" + src;
+                let v = BREAST.cover.get(key3);
                 if (v) return v;
                 const c = document.createElement("canvas");
                 c.width = im.naturalWidth;
@@ -11022,7 +11009,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) px.push([d[i], d[i + 1], d[i + 2]]);
                 px.sort((a, b) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]));
                 v = px.length ? px[Math.floor(px.length * 0.6)] : [40, 40, 44];
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key3, v);
                 return v;
               };
               const strapBase = {};
@@ -11031,8 +11018,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!im) return false;
                 if (!strapBase[piece.key]) strapBase[piece.key] = src;
                 const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted2 = !!(o && o.HexColor);
-                const key2 = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted2 ? 1 : 0);
-                let c = BREAST.out.get(key2);
+                const key3 = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted2 ? 1 : 0);
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 220, MY = 420, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -11138,13 +11125,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       });
                     }
                   }
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const held = [];
-              const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;
+              const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;
               const flushInk = () => {
                 for (const h2 of inkHeld.splice(0)) {
                   try {
@@ -11158,8 +11145,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               const pumpDraw = (name, src, x, y, o) => {
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im || im.naturalHeight < 900) return false;
-                const key2 = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key2);
+                const key3 = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 320, MY = 200, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -11187,7 +11174,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                   }
                   PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N2[i][0] - (PUMP.cupMid[i][0] - sx), MY + N2[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
@@ -11205,8 +11192,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
                 if (!own) return false;
                 if (!ctx3.native && groupOf4(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
-                const key2 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
-                let c = BREAST.out.get(key2);
+                const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
+                let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
                   c = document.createElement("canvas");
@@ -11222,7 +11209,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     const T2 = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T2[0] - x) + (sx + x - N2[0]) * kN, MY + (T2[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
                   });
-                  keepIn(BREAST.out, key2, c);
+                  keepIn(BREAST.out, key3, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
@@ -11336,10 +11323,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf4(src) === "Pussy" && /Penis/.test(src)) {
                   try {
                     const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
-                    const key2 = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
-                    if (GEN.cvKey !== key2) {
+                    const key3 = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
+                    if (GEN.cvKey !== key3) {
                       GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin });
-                      GEN.cvKey = key2;
+                      GEN.cvKey = key3;
                     }
                     if (hard) {
                       if (!blink) ctx3.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
@@ -11666,12 +11653,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (st2) return stampCanvas(st2, o, o.skin || [236, 204, 196]);
       const K2 = KINDS2[o.kind] || KINDS2.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
       const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K2.soft));
-      const W17 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
-      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W17 * 1.25 : 0;
+      const W18 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
+      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W18 * 1.25 : 0;
       const col = K2.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K2.sheath === "skin" || !K2.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K2.sheath;
       const bend = (hard ? 0.11 : 0.09) * L;
-      const widest = W17 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
-      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W17 : W17 * 1.2) + 10, down = Math.max(hard ? W17 * 1.5 : L + W17, drop2 + br * 1.5) + 12;
+      const widest = W18 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
+      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W18 : W18 * 1.2) + 10, down = Math.max(hard ? W18 * 1.5 : L + W18, drop2 + br * 1.5) + 12;
       const cv = document.createElement("canvas");
       cv.width = Math.ceil(half * 2);
       cv.height = Math.ceil(up + down);
@@ -11681,14 +11668,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.lineJoin = "round";
       g.lineCap = "round";
       const sack = () => {
-        const top = oy + W17 * 0.2, cy = top + drop2, r = br;
+        const top = oy + W18 * 0.2, cy = top + drop2, r = br;
         const path = () => {
           g.beginPath();
-          g.moveTo(ox - W17 * 0.9, top);
+          g.moveTo(ox - W18 * 0.9, top);
           g.bezierCurveTo(ox - r * 1.1, top + drop2 * 0.35, ox - r * 2.05, cy - r * 0.5, ox - r * 1.75, cy + r * 0.45);
           g.bezierCurveTo(ox - r * 1.5, cy + r * 1.3, ox - r * 0.35, cy + r * 1.4, ox, cy + r * 0.95);
           g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);
-          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W17 * 0.9, top);
+          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W18 * 0.9, top);
           g.closePath();
         };
         const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
@@ -11734,8 +11721,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const shaft = (dx, lean) => {
         const dir = hard ? -1 : 1, N2 = 56, kn = (t) => knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0;
-        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W17 * 0.15)];
-        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W17;
+        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W18 * 0.15)];
+        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W18;
         const L0 = [], R0 = [];
         for (let i = 0; i <= N2; i++) {
           const t = i / N2, c = cen(t), c2 = cen(Math.min(1, t + 0.01)), c1 = cen(Math.max(0, t - 0.01));
@@ -11767,7 +11754,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         along.addColorStop(1, rgb2(K2.tipCol, 1.04));
         g.fillStyle = along;
         g.fillRect(0, 0, cv.width, cv.height);
-        const across = g.createLinearGradient(ox + dx - W17 * 1.6, 0, ox + dx + W17 * 1.6, 0);
+        const across = g.createLinearGradient(ox + dx - W18 * 1.6, 0, ox + dx + W18 * 1.6, 0);
         across.addColorStop(0.12, "rgba(110,50,48,0.34)");
         across.addColorStop(0.36, "rgba(255,255,255,0.10)");
         across.addColorStop(0.6, "rgba(0,0,0,0)");
@@ -11779,14 +11766,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.strokeStyle = line3(col);
           g.lineWidth = 1.2;
           g.beginPath();
-          g.moveTo(c[0] - W17 * 1.4, c[1]);
-          g.quadraticCurveTo(c[0], c[1] + dir * W17 * 0.5, c[0] + W17 * 1.4, c[1]);
+          g.moveTo(c[0] - W18 * 1.4, c[1]);
+          g.quadraticCurveTo(c[0], c[1] + dir * W18 * 0.5, c[0] + W18 * 1.4, c[1]);
           g.stroke();
           g.fillStyle = "rgba(222,150,152,0.45)";
           for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) {
             const c3 = cen(b2);
             g.beginPath();
-            g.ellipse(c3[0] + a * W17, c3[1], r * W17, r * W17 * 1.5, 0, 0, Math.PI * 2);
+            g.ellipse(c3[0] + a * W18, c3[1], r * W18, r * W18 * 1.5, 0, 0, Math.PI * 2);
             g.fill();
           }
         }
@@ -11811,15 +11798,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.stroke();
           const e = cen(0.985);
           g.beginPath();
-          g.moveTo(e[0], e[1] - dir * W17 * 0.25);
-          g.lineTo(e[0], e[1] + dir * W17 * 0.12);
+          g.moveTo(e[0], e[1] - dir * W18 * 0.25);
+          g.lineTo(e[0], e[1] + dir * W18 * 0.12);
           g.stroke();
           if (K2.cleft) {
             const a = cen(K2.headAt + 0.02), b2 = cen(0.97);
             g.globalAlpha = 0.5;
             g.beginPath();
             g.moveTo(a[0], a[1]);
-            g.quadraticCurveTo(a[0] + W17 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
+            g.quadraticCurveTo(a[0] + W18 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
             g.stroke();
             g.globalAlpha = 1;
           }
@@ -11849,8 +11836,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (false) {
           g.beginPath();
           const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68);
-          g.moveTo(a[0] - W17 * 0.3, a[1]);
-          g.bezierCurveTo(b2[0] - W17 * 0.8, b2[1], b2[0] + W17 * 0.4, b2[1], c4[0] - W17 * 0.1, c4[1]);
+          g.moveTo(a[0] - W18 * 0.3, a[1]);
+          g.bezierCurveTo(b2[0] - W18 * 0.8, b2[1], b2[0] + W18 * 0.4, b2[1], c4[0] - W18 * 0.1, c4[1]);
           g.stroke();
         }
         {
@@ -11870,18 +11857,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.beginPath();
             g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2);
             g.fill();
-            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W17 * 0.9);
+            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W18 * 0.9);
             sh2.addColorStop(0, "rgba(110,50,48,0.30)");
             sh2.addColorStop(1, "rgba(110,50,48,0)");
             g.fillStyle = sh2;
-            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W17 * 0.9), cv.width, W17 * 0.9);
+            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W18 * 0.9), cv.width, W18 * 0.9);
           }
         }
         g.restore();
         if (K2.barbs) {
           g.fillStyle = line3(col);
           for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) {
-            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W17 * 0.22);
+            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W18 * 0.22);
             g.beginPath();
             g.moveTo(p[0], p[1] - dir * s2 * 0.6);
             g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4);
@@ -11903,14 +11890,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           const cE = cen(M / N2);
-          g.quadraticCurveTo(cE[0], cE[1] + dir * W17 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
+          g.quadraticCurveTo(cE[0], cE[1] + dir * W18 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
           for (let i = M; i >= 0; i--) {
             const c = cen(i / N2), p = R0[i];
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           g.closePath();
         };
-        const sg = g.createLinearGradient(ox + dx - W17 * 1.6, 0, ox + dx + W17 * 1.6, 0);
+        const sg = g.createLinearGradient(ox + dx - W18 * 1.6, 0, ox + dx + W18 * 1.6, 0);
         sg.addColorStop(0, rgb2(sh, 0.97));
         sg.addColorStop(0.36, rgb2(sh, 1));
         sg.addColorStop(1, rgb2(sh, 0.96));
@@ -11936,12 +11923,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         shafts();
       }
       g.globalCompositeOperation = "destination-out";
-      const melt = g.createLinearGradient(0, oy - W17 * 0.5, 0, oy + W17 * 0.7);
+      const melt = g.createLinearGradient(0, oy - W18 * 0.5, 0, oy + W18 * 0.7);
       melt.addColorStop(0, "rgba(0,0,0,1)");
       melt.addColorStop(1, "rgba(0,0,0,0)");
       if (!hard) {
         g.fillStyle = melt;
-        g.fillRect(0, oy - W17 * 1.4, cv.width, W17 * 2.1);
+        g.fillRect(0, oy - W18 * 1.4, cv.width, W18 * 2.1);
       }
       g.globalCompositeOperation = "source-over";
       return cv;
@@ -11965,7 +11952,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/belly.js
-  var W3 = window;
+  var W2 = window;
   var SKIN_TOP = 12;
   var trial = 0;
   var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
@@ -12139,13 +12126,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin, pressed) {
-    const key2 = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
-    let p = pictures.get(key2);
+    const key3 = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+    let p = pictures.get(key3);
     if (!p) {
       const cv = bellyCanvas(size, skin, pressed);
       p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut };
       if (pictures.size > 24) pictures.clear();
-      pictures.set(key2, p);
+      pictures.set(key3, p);
     }
     return p;
   }
@@ -12153,7 +12140,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     let n = 0;
     try {
       for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
-        const m = W3[name];
+        const m = W2[name];
         if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
           const bad = [];
           m.forEach((v, k) => {
@@ -12177,16 +12164,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function skinFor(src, hex) {
     hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
-    const key2 = src + "|" + hex, v = skinSeen.get(key2);
+    const key3 = src + "|" + hex, v = skinSeen.get(key3);
     if (Array.isArray(v)) return v;
     if (!v) {
       if (skinSeen.size > 16) skinSeen.clear();
-      skinSeen.set(key2, "loading");
-      skinLoad(key2, src, hex);
+      skinSeen.set(key3, "loading");
+      skinLoad(key3, src, hex);
     }
     return skinGuess(src, hex);
   }
-  function skinLoad(key2, src, hex) {
+  function skinLoad(key3, src, hex) {
     const img2 = new Image();
     img2.onload = () => {
       let c = skinGuess(src, hex);
@@ -12205,13 +12192,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       } catch (e) {
       }
-      skinSeen.set(key2, c);
+      skinSeen.set(key3, c);
       try {
-        if (trial && W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
+        if (trial && W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
       }
     };
-    img2.onerror = () => skinSeen.set(key2, skinGuess(src, hex));
+    img2.onerror = () => skinSeen.set(key3, skinGuess(src, hex));
     img2.src = src;
   }
   var hooked = false;
@@ -12228,14 +12215,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         let finish = null;
         try {
           const C2 = args[0], cb = args[1];
-          if (trial && !W3.__farmDrawnBody && C2 && W3.Player && C2.MemberNumber === W3.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+          if (trial && !W2.__farmDrawnBody && C2 && W2.Player && C2.MemberNumber === W2.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
             let upper = null, lower = false, done = false;
             const gate = skinGate(C2);
             const prio = (src) => {
               const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
               if (!m) return 99;
               try {
-                const g = W3.AssetGroupGet && W3.AssetGroupGet(C2.AssetFamily, m[1]);
+                const g = W2.AssetGroupGet && W2.AssetGroupGet(C2.AssetFamily, m[1]);
                 return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
               } catch (e) {
                 return 99;
@@ -12271,7 +12258,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
               if (src.includes("/BodyLower/")) lower = true;
             };
-            const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;
+            const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand|Mark[1-3])\//;
             const flushInk = () => {
               for (const h2 of inkHeld.splice(0)) {
                 try {
@@ -12328,7 +12315,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (trial) hookBelly(sdk);
     const redraw3 = () => {
       try {
-        if (W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
+        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
         console.warn("[Farmhand Companion] belly redraw:", e);
       }
@@ -12340,36 +12327,36 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/bcr.js
-  var W4 = window;
+  var W3 = window;
   var warned = false;
   var kept = /* @__PURE__ */ new Map();
   function bcrOverBreast(C2, bc, bx, by) {
     try {
-      if (typeof W4.BodyMarksZonesOf !== "function" || typeof W4.BodyMarksDrawZone !== "function" || typeof W4.BodyMarksZoneBox !== "function") return null;
+      if (typeof W3.BodyMarksZonesOf !== "function" || typeof W3.BodyMarksDrawZone !== "function" || typeof W3.BodyMarksZoneBox !== "function") return null;
       const ZONES = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
       if (!ZONES || !ZONES.Breasts || !C2 || C2.MemberNumber == null) return null;
-      const zones2 = W4.BodyMarksZonesOf(C2), state = zones2 && zones2.Breasts;
+      const zones2 = W3.BodyMarksZonesOf(C2), state = zones2 && zones2.Breasts;
       if (!state) return null;
       const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C2.MemberNumber) : void 0;
-      const def = ZONES.Breasts, box3 = W4.BodyMarksZoneBox(C2, def, measured);
+      const def = ZONES.Breasts, box3 = W3.BodyMarksZoneBox(C2, def, measured);
       if (!box3 || box3.Hidden) return null;
-      const size = typeof W4.BodyMarksSizeOf === "function" ? W4.BodyMarksSizeOf(C2, def) || 1 : 1;
-      const key2 = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box3.Top) + "|" + size;
+      const size = typeof W3.BodyMarksSizeOf === "function" ? W3.BodyMarksSizeOf(C2, def) || 1 : 1;
+      const key3 = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box3.Top) + "|" + size;
       const was = kept.get(C2.MemberNumber);
-      if (was && was.key === key2) return was.res;
+      if (was && was.key === key3) return was.res;
       const H = (typeof CanvasDrawHeight !== "undefined" ? CanvasDrawHeight : 0) || C2.Canvas && C2.Canvas.height || 1700;
-      const raw = W4.document.createElement("canvas");
+      const raw = W3.document.createElement("canvas");
       raw.width = 500;
       raw.height = H;
       const prev = MainCanvas;
       MainCanvas = raw.getContext("2d");
       try {
-        W4.BodyMarksDrawZone(C2, "Breasts", state);
+        W3.BodyMarksDrawZone(C2, "Breasts", state);
       } finally {
         MainCanvas = prev;
       }
       const sx = 250 + (box3.X || 0) - 130 * size, sw = 260 * size, sy = box3.Top - box3.Height * 0.35, sh = box3.Height * 1.9;
-      const out = W4.document.createElement("canvas");
+      const out = W3.document.createElement("canvas");
       out.width = bc.width;
       out.height = bc.height;
       const g = out.getContext("2d");
@@ -12384,7 +12371,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         break;
       }
       const res = any ? { cv: out, x: bx, y: by } : null;
-      kept.set(C2.MemberNumber, { key: key2, res });
+      kept.set(C2.MemberNumber, { key: key3, res });
       if (kept.size > 40) kept.delete(kept.keys().next().value);
       return res;
     } catch (e) {
@@ -12459,30 +12446,30 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
 
   // extension/src/drawnbody.js
-  var W5 = window;
+  var W4 = window;
   var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
   var FARM_KEY = "farmhand-drawn-body-farm";
   var CODE_HEAD = "FARMBODY1:";
   var STUDIO = "http://localhost:4780";
   var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
-  var S2 = DEFAULTS();
+  var S = DEFAULTS();
   var sdk2 = null;
   var hooked2 = false;
   var seeOthers = true;
   var farm = null;
-  var onBot = () => !!(W5.Player && W5.Player.MemberNumber === BOT_MEMBER);
+  var onBot = () => !!(W4.Player && W4.Player.MemberNumber === BOT_MEMBER);
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
-  if (W5.__FARMHAND_TEST__) W5.__drawnBody = { mine, others };
+  if (W4.__FARMHAND_TEST__) W4.__drawnBody = { mine, others };
   function load() {
     try {
-      const d = JSON.parse(W5.localStorage.getItem(KEY));
-      if (d && typeof d === "object") S2 = Object.assign(DEFAULTS(), d);
+      const d = JSON.parse(W4.localStorage.getItem(KEY));
+      if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
     try {
-      seeOthers = W5.localStorage.getItem(SEE_KEY) !== "0";
+      seeOthers = W4.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
     {
@@ -12490,14 +12477,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (b) farm = { at: String(farm_look_default.id || "built-in"), body: b };
     }
     try {
-      W5.localStorage.removeItem(FARM_KEY);
+      W4.localStorage.removeItem(FARM_KEY);
     } catch (e) {
     }
-    mine.S = S2;
+    mine.S = S;
   }
   var farmMe = null;
   var BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
-  var bellyMode = () => S2.bellyMode || (S2.bellyOn ? "on" : "farm");
+  var bellyMode = () => S.bellyMode || (S.bellyOn ? "on" : "farm");
   function bellyAt(base, stage) {
     const out = {}, s = BELLY_STAGES[stage], ref = BELLY_STAGES[3];
     for (const k of ["std", "AllFours", "Hogtied"]) {
@@ -12512,8 +12499,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return out;
   }
   function eff() {
-    const base = S2.saved || !farm ? S2 : farm.body, e = Object.assign({}, base, { on: S2.on });
-    if (S2.cupSet) e.cup = S2.cup;
+    const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
+    if (S.cupSet) e.cup = S.cup;
     else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
     const gc = grownCup();
     if (gc) e.cup = Math.max(0, Math.min(20, (Number(e.cup) || 12) + gc));
@@ -12529,12 +12516,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var clampTo = (v, r) => Math.max(r[0], Math.min(r[1], Math.round(Number(v) || 0)));
   function genOf() {
     const f = farmMe && farmMe.cock > 0 ? farmMe : null, g = grownAll();
-    return { inches: clampTo((f ? f.cock : 6) + 2 * g.cock, GEN_IN), balls: clampTo((f && f.balls > 0 ? f.balls : 3) + g.balls, GEN_BALLS), pent: !!(f && f.pent), style: clampTo(S2.genStyle, [0, 2]) };
+    return { inches: clampTo((f ? f.cock : 6) + 2 * g.cock, GEN_IN), balls: clampTo((f && f.balls > 0 ? f.balls : 3) + g.balls, GEN_BALLS), pent: !!(f && f.pent), style: clampTo(S.genStyle, [0, 2]) };
   }
   var FILL_EASE_MS = 3 * 6e4;
   function fillOut() {
     try {
-      const D = W5.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("fillout") : null;
+      const D = W4.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("fillout") : null;
       if (!d) return null;
       return { p: d.p === "belly" || d.p === "ass" ? d.p : "cup", x: Math.max(1, Math.min(5, Math.round(Number(d.x) || 1))), half: Number(d.left) < FILL_EASE_MS };
     } catch (e) {
@@ -12544,7 +12531,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function grownAll() {
     const out = { cup: 0, cock: 0, balls: 0 };
     try {
-      const D = W5.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null;
+      const D = W4.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null;
       if (g) for (const k of Object.keys(out)) out[k] = Math.round(Number(g[k]) || 0);
     } catch (e) {
     }
@@ -12564,7 +12551,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const f = fillOut(), g = grownAll(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;
     if (sig2 === fillSig) return false;
     fillSig = sig2;
-    if (!S2.on) return false;
+    if (!S.on) return false;
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
@@ -12576,14 +12563,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const cock = Math.max(0, Math.min(60, Math.round(Number(d.cock) || 0))), balls = Math.max(0, Math.min(20, Math.round(Number(d.balls) || 0))), pent = !!d.pent;
     if (farmMe && farmMe.cup === cup && farmMe.belly === belly && farmMe.cock === cock && farmMe.balls === balls && farmMe.pent === pent) return;
     farmMe = { cup, belly, cock, balls, pent };
-    if (!S2.on) return;
+    if (!S.on) return;
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
   }
   function save() {
     try {
-      W5.localStorage.setItem(KEY, JSON.stringify(S2));
+      W4.localStorage.setItem(KEY, JSON.stringify(S));
     } catch (e) {
     }
   }
@@ -12624,7 +12611,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       made.set(cv, p);
       return null;
     }
-    const c = W5.document.createElement("canvas");
+    const c = W4.document.createElement("canvas");
     c.width = x1 - x0 + 1;
     c.height = y1 - y0 + 1;
     c.getContext("2d").drawImage(cv, -x0, -y0);
@@ -12643,17 +12630,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       gone.add(src);
       n++;
       try {
-        const m = W5.GLDrawImageCache;
+        const m = W4.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W5.DrawImageCache;
+        const m = W4.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -12668,7 +12655,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
   }
-  var charOf = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C2, g) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
   var drewAt = /* @__PURE__ */ new Map();
@@ -12687,7 +12674,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       drewAt.set(mn, t);
       try {
         const C2 = charOf(mn);
-        if (C2 && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C2);
+        if (C2 && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C2);
       } catch (e) {
         warnSome("[Farmhand Companion] drawn body redraw:", e);
       }
@@ -12695,14 +12682,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     againT.set(mn, setTimeout(go, soon || 60));
   }
   var redraw = (soon) => {
-    if (W5.Player) redrawMn(W5.Player.MemberNumber, soon);
+    if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
   };
   function makeEngine(mn) {
-    if (!W5.FarmBelly) W5.FarmBelly = bellyDrawing;
-    if (typeof W5.FarmBodyEngine !== "function" || !W5.FarmBreasts) return null;
+    if (!W4.FarmBelly) W4.FarmBelly = bellyDrawing;
+    if (typeof W4.FarmBodyEngine !== "function" || !W4.FarmBreasts) return null;
     loadCock();
-    const who2 = mn == null ? () => W5.Player || null : () => charOf(mn);
-    return W5.FarmBodyEngine({
+    const who2 = mn == null ? () => W4.Player || null : () => charOf(mn);
+    return W4.FarmBodyEngine({
       S: { get C() {
         return who2();
       } },
@@ -12719,7 +12706,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     });
   }
   function engine() {
-    if (!mine.E && W5.Player) mine.E = makeEngine(null);
+    if (!mine.E && W4.Player) mine.E = makeEngine(null);
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
@@ -12727,7 +12714,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
-    B.cup = Math.max(0, Math.min(W5.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
+    B.cup = Math.max(0, Math.min(W4.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     const kept2 = JSON.stringify([B.cup, b, B.wear, s.auto !== false, s.tuck !== false, s.dress !== false, s.mould || {}]);
@@ -12754,7 +12741,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     for (const it of s.mould && s.mould.items || []) E.MOULD.items.add(String(it));
     for (const [k, m] of Object.entries(s.mould && s.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
     const g = s.gen || {};
-    E.GEN.drawn = !!(W5.FarmCock && W5.FarmCock.hasStamps("human"));
+    E.GEN.drawn = !!(W4.FarmCock && W4.FarmCock.hasStamps("human"));
     E.GEN.kind = "human";
     E.GEN.knot = false;
     E.GEN.girth = 1;
@@ -12766,12 +12753,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var COCK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/cock/v1/";
   var cockAsked = false;
   function loadCock() {
-    if (cockAsked || !W5.FarmCock || typeof W5.FarmCock.loadStamps !== "function") return;
+    if (cockAsked || !W4.FarmCock || typeof W4.FarmCock.loadStamps !== "function") return;
     cockAsked = true;
     try {
-      W5.FarmCock.loadStamps(COCK_HOST, () => {
+      W4.FarmCock.loadStamps(COCK_HOST, () => {
         if (mine.E) apply(mine.E, eff());
-        if (S2.on) redraw(60);
+        if (S.on) redraw(60);
         for (const [mn, o] of others) if (o.E) {
           apply(o.E, o.S);
           redrawMn(mn, 60);
@@ -12817,7 +12804,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould, gen: s.gen });
   var send = (type, data) => {
     try {
-      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -12834,8 +12821,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function tell(force) {
     if (onBot()) return;
     if (!force && Date.now() - toldAt < 8e3) return;
-    const e = S2.on ? eff() : null, gn = e && e.gen;
-    const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(e) } : { on: true, farm: farm.at, cup: e.cup, bm: bellyMode(), bs: bellyStage(), ck: gn.inches, bl: gn.balls, pt: gn.pent ? 1 : 0, sy: gn.style };
+    const e = S.on ? eff() : null, gn = e && e.gen;
+    const msg = !S.on ? { on: false } : S.saved || !farm ? { on: true, body: shareOf(e) } : { on: true, farm: farm.at, cup: e.cup, bm: bellyMode(), bs: bellyStage(), ck: gn.inches, bl: gn.balls, pt: gn.pent ? 1 : 0, sy: gn.style };
     const sig2 = JSON.stringify(msg);
     if (!force && sig2 === lastTold) return;
     toldAt = Date.now();
@@ -12858,9 +12845,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W5.Player && mn === W5.Player.MemberNumber || onBot()) return;
+    if (!mn || W4.Player && mn === W4.Player.MemberNumber || onBot()) return;
     if (m.type === "bodyAsk") {
-      if (S2.on) setTimeout(() => tell(true), 300 + Math.random() * 1500);
+      if (S.on) setTimeout(() => tell(true), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "body") return;
@@ -12895,8 +12882,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const C2 = args[0];
         if (!C2 || onBot()) return next(args);
         let E = null;
-        if (C2 === W5.Player) {
-          if (S2.on) E = mine.E || engine();
+        if (C2 === W4.Player) {
+          if (S.on) E = mine.E || engine();
         } else if (seeOthers && typeof C2.MemberNumber === "number") {
           const o = others.get(C2.MemberNumber);
           if (o) {
@@ -12930,7 +12917,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       sdk2.hookFunction("ChatRoomSync", 0, (args, next) => {
         const r = next(args);
         setTimeout(() => {
-          if (S2.on) tell(true);
+          if (S.on) tell(true);
           if (seeOthers) ask();
         }, 2500);
         return r;
@@ -12945,29 +12932,29 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     load();
     setInterval(prune, 2e4);
     setTimeout(() => {
-      if (S2.on && engine()) {
-        W5.__farmDrawnBody = true;
+      if (S.on && engine()) {
+        W4.__farmDrawnBody = true;
         redraw(500);
       }
       hook();
-      if (S2.on) tell(true);
+      if (S.on) tell(true);
       if (seeOthers) ask();
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W5.Player, "BodyUpper"), cups = W5.FarmBreasts && W5.FarmBreasts.CUPS || [], e = eff();
+    const up = itemOf(W4.Player, "BodyUpper"), cups = W4.FarmBreasts && W4.FarmBreasts.CUPS || [], e = eff();
     return {
-      on: !!S2.on,
+      on: !!S.on,
       cup: e.cup,
       cupName: cups[e.cup] || "?",
       cups,
-      cupSet: !!S2.cupSet,
+      cupSet: !!S.cupSet,
       farmCup: farmMe && farmMe.cup >= 1 ? farmMe.cup : 0,
       farmBelly: farmMe ? farmMe.belly : 0,
       bellyMode: bellyMode(),
       chest: up && up.Asset ? up.Asset.Name : "",
-      fromStudio: !!S2.saved,
-      fromFarm: !S2.saved && !!farm,
+      fromStudio: !!S.saved,
+      fromFarm: !S.saved && !!farm,
       belly: !!(e.belly && e.belly.std && e.belly.std.on),
       seeOthers,
       othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
@@ -12979,17 +12966,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function onFarmLook() {
   }
   function drawnBodyBelly(mode, say3) {
-    S2.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
-    delete S2.bellyOn;
+    S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
+    delete S.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
+    if (say3) say3({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
   }
   function drawnBodyUseFarm(say3) {
-    delete S2.saved;
-    S2.cupSet = false;
+    delete S.saved;
+    S.cupSet = false;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
@@ -12997,32 +12984,32 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (say3) say3("Back to the farm's look.");
   }
   function drawnBodySet(on3, say3) {
-    S2.on = !!on3;
+    S.on = !!on3;
     save();
-    if (S2.on) {
+    if (S.on) {
       if (!engine()) {
-        S2.on = false;
+        S.on = false;
         save();
         return say3 && say3("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
-      W5.__farmDrawnBody = true;
+      W4.__farmDrawnBody = true;
       hook();
-    } else W5.__farmDrawnBody = false;
+    } else W4.__farmDrawnBody = false;
     tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
     if (say3) {
       const st2 = drawnBodyState();
-      if (!S2.on) say3("Drawn body off. You're the game's own picture again, for you and everybody else.");
-      else if (S2.cup >= 6 && st2.chest !== "XLarge") say3("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
+      if (!S.on) say3("Drawn body off. You're the game's own picture again, for you and everybody else.");
+      else if (S.cup >= 6 && st2.chest !== "XLarge") say3("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
       else say3("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
   }
   function drawnBodySeeOthers(on3, say3) {
     seeOthers = !!on3;
     try {
-      W5.localStorage.setItem(SEE_KEY, on3 ? "1" : "0");
+      W4.localStorage.setItem(SEE_KEY, on3 ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
@@ -13033,9 +13020,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (say3) say3(on3 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say3) {
-    const n = W5.FarmBreasts ? W5.FarmBreasts.CUPS.length : 21;
+    const n = W4.FarmBreasts ? W4.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
-      S2.cupSet = false;
+      S.cupSet = false;
       save();
       if (mine.E) apply(mine.E, eff());
       redraw(60);
@@ -13043,8 +13030,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (say3) say3("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
     }
-    S2.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
-    S2.cupSet = true;
+    S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
+    S.cupSet = true;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
@@ -13054,26 +13041,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function take(d, say3, from) {
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
-    s.on = S2.on;
-    s.bellyMode = S2.bellyMode;
-    s.bellyOn = S2.bellyOn;
-    s.cupSet = S2.cupSet;
-    s.cup = S2.cupSet ? S2.cup : s.cup;
+    s.on = S.on;
+    s.bellyMode = S.bellyMode;
+    s.bellyOn = S.bellyOn;
+    s.cupSet = S.cupSet;
+    s.cup = S.cupSet ? S.cup : s.cup;
     s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
-    S2 = s;
-    mine.S = S2;
+    S = s;
+    mine.S = S;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
+    if (say3) say3("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
     return true;
   }
   function drawnBodyPaste(text3, say3) {
     try {
       const t = String(text3 || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
-      const raw = W5.LZString && typeof W5.LZString.decompressFromBase64 === "function" ? W5.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const raw = W4.LZString && typeof W4.LZString.decompressFromBase64 === "function" ? W4.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
       return take(d, say3, "from the code");
@@ -13107,6 +13094,162 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
     }
     return { engines, others: others.size, pictures: used.size, keptMB: Math.round(kept2 / 1e6) };
+  }
+
+  // extension/src/localsave.js
+  var W5 = window;
+  var MINE = /^(fhc-|farmhand-)/;
+  var S2 = { db: null, dir: null, perm: "none", at: 0, last: "", err: "" };
+  var onChange = () => {
+  };
+  function db() {
+    if (S2.db) return S2.db;
+    S2.db = new Promise((ok2, no) => {
+      try {
+        const rq = W5.indexedDB.open("farmhand-companion", 1);
+        rq.onupgradeneeded = () => {
+          try {
+            rq.result.createObjectStore("kv");
+          } catch (e) {
+          }
+        };
+        rq.onsuccess = () => ok2(rq.result);
+        rq.onerror = () => no(rq.error);
+      } catch (e) {
+        no(e);
+      }
+    });
+    S2.db.catch(() => {
+      S2.db = null;
+    });
+    return S2.db;
+  }
+  async function get(k) {
+    const d = await db();
+    return new Promise((ok2, no) => {
+      const rq = d.transaction("kv").objectStore("kv").get(k);
+      rq.onsuccess = () => ok2(rq.result);
+      rq.onerror = () => no(rq.error);
+    });
+  }
+  async function put(k, v) {
+    const d = await db();
+    return new Promise((ok2, no) => {
+      const tx = d.transaction("kv", "readwrite");
+      tx.objectStore("kv").put(v, k);
+      tx.oncomplete = () => ok2(true);
+      tx.onerror = () => no(tx.error);
+    });
+  }
+  var me = () => W5.Player && W5.Player.MemberNumber || 0;
+  var fileName = () => "farmhand-companion-" + (me() || "player") + ".json";
+  function snapshot(version) {
+    const data = {};
+    try {
+      for (let i = 0; i < W5.localStorage.length; i++) {
+        const k = W5.localStorage.key(i);
+        if (k && MINE.test(k)) data[k] = W5.localStorage.getItem(k);
+      }
+    } catch (e) {
+    }
+    return { kind: "farmhand-companion", v: 1, member: me(), version, data };
+  }
+  async function writeNow(version, force) {
+    if (!S2.dir || S2.perm !== "granted" || !me()) return;
+    const snap2 = snapshot(version), body2 = JSON.stringify(snap2.data);
+    if (!force && body2 === S2.last) return;
+    const errWas = S2.err;
+    try {
+      const fh = await S2.dir.getFileHandle(fileName(), { create: true }), w = await fh.createWritable();
+      await w.write(JSON.stringify(Object.assign(snap2, { savedAt: (/* @__PURE__ */ new Date()).toISOString() }), null, 1));
+      await w.close();
+      S2.last = body2;
+      S2.at = Date.now();
+      S2.err = "";
+    } catch (e) {
+      S2.err = String(e && e.message || e);
+      if (/permission|not allowed/i.test(S2.err)) S2.perm = "prompt";
+    }
+    if (force || S2.err !== errWas) onChange();
+  }
+  function localSaveState() {
+    return { can: typeof W5.showDirectoryPicker === "function", folder: S2.dir ? S2.dir.name : "", perm: S2.perm, at: S2.at, err: S2.err, file: fileName() };
+  }
+  async function localSavePick(version) {
+    try {
+      const d = await W5.showDirectoryPicker({ id: "bnb-farm", mode: "readwrite" });
+      S2.dir = d;
+      S2.perm = "granted";
+      await put("dir", d);
+      await writeNow(version, true);
+    } catch (e) {
+      if (!/abort/i.test(String(e && e.name))) S2.err = String(e && e.message || e);
+    }
+    onChange();
+  }
+  async function localSaveReconnect(version) {
+    try {
+      S2.perm = await S2.dir.requestPermission({ mode: "readwrite" });
+      if (S2.perm === "granted") await writeNow(version, true);
+    } catch (e) {
+      S2.err = String(e && e.message || e);
+    }
+    onChange();
+  }
+  function localSaveNow(version) {
+    return writeNow(version, true);
+  }
+  function localSaveLoad(say3) {
+    const inp = W5.document.createElement("input");
+    inp.type = "file";
+    inp.accept = ".json,application/json";
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      f.text().then((t) => {
+        let d = null;
+        try {
+          d = JSON.parse(t);
+        } catch (e) {
+        }
+        if (!d || d.kind !== "farmhand-companion" || !d.data || typeof d.data !== "object") {
+          say3 && say3("That file isn't a Farmhand Companion save.");
+          return;
+        }
+        const keys = Object.keys(d.data).filter((k) => MINE.test(k) && typeof d.data[k] === "string");
+        if (!W5.confirm("Load these settings?\n\n" + f.name + (d.savedAt ? "\nsaved " + new Date(d.savedAt).toLocaleString() : "") + "\n" + keys.length + " things in it.\n\nWhat this browser has now is replaced, and the page reloads.")) return;
+        try {
+          for (let i = W5.localStorage.length - 1; i >= 0; i--) {
+            const k = W5.localStorage.key(i);
+            if (k && MINE.test(k) && !(k in d.data)) W5.localStorage.removeItem(k);
+          }
+          for (const k of keys) W5.localStorage.setItem(k, d.data[k]);
+        } catch (e) {
+          say3 && say3("Couldn't load it: " + (e && e.message || e));
+          return;
+        }
+        W5.location.reload();
+      });
+    };
+    inp.click();
+  }
+  function initLocalSave(version, changed2) {
+    if (typeof changed2 === "function") onChange = changed2;
+    get("dir").then(async (d) => {
+      if (!d) return;
+      S2.dir = d;
+      try {
+        S2.perm = await d.queryPermission({ mode: "readwrite" });
+      } catch (e) {
+        S2.perm = "prompt";
+      }
+      onChange();
+      if (S2.perm === "granted") writeNow(version, true);
+    }).catch(() => {
+    });
+    setInterval(() => {
+      writeNow(version, false);
+    }, 6e4);
   }
 
   // studio/web/splatters.js
@@ -13377,14 +13520,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W17 = c.width, H = c.height, d = x.getImageData(0, 0, W17, H).data, seen2 = new Uint8Array(W17 * H), out = [];
-      for (let i = 0; i < W17 * H; i++) {
-        if (seen2[i] || d[i * 4 + 3] < 16) continue;
+      const W18 = c.width, H = c.height, d = x.getImageData(0, 0, W18, H).data, seen3 = new Uint8Array(W18 * H), out = [];
+      for (let i = 0; i < W18 * H; i++) {
+        if (seen3[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
-        seen2[i] = 1;
-        let x0 = W17, y0 = H, x1 = 0, y1 = 0, n = 0;
+        seen3[i] = 1;
+        let x0 = W18, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W17, py = p / W17 | 0;
+          const p = q2.pop(), px = p % W18, py = p / W18 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -13392,10 +13535,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W17 || ny >= H) continue;
-            const k = ny * W17 + nx;
-            if (!seen2[k] && d[k * 4 + 3] >= 16) {
-              seen2[k] = 1;
+            if (nx < 0 || ny < 0 || nx >= W18 || ny >= H) continue;
+            const k = ny * W18 + nx;
+            if (!seen3[k] && d[k * 4 + 3] >= 16) {
+              seen3[k] = 1;
               q2.push(k);
             }
           }
@@ -13430,8 +13573,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const tintCache = /* @__PURE__ */ new Map();
     function tinted2(st2, K2) {
       if (!K2.tint) return st2;
-      const key2 = STAMPS.indexOf(st2) + K2.tint;
-      if (tintCache.has(key2)) return tintCache.get(key2);
+      const key3 = STAMPS.indexOf(st2) + K2.tint;
+      if (tintCache.has(key3)) return tintCache.get(key3);
       const c = document.createElement("canvas");
       c.width = st2.width;
       c.height = st2.height;
@@ -13446,7 +13589,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         x.globalCompositeOperation = "source-atop";
         TEXTURES[K2.texture](x, c.width, c.height, rng2(st2.width * 31 + st2.height));
       }
-      tintCache.set(key2, c);
+      tintCache.set(key3, c);
       return c;
     }
     const TEXTURES = {
@@ -13727,7 +13870,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const brandReady2 = (b) => !!art(b && b.art || "mark");
     const made3 = /* @__PURE__ */ new Map();
     function stamp2(b) {
-      const key2 = b.art + "|" + b.look + "|" + Math.round(b.size), was = made3.get(key2);
+      const key3 = b.art + "|" + b.look + "|" + Math.round(b.size), was = made3.get(key3);
       if (was) return was;
       const i = art(b.art);
       if (!i) return null;
@@ -13762,7 +13905,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         tint("#7a2418", 0.85, 0.8);
         tint("#3a120c", 0.55, 0.3);
       }
-      made3.set(key2, c);
+      made3.set(key3, c);
       if (made3.size > 24) made3.delete(made3.keys().next().value);
       return c;
     }
@@ -14006,9 +14149,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const over = W6.CanvasUpperOverflow || 700, h2 = C2.Canvas && C2.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
-    const key2 = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const key3 = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C2.MemberNumber);
-    if (was && was.key === key2) return was;
+    if (was && was.key === key3) return was;
     let mask = null;
     if (body2.length) {
       mask = W6.document.createElement("canvas");
@@ -14036,7 +14179,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     for (const e of list) W6.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
     if (typeof W6.GLDrawLoadTransient === "function") {
-      const p2 = { key: key2, src: c, dx: 0, dy: 0 };
+      const p2 = { key: key3, src: c, dx: 0, dy: 0 };
       keep(C2.MemberNumber, p2);
       return p2;
     }
@@ -14049,7 +14192,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (y > y1) y1 = y;
     }
     if (x1 < 0) {
-      const p2 = { key: key2, src: null };
+      const p2 = { key: key3, src: null };
       keep(C2.MemberNumber, p2);
       return p2;
     }
@@ -14057,7 +14200,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
-    const p = { key: key2, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
+    const p = { key: key3, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
     keep(C2.MemberNumber, p);
     return p;
   }
@@ -14130,7 +14273,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             console.warn("[Farmhand Companion] messes:", e);
           }
         };
-        const seen2 = (name) => (src, x, y, ...rest) => {
+        const seen3 = (name) => (src, x, y, ...rest) => {
           if (C2 === W6.Player) {
             if (typeof src === "string") {
               if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
@@ -14145,7 +14288,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           return real[name](src, x, y, ...rest);
         };
         const wrap = {};
-        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen2(n);
+        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen3(n);
         args[1] = Object.assign({}, real, wrap);
         const out = next(args);
         lay();
@@ -14317,10 +14460,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!(W7.Player && W7.Player.MemberNumber === BOT_MEMBER)) return 0;
     if (W7.CurrentScreen !== "ChatRoom" || !W7.ChatRoomData || !Array.isArray(W7.Character) || typeof W7.CharacterDelete !== "function") return 0;
     const here2 = new Set((W7.ChatRoomCharacter || []).map((c) => c && c.MemberNumber));
-    const keep2 = new Set([W7.Player, W7.InformationSheetSelection, W7.CurrentCharacter].filter(Boolean));
+    const keep3 = new Set([W7.Player, W7.InformationSheetSelection, W7.CurrentCharacter].filter(Boolean));
     let n = 0;
     for (const C2 of W7.Character.slice()) {
-      if (!isOnline(C2) || keep2.has(C2)) continue;
+      if (!isOnline(C2) || keep3.has(C2)) continue;
       const mn = C2.MemberNumber;
       if (here2.has(mn)) {
         missing.delete(mn);
@@ -16778,11 +16921,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
   }
   var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
-  var input = (ph, key2, ctx3) => h("input", { class: "fhc-in", placeholder: ph, value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) });
-  var select = (key2, opts, ctx3) => h(
+  var input = (ph, key3, ctx3) => h("input", { class: "fhc-in", placeholder: ph, value: ctx3.ui[key3] || "", oninput: (e) => ctx3.setUi({ [key3]: e.target.value }, true) });
+  var select = (key3, opts, ctx3) => h(
     "select",
-    { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key2]: e.target.value }, true) },
-    opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key2] || opts[0][0]) === v ? "selected" : null }, l))
+    { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key3]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key3] || opts[0][0]) === v ? "selected" : null }, l))
   );
   function duty(ctx3) {
     const s = ctx3.s;
@@ -16922,8 +17065,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if ((u.ctOnly || "").trim()) p.push("only=" + u.ctOnly.trim().replace(/\s+/g, ""));
       return p.length ? " when " + p.join(" ") : "";
     };
-    const sel = (key2, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key2] || "") === v ? "selected" : null }, l)));
-    const timeIn = (key2) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key2] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) });
+    const sel = (key3, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key3]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key3] || "") === v ? "selected" : null }, l)));
+    const timeIn = (key3) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key3] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key3]: e.target.value }, true) });
     const rn = ctx3.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
     const renewCard = rn.length ? card(
       title("\u{1F4DC} Renewals"),
@@ -17079,12 +17222,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
   ];
-  var pref = (ctx3, key2, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key2], () => {
-    ctx3.setPref(key2, !ctx3.prefs[key2]);
+  var pref = (ctx3, key3, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key3], () => {
+    ctx3.setPref(key3, !ctx3.prefs[key3]);
     if (after) after();
   });
-  var prefNot = (ctx3, key2, label, desc) => toggle(label, desc, !ctx3.prefs[key2], () => {
-    ctx3.setPref(key2, !ctx3.prefs[key2]);
+  var prefNot = (ctx3, key3, label, desc) => toggle(label, desc, !ctx3.prefs[key3], () => {
+    ctx3.setPref(key3, !ctx3.prefs[key3]);
     ctx3.api.rehello && ctx3.api.rehello();
   });
   var rehello = (ctx3) => () => ctx3.api.rehello && ctx3.api.rehello();
@@ -17136,6 +17279,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       )
     ];
   }
+  function bellyToggle(ctx3) {
+    const st2 = drawnBodyState(), on3 = st2.bellyMode !== "off";
+    return toggle(
+      "Show my drawn belly",
+      "Your belly on your drawn body, showin' and growin' as the farm fills you, breeds you or packs you with eggs. Off keeps it flat, on every screen." + (st2.on ? "" : " (It needs Show my drawn body on, in Body and look.)"),
+      on3,
+      () => {
+        const v = on3 ? "off" : "farm";
+        drawnBodyBelly(v, (t) => ctx3.hint(t));
+        ctx3.setPref("drawnBodyBelly", v);
+      }
+    );
+  }
   function gearPage(ctx3) {
     return [
       card(
@@ -17143,10 +17299,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         muted("All of these are off until you switch them on. Your safeword takes everything off."),
         pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
         pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
-        pref(ctx3, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. Switch this off and the farm's ink comes off.", () => {
+        pref(ctx3, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. The marks a trap sears on (the pond's, the pack's, the boar's) go in slots of the farm's own instead, and ?wash scrubs them off unless they're on for good (?marks). Switch this off and the farm's ink comes off.", () => {
           ctx3.api.inkSync && ctx3.api.inkSync();
           ctx3.api.rehello && ctx3.api.rehello();
         }),
+        bellyToggle(ctx3),
         pref(ctx3, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
         pref(ctx3, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx3))
       ),
@@ -17474,6 +17631,69 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       )
     ];
   }
+  function wearTrophy(ctx3, t, slot) {
+    const r = ctx3.api.trophyWear ? ctx3.api.trophyWear(t, slot) : { ok: false, why: "this Companion can't" };
+    if (r.ok) {
+      ctx3.api.trophyAnswered(t.id);
+      ctx3.hint(r.already ? "It's on you already." : "Your " + t.title + " is on, in " + r.name + ". The wardrobe's Layering button moves it; /ink sizes it.");
+      ctx3.setUi({ trophySwap: null, trophyAt: Date.now() });
+    } else if (r.full) ctx3.setUi({ trophySwap: t.id, trophySlots: r.slots || [] });
+    else ctx3.hint("Couldn't put it on: " + r.why + ".");
+  }
+  function trophySwap(ctx3, t) {
+    if (ctx3.ui.trophySwap !== t.id) return null;
+    return h(
+      "div",
+      { style: { margin: "4px 0" } },
+      muted("Your four Farm Ink slots are full. Put it on in place of:"),
+      h(
+        "div",
+        null,
+        (ctx3.ui.trophySlots || []).map((s) => btn(String(s.name).replace(/^Farm /, "") + ": " + (s.title || "empty"), () => wearTrophy(ctx3, t, s.slot))),
+        btn("Never mind", () => ctx3.setUi({ trophySwap: null }))
+      )
+    );
+  }
+  function trophyOffer(ctx3) {
+    const t = ctx3.api.trophyNext ? ctx3.api.trophyNext(ctx3.s.trophies) : null;
+    if (!t) return null;
+    return card(
+      title("\u{1F3C6} A trophy for you: " + t.title),
+      muted("For " + t.why + ". It's live ink that keeps the farm's count, on your skin under your clothes, for everybody with the Companion to see."),
+      h(
+        "div",
+        null,
+        btn("Wear it", () => wearTrophy(ctx3, t), true),
+        btn("No thanks", () => {
+          ctx3.api.trophyAnswered(t.id);
+          ctx3.hint("It's kept in your \u{1F3C6} Trophies for whenever you want it.");
+          ctx3.setUi({ trophySwap: null, trophyAt: Date.now() });
+        })
+      ),
+      trophySwap(ctx3, t),
+      muted("Either way it's yours for good: the \u{1F3C6} Trophies row puts it on or takes it off any time.")
+    );
+  }
+  function trophyList(ctx3) {
+    const list = ctx3.s.trophies || [], worn = ctx3.api.trophyWorn ? ctx3.api.trophyWorn() : {};
+    const offered = ctx3.api.trophyNext ? ctx3.api.trophyNext(list) : null;
+    return [
+      list.map((t) => [
+        h(
+          "div",
+          { class: "fhc-kv" },
+          h("span", null, t.title + " ", h("span", { class: "fhc-muted" }, "for " + t.why)),
+          worn[t.id] ? btn("Take it off", () => {
+            const r = ctx3.api.trophyOff(t.id);
+            ctx3.hint(r.ok ? "Off. It's still yours: put it on again whenever you like." : "Couldn't: " + r.why + ".");
+            ctx3.setUi({ trophyAt: Date.now() });
+          }) : btn("Put it on", () => wearTrophy(ctx3, t))
+        ),
+        offered && offered.id === t.id ? null : trophySwap(ctx3, t)
+      ]),
+      muted("They go in your wardrobe's Farm Ink slots and keep the farm's count. The wardrobe's Layering button moves them; /ink sizes them.")
+    ];
+  }
   function me2(ctx3) {
     const s = ctx3.s, x = mePieces(ctx3), now = Date.now();
     const quiet = s.quietUntil && s.quietUntil > now;
@@ -17500,8 +17720,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const fresh2 = ctx3.feed.filter((m) => m.kind !== "mine" && m.at > (ctx3.ui.inboxSeen || 0)).length;
     const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
     const hp = s.happening || [];
+    const trophies = s.trophies || [], tWorn = trophies.length && ctx3.api.trophyWorn ? Object.keys(ctx3.api.trophyWorn()).length : 0;
     return [
       errCard(s),
+      trophyOffer(ctx3),
       sum,
       rows(ctx3, "me", [
         {
@@ -17565,7 +17787,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             h("div", null, btn("All my feats \u203A", () => ctx3.setUi({ goTab: "ribbons", open_rib: "feats" })))
           ]
         },
-        x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards }
+        x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards },
+        trophies.length && { id: "trophies", label: "\u{1F3C6} Trophies", sum: trophies.length + " earned" + (tWorn ? " \xB7 " + tWorn + " on you" : ""), body: () => trophyList(ctx3) }
       ]),
       quick(ctx3, "me", [
         ["\u{1F6BF} Wash", () => ctx3.send("wash")],
@@ -17957,7 +18180,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
-    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key2, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key2)), muted(d))) },
+    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key3, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key3)), muted(d))) },
     { id: "rules", label: "\u{1F4CF} Rules", render: (ctx3) => [
       h(
         "div",
@@ -17979,8 +18202,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var field2 = (label, el2) => h("label", { class: "fhc-label" }, label, el2);
   var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
   function settingControl(ctx3, rule, s) {
-    const key2 = "set:" + rule.id + ":" + s.name, cur = ctx3.ui[key2];
-    const set2 = (v) => ctx3.setUi({ [key2]: v }, true);
+    const key3 = "set:" + rule.id + ":" + s.name, cur = ctx3.ui[key3];
+    const set2 = (v) => ctx3.setUi({ [key3]: v }, true);
     const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
     switch (s.type) {
       case "checkbox":
@@ -18010,8 +18233,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function addCommand(ctx3, name, rule) {
     const pairs2 = rule.settings.map((s) => {
-      const key2 = "set:" + rule.id + ":" + s.name;
-      let v = ctx3.ui[key2];
+      const key3 = "set:" + rule.id + ":" + s.name;
+      let v = ctx3.ui[key3];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
@@ -18122,16 +18345,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function outfits(ctx3) {
     const saved = ctx3.s.outfits || {}, rules = ctx3.s.outfitRules || {};
     const sp = ctx3.ui.oSp || "cow";
-    const slotBox = (key2, label) => h(
+    const slotBox = (key3, label) => h(
       "div",
-      { class: "fhc-box", style: { padding: "8px", borderColor: saved[key2] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key2] ? "solid" : "dashed" } },
+      { class: "fhc-box", style: { padding: "8px", borderColor: saved[key3] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key3] ? "solid" : "dashed" } },
       h("b", null, label),
-      muted(saved[key2] ? saved[key2].items + " pieces" + (saved[key2].locks ? ", " + saved[key2].locks + " locked" : "") : "Not set \xB7 uses the fallback"),
+      muted(saved[key3] ? saved[key3].items + " pieces" + (saved[key3].locks ? ", " + saved[key3].locks + " locked" : "") : "Not set \xB7 uses the fallback"),
       h(
         "div",
         { style: { marginTop: "6px" } },
-        btn("Save what I'm wearin'", () => ctx3.api.save && ctx3.api.save(key2)),
-        saved[key2] ? btn("Clear", () => ctx3.send("outfit clear " + key2.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+        btn("Save what I'm wearin'", () => ctx3.api.save && ctx3.api.save(key3)),
+        saved[key3] ? btn("Clear", () => ctx3.send("outfit clear " + key3.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
       )
     );
     const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
@@ -18284,10 +18507,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return [
       h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("lines", "\u{1F44E}\u2764\uFE0F Lines"), pill("all", "Everything")),
       shown.length ? shown.map((x) => {
-        const key2 = "fbnote_" + x.id, act = (what) => {
-          const note4 = (ctx3.ui[key2] || "").trim();
+        const key3 = "fbnote_" + x.id, act = (what) => {
+          const note4 = (ctx3.ui[key3] || "").trim();
           ctx3.send("feedback " + what + " " + x.id + (note4 ? " " + note4 : ""));
-          ctx3.setUi({ [key2]: "" });
+          ctx3.setUi({ [key3]: "" });
         };
         return card(
           h(
@@ -18299,7 +18522,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
           x.why && muted("Why: " + x.why),
           x.note && muted("Your note: " + x.note),
-          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }),
+          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx3.ui[key3] || "", oninput: (e) => ctx3.setUi({ [key3]: e.target.value }, true) }),
           h(
             "div",
             { style: { marginTop: "6px" } },
@@ -18922,7 +19145,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         delete this.ui.goTab;
       }
       const tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
-      const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
+      const scroll = this.el.querySelector(".fhc-body"), keep3 = scroll ? scroll.scrollTop : 0;
       const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
@@ -19009,7 +19232,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         )
       ].filter(Boolean));
       const here2 = view2 + ":" + tab.id, body2 = this.el.querySelector(".fhc-body");
-      if (body2) body2.scrollTop = here2 === this.lastTab ? keep2 : 0;
+      if (body2) body2.scrollTop = here2 === this.lastTab ? keep3 : 0;
       this.lastTab = here2;
       const nav = this.el.querySelector("nav.fhc-tabs");
       if (nav) {
@@ -20088,7 +20311,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return [v >> 16 & 255, v >> 8 & 255, v & 255];
   };
   function inMaterial(img2, mat, ox, oy, how, hex) {
-    const ink = how === "ink";
+    const ink2 = how === "ink";
     const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
     if (!w || !h2) return null;
     const c = W13.document.createElement("canvas");
@@ -20135,7 +20358,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     for (let y = 0, i = 0; y < h2; y++) for (let x = 0; x < w; x++, i += 4) {
       if (!d[i + 3]) continue;
       let t = Math.min(1, (d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) / ref);
-      if (ink) t = 0.12 + t * 0.3;
+      if (ink2) t = 0.12 + t * 0.3;
       else if (E) {
         const e = E[(y + oy & T - 1) * T + (x + ox & T - 1)];
         t = Math.max(0, Math.min(1, 0.6 + Math.tanh((t - 0.86) * 3) * 0.42 + (e - 0.5) * 0.3));
@@ -20188,18 +20411,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function turnedOf(src, mat, x, y, how, hex) {
     if (typeof src === "string") {
-      const key3 = mat + "|" + how + "|" + (how === "eyes" ? (hex || "") + "|" : "") + src + "|" + Math.round(x) + "|" + Math.round(y);
-      let c = turned.get(key3);
+      const key4 = mat + "|" + how + "|" + (how === "eyes" ? (hex || "") + "|" : "") + src + "|" + Math.round(x) + "|" + Math.round(y);
+      let c = turned.get(key4);
       if (c) {
-        turned.delete(key3);
-        turned.set(key3, c);
+        turned.delete(key4);
+        turned.set(key4, c);
         return c;
       }
       const im = imgOf(src);
       if (!im) return null;
       c = inMaterial(im, mat, x, y, how, hex);
       if (!c) return null;
-      turned.set(key3, c);
+      turned.set(key4, c);
       if (turned.size > KEEP) turned.delete(turned.keys().next().value);
       return c;
     }
@@ -20209,8 +20432,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       by = {};
       turnedCv.set(src, by);
     }
-    const key2 = mat + "|" + how + "|" + Math.round(x) + "|" + Math.round(y);
-    return by[key2] || (by[key2] = inMaterial(src, mat, x, y, how));
+    const key3 = mat + "|" + how + "|" + Math.round(x) + "|" + Math.round(y);
+    return by[key3] || (by[key3] = inMaterial(src, mat, x, y, how));
   }
   function forget3() {
     turned.clear();
@@ -20242,9 +20465,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var redrawT = /* @__PURE__ */ new Map();
   function redrawC(C2, soon) {
     if (!C2) return;
-    const key2 = C2.MemberNumber;
-    clearTimeout(redrawT.get(key2));
-    redrawT.set(key2, setTimeout(() => {
+    const key3 = C2.MemberNumber;
+    clearTimeout(redrawT.get(key3));
+    redrawT.set(key3, setTimeout(() => {
       try {
         if (typeof W13.CharacterLoadCanvas === "function") W13.CharacterLoadCanvas(C2);
       } catch (e) {
@@ -20764,8 +20987,75 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return out;
   }
 
-  // extension/src/cues.js
+  // extension/src/trophies.js
   var W16 = window;
+  var WEEK = 7 * 864e5;
+  var key2 = () => "farm-trophies-" + (W16.Player && W16.Player.MemberNumber || 0);
+  function seen2() {
+    try {
+      return JSON.parse(W16.localStorage.getItem(key2())) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function keep2(o) {
+    try {
+      W16.localStorage.setItem(key2(), JSON.stringify(o));
+    } catch (e) {
+    }
+  }
+  var clean3 = (list) => Array.isArray(list) ? list.filter((t) => t && typeof t.id === "string" && typeof t.design === "string" && typeof t.title === "string") : [];
+  var offerable = (t, now) => !(Number(t.at) > 0) || now - Number(t.at) < WEEK;
+  function trophyNews(list) {
+    const s = seen2(), now = Date.now(), fresh2 = clean3(list).filter((t) => !s[t.id] && offerable(t, now));
+    for (const t of clean3(list)) if (!s[t.id] && !offerable(t, now)) s[t.id] = "done";
+    if (!fresh2.length) {
+      keep2(s);
+      return null;
+    }
+    for (const t of fresh2) s[t.id] = "told";
+    keep2(s);
+    return fresh2.length === 1 ? "\u{1F3C6} You've earned a trophy: " + fresh2[0].title + ", for " + fresh2[0].why + ". Wear it or No thanks, in your \u{1F33E} panel." : "\u{1F3C6} You've earned " + fresh2.length + " trophies: " + fresh2.map((t) => t.title).join(", ") + ". Wear them or No thanks, in your \u{1F33E} panel.";
+  }
+  function trophyNext(list) {
+    const s = seen2(), now = Date.now();
+    return clean3(list).find((t) => s[t.id] !== "done" && offerable(t, now)) || null;
+  }
+  function trophyAnswered(id) {
+    const s = seen2();
+    s[String(id)] = "done";
+    keep2(s);
+  }
+  var ink = () => W16.__farmInk && typeof W16.__farmInk.trophyWear === "function" ? W16.__farmInk : null;
+  function trophyWear2(t, slot) {
+    const I = ink();
+    if (!I) return { ok: false, why: "the ink slots haven't loaded yet (reload the page if it stays like this)" };
+    try {
+      return I.trophyWear(t, slot);
+    } catch (e) {
+      return { ok: false, why: e.message };
+    }
+  }
+  function trophyOff2(id) {
+    const I = ink();
+    if (!I) return { ok: false, why: "the ink slots haven't loaded yet" };
+    try {
+      return I.trophyOff(id);
+    } catch (e) {
+      return { ok: false, why: e.message };
+    }
+  }
+  function trophyWorn2() {
+    const I = ink();
+    try {
+      return I ? I.trophyWorn() : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  // extension/src/cues.js
+  var W17 = window;
   var ctx2 = null;
   function initCues(c) {
     ctx2 = c;
@@ -20784,20 +21074,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     gear: ctx2.panel.prefs.gear ? void 0 : true,
     ink: ctx2.panel.prefs.ink ? void 0 : true
   });
-  var mapOn = () => typeof W16.ChatRoomMapViewIsActive === "function" && W16.ChatRoomMapViewIsActive() && W16.Player && W16.Player.MapData && W16.Player.MapData.Pos;
-  var others4 = () => (W16.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W16.Player && W16.Player.MemberNumber));
+  var mapOn = () => typeof W17.ChatRoomMapViewIsActive === "function" && W17.ChatRoomMapViewIsActive() && W17.Player && W17.Player.MapData && W17.Player.MapData.Pos;
+  var others4 = () => (W17.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W17.Player && W17.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W16.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W16.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others4().filter((c) => W16.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others4().filter((c) => typeof W16.ChatRoomMapViewCharacterIsHearable === "function" && W16.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W16.Player && W16.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W17.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W17.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others4().filter((c) => W17.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others4().filter((c) => typeof W17.ChatRoomMapViewCharacterIsHearable === "function" && W17.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W17.Player && W17.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
-      const key2 = see.join(",") + "|" + hear.join(",") + "|" + splat;
-      if (key2 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
+      const key3 = see.join(",") + "|" + hear.join(",") + "|" + splat;
+      if (key3 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       if (Date.now() - (sightTick.at || 0) < 8e3) return;
-      lastSight = key2;
+      lastSight = key3;
       sightTick.at = Date.now();
       ctx2.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
     } catch (e) {
@@ -20808,32 +21098,32 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W16.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W17.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W16.ChatRoomMapViewWidth || 40, high = W16.ChatRoomMapViewHeight || 40, key2 = (x, y) => x + "," + y;
+    const wide = W17.ChatRoomMapViewWidth || 40, high = W17.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
-    const prev = /* @__PURE__ */ new Map([[key2(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
+    const prev = /* @__PURE__ */ new Map([[key3(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
       const [x, y] = q2.shift();
       if (goal(x, y)) {
         const path = [];
-        let k = key2(x, y);
+        let k = key3(x, y);
         while (prev.get(k)) {
           const [px, py, d] = prev.get(k);
           path.unshift(d);
-          k = key2(px, py);
+          k = key3(px, py);
         }
         return path;
       }
       if (prev.size > 4e3) break;
       for (const [d, dx, dy] of DIRS) {
         const nx = x + dx, ny = y + dy;
-        if (nx < 0 || ny < 0 || nx >= wide || ny >= high || prev.has(key2(nx, ny)) || !canStep(nx, ny)) continue;
-        prev.set(key2(nx, ny), [x, y, d]);
+        if (nx < 0 || ny < 0 || nx >= wide || ny >= high || prev.has(key3(nx, ny)) || !canStep(nx, ny)) continue;
+        prev.set(key3(nx, ny), [x, y, d]);
         q2.push([nx, ny]);
       }
     }
@@ -20844,8 +21134,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref2("noLead") || !mapOn() || typeof W16.ChatRoomMapViewMove !== "function") return no();
-    const from = W16.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref2("noLead") || !mapOn() || typeof W17.ChatRoomMapViewMove !== "function") return no();
+    const from = W17.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -20864,7 +21154,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function stepWalk() {
-    const w = walk, p = W16.Player && W16.Player.MapData && W16.Player.MapData.Pos;
+    const w = walk, p = W17.Player && W17.Player.MapData && W17.Player.MapData.Pos;
     const end = (ok2) => {
       if (walk === w) walk = null;
       stepping = false;
@@ -20891,9 +21181,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W16.ChatRoomMapViewMovement == null) {
+    if (W17.ChatRoomMapViewMovement == null) {
       try {
-        W16.ChatRoomMapViewMove(w.path[w.i]);
+        W17.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -20915,7 +21205,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W16.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W16.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W17.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W17.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
@@ -20927,7 +21217,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me4 = W16.Player.MapData.Pos;
+      const me4 = W17.Player.MapData.Pos;
       if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
@@ -20955,12 +21245,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref2("noFace") || typeof W16.CharacterSetFacialExpression !== "function" || !W16.Player) return;
+    if (!f || !pref2("noFace") || typeof W17.CharacterSetFacialExpression !== "function" || !W17.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W16.CharacterSetFacialExpression(W16.Player, g, e, secs);
-        if (g === "Eyes") W16.CharacterSetFacialExpression(W16.Player, "Eyes2", e, secs);
+        W17.CharacterSetFacialExpression(W17.Player, g, e, secs);
+        if (g === "Eyes") W17.CharacterSetFacialExpression(W17.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -21009,35 +21299,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref2("noSound") || typeof W16.AudioPlayInstantSound !== "function") return;
-    const vol = W16.Player && W16.Player.AudioSettings && W16.Player.AudioSettings.Volume || 0;
+    if (!f || !pref2("noSound") || typeof W17.AudioPlayInstantSound !== "function") return;
+    const vol = W17.Player && W17.Player.AudioSettings && W17.Player.AudioSettings.Volume || 0;
     try {
-      W16.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W17.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el2 = W16.document.getElementById("fhc-trance");
+    let el2 = W17.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el2) el2.remove();
       return;
     }
     if (!el2) {
-      el2 = W16.document.createElement("div");
+      el2 = W17.document.createElement("div");
       el2.id = "fhc-trance";
       el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W16.document.getElementById("fhc-trance-css")) {
-        const s = W16.document.createElement("style");
+      if (!W17.document.getElementById("fhc-trance-css")) {
+        const s = W17.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W16.document.head.appendChild(s);
+        W17.document.head.appendChild(s);
       }
-      W16.document.body.appendChild(el2);
+      W17.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W16.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W17.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el2.style.opacity = "1";
     });
   }
@@ -21109,13 +21399,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref2("noFeelings") || W16.CurrentScreen !== "ChatRoom" || !W16.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W17.CurrentScreen !== "ChatRoom" || !W17.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx2.panel.s, items = (W16.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W17.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W16.Player.ArousalSettings && W16.Player.ArousalSettings.Progress || 0;
+      const arousal = W17.Player.ArousalSettings && W17.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -21139,11 +21429,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W16.DrawText !== "function") return;
-      const R = W16.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W16.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W17.DrawText !== "function") return;
+      const R = W17.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W17.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C2 = (W16.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W16.ChatRoomMapViewCharacterIsVisible(C2)) continue;
+        const C2 = (W17.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W17.ChatRoomMapViewCharacterIsVisible(C2)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -21152,7 +21442,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me4.X + R) * tile, sy = (C2.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W16.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W17.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -21169,11 +21459,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W16.Player || !W16.Player.ArousalSettings || typeof W16.ActivitySetArousal !== "function") return;
-      if (W16.Player.ArousalSettings.Active === "Inactive" || W16.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W16.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W17.Player || !W17.Player.ArousalSettings || typeof W17.ActivitySetArousal !== "function") return;
+      if (W17.Player.ArousalSettings.Active === "Inactive" || W17.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W17.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W16.ActivitySetArousal(W16.Player, next);
+      if (next > cur || m.add < 0) W17.ActivitySetArousal(W17.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -21181,11 +21471,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W16.Player && Array.isArray(W16.Player.Appearance) ? W16.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W16.DialogCanUnlock === "function" && !W16.DialogCanUnlock(W16.Player, it)));
+  var vibeToys = () => (W17.Player && Array.isArray(W17.Player.Appearance) ? W17.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W17.DialogCanUnlock === "function" && !W17.DialogCanUnlock(W17.Player, it)));
   function vibePush(toys) {
-    if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(W16.Player, false);
-    if (typeof W16.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W16.ChatRoomCharacterItemUpdate(W16.Player, it.Asset.Group.Name));
-    else if (typeof W16.ChatRoomCharacterUpdate === "function") W16.ChatRoomCharacterUpdate(W16.Player);
+    if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(W17.Player, false);
+    if (typeof W17.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W17.ChatRoomCharacterItemUpdate(W17.Player, it.Asset.Group.Name));
+    else if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(W17.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -21241,7 +21531,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W16.ChatRoomMapViewHasSuperPowers === "function" && W16.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W17.ChatRoomMapViewHasSuperPowers === "function" && W17.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -21337,6 +21627,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (r.full.length) toChat("\u{1F58B}\uFE0F The farm wanted to ink " + r.full.map(name).join(", ") + " on you, but your four Farm Ink slots are full.", "#c79bd8");
     } catch (e) {
       console.warn("[Farmhand Companion] farm ink:", e);
+    }
+  }
+  function trophyTell(list) {
+    try {
+      const t = trophyNews(list);
+      if (t) {
+        toChat(t, "#d9a400");
+        if (st.panel) st.panel.renderSoon();
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] trophies:", e);
     }
   }
   function brandShown(b) {
@@ -21472,10 +21773,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const n = st.panel && st.panel.s && st.panel.s.nursery;
       if (!n || n.role !== "little" || !botHere2()) return;
-      const s = nurseryStatsNow(), key2 = JSON.stringify(s);
-      if (!force && key2 === nurseryLast && Date.now() - nurseryLastAt < 10 * 6e4) return;
+      const s = nurseryStatsNow(), key3 = JSON.stringify(s);
+      if (!force && key3 === nurseryLast && Date.now() - nurseryLastAt < 10 * 6e4) return;
       if (!s.abcl && !s.mommy && !(s.carers || []).length && !force) return;
-      nurseryLast = key2;
+      nurseryLast = key3;
       nurseryLastAt = Date.now();
       toBot("nurseryStats", s);
     } catch (e) {
@@ -21586,6 +21887,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
           }
           if ("ink" in m.set) inkCounts(s.ink);
+          if ("trophies" in m.set) trophyTell(s.trophies);
         } else askWhole();
         break;
       case "state":
@@ -21597,6 +21899,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           st.panel.setState(m.state);
           parasiteSync();
           inkSync();
+          trophyTell(m.state.trophies);
           try {
             messBrand(brandShown(m.state.brand));
           } catch (e) {
@@ -21846,6 +22149,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return {};
       }
     },
+    // trophies: offered once, then kept to put on or take off any time (trophies.js, views/livestock.js)
+    trophyNext,
+    trophyAnswered,
+    trophyWear: trophyWear2,
+    trophyOff: trophyOff2,
+    trophyWorn: trophyWorn2,
     save(slot) {
       let c;
       try {

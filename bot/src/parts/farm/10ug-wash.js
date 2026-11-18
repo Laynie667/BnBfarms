@@ -178,23 +178,26 @@
     const use = own.length && (Math.random() < 0.7 || !plain.length) ? own : plain.length ? plain : pool.filter(l => !WASH_TAGS.test(l));
     return pickFor(t, key, use.map(l => l.replace(WASH_TAGS, "")));
   }
+  // (gives what it did to the farm's marks: { off, kept })
   function washNow(t){
     bodyMark(t, { wash: true });   // their Companion: the messes, the splatters, the writing (10s-marks.js)
     const r = rec(t); if (r){ r.messKinds = null; r.rinse = null; }
     const p = prodOf(t); if (p) p.painted = null;
     aftermathWash(t);              // mud, slime, glue, the reek a trap left (10x-trap-extras.js)
+    let marks = { off: [], kept: [] }; try { marks = marksWash(t); } catch(e){ warn("wash marks:", e); }   // the farm's marks, unless seared on for good (10uq3-trophies.js)
     saveLedger(); syncCompanions(true);
+    return marks;
   }
   function washScene(t, by){
     state.washing = state.washing || new Map();
     if (state.washing.get(t) > Date.now()){ tell(by, "🚿 "+(t === by ? "You're" : plainName(t)+" is")+" already at the wash trough, sugar."); return; }
-    if (!onMap(t)){ washNow(t); tell(by, "🚿 All washed up, sugar: everything the farm put on "+(t === by ? "you" : plainName(t))+" is off."); return; }
+    if (!onMap(t)){ const w = washNow(t); tell(by, "🚿 All washed up, sugar: everything the farm put on "+(t === by ? "you" : plainName(t))+" is off"+(w.kept.length ? ", except what's seared on for good" : "")+"."); return; }
     const beats = ["start", "scrub", "scrub", "rinse", "dry"], gap = CFG.WASH_BEAT_S*1000, facts = washFacts(t);
     state.washing.set(t, Date.now() + beats.length*gap + 5000);
     const beat = (k, i) => {
       try {
         emote("🚿 "+tFill(washPick(t, "wash:"+k+":"+i, WASH_LINES[k], facts), t), t);
-        if (i === beats.length - 1){ washNow(t); state.washing.delete(t); }
+        if (i === beats.length - 1){ const w = washNow(t); state.washing.delete(t); marksWashLines(t, w).forEach((l, j) => later(() => { if (charFor(t)) emote(l, t); }, 2500 + j*2500)); }
       } catch(e){ warn("wash:", e); washNow(t); state.washing.delete(t); }
     };
     beats.forEach((k, i) => i === 0 ? beat(k, i) : later(() => beat(k, i), i*gap));   // (the first one at once, so they know it's started)

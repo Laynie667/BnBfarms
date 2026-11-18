@@ -66,6 +66,7 @@
         }
       }
     }
+    try { trapMarkAfter(mn, kind); } catch(e){ warn("trap mark:", e); }   // a stamp in their passport, and the beast's mark (10uq3-trophies.js)
     try { afterLines(mn, kind, before); } catch(e){ warn("trap after lines:", e); }   // how they're left (10y9p-aftermath.js)
   }
 

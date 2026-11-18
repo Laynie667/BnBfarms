@@ -56,6 +56,30 @@ better sizing options", and "as long as it layers properly".
   while somethin' from The Farmhand's Dispensary is in you. Your own Dispensary knows what's in you, and everybody else's
   reads it off your dose icons, so it shows for people with the Dispensary, and stays dark if you've switched off lettin'
   others see your icons. It lights up and goes dark as the dose goes in and wears off.
+- **The farm's marks** (Nov 18; Laynie: "we can include hidden slots the farm uses, that can be removed with ?wash
+  unless permanently branded"): a trap that marks its own sears its brand on when it lets you go. The pond leaves its
+  tentacle ring, the wolf pack its moon paw, the boar its snout ring.
+  - They go in three **Farm Mark** slots of the farm's own, which the wardrobe doesn't show, so they never push out ink
+    you picked and never sit on your own brand. They're on your other side: hip, thigh, then shoulder.
+  - **Newest wins:** the same trap again sears its mark fresh, in the same place.
+  - They heal from angry red to pale over three days, like any brand, and stay on through stripping and outfits.
+  - **`?wash` scrubs them off**, unless they're on for good. **`?marks`** shows yours; **`?marks keep`** sears yours on
+    for good. Staff: `?brand <who> keep` (proprietors and the herd's owner), and `?brand <who> clear` takes the brand and
+    every mark off, kept ones too.
+  - Only with "Farm can ink me" on, and never if your limits rule out brands or marks.
+- **Trophies** (Nov 18; Laynie: "it should be offered, and if its a permanent trophy, have a way to equip or take it off
+  at any time"): live ink the farm hands out the first time somethin' happens to you.
+  - Breeding Card (your first load), Tied × (your first knot), Trap Passport (the first trap that let you go), Bred By
+    (three different studs), High Scores (a stud who's bred you five times), Times Bred (twenty-five loads), Litters
+    (your first litter), Eggs Laid (your first eggs), Litres Milked (ten litres).
+  - Each is offered once at the top of your panel's Me tab: **Wear it** or **No thanks**. Every one is yours for good:
+    the **🏆 Trophies** row on the Me tab puts it on or takes it off any time.
+  - On, it's in a free Farm Ink slot (with all four full, you pick which to swap), keepin' the farm's count. Move it with
+    the wardrobe's Layering button and size it with `/ink`, like any ink.
+  - **The Trap Passport** stamps where each trap had you (the place, or the beast's own lair), the last four.
+- **Show my drawn belly** (Nov 18; Laynie: "the drawn belly, basically show/hide belly"): a switch beside "Farm can ink
+  me". Off keeps your drawn belly flat on every screen; on, it follows the farm. (The drawn body's own Belly list has the
+  same choices, and Always.)
 - **Who sees it:** only people running the Companion or the Dispensary, the same as Echo's clothes only show for
   people with Echo's mod. Everyone else sees plain skin, and nothing breaks.
 - **Spots:** the game draws the front only. Designs meant for the back (a tramp stamp, a butt cheek, a shoulder
@@ -97,13 +121,26 @@ better sizing options", and "as long as it layers properly".
   healing (the brand's three layers, BrandEdge, Brand and BrandShine, eased toward pale) and the fading (opacity, held
   for three fifths of the time) are worked out in the draw hook from `at`, so nothin' goes round the room for them; anybody
   whose is still on its way is drawn again every half hour. The Companion's hello says `off.ink` when the switch is off.
+- **The farm's marks:** three more slots, `FarmMark1` to `3`, added with the game's own `AllowCustomize: false` (the way
+  it keeps the arms and hands out of the wardrobe). They hold the brand designs, each moved to its slot's spot: the other
+  hip (296, 580), the other thigh (292, 662) and the other shoulder (318, 300), sized to that spot's box. Their address is
+  our own (`ink/v2/FarmMark1/...`); the draw hook swaps in the brand's picture, sized and healed for that slot's item.
+  The bot sends them in `farmInk` with slot `mark` (`10uq3-trophies.js`, `r.marks`). `farmInkSync` puts them in the first
+  empty mark slot, else in place of the oldest, and always puts back one that's gone missing, since you can't take one
+  off yourself. A hook on `WardrobeFastLoad` keeps them on through an outfit from the wardrobe.
+- **Trophies:** the bot puts `trophies` in the panel state, `[{ id, design, title, why, at }]`, the first time each one
+  is earned (kept on their record, `r.trophies`). The Companion's `trophies.js` offers each once (remembered on that
+  computer; on a new computer only ones from the last week are offered) and ink.js `trophyWear` puts it in an ink slot
+  marked `Property.FarmInk.trophy`, which the farm's own ink never takes off.
 - **The farm's counts:** the bot puts `ink` in each Companion's panel state (`07b-companion-sync.js`, `inkCounts`): loads
   taken, who gave them (`totals.by`, the 40 most recent studs, kept in `08-production.js`), knots, litters, eggs,
-  litres, how full, how far along, heat left. The Companion hands them to the ink module (`__farmInk.counts`).
+  litres, how full, how far along, heat left, and the trap passport's last four stamps (`passport`). The Companion hands
+  them to the ink module (`__farmInk.counts`).
 - **The list:** `shared/ink/ink-designs.json` has each design's name, title, spot, size, layers and starting colours,
   and for the live ones their measured box, scale and colour palette.
 - **The tests:** `tests/ink.test.cjs` (the slots, the pictures), `tests/ink-live.test.cjs` (the live designs, /ink,
-  the counts, recolouring, sizes, stripping) and `tests/farm-ink.test.cjs` (the farm's own ink).
+  the counts, recolouring, sizes, stripping), `tests/farm-ink.test.cjs` (the farm's own ink) and
+  `tests/farm-marks-trophies.test.cjs` (the farm's marks, trophies, the passport, `?wash`, `?marks`, the belly switch).
 
 ### Making the pictures
 
@@ -149,9 +186,8 @@ for; the hip and cheek moved on Nov 18):
 ## Next
 
 - **Ink that bends with the body:** riding the curve of the drawn belly and breasts rather than sitting flat on them.
-- **More of the farm's own ink** (approved Nov 17; the brands, the species brand and corruption 50 went in Nov 18):
-  - trap brands land in the brand slot
-  - trophies earned as they happen
+- **More of the farm's own ink** (approved Nov 17; the brands, the species brand, corruption 50, the trap marks and
+  trophies went in Nov 18):
   - ink a contract says stays, put back if someone takes it off (hardcore's went in Nov 18)
   - body writing, and a crafted tattoo gun
 - **The sheets' own fonts** for the live designs, carried in the repo.

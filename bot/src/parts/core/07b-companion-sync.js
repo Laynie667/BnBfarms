@@ -28,7 +28,7 @@
        tied           times knotted                                 punches         this card's punches (a free one every tenth)
        studs          the guestbook: the last four studs, and how many more
        scores         HIGH SCORES: the four who've bred them most
-       bredOn         { d, due } while they're carryin' */
+       bredOn         { d, due } while they're carryin'                 passport   the last four places a trap had them (10uq3) */
   function inkCounts(mn, p, now){
     const t = p.totals || {}, o = p.offspring || {}, loads = t.loads || 0, by = t.by || {};
     const out = { loads, used: loads, litters: o.litters || 0, eggs: o.eggs || 0, milked: Math.round((t.milked || 0) / 1000), tied: t.tied || 0,
@@ -42,6 +42,7 @@
       out.studs = { list: recent.slice(0, 4).map(plainName), more: Math.max(0, studs.length - 4) };
       out.scores = most.slice(0, 4).map(s => [plainName(s), by[s].n || 0]);
     }
+    const pp = (rec(mn) || {}).passport; if (Array.isArray(pp) && pp.length) out.passport = pp.slice(-4);
     return out;
   }
   function stateFor(mn){
@@ -117,6 +118,7 @@
       part("nursery", () => nurseryStateFor(mn, s));
       part("feats", () => featsStateFor(mn, s));   // the 🏅 Feats tab (10us-feats.js)
       part("brand", () => { const b = brandFor(mn); if (b) s.brand = b; });
+      part("trophies", () => trophiesFor(mn, s));   // live ink the farm hands out, for their Companion to offer (10uq3-trophies.js)
       part("farm ink", () => { const fi = farmInkFor(mn); if (fi.length) s.farmInk = fi; });   // the farm's own ink, for their Companion to put on (10uq2-farm-ink.js)   // the farm's logo, seared on (10uq-brand.js)   // the 🧸 Nursery panel, for nursery folk only (10up2-nursery.js)
       part("roam", () => { const x = roamState(mn); if (x) s.roam = x; });   // roam passes (10uk-roam.js)
       // the contract they're under, for the Me card's top line (Nov 4 tidy panel): its name and when it ends (none: for good)

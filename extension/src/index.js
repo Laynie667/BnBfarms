@@ -33,6 +33,7 @@ import { initKeys, onWardMsg } from "./keys.js";
 import { hardPrefsOf, setHardPrefsOn } from "./hardlock.js";
 import { initSettings } from "./settings.js";
 import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick, nurseryStatsNow } from "./nursery.js";
+import { trophyNews, trophyNext, trophyAnswered, trophyWear, trophyOff, trophyWorn } from "./trophies.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -99,6 +100,10 @@ function inkSync() {
     if (r.taken.length) toChat("🔥 The farm wanted its brand (" + r.taken.map(name).join(", ") + ") in your Farm Brand slot, but you've your own there. Take yours off and it'll go on.", "#c79bd8");
     if (r.full.length) toChat("🖋️ The farm wanted to ink " + r.full.map(name).join(", ") + " on you, but your four Farm Ink slots are full.", "#c79bd8");
   } catch (e) { console.warn("[Farmhand Companion] farm ink:", e); }
+}
+// a trophy the farm's just handed you (trophies.js): a line in chat, once; the offer itself waits in the panel
+function trophyTell(list) {
+  try { const t = trophyNews(list); if (t) { toChat(t, "#d9a400"); if (st.panel) st.panel.renderSoon(); } } catch (e) { console.warn("[Farmhand Companion] trophies:", e); }
 }
 // the farm's brand the old way (messes.js draws it): not when it's off, and not when it's already in your brand slot
 function brandShown(b) {
@@ -274,11 +279,12 @@ function onFarmMsg(m) {
         if ("brand" in m.set || (m.del || []).includes("brand") || "farmInk" in m.set) { try { messBrand(brandShown(s.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } }   // the farm's brand (messes.js)
         if ("reins" in m.set || (m.del || []).includes("reins")) { try { reinsState(s.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }   // on somebody's reins (cues.js)
         if ("ink" in m.set) inkCounts(s.ink);   // the counts your live ink prints (shared/ink)
+        if ("trophies" in m.set) trophyTell(s.trophies);   // a trophy earned (trophies.js)
       } else askWhole();
       break;
     case "state":
       if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
-      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); inkSync(); try { messBrand(brandShown(m.state.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); inkSync(); trophyTell(m.state.trophies); try { messBrand(brandShown(m.state.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
       break;
     case "reply":
     case "notice": {
@@ -416,6 +422,8 @@ const api = {
   nurseryWear(g) { try { return nurseryWear(g); } catch (e) { return { ok: false, why: e.message }; } },
   nurseryOff(group) { try { return nurseryOff(group); } catch (e) { return { ok: false, why: e.message }; } },
   nurseryWorn() { try { return nurseryWorn(); } catch (e) { return {}; } },
+  // trophies: offered once, then kept to put on or take off any time (trophies.js, views/livestock.js)
+  trophyNext, trophyAnswered, trophyWear, trophyOff, trophyWorn,
   save(slot) {
     let c;
     try { c = captureOutfit(); } catch (e) { st.panel.add("👗 Couldn't read what you're wearin': " + e.message, "notice"); return; }

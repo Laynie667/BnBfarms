@@ -45,6 +45,42 @@ function happening(ctx) {
       muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does."))];
 }
 
+/* ── 🏆 Trophies (Nov 18) ──
+   Live ink the farm hands out the first time somethin' happens to you. A new one's offered once, at the top of the Me
+   tab: Wear it or No thanks. Every one is kept in the 🏆 Trophies row, to put on or take off any time (trophies.js;
+   shared/ink/ink.js trophyWear puts it in a free Farm Ink slot, or the one you pick when they're full). */
+function wearTrophy(ctx, t, slot) {
+  const r = ctx.api.trophyWear ? ctx.api.trophyWear(t, slot) : { ok: false, why: "this Companion can't" };
+  if (r.ok) { ctx.api.trophyAnswered(t.id); ctx.hint(r.already ? "It's on you already." : "Your " + t.title + " is on, in " + r.name + ". The wardrobe's Layering button moves it; /ink sizes it."); ctx.setUi({ trophySwap: null, trophyAt: Date.now() }); }
+  else if (r.full) ctx.setUi({ trophySwap: t.id, trophySlots: r.slots || [] });
+  else ctx.hint("Couldn't put it on: " + r.why + ".");
+}
+function trophySwap(ctx, t) {
+  if (ctx.ui.trophySwap !== t.id) return null;
+  return h("div", { style: { margin: "4px 0" } }, muted("Your four Farm Ink slots are full. Put it on in place of:"),
+    h("div", null, (ctx.ui.trophySlots || []).map((s) => btn(String(s.name).replace(/^Farm /, "") + ": " + (s.title || "empty"), () => wearTrophy(ctx, t, s.slot))),
+      btn("Never mind", () => ctx.setUi({ trophySwap: null }))));
+}
+function trophyOffer(ctx) {
+  const t = ctx.api.trophyNext ? ctx.api.trophyNext(ctx.s.trophies) : null; if (!t) return null;
+  return card(title("🏆 A trophy for you: " + t.title),
+    muted("For " + t.why + ". It's live ink that keeps the farm's count, on your skin under your clothes, for everybody with the Companion to see."),
+    h("div", null, btn("Wear it", () => wearTrophy(ctx, t), true),
+      btn("No thanks", () => { ctx.api.trophyAnswered(t.id); ctx.hint("It's kept in your 🏆 Trophies for whenever you want it."); ctx.setUi({ trophySwap: null, trophyAt: Date.now() }); })),
+    trophySwap(ctx, t),
+    muted("Either way it's yours for good: the 🏆 Trophies row puts it on or takes it off any time."));
+}
+function trophyList(ctx) {
+  const list = ctx.s.trophies || [], worn = ctx.api.trophyWorn ? ctx.api.trophyWorn() : {};
+  const offered = ctx.api.trophyNext ? ctx.api.trophyNext(list) : null;   // (its swap list shows on the offer, not twice)
+  return [list.map((t) => [
+      h("div", { class: "fhc-kv" }, h("span", null, t.title + " ", h("span", { class: "fhc-muted" }, "for " + t.why)),
+        worn[t.id] ? btn("Take it off", () => { const r = ctx.api.trophyOff(t.id); ctx.hint(r.ok ? "Off. It's still yours: put it on again whenever you like." : "Couldn't: " + r.why + "."); ctx.setUi({ trophyAt: Date.now() }); })
+                   : btn("Put it on", () => wearTrophy(ctx, t))),
+      offered && offered.id === t.id ? null : trophySwap(ctx, t)]),
+    muted("They go in your wardrobe's Farm Ink slots and keep the farm's count. The wardrobe's Layering button moves them; /ink sizes them.")];
+}
+
 /* ── 🐄 Me ── */
 function me(ctx) {
   const s = ctx.s, x = mePieces(ctx), now = Date.now();
@@ -68,8 +104,10 @@ function me(ctx) {
   const fresh = ctx.feed.filter((m) => m.kind !== "mine" && m.at > (ctx.ui.inboxSeen || 0)).length;
   const F = ctx.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
   const hp = s.happening || [];
+  const trophies = s.trophies || [], tWorn = trophies.length && ctx.api.trophyWorn ? Object.keys(ctx.api.trophyWorn()).length : 0;
   return [
     errCard(s),
+    trophyOffer(ctx),
     sum,
     rows(ctx, "me", [
       { id: "inbox", label: "📬 Inbox", dot: fresh > 0, sum: fresh ? fresh + " new" : ctx.feed.length ? "nothin' new" : "empty",
@@ -96,6 +134,7 @@ function me(ctx) {
         body: () => [bar(next.icon + " " + next.name + ": tier " + TIER[next.tier + 1], next.n + " of " + next.next + " " + next.unit, next.p, "acc"),
           muted("Perk: " + next.perk + ", " + next.desc), h("div", null, btn("All my feats ›", () => ctx.setUi({ goTab: "ribbons", open_rib: "feats" })))] },
       x.cards.length && { id: "extras", label: "🧩 Farm extras", sum: x.labels.slice(0, 2).join(" · "), body: () => x.cards },
+      trophies.length && { id: "trophies", label: "🏆 Trophies", sum: trophies.length + " earned" + (tWorn ? " · " + tWorn + " on you" : ""), body: () => trophyList(ctx) },
     ]),
     quick(ctx, "me", [
       ["🚿 Wash", () => ctx.send("wash")],

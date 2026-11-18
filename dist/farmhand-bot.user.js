@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.78.0
+// @version      0.79.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.78.0";
-  var COMPANION_VERSION = "0.62.0";
+  var VERSION = "0.79.0";
+  var COMPANION_VERSION = "0.63.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6347,6 +6347,8 @@
         out.studs = { list: recent.slice(0, 4).map(plainName), more: Math.max(0, studs.length - 4) };
         out.scores = most.slice(0, 4).map((s) => [plainName(s), by[s].n || 0]);
       }
+      const pp = (rec(mn) || {}).passport;
+      if (Array.isArray(pp) && pp.length) out.passport = pp.slice(-4);
       return out;
     }
     function stateFor(mn) {
@@ -6466,6 +6468,7 @@
           const b = brandFor(mn);
           if (b) s.brand = b;
         });
+        part("trophies", () => trophiesFor(mn, s));
         part("farm ink", () => {
           const fi = farmInkFor(mn);
           if (fi.length) s.farmInk = fi;
@@ -22056,8 +22059,15 @@
       const p = prodOf(t);
       if (p) p.painted = null;
       aftermathWash(t);
+      let marks = { off: [], kept: [] };
+      try {
+        marks = marksWash(t);
+      } catch (e) {
+        warn("wash marks:", e);
+      }
       saveLedger();
       syncCompanions(true);
+      return marks;
     }
     function washScene(t, by) {
       state.washing = state.washing || /* @__PURE__ */ new Map();
@@ -22066,8 +22076,8 @@
         return;
       }
       if (!onMap(t)) {
-        washNow(t);
-        tell(by, "\u{1F6BF} All washed up, sugar: everything the farm put on " + (t === by ? "you" : plainName(t)) + " is off.");
+        const w = washNow(t);
+        tell(by, "\u{1F6BF} All washed up, sugar: everything the farm put on " + (t === by ? "you" : plainName(t)) + " is off" + (w.kept.length ? ", except what's seared on for good" : "") + ".");
         return;
       }
       const beats = ["start", "scrub", "scrub", "rinse", "dry"], gap = CFG.WASH_BEAT_S * 1e3, facts = washFacts(t);
@@ -22076,8 +22086,11 @@
         try {
           emote("\u{1F6BF} " + tFill(washPick(t, "wash:" + k + ":" + i, WASH_LINES[k], facts), t), t);
           if (i === beats.length - 1) {
-            washNow(t);
+            const w = washNow(t);
             state.washing.delete(t);
+            marksWashLines(t, w).forEach((l, j) => later(() => {
+              if (charFor(t)) emote(l, t);
+            }, 2500 + j * 2500));
           }
         } catch (e) {
           warn("wash:", e);
@@ -25173,6 +25186,7 @@
         const d = CORR_INK[r.corrBrand], id = "corrupt50:" + r.corrBrand.replace(/[^A-Za-z]/g, "");
         out.push(d ? { id, slot: "ink", design: d, keep: 1 } : { id, slot: "ink", design: "LiveWordsBlackletter", keep: 1, color: ["#3a0d52"], values: { t: r.corrBrand } });
       }
+      if (markable(mn)) out.push(...marksInk(mn));
       return out;
     }
     const BRAND_INK_SEAR = [
@@ -25202,8 +25216,215 @@
       const line = pickFresh("brand:ink", BRAND_INK_SEAR).replace(/%b/g, plainName(by)).replace(/%t/g, plainName(t)).replace(/%m/g, name.toUpperCase() === name ? name : "the " + name + " brand");
       if (charFor(t)) emote(line, t);
       R("\u{1F525} " + plainName(t) + " carries " + name + " now." + (inkable(t) ? "" : ' It shows once they switch on "Farm can ink me" in their Companion.'));
-      tell(t, "\u{1F525} " + plainName(by) + " branded you: " + name + ". " + (inkable(t) ? "It's in your wardrobe's Farm Brand slot, angry red, and it heals pale over three days." : `Switch on "Farm can ink me" in your Companion's Toggles (On your character) and it goes on you, in your wardrobe's Farm Brand slot.`));
+      tell(t, "\u{1F525} " + plainName(by) + " branded you: " + name + ". " + (inkable(t) ? "It's in your wardrobe's Farm Brand slot, angry red, and it heals pale over three days." : `Switch on "Farm can ink me" in your Companion's \u2699 Settings (Gear and marks) and it goes on you, in your wardrobe's Farm Brand slot.`));
     }
+    const TROPHIES = [
+      { id: "card", design: "LiveBreedingCard", title: "Breeding Card", why: "your first load at the farm", got: (c) => c.loads >= 1 },
+      { id: "tied", design: "LiveTied", title: "Tied \xD7", why: "your first knot", got: (c) => c.tied >= 1 },
+      { id: "passport", design: "LiveTrapPassport", title: "Trap Passport", why: "the first trap that let you go", got: (c) => Array.isArray(c.passport) && c.passport.length >= 1 },
+      { id: "guestbook", design: "LiveGuestbook", title: "Bred By (guestbook)", why: "three different studs", got: (c) => !!c.studs && c.studs.list.length + (c.studs.more || 0) >= 3 },
+      { id: "scores", design: "LiveHighScores", title: "High Scores", why: "a stud who's bred you five times", got: (c) => (c.scores || []).some((x) => x[1] >= 5) },
+      { id: "bred", design: "LiveTimesBred", title: "Times Bred", why: "twenty-five loads", got: (c) => c.loads >= 25 },
+      { id: "litters", design: "LiveLitters", title: "Litters", why: "your first litter", got: (c) => c.litters >= 1 },
+      { id: "eggs", design: "LiveEggsLaid", title: "Eggs Laid", why: "your first eggs", got: (c) => c.eggs >= 1 },
+      { id: "milked", design: "LiveLitresMilked", title: "Litres Milked", why: "ten litres milked", got: (c) => c.milked >= 10 }
+    ];
+    function trophiesFor(mn, s) {
+      const r = rec(mn), c = s && s.ink;
+      if (!r || !c) return;
+      r.trophies = r.trophies || {};
+      let fresh = false;
+      for (const T of TROPHIES) if (!r.trophies[T.id]) {
+        let got = false;
+        try {
+          got = !!T.got(c);
+        } catch (e) {
+          got = false;
+        }
+        if (got) {
+          r.trophies[T.id] = Date.now();
+          fresh = true;
+        }
+      }
+      if (fresh) saveLedger();
+      const list2 = TROPHIES.filter((T) => r.trophies[T.id]).map((T) => ({ id: T.id, design: T.design, title: T.title, why: T.why, at: r.trophies[T.id] }));
+      if (list2.length) s.trophies = list2;
+    }
+    const STAMP = {
+      kennel: "THE KENNELS",
+      stalls: "THE BARN",
+      bench: "THE BENCH",
+      stockade: "THE STOCKS",
+      cabin: "THE CABIN",
+      pigsty: "THE PIGSTY",
+      pasture: "THE PASTURE",
+      glory: "GLORY HOLES",
+      trough: "THE TROUGH",
+      wildlife: "THE WILDS",
+      office: "THE OFFICE"
+    };
+    function stampOf(spot, kind) {
+      if (kind === "tentacle") return "THE POND";
+      let th = null;
+      try {
+        th = spot ? trapTheme(spot) : null;
+      } catch (e) {
+        th = null;
+      }
+      if (!th && ANTHRO[kind] && ANTHRO[kind].where) return String(ANTHRO[kind].where).toUpperCase().slice(0, 16);
+      if (!th) th = Object.keys(TRAP_THEMES).find((k) => (TRAP_THEMES[k].kinds || []).includes(kind)) || null;
+      return STAMP[th] || (th && TRAP_THEMES[th] ? String(TRAP_THEMES[th].label).toUpperCase().slice(0, 16) : "B&B FARM");
+    }
+    const TRAP_MARK = { tentacle: "TentacleRingBrand", wolves: "MoonPawBrand", boar: "SnoutRingBrand" };
+    const MARK_OF = { TentacleRingBrand: { who: "the pond", name: "tentacle ring" }, MoonPawBrand: { who: "the pack", name: "moon paw" }, SnoutRingBrand: { who: "the boar", name: "snout ring" } };
+    const markName = (d) => MARK_OF[d] ? MARK_OF[d].name : String(d).replace(/Brand$/, "").replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+    const markWho = (d) => MARK_OF[d] ? MARK_OF[d].who : "the farm";
+    const MARKS_HELD = 3;
+    const noMarks = (mn) => /\b(brand|mark)/i.test((rec(mn) || {}).limits || "");
+    function markable(mn) {
+      const c = state.companions.get(mn);
+      return inkable(mn) && !!(c && verAtLeast(c.ver, "0.63.0"));
+    }
+    function marksInk(mn) {
+      const r = rec(mn);
+      if (!r || !Array.isArray(r.marks) || !r.marks.length || noMarks(mn)) return [];
+      return r.marks.map((m) => ({ id: "mark:" + m.d + ":" + m.at, slot: "mark", design: m.d, at: m.at, heal: INK_HEAL_MS }));
+    }
+    const MARK_LINES = {
+      TentacleRingBrand: [
+        "\u{1F419} As the last of it slides out of %n, a tentacle tip curls tight against their skin and squeezes, hot as a coal. When it lets go there's a ring left behind, raised and red: the pond's mark.",
+        "\u{1F419} Somethin' in the water kisses %n on its way back down, and the spot burns. There's a tentacle coiled in a ring there now, seared pink into the skin. The pond knows its own.",
+        "\u{1F419} The pond leaves %n a keepsake: a ring of suckers pressed in so hard it's branded there, angry and red."
+      ],
+      MoonPawBrand: [
+        "\u{1F43A} The last wolf to tie %n bites down as he pulls free, and when the sting fades there's a paw under a moon left in their skin, red and raised: the pack's mark.",
+        "\u{1F43A} Before the pack lopes off, the big one presses a hot paw to %n and holds it there. It comes away and leaves a print under a crescent moon, seared in. Pack property.",
+        "\u{1F43A} %n crawls out of the den with a fresh brand: a paw and a moon, still stingin'. The pack marks what it's bred."
+      ],
+      SnoutRingBrand: [
+        "\u{1F417} The boar grunts and shoves his ringed snout hard against %n, and it comes away hot: a snout and a ring burned into their hide. The sty's mark.",
+        "\u{1F417} When the boar's done he roots at %n one last time, and his snout ring burns like a brandin' iron. They carry the boar's mark now, raised and red under the mud.",
+        "\u{1F417} %n climbs out of the wallow with the boar's ring seared into their hide, angry red under the muck. He marks what he's bred."
+      ]
+    };
+    const MARK_AGAIN = [
+      "\u{1F525} The %m on %n flares up hot and red again, fresh as the day it went on. %w knows its own.",
+      "\u{1F525} %W finds the mark it left on %n last time and sears it in again, deeper.",
+      "\u{1F525} The old %m on %n burns fresh again: %w's been back for more."
+    ];
+    const markFill = (t, mn, d) => t.replace(/%n/g, plainName(mn)).replace(/%m/g, markName(d)).replace(/%W/g, markWho(d).replace(/^./, (x) => x.toUpperCase())).replace(/%w/g, markWho(d));
+    function trapMarkAfter(mn, kind) {
+      const r = rec(mn);
+      if (!r) return;
+      const last = (r.trapLog || []).slice(-1)[0];
+      r.passport = (r.passport || []).concat(stampOf(last && last.kind === kind ? last.spot : "", kind)).slice(-4);
+      const d = TRAP_MARK[kind];
+      if (!d || !markable(mn) || noMarks(mn)) {
+        saveLedger();
+        return;
+      }
+      const had = (r.marks || []).find((m) => m.d === d);
+      r.marks = (r.marks || []).filter((m) => m.d !== d).concat({ d, at: Date.now(), keep: had && had.keep ? 1 : 0 }).slice(-MARKS_HELD);
+      saveLedger();
+      syncCompanions(true);
+      later(() => {
+        if (!charFor(mn)) return;
+        emote(markFill(pickFresh("mark:" + (had ? "again" : d), had ? MARK_AGAIN : MARK_LINES[d]), mn, d), mn);
+        if (!had) tell(mn, "\u{1F525} " + markWho(d).replace(/^./, (x) => x.toUpperCase()) + " left its mark on you: the " + markName(d) + ", on your skin under your clothes, for everybody with the Companion to see. It heals pale over three days. ?wash scrubs it off, unless it's seared on for good (?marks keep does that).");
+      }, 6e3);
+    }
+    function marksWash(mn) {
+      const r = rec(mn);
+      if (!r || !Array.isArray(r.marks) || !r.marks.length) return { off: [], kept: [] };
+      const off = r.marks.filter((m) => !m.keep).map((m) => m.d), kept = r.marks.filter((m) => m.keep).map((m) => m.d);
+      r.marks = kept.length ? r.marks.filter((m) => m.keep) : null;
+      return { off, kept };
+    }
+    const WASH_MARK_OFF = [
+      "\u{1F6BF} The scrubbin' takes the %m off %n too. Never burned in for good, so off it comes.",
+      "\u{1F6BF} A hard scrub with the brush, and the last of %w's markin' on %n comes away with the muck: the %m, gone."
+    ];
+    const WASH_MARK_KEPT = [
+      "\u{1F6BF} The brush goes over the %m on %n and nothin' budges. That's in for good.",
+      "\u{1F6BF} Scrub as hard as they like, the %m on %n won't shift: seared in for good."
+    ];
+    function marksWashLines(mn, w) {
+      const fill2 = (key, pool, list2) => {
+        let t = pickFresh(key, pool);
+        if (list2.length > 1) t = t.replace(/%w/g, "the farm");
+        return markFill(t, mn, list2[0]).replace(markName(list2[0]), list2.map(markName).join(" and "));
+      };
+      const out = [];
+      if (w && w.off.length) out.push(fill2("mark:wash", WASH_MARK_OFF, w.off));
+      if (w && w.kept.length) out.push(fill2("mark:kept", WASH_MARK_KEPT, w.kept));
+      return out;
+    }
+    const KEEP_SEAR = [
+      "\u{1F525} %b heats the iron and goes over %m on %t again, slow, till it's burned in for good. No scrubbin' takes it off now.",
+      "\u{1F525} %b holds %t still and sears %m in a second time, deeper. That one's stayin'."
+    ];
+    const KEEP_SELF = [
+      "\u{1F525} %t holds still at the brandin' post and lets the iron go over %m again, slow, till it's in for good. Their own choice, and it's stayin'.",
+      "\u{1F525} %t bites down and keeps still while the iron goes over %m a second time. They wanted it kept, and now it is."
+    ];
+    function brandKeep(by, t, R) {
+      const r = t ? rec(t) : null;
+      if (!r) {
+        R("Keep whose marks, sugar? ?brand <who> keep sears the farm's marks on for good, so ?wash leaves 'em. ?marks keep for your own.");
+        return;
+      }
+      if (!(t === by || isProprietor(by) || membership(t, by))) {
+        R("Only a proprietor, the herd's owner or " + plainName(t) + " themselves can sear the farm's marks on for good, hon.");
+        return;
+      }
+      const marks = Array.isArray(r.marks) ? r.marks : [];
+      if (!marks.length) {
+        R((t === by ? "You've" : plainName(t) + " has") + ` none of the farm's marks to keep, sugar. The pond, the wolf pack and the boar leave theirs, with "Farm can ink me" on.`);
+        return;
+      }
+      const fresh = marks.filter((m) => !m.keep);
+      if (!fresh.length) {
+        R("Everything the farm's marked on " + (t === by ? "you" : plainName(t)) + " is on for good already.");
+        return;
+      }
+      const now = Date.now();
+      for (const m of fresh) {
+        m.keep = 1;
+        m.at = now;
+      }
+      saveLedger();
+      audit(by, "MARK_KEEP", t + " " + fresh.map((m) => m.d).join(","));
+      syncCompanions(true);
+      const names = fresh.map((m) => "the " + markName(m.d)).join(" and ");
+      const line = pickFresh(t === by ? "mark:keepself" : "mark:keep", t === by ? KEEP_SELF : KEEP_SEAR).replace(/%b/g, plainName(by)).replace(/%t/g, plainName(t)).replace(/%m/g, names);
+      if (charFor(t)) emote(line, t);
+      R("\u{1F525} " + (t === by ? "Yours are" : plainName(t) + "'s are") + " on for good now: " + names + ". ?wash won't touch " + (fresh.length > 1 ? "them" : "it") + "; only ?brand " + (t === by ? "<you>" : plainName(t)) + " clear, from a proprietor or the herd's owner.");
+      if (t !== by) tell(t, "\u{1F525} " + plainName(by) + " seared the farm's marks on you for good: " + names + ". ?wash won't take " + (fresh.length > 1 ? "them" : "it") + " off now.");
+    }
+    function marksClear(mn) {
+      const r = rec(mn);
+      const n = r && Array.isArray(r.marks) ? r.marks.length : 0;
+      if (r) r.marks = null;
+      return n;
+    }
+    function marksNow(mn) {
+      const r = rec(mn);
+      return r && Array.isArray(r.marks) ? r.marks.map((m) => ({ icon: "\u{1F525}", text: markWho(m.d).replace(/^./, (x) => x.toUpperCase()) + "'s mark" + (m.keep ? ", for good" : "") })) : [];
+    }
+    function marksCommand(sender, args, R) {
+      const r = rec(sender), marks = r && Array.isArray(r.marks) ? r.marks : [];
+      if (/^keep$/i.test(args[0] || "")) {
+        brandKeep(sender, sender, R);
+        return;
+      }
+      if (!marks.length) {
+        R(`You've none of the farm's marks on you, sugar. The pond, the wolf pack and the boar leave theirs, with "Farm can ink me" on in your Companion.`);
+        return;
+      }
+      R("\u{1F525} The farm's marks on you: " + marks.map((m) => "the " + markName(m.d) + " (" + markWho(m.d) + "'s" + (m.keep ? ", on for good" : ", ?wash scrubs it off") + ")").join(", ") + "." + (marks.some((m) => !m.keep) ? " ?marks keep sears yours on for good." : ""));
+    }
+    addCommand("marks", { topic: "milk", run: (c) => marksCommand(c.sender, c.args, c.R) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __trophies: TROPHIES, __stampOf: (s, k) => stampOf(s, k), __trapMarkAfter: (m, k) => trapMarkAfter(m, k) });
     CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 1, DRIP_HOLD_MIN: 10, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
     Object.assign(CFG.TAG_WORDS, {
       aphro: ["aphrodisiac", "horny", "lust serum", "libido"],
@@ -29970,6 +30191,7 @@
       if (d.piss) out.push({ icon: "\u{1F49B}", text: "Pissed on" });
       if (d.reek) out.push({ icon: "\u{1F443}", text: "Reeks of " + d.reek });
       if (d.brand) out.push({ icon: "\u{1F58B}\uFE0F", text: "Branded: " + d.brand });
+      for (const m of marksNow(mn)) out.push(m);
       return out;
     }
     function aftermathWash(mn) {
@@ -39624,6 +39846,11 @@
             }, 9e3);
           }
         }
+      }
+      try {
+        trapMarkAfter(mn, kind);
+      } catch (e) {
+        warn("trap mark:", e);
       }
       try {
         afterLines(mn, kind, before);
@@ -61420,7 +61647,8 @@ OPT IN FIRST \xB7 nobody gets bred who hasn't, sweetie
   ?jarok on|off \xB7 jar insemination (on: staff ask every time \xB7 off: never)
   ?yes / ?no \xB7 answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off \xB7 your tally marks on ?who and the board
-  ?wash \xB7 clean off a paintin'
+  ?wash \xB7 clean off a paintin' (and the marks a trap seared on you, unless they're on for good)
+  ?marks \xB7 the marks a trap seared on you \xB7 ?marks keep \xB7 on for good: ?wash leaves 'em
   (standin' in the water or a trough rinses a third of the mess off every few minutes)
   ?grooming on|off \xB7 the farm girl brushes you down when you stand next to her
   ?drain \xB7 empty yourself into the bucket (?drain butt for one hole)
@@ -62059,6 +62287,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?brand <who> logo [place] \xB7 sear the B&B logo on (hip, thigh, belly, breast, shoulder)
   ?brand <who> species \xB7 their animal's brand (Hucow, Mare, Bitch...) \xB7 ?brand <who> stud \xB7 Stud Service
     (with "Farm can ink me" on in their Companion, any of these goes in their wardrobe's Farm Brand slot and heals over three days)
+  ?brand <who> keep \xB7 the marks the pond, the pack and the boar left, seared on for good (?wash leaves 'em)
+  ?brand <who> clear \xB7 takes the brand off, and every one of the farm's marks
   ?brand all logo [place] \xB7 proprietors: every livestock carries it \xB7 ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling \xB7 proprietors, staff
   ?store approve|reject <who> \xB7 a bought greetin'
@@ -65527,19 +65757,38 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             brandInk(sender, resolveTarget(args[0]), /^stud$/i.test(args[1]) ? "stud" : "species", R);
             break;
           }
+          if (/^keep$/i.test(args[1] || "")) {
+            brandKeep(sender, resolveTarget(args[0]), R);
+            break;
+          }
           const t = resolveTarget(args[0]);
           const r = t ? rec(t) : null;
           if (!r) {
-            R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). ?brand <who> logo sears on the farm's BB, ?brand <who> species their animal's brand, ?brand <who> stud Stud Service. ?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear");
+            R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). ?brand <who> logo sears on the farm's BB, ?brand <who> species their animal's brand, ?brand <who> stud Stud Service. ?brand <who> keep sears the farm's marks (what the pond, the pack and the boar leave) on for good, so ?wash leaves 'em. ?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear");
             break;
           }
           const mark = args.slice(1).join(" ").trim();
           const mayBrand = isProprietor(sender) || !!membership(t, sender);
+          const marksSay = (r.marks || []).length ? " The farm's marks on 'em: " + r.marks.map((m) => markName(m.d) + (m.keep ? " (for good)" : "")).join(", ") + "." : "";
           if (!mark) {
-            R(r.brand ? plainName(t) + " carries " + r.brand.mark + ", put there by " + plainName(r.brand.by) + "." : plainName(t) + " is unbranded. Add a mark to brand 'em, like ?brand " + plainName(t) + " LA");
+            R((r.brand ? plainName(t) + " carries " + r.brand.mark + ", put there by " + plainName(r.brand.by) + "." : plainName(t) + " is unbranded. Add a mark to brand 'em, like ?brand " + plainName(t) + " LA") + marksSay);
             break;
           }
           if (mark.toLowerCase() === "clear") {
+            const nMarks = (r.marks || []).length, mayMarks = isProprietor(sender) || !!membership(t, sender);
+            if (!r.brand && nMarks) {
+              if (!mayMarks) {
+                R("Only a proprietor or " + plainName(t) + "'s herd owner can take the farm's marks off, sugar. ?wash scrubs off any that aren't on for good.");
+                break;
+              }
+              marksClear(t);
+              saveLedger();
+              audit(sender, "MARK_CLEAR", String(t));
+              syncCompanions(true);
+              R("The farm's marks are off " + plainName(t) + ", hon.");
+              if (t !== sender) beep(t, "\u{1F33E} " + plainName(sender) + " took the farm's marks off you, sweetie.");
+              break;
+            }
             if (!r.brand) {
               R("There's no brand on 'em to clear, hon.");
               break;
@@ -65549,10 +65798,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               break;
             }
             r.brand = null;
+            const gone = nMarks && mayMarks ? marksClear(t) : 0;
             saveLedger();
             audit(sender, "BRAND_CLEAR", String(t));
             syncCompanions(true);
-            R("Brand's off, hon.");
+            R("Brand's off" + (gone ? ", and the farm's marks with it" : "") + ", hon.");
             beep(t, "\u{1F33E} " + plainName(sender) + " took your brand off, sweetie.");
             break;
           }

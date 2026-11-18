@@ -19,6 +19,13 @@
    • THE FARM'S OWN INK (Nov 18, farmInkSync): what the farm says should be inked on somebody (its brand, their species'
      brand, the corruption's words) goes in their brand slot or a free ink slot, by their own game, if they've switched
      "Farm can ink me" on. A brand heals from angry red to pale over three days; marker wears off in hours, henna in a week.
+   • THE FARM'S MARKS (Nov 18, Laynie: "we can include hidden slots the farm uses, that can be removed with ?wash unless
+     permanently branded"): three more slots, Farm Mark 1 to 3, that the wardrobe doesn't show (the game's own
+     AllowCustomize: false, the way it keeps the arms and hands out of it). What a trap leaves on you goes there, never
+     in your own slots. Each sits at its own spot on your other side (hip, thigh, shoulder), so it isn't on your brand.
+   • TROPHIES (Nov 18, Laynie: "it should be offered, and if its a permanent trophy, have a way to equip or take it off
+     at any time"): live ink the farm hands out when somethin' first happens to you. The Companion offers it; on, it's
+     in a free Farm Ink slot (or one you pick), marked a trophy, and keeps the farm's count. Off and on again any time.
 */
 import LIST from "./ink-designs.json";
 import { LIVE_BY, isLive, valuesFor, picture, loadLiveArt, cleanValues } from "./live.js";
@@ -28,21 +35,32 @@ export const INK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/ma
 const LIVE_HOST = INK_HOST + "live/";   // (no pictures there: a live design's address, for us to draw in its place)
 export const INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
 export const BRAND_SLOT = "FarmBrand";
-const SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand" };
+export const MARK_SLOTS = ["FarmMark1", "FarmMark2", "FarmMark3"];
+const ALL_SLOTS = [...INK_SLOTS, BRAND_SLOT, ...MARK_SLOTS];
+const SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand", FarmMark1: "Farm Mark 1", FarmMark2: "Farm Mark 2", FarmMark3: "Farm Mark 3" };
 const RES = LIST.res || 1;
 const OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;   // one of our pictures (from the repo, or a local copy in a test)
 const LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;   // a live design, drawn here
 const STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;   // one of the still ones: its kind, its name and the layer
+const MARK_SRC = /\/(FarmMark[1-3])\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;          // one of the farm's marks: an address of our own, drawn from the brand's picture
 // the item a still picture belongs to (the same design in two slots shares the first one's size)
 const stillItem = (C, kind, name) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null);
 const PRIORITY = 11;   // on the skin (the body and the game's own body markings are under 11), under socks, underwear and clothes
 const kindOf = (slot) => (slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null);
+const isMark = (slot) => MARK_SLOTS.includes(slot);
+const ours = (slot) => !!kindOf(slot) || isMark(slot);
+const picKind = (slot) => (isMark(slot) ? "FarmBrand" : kindOf(slot));   // the folder its pictures are in (a mark: the brands')
 export const isInkSlot = (slot) => !!kindOf(slot);
 // K: each design's starting size (Nov 18, Laynie: "does that tattoos sizing and placement seem esthetically and visibly the
 // right scale per tattoo for the defaults?"): fitted to a box for its spot, width and height, so long lettering gets room
 const TITLES = {}, MANIFEST = {}, K = {};
 for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) { TITLES[kind + ":" + a.name] = a.title; if (a.live) MANIFEST[a.name] = a; if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k; }
-const kOf = (it) => (it && it.Asset && it.Asset.Group && K[kindOf(it.Asset.Group.Name) + ":" + it.Asset.Name]) || 1;
+// where the farm's marks sit (centre x, y on the 500-wide body, and the spot's box, like the wardrobe's own): on your
+// other side from where your own ink starts, so a mark is never on your brand
+const MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38] };
+const MK = {};
+for (const slot of MARK_SLOTS) for (const a of LIST.groups.FarmBrand) { const [, , bw, bh] = MARK_AT[slot]; MK[slot + ":" + a.name] = Math.round(Math.max(0.3, Math.min(1.2, Math.min(bw / (a.w / RES), bh / (a.h / RES)))) * 100) / 100; }
+const kOf = (it) => { const g = it && it.Asset && it.Asset.Group && it.Asset.Group.Name; if (!g) return 1; return (isMark(g) ? MK[g + ":" + it.Asset.Name] : K[kindOf(g) + ":" + it.Asset.Name]) || 1; };
 
 function assetDef(a) {
   return {
@@ -56,23 +74,31 @@ function groupDef(slot) {
   return { Group: slot, Priority: PRIORITY, Default: false, Random: false, BodyCosplay: true, Clothing: false, AllowNone: true,
     Color: ["Default"], Asset: LIST.groups[kindOf(slot)].map(assetDef) };
 }
+// a farm's mark slot: the brands, each moved to this slot's spot; not in the wardrobe (AllowCustomize: false)
+function markDef(slot) {
+  const [cx, cy] = MARK_AT[slot];
+  return { Group: slot, Priority: PRIORITY, Default: false, Random: false, BodyCosplay: true, Clothing: false, AllowNone: true, AllowCustomize: false,
+    Color: ["Default"], Asset: LIST.groups.FarmBrand.map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) })) };
+}
 // the slots' and designs' names in the wardrobe (the game sets "MISSING DESCRIPTION" on anything its own list doesn't have)
 function describe(W) {
-  for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+  for (const slot of ALL_SLOTS) {
     const G = W.AssetGroupMap && W.AssetGroupMap.get(slot); if (!G) continue;
     G.Description = SLOT_NAMES[slot];
-    for (const A of G.Asset || []) { const t = TITLES[kindOf(slot) + ":" + A.Name]; if (t) A.Description = t; }
+    for (const A of G.Asset || []) { const t = TITLES[picKind(slot) + ":" + A.Name]; if (t) A.Description = t; }
   }
 }
 const gameReady = (W) => typeof W.AssetGroupAdd === "function" && typeof W.AssetAdd === "function" && W.AssetGroupMap && W.AssetGroupMap.size > 30;
 function addSlots(W) {
-  if (W.AssetGroupMap.has(INK_SLOTS[0])) { describe(W); return false; }
-  for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-    const def = groupDef(slot), G = W.AssetGroupAdd("Female3DCG", def);
+  let added = false;
+  for (const slot of ALL_SLOTS) {
+    if (W.AssetGroupMap.has(slot)) continue;   // (the other add-on, or an older copy of this, put it there already)
+    const def = isMark(slot) ? markDef(slot) : groupDef(slot), G = W.AssetGroupAdd("Female3DCG", def);
     for (const a of def.Asset) W.AssetAdd(G, a, W.AssetFemale3DCGExtended || {}, def);
+    added = true;
   }
   describe(W);
-  return true;
+  return added;
 }
 
 // ── the live designs ──
@@ -117,6 +143,7 @@ function autoOf(W, auto) {
   if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
   if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
   if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
+  if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;   // where the last four traps had you (Nov 18)
   return typeof c === "number" ? { n: c } : null;
 }
 function refreshAuto(W) {
@@ -155,13 +182,14 @@ export function healedHex(hex, layer, p) {
   const e = p * p * (3 - 2 * p); return toHex(c.map((v, i) => v + (to[i] - v) * e));
 }
 const DESIGNS = { brand: new Set(LIST.groups.FarmBrand.map((a) => a.name)), ink: new Set(LIST.groups.FarmInk.map((a) => a.name)) };
+DESIGNS.mark = DESIGNS.brand;   // (a farm's mark is one of the brands)
 const LAYERS_OF = {}; for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
 const farmOf = (it) => { const f = it && it.Property && it.Property.FarmInk; return f && typeof f.farm === "string" ? f.farm : null; };
 const doneKey = (W) => "farmink-done-" + (W.Player && W.Player.MemberNumber);
 const KEEP_AGAIN = 20 * 3600000;   // the farm's kept ink, taken off: back by mornin'
 function cleanEntry(e) {
   if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
-  const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : null; if (!slot || !DESIGNS[slot].has(e.design)) return null;
+  const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : e.slot === "mark" ? "mark" : null; if (!slot || !DESIGNS[slot].has(e.design)) return null;
   const n = (v, max) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? Math.min(max, Math.round(x)) : 0; };
   const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
   return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
@@ -169,34 +197,40 @@ function cleanEntry(e) {
 // make what you wear match the farm's list. list: the farm girl's (null: she's said nothin', leave it be); on: "Farm can ink me".
 // opts.hard: in hardcore (The Farmhand's Dispensary), the farm's ink pulled off goes straight back on (approved Nov 17:
 // "ink a contract or hardcore says stays is put back if someone takes it off").
-// Gives { put, off, full, taken } (designs), or null when nothin' could be done (not in the game yet).
+// A mark (slot "mark", what a trap leaves) goes in the farm's own hidden slots, never yours: the first empty one, else in
+// place of the oldest. You can't take one off yourself (only ?wash, through the farm girl), so one that's gone missin'
+// (an outfit put on over it) just goes back.
+// Gives { put, off, full, taken, marked } (designs), or null when nothin' could be done (not in the game yet).
 export function farmInkSync(W, list, on, now, opts) {
   const hard = !!(opts && opts.hard);
   const P = W.Player; if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W.InventoryWear !== "function") return null;
   now = now || Date.now();
-  const want = on ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed = [];
+  const want = on ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed = [];
   let done = {}; try { done = JSON.parse(W.localStorage.getItem(doneKey(W))) || {}; } catch (e) { done = {}; }
   const remove = (slot) => { try { if (typeof W.InventoryRemove === "function") W.InventoryRemove(P, slot, false); else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot)); } catch (e) { return false; } changed.push(slot); return true; };
   // off: the farm's pieces it no longer wants (or you've switched it off), and anything faded right out
-  for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+  for (const slot of ALL_SLOTS) {
     const it = itemIn(P, slot), id = farmOf(it); if (!id) continue;
     const a = ageOf(it.Property.FarmInk, now);
     if (!ids.has(id) || (a && a.done)) { if (remove(slot)) out.off.push(it.Asset.Name); if (a && a.done) done[id] = now; }
   }
   // on: what it wants that isn't on you
   for (const e of want) {
-    if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
-    if (done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off (not in hardcore)
+    if (ALL_SLOTS.some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
+    const mark = e.slot === "mark";
+    if (!mark && done[e.id] && !hard && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off (not in hardcore)
     if (e.fade && e.at && now - e.at >= e.fade) continue;                      // worn off already
     let slot = null;
-    if (e.slot === "brand") { const it = itemIn(P, BRAND_SLOT); if (!it || farmOf(it)) slot = BRAND_SLOT; else { out.taken.push(e.design); continue; } }
+    if (mark) { const atOf = (s) => { const f = farmOf(itemIn(P, s)) && itemIn(P, s).Property.FarmInk; return (f && f.at) || 0; }; slot = MARK_SLOTS.find((s) => !itemIn(P, s)) || MARK_SLOTS.slice().sort((a, b) => atOf(a) - atOf(b))[0]; }
+    else if (e.slot === "brand") { const it = itemIn(P, BRAND_SLOT); if (!it || farmOf(it)) slot = BRAND_SLOT; else { out.taken.push(e.design); continue; } }
     else { slot = INK_SLOTS.find((s) => !itemIn(P, s)) || null; if (!slot) { out.full.push(e.design); continue; } }
     if (itemIn(P, slot)) remove(slot);
-    const kind = kindOf(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
+    const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
     try { W.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false); } catch (err) { continue; }
     const it = itemIn(P, slot); if (!it || it.Asset.Name !== e.design) continue;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, e.values || {}, { farm: e.id, at: e.at || now, heal: e.heal || null, fade: e.fade || null, keep: e.keep || null })) });
-    done[e.id] = now; changed.push(slot); out.put.push(e.design);
+    if (mark) { if (!done[e.id]) out.marked.push(e.design); } else out.put.push(e.design);   // (a mark back on after an outfit: not news)
+    done[e.id] = now; changed.push(slot);
   }
   // remembered for 60 days past the farm forgettin' it
   for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
@@ -215,9 +249,42 @@ export const farmBrandWorn = (W) => { const id = farmOf(itemIn(W.Player, BRAND_S
 // lettin' others see your icons). Without a Dispensary nobody can tell, and it stays hidden.
 export const DOSED_ONLY = new Set(["GlowSlutGlowInk"]);
 const dosed = (W, C) => { try { const D = W.FarmhandDispensary; return !!(D && typeof D.dosedOf === "function" && C && D.dosedOf(C.MemberNumber)); } catch (e) { return false; } };
-const wearsDosedOnly = (C) => [...INK_SLOTS, BRAND_SLOT].some((s) => { const it = itemIn(C, s); return !!(it && DOSED_ONLY.has(it.Asset.Name)); });
+const wearsDosedOnly = (C) => ALL_SLOTS.some((s) => { const it = itemIn(C, s); return !!(it && DOSED_ONLY.has(it.Asset.Name)); });
 // somebody whose farm ink is still healin' or fadin': drawn again now and then, so it moves along on every screen
-const stillChanging = (C, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => { const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now); return !!(a && a.still); });
+const stillChanging = (C, now) => ALL_SLOTS.some((s) => { const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now); return !!(a && a.still); });
+
+// ── TROPHIES (Nov 18) ──
+// The farm hands out live ink when somethin' first happens to you (the farm girl's panel state: trophies). Your
+// Companion offers each one; Wear it puts it in a free Farm Ink slot (or the one you pick, over what's there), marked
+// as a trophy (Property.FarmInk.trophy), with the farm's count on it, kept up like any live design's. The farm's own
+// ink never takes it off. Take it off and put it on again whenever you like.
+const trophyOf = (it) => { const f = it && it.Property && it.Property.FarmInk; return f && typeof f.trophy === "string" ? f.trophy : null; };
+export function trophyWorn(W) { const o = {}; for (const s of INK_SLOTS) { const id = trophyOf(itemIn(W.Player, s)); if (id) o[id] = s; } return o; }
+const roomSees = (W, P) => {
+  try { if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(P); } catch (e) { /* fine */ }
+  try { if (typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(P); } catch (e) { /* not in a room */ }
+};
+export function trophyWear(W, t, slot) {
+  const P = W.Player; if (!P || !Array.isArray(P.Appearance) || typeof W.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
+  const worn = trophyWorn(W); if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
+  if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
+  slot = slot || INK_SLOTS.find((s) => !itemIn(P, s));
+  if (!slot) return { ok: false, full: true, why: "your four Farm Ink slots are full", slots: INK_SLOTS.map((s) => { const it = itemIn(P, s); return { slot: s, name: SLOT_NAMES[s], title: it ? TITLES["FarmInk:" + it.Asset.Name] || it.Asset.Name : "" }; }) };
+  if (itemIn(P, slot)) { try { W.InventoryRemove(P, slot, false); } catch (e) { return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" }; } }
+  try { W.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false); } catch (e) { return { ok: false, why: "the game wouldn't take it" }; }
+  const it = itemIn(P, slot); if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
+  const d = LIVE_BY[t.design], v = d.auto ? autoOf(W, d.auto) : null;
+  it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
+  roomSees(W, P);
+  return { ok: true, slot, name: SLOT_NAMES[slot] };
+}
+export function trophyOff(W, id) {
+  const P = W.Player, slot = P && trophyWorn(W)[id]; if (!slot) return { ok: true, already: true };
+  try { if (typeof W.InventoryRemove === "function") W.InventoryRemove(P, slot, false); else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot)); } catch (e) { return { ok: false, why: "it wouldn't come off" }; }
+  roomSees(W, P);
+  return { ok: true, slot, name: SLOT_NAMES[slot] };
+}
 
 // ── /ink: what your live ink says, and writin' on it ──
 const SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
@@ -282,16 +349,20 @@ export function registerInk(W, mod) {
     // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
     farm: (list, on, opts) => farmInkSync(W, list, on, undefined, opts),
     farmBrandWorn: () => farmBrandWorn(W),
+    // trophies (the Companion's 🏆 Trophies row)
+    trophyWear: (t, slot) => trophyWear(W, t, slot), trophyOff: (id) => trophyOff(W, id), trophyWorn: () => trophyWorn(W),
     worn: () => wornLive(W).map(({ slot, name }) => ({ slot, name })) });
   const hooks = () => {
     const hook = (name, pri, fn) => { try { if (typeof W[name] === "function") mod.hookFunction(name, pri, fn); else console.warn("[Farm ink] the game has no " + name); } catch (e) { console.warn("[Farm ink] couldn't hook " + name, e); } };
     // where the game looks for a layer's picture, and for the wardrobe's preview: ours come from the repo (a live design's
     // is an address of our own, drawn below)
     hook("AssetBaseURL", 0, (args, next) => {
-      const slot = args[2] || (args[1] && args[1].Name), kind = kindOf(slot); if (!kind) return next(args);
+      const slot = args[2] || (args[1] && args[1].Name);
+      if (isMark(slot)) return INK_HOST + slot + "/";   // (a farm's mark: our own address, drawn from the brand's picture below)
+      const kind = kindOf(slot); if (!kind) return next(args);
       return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
     });
-    hook("AssetGetPreviewPath", 0, (args, next) => { const A = args[0], kind = A && A.Group && kindOf(A.Group.Name); return kind ? INK_HOST + kind + "/Preview" : next(args); });
+    hook("AssetGetPreviewPath", 0, (args, next) => { const A = args[0], kind = A && A.Group && picKind(A.Group.Name); return kind ? INK_HOST + kind + "/Preview" : next(args); });
     hook("AssetBuildDescription", 0, (args, next) => { const r = next(args); try { describe(W); } catch (e) { /* next time */ } return r; });
     // the pictures are stored at RES times the size they show: drawn at 1/RES, round their middle (the game scales an
     // item round its centre), so the Layering screen's 1.0 is the design's own size and scalin' up stays crisp. On top,
@@ -327,6 +398,9 @@ export function registerInk(W, mod) {
       };
       const wrap = (f, plain) => (typeof f !== "function" ? f : function (src, x, y, o) {
         if (typeof src === "string") {
+          // a farm's mark: the brand's own picture, at this slot's size, healin' like any of the farm's
+          const mm = src.indexOf("/FarmMark") > 0 ? MARK_SRC.exec(src) : null;
+          if (mm) { const it = itemIn(C, mm[1]); if (!it || it.Asset.Name !== mm[2]) return undefined; const u = src.replace("/" + mm[1] + "/", "/FarmBrand/"); const o3 = aged(sized(o, it), it, mm[3]); if (o3.Alpha === 0) return undefined; seen.add(mm[2]); if (!ready(u)) notReady.push(mm[2]); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
           if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
@@ -343,7 +417,7 @@ export function registerInk(W, mod) {
     // cosplay, the game's own body markings included. Farm ink isn't somethin' you strip: it goes back on. It comes off
     // one slot at a time in the wardrobe, like takin' it off on purpose.
     const keepInk = (name) => hook(name, 0, (args, next) => {
-      const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
+      const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)) : [];
       const r = next(args);
       try {
         let back = 0;
@@ -354,6 +428,18 @@ export function registerInk(W, mod) {
     });
     keepInk("CharacterAppearanceNaked");
     keepInk("CharacterAppearanceStripLayer");
+    // ...and the farm's marks stay on through an outfit put on from the wardrobe (only ?wash takes them off). Your own
+    // ink goes with the outfit, as it always has.
+    hook("WardrobeFastLoad", 0, (args, next) => {
+      const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isMark(it.Asset.Group.Name) && farmOf(it)) : [];
+      const r = next(args);
+      try {
+        let back = 0;
+        for (const it of keep) if (!itemIn(C, it.Asset.Group.Name)) { C.Appearance.push(it); back++; }
+        if (back) { if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(C, false); if (args[2] && typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(C); }
+      } catch (e) { /* fine */ }
+      return r;
+    });
     hook("AssetLoadAll", 0, (args, next) => { const r = next(args); try { addSlots(W); } catch (e) { console.warn("[Farm ink] couldn't add the slots again", e); } return r; });
     // days without cummin': your own game counts it (a ruined one doesn't count as cummin')
     hook("ActivityOrgasmStart", 0, (args, next) => {
@@ -392,7 +478,7 @@ function note(W, C, seen, notReady) {
   if (!C || !Array.isArray(C.Appearance)) return;
   const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
   if (/AllFours|Hogtied/.test(pose)) return;   // (hidden in those poses on purpose)
-  const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+  const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)).map((it) => it.Asset.Name);
   const missing = worn.filter((n) => !seen.has(n));
   if (!missing.length && !notReady.length) return;
   DIAG.push({ t: Date.now(), who: C.MemberNumber, name: String(C.Nickname || C.Name || ""), missing, notReady: [...new Set(notReady)] });

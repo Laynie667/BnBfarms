@@ -11,6 +11,7 @@
        ?brand all logo             every livestock: the farm's mark
        corruption 50               the corruption's words (10y4-corruption.js), in its own dark ink
      Without the switch the farm's logo is still drawn the old way (messes.js); the species and stud brands wait for it.
+     The farm's marks (what a trap sears on, in hidden slots of their own) and trophies: 10uq3-trophies.js.
   */
   const INK_HEAL_MS = 3 * 86400000;
   const SPECIES_BRAND = { cow: "Hucow", pony: "Mare", deer: "Doe", pup: "Bitch", kitt: "Kitten", goblin: "Goblins", bunny: "Bunny", fox: "Vixen", goat: "Nanny", rat: "Rat", dragon: "Dragoness" };
@@ -43,6 +44,7 @@
       const d = CORR_INK[r.corrBrand], id = "corrupt50:" + r.corrBrand.replace(/[^A-Za-z]/g, "");
       out.push(d ? { id, slot: "ink", design: d, keep: 1 } : { id, slot: "ink", design: "LiveWordsBlackletter", keep: 1, color: ["#3a0d52"], values: { t: r.corrBrand } });
     }
+    if (markable(mn)) out.push(...marksInk(mn));   // what the traps seared on, in the farm's hidden Farm Mark slots (10uq3-trophies.js)
     return out;
   }
   const BRAND_INK_SEAR = [
@@ -63,5 +65,5 @@
     R("🔥 " + plainName(t) + " carries " + name + " now." + (inkable(t) ? "" : " It shows once they switch on \"Farm can ink me\" in their Companion."));
     tell(t, "🔥 " + plainName(by) + " branded you: " + name + ". " + (inkable(t)
       ? "It's in your wardrobe's Farm Brand slot, angry red, and it heals pale over three days."
-      : "Switch on \"Farm can ink me\" in your Companion's Toggles (On your character) and it goes on you, in your wardrobe's Farm Brand slot."));
+      : "Switch on \"Farm can ink me\" in your Companion's ⚙ Settings (Gear and marks) and it goes on you, in your wardrobe's Farm Brand slot."));
   }

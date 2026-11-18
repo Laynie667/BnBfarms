@@ -203,7 +203,8 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?jarok on|off · jar insemination (on: staff ask every time · off: never)
   ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
-  ?wash · clean off a paintin'
+  ?wash · clean off a paintin' (and the marks a trap seared on you, unless they're on for good)
+  ?marks · the marks a trap seared on you · ?marks keep · on for good: ?wash leaves 'em
   (standin' in the water or a trough rinses a third of the mess off every few minutes)
   ?grooming on|off · the farm girl brushes you down when you stand next to her
   ?drain · empty yourself into the bucket (?drain butt for one hole)
@@ -857,6 +858,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?brand <who> logo [place] · sear the B&B logo on (hip, thigh, belly, breast, shoulder)
   ?brand <who> species · their animal's brand (Hucow, Mare, Bitch...) · ?brand <who> stud · Stud Service
     (with "Farm can ink me" on in their Companion, any of these goes in their wardrobe's Farm Brand slot and heals over three days)
+  ?brand <who> keep · the marks the pond, the pack and the boar left, seared on for good (?wash leaves 'em)
+  ?brand <who> clear · takes the brand off, and every one of the farm's marks
   ?brand all logo [place] · proprietors: every livestock carries it · ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling · proprietors, staff
   ?store approve|reject <who> · a bought greetin'

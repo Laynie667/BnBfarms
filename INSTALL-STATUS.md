@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.78.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.79.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.62.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.10.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.63.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.11.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.79.0 + Companion 0.63.0 + Dispensary 0.11.0: trophies, the farm's marks, and a belly switch** Laynie's three answers, Nov 18.
+  - **Trophies:** live ink the farm hands out the first time somethin' happens to you: your first load (Breeding Card), first knot, the first trap that let you go (Trap Passport), three studs, a stud who's bred you five times, twenty-five loads, your first litter, your first eggs, ten litres milked.
+    - Each is offered once at the top of your panel's Me tab: Wear it or No thanks. Every one is yours for good, in the new 🏆 Trophies row, to put on or take off any time.
+    - It goes in a free Farm Ink slot (all four full: you pick which to swap) and keeps the farm's count.
+    - The Trap Passport stamps where each trap had you, the last four.
+  - **The farm's marks:** the pond leaves its tentacle ring when it lets you go, the wolf pack its moon paw, the boar its snout ring.
+    - They go in three hidden Farm Mark slots of the farm's own, not the wardrobe's, so they never push out your ink or sit on your brand. Newest wins: the same trap again sears it fresh.
+    - They heal pale over three days. `?wash` scrubs them off unless they're on for good.
+    - `?marks` shows yours, and `?marks keep` sears yours on for good. Staff: `?brand <who> keep`, and `?brand <who> clear` takes the brand and every mark off.
+    - Only with "Farm can ink me" on, and never if your limits rule out brands or marks.
+  - **Show my drawn belly:** a switch beside "Farm can ink me" (⚙ Gear and marks). Off keeps your drawn belly flat on every screen.
+  - Tests: `tests/farm-marks-trophies.test.cjs`; `tests/ink.test.cjs` counts the new slots.
 
 - **Companion 0.62.0 + Dispensary 0.10.0: glow ink while you're dosed, and hardcore keeps the farm's ink on** Both from the ink list Laynie approved Nov 17.
   - **Glow Slut's UV ink only shows while you're dosed:** it lights up while somethin' from The Farmhand's Dispensary is in you, and goes dark as it wears off.

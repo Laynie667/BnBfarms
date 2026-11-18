@@ -10,6 +10,7 @@
 import { h, card, title, muted, btn, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";
 import { SWITCH_INFO, farmSwitches, trapThemesCard, drawnBodyCard, extraSwitches } from "./livestock.js";
+import { drawnBodyState, drawnBodyBelly } from "../drawnbody.js";
 import { localSaveState, localSavePick, localSaveReconnect, localSaveNow, localSaveLoad } from "../localsave.js";
 import { memlogText } from "../memlog.js";
 import { VERSION } from "../version.js";
@@ -62,12 +63,21 @@ function bodyPage(ctx) {
   ];
 }
 
+// the drawn belly, shown or not (Nov 18, Laynie: "the drawn belly, basically show/hide belly"): the same as Never and
+// Follow the farm in the drawn body's Belly list (Body and look). Everybody with the Companion sees it the way you set it.
+function bellyToggle(ctx) {
+  const st = drawnBodyState(), on = st.bellyMode !== "off";
+  return toggle("Show my drawn belly", "Your belly on your drawn body, showin' and growin' as the farm fills you, breeds you or packs you with eggs. Off keeps it flat, on every screen." + (st.on ? "" : " (It needs Show my drawn body on, in Body and look.)"),
+    on, () => { const v = on ? "off" : "farm"; drawnBodyBelly(v, (t) => ctx.hint(t)); ctx.setPref("drawnBodyBelly", v); });
+}
+
 function gearPage(ctx) {
   return [
     card(title("⛓ On your character"), muted("All of these are off until you switch them on. Your safeword takes everything off."),
       pref(ctx, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx)),
       pref(ctx, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
-      pref(ctx, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. Switch this off and the farm's ink comes off.", () => { ctx.api.inkSync && ctx.api.inkSync(); ctx.api.rehello && ctx.api.rehello(); }),
+      pref(ctx, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. The marks a trap sears on (the pond's, the pack's, the boar's) go in slots of the farm's own instead, and ?wash scrubs them off unless they're on for good (?marks). Switch this off and the farm's ink comes off.", () => { ctx.api.inkSync && ctx.api.inkSync(); ctx.api.rehello && ctx.api.rehello(); }),
+      bellyToggle(ctx),
       pref(ctx, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
       pref(ctx, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx))),
     // the farm's little cues on your own screen (cues.js); each one on unless you switch it off

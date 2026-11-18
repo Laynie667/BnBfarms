@@ -1808,19 +1808,29 @@ Welcome to B&B Farm, hon. 🌾`);
         }
         if (/^logo$/i.test(args[1] || "")){ brandLogo(sender, resolveTarget(args[0]), args.slice(2).join(" "), R); break; }
         if (/^(species|animal|stud)$/i.test(args[1] || "")){ brandInk(sender, resolveTarget(args[0]), /^stud$/i.test(args[1]) ? "stud" : "species", R); break; }   // into the brand slot (10uq2-farm-ink.js)
+        if (/^keep$/i.test(args[1] || "")){ brandKeep(sender, resolveTarget(args[0]), R); break; }   // the farm's marks, on for good (10uq3-trophies.js)
         const t = resolveTarget(args[0]);
         const r = t ? rec(t) : null;
         if (!r){ R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). "+
               "?brand <who> logo sears on the farm's BB, ?brand <who> species their animal's brand, ?brand <who> stud Stud Service. "+
+              "?brand <who> keep sears the farm's marks (what the pond, the pack and the boar leave) on for good, so ?wash leaves 'em. "+
               "?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear"); break; }
         const mark = args.slice(1).join(" ").trim();
         const mayBrand = isProprietor(sender) || !!membership(t, sender);
-        if (!mark){ R(r.brand ? plainName(t)+" carries "+r.brand.mark+", put there by "+plainName(r.brand.by)+"." : plainName(t)+" is unbranded. Add a mark to brand 'em, like ?brand "+plainName(t)+" LA"); break; }
+        const marksSay = (r.marks || []).length ? " The farm's marks on 'em: "+r.marks.map(m => markName(m.d)+(m.keep ? " (for good)" : "")).join(", ")+"." : "";
+        if (!mark){ R((r.brand ? plainName(t)+" carries "+r.brand.mark+", put there by "+plainName(r.brand.by)+"." : plainName(t)+" is unbranded. Add a mark to brand 'em, like ?brand "+plainName(t)+" LA")+marksSay); break; }
         if (mark.toLowerCase() === "clear"){
+          // the farm's marks (10uq3-trophies.js), the kept ones too: proprietors and the herd's owner
+          const nMarks = (r.marks || []).length, mayMarks = isProprietor(sender) || !!membership(t, sender);
+          if (!r.brand && nMarks){
+            if (!mayMarks){ R("Only a proprietor or "+plainName(t)+"'s herd owner can take the farm's marks off, sugar. ?wash scrubs off any that aren't on for good."); break; }
+            marksClear(t); saveLedger(); audit(sender, "MARK_CLEAR", String(t)); syncCompanions(true);
+            R("The farm's marks are off "+plainName(t)+", hon."); if (t !== sender) beep(t, "🌾 "+plainName(sender)+" took the farm's marks off you, sweetie."); break;
+          }
           if (!r.brand){ R("There's no brand on 'em to clear, hon."); break; }
           if (!isProprietor(sender) && r.brand.by !== sender){ R("Sorry, sugar, only "+plainName(r.brand.by)+" or a proprietor can take that off."); break; }
-          r.brand = null; saveLedger(); audit(sender,"BRAND_CLEAR",String(t)); syncCompanions(true);
-          R("Brand's off, hon."); beep(t, "🌾 "+plainName(sender)+" took your brand off, sweetie.");
+          r.brand = null; const gone = nMarks && mayMarks ? marksClear(t) : 0; saveLedger(); audit(sender,"BRAND_CLEAR",String(t)); syncCompanions(true);
+          R("Brand's off"+(gone ? ", and the farm's marks with it" : "")+", hon."); beep(t, "🌾 "+plainName(sender)+" took your brand off, sweetie.");
           break;
         }
         if (!mayBrand){ R("You can only brand stock in your own "+herdWord(sender)+", hon."); break; }

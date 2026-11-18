@@ -65,6 +65,7 @@
     if (d.piss) out.push({ icon: "💛", text: "Pissed on" });
     if (d.reek) out.push({ icon: "👃", text: "Reeks of "+d.reek });
     if (d.brand) out.push({ icon: "🖋️", text: "Branded: "+d.brand });
+    for (const m of marksNow(mn)) out.push(m);   // the pond's, the pack's, the boar's mark (10uq3-trophies.js)
     return out;
   }
   function aftermathWash(mn){ const r = rec(mn); if (!r || !r.dirt) return false; const had = aftermathOf(mn).length > 0; r.dirt = null; r.gluedUntil = 0; return had; }

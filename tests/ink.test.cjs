@@ -30,7 +30,7 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   const again = INK.registerInk(W, mod('FarmhandDispensary'));
   await wait(150);
   ok(st.ready && again === st, 'the Companion adds the slots; the Dispensary, loaded after, finds them done');
-  ok(groupAdds === 5 && ['FarmInk1', 'FarmInk2', 'FarmInk3', 'FarmInk4', 'FarmBrand'].every((n) => W.AssetGroupMap.has(n)), 'five slots: Farm Ink 1 to 4 and Farm Brand (added ' + groupAdds + ')');
+  ok(groupAdds === 8 && ['FarmInk1', 'FarmInk2', 'FarmInk3', 'FarmInk4', 'FarmBrand', 'FarmMark1', 'FarmMark2', 'FarmMark3'].every((n) => W.AssetGroupMap.has(n)), 'five wardrobe slots (Farm Ink 1 to 4 and Farm Brand), and the farm\'s three hidden Farm Mark slots (added ' + groupAdds + ')');
   const G1 = W.AssetGroupMap.get('FarmInk1'), GB = W.AssetGroupMap.get('FarmBrand');
   ok(G1.Asset.length === LIST.groups.FarmInk.length && W.AssetGroupMap.get('FarmInk4').Asset.length === G1.Asset.length && GB.Asset.length === LIST.groups.FarmBrand.length,
     'every design is in each ink slot (' + G1.Asset.length + '), every brand in the brand slot (' + GB.Asset.length + ')');

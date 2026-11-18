@@ -12,6 +12,7 @@ const W = window;
 export const HARD_PREFS = {
   gear: ["Farm can put real gear on me", false],
   marks: ["Farm can mark my body", false],
+  ink: ["Farm can ink me", false],
   strip: ["Farm can strip me", false],
   shape: ["Farm can change my body shape", false],
   stir: ["Farm can stir me up", false],

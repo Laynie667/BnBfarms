@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.77.0
+// @version      0.78.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.77.0";
-  var COMPANION_VERSION = "0.60.0";
+  var VERSION = "0.78.0";
+  var COMPANION_VERSION = "0.61.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6465,6 +6465,10 @@
         part("brand", () => {
           const b = brandFor(mn);
           if (b) s.brand = b;
+        });
+        part("farm ink", () => {
+          const fi = farmInkFor(mn);
+          if (fi.length) s.farmInk = fi;
         });
         part("roam", () => {
           const x = roamState(mn);
@@ -25141,6 +25145,65 @@
       if (!place) return null;
       return { place };
     }
+    const INK_HEAL_MS = 3 * 864e5;
+    const SPECIES_BRAND = { cow: "Hucow", pony: "Mare", deer: "Doe", pup: "Bitch", kitt: "Kitten", goblin: "Goblins", bunny: "Bunny", fox: "Vixen", goat: "Nanny", rat: "Rat", dragon: "Dragoness" };
+    function speciesBrandOf(mn) {
+      const s = String((rec(mn) || {}).species || "").toLowerCase();
+      if (/wolf/.test(s)) return "SheWolf";
+      if (/sheep|\bewe|lamb/.test(s)) return "Ewe";
+      if (/\bpig|piggy|\bsow\b|swine|\bhog/.test(s)) return "Sow";
+      return SPECIES_BRAND[speciesKey(mn)] || "TheFarmsMark";
+    }
+    const inkName = (d) => d === "TheFarmsMark" ? "the farm's mark" : d === "StudService" ? "STUD SERVICE" : d === "SheWolf" ? "She-Wolf" : d.replace(/([a-z])([A-Z])/g, "$1 $2");
+    const CORR_INK = { "FARM PROPERTY": "FarmPropertyCorrupted", "RUINED STOCK": "RuinedStockCorrupted", "FARM ANIMAL": "FarmAnimalCorrupted", "BRED": "BredCorrupted" };
+    function inkable(mn) {
+      const c = state.companions.get(mn);
+      return !!(hasCompanion(mn) && c && verAtLeast(c.ver, "0.61.0") && !(c.off && c.off.ink));
+    }
+    function farmInkFor(mn) {
+      const r = rec(mn);
+      if (!r) return [];
+      const out = [], b = r.brand;
+      if (b && b.ink) out.push({ id: "brand:" + b.ink + ":" + (b.at || 0), slot: "brand", design: b.ink, at: b.at || 0, heal: INK_HEAL_MS });
+      else if (brandFor(mn)) {
+        const own = b && b.logo, at = (own ? b.at : L2.brandAll && L2.brandAll.at) || 0;
+        out.push({ id: "brand:logo:" + at, slot: "brand", design: "TheFarmsMark", at, heal: INK_HEAL_MS });
+      }
+      if (r.corrBrand && (r.corrMarks || []).includes(50)) {
+        const d = CORR_INK[r.corrBrand], id = "corrupt50:" + r.corrBrand.replace(/[^A-Za-z]/g, "");
+        out.push(d ? { id, slot: "ink", design: d, keep: 1 } : { id, slot: "ink", design: "LiveWordsBlackletter", keep: 1, color: ["#3a0d52"], values: { t: r.corrBrand } });
+      }
+      return out;
+    }
+    const BRAND_INK_SEAR = [
+      "\u{1F525} %b heats the iron till it glows and lays it to %t's flank: %m, burned in clean. Everybody can see what kind of stock they are now.",
+      "\u{1F525} %b holds %t still with one hand and presses the iron in with the other. When it comes away, %m is seared into their hide, angry and red.",
+      "\u{1F525} Three heartbeats with the iron on %t's skin, and %b steps back. %m, for good."
+    ];
+    function brandInk(by, t, kind, R) {
+      const r = t ? rec(t) : null;
+      if (!r) {
+        R("Brand who, sugar? ?brand <who> species sears on their animal's brand, ?brand <who> stud sears on Stud Service.");
+        return;
+      }
+      if (!isProprietor(by) && !membership(t, by)) {
+        R("You can only brand stock in your own " + herdWord(by) + ", hon.");
+        return;
+      }
+      if (/\bbrand/i.test(r.limits || "")) {
+        R(plainName(t) + "'s limits rule out a brand, sugar.");
+        return;
+      }
+      const design = kind === "stud" ? "StudService" : speciesBrandOf(t), name = inkName(design);
+      r.brand = { mark: name, ink: design, by, at: Date.now() };
+      saveLedger();
+      audit(by, "BRAND", t + " " + design);
+      syncCompanions(true);
+      const line = pickFresh("brand:ink", BRAND_INK_SEAR).replace(/%b/g, plainName(by)).replace(/%t/g, plainName(t)).replace(/%m/g, name.toUpperCase() === name ? name : "the " + name + " brand");
+      if (charFor(t)) emote(line, t);
+      R("\u{1F525} " + plainName(t) + " carries " + name + " now." + (inkable(t) ? "" : ' It shows once they switch on "Farm can ink me" in their Companion.'));
+      tell(t, "\u{1F525} " + plainName(by) + " branded you: " + name + ". " + (inkable(t) ? "It's in your wardrobe's Farm Brand slot, angry red, and it heals pale over three days." : `Switch on "Farm can ink me" in your Companion's Toggles (On your character) and it goes on you, in your wardrobe's Farm Brand slot.`));
+    }
     CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 1, DRIP_HOLD_MIN: 10, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
     Object.assign(CFG.TAG_WORDS, {
       aphro: ["aphrodisiac", "horny", "lust serum", "libido"],
@@ -31964,6 +32027,7 @@
       if (!r || !corrHas(mn, 50) || !r.corrBrand || !charFor(mn) || r.corrBrandDay === dayKey()) return;
       r.corrBrandDay = dayKey();
       saveLedger();
+      if (inkable(mn)) return;
       try {
         bodyMark(mn, { write: { line: r.corrBrand, area: "hips" } });
       } catch (e) {
@@ -61993,6 +62057,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?purge <who> \xB7 take a parasite off them
   ?parasite give <who> \xB7 proprietors (they need ?parasite on)
   ?brand <who> logo [place] \xB7 sear the B&B logo on (hip, thigh, belly, breast, shoulder)
+  ?brand <who> species \xB7 their animal's brand (Hucow, Mare, Bitch...) \xB7 ?brand <who> stud \xB7 Stud Service
+    (with "Farm can ink me" on in their Companion, any of these goes in their wardrobe's Farm Brand slot and heals over three days)
   ?brand all logo [place] \xB7 proprietors: every livestock carries it \xB7 ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling \xB7 proprietors, staff
   ?store approve|reject <who> \xB7 a bought greetin'
@@ -65457,10 +65523,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             brandLogo(sender, resolveTarget(args[0]), args.slice(2).join(" "), R);
             break;
           }
+          if (/^(species|animal|stud)$/i.test(args[1] || "")) {
+            brandInk(sender, resolveTarget(args[0]), /^stud$/i.test(args[1]) ? "stud" : "species", R);
+            break;
+          }
           const t = resolveTarget(args[0]);
           const r = t ? rec(t) : null;
           if (!r) {
-            R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). ?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear");
+            R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). ?brand <who> logo sears on the farm's BB, ?brand <who> species their animal's brand, ?brand <who> stud Stud Service. ?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear");
             break;
           }
           const mark = args.slice(1).join(" ").trim();
@@ -65481,6 +65551,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             r.brand = null;
             saveLedger();
             audit(sender, "BRAND_CLEAR", String(t));
+            syncCompanions(true);
             R("Brand's off, hon.");
             beep(t, "\u{1F33E} " + plainName(sender) + " took your brand off, sweetie.");
             break;

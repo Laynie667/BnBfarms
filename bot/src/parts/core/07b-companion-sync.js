@@ -116,7 +116,8 @@
       part("udders", () => uddersStateFor(mn, s));   // the dial, their words, intensity, kept (10y7-udders.js)   // the album, trained holes, the vat, sittin' the nest (10y6-keepers.js)
       part("nursery", () => nurseryStateFor(mn, s));
       part("feats", () => featsStateFor(mn, s));   // the 🏅 Feats tab (10us-feats.js)
-      part("brand", () => { const b = brandFor(mn); if (b) s.brand = b; });   // the farm's logo, seared on (10uq-brand.js)   // the 🧸 Nursery panel, for nursery folk only (10up2-nursery.js)
+      part("brand", () => { const b = brandFor(mn); if (b) s.brand = b; });
+      part("farm ink", () => { const fi = farmInkFor(mn); if (fi.length) s.farmInk = fi; });   // the farm's own ink, for their Companion to put on (10uq2-farm-ink.js)   // the farm's logo, seared on (10uq-brand.js)   // the 🧸 Nursery panel, for nursery folk only (10up2-nursery.js)
       part("roam", () => { const x = roamState(mn); if (x) s.roam = x; });   // roam passes (10uk-roam.js)
       // the contract they're under, for the Me card's top line (Nov 4 tidy panel): its name and when it ends (none: for good)
       part("contract", () => { contractsLedger(); const c = L.contracts.filter(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > now)).slice(-1)[0];

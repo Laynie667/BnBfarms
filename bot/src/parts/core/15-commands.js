@@ -1807,9 +1807,11 @@ Welcome to B&B Farm, hon. 🌾`);
           R("🔥 Every livestock on the books carries the B&B brand now ("+brandPlaceName(L.brandAll.place)+"). Players see it with the Companion; ?brand all clear takes it off."); break;
         }
         if (/^logo$/i.test(args[1] || "")){ brandLogo(sender, resolveTarget(args[0]), args.slice(2).join(" "), R); break; }
+        if (/^(species|animal|stud)$/i.test(args[1] || "")){ brandInk(sender, resolveTarget(args[0]), /^stud$/i.test(args[1]) ? "stud" : "species", R); break; }   // into the brand slot (10uq2-farm-ink.js)
         const t = resolveTarget(args[0]);
         const r = t ? rec(t) : null;
         if (!r){ R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). "+
+              "?brand <who> logo sears on the farm's BB, ?brand <who> species their animal's brand, ?brand <who> stud Stud Service. "+
               "?brand <who> clear takes it off, and ?brand <who> on its own shows it. For example: ?brand Bessie LA  or  ?brand 123456 clear"); break; }
         const mark = args.slice(1).join(" ").trim();
         const mayBrand = isProprietor(sender) || !!membership(t, sender);
@@ -1817,7 +1819,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (mark.toLowerCase() === "clear"){
           if (!r.brand){ R("There's no brand on 'em to clear, hon."); break; }
           if (!isProprietor(sender) && r.brand.by !== sender){ R("Sorry, sugar, only "+plainName(r.brand.by)+" or a proprietor can take that off."); break; }
-          r.brand = null; saveLedger(); audit(sender,"BRAND_CLEAR",String(t));
+          r.brand = null; saveLedger(); audit(sender,"BRAND_CLEAR",String(t)); syncCompanions(true);
           R("Brand's off, hon."); beep(t, "🌾 "+plainName(sender)+" took your brand off, sweetie.");
           break;
         }

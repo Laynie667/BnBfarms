@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.77.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.78.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.60.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.8.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.61.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.9.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,20 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.78.0 + Companion 0.61.0 + Dispensary 0.9.0: the farm's own ink** Approved Nov 17; Laynie, Nov 18: its own switch ("separate"), studs "either", and the healing and fading times "seems good to me".
+  - **"Farm can ink me"**, a new switch in the Companion's Toggles (On your character). It's off till you turn it on, and apart from "Farm can mark my body", so splatters and permanent ink are separate choices. Hardcore locks it like the others.
+  - **With it on, the farm brands you for real:** it goes in your wardrobe's Farm Brand slot, on your skin under your clothes, and everybody with the Companion or the Dispensary sees it.
+    - `?brand <who> logo`: the farm's BB and bell (without the switch it's still drawn the old way).
+    - `?brand <who> species`: your animal's brand (Hucow, Mare, Doe, Bitch, She-Wolf, Kitten, Bunny, Vixen, Nanny, Ewe, Sow, Rat, Goblins, Dragoness).
+    - `?brand <who> stud`: Stud Service. Studs can carry either.
+    - `?brand all logo`: the farm's mark on every livestock without a brand of their own.
+  - **Corruption 50:** the corruption's words go in a Farm Ink slot in its own dark ink, and come back by mornin' if you take them off.
+  - **Never over your own:** your own brand keeps the brand slot. With all four ink slots full, nothin' goes on, and you're told.
+  - **A fresh brand heals** from angry red to pale and raised over three days, on every screen. Marker wears off in a few hours and henna in a week, then they come off by themselves.
+  - **Takin' it off:** take a brand off and it stays off. Switch "Farm can ink me" off and the farm's ink comes off; yours stays.
+  - Fixed on the way: `?brand <who> clear` now takes the drawn brand off everybody's screen straight away.
+  - Tests: `tests/farm-ink.test.cjs`.
 
 - **Bot 0.77.0 + Companion 0.60.0 + Dispensary 0.8.0: the drawn cock in the game** Laynie: the studio's "looked great", and the pictures going on GitHub, "yes, they can".
   - **The studio's cock, in the game:** with the drawn body on, the Companion draws it where the game would draw its own, soft or standing. It's the human pictures she picked, in your skin.

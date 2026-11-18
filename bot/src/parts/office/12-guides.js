@@ -855,6 +855,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
   ?brand <who> logo [place] · sear the B&B logo on (hip, thigh, belly, breast, shoulder)
+  ?brand <who> species · their animal's brand (Hucow, Mare, Bitch...) · ?brand <who> stud · Stud Service
+    (with "Farm can ink me" on in their Companion, any of these goes in their wardrobe's Farm Brand slot and heals over three days)
   ?brand all logo [place] · proprietors: every livestock carries it · ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling · proprietors, staff
   ?store approve|reject <who> · a bought greetin'

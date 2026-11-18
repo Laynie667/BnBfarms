@@ -38,6 +38,19 @@ better sizing options", and "as long as it layers properly".
 - **A tattoo stays on.** Stripping, the game's "naked" and "strip a layer" leave farm ink where it is. It comes off one
   slot at a time in the wardrobe.
 - **They save with outfits** like any item.
+- **The farm's own ink** (Nov 18): with **"Farm can ink me"** on (the Companion's Toggles, On your character; its own
+  switch, apart from "Farm can mark my body"), the farm puts its ink on you itself, in your Farm Brand and Farm Ink slots:
+  - `?brand <who> logo`: the farm's BB and bell. Without the switch it's still drawn the old way.
+  - `?brand <who> species`: your animal's brand (Hucow, Mare, Doe, Bitch, She-Wolf, Kitten, Bunny, Vixen, Nanny, Ewe, Sow,
+    Rat, Goblins, Dragoness). `?brand <who> stud`: Stud Service. Studs can carry either (Laynie: "either").
+  - `?brand all logo`: the farm's mark on every livestock without a brand of their own.
+  - Corruption 50: the corruption's words in its own dark ink, back by mornin' if you wash or take them off.
+  - It never goes over ink you picked: your own brand keeps the brand slot, and with all four ink slots full nothin' goes
+    on (you're told).
+  - **A fresh brand heals** from angry red to pale and raised over three days. **Marker** wears off in a few hours and
+    **henna** in a week, then they come off by themselves.
+  - Take one off yourself and it stays off (except the corruption's). Switch "Farm can ink me" off and the farm's ink comes
+    off; yours stays.
 - **Who sees it:** only people running the Companion or the Dispensary, the same as Echo's clothes only show for
   people with Echo's mod. Everyone else sees plain skin, and nothing breaks.
 - **Spots:** the game draws the front only. Designs meant for the back (a tramp stamp, a butt cheek, a shoulder
@@ -72,13 +85,20 @@ better sizing options", and "as long as it layers properly".
   loaded yet, is noted. `/ink why` shows the last ten. (Laynie, Nov 18, saw other people's ink blink out for a split
   second as their faces animated, with the drawn body, WCE, LSCG and Echo running; it couldn't be made to happen in the
   studio.)
+- **The farm's own ink:** the bot puts `farmInk` in each Companion's panel state (`10uq2-farm-ink.js`): a list of
+  `{ id, slot, design, at, heal, fade, keep, color, values }`. `farmInkSync` in ink.js makes what's worn match it, marking
+  each piece the farm's (`Property.FarmInk.farm` = its id, with `at`, `heal`, `fade`, `keep`). What it put on before is
+  remembered on the wearer's own computer, so a piece they took off isn't put back (a `keep` one is, after 20 hours). The
+  healing (the brand's three layers, BrandEdge, Brand and BrandShine, eased toward pale) and the fading (opacity, held
+  for three fifths of the time) are worked out in the draw hook from `at`, so nothin' goes round the room for them; anybody
+  whose is still on its way is drawn again every half hour. The Companion's hello says `off.ink` when the switch is off.
 - **The farm's counts:** the bot puts `ink` in each Companion's panel state (`07b-companion-sync.js`, `inkCounts`): loads
   taken, who gave them (`totals.by`, the 40 most recent studs, kept in `08-production.js`), knots, litters, eggs,
   litres, how full, how far along, heat left. The Companion hands them to the ink module (`__farmInk.counts`).
 - **The list:** `shared/ink/ink-designs.json` has each design's name, title, spot, size, layers and starting colours,
   and for the live ones their measured box, scale and colour palette.
-- **The tests:** `tests/ink.test.cjs` (the slots, the pictures) and `tests/ink-live.test.cjs` (the live designs, /ink,
-  the counts, recolouring, sizes, stripping).
+- **The tests:** `tests/ink.test.cjs` (the slots, the pictures), `tests/ink-live.test.cjs` (the live designs, /ink,
+  the counts, recolouring, sizes, stripping) and `tests/farm-ink.test.cjs` (the farm's own ink).
 
 ### Making the pictures
 
@@ -124,13 +144,10 @@ for; the hip and cheek moved on Nov 18):
 ## Next
 
 - **Ink that bends with the body:** riding the curve of the drawn belly and breasts rather than sitting flat on them.
-- **The farm's own ink** (approved Nov 17):
+- **More of the farm's own ink** (approved Nov 17; the brands, the species brand and corruption 50 went in Nov 18):
   - trap brands land in the brand slot
-  - the species brand
-  - the corruption's marks
   - trophies earned as they happen
   - ink a contract or hardcore says stays is put back if someone takes it off
   - body writing, and a crafted tattoo gun
-  - fresh ink and brands healing
-  - marker, henna and glow ink fading at their own pace
+  - glow ink that only shows while you're dosed
 - **The sheets' own fonts** for the live designs, carried in the repo.

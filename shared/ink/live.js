@@ -65,6 +65,10 @@ export function cleanValues(v) {
   if (v.sz != null) { const n = k(v.sz, 0.25, 4); if (n && n !== 1) o.sz = n; }
   if (v.sw != null) { const n = k(v.sw, 0.5, 2); if (n && n !== 1) o.sw = n; }
   if (v.sh != null) { const n = k(v.sh, 0.5, 2); if (n && n !== 1) o.sh = n; }
+  // the farm's own ink (Nov 18, ink.js farmInkSync): which of the farm's it is, when it went on, how long it heals and fades
+  if (typeof v.farm === "string" && /^[\w:.-]{1,48}$/.test(v.farm)) o.farm = v.farm;
+  for (const f of ["at", "heal", "fade"]) if (v[f] != null) { const n = num0(v[f], null, 4e12); if (n) o[f] = n; }
+  if (v.keep) o.keep = 1;
   return o;
 }
 

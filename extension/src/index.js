@@ -85,6 +85,28 @@ const botHere = () =>
 // the Companion on the bot's OWN account (both scripts on one page): talk to the bot directly
 const onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
 const direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
+// THE FARM'S OWN INK (Nov 18, shared/ink/ink.js): what the farm girl says should be inked on you, put on (or taken off)
+// by your own game, with "Farm can ink me" on. Her list comes in your panel state (farmInk); it's checked again every
+// few minutes, so marker and henna come off once they've worn away.
+function inkSync() {
+  try {
+    const I = window.__farmInk, s = st.lastState; if (!I || typeof I.farm !== "function" || !s || !st.gotState) return;
+    const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink));
+    if (!r) return;
+    const name = (d) => String(d).replace(/([a-z])([A-Z])/g, "$1 $2");
+    if (r.put.length) toChat("🔥 The farm's ink is on you now: " + r.put.map(name).join(", ") + ". It's in your wardrobe's Farm Brand and Farm Ink slots.", "#c79bd8");
+    if (r.taken.length) toChat("🔥 The farm wanted its brand (" + r.taken.map(name).join(", ") + ") in your Farm Brand slot, but you've your own there. Take yours off and it'll go on.", "#c79bd8");
+    if (r.full.length) toChat("🖋️ The farm wanted to ink " + r.full.map(name).join(", ") + " on you, but your four Farm Ink slots are full.", "#c79bd8");
+  } catch (e) { console.warn("[Farmhand Companion] farm ink:", e); }
+}
+// the farm's brand the old way (messes.js draws it): not when it's off, and not when it's already in your brand slot
+function brandShown(b) {
+  if (st.panel && st.panel.prefs.brandOff) return null;
+  try { if (window.__farmInk && typeof window.__farmInk.farmBrandWorn === "function" && window.__farmInk.farmBrandWorn()) return null; } catch (e) { /* fine */ }
+  return b;
+}
+setInterval(() => { if (st.gotState) inkSync(); }, 5 * 60000);
+
 function toBot(type, data) {
   if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
   window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
@@ -245,14 +267,15 @@ function onFarmMsg(m) {
         if (st.store) s.store = st.store;
         if (m.seq != null) st.seq = m.seq;
         st.lastState = s; st.panel.setState(s); parasiteSync(); try { if ("drawn" in m.set) drawnBodyFarmState(s.drawn); } catch (e) { /* fine */ }
-        if ("brand" in m.set || (m.del || []).includes("brand")) { try { messBrand(st.panel.prefs.brandOff ? null : s.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } }   // the farm's brand (messes.js)
+        if ("farmInk" in m.set || (m.del || []).includes("farmInk")) inkSync();   // the farm's own ink (shared/ink)
+        if ("brand" in m.set || (m.del || []).includes("brand") || "farmInk" in m.set) { try { messBrand(brandShown(s.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } }   // the farm's brand (messes.js)
         if ("reins" in m.set || (m.del || []).includes("reins")) { try { reinsState(s.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }   // on somebody's reins (cues.js)
         if ("ink" in m.set) inkCounts(s.ink);   // the counts your live ink prints (shared/ink)
       } else askWhole();
       break;
     case "state":
       if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
-      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); inkSync(); try { messBrand(brandShown(m.state.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
       break;
     case "reply":
     case "notice": {
@@ -384,7 +407,8 @@ const api = {
     return true;
   },
   back() { onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" }); },
-  brandSync() { try { messBrand(st.panel.prefs.brandOff ? null : st.panel.s.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } },
+  brandSync() { try { messBrand(brandShown(st.panel.s.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } },
+  inkSync() { inkSync(); try { messBrand(brandShown(st.panel.s.brand)); } catch (e) { /* fine */ } },
   // the nursery's stuffies and baby things, on your own character (nursery.js)
   nurseryWear(g) { try { return nurseryWear(g); } catch (e) { return { ok: false, why: e.message }; } },
   nurseryOff(group) { try { return nurseryOff(group); } catch (e) { return { ok: false, why: e.message }; } },
@@ -562,6 +586,7 @@ function start() {
       const p = st.panel.prefs;
       const said = setHardPrefsOn(p, want, (k, v) => { p[k] = v; }, (k) => {
         if (k === "brandOff") api.brandSync();
+        if (k === "ink") { api.inkSync(); api.rehello(); }
         if (/^no/.test(k)) api.rehello();
       });
       if (said.length) { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* fine */ } st.panel.render(); }

@@ -16,6 +16,9 @@
      number, a name, a date, their own words. They're drawn on the spot from what's written on the item (Property.FarmInk),
      so everybody with an add-on sees the same. The farm's counts are written on as they change (the Companion hands
      them over: counts); names and words with /ink. Days without cummin' is counted here, on the wearer's own game.
+   • THE FARM'S OWN INK (Nov 18, farmInkSync): what the farm says should be inked on somebody (its brand, their species'
+     brand, the corruption's words) goes in their brand slot or a free ink slot, by their own game, if they've switched
+     "Farm can ink me" on. A brand heals from angry red to pale over three days; marker wears off in hours, henna in a week.
 */
 import LIST from "./ink-designs.json";
 import { LIVE_BY, isLive, valuesFor, picture, loadLiveArt, cleanValues } from "./live.js";
@@ -29,7 +32,7 @@ const SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "
 const RES = LIST.res || 1;
 const OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;   // one of our pictures (from the repo, or a local copy in a test)
 const LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;   // a live design, drawn here
-const STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_[A-Za-z0-9]+\.png$/;   // one of the still ones: its kind and its name
+const STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;   // one of the still ones: its kind, its name and the layer
 // the item a still picture belongs to (the same design in two slots shares the first one's size)
 const stillItem = (C, kind, name) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null);
 const PRIORITY = 11;   // on the skin (the body and the game's own body markings are under 11), under socks, underwear and clothes
@@ -125,6 +128,87 @@ function refreshAuto(W) {
   }
 }
 
+// ── THE FARM'S OWN INK (Nov 18) ──
+// Laynie: "Farm can ink me" is its own switch (splatters and words without permanent ink, or the other way round); a
+// fresh brand heals pale over three days, marker wears off in a few hours, henna in a week ("seems good to me").
+// The farm girl's panel state says what should be on you (farmInk: [{ id, slot: "brand"|"ink", design, at, heal, fade,
+// keep, color, values }]). Your own game puts each on once, in the brand slot (empty, or holding the farm's own) or the
+// first empty ink slot, never over ink you picked, and marks it the farm's (Property.FarmInk.farm = its id). Take one
+// off yourself and it stays off, unless the farm keeps it (the corruption's: back by mornin'). The farm's list
+// dropping it, or the switch going off, takes it back off. Healing and fading are worked out as it's drawn, on every
+// screen, from when it went on: nothin' goes round the room for them.
+const HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };   // a healed brand: pale and raised, pink at the edge
+export const FADE_OF = { UseMeFreshMarker: 6 * 3600000, HennaTrail: 7 * DAY };                      // marker: a few hours; henna: a week
+export const HEAL_MS = 3 * DAY;
+const hexRGB = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(String(h || "")); if (!m) return null; const v = parseInt(m[1], 16); return [(v >> 16) & 255, (v >> 8) & 255, v & 255]; };
+const toHex = (c) => "#" + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+// how far along a piece is: healed (0 fresh … 1 healed), and how much of it is left (1 … 0: a fade holds, then goes in its last two fifths)
+export function ageOf(f, now) {
+  const at = Number(f && f.at) || 0; if (!at) return null;
+  const h = Number(f.heal) || 0, fd = Number(f.fade) || 0, t = (now || Date.now()) - at;
+  const heal = h > 0 ? Math.max(0, Math.min(1, t / h)) : null, gone = fd > 0 ? Math.max(0, Math.min(1, t / fd)) : 0;
+  return { heal, alpha: gone < 0.6 ? 1 : Math.max(0, 1 - (gone - 0.6) / 0.4), done: fd > 0 && t >= fd, still: (heal != null && heal < 1) || (fd > 0 && t < fd) };
+}
+// a brand layer's colour, healed as far as it's got
+export function healedHex(hex, layer, p) {
+  const to = HEALED[layer], c = hexRGB(hex); if (!to || !c || p == null || p <= 0) return hex;
+  const e = p * p * (3 - 2 * p); return toHex(c.map((v, i) => v + (to[i] - v) * e));
+}
+const DESIGNS = { brand: new Set(LIST.groups.FarmBrand.map((a) => a.name)), ink: new Set(LIST.groups.FarmInk.map((a) => a.name)) };
+const LAYERS_OF = {}; for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
+const farmOf = (it) => { const f = it && it.Property && it.Property.FarmInk; return f && typeof f.farm === "string" ? f.farm : null; };
+const doneKey = (W) => "farmink-done-" + (W.Player && W.Player.MemberNumber);
+const KEEP_AGAIN = 20 * 3600000;   // the farm's kept ink, taken off: back by mornin'
+function cleanEntry(e) {
+  if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
+  const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : null; if (!slot || !DESIGNS[slot].has(e.design)) return null;
+  const n = (v, max) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? Math.min(max, Math.round(x)) : 0; };
+  const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
+  return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
+}
+// make what you wear match the farm's list. list: the farm girl's (null: she's said nothin', leave it be); on: "Farm can ink me".
+// Gives { put, off, full, taken } (designs), or null when nothin' could be done (not in the game yet).
+export function farmInkSync(W, list, on, now) {
+  const P = W.Player; if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W.InventoryWear !== "function") return null;
+  now = now || Date.now();
+  const want = on ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed = [];
+  let done = {}; try { done = JSON.parse(W.localStorage.getItem(doneKey(W))) || {}; } catch (e) { done = {}; }
+  const remove = (slot) => { try { if (typeof W.InventoryRemove === "function") W.InventoryRemove(P, slot, false); else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot)); } catch (e) { return false; } changed.push(slot); return true; };
+  // off: the farm's pieces it no longer wants (or you've switched it off), and anything faded right out
+  for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+    const it = itemIn(P, slot), id = farmOf(it); if (!id) continue;
+    const a = ageOf(it.Property.FarmInk, now);
+    if (!ids.has(id) || (a && a.done)) { if (remove(slot)) out.off.push(it.Asset.Name); if (a && a.done) done[id] = now; }
+  }
+  // on: what it wants that isn't on you
+  for (const e of want) {
+    if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P, s)) === e.id)) continue;
+    if (done[e.id] && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;   // put on once: you took it off, it stays off
+    if (e.fade && e.at && now - e.at >= e.fade) continue;                      // worn off already
+    let slot = null;
+    if (e.slot === "brand") { const it = itemIn(P, BRAND_SLOT); if (!it || farmOf(it)) slot = BRAND_SLOT; else { out.taken.push(e.design); continue; } }
+    else { slot = INK_SLOTS.find((s) => !itemIn(P, s)) || null; if (!slot) { out.full.push(e.design); continue; } }
+    if (itemIn(P, slot)) remove(slot);
+    const kind = kindOf(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
+    try { W.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false); } catch (err) { continue; }
+    const it = itemIn(P, slot); if (!it || it.Asset.Name !== e.design) continue;
+    it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, e.values || {}, { farm: e.id, at: e.at || now, heal: e.heal || null, fade: e.fade || null, keep: e.keep || null })) });
+    done[e.id] = now; changed.push(slot); out.put.push(e.design);
+  }
+  // remembered for 60 days past the farm forgettin' it
+  for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
+  try { W.localStorage.setItem(doneKey(W), JSON.stringify(done)); } catch (e) { /* fine */ }
+  if (changed.length) {
+    try { if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(P); } catch (e) { /* fine */ }
+    try { if (typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(P); } catch (e) { /* not in a room */ }
+  }
+  return out;
+}
+// is the farm's brand in your brand slot (then it isn't drawn a second time by the Companion's old way)
+export const farmBrandWorn = (W) => { const id = farmOf(itemIn(W.Player, BRAND_SLOT)); return !!(id && /^brand:/.test(id)); };
+// somebody whose farm ink is still healin' or fadin': drawn again now and then, so it moves along on every screen
+const stillChanging = (C, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => { const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now); return !!(a && a.still); });
+
 // ── /ink: what your live ink says, and writin' on it ──
 const SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
 const say = (W, t) => { try { if (typeof W.ChatRoomSendLocal === "function") { const d = W.document.createElement("div"); d.style.cssText = "color:#c79bd8;white-space:pre-wrap"; d.textContent = "🖋️ " + t; W.ChatRoomSendLocal(d.outerHTML); } } catch (e) { /* fine */ } };
@@ -185,6 +269,9 @@ export function registerInk(W, mod) {
     counts: (c) => { if (c && typeof c === "object") { counts = c; try { refreshAuto(W); } catch (e) { /* next time */ } } },
     write: (slot, v) => write(W, slot, v, true),
     command: (a) => inkCommand(W, a),
+    // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
+    farm: (list, on) => farmInkSync(W, list, on),
+    farmBrandWorn: () => farmBrandWorn(W),
     worn: () => wornLive(W).map(({ slot, name }) => ({ slot, name })) });
   const hooks = () => {
     const hook = (name, pri, fn) => { try { if (typeof W[name] === "function") mod.hookFunction(name, pri, fn); else console.warn("[Farm ink] the game has no " + name); } catch (e) { console.warn("[Farm ink] couldn't hook " + name, e); } };
@@ -219,12 +306,21 @@ export function registerInk(W, mod) {
         if (!t) return false;
         const o2 = Object.assign({}, o || {}); delete o2.HexColor; delete o2.FullAlpha; plain.call(self, t, x, y, o2); return true;
       };
+      // (Nov 18) the farm's own ink: a brand healin' from red to pale, marker and henna fadin', as far as they've got
+      const now = Date.now();
+      const aged = (o, it, layer) => {
+        const f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now); if (!a) return o;
+        o = Object.assign({}, o);
+        if (a.heal != null && typeof o.HexColor === "string") o.HexColor = healedHex(o.HexColor, layer, a.heal);
+        if (a.alpha < 1) o.Alpha = (o.Alpha == null ? 1 : o.Alpha) * a.alpha;
+        return o;
+      };
       const wrap = (f, plain) => (typeof f !== "function" ? f : function (src, x, y, o) {
         if (typeof src === "string") {
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
-          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const o3 = sized(o, itemIn(C, lm[1])); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
+          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
-          if (sm) { o = sized(o, stillItem(C, sm[1], sm[2])); seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
+          if (sm) { const it = stillItem(C, sm[1], sm[2]); o = aged(sized(o, it), it, sm[3]); if (o.Alpha === 0) return undefined; seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
         }
         return f.call(this, src, x, y, o);
       });
@@ -264,6 +360,8 @@ export function registerInk(W, mod) {
   }, 50);
   // the counts that change on their own (days without cummin')
   setInterval(() => { try { if (W.Player && W.Player.Appearance) refreshAuto(W); } catch (e) { /* fine */ } }, 10 * 60000);
+  // the farm's ink healin' and fadin': anybody whose is still on its way drawn again every half hour
+  setInterval(() => { try { const now = Date.now(); for (const C of W.ChatRoomCharacter || []) if (stillChanging(C, now) && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { /* fine */ } }, 30 * 60000);
   return st;
 }
 // INK THAT DIDN'T SHOW (Laynie, Nov 18: "the tattoos temporarily disappear when facial animations change", on other

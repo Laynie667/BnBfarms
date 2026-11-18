@@ -65,6 +65,7 @@
   function corrBrandNow(mn){
     const r = rec(mn); if (!r || !corrHas(mn, 50) || !r.corrBrand || !charFor(mn) || r.corrBrandDay === dayKey()) return;
     r.corrBrandDay = dayKey(); saveLedger();
+    if (inkable(mn)) return;   // (Nov 18: it's in their ink, and comes back by mornin' there: 10uq2-farm-ink.js)
     try { bodyMark(mn, { write: { line: r.corrBrand, area: "hips" } }); } catch(e){}
   }
   // take one mark back out of them: what it did comes undone

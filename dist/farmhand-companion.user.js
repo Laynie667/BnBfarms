@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.60.0
+// @version      0.61.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -6325,6 +6325,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const n = k(v.sh, 0.5, 2);
       if (n && n !== 1) o.sh = n;
     }
+    if (typeof v.farm === "string" && /^[\w:.-]{1,48}$/.test(v.farm)) o.farm = v.farm;
+    for (const f of ["at", "heal", "fade"]) if (v[f] != null) {
+      const n = num0(v[f], null, 4e12);
+      if (n) o[f] = n;
+    }
+    if (v.keep) o.keep = 1;
     return o;
   }
   var text2 = text;
@@ -7279,7 +7285,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
   var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
-  var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_[A-Za-z0-9]+\.png$/;
+  var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var stillItem = (C2, kind, name) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
@@ -7417,6 +7423,137 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (v) write(W17, slot, v);
     }
   }
+  var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
+  var FADE_OF = { UseMeFreshMarker: 6 * 36e5, HennaTrail: 7 * DAY };
+  var HEAL_MS = 3 * DAY;
+  var hexRGB = (h2) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(h2 || ""));
+    if (!m) return null;
+    const v = parseInt(m[1], 16);
+    return [v >> 16 & 255, v >> 8 & 255, v & 255];
+  };
+  var toHex = (c) => "#" + c.map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0")).join("");
+  function ageOf(f, now) {
+    const at = Number(f && f.at) || 0;
+    if (!at) return null;
+    const h2 = Number(f.heal) || 0, fd = Number(f.fade) || 0, t = (now || Date.now()) - at;
+    const heal = h2 > 0 ? Math.max(0, Math.min(1, t / h2)) : null, gone2 = fd > 0 ? Math.max(0, Math.min(1, t / fd)) : 0;
+    return { heal, alpha: gone2 < 0.6 ? 1 : Math.max(0, 1 - (gone2 - 0.6) / 0.4), done: fd > 0 && t >= fd, still: heal != null && heal < 1 || fd > 0 && t < fd };
+  }
+  function healedHex(hex, layer, p) {
+    const to = HEALED[layer], c = hexRGB(hex);
+    if (!to || !c || p == null || p <= 0) return hex;
+    const e = p * p * (3 - 2 * p);
+    return toHex(c.map((v, i) => v + (to[i] - v) * e));
+  }
+  var DESIGNS = { brand: new Set(ink_designs_default.groups.FarmBrand.map((a) => a.name)), ink: new Set(ink_designs_default.groups.FarmInk.map((a) => a.name)) };
+  var LAYERS_OF = {};
+  for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) LAYERS_OF[kind + ":" + a.name] = a.layers.filter((l) => l.colorize).map((l) => l.color);
+  var farmOf = (it) => {
+    const f = it && it.Property && it.Property.FarmInk;
+    return f && typeof f.farm === "string" ? f.farm : null;
+  };
+  var doneKey = (W17) => "farmink-done-" + (W17.Player && W17.Player.MemberNumber);
+  var KEEP_AGAIN = 20 * 36e5;
+  function cleanEntry(e) {
+    if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
+    const slot = e.slot === "brand" ? "brand" : e.slot === "ink" ? "ink" : null;
+    if (!slot || !DESIGNS[slot].has(e.design)) return null;
+    const n = (v, max) => {
+      const x = Number(v);
+      return Number.isFinite(x) && x > 0 ? Math.min(max, Math.round(x)) : 0;
+    };
+    const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
+    return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
+  }
+  function farmInkSync(W17, list, on3, now) {
+    const P5 = W17.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W17.InventoryWear !== "function") return null;
+    now = now || Date.now();
+    const want = on3 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [] }, changed2 = [];
+    let done = {};
+    try {
+      done = JSON.parse(W17.localStorage.getItem(doneKey(W17))) || {};
+    } catch (e) {
+      done = {};
+    }
+    const remove = (slot) => {
+      try {
+        if (typeof W17.InventoryRemove === "function") W17.InventoryRemove(P5, slot, false);
+        else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
+      } catch (e) {
+        return false;
+      }
+      changed2.push(slot);
+      return true;
+    };
+    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+      const it = itemIn(P5, slot), id = farmOf(it);
+      if (!id) continue;
+      const a = ageOf(it.Property.FarmInk, now);
+      if (!ids.has(id) || a && a.done) {
+        if (remove(slot)) out.off.push(it.Asset.Name);
+        if (a && a.done) done[id] = now;
+      }
+    }
+    for (const e of want) {
+      if ([...INK_SLOTS, BRAND_SLOT].some((s) => farmOf(itemIn(P5, s)) === e.id)) continue;
+      if (done[e.id] && !(e.keep && now - done[e.id] > KEEP_AGAIN)) continue;
+      if (e.fade && e.at && now - e.at >= e.fade) continue;
+      let slot = null;
+      if (e.slot === "brand") {
+        const it2 = itemIn(P5, BRAND_SLOT);
+        if (!it2 || farmOf(it2)) slot = BRAND_SLOT;
+        else {
+          out.taken.push(e.design);
+          continue;
+        }
+      } else {
+        slot = INK_SLOTS.find((s) => !itemIn(P5, s)) || null;
+        if (!slot) {
+          out.full.push(e.design);
+          continue;
+        }
+      }
+      if (itemIn(P5, slot)) remove(slot);
+      const kind = kindOf(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
+      try {
+        W17.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
+      } catch (err) {
+        continue;
+      }
+      const it = itemIn(P5, slot);
+      if (!it || it.Asset.Name !== e.design) continue;
+      it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, e.values || {}, { farm: e.id, at: e.at || now, heal: e.heal || null, fade: e.fade || null, keep: e.keep || null })) });
+      done[e.id] = now;
+      changed2.push(slot);
+      out.put.push(e.design);
+    }
+    for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
+    try {
+      W17.localStorage.setItem(doneKey(W17), JSON.stringify(done));
+    } catch (e) {
+    }
+    if (changed2.length) {
+      try {
+        if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(P5);
+      } catch (e) {
+      }
+      try {
+        if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(P5);
+      } catch (e) {
+      }
+    }
+    return out;
+  }
+  var farmBrandWorn = (W17) => {
+    const id = farmOf(itemIn(W17.Player, BRAND_SLOT));
+    return !!(id && /^brand:/.test(id));
+  };
+  var stillChanging = (C2, now) => [...INK_SLOTS, BRAND_SLOT].some((s) => {
+    const it = itemIn(C2, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
+    return !!(a && a.still);
+  });
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
   var say = (W17, t) => {
     try {
@@ -7499,6 +7636,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       },
       write: (slot, v) => write(W17, slot, v, true),
       command: (a) => inkCommand(W17, a),
+      // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
+      farm: (list, on3) => farmInkSync(W17, list, on3),
+      farmBrandWorn: () => farmBrandWorn(W17),
       worn: () => wornLive(W17).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
@@ -7562,6 +7702,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
           plain2.call(self, t2, x, y, o2);
           return true;
         };
+        const now = Date.now();
+        const aged = (o, it, layer) => {
+          const f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
+          if (!a) return o;
+          o = Object.assign({}, o);
+          if (a.heal != null && typeof o.HexColor === "string") o.HexColor = healedHex(o.HexColor, layer, a.heal);
+          if (a.alpha < 1) o.Alpha = (o.Alpha == null ? 1 : o.Alpha) * a.alpha;
+          return o;
+        };
         const wrap = (f, plain2) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
@@ -7573,13 +7722,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return void 0;
               }
               if (!ready2(u)) notReady.push(lm[2]);
-              const o3 = sized(o, itemIn(C2, lm[1]));
+              const it = itemIn(C2, lm[1]), o3 = aged(sized(o, it), it, lm[3]);
+              if (o3.Alpha === 0) return void 0;
               if (statue(plain2, this, u, x, y, o3)) return void 0;
               return f.call(this, u, x, y, o3);
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              o = sized(o, stillItem(C2, sm[1], sm[2]));
+              const it = stillItem(C2, sm[1], sm[2]);
+              o = aged(sized(o, it), it, sm[3]);
+              if (o.Alpha === 0) return void 0;
               seen2.add(sm[2]);
               if (!ready2(src)) notReady.push(sm[2]);
               if (statue(plain2, this, src, x, y, o)) return void 0;
@@ -7660,6 +7812,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     }, 10 * 6e4);
+    setInterval(() => {
+      try {
+        const now = Date.now();
+        for (const C2 of W17.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+      } catch (e) {
+      }
+    }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
@@ -7695,7 +7854,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.60.0";
+  var VERSION = "0.61.0";
 
   // shared/species.js
   var WORDS = {
@@ -7877,6 +8036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var HARD_PREFS = {
     gear: ["Farm can put real gear on me", false],
     marks: ["Farm can mark my body", false],
+    ink: ["Farm can ink me", false],
     strip: ["Farm can strip me", false],
     shape: ["Farm can change my body shape", false],
     stir: ["Farm can stir me up", false],
@@ -11985,9 +12145,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return n;
   }
   var skinSeen = /* @__PURE__ */ new Map();
-  var hexRGB = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
+  var hexRGB2 = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
   function skinGuess(src, hex) {
-    if (hex) return hexRGB(hex).map((v) => clamp(v * 1.62));
+    if (hex) return hexRGB2(hex).map((v) => clamp(v * 1.62));
     return /_Black\./.test(src) ? FALLBACK.Black : /_Asian\./.test(src) ? FALLBACK.Asian : FALLBACK.White;
   }
   function skinFor(src, hex) {
@@ -12016,7 +12176,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (good.length >= 40) {
           good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
           const p = good[Math.floor(good.length * 0.7)];
-          c = hex ? hexRGB(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
+          c = hex ? hexRGB2(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
         }
       } catch (e) {
       }
@@ -16958,6 +17118,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         muted("All of these are off until you switch them on. Your safeword takes everything off."),
         pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
         pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
+        pref(ctx3, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. Switch this off and the farm's ink comes off.", () => {
+          ctx3.api.inkSync && ctx3.api.inkSync();
+          ctx3.api.rehello && ctx3.api.rehello();
+        }),
         pref(ctx3, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
         pref(ctx3, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx3))
       ),
@@ -19892,7 +20056,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     return FIELDS[mat] = f;
   }
-  var hexRGB2 = (h2) => {
+  var hexRGB3 = (h2) => {
     const m = /^#?([0-9a-f]{6})$/i.exec(String(h2 || ""));
     if (!m) return null;
     const v = parseInt(m[1], 16);
@@ -19914,7 +20078,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return null;
     }
     const d = id.data, R = RAMPS[mat] || RAMPS.stone, curve = CURVE[mat] || CURVE.stone;
-    const eye = how === "eyes" ? hexRGB2(hex) : null;
+    const eye = how === "eyes" ? hexRGB3(hex) : null;
     const bins = new Uint32Array(64);
     let n = 0;
     for (let i = 0; i < d.length; i += 4 * 3) if (d[i + 3] > 200) {
@@ -20592,7 +20756,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     lead: !pref2("noLead") || void 0,
     slow: !pref2("noSlow") || void 0,
     stir: ctx2.panel.prefs.stir ? void 0 : true,
-    gear: ctx2.panel.prefs.gear ? void 0 : true
+    gear: ctx2.panel.prefs.gear ? void 0 : true,
+    ink: ctx2.panel.prefs.ink ? void 0 : true
   });
   var mapOn = () => typeof W16.ChatRoomMapViewIsActive === "function" && W16.ChatRoomMapViewIsActive() && W16.Player && W16.Player.MapData && W16.Player.MapData.Pos;
   var others4 = () => (W16.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W16.Player && W16.Player.MemberNumber));
@@ -21129,6 +21294,31 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var botHere2 = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
   var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
   var direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
+  function inkSync() {
+    try {
+      const I = window.__farmInk, s = st.lastState;
+      if (!I || typeof I.farm !== "function" || !s || !st.gotState) return;
+      const r = I.farm(Array.isArray(s.farmInk) ? s.farmInk : [], !!(st.panel && st.panel.prefs.ink));
+      if (!r) return;
+      const name = (d) => String(d).replace(/([a-z])([A-Z])/g, "$1 $2");
+      if (r.put.length) toChat("\u{1F525} The farm's ink is on you now: " + r.put.map(name).join(", ") + ". It's in your wardrobe's Farm Brand and Farm Ink slots.", "#c79bd8");
+      if (r.taken.length) toChat("\u{1F525} The farm wanted its brand (" + r.taken.map(name).join(", ") + ") in your Farm Brand slot, but you've your own there. Take yours off and it'll go on.", "#c79bd8");
+      if (r.full.length) toChat("\u{1F58B}\uFE0F The farm wanted to ink " + r.full.map(name).join(", ") + " on you, but your four Farm Ink slots are full.", "#c79bd8");
+    } catch (e) {
+      console.warn("[Farmhand Companion] farm ink:", e);
+    }
+  }
+  function brandShown(b) {
+    if (st.panel && st.panel.prefs.brandOff) return null;
+    try {
+      if (window.__farmInk && typeof window.__farmInk.farmBrandWorn === "function" && window.__farmInk.farmBrandWorn()) return null;
+    } catch (e) {
+    }
+    return b;
+  }
+  setInterval(() => {
+    if (st.gotState) inkSync();
+  }, 5 * 6e4);
   function toBot(type, data) {
     if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
     window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
@@ -21340,9 +21530,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if ("drawn" in m.set) drawnBodyFarmState(s.drawn);
           } catch (e) {
           }
-          if ("brand" in m.set || (m.del || []).includes("brand")) {
+          if ("farmInk" in m.set || (m.del || []).includes("farmInk")) inkSync();
+          if ("brand" in m.set || (m.del || []).includes("brand") || "farmInk" in m.set) {
             try {
-              messBrand(st.panel.prefs.brandOff ? null : s.brand);
+              messBrand(brandShown(s.brand));
             } catch (e) {
               console.warn("[Farmhand Companion] brand:", e);
             }
@@ -21365,8 +21556,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           st.gotState = true;
           st.panel.setState(m.state);
           parasiteSync();
+          inkSync();
           try {
-            messBrand(st.panel.prefs.brandOff ? null : m.state.brand);
+            messBrand(brandShown(m.state.brand));
           } catch (e) {
             console.warn("[Farmhand Companion] brand:", e);
           }
@@ -21580,9 +21772,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     },
     brandSync() {
       try {
-        messBrand(st.panel.prefs.brandOff ? null : st.panel.s.brand);
+        messBrand(brandShown(st.panel.s.brand));
       } catch (e) {
         console.warn("[Farmhand Companion] brand:", e);
+      }
+    },
+    inkSync() {
+      inkSync();
+      try {
+        messBrand(brandShown(st.panel.s.brand));
+      } catch (e) {
       }
     },
     // the nursery's stuffies and baby things, on your own character (nursery.js)
@@ -21837,6 +22036,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           p[k] = v;
         }, (k) => {
           if (k === "brandOff") api2.brandSync();
+          if (k === "ink") {
+            api2.inkSync();
+            api2.rehello();
+          }
           if (/^no/.test(k)) api2.rehello();
         });
         if (said.length) {

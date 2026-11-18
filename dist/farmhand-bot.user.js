@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.72.5
+// @version      0.73.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2901,8 +2901,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.72.5";
-  var COMPANION_VERSION = "0.55.0";
+  var VERSION = "0.73.0";
+  var COMPANION_VERSION = "0.56.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -7760,8 +7760,10 @@
         }
         load *= floodX(sp);
         load *= perkLoadX(stud);
+        const rut = dispOn(stud, "rut");
+        if (rut) load *= CFG.RUT_LOAD_X || 1.5;
         sp.fills = (sp.fills || []).filter((x) => Date.now() - x < 36e5);
-        if (!pent && !boosted(sp, "semen") && sp.fills.length >= CFG.STAMINA_FILLS)
+        if (!pent && !rut && !boosted(sp, "semen") && sp.fills.length >= CFG.STAMINA_FILLS)
           load *= Math.pow(CFG.STAMINA_X, sp.fills.length - CFG.STAMINA_FILLS + 1);
         sp.fills.push(Date.now());
         if (opt.half) {
@@ -7773,9 +7775,10 @@
       const pen = sizeOf(stud, "penis"), need = penisNeeds(pen);
       let gagged = 0, trained = false;
       const funnel = hole === "mouth" && funnelOn(t);
+      const loose = hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t, "throat") && dispOn(t, "deepthroat");
       if (hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t, "throat")) {
-        gagged = load * (1 - sizeOf(t, "throat") / need);
-        tp.throatTrain = (tp.throatTrain || 0) + (T.throatX || 1);
+        gagged = loose ? 0 : load * (1 - sizeOf(t, "throat") / need);
+        tp.throatTrain = (tp.throatTrain || 0) + (T.throatX || 1) * (loose ? 2 : 1);
         if (tp.throatTrain >= CFG.THROAT_TRAIN_EVERY && sizeBase(t, "throat") < CFG.SIZES.throat.natural) {
           tp.throatTrain = 0;
           setSize(t, "throat", sizeOf(t, "throat") + 1, true);
@@ -7810,6 +7813,7 @@
       if (opt.edged) o += " Edged " + opt.edged + " time" + (opt.edged === 1 ? "" : "s") + " first, it just keeps on comin'.";
       if (hole === "mouth" && makesSemen(stud)) o += " " + seedTaste(stud, pent);
       if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" cock and drools ' + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
+      if (loose) o += " Dosed loose, " + plainName(t) + "'s throat takes every inch of that " + pen + '" cock without a single gag' + (trained ? ", and it's learnin' fast: " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
       if (hole !== "mouth" && makesSemen(stud)) {
         const gape = sizeOf(t, hole);
         const needK = need + (knot ? 1 : 0);
@@ -8876,7 +8880,7 @@
       if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)) {
         saveLedger();
         try {
-          shotUnread(data.Sender, tool, text);
+          shotUnread(data.Sender, tool, text, target);
         } catch (e) {
         }
         return;
@@ -25749,10 +25753,19 @@
       if (p.milkFlavor && p.milkFlavor.until > now) out.push("\u{1F353} " + p.milkFlavor.k + " milk \xB7 " + left(p.milkFlavor.until));
       if (kryptoNow(mn)) out.push("\u{1F4A5} Your kryptonite \xB7 " + left(r.krypto.until));
       for (const f of activePotions(mn)) out.push("\u{1F9EA} " + ((potionDef(f.id) || {}).name || f.id) + " \xB7 " + left(f.until));
+      {
+        const d = dispFor(mn), extra = d && Array.isArray(d.on) ? d.on.filter((id) => DISP_LABEL[id] && !["denial", "sedative"].includes(id)) : [];
+        if (extra.length) out.push("\u{1F489} From your Dispensary: " + extra.map((id) => DISP_LABEL[id]).join(", "));
+      }
       return "\u{1F489} WHAT'S IN YOU RIGHT NOW\n" + (out.length ? out.join("\n") : "Nothin'. Clean as a whistle, sugar.") + "\n\n?help shots lists every word a needle can carry.";
     }
-    function shotUnread(by, tool, text) {
-      if (!tool || !tool.Craft || by === CFG.BOT_MEMBER || !SHOT_WORDS.test(text) || LSCG_WORDS.test(text)) return;
+    function shotUnread(by, tool, text, target) {
+      if (!tool || !tool.Craft || by === CFG.BOT_MEMBER || LSCG_WORDS.test(text)) return;
+      if (DISP_WORDS.test(text)) {
+        if (target && !dispFor(target)) tell(by, "\u{1F489} " + itemName(tool) + " is one of the Dispensary's doses, sugar: it only takes on somebody runnin' The Farmhand's Dispensary, and " + plainName(target) + " isn't.");
+        return;
+      }
+      if (!SHOT_WORDS.test(text)) return;
       tell(by, "\u{1F489} I couldn't read a farm word on " + itemName(tool) + ", sugar, so it did nothin' on the farm's side. ?help shots lists the words: lactation, fertility, udder growth, aphrodisiac, cum flood and the rest.");
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __shotsTick: () => {
@@ -25775,16 +25788,74 @@
       }
       return out.slice(0, 300);
     }
+    const DISP_LABEL = {
+      denial: "Denial Serum",
+      sedative: "Sedative",
+      needy: "Needy Nectar",
+      hairtrigger: "Hair Trigger",
+      bitterroot: "Bitterroot",
+      moo: "Moo Juice",
+      hiccup: "Hiccup Fizz",
+      feather: "Featherlight",
+      heat: "Heat",
+      letdown: "Let-Down",
+      fillout: "Fill-Out",
+      airhead: "Airhead Elixir",
+      babble: "Babble Brew",
+      deepthroat: "Deep Throat Drops",
+      rut: "Rut",
+      tender: "Tender"
+    };
+    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er/i;
+    const CRAVE_OFFER_MS = 45 * 6e4;
+    const CRAVE_OFFERS = [
+      "\u{1F489} You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",
+      "\u{1F489} Somebody's fidgety. Want a little %d to take the edge off, hon? ?fix, and it's yours.",
+      "\u{1F489} I know that face. That's a %d face. Say ?fix and I'll fetch you one.",
+      "\u{1F489} Lookin' a bit flat there, sugar. I could fix you up with some %d. Just say ?fix."
+    ];
+    function dispOn(mn, id) {
+      const d = dispFor(mn);
+      return !!(d && Array.isArray(d.on) && d.on.includes(id));
+    }
+    function craveOffer(mn, d) {
+      if (!d.crave || !DISP_LABEL[d.crave]) return;
+      const seen = state.dispCraveAt || (state.dispCraveAt = /* @__PURE__ */ new Map()), now = Date.now();
+      if (now - (seen.get(mn) || 0) < CRAVE_OFFER_MS) return;
+      seen.set(mn, now);
+      tell(mn, CRAVE_OFFERS[Math.floor(Math.random() * CRAVE_OFFERS.length)].replace(/%d/g, DISP_LABEL[d.crave]));
+    }
+    function fixCommand(mn, R) {
+      const d = dispFor(mn);
+      if (!d) return R("That's for folks runnin' The Farmhand's Dispensary, sugar, with cravings switched on.");
+      if (!d.crave || !DISP_LABEL[d.crave]) return R("You're not cravin' anything right now, hon. Good for you.");
+      const dose = d.crave, dc = dispCall(mn, dose, { x: 1, by: CFG.BOT_MEMBER });
+      if (dc === "sent") {
+        d.crave = "";
+        audit(mn, "FIX", dose);
+        return R("\u{1F489} There you go, sugar: " + DISP_LABEL[dose] + ". That should take the edge off.");
+      }
+      return R(dc === "ladder" ? "Your Dispensary doesn't take doses from the farm, hon, so I can't fix you up." : "You've switched " + DISP_LABEL[dose] + " off in your Dispensary, sugar, so I'll leave it be.");
+    }
+    addCommand("fix", { topic: "play", private: true, run: (c) => fixCommand(c.sender, c.R) });
     function onDispHello(mn, m) {
       const had = dispMap().has(mn);
+      const ids = (a) => Array.isArray(a) ? a.filter((x) => typeof x === "string" && /^[a-z]{2,20}$/.test(x)).slice(0, 40) : [];
       dispMap().set(mn, {
         ver: String(m.ver || "?").slice(0, 20),
         farm: m.farm !== false,
         lscg: !!m.lscg,
         off: Array.isArray(m.off) ? m.off.filter((x) => typeof x === "string").slice(0, 40) : [],
         hard: m.hard === true,
-        at: Date.now()
+        at: Date.now(),
+        on: ids(m.on),
+        crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : ""
       });
+      try {
+        craveOffer(mn, dispMap().get(mn));
+      } catch (e) {
+        warn("crave:", e);
+      }
       if (!had) log("Dispensary hello from " + mn + " (v" + String(m.ver || "?").slice(0, 20) + ")");
       const r = rec(mn);
       if (r) {
@@ -61380,6 +61451,8 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
       lactation into her", "injects the wearer with sedative",
       "whenever she's bred it makes her more fertile"
     ?myshots \xB7 what's in you right now, and for how long
+    ?fix \xB7 with The Farmhand's Dispensary and its cravings
+      switched on: when you're itchin' for another, I'll see to it
     ?kryptonite \xB7 the barn's rumours about the proprietors'
       weaknesses. Find the word, put it on a needle\u2026
     ovipositor \xB7 on a gag, belt, plug or dildo: it lays a clutch in

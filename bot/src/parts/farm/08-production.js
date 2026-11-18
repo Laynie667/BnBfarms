@@ -1029,9 +1029,11 @@
       if (sp.edges){ load *= 1 + CFG.EDGE_X * Math.min(sp.edges, CFG.EDGE_MAX); opt.edged = sp.edges; sp.edges = 0; }
       load *= floodX(sp);   // a flood serum (10ur-shots-more.js)
       load *= perkLoadX(stud);   // Prize Stud (10us-feats.js)
-      // stamina: a stud who's been busy this hour runs drier (pent up or a virility shot skips it)
+      const rut = dispOn(stud, "rut");   // in rut (their Dispensary, 10ur2-dispensary.js): half again as big
+      if (rut) load *= CFG.RUT_LOAD_X || 1.5;
+      // stamina: a stud who's been busy this hour runs drier (pent up, a virility shot or rut skips it)
       sp.fills = (sp.fills||[]).filter(x => Date.now() - x < 3600000);
-      if (!pent && !boosted(sp,"semen") && sp.fills.length >= CFG.STAMINA_FILLS)
+      if (!pent && !rut && !boosted(sp,"semen") && sp.fills.length >= CFG.STAMINA_FILLS)
         load *= Math.pow(CFG.STAMINA_X, sp.fills.length - CFG.STAMINA_FILLS + 1);
       sp.fills.push(Date.now());
       if (opt.half){ rest = load/2; load = load/2; }
@@ -1041,9 +1043,11 @@
     // a throat that's not ready for it gags and drools some back out, but it learns
     let gagged = 0, trained = false;
     const funnel = hole === "mouth" && funnelOn(t);   // straight down the funnel: no gaggin'
+    // Deep Throat Drops (their Dispensary): no gaggin' at all, and the trainin' counts twice
+    const loose = hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t,"throat") && dispOn(t, "deepthroat");
     if (hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t,"throat")){
-      gagged = load * (1 - sizeOf(t,"throat") / need);
-      tp.throatTrain = (tp.throatTrain||0) + (T.throatX || 1);
+      gagged = loose ? 0 : load * (1 - sizeOf(t,"throat") / need);
+      tp.throatTrain = (tp.throatTrain||0) + (T.throatX || 1) * (loose ? 2 : 1);
       if (tp.throatTrain >= CFG.THROAT_TRAIN_EVERY && sizeBase(t,"throat") < CFG.SIZES.throat.natural){
         tp.throatTrain = 0; setSize(t, "throat", sizeOf(t,"throat")+1, true); trained = true;
       }
@@ -1068,6 +1072,7 @@
     if (opt.edged) o += " Edged "+opt.edged+" time"+(opt.edged === 1 ? "" : "s")+" first, it just keeps on comin'.";
     if (hole === "mouth" && makesSemen(stud)) o += " "+seedTaste(stud, pent);
     if (gagged >= 1) o += " "+plainName(t)+" gags on that "+pen+"\" cock and drools "+ml(gagged)+" back up"+(trained ? ", but that throat's learnin': it's "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
+    if (loose) o += " Dosed loose, "+plainName(t)+"'s throat takes every inch of that "+pen+"\" cock without a single gag"+(trained ? ", and it's learnin' fast: "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
     if (hole !== "mouth" && makesSemen(stud)){
       const gape = sizeOf(t, hole);
       const needK = need + (knot ? 1 : 0);    // a knot stretches 'em one more

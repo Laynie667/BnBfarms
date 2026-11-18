@@ -4,11 +4,13 @@
      Moo Juice      about half the words come out as your animal's noise (more, the stronger the dose)
      Hiccup Fizz    a *hic* or two breaks up what you say
      Featherlight   giggles slip in
+     the Airhead Elixir and Babble Brew (Nov 17): speech-more.js
    Your animal is the farm's word for you (it tells your Dispensary when you're there), or the one you pick on its page.
 */
 import { mooify } from "../../shared/noises.js";
 import { st } from "./store.js";
 import { active } from "./doses.js";
+import { airhead, babble } from "./speech-more.js";
 
 const xOf = (id) => (st().doses[id] && st().doses[id].x) || 1;
 const GIGGLES = ["hehe", "*giggle*", "hee", "*snrk*", "ahaha", "*giggles*"];
@@ -27,9 +29,11 @@ export function dosedSpeech(text) {
   if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf("moo")));
   if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "—hic—"], 4);
   if (active("feather")) t = sprinkle(t, GIGGLES, 5);
+  if (active("airhead")) t = airhead(t, xOf("airhead"));
+  if (active("babble")) t = babble(t, xOf("babble"));
   return t;
 }
-const touched = () => active("moo") || active("hiccup") || active("feather");
+const touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
 
 export function initSpeech(mod) {
   try {

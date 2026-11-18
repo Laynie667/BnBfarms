@@ -74,9 +74,38 @@ function bellyAt(base, stage) {
 function eff() {
   const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
   if (S.cupSet) e.cup = S.cup; else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+  const f = fillOut();
+  if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
   const mode = bellyMode();
-  e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, mode === "off" ? 0 : mode === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))));
+  e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, bellyStage());
   return e;
+}
+/* FILL-OUT (The Farmhand's Dispensary, Laynie Nov 17: "a temporary swell of cup, belly or ass over the dose, drawn by
+   the engine, then it shrinks back"). While it's in you your drawn tits (two cups a dose, up to six) or belly (a stage or
+   two) swell, half as much in its last three minutes, then back to you. It goes out with your cup and belly, so every
+   Companion in the room draws it. Only when your drawn body's on, and your belly's not switched off or the studio's. */
+const FILL_EASE_MS = 3 * 60000;
+function fillOut() {
+  try {
+    const D = W.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("fillout") : null;
+    if (!d) return null;
+    return { p: d.p === "belly" || d.p === "ass" ? d.p : "cup", x: Math.max(1, Math.min(5, Math.round(Number(d.x) || 1))), half: Number(d.left) < FILL_EASE_MS };
+  } catch (e) { return null; }
+}
+function cupWithFill(cup, f) { const add = Math.min(6, 2 * f.x); return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add / 2) : add)); }
+function bellyWithFill(stage, f) {
+  if (f.half) return Math.min(4, Math.max(stage + 1, 1));
+  return Math.min(4, Math.max(stage + (f.x >= 2 ? 2 : 1), f.x >= 2 ? 3 : 2));
+}
+let fillSig = "";
+// every few seconds (index.js), and when the Dispensary says Fill-Out started or ended: redraw if it changed
+export function drawnBodyFillCheck() {
+  const f = fillOut(), sig = f ? f.p + f.x + (f.half ? "h" : "") : "";
+  if (sig === fillSig) return false;
+  fillSig = sig;
+  if (!S.on) return false;
+  if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
+  return true;
 }
 // the bot's word on your size (index.js hands over state.drawn)
 export function drawnBodyFarmState(d) {
@@ -220,7 +249,12 @@ const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatR
 let toldAt = 0, askedAt = 0;
 // On the farm's look (nearly everybody) only your cup and belly go out: everybody's Companion has the look itself.
 // Only somebody who brought their own studio settings sends them whole.
-const bellyStage = () => { const m = bellyMode(); return m === "off" ? 0 : m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))); };
+const bellyStage = () => {
+  const m = bellyMode(); if (m === "off") return 0;
+  const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+  const f = m === "studio" ? null : fillOut();   // (Fill-Out swells it for now)
+  return f && f.p === "belly" ? bellyWithFill(s, f) : s;
+};
 let lastTold = "";
 function tell(force) {
   if (onBot()) return;

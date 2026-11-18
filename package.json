@@ -4,10 +4,10 @@
   "description": "B&B Farm: the Farmhand bot and the Farmhand Companion extension for Bondage Club",
   "type": "module",
   "versions": {
-    "bot": "0.72.5",
-    "companion": "0.55.0",
+    "bot": "0.73.0",
+    "companion": "0.56.0",
     "watcher": "1.0.4",
-    "dispensary": "0.2.0"
+    "dispensary": "0.3.0"
   },
   "scripts": {
     "build": "node build.mjs",

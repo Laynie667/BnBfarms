@@ -308,7 +308,7 @@
                   item: tool ? ((tool.Craft && tool.Craft.Name) || tool.Asset.Name) : "(nothing in hand)",
                   tags: Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?" up":" down"))) }).slice(-15);
     dbg("INJECT", data.Sender, "→", target, "item:", text || "(no crafted item)", "tags:", Array.from(tags).join(",") || "none");
-    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)){ saveLedger(); try { shotUnread(data.Sender, tool, text); } catch(e){} return; }   // a plain injector: LSCG's business, not ours (10ur-shots-more.js says so when it looked like a farm shot)
+    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)){ saveLedger(); try { shotUnread(data.Sender, tool, text, target); } catch(e){} return; }   // a plain injector: LSCG's business, not ours (10ur-shots-more.js says so when it looked like a farm shot)
     applyShot(target, data.Sender, text);
   }
   const stackWord = lv => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' "+(lv + 1)+" times over";

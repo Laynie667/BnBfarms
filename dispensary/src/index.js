@@ -9,7 +9,8 @@ import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
 import { load, st } from "./store.js";
-import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock } from "./doses.js";
+import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment } from "./doses.js";
+import { laterTick, craving, craveSoon } from "./later.js";
 import { initNeedle } from "./needle.js";
 import { initFarm, hello } from "./farm.js";
 import { initLscg } from "./lscg.js";
@@ -71,7 +72,7 @@ function start() {
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); tickHard(); screenTick(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); tickHard(); screenTick(); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -83,15 +84,19 @@ const boot = setInterval(() => {
 }, 1000);
 
 // the tests reach in (only when a test page says so)
-if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => { tick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
+if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
   lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),
-  speech: (t) => dosedSpeech(t), screen: () => screenTick() };
+  speech: (t) => dosedSpeech(t), screen: () => screenTick(),
+  end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); } };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({
   version: VERSION,
   active: (id) => active(String(id)),
   doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
+  // one dose, if it's in you: how strong, its part or spot (Fill-Out: cup, belly, ass · Tender: the spot), time left.
+  // The Companion's drawn body reads Fill-Out from here.
+  dose: (id) => { const d = st().doses[String(id)]; return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null; },
   who: () => st().who,
   // hardcore, for the Companion (its own settings lock while yours is on)
   hard: () => (hardOn() ? { on: true, until: (st().hard && st().hard.until) || 0, due: dueAt() } : null),

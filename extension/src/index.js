@@ -18,7 +18,7 @@ import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
-import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
+import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck } from "./drawnbody.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initBotScreen, screenNapping } from "./botscreen.js";
@@ -563,6 +563,16 @@ function start() {
     },
   });
 
+  // THE FARMHAND'S DISPENSARY's new doses (Nov 17): Let-Down's leaks land as milk on your chest (only with "Farm can
+  // mark my body" on, like any mess), and Fill-Out swells your drawn body while it lasts (drawnbody.js)
+  window.addEventListener("farmhand-dispensary", (e) => {
+    const d = e && e.detail; if (!d || typeof d !== "object") return;
+    try {
+      if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
+      if (d.type === "dose" && d.id === "fillout") drawnBodyFillCheck();
+    } catch (err) { console.warn("[Farmhand Companion] the Dispensary's doses:", err); }
+  });
+
   // /farm stats, /farm size... (BC eats lines that start with / otherwise)
   if (typeof window.CommandCombine === "function") {
     window.CommandCombine([{
@@ -573,6 +583,7 @@ function start() {
   }
 
   setInterval(() => {
+    try { drawnBodyFillCheck(); } catch (e) { /* fine */ }   // (Fill-Out easin' off in its last minutes)
     const here = botHere();
     st.panel.show(window.CurrentScreen === "ChatRoom");
     if (!here) { if (st.welcomed) st.panel.setStatus("farm girl's not in this room"); st.welcomed = false; return; }

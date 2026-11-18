@@ -9,7 +9,10 @@ const W = window;
 let S = null, saveT = null;
 const listeners = [];
 
-const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true });
+// (Nov 17, more: tolerance and cravings are yours to switch on; taken is the record they read; later holds the
+// time-release capsules waitin' in you; tenderSpot is where Tender goes when the bottle doesn't say)
+const fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true,
+  tolerance: false, cravings: 0, taken: {}, later: [], tenderSpot: "" });
 const num = (v, lo, hi, d) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
 
 // only what's expected, in range: what comes back from the server could be anything
@@ -26,8 +29,27 @@ export function clean(d) {
       const o = { x: Math.round(num(x.x, 1, 5, 1)), by: Math.round(num(x.by, 0, 1e9, 0)), at: num(x.at, 0, 1e14, 0) };
       if (typeof x.until === "number") o.until = num(x.until, 0, 1e14, 0);
       else o.left = num(x.left, 0, 30 * 86400000, 0);
+      if (typeof x.p === "string" && /^[a-z]{2,12}$/.test(x.p)) o.p = x.p;
       s.doses[k] = o;
     }
+  }
+  s.tolerance = d.tolerance === true;
+  s.cravings = num(d.cravings, 0, 1e14, 0);
+  if (typeof d.tenderSpot === "string" && /^[a-z]{2,12}$/.test(d.tenderSpot)) s.tenderSpot = d.tenderSpot;
+  if (d.taken && typeof d.taken === "object") {
+    for (const [k, list] of Object.entries(d.taken).slice(0, 40)) {
+      if (!/^[a-z]{2,20}$/.test(k) || !Array.isArray(list)) continue;
+      const l = list.filter((t) => typeof t === "number" && isFinite(t) && t > 0).slice(-20);
+      if (l.length) s.taken[k] = l;
+    }
+  }
+  if (Array.isArray(d.later)) {
+    s.later = d.later.filter((c) => c && typeof c === "object" && /^[a-z]{2,20}$/.test(c.id)).slice(0, 5).map((c) => {
+      const o = { id: c.id, x: Math.round(num(c.x, 1, 5, 1)), by: Math.round(num(c.by, 0, 1e9, 0)) };
+      if (typeof c.p === "string" && /^[a-z]{2,12}$/.test(c.p)) o.p = c.p;
+      if (typeof c.fire === "number") o.fire = num(c.fire, 0, 1e14, 0); else o.in = num(c.in, 0, 6 * 3600000, 0);
+      return o;
+    });
   }
   if (Array.isArray(d.farm)) s.farm = d.farm.filter((m) => Number.isInteger(m) && m > 0).slice(0, 300);
   s.farmAt = num(d.farmAt, 0, 1e14, 0);

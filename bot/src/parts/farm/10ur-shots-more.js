@@ -428,11 +428,20 @@
     if (p.milkFlavor && p.milkFlavor.until > now) out.push("🍓 " + p.milkFlavor.k + " milk · " + left(p.milkFlavor.until));
     if (kryptoNow(mn)) out.push("💥 Your kryptonite · " + left(r.krypto.until));
     for (const f of activePotions(mn)) out.push("🧪 " + ((potionDef(f.id) || {}).name || f.id) + " · " + left(f.until));
+    // the Dispensary's own, from its hello (10ur2-dispensary.js): what it says is in them
+    { const d = dispFor(mn), extra = d && Array.isArray(d.on) ? d.on.filter(id => DISP_LABEL[id] && !["denial", "sedative"].includes(id)) : [];
+      if (extra.length) out.push("💉 From your Dispensary: " + extra.map(id => DISP_LABEL[id]).join(", ")); }
     return "💉 WHAT'S IN YOU RIGHT NOW\n" + (out.length ? out.join("\n") : "Nothin'. Clean as a whistle, sugar.") + "\n\n?help shots lists every word a needle can carry.";
   }
   // a needle with nothin' the farm can read on it: say so (unless it's one of LSCG's)
-  function shotUnread(by, tool, text){
-    if (!tool || !tool.Craft || by === CFG.BOT_MEMBER || !SHOT_WORDS.test(text) || LSCG_WORDS.test(text)) return;
+  function shotUnread(by, tool, text, target){
+    if (!tool || !tool.Craft || by === CFG.BOT_MEMBER || LSCG_WORDS.test(text)) return;
+    // one of The Farmhand's Dispensary's own (Rut, Tender, Fill-Out...): their Dispensary reads it, not me
+    if (DISP_WORDS.test(text)){
+      if (target && !dispFor(target)) tell(by, "💉 " + itemName(tool) + " is one of the Dispensary's doses, sugar: it only takes on somebody runnin' The Farmhand's Dispensary, and " + plainName(target) + " isn't.");
+      return;
+    }
+    if (!SHOT_WORDS.test(text)) return;
     tell(by, "💉 I couldn't read a farm word on " + itemName(tool) + ", sugar, so it did nothin' on the farm's side. ?help shots lists the words: lactation, fertility, udder growth, aphrodisiac, cum flood and the rest.");
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __shotsTick: () => { state.shots2At = 0; shotsMoreTick(); }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });

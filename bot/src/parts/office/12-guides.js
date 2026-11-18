@@ -363,6 +363,8 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
       lactation into her", "injects the wearer with sedative",
       "whenever she's bred it makes her more fertile"
     ?myshots · what's in you right now, and for how long
+    ?fix · with The Farmhand's Dispensary and its cravings
+      switched on: when you're itchin' for another, I'll see to it
     ?kryptonite · the barn's rumours about the proprietors'
       weaknesses. Find the word, put it on a needle…
     ovipositor · on a gag, belt, plug or dildo: it lays a clutch in

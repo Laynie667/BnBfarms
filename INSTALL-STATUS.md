@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.72.5** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.73.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.55.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.2.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.56.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items (not released yet) | **0.3.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,25 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.73.0 + Companion 0.56.0 + Dispensary 0.3.0: the new doses: Let-Down, Fill-Out, Airhead, Babble, Deep Throat, Rut, Tender, capsules, tolerance, cravings**
+- **Dispensary 0.3.0 + Companion 0.56.0 + Bot 0.73.0: the new doses.** Laynie, Nov 17: "I love it", then "the new drug effects go in". None of them is a farm shot: on the farm too, the player's own Dispensary reads the needle.
+  - **Let-Down:** tits leak, with wet moments every few minutes. With the Companion and "Farm can mark my body" on, each leak lands as milk on the chest.
+  - **Fill-Out:** a swell that comes and goes. The bottle says which part: the cup (two cups a dose), the belly, or the ass (lines only for now). The Companion's drawn body draws it, and it shrinks back at the end.
+  - **The Airhead Elixir:** likes, ums, uptalk, giggles, and big words that float off.
+  - **Babble Brew:** filthy words slip out, and innocent ones come out wrong ("the clock" → "the cock").
+  - **Deep Throat Drops:** the mouth counts double. On the farm, a dosed throat takes a load without gaggin', and the trainin' counts twice.
+  - **Rut:** never cools right off, and straight back up after cummin'. On the farm, loads come half again as big and a busy hour doesn't run the stud dry.
+  - **Tender:** one spot counts triple when touched: the bottle's spot ("Tender Drops (ears)"), or the one picked on the page.
+  - **Time-release capsules:** a needle that also says time-release, slow-release, delayed or capsule goes off 5 to 40 minutes later. The safeword clears what's waiting.
+  - **Tolerance and cravings:** both off till the player switches them on.
+    - Tolerance: the same dose again within three hours takes less.
+    - Cravings: after six doses in three days, the player wants more. On the farm the farm girl offers, and `?fix` gets it.
+  - **Screen touches:** Rut reddens the edges; the Airhead Elixir goes soft and pink.
+  - **Also:**
+    - `?myshots` lists what the Dispensary says is in you.
+    - A Dispensary needle on somebody without the Dispensary gets a plain "it needs the Dispensary" instead of "couldn't read a farm word".
+  - Tests: `tests/dispensary-more.test.cjs` and `tests/dispensary-farm-more.test.cjs`.
 
 - **Companion 0.55.0 + Dispensary 0.2.0: farm ink, tattoos and brands in the wardrobe.** Laynie, Nov 17: "add a few branding slots into the wardrobe too, like echoes adds wardrobe slots… then players can select tattoos and place them their selves", and "build it all". See docs/TATTOOS.md.
   - **Five new wardrobe slots:** Farm Ink 1 to 4, and Farm Brand.

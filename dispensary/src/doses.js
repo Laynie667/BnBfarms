@@ -6,10 +6,17 @@
      step 3 (Nov 17)   the shots and potions that work anywhere: Needy Nectar (LSCG's aphrodisiac when it's loaded),
                        Hair Trigger, Bitterroot, Moo Juice, Hiccup Fizz, Featherlight, Heat, the Purge, and Suggestible
                        (LSCG's only: without LSCG, the farm's obedience shot stays the farm's trance)
+     more (Nov 17)     the ones Laynie picked ("I love it"): Let-Down, Fill-Out, the Airhead Elixir, Babble Brew, Deep
+                       Throat Drops, Rut and Tender. Fill-Out and Tender read a part or a spot off the bottle ("Fill-Out
+                       (belly)", "Tender Drops (ears)"); time-release capsules, cravings and the rest are in later.js;
+                       tolerance is here (give).
    The farm's potions speak in the farm girl's own voice (shared/potion-voice.js), on the farm and off it alike.
+   The new ones tell the Companion (a "farmhand-dispensary" event on the page): Let-Down's leaks land as milk on you,
+   Fill-Out swells your drawn body.
 */
 import { st, save } from "./store.js";
 import { LINES } from "./lines.js";
+import { TOLERANCE_NOTE } from "./lines-more.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
@@ -80,6 +87,49 @@ export const BOOK = {
     keywords: ["obedience", "docile"],
     desc: "LSCG's Suggestible: the more of it in you, the more you want to do as you're told. Only with LSCG; without it, the farm's obedience shot is the farm's trance.",
   },
+  // ── Nov 17, more (none of these is a farm shot: on the farm too, your Dispensary reads the needle) ──
+  letdown: {
+    label: "Let-Down", icon: "🍼", mins: 30, color: "#efe3c8", every: [4, 7], room: true,
+    words: /\b(let[- ]?down (?:tonic|serum|shot|draught|drops?|potion)|leaky (?:tits|teats|udders?) (?:tonic|serum|shot))\b/,
+    keywords: ["let-down tonic", "letdown serum"], soak: ["let-down", "leaky"],
+    desc: "Your tits go heavy and leak: fresh wet spots bloom through your top every few minutes. With the Companion and its \"Farm can mark my body\" on, the milk shows on your chest for everybody with a Companion. Half an hour a dose.",
+  },
+  fillout: {
+    label: "Fill-Out", icon: "🎈", mins: 30, color: "#f0a0b8", every: [6, 10], room: true,
+    words: /\b(fill-out|fill[- ]?out (?:serum|shot|tonic|potion|drops?)|swell(?:ing)? (?:serum|shot|tonic|potion|drops?))\b/,
+    keywords: ["fill-out", "swelling serum"], soak: ["swelling", "fill-out"],
+    desc: "A swell that comes and goes: your tits a few cups bigger, or your belly round and full, for as long as it lasts, then it shrinks back. Say which on the bottle (Fill-Out (belly), Fill-Out (ass)); it's the cup if it doesn't say. The Companion's drawn body draws your tits and belly swollen for everybody with a Companion (a swollen ass gets its lines, not a picture, for now). Half an hour a dose.",
+  },
+  airhead: {
+    label: "Airhead Elixir", icon: "🎀", mins: 20, color: "#ff9ccf", every: [6, 10], room: true,
+    words: /\b((?:airhead|bimbo) (?:elixir|potion|serum|tonic|shot|juice|drops?))\b/,
+    keywords: ["airhead elixir", "bimbo serum"], soak: ["airhead", "bimbo"],
+    desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose.",
+  },
+  babble: {
+    label: "Babble Brew", icon: "💬", mins: 20, color: "#c0508a", every: [6, 10], room: true,
+    words: /\b(babble (?:brew|potion|tonic|shot|serum)|potty[- ]?mouth (?:potion|tonic|brew|serum))\b/,
+    keywords: ["babble brew", "potty mouth potion"], soak: ["babble"],
+    desc: "Filthy words keep slippin' out in the middle of what you say, and innocent ones come out wrong (the clock, the class, the bread...). The stronger the dose, the filthier your mouth. Twenty minutes a dose.",
+  },
+  deepthroat: {
+    label: "Deep Throat Drops", icon: "👄", mins: 60, color: "#d06070", every: [8, 12],
+    words: /\b(deep[- ]?throat (?:drops?|serum|spray|shot|tonic)|throat relax\w*|gag[- ]?reflex (?:blocker|drops?|serum))\b/,
+    keywords: ["deep throat drops", "throat relaxer"], soak: ["deep throat"],
+    desc: "No gag reflex: anything goes down easy, and whatever's done to your mouth counts double. On the farm, a dosed throat takes a load without gaggin', and the trainin' counts twice. An hour a dose.",
+  },
+  rut: {
+    label: "Rut", icon: "🐂", mins: 60, color: "#a8432c", every: [5, 8], room: true,
+    words: /\b(rut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut (?:serum|shot|tonic))\b/,
+    keywords: ["rut serum", "rutting tonic"], soak: ["rut", "rutting"],
+    desc: "In rut: hot, hungry and ready again almost as soon as you've finished. Your arousal never cools right off, and after you go over it bounces straight back up. On the farm, your loads come bigger and you don't run dry. An hour a dose.",
+  },
+  tender: {
+    label: "Tender", icon: "🌸", mins: 30, color: "#f2a6b8", every: [6, 9],
+    words: /\b(tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er)\b/,
+    keywords: ["tender drops", "tenderizer"], soak: ["tender"],
+    desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose.",
+  },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
     words: /\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/,
@@ -95,17 +145,53 @@ export function stackOf(text) {
   if (m) return Number(m[1] || m[2]);
   return /\btriple\b/.test(t) ? 3 : /\bdouble\b/.test(t) ? 2 : 1;
 }
+// TENDER's spots: the words on a bottle, the game's zones a touch there lands on, and what the lines call it
+export const TENDER_SPOTS = {
+  nipples: { word: "nipples", zones: ["ItemNipples", "ItemNipplesPiercings"], re: /\b(nipples?|teats?)\b/ },
+  breasts: { word: "tits", zones: ["ItemBreast"], re: /\b(breasts?|tits?|titties|boobs?|chest|udders?)\b/ },
+  clit: { word: "clit", zones: ["ItemVulvaPiercings"], re: /\bclit\w*\b/ },
+  pussy: { word: "pussy", zones: ["ItemVulva"], re: /\b(pussy|cunt|slit|vulva|cooch)\b/ },
+  ass: { word: "ass", zones: ["ItemButt"], re: /\b(ass|butt|bum|rear|asshole)\b/ },
+  neck: { word: "neck", zones: ["ItemNeck"], re: /\b(neck|throat|nape)\b/ },
+  ears: { word: "ears", zones: ["ItemEars"], re: /\bears?\b/ },
+  mouth: { word: "lips", zones: ["ItemMouth"], re: /\b(lips?|mouth|tongue)\b/ },
+  belly: { word: "belly", zones: ["ItemPelvis"], re: /\b(belly|tummy|stomach|navel)\b/ },
+  thighs: { word: "thighs", zones: ["ItemLegs"], re: /\b(thighs?|legs?)\b/ },
+  feet: { word: "feet", zones: ["ItemFeet", "ItemBoots"], re: /\b(feet|foot|toes?|soles?)\b/ },
+};
+export const TENDER_DEFAULT = "nipples";
+// FILL-OUT's parts
+const PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
+export function partFor(id, text) {
+  const t = String(text || "").toLowerCase();
+  if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+  if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
+  return "";
+}
 export function dosesIn(text) {
   const t = String(text || "").toLowerCase(), x = stackOf(t);
-  return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => ({ id, x }));
+  return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => { const p = partFor(id, t); return p ? { id, x, p } : { id, x }; });
 }
+// the part or spot a dose is on (Fill-Out: cup, belly or ass · Tender: the bottle's spot, or the one you picked)
+export function partOf(id) {
+  const d = st().doses[id];
+  if (id === "fillout") return (d && d.p) || "cup";
+  if (id === "tender") { const p = (d && d.p) || st().tenderSpot; return TENDER_SPOTS[p] ? p : TENDER_DEFAULT; }
+  return "";
+}
+export const tenderZones = () => TENDER_SPOTS[partOf("tender")].zones;
 
-// what it says: the farm girl's own lines for a farm potion, otherwise the Dispensary's (lines.js)
+// what it says: the farm girl's own lines for a farm potion, otherwise the Dispensary's (lines.js, lines-more.js)
 const voiceOf = (id) => (BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice]) || null;
 const nameIn = (t) => String(t).replace(/%n/g, myName());
-export function takeLine(id) { const v = voiceOf(id); return v && v.seen.length ? nameIn(pick(v.seen)) : LINES[id] && LINES[id].take ? fill(pick(LINES[id].take)) : ""; }
-function nowLine(id) { const v = voiceOf(id); return v && v.now.length ? nameIn(pick(v.now)) : LINES[id] && LINES[id].now ? fill(pick(LINES[id].now)) : ""; }
-function offLine(id) { const v = voiceOf(id); return v && v.off.length ? nameIn(pick(v.off)) : LINES[id] && LINES[id].off ? fill(pick(LINES[id].off)) : ""; }
+const poolOf = (id, p) => (id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id]);
+const spotIn = (t, id, p) => (id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : t);
+const ours = (id, kind, p) => { const L = poolOf(id, p); return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : ""; };
+export function takeLine(id) { const v = voiceOf(id); return v && v.seen.length ? nameIn(pick(v.seen)) : ours(id, "take"); }
+function nowLine(id) { const v = voiceOf(id); return v && v.now.length ? nameIn(pick(v.now)) : ours(id, "now"); }
+function offLine(id, p) { const v = voiceOf(id); return v && v.off.length ? nameIn(pick(v.off)) : ours(id, "off", p); }
+// the Companion (and any other add-on) hears what's goin' on: { type: "dose", id, on } · { type: "leak", mess, areas, amount }
+function tellPage(detail) { try { W.dispatchEvent(new W.CustomEvent("farmhand-dispensary", { detail })); } catch (e) { /* fine */ } }
 
 const penaltyF = () => 1 + st().penalty / 100;
 export function active(id) {
@@ -119,8 +205,20 @@ export function leftMs(id) {
   return typeof d.until === "number" ? Math.max(0, d.until - Date.now()) : Math.max(0, d.left || 0);
 }
 
+// TOLERANCE (yours to switch on): the same dose again within three hours takes a fifth less for each one before it,
+// down to two fifths. A breath through soaked gear toppin' a dose up doesn't count.
+export const TOLERANCE_HOURS = 3;
+const TOLERANCE_STEP = 0.2, TOLERANCE_FLOOR = 0.4;
+export function toleranceOf(id, now) {
+  const S = st();
+  if (!S.tolerance) return 1;
+  const recent = (S.taken[id] || []).filter((t) => (now || Date.now()) - t < TOLERANCE_HOURS * 3600000).length;
+  return Math.max(TOLERANCE_FLOOR, 1 - TOLERANCE_STEP * recent);
+}
+
 // give a dose. o: { by, x, mins (instead of the book's time × x), line (the room's line instead of ours), quiet,
-// upto (top it up to at least this much instead of addin': the same dose arriving twice by two roads) }
+// upto (top it up to at least this much instead of addin': the same dose arriving twice by two roads),
+// p (Fill-Out's part, Tender's spot) }
 export function give(id, o) {
   o = o || {};
   const B = BOOK[id], S = st();
@@ -130,9 +228,11 @@ export function give(id, o) {
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
   const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
-  const dur = Math.max(MIN, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN));
+  const tol = o.upto ? 1 : toleranceOf(id, now);
+  const dur = Math.max(MIN, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN * tol));
   const was = active(id), d = S.doses[id], by = Number(o.by) || 0;
   const xNow = Math.max(x, was && d ? d.x || 1 : 1);
+  const p = typeof o.p === "string" && o.p ? o.p : was && d && d.p ? d.p : "";
   if (S.clock === "real") {
     const add = dur * penaltyF(), base = was && typeof d.until === "number" ? d.until : now;
     S.doses[id] = { x: xNow, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add) : base + add) };
@@ -140,9 +240,14 @@ export function give(id, o) {
     const base = was && typeof d.left === "number" ? d.left : 0;
     S.doses[id] = { x: xNow, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
   }
+  if (p) S.doses[id].p = p;
+  // the record, for tolerance and cravings (the last 20 of each, three days back)
+  if (!o.upto) S.taken[id] = (S.taken[id] || []).concat(now).filter((t) => now - t < 3 * 86400000).slice(-20);
   save();
   if (!was) start(id);
   if (!o.quiet) action(o.line || takeLine(id));
+  if (tol < 1) local(fill(TOLERANCE_NOTE, { dose: B.label }).replace("%p", String(Math.round(tol * 100))));
+  if (!was || (p && d && d.p !== p) || xNow !== (d && d.x)) tellPage({ type: "dose", id, on: true, x: xNow, p });
   try { lscgShow(id, by); } catch (e) { /* fine */ }
   return { ok: true };
 }
@@ -158,13 +263,20 @@ function purge(o) {
 export function end(id, why) {
   const S = st();
   if (!S.doses[id]) return false;
+  const p = S.doses[id].p || (id === "tender" ? partOf(id) : "");
   delete S.doses[id];
   save();
   stop(id);
-  if (why === "done" || why === "lscg") { const l = offLine(id); if (l) local(l); }
+  tellPage({ type: "dose", id, on: false });
+  if (why === "done" || why === "lscg") { const l = offLine(id, p); if (l) local(l); }
   return true;
 }
-export function clearAll(why) { let n = 0; for (const id of Object.keys(st().doses)) if (end(id, why)) n++; return n; }
+// everything out (the safeword, the Purge, a keyholder lettin' you out): time-release capsules waitin' in you too
+export function clearAll(why) {
+  let n = 0; for (const id of Object.keys(st().doses)) if (end(id, why)) n++;
+  if (st().later && st().later.length) { n += st().later.length; st().later = []; save(); }
+  return n;
+}
 
 // the clock, every few seconds. Online: only time you're here counts (a sleepin' laptop's gap doesn't).
 let lastTick = 0, lastSave = 0;
@@ -201,15 +313,22 @@ function setArousal(v) {
 }
 const xOf = (id) => (st().doses[id] && st().doses[id].x) || 1;
 const felt = {};   // id → { face, next } (when its face was last set, when its next moment is)
+const FLUSHED = ["needy", "heat", "rut", "letdown"];
+// Let-Down: a leak, for the Companion to draw (milk on the chest, a little more for a stronger dose)
+const leak = () => tellPage({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
 function start(id) {
   if (id === "sedative") face("Eyes", "Dazed", 180);
-  if (id === "needy" || id === "heat") face("Blush", "Medium", 120);
+  if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
+  if (id === "airhead") face("Eyes", "Dazed", 120);
+  if (id === "letdown") leak();
 }
 function stop(id) {
-  if (id === "sedative") face("Eyes", null);
-  if ((id === "needy" || id === "heat") && !active("needy") && !active("heat")) face("Blush", null);
+  if ((id === "sedative" && !active("airhead")) || (id === "airhead" && !active("sedative"))) face("Eyes", null);
+  if (FLUSHED.includes(id) && !FLUSHED.some(active)) face("Blush", null);
   delete felt[id];
 }
+// a dose's next moment, now (for the tests)
+export function moment(id) { tick(); if (felt[id]) felt[id].next = 0; tick(); }
 function feel(id, now) {
   const B = BOOK[id];
   const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN });
@@ -225,17 +344,32 @@ function feel(id, now) {
     if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
     if (now - f.face > 2 * MIN) { f.face = now; face("Blush", "Medium", 120); }
   }
+  if (id === "rut") {     // never cools right off (and bounces back after: initDoses)
+    const A = meter(), floor = Math.min(60, 20 + 10 * xOf(id));
+    if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
+    if (now - f.face > 2 * MIN) { f.face = now; face("Blush", "Medium", 120); }
+  }
+  if (id === "airhead" && now - f.face > 2 * MIN) { f.face = now; face("Eyes", "Dazed", 120); }
   // its moments, now and then: for the room, or just for you
   if (B.every && now >= f.next && inRoom()) {
     f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN;
     const l = nowLine(id);
     if (l) { if (B.room) action(l); else local(l); }
+    if (id === "letdown") leak();
   } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
     f.next = now + (8 + Math.random() * 6) * MIN; local(pick(LINES.sedative.drift));
   }
 }
 
 let heldTold = 0;
+// a note only you see, from a dose's own pool (Deep Throat's "used", Tender's "touched", Rut's "again"), not too often
+const toldAt = {};
+function feltOnce(id, kind, gap) {
+  const now = Date.now(), k = id + ":" + kind;
+  if (now - (toldAt[k] || 0) < gap) return;
+  toldAt[k] = now;
+  const l = ours(id, kind); if (l) local(l);
+}
 export function initDoses(mod) {
   // Denial Serum: held at the edge instead of goin' over
   try {
@@ -259,13 +393,36 @@ export function initDoses(mod) {
       return next(args);
     });
   } catch (e) { console.warn("[Dispensary] Bitterroot can't ruin you:", e); }
-  // Hair Trigger: every touch on you counts double
+  // Hair Trigger: every touch on you counts double · Deep Throat Drops: your mouth counts double · Tender: its spot
+  // counts triple (they stack)
   try {
     mod.hookFunction("ActivitySetArousalTimer", 6, (args, next) => {
-      try { const C = args[0]; if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("hairtrigger") && Number(args[3]) > 0) { args[3] = Number(args[3]) * 2; } } catch (e) { /* fine */ }
+      try {
+        const C = args[0], zone = String(args[2] || "");
+        if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && Number(args[3]) > 0) {
+          let f = 1;
+          if (active("hairtrigger")) f *= 2;
+          if (active("deepthroat") && /^ItemMouth/.test(zone)) { f *= 2; feltOnce("deepthroat", "used", 90000); }
+          if (active("tender") && tenderZones().includes(zone)) { f *= 3; feltOnce("tender", "touched", 120000); }
+          if (f > 1) args[3] = Number(args[3]) * f;
+        }
+      } catch (e) { /* fine */ }
       return next(args);
     });
   } catch (e) { console.warn("[Dispensary] Hair Trigger can't reach you:", e); }
+  // Rut: you go over, and you're straight back up
+  try {
+    mod.hookFunction("ActivityOrgasmStop", 6, (args, next) => {
+      try {
+        const C = args[0];
+        if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("rut")) {
+          const back = Math.min(80, 40 + 8 * xOf("rut"));
+          if ((Number(args[1]) || 0) < back) { args = [args[0], back].concat(args.slice(2)); feltOnce("rut", "again", MIN); }
+        }
+      } catch (e) { /* fine */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Dispensary] Rut can't keep you goin':", e); }
   // the Sedative (ours): every step on a map takes longer
   try {
     mod.hookFunction("ChatRoomMapViewCanEnterTile", 1, (args, next) => {

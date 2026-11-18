@@ -6,7 +6,8 @@ import { h } from "../../extension/src/dom.js";
 import { LADDER, PROPRIETORS } from "./config.js";
 import { VERSION } from "./version.js";
 import { st, save } from "./store.js";
-import { BOOK, doseIds, active, leftMs, setClock } from "./doses.js";
+import { BOOK, doseIds, active, leftMs, setClock, TENDER_SPOTS, TENDER_DEFAULT, TOLERANCE_HOURS, partOf } from "./doses.js";
+import { LATER_MAX, FUSE_MINS, CRAVE_AFTER, CRAVE_DAYS } from "./later.js";
 import { ladderWho } from "./ladder.js";
 import { lscgPresent, lscgApi } from "./lscg.js";
 import { safeword } from "./safeword.js";
@@ -44,6 +45,8 @@ const clockTip = (mode) => {
     ? "Real time: your timers keep running while you're logged off. To make up for it, every timer runs " + p + "% longer, so a 2-hour dose lasts " + (2 * (1 + p / 100)).toFixed(1).replace(/\.0$/, "") + " hours."
     : "While online: your timers only count down while you're logged in. A 2-hour dose is 2 hours of you being here.";
 };
+// Fill-Out's part, Tender's spot, in the list of what's in you
+const partLabel = (id) => (id === "fillout" ? " (" + ({ cup: "tits", belly: "belly", ass: "ass" }[partOf(id)] || "tits") + ")" : id === "tender" ? " (" + TENDER_SPOTS[partOf(id)].word + ")" : "");
 export function timeLeft(ms) {
   const m = Math.ceil(ms / 60000);
   return m >= 120 ? Math.floor(m / 60) + " h " + (m % 60 ? (m % 60) + " min" : "") : m >= 60 ? "1 h " + (m - 60 ? (m - 60) + " min" : "") : m + " min";
@@ -154,7 +157,8 @@ function view() {
   // in you now, and the way out
   kids.push(h("h3", null, "In you now"));
   kids.push(h("div", { class: "fd-card" },
-    now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " ×" + st().doses[id].x : "") + ": " + timeLeft(leftMs(id)) + " left" + (S.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+    now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " ×" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+    S.later.length ? h("div", null, "💊 " + (S.later.length === 1 ? "A time-release capsule's" : S.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
     h("div", { class: "fd-row", style: { marginTop: "8px" } },
       locked
         ? h("button", { class: "fd-safe", onclick: () => { safeword("page"); note = "🗝️ Your keyholders have been asked to let you out."; draw(); } }, "🗝️ Ask to be let out")
@@ -180,7 +184,7 @@ function view() {
   kids.push(h("h3", null, "Touches"));
   kids.push(h("div", { class: "fd-card" },
     h("label", null, h("input", { type: "checkbox", checked: S.screen !== false ? true : undefined, onchange: (e) => { st().screen = e.target.checked; save(); draw(); } }), h("b", null, "Screen touches")),
-    h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it. Only you see them. With reduce motion set on your computer, they hold still."),
+    h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
     h("div", { class: "fd-row", style: { marginTop: "8px" } },
       h("span", null, "Your animal, for Moo Juice:"),
       h("select", { "aria-label": "Your animal", onchange: (e) => { st().species = e.target.value; save(); draw(); } },
@@ -202,6 +206,17 @@ function view() {
       theirs ? h("div", { class: "fd-note" }, "LSCG is loaded, so this one is LSCG's own: LSCG's settings decide.") : null,
       B.lscgOnly && !lscg ? h("div", { class: "fd-muted" }, "Needs LSCG.") : null));
   }
+  // the extras (Nov 17): where Tender goes, time-release capsules, tolerance, cravings
+  kids.push(h("h3", null, "How doses take you"));
+  kids.push(h("div", { class: "fd-card" },
+    h("div", { class: "fd-row" }, h("span", null, "🌸 Where Tender goes when the bottle doesn't say:"),
+      h("select", { "aria-label": "Where Tender goes", disabled: locked, onchange: (e) => { st().tenderSpot = e.target.value; save(); draw(); } },
+        Object.entries(TENDER_SPOTS).map(([k, s2]) => h("option", { value: k, selected: (S.tenderSpot || TENDER_DEFAULT) === k ? true : undefined }, s2.word)))),
+    h("div", { class: "fd-muted", style: { marginTop: "8px" } }, "💊 A needle that also says time-release, slow-release, delayed or capsule doesn't hit at once: it goes off somewhere between " + FUSE_MINS[0] + " and " + FUSE_MINS[1] + " minutes later, at a moment nobody knows. Up to " + LATER_MAX + " can wait in you; your safeword clears them."),
+    h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.tolerance ? true : undefined, onchange: (e) => { st().tolerance = e.target.checked; save(); draw(); } }), h("b", null, "Tolerance")),
+    h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
+    h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.cravings ? true : undefined, onchange: (e) => { st().cravings = e.target.checked ? Date.now() : 0; save(); draw(); } }), h("b", null, "Cravings")),
+    h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")));
   if (lscg) {
     kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi()
       ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left."

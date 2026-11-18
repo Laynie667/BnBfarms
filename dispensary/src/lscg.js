@@ -13,7 +13,9 @@
 */
 import { LSCG_ID } from "./config.js";
 import { VERSION } from "./version.js";
-import { BOOK, give, end, active, leftMs, clearAll } from "./doses.js";
+import { BOOK, give, end, active, leftMs, clearAll, partFor } from "./doses.js";
+import { handTextOf } from "./needle.js";
+import { isLater, queue } from "./later.js";
 import { allowed } from "./ladder.js";
 import { st } from "./store.js";
 import { hardOn, askOut } from "./hardcore.js";
@@ -71,7 +73,10 @@ function setUp(L) {
               return;
             }
             const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
-            const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult) });
+            // what's on the needle (Fill-Out's part, Tender's spot, a time-release capsule): the words in their hand
+            const text = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text) || undefined;
+            if (text && isLater(text)) { queue(id, { by: ctx.sender, x: 1, p }); ctx.setLevel(active(id) ? minsLeft(id) : 0); return; }
+            const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult), p });
             ctx.setLevel(r.ok ? minsLeft(id) : 0);
           },
           onTick(ctx) { const m = active(id) ? minsLeft(id) : 0; if (ctx.level !== m) ctx.setLevel(m); },

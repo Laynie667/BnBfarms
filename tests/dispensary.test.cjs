@@ -369,7 +369,7 @@ function page(opts) {
   D3.st().species = "cow";
   ok(/moo|mrrrm|Moo/.test(said("hello there my lovely friends, how are you all doing tonight")), "...or the animal you pick on the page");
   s3.needle(OWNER, "Hiccup Fizz");
-  ok(/\*hic/.test(said("I really do not know what you mean by that")), "Hiccup Fizz: a *hic* breaks up what you say");
+  ok(/\*hic|—hic—/.test(said("I really do not know what you mean by that")), "Hiccup Fizz: a *hic* breaks up what you say");
   s3.needle(OWNER, "Featherlight");
   ok(/hehe|giggle|hee|snrk|ahaha/.test(said("stop it right now please I mean it")), "Featherlight: giggles slip in");
   // Heat: a simmer it won't drop below

@@ -5,6 +5,8 @@
      Denial Serum     a slow pink pulse at the edges once you're close to the top
      Heat             a warm haze
      Needy Nectar     a pink flush (LSCG draws its own when it's loaded)
+     Rut              a hungry red at the edges
+     Airhead Elixir   a soft, bubbly pink haze
 */
 import { st } from "./store.js";
 import { active } from "./doses.js";
@@ -30,6 +32,8 @@ export function screenNow() {
   if (st().screen === false || W.CurrentScreen !== "ChatRoom") return null;
   if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
   if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
+  if (active("rut")) return { bg: "radial-gradient(ellipse at center, transparent 45%, rgba(170,40,20,.42) 100%)", cls: "breathe", id: "rut" };
+  if (active("airhead")) return { bg: "radial-gradient(ellipse at center, rgba(255,200,235,.10) 25%, rgba(255,150,210,.38) 100%)", cls: "breathe", id: "airhead" };
   if (active("heat")) return { bg: "radial-gradient(ellipse at center, rgba(255,140,60,.06) 30%, rgba(255,110,40,.35) 100%)", cls: "breathe", id: "heat" };
   if (active("needy")) return { bg: "radial-gradient(ellipse at center, rgba(255,120,170,.05) 40%, rgba(255,90,150,.3) 100%)", cls: "breathe", id: "needy" };
   return null;

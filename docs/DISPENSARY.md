@@ -82,6 +82,28 @@ and running timers follow you between your phone and your PC, and clearing the b
    Suggestible drug (the farm's obedience shot becomes it when LSCG is loaded), farm instructions in its hypnosis
    suggestion editor, and our own screen touches for our doses. The farm's own hypno module targets LSCG's hypnosis first
    (Laynie: "LSCG's hypno might be a better compatiblity focus").
+   **More doses** (built Nov 17; Laynie: "I love it", then "the new drug effects go in"). None of these is a farm
+   shot: on the farm too, your own Dispensary reads the needle.
+   - **Let-Down:** your tits leak; wet moments every few minutes. With the Companion and "Farm can mark my body" on,
+     each leak lands as milk on your chest, for everybody with a Companion.
+   - **Fill-Out:** a swell that comes and goes. The bottle says which: the cup (two cups a dose, up to six), the belly
+     (a stage or two), or the ass (lines only, for now). The Companion's drawn body draws it for everybody with a
+     Companion, half as much in its last three minutes.
+   - **The Airhead Elixir** (likes, ums, uptalk, big words floatin' off) and **Babble Brew** (filthy words slip in,
+     innocent ones come out wrong): speech changes, stronger with the dose.
+   - **Deep Throat Drops:** your mouth counts double. On the farm, a dosed throat takes a load without gaggin', and the
+     trainin' counts twice.
+   - **Rut:** never cools right off, and after you go over you're straight back up. On the farm, a stud in rut loads
+     half again as big and doesn't run dry.
+   - **Tender:** one spot counts triple: the bottle's (Tender Drops (ears)), or the one you pick on the page.
+   - **Time-release capsules:** a needle that also says time-release, slow-release, delayed or capsule goes off 5 to
+     40 minutes later, at a moment nobody knows, in a room. Up to five wait at once; the safeword clears them.
+   - **Tolerance** (yours to switch on): the same dose again within three hours takes a fifth less for each before it,
+     down to two fifths.
+   - **Cravings** (yours to switch on): after six doses in three days, while nothin's in you, you want another now and
+     then. Your hello tells the farm girl (`crave`); she offers at most every 45 minutes, and `?fix` has her call your
+     Dispensary for it.
+   - Your hello also tells her what's in you (`on`), and `?myshots` lists it.
 4. **Kits, tongues and poses:** saved outfit kits put on for real with timer locks (Jane's set among them), animal
    tongues for every species, kneel / all fours / can't stand.
 5. **Senses:** dim and blinder drops, cotton ears, tunnel vision, haze.
@@ -100,7 +122,7 @@ Dispensary, she doesn't narrate it: she sends their game one hidden message and 
 
 | | Message | |
 |---|---|---|
-| player → her | `dispHello { ver, farm, lscg, off }` | is the farm on their ladder, is LSCG loaded, which doses they've switched off |
+| player → her | `dispHello { ver, farm, lscg, off, hard, on, crave }` | is the farm on their ladder, is LSCG loaded, which doses they've switched off, hardcore, what's in them now, what they're cravin' |
 | her → player | `dispWelcome { farm }` | who the farm is (proprietors and staff), for their ladder |
 | her → player | `dose { id, dose, x, mins, by, line, hand, quiet }` | give this; say this line from your own game |
 | player → her | `doseDone { id, ok, why }` | it didn't take (LSCG has it switched off): she takes her side back off |

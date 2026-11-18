@@ -4,8 +4,9 @@
    denial, sentences): your game can't be trusted with those, and they cost her almost nothin'. What you feel, see and
    say is ours: she sends one hidden "dose", your Dispensary does it and says the line from your own game, and tells her
    whether it took. Without a Dispensary, she does it all herself, as ever.
-     you → her    dispHello { ver, farm, lscg, off, hard }   who you are to her: is the farm on your ladder, is LSCG
-                                                       here, which doses you've switched off (a limit), hardcore
+     you → her    dispHello { ver, farm, lscg, off, hard, on, crave }   who you are to her: is the farm on your ladder,
+                                                       is LSCG here, which doses you've switched off (a limit),
+                                                       hardcore, what's in you now, what you're cravin'
      her → you    dispWelcome { farm, stock }          who the farm is (her staff), for your ladder; are you on her books
                                                        (then the proprietors hold your hardcore key)
      her → you    dose { id, dose, x, mins, by, line, hand, quiet }
@@ -17,7 +18,8 @@
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { BOT } from "./config.js";
 import { VERSION } from "./version.js";
-import { BOOK, give, clearAll } from "./doses.js";
+import { BOOK, give, clearAll, doseIds, active } from "./doses.js";
+import { craving } from "./later.js";
 import { allowed } from "./ladder.js";
 import { st, save, onSave } from "./store.js";
 import { lscgPresent, lscgDose, lscgHas, lastLscgDose } from "./lscg.js";
@@ -32,12 +34,15 @@ function send(type, data) {
   return false;
 }
 let helloAt = 0, helloSig = "";
-const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0]);
+// (Nov 17, more) on: what's in you now, so a dosed throat doesn't gag on the farm and a stud in rut loads bigger ·
+// crave: the dose you're cravin', if you've switched cravings on, so the farm girl can offer (?fix)
+const onNow = () => doseIds().filter(active).sort();
+const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0, onNow(), craving()]);
 export function hello(force) {
   const now = Date.now(), sig = sigNow();
   if (!force && sig === helloSig && now - helloAt < 30 * 60000) return false;
   if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off), hard: hardOn(),
-    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [] })) return false;
+    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving() })) return false;
   helloAt = now; helloSig = sig;
   return true;
 }

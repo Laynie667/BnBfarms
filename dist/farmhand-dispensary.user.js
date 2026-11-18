@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.2.0
+// @version      0.3.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2854,7 +2854,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.2.0";
+  var VERSION = "0.3.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -2879,7 +2879,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var S = null;
   var saveT = null;
   var listeners = [];
-  var fresh = () => ({ v: 1, who: DEFAULT_RUNG, clock: "online", penalty: PENALTY, off: {}, doses: {}, farm: [], farmAt: 0, seen: 0, stock: false, hard: { on: false, log: [] }, wards: {}, keys: [], species: "", speciesFarm: "", screen: true });
+  var fresh = () => ({
+    v: 1,
+    who: DEFAULT_RUNG,
+    clock: "online",
+    penalty: PENALTY,
+    off: {},
+    doses: {},
+    farm: [],
+    farmAt: 0,
+    seen: 0,
+    stock: false,
+    hard: { on: false, log: [] },
+    wards: {},
+    keys: [],
+    species: "",
+    speciesFarm: "",
+    screen: true,
+    tolerance: false,
+    cravings: 0,
+    taken: {},
+    later: [],
+    tenderSpot: ""
+  });
   var num = (v, lo, hi, d) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d;
   function clean(d) {
     const s = fresh();
@@ -2896,8 +2918,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const o = { x: Math.round(num(x.x, 1, 5, 1)), by: Math.round(num(x.by, 0, 1e9, 0)), at: num(x.at, 0, 1e14, 0) };
         if (typeof x.until === "number") o.until = num(x.until, 0, 1e14, 0);
         else o.left = num(x.left, 0, 30 * 864e5, 0);
+        if (typeof x.p === "string" && /^[a-z]{2,12}$/.test(x.p)) o.p = x.p;
         s.doses[k] = o;
       }
+    }
+    s.tolerance = d.tolerance === true;
+    s.cravings = num(d.cravings, 0, 1e14, 0);
+    if (typeof d.tenderSpot === "string" && /^[a-z]{2,12}$/.test(d.tenderSpot)) s.tenderSpot = d.tenderSpot;
+    if (d.taken && typeof d.taken === "object") {
+      for (const [k, list] of Object.entries(d.taken).slice(0, 40)) {
+        if (!/^[a-z]{2,20}$/.test(k) || !Array.isArray(list)) continue;
+        const l = list.filter((t) => typeof t === "number" && isFinite(t) && t > 0).slice(-20);
+        if (l.length) s.taken[k] = l;
+      }
+    }
+    if (Array.isArray(d.later)) {
+      s.later = d.later.filter((c) => c && typeof c === "object" && /^[a-z]{2,20}$/.test(c.id)).slice(0, 5).map((c) => {
+        const o = { id: c.id, x: Math.round(num(c.x, 1, 5, 1)), by: Math.round(num(c.by, 0, 1e9, 0)) };
+        if (typeof c.p === "string" && /^[a-z]{2,12}$/.test(c.p)) o.p = c.p;
+        if (typeof c.fire === "number") o.fire = num(c.fire, 0, 1e14, 0);
+        else o.in = num(c.in, 0, 6 * 36e5, 0);
+        return o;
+      });
     }
     if (Array.isArray(d.farm)) s.farm = d.farm.filter((m) => Number.isInteger(m) && m > 0).slice(0, 300);
     s.farmAt = num(d.farmAt, 0, 1e14, 0);
@@ -3052,6 +3094,233 @@ One of mods you are using is using an old version of SDK. It will work for now b
     safeword: "Safeword: every dose in you is lifted. You're clear.",
     lscgOff: "%d came your way, but it's switched off in LSCG's Drug Enhancements, so LSCG let it pass. Switch it on there if you want it."
   };
+
+  // dispensary/src/lines-more.js
+  Object.assign(LINES, {
+    letdown: {
+      take: [
+        "%t gasps and cups their chest as it hits. Somethin' warm swells up behind each nipple, achin' to get out.",
+        "The tonic goes straight to %t's tits. They go heavy and tight, and the first warm bead slips out before they can stop it.",
+        "%t's nipples stiffen and darken as the let-down takes. A slow, sweet ache fills both breasts right up.",
+        "It hits %t like the stall's pump just switched on: a warm rush, a tingle, and then the leakin' starts.",
+        "%t feels their chest fill, heavy and warm. Two damp spots are already bloomin' through their top.",
+        "%t's breath hitches. They can feel it risin' in them, full and warm, with nowhere to go but out."
+      ],
+      now: [
+        "Two fresh wet spots spread across %t's top. They're leakin' again.",
+        "A warm drip runs down %t's belly from one achin' nipple.",
+        "%t's chest twinges and lets down all at once. Their top's soaked through at the tips now.",
+        "%t crosses their arms over their chest. It doesn't stop the drip.",
+        "A milky bead swells on %t's nipple, hangs there a moment, and falls.",
+        "%t's tits feel fuller by the minute, and they're leakin' to prove it.",
+        "Somebody only has to glance at %t's chest and it lets down again, warm and wet and impossible to hide."
+      ],
+      off: [
+        "The ache in your chest eases off. The leakin' slows to nothin', and you're left damp and a little tender.",
+        "The Let-Down's worn off. Your top's still wet, but nothin' new is comin'.",
+        "Your tits settle and stop leakin'. Somebody might want to fetch you a dry top."
+      ]
+    },
+    // Fill-Out: which part swells is on the bottle ("Fill-Out (belly)"), the cup if it doesn't say
+    fillout_cup: {
+      take: [
+        "%t's top goes tight all at once. Their tits swell up and out, a cup size, then another, and keep on goin'.",
+        "%t looks down as their chest fills out, round and heavy, strainin' every seam they've got.",
+        "Warmth floods into %t's breasts and they plump up under it, fuller and rounder by the second.",
+        "%t's buttons creak. Their tits are swellin', soft and heavy, and there's no stoppin' it.",
+        "%t gasps as their chest blooms outward. Their bra gives up first."
+      ],
+      now: [
+        "%t's chest is still swollen full and heavy. Every step makes it bounce.",
+        "%t tugs at their top. It isn't built for what it's holdin' right now.",
+        "%t's tits feel tight and warm and far too big. Somebody's starin'.",
+        "%t tries to see their own feet. There's too much in the way."
+      ],
+      off: [
+        "Your chest slowly settles back down to its own size. Your top can breathe again.",
+        "The Fill-Out's done. Your tits shrink back to where they were, a little tender for the trip."
+      ]
+    },
+    fillout_belly: {
+      take: [
+        "%t's belly rounds out under their hands, swellin' soft and taut like they've been bred full.",
+        "A warm pressure blooms low in %t's belly, and it grows: rounder, tighter, heavier.",
+        "%t's tummy pushes out against their clothes. They look a few months along and countin'.",
+        "%t sways as their belly fills out, heavy and round and impossible to hide.",
+        "%t presses a hand to their middle and feels it swell up to meet it."
+      ],
+      now: [
+        "%t rubs their swollen belly. It's still round and tight and warm.",
+        "%t's belly sloshes when they shift. It's still filled right out.",
+        "Every time %t moves, that round belly gets in the way.",
+        "%t's waistband has given up. The belly's won."
+      ],
+      off: [
+        "Your belly slowly flattens back down. The tight, full feelin' fades with it.",
+        "The Fill-Out's worn off. Your tummy's your own size again."
+      ]
+    },
+    fillout_ass: {
+      take: [
+        "%t yelps as their ass plumps up, round and soft and suddenly far too big for what they're wearin'.",
+        "Warmth spreads through %t's hips and rear, and it all swells: wider, rounder, heavier.",
+        "%t's hips fill out with a jiggle. Their clothes are holdin' on for dear life back there.",
+        "%t looks over their shoulder and finds a whole lot more of themselves than there was a moment ago."
+      ],
+      now: [
+        "%t's swollen rear sways with every step. Nobody's lookin' anywhere else.",
+        "%t tries to sit and finds there's a lot more of them to sit on.",
+        "%t's hips bump the furniture. They've not got used to the width yet."
+      ],
+      off: [
+        "Your hips and ass slowly settle back down. Your clothes fit again.",
+        "The Fill-Out's done with your rear. It shrinks back, one jiggle at a time."
+      ]
+    },
+    airhead: {
+      take: [
+        "%t blinks, slow and sweet, as the elixir takes. Whatever they were thinkin' about just sort of... floats off.",
+        "A pink, bubbly fog rolls into %t's head. They giggle, and can't remember why.",
+        "%t's eyes go big and soft. Thinkin' feels like a lot of work all of a sudden. Smilin' doesn't.",
+        "%t twirls a bit of hair round one finger without meanin' to. The elixir's got them, like, totally.",
+        "Every serious thought in %t's head pops like a bubble. What's left is warm and giggly and empty."
+      ],
+      now: [
+        "%t loses their train of thought halfway through and just... giggles.",
+        "%t stares at nothin' for a long, happy moment, then remembers they were doin' somethin'.",
+        "%t twirls their hair and hums. Nobody's home, and it's lovely in there.",
+        "%t starts to say somethin' clever, frowns, and gives up with a giggle.",
+        "%t's head tilts, all soft and empty. What were we talkin' about?",
+        "%t counts on their fingers, gets to three, and decides that's plenty."
+      ],
+      off: [
+        "The pink fog thins out. Your thoughts come back one at a time, a bit embarrassed about where they've been.",
+        "The Airhead Elixir's worn off. Big words come back. So does rememberin' what you said.",
+        "You blink, and your head's clear. That was, like... no. That was a lot."
+      ]
+    },
+    babble: {
+      take: [
+        "%t swallows, and their tongue starts to tingle. Somethin' filthy is waitin' right behind their teeth.",
+        "The brew goes down warm and their mouth goes loose. %t has a feelin' they're about to say somethin' they shouldn't.",
+        "%t's lips buzz. Every word they reach for, a dirtier one gets there first.",
+        "%t clamps their mouth shut as it takes. It won't help for long.",
+        "%t licks their lips. They taste of somethin' sweet and rude."
+      ],
+      now: [
+        "%t opens their mouth to say somethin' polite. It doesn't come out polite.",
+        "%t goes red to the ears. They definitely didn't mean to say that out loud.",
+        "%t bites their lip hard, tryin' to keep the next one in.",
+        "%t covers their mouth with both hands. Somethin' filthy still leaks out between their fingers.",
+        "%t starts a sentence, hears where it's headed, and stops dead."
+      ],
+      off: [
+        "Your tongue stops tinglin'. Words come out the way you meant them again. Mostly.",
+        "The Babble Brew's worn off. Your mouth is your own again, for what that's worth after the last while."
+      ]
+    },
+    deepthroat: {
+      take: [
+        "%t's throat goes warm and loose as the drops take. Swallowin' feels easy. Everything feels easy.",
+        "A tingle slides down the back of %t's throat and everything there just... relaxes. No gag, no fight.",
+        "%t opens and closes their mouth, testin'. The back of their throat feels soft and open and wantin'.",
+        "The drops numb the fight right out of %t's throat. Whatever goes in there now is goin' all the way.",
+        "%t swallows once, twice, and finds nothin' stops it. Their throat's wide open."
+      ],
+      now: [
+        "%t swallows slow and easy. Their throat's still loose and waitin'.",
+        "%t's mouth hangs a little open. It's hard to remember why they'd ever close it.",
+        "%t licks their lips. Their throat feels open, soft and ready.",
+        "%t keeps swallowin' on nothin'. Their throat wants somethin' in it."
+      ],
+      used: [
+        "It slides right down. No gag, no fight, just your throat takin' it.",
+        "Your throat opens up and lets it in, easy as anything.",
+        "Deeper than you'd ever manage on your own, and you don't even choke.",
+        "All the way down, and your throat just holds it there, soft and willin'."
+      ],
+      off: [
+        "The tingle in your throat fades. Your gag reflex comes back, and with it, a little sense.",
+        "The Deep Throat Drops wear off. Your throat remembers how to say no."
+      ]
+    },
+    rut: {
+      take: [
+        "%t's breath goes ragged as the rut takes. Heat pours straight down between their legs and stays there.",
+        "Somethin' wild and hungry wakes up in %t. Their eyes go dark and fix on the nearest warm body.",
+        "%t growls before they can stop it. They're hot and achin' and dyin' to breed somethin'.",
+        "The rut hits %t like a kick. Every thought they had narrows down to one.",
+        "%t's heart pounds. They're ready, and they're goin' to stay ready."
+      ],
+      now: [
+        "%t paces like a stud in a pen, all heat and want.",
+        "%t's eyes follow every hip that sways past.",
+        "%t is achin' again already. The rut doesn't let 'em rest long.",
+        "%t's breathin' heavy, flushed and restless, sniffin' the air.",
+        "A low, needy grunt slips out of %t. The rut's still ridin' them."
+      ],
+      again: [
+        "Barely done, and the rut's got you achin' for more already.",
+        "You've hardly caught your breath, and you're ready again.",
+        "Spent, for about a heartbeat. Then the rut hauls you right back up.",
+        "It should be over. The rut says otherwise."
+      ],
+      off: [
+        "The rut burns itself out. The hunger fades, and you're left wrung out and very, very satisfied.",
+        "The Rut's worn off. You can think about somethin' besides breedin' again. Mostly."
+      ]
+    },
+    tender: {
+      take: [
+        "Warmth gathers in %t's %s and stays there. The lightest touch there is goin' to feel like three.",
+        "The drops soak into %t's %s, hot and tingly. They can feel their own pulse there now.",
+        "%t shivers as it takes. All the feelin' in them just pooled in their %s.",
+        "It sinks into %t's %s, soft and warm. Anybody who touches them there is goin' to find out how much."
+      ],
+      now: [
+        "The ache in your %s throbs, warm and tender. Even your clothes brushin' there is a lot.",
+        "You can't stop thinkin' about your %s. One touch there and you'd melt.",
+        "Every move you make, that tingle in your %s answers."
+      ],
+      touched: [
+        "A touch on your %s, and it hits three times over. Your knees nearly give.",
+        "Right there on your tender %s. You can't help the noise you make.",
+        "That one touch on your %s goes through you like a bell.",
+        "Your %s, of all places. It's too much, and you want more of it."
+      ],
+      off: [
+        "The tenderness in your %s fades. A touch there is just a touch again.",
+        "The Tender drops have worn off, and your %s can take a touch again without you meltin'."
+      ]
+    },
+    // a time-release capsule: given now, goes off later
+    later: {
+      set: [
+        "%t feels the capsule settle somewhere deep inside. Nothin' yet. They'll have to wait and see.",
+        "The needle leaves somethin' small and slow behind in %t. It'll go off when it's good and ready.",
+        "%t braces for it to hit. It doesn't. Not yet.",
+        "Just a little pinch, and then nothin'. Whatever's in %t is takin' its sweet time."
+      ],
+      fire: [
+        "Somethin' gives way inside %t without warnin': the capsule's finally cracked open.",
+        "%t jolts. The capsule they'd half forgot about just burst, all at once.",
+        "Out of nowhere, %t's knees wobble. That slow capsule's gone off.",
+        "%t stops mid-step. There it is. It took its time, and now it's all comin' at once."
+      ]
+    },
+    // cravings (only if you switched them on): now and then, while nothin's in you
+    crave: {
+      want: [
+        "Your arm itches right where the needle usually goes.",
+        "You catch yourself thinkin' about %d again. Just a little one wouldn't hurt.",
+        "Everything feels a bit flat without somethin' in you.",
+        "You find yourself lookin' round for whoever's holdin' the needles.",
+        "A little %d would really take the edge off right now.",
+        "You can almost taste it. %d. You know exactly who you'd ask."
+      ]
+    }
+  });
+  var TOLERANCE_NOTE = "Your body's gettin' used to %d: this one only takes %p% as long.";
 
   // shared/potion-voice.js
   var POTION_VOICE = {
@@ -3240,6 +3509,170 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var ladderWho = () => (LADDER[rungIndex(st().who)] || LADDER[0]).who;
 
+  // dispensary/src/later.js
+  var MIN = 6e4;
+  var DAY = 864e5;
+  var LATER_WORDS = /\b(time[- ]?release\w*|slow[- ]?release\w*|delayed|capsules?)\b/;
+  var isLater = (text) => LATER_WORDS.test(String(text || "").toLowerCase());
+  var LATER_MAX = 5;
+  var FUSE_MINS = [5, 40];
+  var CRAVE_AFTER = 6;
+  var CRAVE_DAYS = 3;
+  var CRAVE_EVERY = [20, 40];
+  function queue(id, o) {
+    o = o || {};
+    const S2 = st();
+    if (!BOOK[id] || BOOK[id].instant || S2.off[id]) return false;
+    if (S2.later.length >= LATER_MAX) return false;
+    const fuse = (FUSE_MINS[0] + Math.random() * (FUSE_MINS[1] - FUSE_MINS[0])) * MIN;
+    const c = { id, x: Math.max(1, Math.min(5, Math.round(Number(o.x) || 1))), by: Number(o.by) || 0 };
+    if (o.p) c.p = String(o.p);
+    if (S2.clock === "real") c.fire = Date.now() + fuse * (1 + S2.penalty / 100);
+    else c.in = fuse;
+    S2.later.push(c);
+    save();
+    if (!o.quiet) action(fill(pick(LINES.later.set)));
+    return true;
+  }
+  var lastAt = 0;
+  var craveNext = 0;
+  function laterTick() {
+    const S2 = st(), now = Date.now(), gap = lastAt ? Math.max(0, Math.min(now - lastAt, 15e3)) : 0;
+    lastAt = now;
+    let changed = false;
+    for (const c of S2.later) if (typeof c.fire !== "number") {
+      c.in = Math.max(0, (c.in || 0) - gap);
+    }
+    if (inRoom()) {
+      const due = S2.later.filter((c) => typeof c.fire === "number" ? c.fire <= now : c.in <= 0);
+      for (const c of due) {
+        S2.later.splice(S2.later.indexOf(c), 1);
+        changed = true;
+        action(fill(pick(LINES.later.fire)));
+        give(c.id, { by: c.by, x: c.x, p: c.p, later: true });
+      }
+    }
+    if (changed) save();
+    craveTick(now);
+  }
+  function since() {
+    const S2 = st(), from = Math.max(S2.cravings || 0, Date.now() - CRAVE_DAYS * DAY), out = {};
+    for (const [id, list] of Object.entries(S2.taken || {})) {
+      const n = list.filter((t) => t >= from).length;
+      if (n) out[id] = n;
+    }
+    return out;
+  }
+  var ours = (id) => {
+    const B = BOOK[id];
+    return !!B && !B.instant && !st().off[id] && !(B.lscg && lscgPresent()) && !B.lscgOnly;
+  };
+  function craving() {
+    const S2 = st();
+    if (!S2.cravings) return "";
+    const n = since(), total = Object.values(n).reduce((a, b) => a + b, 0);
+    if (total < CRAVE_AFTER || doseIds().some(active)) return "";
+    const fav = Object.keys(n).filter(ours).sort((a, b) => n[b] - n[a])[0];
+    return fav || "";
+  }
+  function craveTick(now) {
+    const want = craving();
+    if (!want) {
+      craveNext = 0;
+      return;
+    }
+    if (!craveNext) {
+      craveNext = now + CRAVE_EVERY[0] / 2 * MIN;
+      return;
+    }
+    if (now < craveNext || !inRoom()) return;
+    craveNext = now + (CRAVE_EVERY[0] + Math.random() * (CRAVE_EVERY[1] - CRAVE_EVERY[0])) * MIN;
+    local(fill(pick(LINES.crave.want), { dose: BOOK[want].label }));
+  }
+  function craveSoon() {
+    craveNext = 1;
+  }
+
+  // dispensary/src/needle.js
+  var W4 = window;
+  var botHere = () => (W4.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf = (mn) => (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W4.Player && W4.Player.MemberNumber === mn ? W4.Player : null);
+  function craftText(item) {
+    if (!item || !item.Craft) return "";
+    let d = item.Craft.Description || "";
+    try {
+      if (W4.CraftingDescription && typeof W4.CraftingDescription.Decode === "function") d = W4.CraftingDescription.Decode(d);
+    } catch (e) {
+    }
+    return ((item.Craft.Name || "") + " | " + d).toLowerCase();
+  }
+  var handOf = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
+  var handTextOf = (mn) => craftText(handOf(charOf(mn)));
+  function factsOf(data, sender) {
+    try {
+      if (typeof W4.ChatRoomMessageRunExtractors === "function") {
+        const m = W4.ChatRoomMessageRunExtractors(data, sender).metadata;
+        if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
+      }
+    } catch (e) {
+    }
+    const dict = Array.isArray(data.Dictionary) ? data.Dictionary : [];
+    const name = (dict.find((d) => d && d.ActivityName) || {}).ActivityName;
+    const t = dict.find((d) => d && (typeof d.TargetCharacter === "number" || d.Tag === "TargetCharacter"));
+    return { name, target: t ? typeof t.TargetCharacter === "number" ? t.TargetCharacter : t.MemberNumber : void 0 };
+  }
+  var LSCG_WAIT_MS = 1500;
+  function onNeedle(by, item) {
+    const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [], later = isLater(text);
+    for (const { id, x, p } of list) {
+      const B = BOOK[id];
+      if (B.farm && botHere()) continue;
+      if (B.lscg && lscgPresent()) continue;
+      if (!allowed(by)) {
+        local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label }));
+        continue;
+      }
+      const go = () => {
+        if (later && !B.instant) {
+          if (st().off[id]) {
+            local(fill(NOTES.switchedOff, { dose: B.label }));
+            return { ok: false, why: "off" };
+          }
+          return { ok: queue(id, { by, x, p }), later: true };
+        }
+        const r = give(id, { by, x, p });
+        if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
+        return r;
+      };
+      if (lscgHas(id)) setTimeout(() => {
+        if (lastLscgDose(id) < at) go();
+      }, LSCG_WAIT_MS);
+      else {
+        go();
+        done.push(id);
+      }
+    }
+    return done;
+  }
+  function initNeedle(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 1, (args, next) => {
+        try {
+          const data = args[0], P = W4.Player;
+          if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
+            const sender = charOf(data.Sender), f = factsOf(data, sender);
+            if (f.name === "Inject" && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+          }
+        } catch (e) {
+          console.warn("[Dispensary] needle:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] can't feel needles:", e);
+    }
+  }
+
   // shared/protocol.js
   var FARM_MSG = "FarmhandMsg";
   var PROTOCOL = 2;
@@ -3256,11 +3689,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/hardcore.js
-  var W4 = window;
-  var DAY = 864e5;
+  var W5 = window;
+  var DAY2 = 864e5;
   var CHECK_DAYS = 30;
-  var me = () => W4.Player && W4.Player.MemberNumber || 0;
-  var here = (mn) => (W4.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var me = () => W5.Player && W5.Player.MemberNumber || 0;
+  var here = (mn) => (W5.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
   var who = (mn) => here(mn) ? nameOf(mn) : "#" + mn;
   var onChange = () => {
   };
@@ -3269,7 +3702,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var hardOn = () => !!(st().hard && st().hard.on);
   function keyholders() {
-    const P = W4.Player, out = [];
+    const P = W5.Player, out = [];
     const own = P && P.Ownership && P.Ownership.MemberNumber;
     if (typeof own === "number" && own > 0 && own !== me()) out.push(own);
     if (st().stock) {
@@ -3304,7 +3737,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var companion = () => {
     try {
-      const C = W4.FarmhandCompanion;
+      const C = W5.FarmhandCompanion;
       return C && typeof C.hardPrefs === "function" ? C : null;
     } catch (e) {
       return null;
@@ -3313,7 +3746,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var isKey = (mn) => typeof mn === "number" && keyholders().includes(mn);
   function dueAt() {
     const H = st().hard || {};
-    return H.until ? H.until : (H.checkAt || H.since || Date.now()) + CHECK_DAYS * DAY;
+    return H.until ? H.until : (H.checkAt || H.since || Date.now()) + CHECK_DAYS * DAY2;
   }
   function log(by, what) {
     const H = st().hard;
@@ -3322,8 +3755,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var hardLog = () => (st().hard && st().hard.log || []).slice();
   function sendTo(mn, type, data) {
     try {
-      if (here(mn) && typeof W4.ServerSend === "function") {
-        W4.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
+      if (here(mn) && typeof W5.ServerSend === "function") {
+        W5.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
         return true;
       }
     } catch (e) {
@@ -3332,8 +3765,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function beepTo(mn, text) {
     try {
-      if (typeof W4.ServerSend === "function") {
-        W4.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text).slice(0, 900) });
+      if (typeof W5.ServerSend === "function") {
+        W5.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text).slice(0, 900) });
         return true;
       }
     } catch (e) {
@@ -3342,13 +3775,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function announce() {
     const H = st().hard || {}, keys = keyholders();
-    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W4.Player && (W4.Player.Nickname || W4.Player.Name) || "" });
+    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W5.Player && (W5.Player.Nickname || W5.Player.Name) || "" });
   }
   function lock(days) {
     if (hardOn()) return { ok: false, why: "on" };
     if (!keyholders().length) return { ok: false, why: "nokey" };
     const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
-    st().hard = { on: true, since: now, until: d ? now + d * DAY : 0, checkAt: now, log: st().hard && st().hard.log || [] };
+    st().hard = { on: true, since: now, until: d ? now + d * DAY2 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
     log(me(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
     save(true);
     announce();
@@ -3371,7 +3804,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!hardOn() || !isKey(by)) return false;
     const H = st().hard, now = Date.now(), last = H.checkAt || 0;
     H.checkAt = now;
-    if (now - last > DAY) log(by, "checked in");
+    if (now - last > DAY2) log(by, "checked in");
     save();
     onChange();
     return true;
@@ -3380,11 +3813,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!hardOn()) return;
     const H = st().hard, now = Date.now();
     if (H.until && now >= H.until) unlock(me(), "the end date came");
-    else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
+    else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY2) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
   }
   var askedAt = 0;
   function askOut() {
-    const now = Date.now(), keys = keyholders(), name = W4.Player && (W4.Player.Nickname || W4.Player.Name) || "Somebody";
+    const now = Date.now(), keys = keyholders(), name = W5.Player && (W5.Player.Nickname || W5.Player.Name) || "Somebody";
     if (now - askedAt < 5 * 6e4) {
       local("\u{1F5DD}\uFE0F Your keyholders have already been asked. Your doses stay till one of them lets you out.");
       return 0;
@@ -3404,7 +3837,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!isKey(by) || !m || typeof m !== "object") return false;
     const H = st().hard, nm = who(by);
     if (m.do === "check") {
-      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H.until || 0, due: dueAt(), keys: keyholders(), name: W4.Player && (W4.Player.Nickname || W4.Player.Name) || "" });
+      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H.until || 0, due: dueAt(), keys: keyholders(), name: W5.Player && (W5.Player.Nickname || W5.Player.Name) || "" });
       return true;
     }
     if (!hardOn()) return false;
@@ -3428,7 +3861,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (m.do === "extend") {
       const d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(m.days) || 0)));
-      H.until = d ? Date.now() + d * DAY : 0;
+      H.until = d ? Date.now() + d * DAY2 : 0;
       H.checkAt = Date.now();
       log(by, d ? "set the end to " + d + " day" + (d === 1 ? "" : "s") + " from now" : "took the end date away");
       save();
@@ -3507,7 +3940,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (sendTo(mn, "dispKey", Object.assign({ do: what }, data || {}))) return "room";
     const words = { check: "checked in on your hardcore", letout: "let you out: every dose lifted", end: "ended your hardcore" };
     if (!words[what]) return null;
-    const nm = W4.Player && (W4.Player.Nickname || W4.Player.Name) || "Your keyholder";
+    const nm = W5.Player && (W5.Player.Nickname || W5.Player.Name) || "Your keyholder";
     return beepTo(mn, "\u{1F5DD}\uFE0F " + nm + " " + words[what] + ". [fd:" + what + "]") ? "beep" : null;
   }
   function initHardcore(mod2) {
@@ -3564,19 +3997,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/lscg.js
-  var W5 = window;
+  var W6 = window;
   var api = null;
   var caps = null;
   var syncing = null;
   var REG = {};
   var lastLscg = {};
-  var ours = (id) => LSCG_ID + "." + id;
+  var ours2 = (id) => LSCG_ID + "." + id;
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
   var BREATH_MINS = 10;
   function lscgPresent() {
-    if (W5.LSCG) return true;
+    if (W6.LSCG) return true;
     try {
-      const sdk = W5.bcModSdk;
+      const sdk = W6.bcModSdk;
       if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
     } catch (e) {
     }
@@ -3598,7 +4031,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!lscgHas(id) || syncing) return;
     syncing = id;
     try {
-      api.drugs.dose(ours(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
+      api.drugs.dose(ours2(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
     } catch (e) {
     } finally {
       syncing = null;
@@ -3638,7 +4071,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return;
               }
               const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
-              const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult) });
+              const text = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text) || void 0;
+              if (text && isLater(text)) {
+                queue(id, { by: ctx.sender, x: 1, p });
+                ctx.setLevel(active(id) ? minsLeft(id) : 0);
+                return;
+              }
+              const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult), p });
               ctx.setLevel(r.ok ? minsLeft(id) : 0);
             },
             onTick(ctx) {
@@ -3678,7 +4117,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function initLscg() {
-    const q = W5.LSCG_OnLoad = W5.LSCG_OnLoad || [];
+    const q = W6.LSCG_OnLoad = W6.LSCG_OnLoad || [];
     q.push((L) => {
       try {
         setUp(L);
@@ -3689,9 +4128,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/doses.js
-  var W6 = window;
-  var MIN = 6e4;
-  var CAP = 48 * 60 * MIN;
+  var W7 = window;
+  var MIN2 = 6e4;
+  var CAP = 48 * 60 * MIN2;
   var BOOK = {
     denial: {
       label: "Denial Serum",
@@ -3821,6 +4260,89 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keywords: ["obedience", "docile"],
       desc: "LSCG's Suggestible: the more of it in you, the more you want to do as you're told. Only with LSCG; without it, the farm's obedience shot is the farm's trance."
     },
+    // ── Nov 17, more (none of these is a farm shot: on the farm too, your Dispensary reads the needle) ──
+    letdown: {
+      label: "Let-Down",
+      icon: "\u{1F37C}",
+      mins: 30,
+      color: "#efe3c8",
+      every: [4, 7],
+      room: true,
+      words: /\b(let[- ]?down (?:tonic|serum|shot|draught|drops?|potion)|leaky (?:tits|teats|udders?) (?:tonic|serum|shot))\b/,
+      keywords: ["let-down tonic", "letdown serum"],
+      soak: ["let-down", "leaky"],
+      desc: 'Your tits go heavy and leak: fresh wet spots bloom through your top every few minutes. With the Companion and its "Farm can mark my body" on, the milk shows on your chest for everybody with a Companion. Half an hour a dose.'
+    },
+    fillout: {
+      label: "Fill-Out",
+      icon: "\u{1F388}",
+      mins: 30,
+      color: "#f0a0b8",
+      every: [6, 10],
+      room: true,
+      words: /\b(fill-out|fill[- ]?out (?:serum|shot|tonic|potion|drops?)|swell(?:ing)? (?:serum|shot|tonic|potion|drops?))\b/,
+      keywords: ["fill-out", "swelling serum"],
+      soak: ["swelling", "fill-out"],
+      desc: "A swell that comes and goes: your tits a few cups bigger, or your belly round and full, for as long as it lasts, then it shrinks back. Say which on the bottle (Fill-Out (belly), Fill-Out (ass)); it's the cup if it doesn't say. The Companion's drawn body draws your tits and belly swollen for everybody with a Companion (a swollen ass gets its lines, not a picture, for now). Half an hour a dose."
+    },
+    airhead: {
+      label: "Airhead Elixir",
+      icon: "\u{1F380}",
+      mins: 20,
+      color: "#ff9ccf",
+      every: [6, 10],
+      room: true,
+      words: /\b((?:airhead|bimbo) (?:elixir|potion|serum|tonic|shot|juice|drops?))\b/,
+      keywords: ["airhead elixir", "bimbo serum"],
+      soak: ["airhead", "bimbo"],
+      desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose."
+    },
+    babble: {
+      label: "Babble Brew",
+      icon: "\u{1F4AC}",
+      mins: 20,
+      color: "#c0508a",
+      every: [6, 10],
+      room: true,
+      words: /\b(babble (?:brew|potion|tonic|shot|serum)|potty[- ]?mouth (?:potion|tonic|brew|serum))\b/,
+      keywords: ["babble brew", "potty mouth potion"],
+      soak: ["babble"],
+      desc: "Filthy words keep slippin' out in the middle of what you say, and innocent ones come out wrong (the clock, the class, the bread...). The stronger the dose, the filthier your mouth. Twenty minutes a dose."
+    },
+    deepthroat: {
+      label: "Deep Throat Drops",
+      icon: "\u{1F444}",
+      mins: 60,
+      color: "#d06070",
+      every: [8, 12],
+      words: /\b(deep[- ]?throat (?:drops?|serum|spray|shot|tonic)|throat relax\w*|gag[- ]?reflex (?:blocker|drops?|serum))\b/,
+      keywords: ["deep throat drops", "throat relaxer"],
+      soak: ["deep throat"],
+      desc: "No gag reflex: anything goes down easy, and whatever's done to your mouth counts double. On the farm, a dosed throat takes a load without gaggin', and the trainin' counts twice. An hour a dose."
+    },
+    rut: {
+      label: "Rut",
+      icon: "\u{1F402}",
+      mins: 60,
+      color: "#a8432c",
+      every: [5, 8],
+      room: true,
+      words: /\b(rut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut (?:serum|shot|tonic))\b/,
+      keywords: ["rut serum", "rutting tonic"],
+      soak: ["rut", "rutting"],
+      desc: "In rut: hot, hungry and ready again almost as soon as you've finished. Your arousal never cools right off, and after you go over it bounces straight back up. On the farm, your loads come bigger and you don't run dry. An hour a dose."
+    },
+    tender: {
+      label: "Tender",
+      icon: "\u{1F338}",
+      mins: 30,
+      color: "#f2a6b8",
+      every: [6, 9],
+      words: /\b(tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er)\b/,
+      keywords: ["tender drops", "tenderizer"],
+      soak: ["tender"],
+      desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose."
+    },
     purge: {
       label: "Purge",
       icon: "\u{1F9FC}",
@@ -3839,23 +4361,72 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (m) return Number(m[1] || m[2]);
     return /\btriple\b/.test(t) ? 3 : /\bdouble\b/.test(t) ? 2 : 1;
   }
+  var TENDER_SPOTS = {
+    nipples: { word: "nipples", zones: ["ItemNipples", "ItemNipplesPiercings"], re: /\b(nipples?|teats?)\b/ },
+    breasts: { word: "tits", zones: ["ItemBreast"], re: /\b(breasts?|tits?|titties|boobs?|chest|udders?)\b/ },
+    clit: { word: "clit", zones: ["ItemVulvaPiercings"], re: /\bclit\w*\b/ },
+    pussy: { word: "pussy", zones: ["ItemVulva"], re: /\b(pussy|cunt|slit|vulva|cooch)\b/ },
+    ass: { word: "ass", zones: ["ItemButt"], re: /\b(ass|butt|bum|rear|asshole)\b/ },
+    neck: { word: "neck", zones: ["ItemNeck"], re: /\b(neck|throat|nape)\b/ },
+    ears: { word: "ears", zones: ["ItemEars"], re: /\bears?\b/ },
+    mouth: { word: "lips", zones: ["ItemMouth"], re: /\b(lips?|mouth|tongue)\b/ },
+    belly: { word: "belly", zones: ["ItemPelvis"], re: /\b(belly|tummy|stomach|navel)\b/ },
+    thighs: { word: "thighs", zones: ["ItemLegs"], re: /\b(thighs?|legs?)\b/ },
+    feet: { word: "feet", zones: ["ItemFeet", "ItemBoots"], re: /\b(feet|foot|toes?|soles?)\b/ }
+  };
+  var TENDER_DEFAULT = "nipples";
+  var PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
+  function partFor(id, text) {
+    const t = String(text || "").toLowerCase();
+    if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+    if (id === "tender") {
+      for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
+      return "";
+    }
+    return "";
+  }
   function dosesIn(text) {
     const t = String(text || "").toLowerCase(), x = stackOf(t);
-    return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => ({ id, x }));
+    return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => {
+      const p = partFor(id, t);
+      return p ? { id, x, p } : { id, x };
+    });
   }
+  function partOf(id) {
+    const d = st().doses[id];
+    if (id === "fillout") return d && d.p || "cup";
+    if (id === "tender") {
+      const p = d && d.p || st().tenderSpot;
+      return TENDER_SPOTS[p] ? p : TENDER_DEFAULT;
+    }
+    return "";
+  }
+  var tenderZones = () => TENDER_SPOTS[partOf("tender")].zones;
   var voiceOf = (id) => BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice] || null;
   var nameIn = (t) => String(t).replace(/%n/g, myName());
+  var poolOf = (id, p) => id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id];
+  var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : t;
+  var ours3 = (id, kind, p) => {
+    const L = poolOf(id, p);
+    return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : "";
+  };
   function takeLine(id) {
     const v = voiceOf(id);
-    return v && v.seen.length ? nameIn(pick(v.seen)) : LINES[id] && LINES[id].take ? fill(pick(LINES[id].take)) : "";
+    return v && v.seen.length ? nameIn(pick(v.seen)) : ours3(id, "take");
   }
   function nowLine(id) {
     const v = voiceOf(id);
-    return v && v.now.length ? nameIn(pick(v.now)) : LINES[id] && LINES[id].now ? fill(pick(LINES[id].now)) : "";
+    return v && v.now.length ? nameIn(pick(v.now)) : ours3(id, "now");
   }
-  function offLine(id) {
+  function offLine(id, p) {
     const v = voiceOf(id);
-    return v && v.off.length ? nameIn(pick(v.off)) : LINES[id] && LINES[id].off ? fill(pick(LINES[id].off)) : "";
+    return v && v.off.length ? nameIn(pick(v.off)) : ours3(id, "off", p);
+  }
+  function tellPage(detail) {
+    try {
+      W7.dispatchEvent(new W7.CustomEvent("farmhand-dispensary", { detail }));
+    } catch (e) {
+    }
   }
   var penaltyF = () => 1 + st().penalty / 100;
   function active(id) {
@@ -3867,6 +4438,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!d) return 0;
     return typeof d.until === "number" ? Math.max(0, d.until - Date.now()) : Math.max(0, d.left || 0);
   }
+  var TOLERANCE_HOURS = 3;
+  var TOLERANCE_STEP = 0.2;
+  var TOLERANCE_FLOOR = 0.4;
+  function toleranceOf(id, now) {
+    const S2 = st();
+    if (!S2.tolerance) return 1;
+    const recent = (S2.taken[id] || []).filter((t) => (now || Date.now()) - t < TOLERANCE_HOURS * 36e5).length;
+    return Math.max(TOLERANCE_FLOOR, 1 - TOLERANCE_STEP * recent);
+  }
   function give(id, o) {
     o = o || {};
     const B = BOOK[id], S2 = st();
@@ -3876,9 +4456,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
-    const dur = Math.max(MIN, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN));
+    const tol = o.upto ? 1 : toleranceOf(id, now);
+    const dur = Math.max(MIN2, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN2 * tol));
     const was = active(id), d = S2.doses[id], by = Number(o.by) || 0;
     const xNow = Math.max(x, was && d ? d.x || 1 : 1);
+    const p = typeof o.p === "string" && o.p ? o.p : was && d && d.p ? d.p : "";
     if (S2.clock === "real") {
       const add2 = dur * penaltyF(), base = was && typeof d.until === "number" ? d.until : now;
       S2.doses[id] = { x: xNow, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add2) : base + add2) };
@@ -3886,9 +4468,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const base = was && typeof d.left === "number" ? d.left : 0;
       S2.doses[id] = { x: xNow, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
     }
+    if (p) S2.doses[id].p = p;
+    if (!o.upto) S2.taken[id] = (S2.taken[id] || []).concat(now).filter((t) => now - t < 3 * 864e5).slice(-20);
     save();
     if (!was) start(id);
     if (!o.quiet) action(o.line || takeLine(id));
+    if (tol < 1) local(fill(TOLERANCE_NOTE, { dose: B.label }).replace("%p", String(Math.round(tol * 100))));
+    if (!was || p && d && d.p !== p || xNow !== (d && d.x)) tellPage({ type: "dose", id, on: true, x: xNow, p });
     try {
       lscgShow(id, by);
     } catch (e) {
@@ -3910,11 +4496,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function end(id, why) {
     const S2 = st();
     if (!S2.doses[id]) return false;
+    const p = S2.doses[id].p || (id === "tender" ? partOf(id) : "");
     delete S2.doses[id];
     save();
     stop(id);
+    tellPage({ type: "dose", id, on: false });
     if (why === "done" || why === "lscg") {
-      const l = offLine(id);
+      const l = offLine(id, p);
       if (l) local(l);
     }
     return true;
@@ -3922,6 +4510,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function clearAll(why) {
     let n = 0;
     for (const id of Object.keys(st().doses)) if (end(id, why)) n++;
+    if (st().later && st().later.length) {
+      n += st().later.length;
+      st().later = [];
+      save();
+    }
     return n;
   }
   var lastTick = 0;
@@ -3938,7 +4531,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!active(id)) end(id, "done");
       else feel(id, now);
     }
-    if (now - lastSave > MIN) {
+    if (now - lastSave > MIN2) {
       lastSave = now;
       if (Object.keys(S2.doses).length) save();
     }
@@ -3961,12 +4554,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var face = (group, expr, secs) => {
     try {
-      if (typeof W6.CharacterSetFacialExpression === "function" && W6.Player) W6.CharacterSetFacialExpression(W6.Player, group, expr, secs);
+      if (typeof W7.CharacterSetFacialExpression === "function" && W7.Player) W7.CharacterSetFacialExpression(W7.Player, group, expr, secs);
     } catch (e) {
     }
   };
   var meter = () => {
-    const A = W6.Player && W6.Player.ArousalSettings;
+    const A = W7.Player && W7.Player.ArousalSettings;
     return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
   };
   function setArousal(v) {
@@ -3974,33 +4567,42 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const A = meter();
       if (!A) return;
       const n = Math.max(0, Math.min(100, Math.round(v)));
-      if (typeof W6.ActivitySetArousal === "function") W6.ActivitySetArousal(W6.Player, n);
+      if (typeof W7.ActivitySetArousal === "function") W7.ActivitySetArousal(W7.Player, n);
       else A.Progress = n;
     } catch (e) {
     }
   }
   var xOf = (id) => st().doses[id] && st().doses[id].x || 1;
   var felt = {};
+  var FLUSHED = ["needy", "heat", "rut", "letdown"];
+  var leak = () => tellPage({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
   function start(id) {
     if (id === "sedative") face("Eyes", "Dazed", 180);
-    if (id === "needy" || id === "heat") face("Blush", "Medium", 120);
+    if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
+    if (id === "airhead") face("Eyes", "Dazed", 120);
+    if (id === "letdown") leak();
   }
   function stop(id) {
-    if (id === "sedative") face("Eyes", null);
-    if ((id === "needy" || id === "heat") && !active("needy") && !active("heat")) face("Blush", null);
+    if (id === "sedative" && !active("airhead") || id === "airhead" && !active("sedative")) face("Eyes", null);
+    if (FLUSHED.includes(id) && !FLUSHED.some(active)) face("Blush", null);
     delete felt[id];
+  }
+  function moment(id) {
+    tick();
+    if (felt[id]) felt[id].next = 0;
+    tick();
   }
   function feel(id, now) {
     const B = BOOK[id];
-    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN });
-    if (id === "sedative" && now - f.face > 2 * MIN) {
+    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN2 });
+    if (id === "sedative" && now - f.face > 2 * MIN2) {
       f.face = now;
       face("Eyes", "Dazed", 180);
     }
     if (id === "needy") {
       const A = meter(), cap = Math.min(92, 60 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < cap) setArousal((Number(A.Progress) || 0) + 2);
-      if (now - f.face > 2 * MIN) {
+      if (now - f.face > 2 * MIN2) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -4008,24 +4610,45 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "heat") {
       const A = meter(), floor = Math.min(70, 25 + 15 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN) {
+      if (now - f.face > 2 * MIN2) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
     }
+    if (id === "rut") {
+      const A = meter(), floor = Math.min(60, 20 + 10 * xOf(id));
+      if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
+      if (now - f.face > 2 * MIN2) {
+        f.face = now;
+        face("Blush", "Medium", 120);
+      }
+    }
+    if (id === "airhead" && now - f.face > 2 * MIN2) {
+      f.face = now;
+      face("Eyes", "Dazed", 120);
+    }
     if (B.every && now >= f.next && inRoom()) {
-      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN;
+      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN2;
       const l = nowLine(id);
       if (l) {
         if (B.room) action(l);
         else local(l);
       }
+      if (id === "letdown") leak();
     } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
-      f.next = now + (8 + Math.random() * 6) * MIN;
+      f.next = now + (8 + Math.random() * 6) * MIN2;
       local(pick(LINES.sedative.drift));
     }
   }
   var heldTold = 0;
+  var toldAt = {};
+  function feltOnce(id, kind, gap) {
+    const now = Date.now(), k = id + ":" + kind;
+    if (now - (toldAt[k] || 0) < gap) return;
+    toldAt[k] = now;
+    const l = ours3(id, kind);
+    if (l) local(l);
+  }
   function initDoses(mod2) {
     try {
       mod2.hookFunction("ActivityOrgasmPrepare", 6, (args, next) => {
@@ -4034,7 +4657,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("denial")) {
             if (C.ArousalSettings) C.ArousalSettings.Progress = 94;
             face("Blush", "High", 20);
-            if (Date.now() - heldTold > MIN) {
+            if (Date.now() - heldTold > MIN2) {
               heldTold = Date.now();
               local(pick(LINES.denial.held));
             }
@@ -4051,7 +4674,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mod2.hookFunction("ActivityOrgasmStart", 6, (args, next) => {
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W6.ActivityOrgasmRuined = true;
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W7.ActivityOrgasmRuined = true;
         } catch (e) {
         }
         return next(args);
@@ -4062,9 +4685,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivitySetArousalTimer", 6, (args, next) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("hairtrigger") && Number(args[3]) > 0) {
-            args[3] = Number(args[3]) * 2;
+          const C = args[0], zone = String(args[2] || "");
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && Number(args[3]) > 0) {
+            let f = 1;
+            if (active("hairtrigger")) f *= 2;
+            if (active("deepthroat") && /^ItemMouth/.test(zone)) {
+              f *= 2;
+              feltOnce("deepthroat", "used", 9e4);
+            }
+            if (active("tender") && tenderZones().includes(zone)) {
+              f *= 3;
+              feltOnce("tender", "touched", 12e4);
+            }
+            if (f > 1) args[3] = Number(args[3]) * f;
           }
         } catch (e) {
         }
@@ -4072,6 +4705,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     } catch (e) {
       console.warn("[Dispensary] Hair Trigger can't reach you:", e);
+    }
+    try {
+      mod2.hookFunction("ActivityOrgasmStop", 6, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("rut")) {
+            const back = Math.min(80, 40 + 8 * xOf("rut"));
+            if ((Number(args[1]) || 0) < back) {
+              args = [args[0], back].concat(args.slice(2));
+              feltOnce("rut", "again", MIN2);
+            }
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] Rut can't keep you goin':", e);
     }
     try {
       mod2.hookFunction("ChatRoomMapViewCanEnterTile", 1, (args, next) => {
@@ -4084,78 +4735,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     } catch (e) {
       console.warn("[Dispensary] the Sedative can't slow you:", e);
-    }
-  }
-
-  // dispensary/src/needle.js
-  var W7 = window;
-  var botHere = () => (W7.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
-  var charOf = (mn) => (W7.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W7.Player && W7.Player.MemberNumber === mn ? W7.Player : null);
-  function craftText(item) {
-    if (!item || !item.Craft) return "";
-    let d = item.Craft.Description || "";
-    try {
-      if (W7.CraftingDescription && typeof W7.CraftingDescription.Decode === "function") d = W7.CraftingDescription.Decode(d);
-    } catch (e) {
-    }
-    return ((item.Craft.Name || "") + " | " + d).toLowerCase();
-  }
-  var handOf = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
-  function factsOf(data, sender) {
-    try {
-      if (typeof W7.ChatRoomMessageRunExtractors === "function") {
-        const m = W7.ChatRoomMessageRunExtractors(data, sender).metadata;
-        if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
-      }
-    } catch (e) {
-    }
-    const dict = Array.isArray(data.Dictionary) ? data.Dictionary : [];
-    const name = (dict.find((d) => d && d.ActivityName) || {}).ActivityName;
-    const t = dict.find((d) => d && (typeof d.TargetCharacter === "number" || d.Tag === "TargetCharacter"));
-    return { name, target: t ? typeof t.TargetCharacter === "number" ? t.TargetCharacter : t.MemberNumber : void 0 };
-  }
-  var LSCG_WAIT_MS = 1500;
-  function onNeedle(by, item) {
-    const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [];
-    for (const { id, x } of list) {
-      const B = BOOK[id];
-      if (B.farm && botHere()) continue;
-      if (B.lscg && lscgPresent()) continue;
-      if (!allowed(by)) {
-        local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label }));
-        continue;
-      }
-      const go = () => {
-        const r = give(id, { by, x });
-        if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
-        return r;
-      };
-      if (lscgHas(id)) setTimeout(() => {
-        if (lastLscgDose(id) < at) go();
-      }, LSCG_WAIT_MS);
-      else {
-        go();
-        done.push(id);
-      }
-    }
-    return done;
-  }
-  function initNeedle(mod2) {
-    try {
-      mod2.hookFunction("ChatRoomMessage", 1, (args, next) => {
-        try {
-          const data = args[0], P = W7.Player;
-          if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
-            const sender = charOf(data.Sender), f = factsOf(data, sender);
-            if (f.name === "Inject" && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
-          }
-        } catch (e) {
-          console.warn("[Dispensary] needle:", e);
-        }
-        return next(args);
-      });
-    } catch (e) {
-      console.warn("[Dispensary] can't feel needles:", e);
     }
   }
 
@@ -4173,7 +4752,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var helloAt = 0;
   var helloSig = "";
-  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0]);
+  var onNow = () => doseIds().filter(active).sort();
+  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0, onNow(), craving()]);
   function hello(force) {
     const now = Date.now(), sig = sigNow();
     if (!force && sig === helloSig && now - helloAt < 30 * 6e4) return false;
@@ -4184,7 +4764,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       off: Object.keys(st().off),
       hard: hardOn(),
       due: hardOn() ? dueAt() : 0,
-      keys: hardOn() ? keyholders() : []
+      keys: hardOn() ? keyholders() : [],
+      on: onNow(),
+      crave: craving()
     })) return false;
     helloAt = now;
     helloSig = sig;
@@ -4466,24 +5048,185 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
   }
 
+  // dispensary/src/speech-more.js
+  var pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+  function sameCase(from, to) {
+    if (from === from.toUpperCase() && from.length > 1) return to.toUpperCase();
+    if (from[0] === from[0].toUpperCase()) return to[0].toUpperCase() + to.slice(1);
+    return to;
+  }
+  var parts = (w) => /^([^A-Za-z']*)([A-Za-z][A-Za-z']*)([^A-Za-z']*)$/.exec(w);
+  var AIR_SWAP = {
+    very: "super",
+    really: "totally",
+    yes: "yesss",
+    yeah: "yeahhh",
+    good: "cute",
+    great: "sooo good",
+    nice: "cute",
+    think: "think? like,",
+    maybe: "maybe? idk",
+    know: "know, like,",
+    sure: "totally",
+    definitely: "totally",
+    probably: "like, prolly",
+    absolutely: "totally",
+    understand: "get it",
+    remember: "remember? I think",
+    because: "cuz",
+    important: "big",
+    interesting: "fun",
+    difficult: "hard",
+    wonderful: "sooo pretty",
+    beautiful: "sooo pretty",
+    excellent: "super good",
+    amazing: "omg amazing",
+    perhaps: "maybe?",
+    correct: "right?",
+    hello: "hiii",
+    hi: "hiii",
+    bye: "byeee"
+  };
+  var AIR_FILL = ["like,", "like,", "um,", "like, totally", "uh,"];
+  var AIR_LOST = ["um... thingy", "big-word thing", "whatchamacallit", "the, um...", "whatever it's called"];
+  var AIR_OPEN = ["Um, ", "Sooo, ", "Like, ", "Omg, ", "Okay so, "];
+  var AIR_END = ["*giggles*", "hehe", "...wait, what was I sayin'?", "*twirls hair*", "lol", "*giggle*"];
+  function airhead(text, x) {
+    const p = Math.min(0.6, 0.2 + 0.08 * (x || 1));
+    const words = String(text).split(" ");
+    const out = words.map((w, i) => {
+      const m = parts(w);
+      if (!m) return w;
+      let core = m[2];
+      const low = core.toLowerCase();
+      if (AIR_SWAP[low] && Math.random() < p + 0.25) core = sameCase(core, AIR_SWAP[low]);
+      else if (core.length >= 10 && Math.random() < p) core = pickOf(AIR_LOST);
+      const pre = i > 0 && i < words.length - 1 && Math.random() < p * 0.45 ? pickOf(AIR_FILL) + " " : "";
+      return pre + m[1] + core + m[3];
+    });
+    let t = out.join(" ");
+    if (Math.random() < p) {
+      const first = t.split(" ")[0];
+      t = pickOf(AIR_OPEN) + (first === "I" || first.startsWith("I'") || first === first.toUpperCase() ? t : t[0].toLowerCase() + t.slice(1));
+    }
+    t = t.replace(/\.(\s|$)/g, (m0, s) => Math.random() < p ? "?" + s : m0);
+    if (Math.random() < p * 0.7) t += " " + pickOf(AIR_END);
+    return t;
+  }
+  var SLIPS = {
+    clock: "cock",
+    sock: "cock",
+    rock: "cock",
+    block: "cock",
+    duck: "fuck",
+    luck: "fuck",
+    truck: "fuck",
+    stuck: "fucked",
+    hit: "tit",
+    bit: "tit",
+    sit: "tit",
+    fit: "tit",
+    sick: "dick",
+    pick: "dick",
+    kick: "dick",
+    trick: "dick",
+    bread: "breed",
+    need: "breed",
+    feed: "breed",
+    read: "breed",
+    come: "cum",
+    coming: "cumming",
+    comes: "cums",
+    not: "knot",
+    hot: "knot",
+    glass: "ass",
+    pass: "ass",
+    class: "ass",
+    grass: "ass",
+    city: "titty",
+    pretty: "titty",
+    dream: "cream",
+    stream: "cream",
+    seat: "teat",
+    sweet: "teat",
+    heard: "herd",
+    hug: "hump",
+    jump: "hump",
+    bump: "hump",
+    mild: "milked",
+    silk: "milk",
+    slick: "lick",
+    beast: "breast",
+    best: "breast",
+    pussycat: "pussy",
+    butter: "butt",
+    button: "butt",
+    but: "butt",
+    whole: "hole",
+    bowl: "hole",
+    ball: "balls",
+    what: "wet",
+    "what's": "wet",
+    sir: "stud",
+    stood: "stud",
+    sorry: "sore",
+    thank: "spank"
+  };
+  var BLURTS = [
+    "\u2014fuck\u2014",
+    "\u2014breed me\u2014",
+    "*moan*",
+    "\u2014cock\u2014",
+    "\u2014milk me\u2014",
+    "\u2014use me\u2014",
+    "\u2014so wet\u2014",
+    "\u2014knot me\u2014",
+    "\u2014please\u2014",
+    "\u2014fill me\u2014",
+    "\u2014tits\u2014",
+    "\u2014harder\u2014",
+    "\u2014mmh, cum\u2014",
+    "\u2014pet me\u2014",
+    "\u2014spank me\u2014",
+    "\u2014mount me\u2014"
+  ];
+  function babble(text, x) {
+    const p = Math.min(0.55, 0.15 + 0.08 * (x || 1));
+    const words = String(text).split(" "), out = [];
+    let blurted = false, slipped = false;
+    words.forEach((w, i) => {
+      const m = parts(w);
+      if (m && SLIPS[m[2].toLowerCase()] && SLIPS[m[2].toLowerCase()] !== m[2].toLowerCase() && Math.random() < p + 0.2) {
+        out.push(m[1] + sameCase(m[2], SLIPS[m[2].toLowerCase()]) + m[3]);
+        slipped = true;
+      } else out.push(w);
+      if (i < words.length - 1 && Math.random() < p * 0.35) {
+        out.push(pickOf(BLURTS));
+        blurted = true;
+      }
+    });
+    if (!blurted && !slipped) out.splice(out.length < 2 ? out.length : 1 + Math.floor(Math.random() * (out.length - 1)), 0, pickOf(BLURTS));
+    return out.join(" ");
+  }
+
   // dispensary/src/speech.js
   var xOf2 = (id) => st().doses[id] && st().doses[id].x || 1;
   var GIGGLES = ["hehe", "*giggle*", "hee", "*snrk*", "ahaha", "*giggles*"];
-  var pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+  var pickOf2 = (a) => a[Math.floor(Math.random() * a.length)];
   function sprinkle(text, bits, every) {
     const words = String(text).split(" ");
-    if (words.length < 2) return text + " " + pickOf(bits);
+    if (words.length < 2) return text + " " + pickOf2(bits);
     const out = [];
-    let since = 0;
+    let since2 = 0;
     words.forEach((w, i) => {
       out.push(w);
-      since++;
-      if (i < words.length - 1 && since >= every && Math.random() < 0.5) {
-        out.push(pickOf(bits));
-        since = 0;
+      since2++;
+      if (i < words.length - 1 && since2 >= every && Math.random() < 0.5) {
+        out.push(pickOf2(bits));
+        since2 = 0;
       }
     });
-    if (!out.some((w) => bits.includes(w))) out.splice(1 + Math.floor(Math.random() * (out.length - 1)), 0, pickOf(bits));
+    if (!out.some((w) => bits.includes(w))) out.splice(1 + Math.floor(Math.random() * (out.length - 1)), 0, pickOf2(bits));
     return out.join(" ");
   }
   function dosedSpeech(text) {
@@ -4491,9 +5234,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf2("moo")));
     if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "\u2014hic\u2014"], 4);
     if (active("feather")) t = sprinkle(t, GIGGLES, 5);
+    if (active("airhead")) t = airhead(t, xOf2("airhead"));
+    if (active("babble")) t = babble(t, xOf2("babble"));
     return t;
   }
-  var touched = () => active("moo") || active("hiccup") || active("feather");
+  var touched = () => ["moo", "hiccup", "feather", "airhead", "babble"].some(active);
   function initSpeech(mod2) {
     try {
       mod2.hookFunction("ServerSend", 6, (args, next) => {
@@ -4546,6 +5291,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (st().screen === false || W9.CurrentScreen !== "ChatRoom") return null;
     if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
     if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
+    if (active("rut")) return { bg: "radial-gradient(ellipse at center, transparent 45%, rgba(170,40,20,.42) 100%)", cls: "breathe", id: "rut" };
+    if (active("airhead")) return { bg: "radial-gradient(ellipse at center, rgba(255,200,235,.10) 25%, rgba(255,150,210,.38) 100%)", cls: "breathe", id: "airhead" };
     if (active("heat")) return { bg: "radial-gradient(ellipse at center, rgba(255,140,60,.06) 30%, rgba(255,110,40,.35) 100%)", cls: "breathe", id: "heat" };
     if (active("needy")) return { bg: "radial-gradient(ellipse at center, rgba(255,120,170,.05) 40%, rgba(255,90,150,.3) 100%)", cls: "breathe", id: "needy" };
     return null;
@@ -4625,6 +5372,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const p = st().penalty;
     return mode === "real" ? "Real time: your timers keep running while you're logged off. To make up for it, every timer runs " + p + "% longer, so a 2-hour dose lasts " + (2 * (1 + p / 100)).toFixed(1).replace(/\.0$/, "") + " hours." : "While online: your timers only count down while you're logged in. A 2-hour dose is 2 hours of you being here.";
   };
+  var partLabel = (id) => id === "fillout" ? " (" + ({ cup: "tits", belly: "belly", ass: "ass" }[partOf(id)] || "tits") + ")" : id === "tender" ? " (" + TENDER_SPOTS[partOf(id)].word + ")" : "";
   function timeLeft(ms) {
     const m = Math.ceil(ms / 6e4);
     return m >= 120 ? Math.floor(m / 60) + " h " + (m % 60 ? m % 60 + " min" : "") : m >= 60 ? "1 h " + (m - 60 ? m - 60 + " min" : "") : m + " min";
@@ -4833,7 +5581,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kids.push(h(
       "div",
       { class: "fd-card" },
-      now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + ": " + timeLeft(leftMs(id)) + " left" + (S2.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+      now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S2.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+      S2.later.length ? h("div", null, "\u{1F48A} " + (S2.later.length === 1 ? "A time-release capsule's" : S2.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
       h(
         "div",
         { class: "fd-row", style: { marginTop: "8px" } },
@@ -4886,7 +5635,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         save();
         draw();
       } }), h("b", null, "Screen touches")),
-      h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it. Only you see them. With reduce motion set on your computer, they hold still."),
+      h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
       h(
         "div",
         { class: "fd-row", style: { marginTop: "8px" } },
@@ -4931,6 +5680,38 @@ One of mods you are using is using an old version of SDK. It will work for now b
         B.lscgOnly && !lscg ? h("div", { class: "fd-muted" }, "Needs LSCG.") : null
       ));
     }
+    kids.push(h("h3", null, "How doses take you"));
+    kids.push(h(
+      "div",
+      { class: "fd-card" },
+      h(
+        "div",
+        { class: "fd-row" },
+        h("span", null, "\u{1F338} Where Tender goes when the bottle doesn't say:"),
+        h(
+          "select",
+          { "aria-label": "Where Tender goes", disabled: locked, onchange: (e) => {
+            st().tenderSpot = e.target.value;
+            save();
+            draw();
+          } },
+          Object.entries(TENDER_SPOTS).map(([k, s2]) => h("option", { value: k, selected: (S2.tenderSpot || TENDER_DEFAULT) === k ? true : void 0 }, s2.word))
+        )
+      ),
+      h("div", { class: "fd-muted", style: { marginTop: "8px" } }, "\u{1F48A} A needle that also says time-release, slow-release, delayed or capsule doesn't hit at once: it goes off somewhere between " + FUSE_MINS[0] + " and " + FUSE_MINS[1] + " minutes later, at a moment nobody knows. Up to " + LATER_MAX + " can wait in you; your safeword clears them."),
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.tolerance ? true : void 0, onchange: (e) => {
+        st().tolerance = e.target.checked;
+        save();
+        draw();
+      } }), h("b", null, "Tolerance")),
+      h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.cravings ? true : void 0, onchange: (e) => {
+        st().cravings = e.target.checked ? Date.now() : 0;
+        save();
+        draw();
+      } }), h("b", null, "Cravings")),
+      h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")
+    ));
     if (lscg) {
       kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi() ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left." : "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's."));
     }
@@ -5055,6 +5836,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setInterval(() => {
       try {
         tick();
+        laterTick();
         tickHard();
         screenTick();
         if (pageOpen()) redrawPage();
@@ -5079,6 +5861,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     give: (...a) => give(...a),
     tick: () => {
       tick();
+      laterTick();
       tickHard();
     },
     setClock: (m) => setClock(m),
@@ -5091,12 +5874,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     keyholders: () => keyholders(),
     dueAt: () => dueAt(),
     speech: (t) => dosedSpeech(t),
-    screen: () => screenTick()
+    screen: () => screenTick(),
+    end: (id) => end(id, "quiet"),
+    moment: (id) => moment(id),
+    craving: () => craving(),
+    craveNow: () => {
+      craveSoon();
+      laterTick();
+    }
   };
   W11.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     doses: () => doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })),
+    // one dose, if it's in you: how strong, its part or spot (Fill-Out: cup, belly, ass · Tender: the spot), time left.
+    // The Companion's drawn body reads Fill-Out from here.
+    dose: (id) => {
+      const d = st().doses[String(id)];
+      return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null;
+    },
     who: () => st().who,
     // hardcore, for the Companion (its own settings lock while yours is on)
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null

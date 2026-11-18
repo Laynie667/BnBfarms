@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.55.0
+// @version      0.56.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2869,7 +2869,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.55.0";
+  var VERSION = "0.56.0";
 
   // shared/species.js
   var WORDS = {
@@ -6970,9 +6970,40 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const base = S2.saved || !farm ? S2 : farm.body, e = Object.assign({}, base, { on: S2.on });
     if (S2.cupSet) e.cup = S2.cup;
     else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+    const f = fillOut();
+    if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
     const mode = bellyMode();
-    e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, mode === "off" ? 0 : mode === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))));
+    e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, bellyStage());
     return e;
+  }
+  var FILL_EASE_MS = 3 * 6e4;
+  function fillOut() {
+    try {
+      const D = W5.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("fillout") : null;
+      if (!d) return null;
+      return { p: d.p === "belly" || d.p === "ass" ? d.p : "cup", x: Math.max(1, Math.min(5, Math.round(Number(d.x) || 1))), half: Number(d.left) < FILL_EASE_MS };
+    } catch (e) {
+      return null;
+    }
+  }
+  function cupWithFill(cup, f) {
+    const add3 = Math.min(6, 2 * f.x);
+    return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add3 / 2) : add3));
+  }
+  function bellyWithFill(stage, f) {
+    if (f.half) return Math.min(4, Math.max(stage + 1, 1));
+    return Math.min(4, Math.max(stage + (f.x >= 2 ? 2 : 1), f.x >= 2 ? 3 : 2));
+  }
+  var fillSig = "";
+  function drawnBodyFillCheck() {
+    const f = fillOut(), sig2 = f ? f.p + f.x + (f.half ? "h" : "") : "";
+    if (sig2 === fillSig) return false;
+    fillSig = sig2;
+    if (!S2.on) return false;
+    if (mine.E) apply(mine.E, eff());
+    redraw(60);
+    tell(true);
+    return true;
   }
   function drawnBodyFarmState(d) {
     if (!d || typeof d !== "object") return;
@@ -7200,7 +7231,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var askedAt = 0;
   var bellyStage = () => {
     const m = bellyMode();
-    return m === "off" ? 0 : m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+    if (m === "off") return 0;
+    const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+    const f = m === "studio" ? null : fillOut();
+    return f && f.p === "belly" ? bellyWithFill(s, f) : s;
   };
   var lastTold = "";
   function tell(force) {
@@ -16026,6 +16060,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return said.map((x) => "Companion " + x);
       }
     });
+    window.addEventListener("farmhand-dispensary", (e) => {
+      const d = e && e.detail;
+      if (!d || typeof d !== "object") return;
+      try {
+        if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
+        if (d.type === "dose" && d.id === "fillout") drawnBodyFillCheck();
+      } catch (err) {
+        console.warn("[Farmhand Companion] the Dispensary's doses:", err);
+      }
+    });
     if (typeof window.CommandCombine === "function") {
       window.CommandCombine([{
         Tag: "farm",
@@ -16037,6 +16081,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }]);
     }
     setInterval(() => {
+      try {
+        drawnBodyFillCheck();
+      } catch (e) {
+      }
       const here2 = botHere2();
       st.panel.show(window.CurrentScreen === "ChatRoom");
       if (!here2) {

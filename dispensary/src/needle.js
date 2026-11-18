@@ -7,6 +7,8 @@
    - LSCG's own drugs are LSCG's (lscg.js).
    - A dose we've put in LSCG's list: LSCG catches it if you've switched it on there. If it hasn't come through LSCG
      a moment later, we give it ourselves.
+   - A needle that also says time-release (slow-release, delayed, a capsule) doesn't hit now: it goes off later
+     (later.js), whichever of us caught it.
 */
 import { BOT } from "./config.js";
 import { BOOK, dosesIn, give } from "./doses.js";
@@ -14,6 +16,8 @@ import { allowed } from "./ladder.js";
 import { lscgPresent, lscgHas, lastLscgDose } from "./lscg.js";
 import { local, fill, nameOf } from "./say.js";
 import { NOTES } from "./lines.js";
+import { isLater, queue } from "./later.js";
+import { st as st0 } from "./store.js";
 
 const W = window;
 export const botHere = () => (W.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
@@ -26,6 +30,8 @@ export function craftText(item) {
   return ((item.Craft.Name || "") + " | " + d).toLowerCase();
 }
 const handOf = (C) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null);
+// the words on whatever somebody in the room has in their hand ("" if nothin' crafted)
+export const handTextOf = (mn) => craftText(handOf(charOf(mn)));
 
 // the activity's own facts, the game's way (falls back to the dictionary for an older game)
 function factsOf(data, sender) {
@@ -39,14 +45,15 @@ function factsOf(data, sender) {
 export const LSCG_WAIT_MS = 1500;
 // a needle went into you: what's on it, and what you let through
 export function onNeedle(by, item) {
-  const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [];
-  for (const { id, x } of list) {
+  const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [], later = isLater(text);
+  for (const { id, x, p } of list) {
     const B = BOOK[id];
     if (B.farm && botHere()) continue;              // the farm girl's (farm.js)
     if (B.lscg && lscgPresent()) continue;          // LSCG's own
     if (!allowed(by)) { local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label })); continue; }
     const go = () => {
-      const r = give(id, { by, x });
+      if (later && !B.instant) { if (st0().off[id]) { local(fill(NOTES.switchedOff, { dose: B.label })); return { ok: false, why: "off" }; } return { ok: queue(id, { by, x, p }), later: true }; }
+      const r = give(id, { by, x, p });
       if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
       return r;
     };

@@ -23,10 +23,48 @@
     for (const k of Object.keys(L.people || {})){ const mn = Number(k); if (mn && !out.includes(mn) && isStaff(mn)) out.push(mn); }
     return out.slice(0, 300);
   }
+  /* NOV 17, MORE: the Dispensary's own doses, the ones Laynie picked ("I love it"). Their hello says what's in them now
+     (on) and, if they've switched cravings on, what they're cravin' (crave). I read two of them on the farm:
+       Deep Throat Drops   a dosed throat takes a load without gaggin', and the trainin' counts twice (08-production.js)
+       Rut                 a stud in rut loads half again as big, and doesn't run dry from a busy hour
+     Cravings: when somebody's cravin', I notice (at most every 45 minutes) and offer; ?fix and I call their Dispensary
+     for it, like any of my calls. Only ever for somebody who switched cravings on, for themselves. */
+  const DISP_LABEL = { denial: "Denial Serum", sedative: "Sedative", needy: "Needy Nectar", hairtrigger: "Hair Trigger", bitterroot: "Bitterroot",
+    moo: "Moo Juice", hiccup: "Hiccup Fizz", feather: "Featherlight", heat: "Heat", letdown: "Let-Down", fillout: "Fill-Out",
+    airhead: "Airhead Elixir", babble: "Babble Brew", deepthroat: "Deep Throat Drops", rut: "Rut", tender: "Tender" };
+  // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me)
+  const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er/i;
+  const CRAVE_OFFER_MS = 45 * 60000;
+  const CRAVE_OFFERS = [
+    "💉 You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",
+    "💉 Somebody's fidgety. Want a little %d to take the edge off, hon? ?fix, and it's yours.",
+    "💉 I know that face. That's a %d face. Say ?fix and I'll fetch you one.",
+    "💉 Lookin' a bit flat there, sugar. I could fix you up with some %d. Just say ?fix.",
+  ];
+  function dispOn(mn, id){ const d = dispFor(mn); return !!(d && Array.isArray(d.on) && d.on.includes(id)); }
+  function craveOffer(mn, d){
+    if (!d.crave || !DISP_LABEL[d.crave]) return;
+    const seen = state.dispCraveAt || (state.dispCraveAt = new Map()), now = Date.now();
+    if (now - (seen.get(mn) || 0) < CRAVE_OFFER_MS) return;
+    seen.set(mn, now);
+    tell(mn, CRAVE_OFFERS[Math.floor(Math.random() * CRAVE_OFFERS.length)].replace(/%d/g, DISP_LABEL[d.crave]));
+  }
+  function fixCommand(mn, R){
+    const d = dispFor(mn);
+    if (!d) return R("That's for folks runnin' The Farmhand's Dispensary, sugar, with cravings switched on.");
+    if (!d.crave || !DISP_LABEL[d.crave]) return R("You're not cravin' anything right now, hon. Good for you.");
+    const dose = d.crave, dc = dispCall(mn, dose, { x: 1, by: CFG.BOT_MEMBER });
+    if (dc === "sent"){ d.crave = ""; audit(mn, "FIX", dose); return R("💉 There you go, sugar: " + DISP_LABEL[dose] + ". That should take the edge off."); }
+    return R(dc === "ladder" ? "Your Dispensary doesn't take doses from the farm, hon, so I can't fix you up." : "You've switched " + DISP_LABEL[dose] + " off in your Dispensary, sugar, so I'll leave it be.");
+  }
+  addCommand("fix", { topic: "play", private: true, run: (c) => fixCommand(c.sender, c.R) });
   function onDispHello(mn, m){
     const had = dispMap().has(mn);
+    const ids = (a) => Array.isArray(a) ? a.filter(x => typeof x === "string" && /^[a-z]{2,20}$/.test(x)).slice(0, 40) : [];
     dispMap().set(mn, { ver: String(m.ver || "?").slice(0, 20), farm: m.farm !== false, lscg: !!m.lscg,
-                        off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now() });
+                        off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now(),
+                        on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "" });
+    try { craveOffer(mn, dispMap().get(mn)); } catch(e){ warn("crave:", e); }
     if (!had) log("Dispensary hello from "+mn+" (v"+String(m.ver || "?").slice(0, 20)+")");
     const r = rec(mn);
     // their hardcore, kept on their record: it holds even when their Dispensary isn't here to say so, till it lets go

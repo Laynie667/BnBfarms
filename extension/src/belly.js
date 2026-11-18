@@ -244,9 +244,16 @@ function hookBelly(mod) {
             if (gate ? gate(src) : (lower && prio(src) > SKIN_TOP)) paint();
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };
-          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } } : cb[name]);
+          // farm ink (shared/ink, Nov 18) waits for the belly and goes on top of it, under anything worn
+          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;   // (the repo's or a local copy; a live one has its slot)
+          const flushInk = () => { for (const h of inkHeld.splice(0)) { try { cb[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[Farmhand Companion] ink:", e); } } };
+          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => {
+            if (!done && typeof src === "string" && INK_SRC.test(src)) { inkHeld.push([name, src, x, y, o]); return; }
+            try { before(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); }
+            if (done && inkHeld.length) flushInk();
+            cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { warnSome("[Farmhand Companion] belly:", e); } } : cb[name]);
           args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
-          finish = paint;   // (a bare body: nothin' comes after the skin, so it goes in at the very end)
+          finish = () => { paint(); flushInk(); };   // (a bare body: nothin' comes after the skin, so the belly goes in at the very end, then the ink)
         }
       } catch (e) { warnSome("[Farmhand Companion] belly hook:", e); }
       const out = next(args);   // the game's own drawing, called once, whatever happened above

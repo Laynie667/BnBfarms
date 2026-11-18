@@ -1112,6 +1112,11 @@ window.FarmBodyEngine = function (host) {
             put(name, c, x - c.MX, y - c.MY, o, src); return true;
           };
           const held = [];
+          // FARM INK (shared/ink, Nov 18): a tattoo is on the skin, so it waits till the drawn belly and breasts are on and
+          // goes on top of them, under anything worn (it used to go first and the drawn belly covered it). Laynie, Nov 17:
+          // "as long as it layers properly".
+          const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;   // (the repo's or a local copy; a live one has its slot)
+          const flushInk = () => { for (const h of inkHeld.splice(0)) { try { real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { warnSome("[studio] ink:", e); } } };
           // The lactation pump is one picture: two cups, a Y of tube, a long hose, and the pump with its bottle down by her
           // leg. Moved and grown as a whole, like other nipple gear, the bottle went with one breast and grew, and the
           // hoses crossed (Laynie, Oct 14: "the milker attachment looks odd too. I don't mind if we can make the hose
@@ -1163,7 +1168,9 @@ window.FarmBodyEngine = function (host) {
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { try { upperSkin = bellySkin(src, o && o.HexColor, FarmBelly.bellyPose(src)); } catch (e) { /* the usual colour */ } upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
           const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
             const blink = /Blink$/.test(name);
+            if (!done && typeof src === "string" && INK_SRC.test(src)) { inkHeld.push([name, src, x, y, o]); return; }   // (farm ink: after the belly)
             if (!blink) { try { before(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
+            if (done && inkHeld.length) flushInk();
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { warnSome("[studio] nipples:", e); } }
@@ -1216,7 +1223,7 @@ window.FarmBodyEngine = function (host) {
             if (!blink) { try { after(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
           } : real[name]);
           cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
-          finish = paint;
+          finish = () => { paint(); flushInk(); };   // (a bare body: the belly at the very end, then the ink on it)
         }
       } catch (e) { warnSome("[studio] belly hook:", e); }
       const out = game(cb);

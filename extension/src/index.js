@@ -9,6 +9,8 @@
 // messages, and the panel shows them in the right place instead of whispers and beeps.
 import sdkModule from "bondage-club-mod-sdk";
 import { registerInk } from "../../shared/ink/ink.js";
+// the farm's counts for your live ink (state.ink from the farm girl), to whichever add-on carries the ink
+const inkCounts = (c) => { try { if (c && window.__farmInk && typeof window.__farmInk.counts === "function") window.__farmInk.counts(c); } catch (e) { console.warn("[Farmhand Companion] ink counts:", e); } };
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
 import { speciesKeyOf } from "../../shared/species.js";
@@ -243,11 +245,12 @@ function onFarmMsg(m) {
         st.lastState = s; st.panel.setState(s); parasiteSync(); try { if ("drawn" in m.set) drawnBodyFarmState(s.drawn); } catch (e) { /* fine */ }
         if ("brand" in m.set || (m.del || []).includes("brand")) { try { messBrand(st.panel.prefs.brandOff ? null : s.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } }   // the farm's brand (messes.js)
         if ("reins" in m.set || (m.del || []).includes("reins")) { try { reinsState(s.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }   // on somebody's reins (cues.js)
+        if ("ink" in m.set) inkCounts(s.ink);   // the counts your live ink prints (shared/ink)
       } else askWhole();
       break;
     case "state":
       if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
-      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
       break;
     case "reply":
     case "notice": {

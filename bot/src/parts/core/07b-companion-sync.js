@@ -20,6 +20,30 @@
     const k = mn+":"+name; if (Date.now() - (state.stateWarned.get(k) || 0) < 600000) return;
     state.stateWarned.set(k, Date.now()); warn("panel state ("+name+") for "+mn+":", e);
   }
+  /* LIVE INK's counts (shared/ink/live.js): what the wearer's live tattoos print, from my books. Rounded so a slowly
+     changin' one (the tank, the heat) doesn't resend their panel every minute. Their Companion writes them on the ink.
+       loads, used    loads taken (the tally, BREEDING FACTS)       litters, eggs   from their offspring
+       milked         litres milked, all told                       tank            % full (the CUM TANK gauge)
+       loading        % of the way to due (LOADING...)              heat            % of their heat left (the HEAT CREST)
+       tied           times knotted                                 punches         this card's punches (a free one every tenth)
+       studs          the guestbook: the last four studs, and how many more
+       scores         HIGH SCORES: the four who've bred them most
+       bredOn         { d, due } while they're carryin' */
+  function inkCounts(mn, p, now){
+    const t = p.totals || {}, o = p.offspring || {}, loads = t.loads || 0, by = t.by || {};
+    const out = { loads, used: loads, litters: o.litters || 0, eggs: o.eggs || 0, milked: Math.round((t.milked || 0) / 1000), tied: t.tied || 0,
+      tank: Math.round(10 * heldTotal(p) / Math.max(1, capacity(mn))) * 10, punches: loads ? (loads % 10 || 10) : 0 };
+    out.heat = inHeat(p) ? Math.max(0, Math.min(100, Math.round(10 * (p.heat.until - now) / (CFG.PROD.HEAT_H * 3600000)) * 10)) : 0;
+    out.loading = p.preg && p.preg.due > p.preg.since ? Math.max(0, Math.min(100, Math.round(20 * (now - p.preg.since) / (p.preg.due - p.preg.since)) * 5)) : 0;
+    if (p.preg) out.bredOn = { d: Math.floor(p.preg.since / 86400000) * 86400000, due: Math.floor(p.preg.due / 86400000) * 86400000 };
+    const studs = Object.keys(by).map(Number).filter(Boolean);
+    if (studs.length){
+      const recent = studs.slice().sort((a, b) => (by[b].at || 0) - (by[a].at || 0)), most = studs.slice().sort((a, b) => (by[b].n || 0) - (by[a].n || 0));
+      out.studs = { list: recent.slice(0, 4).map(plainName), more: Math.max(0, studs.length - 4) };
+      out.scores = most.slice(0, 4).map(s => [plainName(s), by[s].n || 0]);
+    }
+    return out;
+  }
   function stateFor(mn){
     // proprietors named in CFG.PROPRIETORS are staff even if their record lists no roles (or they have no record yet)
     const staff = isStaff(mn);
@@ -53,6 +77,8 @@
       // big their belly is (0 to 4: pregnant, eggs, a full load). Laynie, Oct 14: "the belly sizes in game need to
       // automatically adjust based on how full or pregnant each player is", "same for tit sizes and growth".
       s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
+      // LIVE INK (shared/ink/live.js, Nov 17): the counts their live tattoos print, for their Companion to write on them
+      s.ink = inkCounts(mn, p, now);
       if (inHeat(p)) s.heatUntil = p.heat.until;
       if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
       if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };

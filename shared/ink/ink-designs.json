@@ -1,6 +1,6 @@
 {
- "made": "2026-11-18T00:49:11.491Z",
- "res": 2,
+ "made": "2026-11-18T06:17:25.015Z",
+ "res": 3,
  "groups": {
   "FarmInk": [
    {
@@ -10,16 +10,23 @@
     "desc": "blackletter, with a knot under it",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 465,
-    "w": 220,
-    "h": 126,
+    "left": 85,
+    "top": 434,
+    "w": 330,
+    "h": 189,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -29,16 +36,23 @@
     "desc": "flowing script on a curve, a heart and a snout",
     "sheet": 1,
     "spot": "hip",
-    "left": 134,
-    "top": 515,
-    "w": 144,
-    "h": 66,
+    "left": 98,
+    "top": 499,
+    "w": 216,
+    "h": 99,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -48,16 +62,23 @@
     "desc": "drippin' graffiti, paw prints",
     "sheet": 1,
     "spot": "thigh",
-    "left": 148,
-    "top": 632,
-    "w": 120,
-    "h": 60,
+    "left": 118,
+    "top": 618,
+    "w": 180,
+    "h": 89,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -67,16 +88,23 @@
     "desc": "western, a horseshoe for luck",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 483,
-    "w": 220,
-    "h": 91,
+    "left": 85,
+    "top": 461,
+    "w": 330,
+    "h": 135,
     "layers": [
      {
       "name": "Ink",
-      "color": "#19151f",
+      "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -86,16 +114,43 @@
     "desc": "bubble graffiti, paw prints",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 485,
-    "w": 220,
-    "h": 87,
+    "left": 85,
+    "top": 463,
+    "w": 330,
+    "h": 131,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "White",
+      "color": "#fbfbfb",
+      "colorize": true
+     },
+     {
+      "name": "Grey",
+      "color": "#737177",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      251,
+      251,
+      251
+     ],
+     [
+      115,
+      113,
+      119
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -105,16 +160,23 @@
     "desc": "flowing script, a heart with ears",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 448,
-    "w": 220,
-    "h": 161,
+    "left": 85,
+    "top": 408,
+    "w": 330,
+    "h": 241,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -124,16 +186,23 @@
     "desc": "the lewd crest, glowin' pink",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 458,
-    "w": 220,
-    "h": 141,
+    "left": 85,
+    "top": 423,
+    "w": 330,
+    "h": 210,
     "layers": [
      {
       "name": "Ink",
       "color": "#d4237a",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      35,
+      122
+     ]
     ]
    },
    {
@@ -143,16 +212,23 @@
     "desc": "marker scrawl and an arrow",
     "sheet": 1,
     "spot": "womb",
-    "left": 140,
-    "top": 458,
-    "w": 220,
-    "h": 141,
+    "left": 85,
+    "top": 422,
+    "w": 330,
+    "h": 212,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -162,16 +238,23 @@
     "desc": "blackletter, with arrows",
     "sheet": 1,
     "spot": "hip",
-    "left": 134,
-    "top": 514,
-    "w": 144,
-    "h": 69,
+    "left": 98,
+    "top": 497,
+    "w": 216,
+    "h": 103,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -181,16 +264,23 @@
     "desc": "graffiti, with a curl of tentacle",
     "sheet": 1,
     "spot": "hip",
-    "left": 134,
-    "top": 506,
-    "w": 144,
-    "h": 85,
+    "left": 98,
+    "top": 485,
+    "w": 216,
+    "h": 127,
     "layers": [
      {
       "name": "Ink",
-      "color": "#1b1720",
+      "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -200,16 +290,23 @@
     "desc": "a wolf's paw and the pack's words",
     "sheet": 1,
     "spot": "thigh",
-    "left": 148,
-    "top": 609,
-    "w": 120,
-    "h": 106,
+    "left": 118,
+    "top": 584,
+    "w": 180,
+    "h": 157,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -219,16 +316,33 @@
     "desc": "a crown in flames",
     "sheet": 1,
     "spot": "hip",
-    "left": 134,
-    "top": 503,
-    "w": 144,
-    "h": 91,
+    "left": 98,
+    "top": 480,
+    "w": 216,
+    "h": 136,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#b3122e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#17121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      179,
+      18,
+      46
+     ],
+     [
+      23,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -238,16 +352,33 @@
     "desc": "a warning label",
     "sheet": 1,
     "spot": "thigh",
-    "left": 148,
-    "top": 633,
-    "w": 120,
-    "h": 58,
+    "left": 118,
+    "top": 619,
+    "w": 180,
+    "h": 87,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#e8c21a",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      232,
+      194,
+      26
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -257,16 +388,43 @@
     "desc": "a dairy-print badge",
     "sheet": 1,
     "spot": "chest",
-    "left": 154,
-    "top": 209,
-    "w": 192,
-    "h": 146,
+    "left": 106,
+    "top": 172,
+    "w": 288,
+    "h": 220,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "White",
+      "color": "#f4f3f4",
+      "colorize": true
+     },
+     {
+      "name": "Grey",
+      "color": "#89878c",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      244,
+      243,
+      244
+     ],
+     [
+      137,
+      135,
+      140
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -276,35 +434,49 @@
     "desc": "the crest once you've taken: an egg in the heart",
     "sheet": 2,
     "spot": "womb",
-    "left": 140,
-    "top": 458,
-    "w": 220,
-    "h": 141,
+    "left": 85,
+    "top": 414,
+    "w": 330,
+    "h": 229,
     "layers": [
      {
       "name": "Ink",
       "color": "#d4237a",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      35,
+      122
+     ]
     ]
    },
    {
     "name": "GoblinLoot",
     "title": "Goblin Loot",
-    "where": "anywhere they could reach",
-    "desc": "a crude stick-and-poke, crossed daggers",
+    "where": "wherever they reached",
+    "desc": "crude stick-and-poke, daggers",
     "sheet": 2,
     "spot": "hip",
-    "left": 134,
-    "top": 509,
-    "w": 144,
-    "h": 79,
+    "left": 98,
+    "top": 462,
+    "w": 216,
+    "h": 173,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -314,16 +486,23 @@
     "desc": "little hand-poked dots",
     "sheet": 2,
     "spot": "cheek",
-    "left": 202,
-    "top": 171,
-    "w": 48,
-    "h": 19,
+    "left": 190,
+    "top": 166,
+    "w": 72,
+    "h": 28,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -333,16 +512,33 @@
     "desc": "inside a cow-print patch",
     "sheet": 2,
     "spot": "shoulder",
-    "left": 140,
-    "top": 272,
-    "w": 84,
-    "h": 56,
+    "left": 119,
+    "top": 259,
+    "w": 126,
+    "h": 83,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "White",
+      "color": "#ffffff",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      255,
+      255,
+      255
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -352,16 +548,33 @@
     "desc": "wet marker, still shiny",
     "sheet": 2,
     "spot": "thigh",
-    "left": 148,
-    "top": 648,
-    "w": 120,
-    "h": 28,
+    "left": 118,
+    "top": 641,
+    "w": 180,
+    "h": 42,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Blue",
+      "color": "#63687e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#151c3c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      99,
+      104,
+      126
+     ],
+     [
+      21,
+      28,
+      60
+     ]
     ]
    },
    {
@@ -371,10 +584,10 @@
     "desc": "UV ink, glowin'",
     "sheet": 2,
     "spot": "womb",
-    "left": 140,
-    "top": 475,
-    "w": 220,
-    "h": 106,
+    "left": 85,
+    "top": 449,
+    "w": 330,
+    "h": 159,
     "layers": [
      {
       "name": "Glow",
@@ -395,16 +608,23 @@
     "desc": "a ruler, inches, BIGGER at the top",
     "sheet": 2,
     "spot": "innerThigh",
-    "left": 182,
-    "top": 610,
-    "w": 96,
-    "h": 60,
+    "left": 158,
+    "top": 596,
+    "w": 144,
+    "h": 89,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -414,16 +634,23 @@
     "desc": "a bullseye and a slot",
     "sheet": 2,
     "spot": "womb",
-    "left": 140,
-    "top": 410,
-    "w": 220,
-    "h": 237,
+    "left": 85,
+    "top": 352,
+    "w": 330,
+    "h": 352,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -433,16 +660,23 @@
     "desc": "hoof prints trailin' down",
     "sheet": 2,
     "spot": "belly",
-    "left": 158,
-    "top": 366,
-    "w": 184,
-    "h": 192,
+    "left": 112,
+    "top": 318,
+    "w": 276,
+    "h": 288,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -452,16 +686,23 @@
     "desc": "the whole sign: Farm · Dairy · Kennel",
     "sheet": 3,
     "spot": "hip",
-    "left": 136,
-    "top": 465,
-    "w": 140,
-    "h": 166,
+    "left": 102,
+    "top": 424,
+    "w": 209,
+    "h": 248,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -471,16 +712,23 @@
     "desc": "stencil words round the BB",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 493,
-    "w": 144,
-    "h": 111,
+    "left": 98,
+    "top": 465,
+    "w": 216,
+    "h": 166,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -490,10 +738,10 @@
     "desc": "a purple inspection stamp",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 476,
-    "w": 144,
-    "h": 144,
+    "left": 98,
+    "top": 440,
+    "w": 216,
+    "h": 216,
     "layers": [
      {
       "name": "Stamp",
@@ -509,16 +757,23 @@
     "desc": "the crest, with the BB in its heart",
     "sheet": 3,
     "spot": "womb",
-    "left": 140,
-    "top": 456,
-    "w": 220,
-    "h": 144,
+    "left": 85,
+    "top": 420,
+    "w": 330,
+    "h": 216,
     "layers": [
      {
       "name": "Ink",
       "color": "#d4237a",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      35,
+      122
+     ]
     ]
    },
    {
@@ -528,16 +783,23 @@
     "desc": "the bell, an arrow, an invitation",
     "sheet": 3,
     "spot": "womb",
-    "left": 140,
-    "top": 445,
-    "w": 220,
-    "h": 166,
+    "left": 85,
+    "top": 405,
+    "w": 330,
+    "h": 247,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -547,10 +809,10 @@
     "desc": "the BB so wet it runs, still shinin'",
     "sheet": 3,
     "spot": "thigh",
-    "left": 148,
-    "top": 603,
-    "w": 120,
-    "h": 119,
+    "left": 118,
+    "top": 573,
+    "w": 180,
+    "h": 178,
     "layers": [
      {
       "name": "Ink",
@@ -558,10 +820,17 @@
       "colorize": true
      },
      {
-      "name": "Wet",
+      "name": "WetInk",
       "color": "#ffffff",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -571,16 +840,23 @@
     "desc": "the sign's bone, with praise in it",
     "sheet": 3,
     "spot": "chest",
-    "left": 154,
-    "top": 229,
-    "w": 192,
-    "h": 106,
+    "left": 106,
+    "top": 203,
+    "w": 288,
+    "h": 159,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -590,16 +866,23 @@
     "desc": "the bone, and the bell hung off it",
     "sheet": 3,
     "spot": "thigh",
-    "left": 148,
-    "top": 624,
-    "w": 120,
-    "h": 77,
+    "left": 118,
+    "top": 605,
+    "w": 180,
+    "h": 115,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -609,16 +892,23 @@
     "desc": "a dairy bottle cap in dairy blue",
     "sheet": 3,
     "spot": "chest",
-    "left": 154,
-    "top": 186,
-    "w": 192,
-    "h": 192,
+    "left": 106,
+    "top": 138,
+    "w": 288,
+    "h": 288,
     "layers": [
      {
       "name": "Ink",
       "color": "#1d3f8f",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      29,
+      63,
+      143
+     ]
     ]
    },
    {
@@ -628,16 +918,43 @@
     "desc": "a prize ribbon from the county fair",
     "sheet": 3,
     "spot": "thigh",
-    "left": 153,
-    "top": 593,
-    "w": 111,
-    "h": 138,
+    "left": 125,
+    "top": 559,
+    "w": 167,
+    "h": 207,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#e8d29a",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#2a4fb5",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141e",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      232,
+      210,
+      154
+     ],
+     [
+      42,
+      79,
+      181
+     ],
+     [
+      24,
+      20,
+      30
+     ]
     ]
    },
    {
@@ -647,16 +964,23 @@
     "desc": "curls, hearts and the BB",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 517,
-    "w": 144,
-    "h": 62,
+    "left": 98,
+    "top": 502,
+    "w": 216,
+    "h": 92,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -666,10 +990,10 @@
     "desc": "a paddle with BB cut through it",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 466,
-    "w": 144,
-    "h": 165,
+    "left": 98,
+    "top": 424,
+    "w": 216,
+    "h": 248,
     "layers": [
      {
       "name": "Welt",
@@ -695,10 +1019,10 @@
     "desc": "our biggest cup out a porthole, a B seared on each",
     "sheet": 3,
     "spot": "chest",
-    "left": 156,
-    "top": 172,
-    "w": 189,
-    "h": 221,
+    "left": 110,
+    "top": 117,
+    "w": 281,
+    "h": 331,
     "layers": [
      {
       "name": "Ink",
@@ -720,6 +1044,13 @@
       "color": "#f2b9a8",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -729,10 +1060,10 @@
     "desc": "a red inspection stamp: didn't take, go again",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 502,
-    "w": 144,
-    "h": 93,
+    "left": 98,
+    "top": 479,
+    "w": 216,
+    "h": 139,
     "layers": [
      {
       "name": "Stamp",
@@ -748,16 +1079,23 @@
     "desc": "a laundry tag: how to treat her",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 489,
-    "w": 144,
-    "h": 118,
+    "left": 98,
+    "top": 460,
+    "w": 216,
+    "h": 176,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -767,16 +1105,33 @@
     "desc": "shipping arrows, handle roughly",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 492,
-    "w": 144,
-    "h": 113,
+    "left": 98,
+    "top": 464,
+    "w": 216,
+    "h": 169,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#b3122e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      179,
+      18,
+      46
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -786,16 +1141,33 @@
     "desc": "a yellow wet-floor sign",
     "sheet": 4,
     "spot": "innerThigh",
-    "left": 182,
-    "top": 589,
-    "w": 96,
-    "h": 102,
+    "left": 158,
+    "top": 564,
+    "w": 144,
+    "h": 153,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#f2c230",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18131c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      242,
+      194,
+      48
+     ],
+     [
+      24,
+      19,
+      28
+     ]
     ]
    },
    {
@@ -805,16 +1177,23 @@
     "desc": "an arcade coin slot",
     "sheet": 4,
     "spot": "womb",
-    "left": 143,
-    "top": 402,
-    "w": 215,
-    "h": 253,
+    "left": 90,
+    "top": 339,
+    "w": 321,
+    "h": 379,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -824,16 +1203,23 @@
     "desc": "a sign taped on: use the other hole",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 494,
-    "w": 144,
-    "h": 109,
+    "left": 98,
+    "top": 466,
+    "w": 216,
+    "h": 164,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -843,16 +1229,23 @@
     "desc": "a made-up code: it scans as nothin'",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 487,
-    "w": 144,
-    "h": 122,
+    "left": 98,
+    "top": 457,
+    "w": 216,
+    "h": 182,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -862,16 +1255,23 @@
     "desc": "a collar inked on for good, a bone tag hangin'",
     "sheet": 4,
     "spot": "neck",
-    "left": 180,
-    "top": 205,
-    "w": 140,
-    "h": 70,
+    "left": 145,
+    "top": 188,
+    "w": 210,
+    "h": 104,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -881,16 +1281,43 @@
     "desc": "a milk carton notice",
     "sheet": 4,
     "spot": "hip",
-    "left": 145,
-    "top": 465,
-    "w": 122,
-    "h": 166,
+    "left": 115,
+    "top": 424,
+    "w": 183,
+    "h": 248,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#b3122e",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#1d3f8f",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      179,
+      18,
+      46
+     ],
+     [
+      29,
+      63,
+      143
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -900,16 +1327,33 @@
     "desc": "a spray-painted tag, crown and drips",
     "sheet": 4,
     "spot": "belly",
-    "left": 158,
-    "top": 416,
-    "w": 184,
-    "h": 92,
+    "left": 112,
+    "top": 393,
+    "w": 276,
+    "h": 138,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Pink",
+      "color": "#dc2188",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#1e1321",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      220,
+      33,
+      136
+     ],
+     [
+      30,
+      19,
+      33
+     ]
     ]
    },
    {
@@ -919,16 +1363,53 @@
     "desc": "a steel horseshoe, a yellow banner",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 505,
-    "w": 144,
-    "h": 86,
+    "left": 98,
+    "top": 484,
+    "w": 216,
+    "h": 128,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#dcae21",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#7b8fa6",
+      "colorize": true
+     },
+     {
+      "name": "Brown",
+      "color": "#5e4b1f",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141d",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      220,
+      174,
+      33
+     ],
+     [
+      123,
+      143,
+      166
+     ],
+     [
+      94,
+      75,
+      31
+     ],
+     [
+      24,
+      20,
+      29
+     ]
     ]
    },
    {
@@ -938,16 +1419,43 @@
     "desc": "a paw print in flames",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 504,
-    "w": 144,
-    "h": 89,
+    "left": 98,
+    "top": 482,
+    "w": 216,
+    "h": 133,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#e5af21",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#d7261f",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#1d151c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      229,
+      175,
+      33
+     ],
+     [
+      215,
+      38,
+      31
+     ],
+     [
+      29,
+      21,
+      28
+     ]
     ]
    },
    {
@@ -957,16 +1465,53 @@
     "desc": "two cherries and a banner",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 490,
-    "w": 144,
-    "h": 116,
+    "left": 98,
+    "top": 462,
+    "w": 216,
+    "h": 173,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#ddaf21",
+      "colorize": true
+     },
+     {
+      "name": "Green",
+      "color": "#3d852d",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#c7102e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      221,
+      175,
+      33
+     ],
+     [
+      61,
+      133,
+      45
+     ],
+     [
+      199,
+      16,
+      46
+     ],
+     [
+      24,
+      20,
+      28
+     ]
     ]
    },
    {
@@ -976,21 +1521,58 @@
     "desc": "a ripe peach, crease and all, drippin' white",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 475,
-    "w": 144,
-    "h": 146,
+    "left": 98,
+    "top": 439,
+    "w": 216,
+    "h": 218,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Orange",
+      "color": "#f08f67",
+      "colorize": true
      },
      {
-      "name": "Wet",
+      "name": "Red",
+      "color": "#e56757",
+      "colorize": true
+     },
+     {
+      "name": "Green",
+      "color": "#3e872e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141d",
+      "colorize": true
+     },
+     {
+      "name": "WetInk",
       "color": "#f7f2ea",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      240,
+      143,
+      103
+     ],
+     [
+      229,
+      103,
+      87
+     ],
+     [
+      62,
+      135,
+      46
+     ],
+     [
+      24,
+      20,
+      29
+     ]
     ]
    },
    {
@@ -1000,16 +1582,43 @@
     "desc": "a bunny with her ears up",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 501,
-    "w": 144,
-    "h": 95,
+    "left": 98,
+    "top": 477,
+    "w": 216,
+    "h": 143,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Pink",
+      "color": "#edb8c7",
+      "colorize": true
+     },
+     {
+      "name": "Gold",
+      "color": "#ddb023",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18131c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      237,
+      184,
+      199
+     ],
+     [
+      221,
+      176,
+      35
+     ],
+     [
+      24,
+      19,
+      28
+     ]
     ]
    },
    {
@@ -1019,16 +1628,53 @@
     "desc": "a nest of eggs, for the ovipositor girls",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 506,
-    "w": 144,
-    "h": 85,
+    "left": 98,
+    "top": 484,
+    "w": 216,
+    "h": 128,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Teal",
+      "color": "#a9d6cf",
+      "colorize": true
+     },
+     {
+      "name": "Gold",
+      "color": "#dfb121",
+      "colorize": true
+     },
+     {
+      "name": "Brown",
+      "color": "#885a2a",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      169,
+      214,
+      207
+     ],
+     [
+      223,
+      177,
+      33
+     ],
+     [
+      136,
+      90,
+      42
+     ],
+     [
+      24,
+      20,
+      28
+     ]
     ]
    },
    {
@@ -1038,16 +1684,33 @@
     "desc": "a name-tag sticker, filled in",
     "sheet": 5,
     "spot": "chest",
-    "left": 154,
-    "top": 218,
-    "w": 192,
-    "h": 128,
+    "left": 106,
+    "top": 186,
+    "w": 288,
+    "h": 192,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#d42020",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      32,
+      32
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1057,16 +1720,33 @@
     "desc": "a door hanger: breedin' in progress, walk right in",
     "sheet": 5,
     "spot": "hip",
-    "left": 148,
-    "top": 465,
-    "w": 117,
-    "h": 166,
+    "left": 118,
+    "top": 424,
+    "w": 176,
+    "h": 248,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#d42020",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      32,
+      32
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1076,16 +1756,33 @@
     "desc": "a price tag on a string",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 511,
-    "w": 144,
-    "h": 75,
+    "left": 98,
+    "top": 492,
+    "w": 216,
+    "h": 113,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Red",
+      "color": "#d42020",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      212,
+      32,
+      32
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1095,16 +1792,33 @@
     "desc": "a tip jar, half full",
     "sheet": 5,
     "spot": "womb",
-    "left": 171,
-    "top": 402,
-    "w": 158,
-    "h": 253,
+    "left": 132,
+    "top": 339,
+    "w": 236,
+    "h": 379,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#dfb43a",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      223,
+      180,
+      58
+     ],
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1114,16 +1828,23 @@
     "desc": "a reserved sign: everyone else gets milked",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 479,
-    "w": 144,
-    "h": 138,
+    "left": 98,
+    "top": 445,
+    "w": 216,
+    "h": 207,
     "layers": [
      {
       "name": "Ink",
       "color": "#1f4fa8",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      31,
+      79,
+      168
+     ]
     ]
    },
    {
@@ -1133,16 +1854,23 @@
     "desc": "a mandala in tiny dots",
     "sheet": 5,
     "spot": "belly",
-    "left": 158,
-    "top": 362,
-    "w": 184,
-    "h": 201,
+    "left": 112,
+    "top": 312,
+    "w": 276,
+    "h": 300,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1152,16 +1880,23 @@
     "desc": "mehndi vines and paisleys",
     "sheet": 5,
     "spot": "thigh",
-    "left": 106,
-    "top": 596,
-    "w": 204,
-    "h": 133,
+    "left": 55,
+    "top": 563,
+    "w": 306,
+    "h": 198,
     "layers": [
      {
       "name": "Ink",
       "color": "#7a3410",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      122,
+      52,
+      16
+     ]
     ]
    },
    {
@@ -1171,16 +1906,23 @@
     "desc": "a fine-line womb in a wash of colour",
     "sheet": 5,
     "spot": "womb",
-    "left": 140,
-    "top": 456,
-    "w": 220,
-    "h": 145,
+    "left": 85,
+    "top": 420,
+    "w": 330,
+    "h": 217,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Ink",
+      "color": "#1a1420",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      26,
+      20,
+      32
+     ]
     ]
    },
    {
@@ -1190,16 +1932,23 @@
     "desc": "tiny script and a tiny heart",
     "sheet": 5,
     "spot": "hip",
-    "left": 134,
-    "top": 525,
-    "w": 144,
-    "h": 47,
+    "left": 98,
+    "top": 513,
+    "w": 216,
+    "h": 70,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1209,16 +1958,43 @@
     "desc": "the classic MOM heart, for a cow",
     "sheet": 6,
     "spot": "shoulder",
-    "left": 140,
-    "top": 274,
-    "w": 84,
-    "h": 52,
+    "left": 119,
+    "top": 262,
+    "w": 126,
+    "h": 77,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#ddaf21",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#c7102e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#1f171d",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      221,
+      175,
+      33
+     ],
+     [
+      199,
+      16,
+      46
+     ],
+     [
+      31,
+      23,
+      29
+     ]
     ]
    },
    {
@@ -1228,16 +2004,53 @@
     "desc": "two swallows, for the girls who do",
     "sheet": 6,
     "spot": "chest",
-    "left": 154,
-    "top": 225,
-    "w": 192,
-    "h": 115,
+    "left": 106,
+    "top": 196,
+    "w": 288,
+    "h": 172,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#dcae21",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#d8261f",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#2a5faf",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#17131d",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      220,
+      174,
+      33
+     ],
+     [
+      216,
+      38,
+      31
+     ],
+     [
+      42,
+      95,
+      175
+     ],
+     [
+      23,
+      19,
+      29
+     ]
     ]
    },
    {
@@ -1247,16 +2060,53 @@
     "desc": "the sailor's anchor, rope and all",
     "sheet": 6,
     "spot": "forearm",
-    "left": 140,
-    "top": 299,
-    "w": 80,
-    "h": 63,
+    "left": 120,
+    "top": 283,
+    "w": 120,
+    "h": 95,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Gold",
+      "color": "#dfb122",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#7a8ea5",
+      "colorize": true
+     },
+     {
+      "name": "Brown",
+      "color": "#4e4535",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18141e",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      223,
+      177,
+      34
+     ],
+     [
+      122,
+      142,
+      165
+     ],
+     [
+      78,
+      69,
+      53
+     ],
+     [
+      24,
+      20,
+      30
+     ]
     ]
    },
    {
@@ -1266,16 +2116,53 @@
     "desc": "a heart with a dagger through it",
     "sheet": 6,
     "spot": "heart",
-    "left": 228,
-    "top": 251,
-    "w": 108,
-    "h": 83,
+    "left": 201,
+    "top": 230,
+    "w": 162,
+    "h": 125,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Grey",
+      "color": "#b9c7d6",
+      "colorize": true
+     },
+     {
+      "name": "Gold",
+      "color": "#e0b122",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#c7102e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#18131c",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      185,
+      199,
+      214
+     ],
+     [
+      224,
+      177,
+      34
+     ],
+     [
+      199,
+      16,
+      46
+     ],
+     [
+      24,
+      19,
+      28
+     ]
     ]
    },
    {
@@ -1285,16 +2172,23 @@
     "desc": "a shibari harness that never comes off",
     "sheet": 6,
     "spot": "chest",
-    "left": 106,
-    "top": 188,
-    "w": 288,
-    "h": 189,
+    "left": 34,
+    "top": 140,
+    "w": 432,
+    "h": 284,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1304,16 +2198,23 @@
     "desc": "a chain inked round, a padlock hangin' off it",
     "sheet": 6,
     "spot": "thigh",
-    "left": 130,
-    "top": 630,
-    "w": 156,
-    "h": 65,
+    "left": 91,
+    "top": 614,
+    "w": 234,
+    "h": 97,
     "layers": [
      {
       "name": "Ink",
-      "color": "#19151f",
+      "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1323,16 +2224,23 @@
     "desc": "leather cuffs inked on, D-ring and all",
     "sheet": 6,
     "spot": "wrist",
-    "left": 126,
-    "top": 331,
-    "w": 108,
-    "h": 39,
+    "left": 99,
+    "top": 321,
+    "w": 162,
+    "h": 59,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1342,16 +2250,23 @@
     "desc": "a zipper inked down her front, half open",
     "sheet": 6,
     "spot": "belly",
-    "left": 140,
-    "top": 343,
-    "w": 221,
-    "h": 239,
+    "left": 85,
+    "top": 283,
+    "w": 331,
+    "h": 359,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1361,16 +2276,33 @@
     "desc": "an elevator plate: this cow has no limit",
     "sheet": 6,
     "spot": "belly",
-    "left": 158,
-    "top": 399,
-    "w": 184,
-    "h": 127,
+    "left": 112,
+    "top": 367,
+    "w": 276,
+    "h": 191,
     "layers": [
      {
-      "name": "InkArt",
-      "color": null,
-      "colorize": false
+      "name": "Grey",
+      "color": "#9aa3ad",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#17131d",
+      "colorize": true
      }
+    ],
+    "pal": [
+     [
+      154,
+      163,
+      173
+     ],
+     [
+      23,
+      19,
+      29
+     ]
     ]
    },
    {
@@ -1380,16 +2312,23 @@
     "desc": "a dotted line and scissors",
     "sheet": 6,
     "spot": "womb",
-    "left": 140,
-    "top": 489,
-    "w": 220,
-    "h": 78,
+    "left": 85,
+    "top": 471,
+    "w": 330,
+    "h": 115,
     "layers": [
      {
       "name": "Ink",
       "color": "#16121c",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
     ]
    },
    {
@@ -1399,16 +2338,23 @@
     "desc": "a green farm-shop sticker",
     "sheet": 6,
     "spot": "shoulder",
-    "left": 140,
-    "top": 258,
-    "w": 84,
-    "h": 84,
+    "left": 119,
+    "top": 237,
+    "w": 126,
+    "h": 126,
     "layers": [
      {
       "name": "Ink",
       "color": "#3f8a2e",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      63,
+      138,
+      46
+     ]
     ]
    },
    {
@@ -1418,10 +2364,10 @@
     "desc": "a rose in a heart, thorny vines",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 483,
-    "w": 220,
-    "h": 91,
+    "left": 85,
+    "top": 460,
+    "w": 330,
+    "h": 136,
     "layers": [
      {
       "name": "Glow",
@@ -1442,10 +2388,10 @@
     "desc": "wings and a chain of hearts",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 452,
-    "w": 220,
-    "h": 153,
+    "left": 85,
+    "top": 413,
+    "w": 330,
+    "h": 230,
     "layers": [
      {
       "name": "Glow",
@@ -1466,10 +2412,10 @@
     "desc": "horns, bat wings, a spade tail",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 460,
-    "w": 220,
-    "h": 137,
+    "left": 85,
+    "top": 426,
+    "w": 330,
+    "h": 205,
     "layers": [
      {
       "name": "Glow",
@@ -1490,10 +2436,10 @@
     "desc": "tribal blades round a heart",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 473,
-    "w": 220,
-    "h": 110,
+    "left": 85,
+    "top": 446,
+    "w": 330,
+    "h": 165,
     "layers": [
      {
       "name": "Glow",
@@ -1514,10 +2460,10 @@
     "desc": "a heart and a chain of eggs",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 465,
-    "w": 220,
-    "h": 127,
+    "left": 85,
+    "top": 433,
+    "w": 330,
+    "h": 190,
     "layers": [
      {
       "name": "Glow",
@@ -1538,16 +2484,23 @@
     "desc": "its own words, veins creepin' out",
     "sheet": 7,
     "spot": "hip",
-    "left": 134,
-    "top": 497,
-    "w": 144,
-    "h": 103,
+    "left": 98,
+    "top": 471,
+    "w": 216,
+    "h": 154,
     "layers": [
      {
       "name": "Ink",
       "color": "#3a0d52",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      58,
+      13,
+      82
+     ]
     ]
    },
    {
@@ -1557,16 +2510,23 @@
     "desc": "the corruption's own words",
     "sheet": 7,
     "spot": "thigh",
-    "left": 148,
-    "top": 605,
-    "w": 120,
-    "h": 114,
+    "left": 118,
+    "top": 576,
+    "w": 180,
+    "h": 172,
     "layers": [
      {
       "name": "Ink",
       "color": "#3a0d52",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      58,
+      13,
+      82
+     ]
     ]
    },
    {
@@ -1576,16 +2536,23 @@
     "desc": "the corruption's own words",
     "sheet": 7,
     "spot": "belly",
-    "left": 158,
-    "top": 387,
-    "w": 184,
-    "h": 151,
+    "left": 112,
+    "top": 349,
+    "w": 276,
+    "h": 227,
     "layers": [
      {
       "name": "Ink",
       "color": "#3a0d52",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      58,
+      13,
+      82
+     ]
     ]
    },
    {
@@ -1595,17 +2562,1039 @@
     "desc": "one word, spreadin'",
     "sheet": 7,
     "spot": "womb",
-    "left": 140,
-    "top": 459,
-    "w": 220,
-    "h": 138,
+    "left": 85,
+    "top": 425,
+    "w": 330,
+    "h": 207,
     "layers": [
      {
       "name": "Ink",
       "color": "#3a0d52",
       "colorize": true
      }
+    ],
+    "pal": [
+     [
+      58,
+      13,
+      82
+     ]
     ]
+   },
+   {
+    "name": "LiveFarmProperty",
+    "title": "Farm Property (your number)",
+    "where": "neck or hip",
+    "sheet": 1,
+    "spot": "neck",
+    "left": 125,
+    "top": 179,
+    "w": 250,
+    "h": 123,
+    "box": [
+     4,
+     34,
+     376,
+     216
+    ],
+    "s": 0.6731,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveUsedByStrangers",
+    "title": "Used By Strangers (keeps count)",
+    "where": "inner thigh",
+    "sheet": 1,
+    "spot": "innerThigh",
+    "left": 146,
+    "top": 609,
+    "w": 165,
+    "h": 62,
+    "box": [
+     0,
+     41,
+     380,
+     184
+    ],
+    "s": 0.435,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveTimesBred",
+    "title": "Times Bred (keeps count)",
+    "where": "inner thigh",
+    "sheet": 2,
+    "spot": "innerThigh",
+    "left": 144,
+    "top": 595,
+    "w": 173,
+    "h": 89,
+    "box": [
+     17,
+     29,
+     378,
+     216
+    ],
+    "s": 0.4784,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveLitters",
+    "title": "Litters (keeps count)",
+    "where": "lower belly",
+    "sheet": 2,
+    "spot": "womb",
+    "left": 44,
+    "top": 410,
+    "w": 411,
+    "h": 235,
+    "box": [
+     38,
+     38,
+     342,
+     212
+    ],
+    "s": 1.3525,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveLitresMilked",
+    "title": "Litres Milked (keeps count)",
+    "where": "above a breast",
+    "sheet": 2,
+    "spot": "chest",
+    "left": 72,
+    "top": 222,
+    "w": 357,
+    "h": 120,
+    "box": [
+     24,
+     74,
+     336,
+     179
+    ],
+    "s": 1.1429,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveEggsLaid",
+    "title": "Eggs Laid (keeps count)",
+    "where": "a hip",
+    "sheet": 2,
+    "spot": "hip",
+    "left": 74,
+    "top": 500,
+    "w": 265,
+    "h": 96,
+    "box": [
+     21,
+     69,
+     348,
+     188
+    ],
+    "s": 0.809,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveDaysDenied",
+    "title": "Days Since Last Orgasm (keeps count)",
+    "where": "low belly",
+    "sheet": 2,
+    "spot": "womb",
+    "left": 53,
+    "top": 428,
+    "w": 393,
+    "h": 201,
+    "box": [
+     4,
+     30,
+     376,
+     220
+    ],
+    "s": 1.0577,
+    "layers": [
+     {
+      "name": "White",
+      "color": "#fdfdfd",
+      "colorize": true
+     },
+     {
+      "name": "Green",
+      "color": "#1f6b3a",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      253,
+      253,
+      253
+     ],
+     [
+      31,
+      107,
+      58
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveOwnedBy",
+    "title": "Owned By (a name)",
+    "where": "a hip or above the heart",
+    "sheet": 2,
+    "spot": "hip",
+    "left": 69,
+    "top": 459,
+    "w": 273,
+    "h": 179,
+    "box": [
+     49,
+     37,
+     335,
+     224
+    ],
+    "s": 0.9558,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveStockNumber",
+    "title": "Stock Number (your number)",
+    "where": "back of the neck",
+    "sheet": 2,
+    "spot": "neck",
+    "left": 121,
+    "top": 165,
+    "w": 258,
+    "h": 150,
+    "box": [
+     29,
+     30,
+     349,
+     216
+    ],
+    "s": 0.8077,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveLocked",
+    "title": "Locked (keyholder's name)",
+    "where": "above the heart",
+    "sheet": 2,
+    "spot": "heart",
+    "left": 179,
+    "top": 228,
+    "w": 206,
+    "h": 129,
+    "box": [
+     57,
+     70,
+     340,
+     247
+    ],
+    "s": 0.7265,
+    "layers": [
+     {
+      "name": "White",
+      "color": "#fefefe",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      254,
+      254,
+      254
+     ],
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveBredByBB",
+    "title": "Bred By B&B",
+    "where": "lower belly",
+    "sheet": 3,
+    "spot": "womb",
+    "left": 41,
+    "top": 373,
+    "w": 418,
+    "h": 311,
+    "box": [
+     48,
+     21,
+     332,
+     232
+    ],
+    "s": 1.4732,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveEarTag",
+    "title": "B&B Ear Tag (your number)",
+    "where": "a hip",
+    "sheet": 3,
+    "spot": "hip",
+    "left": 68,
+    "top": 432,
+    "w": 277,
+    "h": 232,
+    "box": [
+     53,
+     10,
+     327,
+     240
+    ],
+    "s": 1.0093,
+    "layers": [
+     {
+      "name": "Gold",
+      "color": "#e3b021",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#17131c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      227,
+      176,
+      33
+     ],
+     [
+      23,
+      19,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveCumTank",
+    "title": "Cum Tank (how full you are)",
+    "where": "the belly",
+    "sheet": 4,
+    "spot": "belly",
+    "left": 76,
+    "top": 351,
+    "w": 348,
+    "h": 222,
+    "box": [
+     45,
+     34,
+     335,
+     219
+    ],
+    "s": 1.2,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveBreedingFacts",
+    "title": "Breeding Facts (keeps count)",
+    "where": "the small of the back",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 68,
+    "top": 413,
+    "w": 276,
+    "h": 270,
+    "box": [
+     62,
+     0,
+     318,
+     250
+    ],
+    "s": 1.08,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveLoading",
+    "title": "Loading (how far along you are)",
+    "where": "the belly",
+    "sheet": 4,
+    "spot": "belly",
+    "left": 84,
+    "top": 375,
+    "w": 332,
+    "h": 174,
+    "box": [
+     13,
+     40,
+     367,
+     225
+    ],
+    "s": 0.9388,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveLipstickKisses",
+    "title": "Lipstick Kisses (signed)",
+    "where": "a butt cheek",
+    "sheet": 4,
+    "spot": "hip",
+    "left": 71,
+    "top": 457,
+    "w": 269,
+    "h": 182,
+    "box": [
+     34,
+     41,
+     337,
+     246
+    ],
+    "s": 0.8889,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#c41e3a",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      196,
+      30,
+      58
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveWouldBreedAgain",
+    "title": "★★★★★ Would Breed Again (signed)",
+    "where": "a thigh",
+    "sheet": 4,
+    "spot": "thigh",
+    "left": 101,
+    "top": 603,
+    "w": 214,
+    "h": 117,
+    "box": [
+     2,
+     20,
+     378,
+     226
+    ],
+    "s": 0.5696,
+    "layers": [
+     {
+      "name": "Gold",
+      "color": "#d8a300",
+      "colorize": true
+     },
+     {
+      "name": "Brown",
+      "color": "#75590e",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      216,
+      163,
+      0
+     ],
+     [
+      117,
+      89,
+      14
+     ],
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveGuestbook",
+    "title": "Bred By (a guestbook)",
+    "where": "an inner thigh",
+    "sheet": 5,
+    "spot": "innerThigh",
+    "left": 140,
+    "top": 567,
+    "w": 180,
+    "h": 146,
+    "box": [
+     40,
+     1,
+     342,
+     246
+    ],
+    "s": 0.595,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveBreedingCard",
+    "title": "Breeding Card (a punch a load)",
+    "where": "a butt cheek",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 77,
+    "top": 471,
+    "w": 258,
+    "h": 154,
+    "box": [
+     4,
+     14,
+     376,
+     236
+    ],
+    "s": 0.6923,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveTrapPassport",
+    "title": "Trap Passport (a stamp a trap)",
+    "where": "a shoulder blade",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 78,
+    "top": 469,
+    "w": 245,
+    "h": 158,
+    "box": [
+     10,
+     10,
+     380,
+     249
+    ],
+    "s": 0.6626,
+    "layers": [
+     {
+      "name": "Green",
+      "color": "#3f8a2e",
+      "colorize": true
+     },
+     {
+      "name": "Red",
+      "color": "#b3122e",
+      "colorize": true
+     },
+     {
+      "name": "Purple",
+      "color": "#5b2a86",
+      "colorize": true
+     },
+     {
+      "name": "Blue",
+      "color": "#1d3f8f",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      63,
+      138,
+      46
+     ],
+     [
+      179,
+      18,
+      46
+     ],
+     [
+      91,
+      42,
+      134
+     ],
+     [
+      29,
+      63,
+      143
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveHighScores",
+    "title": "High Scores (who's bred you most)",
+    "where": "a thigh",
+    "sheet": 5,
+    "spot": "thigh",
+    "left": 100,
+    "top": 594,
+    "w": 217,
+    "h": 137,
+    "box": [
+     13,
+     17,
+     366,
+     240
+    ],
+    "s": 0.6143,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveTied",
+    "title": "Tied × (keeps count)",
+    "where": "a hip",
+    "sheet": 5,
+    "spot": "hip",
+    "left": 75,
+    "top": 475,
+    "w": 262,
+    "h": 146,
+    "box": [
+     22,
+     56,
+     365,
+     247
+    ],
+    "s": 0.7633,
+    "layers": [
+     {
+      "name": "Gold",
+      "color": "#deb021",
+      "colorize": true
+     },
+     {
+      "name": "Pink",
+      "color": "#d9577a",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#17121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      222,
+      176,
+      33
+     ],
+     [
+      217,
+      87,
+      122
+     ],
+     [
+      23,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveBredOn",
+    "title": "Bred On (a date stamp)",
+    "where": "a hip",
+    "sheet": 6,
+    "spot": "hip",
+    "left": 72,
+    "top": 466,
+    "w": 269,
+    "h": 163,
+    "box": [
+     37,
+     33,
+     343,
+     219
+    ],
+    "s": 0.878,
+    "layers": [
+     {
+      "name": "Stamp",
+      "color": "#1d3f8f",
+      "colorize": true
+     }
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveHeatCrest",
+    "title": "Heat Crest (fills as your heat rises)",
+    "where": "over the womb",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 31,
+    "top": 345,
+    "w": 438,
+    "h": 366,
+    "box": [
+     68,
+     14,
+     311,
+     217
+    ],
+    "s": 1.8033,
+    "layers": [
+     {
+      "name": "Glow",
+      "color": "#ff4fd8",
+      "colorize": true
+     },
+     {
+      "name": "GlowInk",
+      "color": "#ff4fd8",
+      "colorize": true
+     }
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveWordsBlackletter",
+    "title": "Your Words: Blackletter",
+    "where": "anywhere",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 43,
+    "top": 518,
+    "w": 325,
+    "h": 60,
+    "box": [
+     0,
+     90,
+     380,
+     160
+    ],
+    "s": 0.8561,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveWordsScript",
+    "title": "Your Words: Script",
+    "where": "anywhere",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 39,
+    "top": 491,
+    "w": 330,
+    "h": 115,
+    "box": [
+     4,
+     56,
+     380,
+     187
+    ],
+    "s": 0.8775,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveWordsTypewriter",
+    "title": "Your Words: Typewriter",
+    "where": "anywhere",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 52,
+    "top": 509,
+    "w": 309,
+    "h": 78,
+    "box": [
+     3,
+     78,
+     377,
+     172
+    ],
+    "s": 0.8255,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#16121c",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      22,
+      18,
+      28
+     ]
+    ],
+    "live": true
+   },
+   {
+    "name": "LiveWordsGraffiti",
+    "title": "Your Words: Graffiti",
+    "where": "anywhere",
+    "sheet": 7,
+    "spot": "hip",
+    "left": 38,
+    "top": 484,
+    "w": 336,
+    "h": 127,
+    "box": [
+     8,
+     72,
+     372,
+     210
+    ],
+    "s": 0.9237,
+    "layers": [
+     {
+      "name": "Ink",
+      "color": "#1d3f8f",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      29,
+      63,
+      143
+     ]
+    ],
+    "live": true
    }
   ],
   "FarmBrand": [
@@ -1616,10 +3605,10 @@
     "desc": "a tentacle in a ring: the pond had you",
     "sheet": 2,
     "spot": "thigh",
-    "left": 148,
-    "top": 602,
-    "w": 120,
-    "h": 120,
+    "left": 118,
+    "top": 572,
+    "w": 180,
+    "h": 180,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1645,10 +3634,10 @@
     "desc": "a paw under a moon: the pack's",
     "sheet": 2,
     "spot": "hip",
-    "left": 134,
-    "top": 476,
-    "w": 144,
-    "h": 145,
+    "left": 98,
+    "top": 440,
+    "w": 216,
+    "h": 217,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1674,10 +3663,10 @@
     "desc": "a snout in a ring",
     "sheet": 2,
     "spot": "hip",
-    "left": 134,
-    "top": 476,
-    "w": 144,
-    "h": 144,
+    "left": 98,
+    "top": 440,
+    "w": 216,
+    "h": 216,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1703,10 +3692,10 @@
     "desc": "the BB and its bell, seared in",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 472,
-    "w": 144,
-    "h": 153,
+    "left": 98,
+    "top": 434,
+    "w": 216,
+    "h": 229,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1732,10 +3721,10 @@
     "desc": "a lucky horseshoe round the BB",
     "sheet": 3,
     "spot": "thigh",
-    "left": 148,
-    "top": 617,
-    "w": 120,
-    "h": 91,
+    "left": 118,
+    "top": 594,
+    "w": 180,
+    "h": 136,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1761,10 +3750,10 @@
     "desc": "a bone in a ring, a paw cut through",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 476,
-    "w": 144,
-    "h": 144,
+    "left": 98,
+    "top": 440,
+    "w": 216,
+    "h": 216,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1790,10 +3779,10 @@
     "desc": "a cattle brand: the BB on a rocker",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 495,
-    "w": 144,
-    "h": 107,
+    "left": 98,
+    "top": 468,
+    "w": 216,
+    "h": 161,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1819,10 +3808,10 @@
     "desc": "iron letters in a frame",
     "sheet": 3,
     "spot": "hip",
-    "left": 134,
-    "top": 511,
-    "w": 144,
-    "h": 75,
+    "left": 98,
+    "top": 492,
+    "w": 216,
+    "h": 112,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1848,10 +3837,10 @@
     "desc": "an oval brand: no need to ask",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 504,
-    "w": 144,
-    "h": 89,
+    "left": 98,
+    "top": 482,
+    "w": 216,
+    "h": 133,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1877,10 +3866,10 @@
     "desc": "the words and an arrow, burned in",
     "sheet": 4,
     "spot": "womb",
-    "left": 140,
-    "top": 454,
-    "w": 220,
-    "h": 149,
+    "left": 85,
+    "top": 417,
+    "w": 330,
+    "h": 223,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1906,10 +3895,10 @@
     "desc": "an udder in a ring",
     "sheet": 4,
     "spot": "chest",
-    "left": 154,
-    "top": 186,
-    "w": 192,
-    "h": 192,
+    "left": 106,
+    "top": 138,
+    "w": 288,
+    "h": 288,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1935,10 +3924,10 @@
     "desc": "a knot in a ring, for the farm's studs",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 476,
-    "w": 144,
-    "h": 144,
+    "left": 98,
+    "top": 440,
+    "w": 216,
+    "h": 216,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1964,10 +3953,10 @@
     "desc": "a cattle brand: rated for the rough stuff",
     "sheet": 4,
     "spot": "hip",
-    "left": 134,
-    "top": 504,
-    "w": 144,
-    "h": 89,
+    "left": 98,
+    "top": 482,
+    "w": 216,
+    "h": 133,
     "layers": [
      {
       "name": "BrandEdge",
@@ -1993,10 +3982,10 @@
     "desc": "horns and a muzzle",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2022,10 +4011,10 @@
     "desc": "a horseshoe; STALLION for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2051,10 +4040,10 @@
     "desc": "a paw; STUD DOG for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2080,10 +4069,10 @@
     "desc": "a snout; BOAR for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2109,10 +4098,10 @@
     "desc": "a brush of a tail",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2138,10 +4127,10 @@
     "desc": "ears up; BUCK for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2167,10 +4156,10 @@
     "desc": "ears and whiskers; TOM for studs",
     "sheet": 6,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2196,10 +4185,10 @@
     "desc": "a wing",
     "sheet": 6,
     "spot": "shoulder",
-    "left": 141,
-    "top": 252,
-    "w": 83,
-    "h": 97,
+    "left": 120,
+    "top": 228,
+    "w": 124,
+    "h": 145,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2225,10 +4214,10 @@
     "desc": "horns and a beard; BILLY for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2254,10 +4243,10 @@
     "desc": "a curly fleece; RAM for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2283,10 +4272,10 @@
     "desc": "ears up and a long muzzle",
     "sheet": 7,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2312,10 +4301,10 @@
     "desc": "big soft ears and a spotted brow; BUCK for studs",
     "sheet": 7,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2341,10 +4330,10 @@
     "desc": "round ears and a long tail",
     "sheet": 7,
     "spot": "shoulder",
-    "left": 141,
-    "top": 252,
-    "w": 83,
-    "h": 97,
+    "left": 120,
+    "top": 228,
+    "w": 124,
+    "h": 145,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2370,10 +4359,10 @@
     "desc": "a goblin's ear, earring and all: their plunder",
     "sheet": 7,
     "spot": "hip",
-    "left": 135,
-    "top": 465,
-    "w": 142,
-    "h": 166,
+    "left": 100,
+    "top": 424,
+    "w": 213,
+    "h": 248,
     "layers": [
      {
       "name": "BrandEdge",
@@ -2393,119 +4382,5 @@
     ]
    }
   ]
- },
- "live": [
-  {
-   "sheet": 1,
-   "title": "FARM PROPERTY"
-  },
-  {
-   "sheet": 1,
-   "title": "USED BY STRANGERS"
-  },
-  {
-   "sheet": 2,
-   "title": "TIMES BRED (keeps count)"
-  },
-  {
-   "sheet": 2,
-   "title": "LITTERS (keeps count)"
-  },
-  {
-   "sheet": 2,
-   "title": "LITRES MILKED (keeps count)"
-  },
-  {
-   "sheet": 2,
-   "title": "EGGS LAID (keeps count)"
-  },
-  {
-   "sheet": 2,
-   "title": "DAYS SINCE LAST ORGASM"
-  },
-  {
-   "sheet": 2,
-   "title": "OWNED BY (the crafter signs it)"
-  },
-  {
-   "sheet": 2,
-   "title": "STOCK NUMBER"
-  },
-  {
-   "sheet": 2,
-   "title": "LOCKED (keyholder's name)"
-  },
-  {
-   "sheet": 3,
-   "title": "BRED BY B&B"
-  },
-  {
-   "sheet": 3,
-   "title": "B&B EAR TAG"
-  },
-  {
-   "sheet": 4,
-   "title": "CUM TANK (keeps count)"
-  },
-  {
-   "sheet": 4,
-   "title": "BREEDING FACTS (keeps count)"
-  },
-  {
-   "sheet": 4,
-   "title": "LOADING (keeps count)"
-  },
-  {
-   "sheet": 4,
-   "title": "LIPSTICK KISSES"
-  },
-  {
-   "sheet": 4,
-   "title": "★★★★★ WOULD BREED AGAIN"
-  },
-  {
-   "sheet": 5,
-   "title": "BRED BY (keeps count)"
-  },
-  {
-   "sheet": 5,
-   "title": "BREEDING CARD (keeps count)"
-  },
-  {
-   "sheet": 5,
-   "title": "TRAP PASSPORT (keeps count)"
-  },
-  {
-   "sheet": 5,
-   "title": "HIGH SCORES (keeps count)"
-  },
-  {
-   "sheet": 5,
-   "title": "TIED ×7 (keeps count)"
-  },
-  {
-   "sheet": 6,
-   "title": "BRED ON"
-  },
-  {
-   "sheet": 7,
-   "title": "HEAT CREST (keeps count)"
-  },
-  {
-   "sheet": 7,
-   "title": "YOUR WORDS: blackletter"
-  },
-  {
-   "sheet": 7,
-   "title": "YOUR WORDS: script"
-  },
-  {
-   "sheet": 7,
-   "title": "YOUR WORDS: typewriter"
-  },
-  {
-   "sheet": 7,
-   "title": "YOUR WORDS: graffiti"
-  }
- ]
+ }
 }

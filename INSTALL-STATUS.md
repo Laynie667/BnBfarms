@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.73.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.74.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.56.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.3.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.57.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.4.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,29 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.74.0 + Companion 0.57.0 + Dispensary 0.4.0: farm ink: recolourable, sized, live designs, layered over the drawn belly**
+- **Companion 0.57.0 + Dispensary 0.4.0 + Bot 0.74.0: farm ink, recolourable and sized, the live designs, and layered right.** Laynie, Nov 18: "the tattoos need to be recolorable and have better sizing options", and "as long as it layers properly".
+  - **Every design is recolourable:** the full-colour ones (flash, signs, the ear tag, cow print...) are split into a layer per colour, each taking the colour picker on its own.
+  - **Colours come out as picked:** before, every tinted layer came out twice as bright as the picked colour (the HUCOW brand looked washed-out pink). Fixed: the colour you pick is the colour you get, with shading kept.
+  - **Sizing:** `/ink` opens the ink panel. For each slot:
+    - size from a quarter to four times
+    - width and height on their own
+    - back to normal
+    The pictures are re-made at three times their size, so they stay crisp up to three times. (Before, the game's Layering scale stopped at one and a half times our size.)
+  - **The 28 live designs:**
+    - the farm's counts: times bred, litters, litres, eggs, the cum tank, breeding card, guestbook, high scores, tied, heat crest, bred on
+    - days without cummin', counted by your own game
+    - your number: stock number, ear tag, farm property
+    - a name: owned by, keyholder, kisses, the review
+    - your own words in four styles
+    Write on them from the panel or with `/ink <slot> <words>`. The farm girl now counts loads taken, who gave them, and knots, for these.
+  - **Layering:** with the drawn body on, ink sits on the drawn belly and breasts, under anything worn. Before, the drawn belly covered it.
+  - **A tattoo stays on:** the game's "naked" and "strip a layer" leave farm ink alone. It comes off one slot at a time in the wardrobe.
+  - **Fixed:** four designs had shipped as drafts from before the sheet-two fixes: Goblin Loot, the cow-print MOO, the tentacle ring brand and the seeded womb crest.
+  - **Ink that blinks out:** `/ink why` lists any ink that didn't show when somebody was drawn, and why. This is for the split-second flicker on other people's faces animating, which couldn't be reproduced here.
+  - The pictures moved to `ink/v2/` (the old `ink/v1/` stays for add-ons not yet updated).
+  - Tests: `tests/ink-live.test.cjs`, and the ink checks in `tests/dispensary-farm-more.test.cjs`.
 
 - **Bot 0.73.0 + Companion 0.56.0 + Dispensary 0.3.0: the new doses: Let-Down, Fill-Out, Airhead, Babble, Deep Throat, Rut, Tender, capsules, tolerance, cravings**
 - **Dispensary 0.3.0 + Companion 0.56.0 + Bot 0.73.0: the new doses.** Laynie, Nov 17: "I love it", then "the new drug effects go in". None of them is a farm shot: on the farm too, the player's own Dispensary reads the needle.

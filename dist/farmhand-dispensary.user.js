@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.3.0
+// @version      0.4.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -31,20 +31,24 @@
   var __commonJS = (cb, mod2) => function __require() {
     return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
   };
+  var __export = (target2, all) => {
+    for (var name in all)
+      __defProp(target2, name, { get: all[name], enumerable: true });
+  };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
-      for (let key of __getOwnPropNames(from))
-        if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+      for (let key2 of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key2) && key2 !== except)
+          __defProp(to, key2, { get: () => from[key2], enumerable: !(desc = __getOwnPropDesc(from, key2)) || desc.enumerable });
     }
     return to;
   };
-  var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+  var __toESM = (mod2, isNodeMode, target2) => (target2 = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
     // If the importer is in node compatibility mode or this is not an ESM
     // file that has been converted to a CommonJS file using a Babel-
     // compatible transform (i.e. "__esModule" has not been set), then set
     // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
+    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target2, "default", { value: mod2, enumerable: true }) : target2,
     mod2
   ));
 
@@ -213,8 +217,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // shared/ink/ink-designs.json
   var ink_designs_default = {
-    made: "2026-11-18T00:49:11.491Z",
-    res: 2,
+    made: "2026-11-18T06:17:25.015Z",
+    res: 3,
     groups: {
       FarmInk: [
         {
@@ -224,16 +228,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "blackletter, with a knot under it",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 465,
-          w: 220,
-          h: 126,
+          left: 85,
+          top: 434,
+          w: 330,
+          h: 189,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -243,16 +254,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "flowing script on a curve, a heart and a snout",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 515,
-          w: 144,
-          h: 66,
+          left: 98,
+          top: 499,
+          w: 216,
+          h: 99,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -262,16 +280,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "drippin' graffiti, paw prints",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 632,
-          w: 120,
-          h: 60,
+          left: 118,
+          top: 618,
+          w: 180,
+          h: 89,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -281,16 +306,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "western, a horseshoe for luck",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 483,
-          w: 220,
-          h: 91,
+          left: 85,
+          top: 461,
+          w: 330,
+          h: 135,
           layers: [
             {
               name: "Ink",
-              color: "#19151f",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -300,16 +332,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "bubble graffiti, paw prints",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 485,
-          w: 220,
-          h: 87,
+          left: 85,
+          top: 463,
+          w: 330,
+          h: 131,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#fbfbfb",
+              colorize: true
+            },
+            {
+              name: "Grey",
+              color: "#737177",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              251,
+              251,
+              251
+            ],
+            [
+              115,
+              113,
+              119
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -319,16 +378,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "flowing script, a heart with ears",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 448,
-          w: 220,
-          h: 161,
+          left: 85,
+          top: 408,
+          w: 330,
+          h: 241,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -338,16 +404,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the lewd crest, glowin' pink",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 423,
+          w: 330,
+          h: 210,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
@@ -357,16 +430,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "marker scrawl and an arrow",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 422,
+          w: 330,
+          h: 212,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -376,16 +456,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "blackletter, with arrows",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 514,
-          w: 144,
-          h: 69,
+          left: 98,
+          top: 497,
+          w: 216,
+          h: 103,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -395,16 +482,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "graffiti, with a curl of tentacle",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 506,
-          w: 144,
-          h: 85,
+          left: 98,
+          top: 485,
+          w: 216,
+          h: 127,
           layers: [
             {
               name: "Ink",
-              color: "#1b1720",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -414,16 +508,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a wolf's paw and the pack's words",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 609,
-          w: 120,
-          h: 106,
+          left: 118,
+          top: 584,
+          w: 180,
+          h: 157,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -433,16 +534,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a crown in flames",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 503,
-          w: 144,
-          h: 91,
+          left: 98,
+          top: 480,
+          w: 216,
+          h: 136,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              23,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -452,16 +570,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a warning label",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 633,
-          w: 120,
-          h: 58,
+          left: 118,
+          top: 619,
+          w: 180,
+          h: 87,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e8c21a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              232,
+              194,
+              26
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -471,16 +606,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dairy-print badge",
           sheet: 1,
           spot: "chest",
-          left: 154,
-          top: 209,
-          w: 192,
-          h: 146,
+          left: 106,
+          top: 172,
+          w: 288,
+          h: 220,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#f4f3f4",
+              colorize: true
+            },
+            {
+              name: "Grey",
+              color: "#89878c",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              244,
+              243,
+              244
+            ],
+            [
+              137,
+              135,
+              140
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -490,35 +652,49 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the crest once you've taken: an egg in the heart",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 414,
+          w: 330,
+          h: 229,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
           name: "GoblinLoot",
           title: "Goblin Loot",
-          where: "anywhere they could reach",
-          desc: "a crude stick-and-poke, crossed daggers",
+          where: "wherever they reached",
+          desc: "crude stick-and-poke, daggers",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 509,
-          w: 144,
-          h: 79,
+          left: 98,
+          top: 462,
+          w: 216,
+          h: 173,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -528,16 +704,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "little hand-poked dots",
           sheet: 2,
           spot: "cheek",
-          left: 202,
-          top: 171,
-          w: 48,
-          h: 19,
+          left: 190,
+          top: 166,
+          w: 72,
+          h: 28,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -547,16 +730,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "inside a cow-print patch",
           sheet: 2,
           spot: "shoulder",
-          left: 140,
-          top: 272,
-          w: 84,
-          h: 56,
+          left: 119,
+          top: 259,
+          w: 126,
+          h: 83,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#ffffff",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -566,16 +766,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "wet marker, still shiny",
           sheet: 2,
           spot: "thigh",
-          left: 148,
-          top: 648,
-          w: 120,
-          h: 28,
+          left: 118,
+          top: 641,
+          w: 180,
+          h: 42,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Blue",
+              color: "#63687e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#151c3c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              99,
+              104,
+              126
+            ],
+            [
+              21,
+              28,
+              60
+            ]
           ]
         },
         {
@@ -585,10 +802,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "UV ink, glowin'",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 475,
-          w: 220,
-          h: 106,
+          left: 85,
+          top: 449,
+          w: 330,
+          h: 159,
           layers: [
             {
               name: "Glow",
@@ -609,16 +826,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a ruler, inches, BIGGER at the top",
           sheet: 2,
           spot: "innerThigh",
-          left: 182,
-          top: 610,
-          w: 96,
-          h: 60,
+          left: 158,
+          top: 596,
+          w: 144,
+          h: 89,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -628,16 +852,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bullseye and a slot",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 410,
-          w: 220,
-          h: 237,
+          left: 85,
+          top: 352,
+          w: 330,
+          h: 352,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -647,16 +878,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "hoof prints trailin' down",
           sheet: 2,
           spot: "belly",
-          left: 158,
-          top: 366,
-          w: 184,
-          h: 192,
+          left: 112,
+          top: 318,
+          w: 276,
+          h: 288,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -666,16 +904,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the whole sign: Farm \xB7 Dairy \xB7 Kennel",
           sheet: 3,
           spot: "hip",
-          left: 136,
-          top: 465,
-          w: 140,
-          h: 166,
+          left: 102,
+          top: 424,
+          w: 209,
+          h: 248,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -685,16 +930,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "stencil words round the BB",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 493,
-          w: 144,
-          h: 111,
+          left: 98,
+          top: 465,
+          w: 216,
+          h: 166,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -704,10 +956,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a purple inspection stamp",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "Stamp",
@@ -723,16 +975,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the crest, with the BB in its heart",
           sheet: 3,
           spot: "womb",
-          left: 140,
-          top: 456,
-          w: 220,
-          h: 144,
+          left: 85,
+          top: 420,
+          w: 330,
+          h: 216,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
@@ -742,16 +1001,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the bell, an arrow, an invitation",
           sheet: 3,
           spot: "womb",
-          left: 140,
-          top: 445,
-          w: 220,
-          h: 166,
+          left: 85,
+          top: 405,
+          w: 330,
+          h: 247,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -761,10 +1027,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the BB so wet it runs, still shinin'",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 603,
-          w: 120,
-          h: 119,
+          left: 118,
+          top: 573,
+          w: 180,
+          h: 178,
           layers: [
             {
               name: "Ink",
@@ -772,10 +1038,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               colorize: true
             },
             {
-              name: "Wet",
+              name: "WetInk",
               color: "#ffffff",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -785,16 +1058,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the sign's bone, with praise in it",
           sheet: 3,
           spot: "chest",
-          left: 154,
-          top: 229,
-          w: 192,
-          h: 106,
+          left: 106,
+          top: 203,
+          w: 288,
+          h: 159,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -804,16 +1084,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the bone, and the bell hung off it",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 624,
-          w: 120,
-          h: 77,
+          left: 118,
+          top: 605,
+          w: 180,
+          h: 115,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -823,16 +1110,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dairy bottle cap in dairy blue",
           sheet: 3,
           spot: "chest",
-          left: 154,
-          top: 186,
-          w: 192,
-          h: 192,
+          left: 106,
+          top: 138,
+          w: 288,
+          h: 288,
           layers: [
             {
               name: "Ink",
               color: "#1d3f8f",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              29,
+              63,
+              143
+            ]
           ]
         },
         {
@@ -842,16 +1136,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a prize ribbon from the county fair",
           sheet: 3,
           spot: "thigh",
-          left: 153,
-          top: 593,
-          w: 111,
-          h: 138,
+          left: 125,
+          top: 559,
+          w: 167,
+          h: 207,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e8d29a",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#2a4fb5",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141e",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              232,
+              210,
+              154
+            ],
+            [
+              42,
+              79,
+              181
+            ],
+            [
+              24,
+              20,
+              30
+            ]
           ]
         },
         {
@@ -861,16 +1182,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "curls, hearts and the BB",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 517,
-          w: 144,
-          h: 62,
+          left: 98,
+          top: 502,
+          w: 216,
+          h: 92,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -880,10 +1208,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paddle with BB cut through it",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 466,
-          w: 144,
-          h: 165,
+          left: 98,
+          top: 424,
+          w: 216,
+          h: 248,
           layers: [
             {
               name: "Welt",
@@ -909,10 +1237,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "our biggest cup out a porthole, a B seared on each",
           sheet: 3,
           spot: "chest",
-          left: 156,
-          top: 172,
-          w: 189,
-          h: 221,
+          left: 110,
+          top: 117,
+          w: 281,
+          h: 331,
           layers: [
             {
               name: "Ink",
@@ -934,6 +1262,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -943,10 +1278,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a red inspection stamp: didn't take, go again",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 502,
-          w: 144,
-          h: 93,
+          left: 98,
+          top: 479,
+          w: 216,
+          h: 139,
           layers: [
             {
               name: "Stamp",
@@ -962,16 +1297,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a laundry tag: how to treat her",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 489,
-          w: 144,
-          h: 118,
+          left: 98,
+          top: 460,
+          w: 216,
+          h: 176,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -981,16 +1323,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "shipping arrows, handle roughly",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 492,
-          w: 144,
-          h: 113,
+          left: 98,
+          top: 464,
+          w: 216,
+          h: 169,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1000,16 +1359,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a yellow wet-floor sign",
           sheet: 4,
           spot: "innerThigh",
-          left: 182,
-          top: 589,
-          w: 96,
-          h: 102,
+          left: 158,
+          top: 564,
+          w: 144,
+          h: 153,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#f2c230",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              242,
+              194,
+              48
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1019,16 +1395,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an arcade coin slot",
           sheet: 4,
           spot: "womb",
-          left: 143,
-          top: 402,
-          w: 215,
-          h: 253,
+          left: 90,
+          top: 339,
+          w: 321,
+          h: 379,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1038,16 +1421,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a sign taped on: use the other hole",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 494,
-          w: 144,
-          h: 109,
+          left: 98,
+          top: 466,
+          w: 216,
+          h: 164,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1057,16 +1447,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a made-up code: it scans as nothin'",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 487,
-          w: 144,
-          h: 122,
+          left: 98,
+          top: 457,
+          w: 216,
+          h: 182,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1076,16 +1473,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a collar inked on for good, a bone tag hangin'",
           sheet: 4,
           spot: "neck",
-          left: 180,
-          top: 205,
-          w: 140,
-          h: 70,
+          left: 145,
+          top: 188,
+          w: 210,
+          h: 104,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1095,16 +1499,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a milk carton notice",
           sheet: 4,
           spot: "hip",
-          left: 145,
-          top: 465,
-          w: 122,
-          h: 166,
+          left: 115,
+          top: 424,
+          w: 183,
+          h: 248,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#1d3f8f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              29,
+              63,
+              143
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1114,16 +1545,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a spray-painted tag, crown and drips",
           sheet: 4,
           spot: "belly",
-          left: 158,
-          top: 416,
-          w: 184,
-          h: 92,
+          left: 112,
+          top: 393,
+          w: 276,
+          h: 138,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Pink",
+              color: "#dc2188",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1e1321",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              33,
+              136
+            ],
+            [
+              30,
+              19,
+              33
+            ]
           ]
         },
         {
@@ -1133,16 +1581,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a steel horseshoe, a yellow banner",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 505,
-          w: 144,
-          h: 86,
+          left: 98,
+          top: 484,
+          w: 216,
+          h: 128,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dcae21",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#7b8fa6",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#5e4b1f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              174,
+              33
+            ],
+            [
+              123,
+              143,
+              166
+            ],
+            [
+              94,
+              75,
+              31
+            ],
+            [
+              24,
+              20,
+              29
+            ]
           ]
         },
         {
@@ -1152,16 +1637,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw print in flames",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e5af21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#d7261f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1d151c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              229,
+              175,
+              33
+            ],
+            [
+              215,
+              38,
+              31
+            ],
+            [
+              29,
+              21,
+              28
+            ]
           ]
         },
         {
@@ -1171,16 +1683,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "two cherries and a banner",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 490,
-          w: 144,
-          h: 116,
+          left: 98,
+          top: 462,
+          w: 216,
+          h: 173,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#ddaf21",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#3d852d",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              221,
+              175,
+              33
+            ],
+            [
+              61,
+              133,
+              45
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              24,
+              20,
+              28
+            ]
           ]
         },
         {
@@ -1190,21 +1739,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a ripe peach, crease and all, drippin' white",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 475,
-          w: 144,
-          h: 146,
+          left: 98,
+          top: 439,
+          w: 216,
+          h: 218,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Orange",
+              color: "#f08f67",
+              colorize: true
             },
             {
-              name: "Wet",
+              name: "Red",
+              color: "#e56757",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#3e872e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141d",
+              colorize: true
+            },
+            {
+              name: "WetInk",
               color: "#f7f2ea",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              240,
+              143,
+              103
+            ],
+            [
+              229,
+              103,
+              87
+            ],
+            [
+              62,
+              135,
+              46
+            ],
+            [
+              24,
+              20,
+              29
+            ]
           ]
         },
         {
@@ -1214,16 +1800,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bunny with her ears up",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 501,
-          w: 144,
-          h: 95,
+          left: 98,
+          top: 477,
+          w: 216,
+          h: 143,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Pink",
+              color: "#edb8c7",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#ddb023",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              237,
+              184,
+              199
+            ],
+            [
+              221,
+              176,
+              35
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1233,16 +1846,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a nest of eggs, for the ovipositor girls",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 506,
-          w: 144,
-          h: 85,
+          left: 98,
+          top: 484,
+          w: 216,
+          h: 128,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Teal",
+              color: "#a9d6cf",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#dfb121",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#885a2a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              169,
+              214,
+              207
+            ],
+            [
+              223,
+              177,
+              33
+            ],
+            [
+              136,
+              90,
+              42
+            ],
+            [
+              24,
+              20,
+              28
+            ]
           ]
         },
         {
@@ -1252,16 +1902,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a name-tag sticker, filled in",
           sheet: 5,
           spot: "chest",
-          left: 154,
-          top: 218,
-          w: 192,
-          h: 128,
+          left: 106,
+          top: 186,
+          w: 288,
+          h: 192,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1271,16 +1938,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a door hanger: breedin' in progress, walk right in",
           sheet: 5,
           spot: "hip",
-          left: 148,
-          top: 465,
-          w: 117,
-          h: 166,
+          left: 118,
+          top: 424,
+          w: 176,
+          h: 248,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1290,16 +1974,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a price tag on a string",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 511,
-          w: 144,
-          h: 75,
+          left: 98,
+          top: 492,
+          w: 216,
+          h: 113,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1309,16 +2010,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a tip jar, half full",
           sheet: 5,
           spot: "womb",
-          left: 171,
-          top: 402,
-          w: 158,
-          h: 253,
+          left: 132,
+          top: 339,
+          w: 236,
+          h: 379,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dfb43a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              223,
+              180,
+              58
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1328,16 +2046,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a reserved sign: everyone else gets milked",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 479,
-          w: 144,
-          h: 138,
+          left: 98,
+          top: 445,
+          w: 216,
+          h: 207,
           layers: [
             {
               name: "Ink",
               color: "#1f4fa8",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              31,
+              79,
+              168
+            ]
           ]
         },
         {
@@ -1347,16 +2072,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a mandala in tiny dots",
           sheet: 5,
           spot: "belly",
-          left: 158,
-          top: 362,
-          w: 184,
-          h: 201,
+          left: 112,
+          top: 312,
+          w: 276,
+          h: 300,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1366,16 +2098,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "mehndi vines and paisleys",
           sheet: 5,
           spot: "thigh",
-          left: 106,
-          top: 596,
-          w: 204,
-          h: 133,
+          left: 55,
+          top: 563,
+          w: 306,
+          h: 198,
           layers: [
             {
               name: "Ink",
               color: "#7a3410",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              122,
+              52,
+              16
+            ]
           ]
         },
         {
@@ -1385,16 +2124,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a fine-line womb in a wash of colour",
           sheet: 5,
           spot: "womb",
-          left: 140,
-          top: 456,
-          w: 220,
-          h: 145,
+          left: 85,
+          top: 420,
+          w: 330,
+          h: 217,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Ink",
+              color: "#1a1420",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              26,
+              20,
+              32
+            ]
           ]
         },
         {
@@ -1404,16 +2150,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "tiny script and a tiny heart",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 525,
-          w: 144,
-          h: 47,
+          left: 98,
+          top: 513,
+          w: 216,
+          h: 70,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1423,16 +2176,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the classic MOM heart, for a cow",
           sheet: 6,
           spot: "shoulder",
-          left: 140,
-          top: 274,
-          w: 84,
-          h: 52,
+          left: 119,
+          top: 262,
+          w: 126,
+          h: 77,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#ddaf21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1f171d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              221,
+              175,
+              33
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              31,
+              23,
+              29
+            ]
           ]
         },
         {
@@ -1442,16 +2222,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "two swallows, for the girls who do",
           sheet: 6,
           spot: "chest",
-          left: 154,
-          top: 225,
-          w: 192,
-          h: 115,
+          left: 106,
+          top: 196,
+          w: 288,
+          h: 172,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dcae21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#d8261f",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#2a5faf",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              174,
+              33
+            ],
+            [
+              216,
+              38,
+              31
+            ],
+            [
+              42,
+              95,
+              175
+            ],
+            [
+              23,
+              19,
+              29
+            ]
           ]
         },
         {
@@ -1461,16 +2278,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the sailor's anchor, rope and all",
           sheet: 6,
           spot: "forearm",
-          left: 140,
-          top: 299,
-          w: 80,
-          h: 63,
+          left: 120,
+          top: 283,
+          w: 120,
+          h: 95,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dfb122",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#7a8ea5",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#4e4535",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141e",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              223,
+              177,
+              34
+            ],
+            [
+              122,
+              142,
+              165
+            ],
+            [
+              78,
+              69,
+              53
+            ],
+            [
+              24,
+              20,
+              30
+            ]
           ]
         },
         {
@@ -1480,16 +2334,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a heart with a dagger through it",
           sheet: 6,
           spot: "heart",
-          left: 228,
-          top: 251,
-          w: 108,
-          h: 83,
+          left: 201,
+          top: 230,
+          w: 162,
+          h: 125,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Grey",
+              color: "#b9c7d6",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#e0b122",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              185,
+              199,
+              214
+            ],
+            [
+              224,
+              177,
+              34
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1499,16 +2390,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a shibari harness that never comes off",
           sheet: 6,
           spot: "chest",
-          left: 106,
-          top: 188,
-          w: 288,
-          h: 189,
+          left: 34,
+          top: 140,
+          w: 432,
+          h: 284,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1518,16 +2416,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a chain inked round, a padlock hangin' off it",
           sheet: 6,
           spot: "thigh",
-          left: 130,
-          top: 630,
-          w: 156,
-          h: 65,
+          left: 91,
+          top: 614,
+          w: 234,
+          h: 97,
           layers: [
             {
               name: "Ink",
-              color: "#19151f",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1537,16 +2442,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "leather cuffs inked on, D-ring and all",
           sheet: 6,
           spot: "wrist",
-          left: 126,
-          top: 331,
-          w: 108,
-          h: 39,
+          left: 99,
+          top: 321,
+          w: 162,
+          h: 59,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1556,16 +2468,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a zipper inked down her front, half open",
           sheet: 6,
           spot: "belly",
-          left: 140,
-          top: 343,
-          w: 221,
-          h: 239,
+          left: 85,
+          top: 283,
+          w: 331,
+          h: 359,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1575,16 +2494,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an elevator plate: this cow has no limit",
           sheet: 6,
           spot: "belly",
-          left: 158,
-          top: 399,
-          w: 184,
-          h: 127,
+          left: 112,
+          top: 367,
+          w: 276,
+          h: 191,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Grey",
+              color: "#9aa3ad",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              154,
+              163,
+              173
+            ],
+            [
+              23,
+              19,
+              29
+            ]
           ]
         },
         {
@@ -1594,16 +2530,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dotted line and scissors",
           sheet: 6,
           spot: "womb",
-          left: 140,
-          top: 489,
-          w: 220,
-          h: 78,
+          left: 85,
+          top: 471,
+          w: 330,
+          h: 115,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1613,16 +2556,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a green farm-shop sticker",
           sheet: 6,
           spot: "shoulder",
-          left: 140,
-          top: 258,
-          w: 84,
-          h: 84,
+          left: 119,
+          top: 237,
+          w: 126,
+          h: 126,
           layers: [
             {
               name: "Ink",
               color: "#3f8a2e",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              63,
+              138,
+              46
+            ]
           ]
         },
         {
@@ -1632,10 +2582,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a rose in a heart, thorny vines",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 483,
-          w: 220,
-          h: 91,
+          left: 85,
+          top: 460,
+          w: 330,
+          h: 136,
           layers: [
             {
               name: "Glow",
@@ -1656,10 +2606,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "wings and a chain of hearts",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 452,
-          w: 220,
-          h: 153,
+          left: 85,
+          top: 413,
+          w: 330,
+          h: 230,
           layers: [
             {
               name: "Glow",
@@ -1680,10 +2630,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns, bat wings, a spade tail",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 460,
-          w: 220,
-          h: 137,
+          left: 85,
+          top: 426,
+          w: 330,
+          h: 205,
           layers: [
             {
               name: "Glow",
@@ -1704,10 +2654,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "tribal blades round a heart",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 473,
-          w: 220,
-          h: 110,
+          left: 85,
+          top: 446,
+          w: 330,
+          h: 165,
           layers: [
             {
               name: "Glow",
@@ -1728,10 +2678,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a heart and a chain of eggs",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 465,
-          w: 220,
-          h: 127,
+          left: 85,
+          top: 433,
+          w: 330,
+          h: 190,
           layers: [
             {
               name: "Glow",
@@ -1752,16 +2702,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "its own words, veins creepin' out",
           sheet: 7,
           spot: "hip",
-          left: 134,
-          top: 497,
-          w: 144,
-          h: 103,
+          left: 98,
+          top: 471,
+          w: 216,
+          h: 154,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1771,16 +2728,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the corruption's own words",
           sheet: 7,
           spot: "thigh",
-          left: 148,
-          top: 605,
-          w: 120,
-          h: 114,
+          left: 118,
+          top: 576,
+          w: 180,
+          h: 172,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1790,16 +2754,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the corruption's own words",
           sheet: 7,
           spot: "belly",
-          left: 158,
-          top: 387,
-          w: 184,
-          h: 151,
+          left: 112,
+          top: 349,
+          w: 276,
+          h: 227,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1809,17 +2780,1039 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "one word, spreadin'",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 459,
-          w: 220,
-          h: 138,
+          left: 85,
+          top: 425,
+          w: 330,
+          h: 207,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
+        },
+        {
+          name: "LiveFarmProperty",
+          title: "Farm Property (your number)",
+          where: "neck or hip",
+          sheet: 1,
+          spot: "neck",
+          left: 125,
+          top: 179,
+          w: 250,
+          h: 123,
+          box: [
+            4,
+            34,
+            376,
+            216
+          ],
+          s: 0.6731,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveUsedByStrangers",
+          title: "Used By Strangers (keeps count)",
+          where: "inner thigh",
+          sheet: 1,
+          spot: "innerThigh",
+          left: 146,
+          top: 609,
+          w: 165,
+          h: 62,
+          box: [
+            0,
+            41,
+            380,
+            184
+          ],
+          s: 0.435,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTimesBred",
+          title: "Times Bred (keeps count)",
+          where: "inner thigh",
+          sheet: 2,
+          spot: "innerThigh",
+          left: 144,
+          top: 595,
+          w: 173,
+          h: 89,
+          box: [
+            17,
+            29,
+            378,
+            216
+          ],
+          s: 0.4784,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLitters",
+          title: "Litters (keeps count)",
+          where: "lower belly",
+          sheet: 2,
+          spot: "womb",
+          left: 44,
+          top: 410,
+          w: 411,
+          h: 235,
+          box: [
+            38,
+            38,
+            342,
+            212
+          ],
+          s: 1.3525,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLitresMilked",
+          title: "Litres Milked (keeps count)",
+          where: "above a breast",
+          sheet: 2,
+          spot: "chest",
+          left: 72,
+          top: 222,
+          w: 357,
+          h: 120,
+          box: [
+            24,
+            74,
+            336,
+            179
+          ],
+          s: 1.1429,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveEggsLaid",
+          title: "Eggs Laid (keeps count)",
+          where: "a hip",
+          sheet: 2,
+          spot: "hip",
+          left: 74,
+          top: 500,
+          w: 265,
+          h: 96,
+          box: [
+            21,
+            69,
+            348,
+            188
+          ],
+          s: 0.809,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveDaysDenied",
+          title: "Days Since Last Orgasm (keeps count)",
+          where: "low belly",
+          sheet: 2,
+          spot: "womb",
+          left: 53,
+          top: 428,
+          w: 393,
+          h: 201,
+          box: [
+            4,
+            30,
+            376,
+            220
+          ],
+          s: 1.0577,
+          layers: [
+            {
+              name: "White",
+              color: "#fdfdfd",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#1f6b3a",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              253,
+              253,
+              253
+            ],
+            [
+              31,
+              107,
+              58
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveOwnedBy",
+          title: "Owned By (a name)",
+          where: "a hip or above the heart",
+          sheet: 2,
+          spot: "hip",
+          left: 69,
+          top: 459,
+          w: 273,
+          h: 179,
+          box: [
+            49,
+            37,
+            335,
+            224
+          ],
+          s: 0.9558,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveStockNumber",
+          title: "Stock Number (your number)",
+          where: "back of the neck",
+          sheet: 2,
+          spot: "neck",
+          left: 121,
+          top: 165,
+          w: 258,
+          h: 150,
+          box: [
+            29,
+            30,
+            349,
+            216
+          ],
+          s: 0.8077,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLocked",
+          title: "Locked (keyholder's name)",
+          where: "above the heart",
+          sheet: 2,
+          spot: "heart",
+          left: 179,
+          top: 228,
+          w: 206,
+          h: 129,
+          box: [
+            57,
+            70,
+            340,
+            247
+          ],
+          s: 0.7265,
+          layers: [
+            {
+              name: "White",
+              color: "#fefefe",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              254,
+              254,
+              254
+            ],
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBredByBB",
+          title: "Bred By B&B",
+          where: "lower belly",
+          sheet: 3,
+          spot: "womb",
+          left: 41,
+          top: 373,
+          w: 418,
+          h: 311,
+          box: [
+            48,
+            21,
+            332,
+            232
+          ],
+          s: 1.4732,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveEarTag",
+          title: "B&B Ear Tag (your number)",
+          where: "a hip",
+          sheet: 3,
+          spot: "hip",
+          left: 68,
+          top: 432,
+          w: 277,
+          h: 232,
+          box: [
+            53,
+            10,
+            327,
+            240
+          ],
+          s: 1.0093,
+          layers: [
+            {
+              name: "Gold",
+              color: "#e3b021",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              227,
+              176,
+              33
+            ],
+            [
+              23,
+              19,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveCumTank",
+          title: "Cum Tank (how full you are)",
+          where: "the belly",
+          sheet: 4,
+          spot: "belly",
+          left: 76,
+          top: 351,
+          w: 348,
+          h: 222,
+          box: [
+            45,
+            34,
+            335,
+            219
+          ],
+          s: 1.2,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBreedingFacts",
+          title: "Breeding Facts (keeps count)",
+          where: "the small of the back",
+          sheet: 4,
+          spot: "hip",
+          left: 68,
+          top: 413,
+          w: 276,
+          h: 270,
+          box: [
+            62,
+            0,
+            318,
+            250
+          ],
+          s: 1.08,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLoading",
+          title: "Loading (how far along you are)",
+          where: "the belly",
+          sheet: 4,
+          spot: "belly",
+          left: 84,
+          top: 375,
+          w: 332,
+          h: 174,
+          box: [
+            13,
+            40,
+            367,
+            225
+          ],
+          s: 0.9388,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLipstickKisses",
+          title: "Lipstick Kisses (signed)",
+          where: "a butt cheek",
+          sheet: 4,
+          spot: "hip",
+          left: 71,
+          top: 457,
+          w: 269,
+          h: 182,
+          box: [
+            34,
+            41,
+            337,
+            246
+          ],
+          s: 0.8889,
+          layers: [
+            {
+              name: "Ink",
+              color: "#c41e3a",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              196,
+              30,
+              58
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWouldBreedAgain",
+          title: "\u2605\u2605\u2605\u2605\u2605 Would Breed Again (signed)",
+          where: "a thigh",
+          sheet: 4,
+          spot: "thigh",
+          left: 101,
+          top: 603,
+          w: 214,
+          h: 117,
+          box: [
+            2,
+            20,
+            378,
+            226
+          ],
+          s: 0.5696,
+          layers: [
+            {
+              name: "Gold",
+              color: "#d8a300",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#75590e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              216,
+              163,
+              0
+            ],
+            [
+              117,
+              89,
+              14
+            ],
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveGuestbook",
+          title: "Bred By (a guestbook)",
+          where: "an inner thigh",
+          sheet: 5,
+          spot: "innerThigh",
+          left: 140,
+          top: 567,
+          w: 180,
+          h: 146,
+          box: [
+            40,
+            1,
+            342,
+            246
+          ],
+          s: 0.595,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBreedingCard",
+          title: "Breeding Card (a punch a load)",
+          where: "a butt cheek",
+          sheet: 5,
+          spot: "hip",
+          left: 77,
+          top: 471,
+          w: 258,
+          h: 154,
+          box: [
+            4,
+            14,
+            376,
+            236
+          ],
+          s: 0.6923,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTrapPassport",
+          title: "Trap Passport (a stamp a trap)",
+          where: "a shoulder blade",
+          sheet: 5,
+          spot: "hip",
+          left: 78,
+          top: 469,
+          w: 245,
+          h: 158,
+          box: [
+            10,
+            10,
+            380,
+            249
+          ],
+          s: 0.6626,
+          layers: [
+            {
+              name: "Green",
+              color: "#3f8a2e",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Purple",
+              color: "#5b2a86",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              63,
+              138,
+              46
+            ],
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              91,
+              42,
+              134
+            ],
+            [
+              29,
+              63,
+              143
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveHighScores",
+          title: "High Scores (who's bred you most)",
+          where: "a thigh",
+          sheet: 5,
+          spot: "thigh",
+          left: 100,
+          top: 594,
+          w: 217,
+          h: 137,
+          box: [
+            13,
+            17,
+            366,
+            240
+          ],
+          s: 0.6143,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTied",
+          title: "Tied \xD7 (keeps count)",
+          where: "a hip",
+          sheet: 5,
+          spot: "hip",
+          left: 75,
+          top: 475,
+          w: 262,
+          h: 146,
+          box: [
+            22,
+            56,
+            365,
+            247
+          ],
+          s: 0.7633,
+          layers: [
+            {
+              name: "Gold",
+              color: "#deb021",
+              colorize: true
+            },
+            {
+              name: "Pink",
+              color: "#d9577a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              222,
+              176,
+              33
+            ],
+            [
+              217,
+              87,
+              122
+            ],
+            [
+              23,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBredOn",
+          title: "Bred On (a date stamp)",
+          where: "a hip",
+          sheet: 6,
+          spot: "hip",
+          left: 72,
+          top: 466,
+          w: 269,
+          h: 163,
+          box: [
+            37,
+            33,
+            343,
+            219
+          ],
+          s: 0.878,
+          layers: [
+            {
+              name: "Stamp",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          live: true
+        },
+        {
+          name: "LiveHeatCrest",
+          title: "Heat Crest (fills as your heat rises)",
+          where: "over the womb",
+          sheet: 7,
+          spot: "womb",
+          left: 31,
+          top: 345,
+          w: 438,
+          h: 366,
+          box: [
+            68,
+            14,
+            311,
+            217
+          ],
+          s: 1.8033,
+          layers: [
+            {
+              name: "Glow",
+              color: "#ff4fd8",
+              colorize: true
+            },
+            {
+              name: "GlowInk",
+              color: "#ff4fd8",
+              colorize: true
+            }
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsBlackletter",
+          title: "Your Words: Blackletter",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 43,
+          top: 518,
+          w: 325,
+          h: 60,
+          box: [
+            0,
+            90,
+            380,
+            160
+          ],
+          s: 0.8561,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsScript",
+          title: "Your Words: Script",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 39,
+          top: 491,
+          w: 330,
+          h: 115,
+          box: [
+            4,
+            56,
+            380,
+            187
+          ],
+          s: 0.8775,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsTypewriter",
+          title: "Your Words: Typewriter",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 52,
+          top: 509,
+          w: 309,
+          h: 78,
+          box: [
+            3,
+            78,
+            377,
+            172
+          ],
+          s: 0.8255,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsGraffiti",
+          title: "Your Words: Graffiti",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 38,
+          top: 484,
+          w: 336,
+          h: 127,
+          box: [
+            8,
+            72,
+            372,
+            210
+          ],
+          s: 0.9237,
+          layers: [
+            {
+              name: "Ink",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              29,
+              63,
+              143
+            ]
+          ],
+          live: true
         }
       ],
       FarmBrand: [
@@ -1830,10 +3823,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a tentacle in a ring: the pond had you",
           sheet: 2,
           spot: "thigh",
-          left: 148,
-          top: 602,
-          w: 120,
-          h: 120,
+          left: 118,
+          top: 572,
+          w: 180,
+          h: 180,
           layers: [
             {
               name: "BrandEdge",
@@ -1859,10 +3852,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw under a moon: the pack's",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 145,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 217,
           layers: [
             {
               name: "BrandEdge",
@@ -1888,10 +3881,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout in a ring",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -1917,10 +3910,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the BB and its bell, seared in",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 472,
-          w: 144,
-          h: 153,
+          left: 98,
+          top: 434,
+          w: 216,
+          h: 229,
           layers: [
             {
               name: "BrandEdge",
@@ -1946,10 +3939,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a lucky horseshoe round the BB",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 617,
-          w: 120,
-          h: 91,
+          left: 118,
+          top: 594,
+          w: 180,
+          h: 136,
           layers: [
             {
               name: "BrandEdge",
@@ -1975,10 +3968,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bone in a ring, a paw cut through",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -2004,10 +3997,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: the BB on a rocker",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 495,
-          w: 144,
-          h: 107,
+          left: 98,
+          top: 468,
+          w: 216,
+          h: 161,
           layers: [
             {
               name: "BrandEdge",
@@ -2033,10 +4026,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "iron letters in a frame",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 511,
-          w: 144,
-          h: 75,
+          left: 98,
+          top: 492,
+          w: 216,
+          h: 112,
           layers: [
             {
               name: "BrandEdge",
@@ -2062,10 +4055,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an oval brand: no need to ask",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
               name: "BrandEdge",
@@ -2091,10 +4084,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the words and an arrow, burned in",
           sheet: 4,
           spot: "womb",
-          left: 140,
-          top: 454,
-          w: 220,
-          h: 149,
+          left: 85,
+          top: 417,
+          w: 330,
+          h: 223,
           layers: [
             {
               name: "BrandEdge",
@@ -2120,10 +4113,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an udder in a ring",
           sheet: 4,
           spot: "chest",
-          left: 154,
-          top: 186,
-          w: 192,
-          h: 192,
+          left: 106,
+          top: 138,
+          w: 288,
+          h: 288,
           layers: [
             {
               name: "BrandEdge",
@@ -2149,10 +4142,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a knot in a ring, for the farm's studs",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -2178,10 +4171,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: rated for the rough stuff",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
               name: "BrandEdge",
@@ -2207,10 +4200,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a muzzle",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2236,10 +4229,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a horseshoe; STALLION for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2265,10 +4258,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw; STUD DOG for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2294,10 +4287,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout; BOAR for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2323,10 +4316,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a brush of a tail",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2352,10 +4345,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up; BUCK for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2381,10 +4374,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears and whiskers; TOM for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2410,10 +4403,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a wing",
           sheet: 6,
           spot: "shoulder",
-          left: 141,
-          top: 252,
-          w: 83,
-          h: 97,
+          left: 120,
+          top: 228,
+          w: 124,
+          h: 145,
           layers: [
             {
               name: "BrandEdge",
@@ -2439,10 +4432,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a beard; BILLY for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2468,10 +4461,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a curly fleece; RAM for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2497,10 +4490,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up and a long muzzle",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2526,10 +4519,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "big soft ears and a spotted brow; BUCK for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2555,10 +4548,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "round ears and a long tail",
           sheet: 7,
           spot: "shoulder",
-          left: 141,
-          top: 252,
-          w: 83,
-          h: 97,
+          left: 120,
+          top: 228,
+          w: 124,
+          h: 145,
           layers: [
             {
               name: "BrandEdge",
@@ -2584,10 +4577,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a goblin's ear, earring and all: their plunder",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2607,134 +4600,2555 @@ One of mods you are using is using an old version of SDK. It will work for now b
           ]
         }
       ]
-    },
-    live: [
-      {
-        sheet: 1,
-        title: "FARM PROPERTY"
-      },
-      {
-        sheet: 1,
-        title: "USED BY STRANGERS"
-      },
-      {
-        sheet: 2,
-        title: "TIMES BRED (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "LITTERS (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "LITRES MILKED (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "EGGS LAID (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "DAYS SINCE LAST ORGASM"
-      },
-      {
-        sheet: 2,
-        title: "OWNED BY (the crafter signs it)"
-      },
-      {
-        sheet: 2,
-        title: "STOCK NUMBER"
-      },
-      {
-        sheet: 2,
-        title: "LOCKED (keyholder's name)"
-      },
-      {
-        sheet: 3,
-        title: "BRED BY B&B"
-      },
-      {
-        sheet: 3,
-        title: "B&B EAR TAG"
-      },
-      {
-        sheet: 4,
-        title: "CUM TANK (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "BREEDING FACTS (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "LOADING (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "LIPSTICK KISSES"
-      },
-      {
-        sheet: 4,
-        title: "\u2605\u2605\u2605\u2605\u2605 WOULD BREED AGAIN"
-      },
-      {
-        sheet: 5,
-        title: "BRED BY (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "BREEDING CARD (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "TRAP PASSPORT (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "HIGH SCORES (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "TIED \xD77 (keeps count)"
-      },
-      {
-        sheet: 6,
-        title: "BRED ON"
-      },
-      {
-        sheet: 7,
-        title: "HEAT CREST (keeps count)"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: blackletter"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: script"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: typewriter"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: graffiti"
-      }
-    ]
+    }
   };
 
+  // shared/ink/live-art.js
+  var live_art_exports = {};
+  __export(live_art_exports, {
+    CH: () => CH,
+    CW: () => CW,
+    DRIPS: () => DRIPS,
+    GRN: () => GRN,
+    ICON: () => ICON,
+    IMG: () => IMG,
+    INK: () => INK,
+    PINK: () => PINK,
+    PINKGLOW: () => PINKGLOW,
+    RED: () => RED,
+    RED2: () => RED2,
+    YEL: () => YEL,
+    YEL2: () => YEL2,
+    arcText: () => arcText,
+    arcTextLow: () => arcTextLow,
+    arrowDown: () => arrowDown,
+    banner: () => banner,
+    barcode: () => barcode,
+    bigS: () => bigS,
+    blossom: () => blossom,
+    boneOutline: () => boneOutline,
+    boneShape: () => boneShape,
+    canine: () => canine,
+    care: () => care,
+    corrupted: () => corrupted,
+    cowSpots: () => cowSpots,
+    crop: () => crop,
+    crown: () => crown,
+    cut: () => cut,
+    daggers: () => daggers,
+    dripFrom: () => dripFrom,
+    drips: () => drips,
+    drop: () => drop,
+    earTag: () => earTag,
+    egg: () => egg,
+    flame: () => flame,
+    flash: () => flash,
+    flourish: () => flourish,
+    glow: () => glow,
+    heart: () => heart,
+    hoof: () => hoof,
+    horseshoe: () => horseshoe,
+    jug: () => jug,
+    key: () => key,
+    knotBulb: () => knotBulb,
+    leaf: () => leaf,
+    lips: () => lips,
+    loadImg: () => loadImg,
+    loadLogo: () => loadLogo,
+    logo: () => logo,
+    ownSide: () => ownSide,
+    ownWords: () => ownWords,
+    padlock: () => padlock,
+    paisley: () => paisley,
+    paw: () => paw,
+    pigRing: () => pigRing,
+    poked: () => poked,
+    qr: () => qr,
+    rng: () => rng,
+    rope: () => rope,
+    rosette: () => rosette,
+    scar: () => scar,
+    setFontOf: () => setFontOf,
+    shield: () => shield,
+    snout: () => snout,
+    speciesBrand: () => speciesBrand,
+    speckle: () => speckle,
+    stamp: () => stamp,
+    star: () => star,
+    swallow: () => swallow,
+    tally: () => tally,
+    target: () => target,
+    tentacle: () => tentacle,
+    text: () => text,
+    tie: () => tie,
+    titArc: () => titArc,
+    titPath: () => titPath,
+    titPt: () => titPt,
+    upArrow: () => upArrow,
+    veins: () => veins,
+    welt: () => welt,
+    wolfMark: () => wolfMark,
+    wombCrest: () => wombCrest
+  });
+  var LOGO_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/shared/brand/";
+  var FONT_OF = (f) => "'" + f + "'";
+  function setFontOf(fn) {
+    FONT_OF = fn;
+  }
+  var fontOf = (f) => FONT_OF(f);
+  var INK = "#16121c";
+  var PINK = "#d4237a";
+  var RED = "#b3122e";
+  var CW = 380;
+  var CH = 250;
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => ((s = Math.imul(s ^ s >>> 15, 2246822507) ^ Math.imul(s ^ s >>> 13, 3266489909)) >>> 0) / 4294967295;
+  }
+  function heart(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y + s * 0.35);
+    g.bezierCurveTo(x - s, y - s * 0.4, x - s * 0.45, y - s * 1.05, x, y - s * 0.45);
+    g.bezierCurveTo(x + s * 0.45, y - s * 1.05, x + s, y - s * 0.4, x, y + s * 0.35);
+    g.closePath();
+  }
+  function paw(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x, y + s * 0.25, s * 0.42, s * 0.34, 0, 0, Math.PI * 2);
+    g.fill();
+    for (const [dx, dy] of [[-0.48, -0.28], [-0.17, -0.55], [0.17, -0.55], [0.48, -0.28]]) {
+      g.beginPath();
+      g.ellipse(x + dx * s, y + dy * s, s * 0.15, s * 0.19, dx * 0.6, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function hoof(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x - s * 0.22, y, s * 0.2, s * 0.36, -0.15, 0, Math.PI * 2);
+    g.fill();
+    g.beginPath();
+    g.ellipse(x + s * 0.22, y, s * 0.2, s * 0.36, 0.15, 0, Math.PI * 2);
+    g.fill();
+  }
+  function horseshoe(g, x, y, s) {
+    const r = s * 0.55;
+    g.lineWidth = s * 0.24;
+    g.lineCap = "butt";
+    g.beginPath();
+    g.arc(x, y, r, -Math.PI * 0.1, Math.PI * 1.1, false);
+    g.stroke();
+    const fs = g.fillStyle;
+    g.fillStyle = "#fff";
+    for (let i = 0; i < 6; i++) {
+      const a = -Math.PI * 0.02 + i * (Math.PI * 1.04 / 5);
+      g.beginPath();
+      g.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, s * 0.04, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = fs;
+  }
+  function arrowDown(g, x, y, len, w) {
+    g.lineWidth = w;
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x, y + len);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x - w * 2.6, y + len - w * 2.6);
+    g.lineTo(x, y + len + w * 0.8);
+    g.lineTo(x + w * 2.6, y + len - w * 2.6);
+    g.stroke();
+  }
+  function tally(g, x, y, n, h2) {
+    g.lineWidth = 3.2;
+    g.lineCap = "round";
+    for (let i = 0; i < n; i++) {
+      const grp = Math.floor(i / 5), k = i % 5, gx = x + grp * (h2 * 0.95);
+      if (k < 4) {
+        g.beginPath();
+        g.moveTo(gx + k * h2 * 0.17, y);
+        g.lineTo(gx + k * h2 * 0.17 + 2, y + h2);
+        g.stroke();
+      } else {
+        g.beginPath();
+        g.moveTo(gx - h2 * 0.08, y + h2 * 0.85);
+        g.lineTo(gx + h2 * 0.62, y + h2 * 0.12);
+        g.stroke();
+      }
+    }
+  }
+  function barcode(g, x, y, w, h2, seed) {
+    const r = rng(seed);
+    let cx = x;
+    while (cx < x + w) {
+      const bw = 1 + Math.floor(r() * 4);
+      if (r() > 0.35) g.fillRect(cx, y, bw, h2);
+      cx += bw + 1;
+    }
+  }
+  function crown(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x - s, y);
+    g.lineTo(x - s, y - s * 0.6);
+    g.lineTo(x - s * 0.5, y - s * 0.2);
+    g.lineTo(x, y - s * 0.85);
+    g.lineTo(x + s * 0.5, y - s * 0.2);
+    g.lineTo(x + s, y - s * 0.6);
+    g.lineTo(x + s, y);
+    g.closePath();
+    g.fill();
+  }
+  function flame(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y);
+    g.bezierCurveTo(x - s * 0.6, y - s * 0.3, x - s * 0.2, y - s * 0.7, x, y - s * 1.2);
+    g.bezierCurveTo(x + s * 0.15, y - s * 0.7, x + s * 0.65, y - s * 0.5, x, y);
+    g.fill();
+  }
+  function tentacle(g, x, y, s, dir) {
+    const pts = [];
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60, a = t * Math.PI * 1.6;
+      pts.push([x + dir * (s * 1.1 * t + Math.sin(a) * s * 0.18 * t), y - s * 0.95 * t + Math.cos(a * 1.4) * s * 0.1 * t, s * 0.16 * (1 - t) + 2]);
+    }
+    const fs = g.fillStyle;
+    for (const [px, py, r] of pts) {
+      g.beginPath();
+      g.arc(px, py, r, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = "#fff";
+    for (let i = 4; i < 44; i += 6) {
+      const [px, py, r] = pts[i];
+      g.beginPath();
+      g.arc(px + dir * r * 0.15, py + r * 0.55, r * 0.32, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = fs;
+  }
+  function knotBulb(g, x, y, w, h2) {
+    const L = x - w, R = x + w;
+    g.beginPath();
+    g.moveTo(L, y - h2 * 0.32);
+    g.lineTo(L + w * 0.35, y - h2 * 0.32);
+    g.bezierCurveTo(L + w * 0.42, y - h2 * 1.1, L + w * 0.9, y - h2 * 1.1, L + w * 0.95, y - h2 * 0.4);
+    g.lineTo(R - w * 0.25, y - h2 * 0.34);
+    g.quadraticCurveTo(R, y - h2 * 0.3, R + h2 * 0.2, y);
+    g.quadraticCurveTo(R, y + h2 * 0.3, R - w * 0.25, y + h2 * 0.34);
+    g.lineTo(L + w * 0.95, y + h2 * 0.4);
+    g.bezierCurveTo(L + w * 0.9, y + h2 * 1.1, L + w * 0.42, y + h2 * 1.1, L + w * 0.35, y + h2 * 0.32);
+    g.lineTo(L, y + h2 * 0.32);
+    g.closePath();
+    g.fill();
+  }
+  function wombCrest(g, x, y, s, col) {
+    g.strokeStyle = col;
+    g.fillStyle = col;
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.lineWidth = s * 0.06;
+    heart(g, x, y, s * 0.42);
+    g.stroke();
+    g.lineWidth = s * 0.035;
+    heart(g, x, y + s * 0.02, s * 0.26);
+    g.stroke();
+    for (const d of [-1, 1]) {
+      g.lineWidth = s * 0.05;
+      g.beginPath();
+      g.moveTo(x + d * s * 0.3, y - s * 0.12);
+      g.bezierCurveTo(x + d * s * 0.75, y - s * 0.38, x + d * s * 1.05, y - s * 0.05, x + d * s * 0.92, y + s * 0.18);
+      g.bezierCurveTo(x + d * s * 0.85, y + s * 0.3, x + d * s * 0.68, y + s * 0.28, x + d * s * 0.7, y + s * 0.15);
+      g.stroke();
+      g.lineWidth = s * 0.03;
+      g.beginPath();
+      g.moveTo(x + d * s * 0.36, y + s * 0.12);
+      g.quadraticCurveTo(x + d * s * 0.7, y + s * 0.42, x + d * s * 1.12, y + s * 0.22);
+      g.stroke();
+      g.beginPath();
+      g.arc(x + d * s * 1.15, y + s * 0.2, s * 0.04, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.lineWidth = s * 0.035;
+    arrowDown(g, x, y + s * 0.42, s * 0.28, s * 0.035);
+    for (let i = 0; i < 3; i++) {
+      g.beginPath();
+      g.arc(x, y - s * 0.62 - i * s * 0.1, s * (0.03 - i * 7e-3), 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function arcText(g, t, cx, textY, R, font, size) {
+    g.font = size + "px " + fontOf(font);
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY + R;
+    let a = -Math.PI / 2 - span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a + da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid + Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a += da;
+    }
+  }
+  function snout(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.ellipse(x, y, s, s * 0.72, 0, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.ellipse(x - s * 0.33, y, s * 0.16, s * 0.26, 0, 0, Math.PI * 2);
+    g.fill();
+    g.beginPath();
+    g.ellipse(x + s * 0.33, y, s * 0.16, s * 0.26, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  function text(g, t, x, y, font, size, opt) {
+    opt = opt || {};
+    g.font = (opt.weight || "") + " " + size + "px " + fontOf(font);
+    g.textAlign = opt.align || "center";
+    g.textBaseline = "middle";
+    let s = size;
+    while (opt.max && g.measureText(t).width > opt.max && s > 10) {
+      s -= 2;
+      g.font = (opt.weight || "") + " " + s + "px " + fontOf(font);
+    }
+    if (opt.stroke) {
+      g.lineWidth = opt.stroke;
+      g.strokeStyle = opt.strokeColor || INK;
+      g.lineJoin = "round";
+      g.strokeText(t, x, y);
+    }
+    g.fillText(t, x, y);
+    return s;
+  }
+  function drips(g, x0, x1, y, seed, n) {
+    const r = rng(seed);
+    for (let i = 0; i < n; i++) {
+      const x = x0 + r() * (x1 - x0), len = 6 + r() * 22;
+      g.lineWidth = 2 + r() * 2.5;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x, y + len);
+      g.stroke();
+      g.beginPath();
+      g.arc(x, y + len, g.lineWidth * 0.7, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function scar(g, ink, x0, y0) {
+    const w = ink.width, h2 = ink.height, tint = (col, blur, dx, dy, a) => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h2;
+      const cg = c.getContext("2d");
+      cg.filter = blur ? "blur(" + blur + "px)" : "none";
+      cg.drawImage(ink, 0, 0);
+      cg.filter = "none";
+      cg.globalCompositeOperation = "source-in";
+      cg.fillStyle = col;
+      cg.fillRect(0, 0, w, h2);
+      g.globalAlpha = a;
+      g.drawImage(c, x0 + dx, y0 + dy);
+      g.globalAlpha = 1;
+    };
+    tint("#5e1414", 3, 0, 1, 0.75);
+    tint("#b4524a", 0.6, 0, 0, 0.95);
+    tint("#f2b9a8", 0.8, -1, -1.4, 0.45);
+  }
+  function glow(g, ink, x0, y0, col) {
+    const c = document.createElement("canvas");
+    c.width = ink.width;
+    c.height = ink.height;
+    const cg = c.getContext("2d");
+    cg.drawImage(ink, 0, 0);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col;
+    cg.fillRect(0, 0, c.width, c.height);
+    g.save();
+    g.shadowColor = col;
+    g.shadowBlur = 18;
+    g.drawImage(c, x0, y0);
+    g.shadowBlur = 8;
+    g.drawImage(c, x0, y0);
+    g.restore();
+  }
+  function poked(g, t, x, y, font, size, seed) {
+    const c = document.createElement("canvas");
+    c.width = 380;
+    c.height = 250;
+    const cg = c.getContext("2d");
+    cg.fillStyle = "#000";
+    text(cg, t, x, y, font, size, { max: 340 });
+    const d = cg.getImageData(0, 0, c.width, c.height).data, r = rng(seed);
+    for (let yy = 0; yy < c.height; yy += 3) for (let xx = 0; xx < c.width; xx += 3) if (d[(yy * c.width + xx) * 4 + 3] > 120 && r() > 0.15) {
+      g.beginPath();
+      g.arc(xx + (r() - 0.5) * 1.6, yy + (r() - 0.5) * 1.6, 1.3 + r() * 0.6, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function cowSpots(g, x, y, w, h2, seed) {
+    const r = rng(seed);
+    for (let i = 0; i < 7; i++) {
+      g.beginPath();
+      const cx = x + r() * w, cy = y + r() * h2, rr = 10 + r() * 20;
+      for (let k = 0; k <= 12; k++) {
+        const a = k / 12 * Math.PI * 2, q = rr * (0.7 + r() * 0.5);
+        if (k) g.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q);
+        else g.moveTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q);
+      }
+      g.closePath();
+      g.fill();
+    }
+  }
+  function egg(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x, y, s * 0.36, s * 0.48, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  function jug(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x - s * 0.3, y - s * 0.55);
+    g.lineTo(x + s * 0.3, y - s * 0.55);
+    g.lineTo(x + s * 0.32, y - s * 0.35);
+    g.quadraticCurveTo(x + s * 0.55, y - s * 0.1, x + s * 0.5, y + s * 0.5);
+    g.lineTo(x - s * 0.5, y + s * 0.5);
+    g.quadraticCurveTo(x - s * 0.55, y - s * 0.1, x - s * 0.32, y - s * 0.35);
+    g.closePath();
+    g.fill();
+  }
+  function padlock(g, x, y, s) {
+    g.lineWidth = s * 0.14;
+    g.beginPath();
+    g.arc(x, y - s * 0.25, s * 0.32, Math.PI, 0);
+    g.stroke();
+    heart(g, x, y + s * 0.38, s * 0.62);
+    g.fill();
+    const fs = g.fillStyle;
+    g.fillStyle = "#fff";
+    g.beginPath();
+    g.arc(x, y + s * 0.18, s * 0.08, 0, Math.PI * 2);
+    g.fill();
+    g.fillRect(x - s * 0.03, y + s * 0.2, s * 0.06, s * 0.18);
+    g.fillStyle = fs;
+  }
+  function key(g, x, y, s) {
+    g.lineWidth = s * 0.1;
+    g.beginPath();
+    g.arc(x, y, s * 0.22, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x + s * 0.22, y);
+    g.lineTo(x + s * 0.95, y);
+    g.lineTo(x + s * 0.95, y + s * 0.18);
+    g.moveTo(x + s * 0.75, y);
+    g.lineTo(x + s * 0.75, y + s * 0.14);
+    g.stroke();
+  }
+  function target(g, x, y, s) {
+    g.lineWidth = s * 0.07;
+    for (const k of [1, 0.68, 0.36]) {
+      g.beginPath();
+      g.arc(x, y, s * k, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.beginPath();
+    g.arc(x, y, s * 0.12, 0, Math.PI * 2);
+    g.fill();
+  }
+  function pigRing(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.arc(x, y, s, 0, Math.PI * 2);
+    g.stroke();
+    snout(g, x, y, s * 0.55);
+  }
+  function wolfMark(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.arc(x, y, s, Math.PI * 0.62, Math.PI * 1.88);
+    g.arc(x + s * 0.32, y - s * 0.12, s * 0.78, Math.PI * 1.75, Math.PI * 0.72, true);
+    g.closePath();
+    g.stroke();
+    paw(g, x - s * 0.15, y + s * 0.08, s * 0.5);
+  }
+  function daggers(g, x, y, s) {
+    g.lineWidth = s * 0.09;
+    g.lineCap = "round";
+    for (const d of [-1, 1]) {
+      g.beginPath();
+      g.moveTo(x - d * s * 0.7, y - s * 0.7);
+      g.lineTo(x + d * s * 0.55, y + s * 0.55);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x + d * s * 0.32 - s * 0.18, y + s * 0.32 + d * s * 0.18 * 0);
+      g.lineTo(x + d * s * 0.32 + s * 0.18, y + s * 0.32);
+      g.stroke();
+    }
+  }
+  var IMG = {};
+  function loadImg(src) {
+    return new Promise((res) => {
+      const i = new Image();
+      i.crossOrigin = "anonymous";
+      i.onload = () => res(i);
+      i.onerror = () => res(null);
+      i.src = src;
+    });
+  }
+  function crop(img, sx, sy, sw, sh, erase) {
+    const c = document.createElement("canvas");
+    c.width = sw;
+    c.height = sh;
+    const cg = c.getContext("2d");
+    cg.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    if (erase) {
+      cg.globalCompositeOperation = "destination-out";
+      for (const [x, y, w, h2] of erase) cg.fillRect(x - sx, y - sy, w, h2);
+    }
+    return c;
+  }
+  async function loadLogo() {
+    const mark = await loadImg(LOGO_HOST + "brand-mark.png"), full = await loadImg(LOGO_HOST + "brand-full.png");
+    IMG.mark = mark;
+    IMG.full = full;
+    IMG.letters = crop(mark, 0, 0, 205, 168, [[154, 121, 14, 15], [149, 135, 60, 40], [140, 148, 20, 30]]);
+    IMG.bell = crop(mark, 128, 150, 66, 70);
+    IMG.bellOnly = crop(mark, 128, 158, 66, 62);
+    const GAP = [[112, 0], [112, 30], [113, 72], [110, 84], [107, 96], [105, 108], [101, 120], [96, 128], [90, 168]];
+    const half = (left) => {
+      const c = document.createElement("canvas");
+      c.width = 205;
+      c.height = 168;
+      const cg = c.getContext("2d");
+      cg.beginPath();
+      cg.moveTo(left ? 0 : 205, 0);
+      for (const [x, y] of GAP) cg.lineTo(x, y);
+      cg.lineTo(left ? 0 : 205, 168);
+      cg.closePath();
+      cg.clip();
+      cg.drawImage(IMG.letters, 0, 0);
+      return c;
+    };
+    IMG.b1 = half(true);
+    IMG.b2 = half(false);
+  }
+  function bigS(apart) {
+    const i = 14, k = 1, r = 44 + 2.6 * i, sag = 0.06 + 0.22 * k, top = 1.34 + 0.16 * k;
+    return { k, r, sag, top, bx: r * (1.03 - 0.13 * k) * (apart || 1), by: r * top };
+  }
+  function titPt(S2, s, t) {
+    const sn = Math.sin(t), cs = Math.cos(t);
+    if (sn >= 0) return [s * S2.bx + S2.r * cs * (1 + S2.sag * 0.3 * sn * sn) + s * S2.r * 0.06 * S2.k * sn * sn, S2.by + S2.r * sn * (1 + S2.sag)];
+    const up = -sn;
+    return [s * S2.bx + S2.r * cs * (1 - 0.5 * up * up) - s * S2.r * 0.2 * up * up, S2.by - S2.r * S2.top * up];
+  }
+  function titArc(g, S2, s, ox, oy, sc, a0, a1) {
+    g.beginPath();
+    for (let j = 0; j <= 120; j++) {
+      let t = (a0 + (a1 - a0) * j / 120) * Math.PI;
+      if (s < 0) t = Math.PI - t;
+      const p = titPt(S2, s, t), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      if (j) g.lineTo(X, Y);
+      else g.moveTo(X, Y);
+    }
+  }
+  function titPath(g, S2, s, ox, oy, sc) {
+    g.beginPath();
+    for (let j = 0; j <= 160; j++) {
+      const p = titPt(S2, s, j / 160 * Math.PI * 2), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      if (j) g.lineTo(X, Y);
+      else g.moveTo(X, Y);
+    }
+    g.closePath();
+  }
+  function ownSide(g, s, ox, f) {
+    g.save();
+    g.beginPath();
+    if (s < 0) g.rect(-9999, -9999, 9999 + ox, 99999);
+    else g.rect(ox, -9999, 9999, 99999);
+    g.clip();
+    f();
+    g.restore();
+  }
+  var DRIPS = [];
+  function dripFrom(g, w, h2, x0, x1, seed, n) {
+    const data = g.getImageData(0, 0, w, h2).data, r = rng(seed), lows = [];
+    for (let x = x0; x < x1; x += 3) {
+      for (let y = h2 - 1; y > 0; y--) if (data[(y * w + x) * 4 + 3] > 140) {
+        lows.push([x, y]);
+        break;
+      }
+    }
+    const picked = [];
+    for (const [x, y] of lows) if (r() < n / lows.length * 1.6 && !picked.some(([px]) => Math.abs(px - x) < 16)) picked.push([x, y]);
+    DRIPS.length = 0;
+    for (const [x, y] of picked) {
+      const wd = 8 + r() * 6, len = r() < 0.3 ? 4 + r() * 8 : 16 + Math.pow(r(), 1.4) * 58, wob = (r() - 0.5) * 3;
+      g.beginPath();
+      g.moveTo(x - wd * 1.5, y - 2);
+      g.quadraticCurveTo(x - wd * 0.5, y, x - wd * 0.45, y + Math.min(len, wd * 1.2));
+      g.bezierCurveTo(x - wd * 0.42 + wob, y + len * 0.6, x - wd * 0.5, y + len * 0.85, x - wd * 0.62, y + len);
+      g.arc(x, y + len, wd * 0.62, Math.PI, 0, true);
+      g.bezierCurveTo(x + wd * 0.5, y + len * 0.85, x + wd * 0.42 + wob, y + len * 0.6, x + wd * 0.45, y + Math.min(len, wd * 1.2));
+      g.quadraticCurveTo(x + wd * 0.5, y, x + wd * 1.5, y - 2);
+      g.closePath();
+      g.fill();
+      DRIPS.push([x, y, wd, len]);
+    }
+  }
+  function logo(g, which, cx, cy, h2, col) {
+    const src = IMG[which], s = h2 / src.height, w = src.width * s;
+    const c = document.createElement("canvas");
+    c.width = Math.ceil(w);
+    c.height = Math.ceil(h2);
+    const cg = c.getContext("2d");
+    cg.drawImage(src, 0, 0, w, h2);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col || INK;
+    cg.fillRect(0, 0, c.width, c.height);
+    g.drawImage(c, cx - w / 2, cy - h2 / 2);
+    return w;
+  }
+  function arcTextLow(g, t, cx, textY, R, font, size) {
+    g.font = size + "px " + fontOf(font);
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY - R;
+    let a = Math.PI / 2 + span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a - da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid - Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a -= da;
+    }
+  }
+  function boneShape(g, cx, cy, w, h2) {
+    const r = h2 * 0.36, L = cx - w / 2 + r, R = cx + w / 2 - r;
+    g.beginPath();
+    g.rect(L, cy - h2 * 0.3, R - L, h2 * 0.6);
+    for (const [x, y] of [[L, cy - h2 * 0.26], [L, cy + h2 * 0.26], [R, cy - h2 * 0.26], [R, cy + h2 * 0.26]]) {
+      g.moveTo(x + r, y);
+      g.arc(x, y, r, 0, Math.PI * 2);
+    }
+  }
+  function boneOutline(g, cx, cy, w, h2, lw) {
+    boneShape(g, cx, cy, w, h2);
+    g.fill("nonzero");
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    boneShape(g, cx, cy, w - lw * 2, h2 - lw * 2);
+    g.fill("nonzero");
+    g.restore();
+  }
+  function cut(g, f) {
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    f();
+    g.restore();
+  }
+  function earTag(g, cx, top, w, h2) {
+    g.beginPath();
+    g.roundRect(cx - w * 0.18, top, w * 0.36, h2 * 0.34, 14);
+    g.roundRect(cx - w / 2, top + h2 * 0.24, w, h2 * 0.76, 26);
+  }
+  function rosette(g, cx, cy, r, ring, tails, mid) {
+    g.fillStyle = tails;
+    for (const d of [-1, 1]) {
+      g.beginPath();
+      g.moveTo(cx + d * r * 0.15, cy + r * 0.3);
+      g.lineTo(cx + d * r * 0.75, cy + r * 1.55);
+      g.lineTo(cx + d * r * 0.45, cy + r * 1.35);
+      g.lineTo(cx + d * r * 0.25, cy + r * 1.62);
+      g.lineTo(cx - d * r * 0.2, cy + r * 0.45);
+      g.closePath();
+      g.fill();
+    }
+    g.fillStyle = ring;
+    for (let i = 0; i < 22; i++) {
+      const a = i / 22 * Math.PI * 2;
+      g.beginPath();
+      g.arc(cx + Math.cos(a) * r * 0.86, cy + Math.sin(a) * r * 0.86, r * 0.2, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.beginPath();
+    g.arc(cx, cy, r * 0.88, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = mid;
+    g.beginPath();
+    g.arc(cx, cy, r * 0.62, 0, Math.PI * 2);
+    g.fill();
+  }
+  function flourish(g, x, y, s, d) {
+    g.lineCap = "round";
+    g.lineWidth = s * 0.07;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.bezierCurveTo(x + d * s * 0.6, y - s * 0.5, x + d * s * 1.2, y + s * 0.3, x + d * s * 1.6, y - s * 0.1);
+    g.bezierCurveTo(x + d * s * 1.8, y - s * 0.25, x + d * s * 1.65, y - s * 0.45, x + d * s * 1.5, y - s * 0.32);
+    g.stroke();
+    g.lineWidth = s * 0.045;
+    g.beginPath();
+    g.moveTo(x + d * s * 0.3, y + s * 0.12);
+    g.bezierCurveTo(x + d * s * 0.8, y + s * 0.55, x + d * s * 1.3, y + s * 0.45, x + d * s * 1.55, y + s * 0.22);
+    g.stroke();
+    g.beginPath();
+    g.arc(x + d * s * 1.62, y + s * 0.2, s * 0.06, 0, Math.PI * 2);
+    g.fill();
+  }
+  function stamp(g, ink, x0, y0, col, seed) {
+    const c = document.createElement("canvas");
+    c.width = ink.width;
+    c.height = ink.height;
+    const cg = c.getContext("2d");
+    cg.drawImage(ink, 0, 0);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col;
+    cg.fillRect(0, 0, c.width, c.height);
+    cg.globalCompositeOperation = "destination-out";
+    const r = rng(seed);
+    for (let i = 0; i < 1400; i++) {
+      cg.globalAlpha = 0.3 + r() * 0.7;
+      cg.beginPath();
+      cg.arc(r() * c.width, r() * c.height, 0.5 + r() * 1.8, 0, Math.PI * 2);
+      cg.fill();
+    }
+    for (let i = 0; i < 5; i++) {
+      cg.globalAlpha = 0.18 + r() * 0.2;
+      cg.fillRect(0, r() * c.height, c.width, 6 + r() * 16);
+    }
+    g.globalCompositeOperation = "multiply";
+    g.globalAlpha = 0.9;
+    g.drawImage(c, x0, y0);
+    g.globalCompositeOperation = "source-over";
+    g.globalAlpha = 1;
+  }
+  function welt(g, ink, x0, y0) {
+    const w = ink.width, h2 = ink.height, tint = (col, blur, a, op) => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h2;
+      const cg = c.getContext("2d");
+      cg.filter = blur ? "blur(" + blur + "px)" : "none";
+      cg.drawImage(ink, 0, 0);
+      cg.filter = "none";
+      cg.globalCompositeOperation = "source-in";
+      cg.fillStyle = col;
+      cg.fillRect(0, 0, w, h2);
+      g.globalCompositeOperation = op || "source-over";
+      g.globalAlpha = a;
+      g.drawImage(c, x0, y0);
+      g.globalAlpha = 1;
+      g.globalCompositeOperation = "source-over";
+    };
+    tint("#c22f3a", 9, 0.55, "multiply");
+    tint("#d8434c", 3, 0.5, "multiply");
+    tint("#ff8f8a", 2, 0.22);
+  }
+  function upArrow(g, x, y0, y1, wd) {
+    g.lineWidth = wd;
+    g.lineCap = "butt";
+    g.beginPath();
+    g.moveTo(x, y1);
+    g.lineTo(x, y0 + wd * 2);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x - wd * 2.4, y0 + wd * 2.6);
+    g.lineTo(x, y0);
+    g.lineTo(x + wd * 2.4, y0 + wd * 2.6);
+    g.closePath();
+    g.fill();
+  }
+  function star(g, x, y, r) {
+    g.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r * 0.45 : r;
+      if (i) g.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q);
+      else g.moveTo(x + Math.cos(a) * q, y + Math.sin(a) * q);
+    }
+    g.closePath();
+  }
+  function drop(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y - s);
+    g.bezierCurveTo(x + s * 0.2, y - s * 0.5, x + s * 0.7, y - s * 0.05, x + s * 0.7, y + s * 0.35);
+    g.arc(x, y + s * 0.35, s * 0.7, 0, Math.PI);
+    g.bezierCurveTo(x - s * 0.7, y - s * 0.05, x - s * 0.2, y - s * 0.5, x, y - s);
+    g.closePath();
+    g.fill();
+  }
+  function lips(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    g.beginPath();
+    g.moveTo(-s, 0);
+    g.bezierCurveTo(-s * 0.6, -s * 0.55, -s * 0.25, -s * 0.6, 0, -s * 0.28);
+    g.bezierCurveTo(s * 0.25, -s * 0.6, s * 0.6, -s * 0.55, s, 0);
+    g.bezierCurveTo(s * 0.5, -s * 0.1, -s * 0.5, -s * 0.1, -s, 0);
+    g.fill();
+    g.beginPath();
+    g.moveTo(-s, s * 0.03);
+    g.bezierCurveTo(-s * 0.5, s * 0.1, s * 0.5, s * 0.1, s, s * 0.03);
+    g.bezierCurveTo(s * 0.6, s * 0.66, -s * 0.6, s * 0.66, -s, s * 0.03);
+    g.fill();
+    g.globalCompositeOperation = "destination-out";
+    g.lineWidth = Math.max(1, s * 0.035);
+    g.lineCap = "round";
+    for (let i = -4; i <= 4; i++) {
+      g.beginPath();
+      g.moveTo(i * s * 0.17, s * 0.14);
+      g.lineTo(i * s * 0.2, s * 0.44);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(i * s * 0.15, -s * 0.1);
+      g.lineTo(i * s * 0.18, -s * 0.34);
+      g.stroke();
+    }
+    g.restore();
+  }
+  function care(g, kind, x, y) {
+    g.lineWidth = 2.6;
+    g.lineJoin = "round";
+    if (kind === "tub") {
+      g.beginPath();
+      g.moveTo(x - 17, y - 9);
+      g.lineTo(x - 13, y + 12);
+      g.lineTo(x + 13, y + 12);
+      g.lineTo(x + 17, y - 9);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x - 15, y - 4);
+      g.quadraticCurveTo(x - 8, y - 9, x - 2, y - 4);
+      g.quadraticCurveTo(x + 6, y + 1, x + 15, y - 4);
+      g.stroke();
+      g.font = "bold 11px Arial";
+      g.textAlign = "center";
+      g.textBaseline = "middle";
+      g.fillText("69", x, y + 5);
+    }
+    if (kind === "noBleach") {
+      g.beginPath();
+      g.moveTo(x, y - 12);
+      g.lineTo(x + 15, y + 12);
+      g.lineTo(x - 15, y + 12);
+      g.closePath();
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x - 15, y - 12);
+      g.lineTo(x + 15, y + 14);
+      g.moveTo(x + 15, y - 12);
+      g.lineTo(x - 15, y + 14);
+      g.stroke();
+    }
+    if (kind === "tumble") {
+      g.strokeRect(x - 13, y - 13, 26, 26);
+      g.beginPath();
+      g.arc(x, y, 9, 0, Math.PI * 2);
+      g.stroke();
+      for (const d of [-3, 3]) {
+        g.beginPath();
+        g.arc(x + d, y, 1.6, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+    if (kind === "noDry") {
+      g.strokeRect(x - 13, y - 13, 26, 26);
+      g.beginPath();
+      g.moveTo(x - 13, y - 13);
+      g.lineTo(x + 13, y + 13);
+      g.moveTo(x + 13, y - 13);
+      g.lineTo(x - 13, y + 13);
+      g.stroke();
+    }
+  }
+  function qr(g, x, y, cell, seed) {
+    const N = 21, r = rng(seed), finder = (cx, cy) => {
+      g.fillRect(x + cx * cell, y + cy * cell, 7 * cell, 7 * cell);
+      g.save();
+      g.globalCompositeOperation = "destination-out";
+      g.fillRect(x + (cx + 1) * cell, y + (cy + 1) * cell, 5 * cell, 5 * cell);
+      g.restore();
+      g.fillRect(x + (cx + 2) * cell, y + (cy + 2) * cell, 3 * cell, 3 * cell);
+    };
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      const inF = i < 8 && j < 8 || i > N - 9 && j < 8 || i < 8 && j > N - 9;
+      if (!inF && r() < 0.48) g.fillRect(x + i * cell, y + j * cell, cell, cell);
+    }
+    finder(0, 0);
+    finder(N - 7, 0);
+    finder(0, N - 7);
+  }
+  var YEL = "#efc02a";
+  var YEL2 = "#c4950f";
+  var GRN = "#3f8a2e";
+  var RED2 = "#d42020";
+  function banner(g, cx, cy, bw, bh, col, tail, t, font, size) {
+    const L = cx - bw / 2, R = cx + bw / 2;
+    for (const d of [-1, 1]) {
+      const x0 = d < 0 ? L : R;
+      g.beginPath();
+      g.moveTo(x0 - d * 12, cy - bh * 0.15);
+      g.lineTo(x0 + d * bh * 1.05, cy - bh * 0.15);
+      g.lineTo(x0 + d * bh * 0.62, cy + bh * 0.38);
+      g.lineTo(x0 + d * bh * 1.05, cy + bh * 0.9);
+      g.lineTo(x0 - d * 12, cy + bh * 0.9);
+      g.closePath();
+      g.fillStyle = tail;
+      g.fill();
+      g.strokeStyle = INK;
+      g.lineWidth = 3;
+      g.lineJoin = "round";
+      g.stroke();
+    }
+    g.beginPath();
+    g.moveTo(L, cy - bh / 2);
+    g.quadraticCurveTo(cx, cy - bh / 2 - 12, R, cy - bh / 2);
+    g.lineTo(R, cy + bh / 2);
+    g.quadraticCurveTo(cx, cy + bh / 2 - 12, L, cy + bh / 2);
+    g.closePath();
+    g.fillStyle = col;
+    g.fill();
+    g.strokeStyle = INK;
+    g.lineWidth = 3.5;
+    g.stroke();
+    g.fillStyle = INK;
+    text(g, t, cx, cy - 5, font, size, { max: bw - 22 });
+  }
+  function canine(g, x, y, L, a) {
+    const hh = L * 0.13, pt = (u, v) => [x + Math.cos(a) * u - Math.sin(a) * v, y + Math.sin(a) * u + Math.cos(a) * v];
+    const P = [];
+    const M = (u, v) => P.push(pt(u, v));
+    g.beginPath();
+    let p = pt(0, -hh * 0.7);
+    g.moveTo(p[0], p[1]);
+    const seg = (c1, c2, e) => {
+      const a1 = pt(...c1), a2 = pt(...c2), b = pt(...e);
+      g.bezierCurveTo(a1[0], a1[1], a2[0], a2[1], b[0], b[1]);
+    };
+    seg([L * 0.04, -hh * 1.6], [L * 0.26, -hh * 1.7], [L * 0.32, -hh * 0.82]);
+    seg([L * 0.55, -hh * 0.9], [L * 0.86, -hh * 0.62], [L, 0]);
+    seg([L * 0.86, hh * 0.62], [L * 0.55, hh * 0.9], [L * 0.32, hh * 0.82]);
+    seg([L * 0.26, hh * 1.7], [L * 0.04, hh * 1.6], [0, hh * 0.7]);
+    g.closePath();
+  }
+  function flash(g, path, col, lw) {
+    path();
+    g.fillStyle = col;
+    g.fill();
+    path();
+    g.strokeStyle = INK;
+    g.lineWidth = lw || 4;
+    g.lineJoin = "round";
+    g.stroke();
+  }
+  function speckle(g, seed, n, w, h2) {
+    const r = rng(seed);
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < n; i++) {
+      g.globalAlpha = 0.4 + r() * 0.6;
+      g.beginPath();
+      g.arc(r() * w, r() * h2, 0.5 + r() * 1.6, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.restore();
+  }
+  function paisley(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    const shape = (k) => {
+      g.beginPath();
+      g.moveTo(0, -s * k);
+      g.bezierCurveTo(s * 0.95 * k, -s * 0.85 * k, s * 0.9 * k, s * 0.65 * k, 0, s * 0.72 * k);
+      g.bezierCurveTo(-s * 0.72 * k, s * 0.75 * k, -s * 0.82 * k, 0, -s * 0.22 * k, -s * 0.22 * k);
+      g.quadraticCurveTo(-s * 0.04 * k, -s * 0.5 * k, 0, -s * k);
+    };
+    g.lineWidth = 2.6;
+    shape(1);
+    g.stroke();
+    g.lineWidth = 1.5;
+    shape(0.62);
+    g.stroke();
+    g.beginPath();
+    g.arc(s * 0.08, s * 0.12, s * 0.12, 0, Math.PI * 2);
+    g.fill();
+    for (let i = 0; i < 9; i++) {
+      const a = -0.3 + i * 0.36;
+      g.beginPath();
+      g.arc(Math.cos(a) * s * 1.05 + s * 0.1, Math.sin(a) * s * 1 + s * 0.05, 1.5, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.restore();
+  }
+  function leaf(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.quadraticCurveTo(s * 0.5, -s * 0.45, s, 0);
+    g.quadraticCurveTo(s * 0.5, s * 0.45, 0, 0);
+    g.fill();
+    g.restore();
+  }
+  function blossom(g, x, y, s, petals) {
+    g.lineWidth = 1.8;
+    for (let i = 0; i < (petals || 8); i++) {
+      const a = i / (petals || 8) * Math.PI * 2;
+      g.beginPath();
+      g.ellipse(x + Math.cos(a) * s * 0.55, y + Math.sin(a) * s * 0.55, s * 0.42, s * 0.2, a, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.beginPath();
+    g.arc(x, y, s * 0.18, 0, Math.PI * 2);
+    g.fill();
+  }
+  function shield(g, cx, cy, W12, H) {
+    const t = cy - H / 2, L = cx - W12 / 2, R = cx + W12 / 2;
+    g.beginPath();
+    g.moveTo(L + 14, t);
+    g.lineTo(R - 14, t);
+    g.quadraticCurveTo(R, t, R, t + 14);
+    g.lineTo(R, cy + H * 0.1);
+    g.quadraticCurveTo(R - 8, cy + H * 0.36, cx, cy + H / 2);
+    g.quadraticCurveTo(L + 8, cy + H * 0.36, L, cy + H * 0.1);
+    g.lineTo(L, t + 14);
+    g.quadraticCurveTo(L, t, L + 14, t);
+    g.closePath();
+  }
+  function speciesBrand(word, icon) {
+    return (g, w, h2) => {
+      const cx = w / 2, cy = h2 / 2 + 2;
+      g.fillStyle = INK;
+      g.strokeStyle = INK;
+      g.lineWidth = 8;
+      shield(g, cx, cy, 172, 206);
+      g.stroke();
+      icon(g, cx, cy - 30);
+      text(g, word, cx, cy + 44, "Black Ops One", 29, { max: 132 });
+    };
+  }
+  var ICON = {
+    cow: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 18, y - 18);
+        g.quadraticCurveTo(x + d * 58, y - 22, x + d * 52, y - 56);
+        g.quadraticCurveTo(x + d * 44, y - 30, x + d * 12, y - 6);
+        g.closePath();
+        g.fill();
+        g.beginPath();
+        g.ellipse(x + d * 40, y - 4, 16, 7, d * 0.35, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 4, 26, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      g.beginPath();
+      g.ellipse(x, y + 28, 23, 14, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 9, y + 29, 3.6, 5, 0, 0, Math.PI * 2);
+          g.fill();
+          g.beginPath();
+          g.arc(x + d * 12, y - 2, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    horse: (g, x, y) => {
+      g.lineCap = "butt";
+      g.lineWidth = 22;
+      g.beginPath();
+      g.arc(x, y - 4, 36, -0.12 * Math.PI, 1.12 * Math.PI);
+      g.stroke();
+      cut(g, () => {
+        for (let i = 0; i < 6; i++) {
+          const a = -0.03 * Math.PI + i * (1.06 * Math.PI / 5);
+          g.beginPath();
+          g.arc(x + Math.cos(a) * 36, y - 4 + Math.sin(a) * 36, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    dog: (g, x, y) => paw(g, x, y + 4, 72),
+    pig: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x, y, 42, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 13, y, 6.5, 11, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    fox: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 30, y + 34);
+      g.bezierCurveTo(x - 64, y - 6, x - 16, y - 56, x + 44, y - 42);
+      g.bezierCurveTo(x + 6, y - 30, x - 22, y - 2, x - 8, y + 34);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(x + 10, y - 50);
+        g.lineTo(x + 4, y - 40);
+        g.lineTo(x + 14, y - 36);
+        g.lineTo(x + 8, y - 26);
+        g.stroke();
+      });
+    },
+    bunny: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 15, y - 26, 10, 30, d * 0.18, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 16, 32, 26, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.arc(x + d * 12, y + 12, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+        heart(g, x, y + 24, 5);
+        g.fill();
+      });
+    },
+    cat: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x, y + 8, 38, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 36, y - 6);
+        g.lineTo(x + d * 38, y - 40);
+        g.lineTo(x + d * 8, y - 18);
+        g.closePath();
+        g.fill();
+      }
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 14, y + 4, 4, 7, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.beginPath();
+        g.moveTo(x - 5, y + 16);
+        g.lineTo(x + 5, y + 16);
+        g.lineTo(x, y + 21);
+        g.closePath();
+        g.fill();
+        g.lineWidth = 2;
+        for (const d of [-1, 1]) for (const k of [-1, 1]) {
+          g.beginPath();
+          g.moveTo(x + d * 14, y + 22 + k * 3);
+          g.lineTo(x + d * 34, y + 20 + k * 7);
+          g.stroke();
+        }
+      });
+    },
+    dragon: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 44, y + 26);
+      g.lineTo(x - 30, y - 36);
+      g.lineTo(x + 48, y - 44);
+      g.quadraticCurveTo(x + 30, y - 14, x + 40, y + 4);
+      g.quadraticCurveTo(x + 14, y + 2, x + 16, y + 30);
+      g.quadraticCurveTo(x - 10, y + 16, x - 44, y + 26);
+      g.closePath();
+      g.fill();
+      g.beginPath();
+      g.moveTo(x - 30, y - 36);
+      g.lineTo(x - 38, y - 50);
+      g.lineTo(x - 22, y - 40);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(x - 28, y - 32);
+        g.lineTo(x + 36, y + 2);
+        g.moveTo(x - 30, y - 28);
+        g.lineTo(x + 14, y + 26);
+        g.stroke();
+      });
+    }
+  };
+  function swallow(g, x, y, s, flip) {
+    g.save();
+    g.translate(x, y);
+    g.scale(flip ? -1 : 1, 1);
+    const body = () => {
+      g.beginPath();
+      g.moveTo(s * 0.9, -s * 0.02);
+      g.quadraticCurveTo(s * 0.62, -s * 0.3, s * 0.28, -s * 0.2);
+      g.quadraticCurveTo(-s * 0.1, -s * 0.12, -s * 0.42, -s * 0.06);
+      g.lineTo(-s * 1.25, -s * 0.36);
+      g.lineTo(-s * 0.7, s * 0.03);
+      g.lineTo(-s * 1.2, s * 0.3);
+      g.lineTo(-s * 0.38, s * 0.14);
+      g.quadraticCurveTo(s * 0.35, s * 0.34, s * 0.9, -s * 0.02);
+      g.closePath();
+    };
+    const wing = () => {
+      g.beginPath();
+      g.moveTo(s * 0.3, -s * 0.18);
+      g.quadraticCurveTo(s * 0, -s * 0.95, -s * 0.75, -s * 1.05);
+      g.quadraticCurveTo(-s * 0.35, -s * 0.6, -s * 0.18, -s * 0.08);
+      g.closePath();
+    };
+    flash(g, body, "#2a5fb0", 3);
+    g.save();
+    body();
+    g.clip();
+    g.fillStyle = "#d8261f";
+    g.beginPath();
+    g.ellipse(s * 0.3, s * 0.14, s * 0.42, s * 0.2, 0.15, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    body();
+    g.strokeStyle = INK;
+    g.lineWidth = 3;
+    g.stroke();
+    flash(g, wing, "#2a5fb0", 3);
+    g.fillStyle = INK;
+    g.beginPath();
+    g.arc(s * 0.6, -s * 0.12, s * 0.05, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+  }
+  function rope(g, pts) {
+    const seg = (f) => {
+      for (let i = 0; i < pts.length - 1; i++) f(pts[i], pts[i + 1]);
+    };
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.strokeStyle = INK;
+    g.lineWidth = 11;
+    g.beginPath();
+    g.moveTo(pts[0][0], pts[0][1]);
+    for (const p of pts.slice(1)) g.lineTo(p[0], p[1]);
+    g.stroke();
+    cut(g, () => {
+      g.lineWidth = 6.5;
+      g.beginPath();
+      g.moveTo(pts[0][0], pts[0][1]);
+      for (const p of pts.slice(1)) g.lineTo(p[0], p[1]);
+      g.stroke();
+    });
+    g.lineWidth = 1.6;
+    seg(([x0, y0], [x1, y1]) => {
+      const L = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / L, uy = (y1 - y0) / L;
+      for (let t = 5; t < L - 3; t += 7) {
+        const x = x0 + ux * t, y = y0 + uy * t;
+        g.beginPath();
+        g.moveTo(x - uy * 4 - ux * 2.5, y + ux * 4 - uy * 2.5);
+        g.lineTo(x + uy * 4 + ux * 2.5, y - ux * 4 + uy * 2.5);
+        g.stroke();
+      }
+    });
+  }
+  function tie(g, x, y) {
+    g.fillStyle = INK;
+    g.beginPath();
+    g.ellipse(x, y, 9, 7, 0.3, 0, Math.PI * 2);
+    g.fill();
+    cut(g, () => {
+      g.lineWidth = 1.5;
+      g.beginPath();
+      g.moveTo(x - 5, y - 3);
+      g.lineTo(x + 5, y + 3);
+      g.stroke();
+    });
+  }
+  Object.assign(ICON, {
+    goat: (g, x, y) => {
+      g.lineCap = "round";
+      g.lineWidth = 9;
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 10, y - 22);
+        g.bezierCurveTo(x + d * 18, y - 56, x + d * 50, y - 54, x + d * 46, y - 22);
+        g.stroke();
+        g.beginPath();
+        g.ellipse(x + d * 32, y - 6, 15, 6, d * 0.4, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.moveTo(x - 20, y - 18);
+      g.quadraticCurveTo(x, y - 30, x + 20, y - 18);
+      g.quadraticCurveTo(x + 18, y + 18, x + 8, y + 30);
+      g.lineTo(x - 8, y + 30);
+      g.quadraticCurveTo(x - 18, y + 18, x - 20, y - 18);
+      g.fill();
+      g.beginPath();
+      g.moveTo(x - 8, y + 26);
+      g.lineTo(x + 8, y + 26);
+      g.lineTo(x, y + 50);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 9, y - 4, 4, 2.6, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    sheep: (g, x, y) => {
+      for (const [dx, dy, r] of [[-28, -24, 15], [-12, -34, 16], [8, -35, 16], [26, -26, 15], [36, -10, 12], [-36, -10, 12]]) {
+        g.beginPath();
+        g.arc(x + dx, y + dy, r, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 8, 20, 28, 0, 0, Math.PI * 2);
+      g.fill();
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 30, y + 4, 14, 6, d * 0.3, 0, Math.PI * 2);
+        g.fill();
+      }
+      cut(g, () => {
+        g.lineWidth = 2.5;
+        for (const [dx, dy] of [[-20, -26], [0, -34], [20, -26]]) {
+          g.beginPath();
+          g.arc(x + dx, y + dy, 6, 0.2, 2.8);
+          g.stroke();
+        }
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.arc(x + d * 8, y + 2, 3.2, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    wolf: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x, y + 40);
+      g.lineTo(x - 14, y + 26);
+      g.lineTo(x - 34, y + 10);
+      g.lineTo(x - 40, y - 8);
+      g.lineTo(x - 36, y - 48);
+      g.lineTo(x - 16, y - 26);
+      g.lineTo(x, y - 30);
+      g.lineTo(x + 16, y - 26);
+      g.lineTo(x + 36, y - 48);
+      g.lineTo(x + 40, y - 8);
+      g.lineTo(x + 34, y + 10);
+      g.lineTo(x + 14, y + 26);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.moveTo(x + d * 8, y - 4);
+          g.lineTo(x + d * 24, y - 10);
+          g.lineTo(x + d * 20, y - 2);
+          g.closePath();
+          g.fill();
+        }
+        g.beginPath();
+        g.ellipse(x, y + 30, 6, 4, 0, 0, Math.PI * 2);
+        g.fill();
+      });
+    },
+    deer: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 32, y - 22, 20, 10, d * -0.5, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.moveTo(x - 22, y - 24);
+      g.quadraticCurveTo(x, y - 36, x + 22, y - 24);
+      g.quadraticCurveTo(x + 24, y + 4, x + 8, y + 36);
+      g.quadraticCurveTo(x, y + 42, x - 8, y + 36);
+      g.quadraticCurveTo(x - 24, y + 4, x - 22, y - 24);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 11, y - 8, 4, 5.5, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        for (const [dx, dy] of [[-6, -22], [6, -24], [0, -14]]) {
+          g.beginPath();
+          g.arc(x + dx, y + dy, 2.2, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    rat: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x - 4, y + 4, 34, 22, -0.1, 0, Math.PI * 2);
+      g.fill();
+      g.beginPath();
+      g.moveTo(x + 22, y - 10);
+      g.quadraticCurveTo(x + 48, y - 4, x + 54, y + 8);
+      g.quadraticCurveTo(x + 40, y + 18, x + 22, y + 18);
+      g.fill();
+      g.beginPath();
+      g.arc(x + 22, y - 14, 11, 0, Math.PI * 2);
+      g.fill();
+      g.lineWidth = 4;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x - 36, y + 8);
+      g.bezierCurveTo(x - 64, y + 10, x - 60, y - 30, x - 34, y - 34);
+      g.stroke();
+      cut(g, () => {
+        g.beginPath();
+        g.arc(x + 36, y + 2, 2.6, 0, Math.PI * 2);
+        g.fill();
+        g.beginPath();
+        g.arc(x + 22, y - 14, 5, 0, Math.PI * 2);
+        g.fill();
+      });
+    },
+    goblin: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 26, y + 30);
+      g.quadraticCurveTo(x - 30, y - 2, x - 10, y - 14);
+      g.lineTo(x + 50, y - 46);
+      g.lineTo(x + 34, y - 18);
+      g.lineTo(x + 42, y - 14);
+      g.quadraticCurveTo(x + 18, y + 26, x - 26, y + 30);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.beginPath();
+        g.moveTo(x - 6, y + 6);
+        g.quadraticCurveTo(x + 8, y - 10, x + 30, y - 22);
+        g.lineWidth = 4;
+        g.stroke();
+      });
+      g.lineWidth = 3.5;
+      g.beginPath();
+      g.arc(x - 18, y + 38, 8, 0, Math.PI * 2);
+      g.stroke();
+    }
+  });
+  function veins(g, x, y, ang, len, wd, depth, r) {
+    if (depth <= 0 || len < 4) return;
+    let px = x, py = y, a = ang;
+    g.lineCap = "round";
+    for (let i = 0; i < 6; i++) {
+      a += (r() - 0.5) * 0.7;
+      const nx = px + Math.cos(a) * len / 6, ny = py + Math.sin(a) * len / 6;
+      g.lineWidth = Math.max(0.6, wd * (1 - i / 7));
+      g.beginPath();
+      g.moveTo(px, py);
+      g.lineTo(nx, ny);
+      g.stroke();
+      px = nx;
+      py = ny;
+      if (r() < 0.32) veins(g, px, py, a + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6), len * 0.55, wd * 0.6, depth - 1, r);
+    }
+  }
+  function corrupted(lines, size, seed) {
+    return (g, w, h2) => {
+      const C = "#3a0d52", r = rng(seed);
+      g.fillStyle = C;
+      g.strokeStyle = C;
+      const ys = lines.length === 1 ? [h2 / 2] : [h2 / 2 - size * 0.55, h2 / 2 + size * 0.55];
+      let maxW = 0;
+      lines.forEach((t, i) => {
+        const s = text(g, t, w / 2, ys[i], "Pirata One", size, { max: 320 });
+        g.font = s + "px 'Pirata One'";
+        maxW = Math.max(maxW, g.measureText(t).width);
+      });
+      const top = ys[0] - size * 0.42, bot = ys[ys.length - 1] + size * 0.42, L = w / 2 - maxW / 2, R = w / 2 + maxW / 2;
+      for (let i = 0; i < 11; i++) {
+        const side = r();
+        let x, y, a;
+        if (side < 0.35) {
+          x = L + r() * (R - L);
+          y = top;
+          a = -Math.PI / 2;
+        } else if (side < 0.7) {
+          x = L + r() * (R - L);
+          y = bot;
+          a = Math.PI / 2;
+        } else if (side < 0.85) {
+          x = L;
+          y = top + r() * (bot - top);
+          a = Math.PI;
+        } else {
+          x = R;
+          y = top + r() * (bot - top);
+          a = 0;
+        }
+        veins(g, x, y, a + (r() - 0.5) * 0.8, 20 + r() * 30, 2.6, 2, r);
+      }
+    };
+  }
+  function ownWords(t, font, size, col, extra) {
+    return (g, w, h2) => {
+      g.fillStyle = col || INK;
+      g.strokeStyle = col || INK;
+      text(g, t, w / 2, h2 / 2, font, size, { max: 330 });
+      if (extra) extra(g, w, h2);
+    };
+  }
+  var PINKGLOW = "#ff4fd8";
+
+  // shared/ink/live.js
+  var { INK: INK2, YEL: YEL3, YEL2: YEL22, GRN: GRN2, PINKGLOW: PINKGLOW2, CW: CW2, CH: CH2 } = live_art_exports;
+  var GAME_FONT = {
+    "Black Ops One": "'Saira Stencil One', 'Archivo Black', sans-serif",
+    "Stardos Stencil": "'Saira Stencil One', sans-serif",
+    "Rye": "'Archivo Black', serif",
+    "Bungee": "'Archivo Black', sans-serif",
+    "Shrikhand": "'Pacifico', cursive",
+    "Pinyon Script": "'Satisfy', cursive",
+    "Great Vibes": "'Satisfy', cursive",
+    "Permanent Marker": "'Caveat-Bold', 'Caveat', cursive",
+    "Press Start 2P": "'Courier New', monospace",
+    "Special Elite": "'Courier New', monospace",
+    "Sedgwick Ave Display": "'Calligraffitti', cursive",
+    "UnifrakturMaguntia": "'Old English Text MT', serif"
+  };
+  var loadedFonts = /* @__PURE__ */ new Set();
+  setFontOf((f) => (loadedFonts.has(f) ? "'" + f + "', " : "") + (GAME_FONT[f] || "'" + f + "', sans-serif"));
+  var fontCss = (size, f) => size + "px " + ((loadedFonts.has(f) ? "'" + f + "', " : "") + (GAME_FONT[f] || "sans-serif"));
+  var num0 = (v, d, max) => {
+    const x = Number(v);
+    return v === "" || v == null || !Number.isFinite(x) ? d : Math.max(0, Math.min(max || 999999999, Math.round(x)));
+  };
+  var txt0 = (v, d, max) => typeof v === "string" && v.trim() ? v.replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, max || 24) : d;
+  var MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  var dateWord = (ms) => {
+    const d = new Date(Number(ms));
+    return isNaN(d) ? "" : MONTHS[d.getMonth()] + " " + String(d.getDate()).padStart(2, "0");
+  };
+  function cleanValues(v) {
+    const o = {};
+    if (!v || typeof v !== "object") return o;
+    if (v.n != null) {
+      const n = num0(v.n, null, 99999);
+      if (n != null) o.n = n;
+    }
+    if (v.num != null) {
+      const n = num0(v.num, null);
+      if (n != null) o.num = n;
+    }
+    if (typeof v.t === "string") {
+      const t = txt0(v.t, null, 28);
+      if (t) o.t = t;
+    }
+    for (const k2 of ["d", "due"]) if (v[k2] != null) {
+      const n = num0(v[k2], null, 4e12);
+      if (n) o[k2] = n;
+    }
+    if (Array.isArray(v.list)) {
+      const l = v.list.map((x) => txt0(x, null, 16)).filter(Boolean).slice(0, 6);
+      if (l.length) o.list = l;
+    }
+    if (v.more != null) {
+      const n = num0(v.more, null, 9999);
+      if (n) o.more = n;
+    }
+    if (Array.isArray(v.rows)) {
+      const r = v.rows.filter((x) => Array.isArray(x)).map((x) => [txt0(x[0], null, 10), num0(x[1], 0, 999)]).filter((x) => x[0]).slice(0, 4);
+      if (r.length) o.rows = r;
+    }
+    const k = (x, lo, hi) => {
+      const n = Number(x);
+      return Number.isFinite(n) && n > 0 ? Math.round(Math.max(lo, Math.min(hi, n)) * 100) / 100 : null;
+    };
+    if (v.sz != null) {
+      const n = k(v.sz, 0.25, 4);
+      if (n && n !== 1) o.sz = n;
+    }
+    if (v.sw != null) {
+      const n = k(v.sw, 0.5, 2);
+      if (n && n !== 1) o.sw = n;
+    }
+    if (v.sh != null) {
+      const n = k(v.sh, 0.5, 2);
+      if (n && n !== 1) o.sh = n;
+    }
+    return o;
+  }
+  var text2 = text;
+  var pct = (n) => Math.max(0, Math.min(100, n)) / 100;
+  function tallyCount(g, x, y, n, h2, w, font) {
+    tally(g, x, y, Math.min(n, 25), h2);
+  }
+  var LIVE = [
+    {
+      name: "LiveFarmProperty",
+      title: "Farm Property (your number)",
+      sheet: 1,
+      where: "neck or hip",
+      fields: ["num"],
+      sample: { num: 123456 },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 4;
+        g.strokeRect(36, 46, w - 72, h2 - 92);
+        text2(g, "PROPERTY OF B&B FARM", w / 2, 84, "Stardos Stencil", 30, { max: w - 100 });
+        barcode(g, 70, 108, w - 140, 58, V.num || 7);
+        text2(g, "N\xBA " + V.num, w / 2, 186, "Black Ops One", 24);
+      }
+    },
+    {
+      name: "LiveUsedByStrangers",
+      title: "Used By Strangers (keeps count)",
+      sheet: 1,
+      where: "inner thigh",
+      fields: ["n"],
+      auto: "used",
+      sample: { n: 17 },
+      draw: (g, w, h2, V) => {
+        text2(g, "USED BY STRANGERS", w / 2, 62, "Permanent Marker", 32, { max: w - 30 });
+        tallyCount(g, 60, 108, V.n, 64);
+        if (V.n > 25) text2(g, String(V.n), w - 40, 212, "Permanent Marker", 30);
+      }
+    },
+    {
+      name: "LiveTimesBred",
+      title: "Times Bred (keeps count)",
+      sheet: 2,
+      where: "inner thigh",
+      fields: ["n"],
+      auto: "loads",
+      sample: { n: 23 },
+      draw: (g, w, h2, V) => {
+        text2(g, "BRED", w / 2, 56, "Black Ops One", 40);
+        tallyCount(g, 54, 96, V.n, 62);
+        text2(g, String(V.n), w - 50, 200, "Black Ops One", 26);
+      }
+    },
+    {
+      name: "LiveLitters",
+      title: "Litters (keeps count)",
+      sheet: 2,
+      where: "lower belly",
+      fields: ["n"],
+      auto: "litters",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 4;
+        g.beginPath();
+        g.roundRect(70, 50, w - 140, h2 - 100, 24);
+        g.stroke();
+        text2(g, "LITTERS", w / 2, 92, "Rye", 34);
+        text2(g, String(V.n), w / 2, 140, "Rye", 58, { max: w - 170 });
+        const k = Math.min(7, V.n);
+        for (let i = 0; i < k; i++) {
+          heart(g, w / 2 - (k - 1) * 15 + i * 30, 188, 7);
+          g.fill();
+        }
+      }
+    },
+    {
+      name: "LiveLitresMilked",
+      title: "Litres Milked (keeps count)",
+      sheet: 2,
+      where: "above a breast",
+      fields: ["n"],
+      auto: "milked",
+      sample: { n: 412 },
+      draw: (g, w, h2, V) => {
+        jug(g, 92, h2 / 2, 74);
+        text2(g, V.n + " L", 236, 112, "Bungee", 50, { max: 200 });
+        text2(g, "MILKED", 236, 162, "Bungee", 26);
+      }
+    },
+    {
+      name: "LiveEggsLaid",
+      title: "Eggs Laid (keeps count)",
+      sheet: 2,
+      where: "a hip",
+      fields: ["n"],
+      auto: "eggs",
+      sample: { n: 96 },
+      draw: (g, w, h2, V) => {
+        for (const [x, y] of [[70, 120], [100, 104], [96, 146], [128, 128], [66, 158]]) egg(g, x, y, 40);
+        text2(g, String(V.n), 250, 108, "Bungee", 62, { max: 190 });
+        text2(g, "EGGS LAID", 250, 166, "Bungee", 24);
+      }
+    },
+    {
+      name: "LiveDaysDenied",
+      title: "Days Since Last Orgasm (keeps count)",
+      sheet: 2,
+      where: "low belly",
+      fields: ["n"],
+      auto: "denied",
+      sample: { n: 12 },
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#1f6b3a";
+        g.fillRect(34, 40, w - 68, h2 - 80);
+        g.fillStyle = "#fff";
+        text2(g, "THIS SLUT HAS GONE", w / 2, 72, "Black Ops One", 18);
+        g.fillRect(w / 2 - 44, 92, 88, 64);
+        g.fillStyle = "#1f6b3a";
+        text2(g, String(V.n), w / 2, 125, "Black Ops One", 48, { max: 80 });
+        g.fillStyle = "#fff";
+        text2(g, V.n === 1 ? "DAY WITHOUT CUMMING" : "DAYS WITHOUT CUMMING", w / 2, 180, "Black Ops One", 18);
+      }
+    },
+    {
+      name: "LiveOwnedBy",
+      title: "Owned By (a name)",
+      sheet: 2,
+      where: "a hip or above the heart",
+      fields: ["t"],
+      dflt: "owner",
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        text2(g, "owned by", w / 2, 64, "Pinyon Script", 30);
+        text2(g, V.t, w / 2, 126, "Great Vibes", 72, { max: 300 });
+        g.lineWidth = 2.5;
+        g.beginPath();
+        g.moveTo(80, 172);
+        g.quadraticCurveTo(w / 2, 150, w - 80, 172);
+        g.stroke();
+        padlock(g, w / 2, 200, 22);
+      }
+    },
+    {
+      name: "LiveStockNumber",
+      title: "Stock Number (your number)",
+      sheet: 2,
+      where: "back of the neck",
+      fields: ["num"],
+      sample: { num: 123456 },
+      draw: (g, w, h2, V) => {
+        g.save();
+        g.translate(w * 0.72, h2 / 2);
+        g.rotate(-Math.PI / 2);
+        barcode(g, -90, -45, 180, 90, V.num || 11);
+        g.restore();
+        text2(g, "STOCK", 112, 105, "Stardos Stencil", 30);
+        text2(g, "N\xBA " + V.num, 112, 145, "Stardos Stencil", 22, { max: 170 });
+      }
+    },
+    {
+      name: "LiveLocked",
+      title: "Locked (keyholder's name)",
+      sheet: 2,
+      where: "above the heart",
+      fields: ["t"],
+      dflt: "owner",
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        padlock(g, w / 2 - 50, h2 / 2, 70);
+        key(g, w / 2 + 30, h2 / 2 + 10, 90);
+        text2(g, "keyholder: " + V.t, w / 2, h2 - 30, "Pinyon Script", 30, { max: w - 20 });
+      }
+    },
+    {
+      name: "LiveBredByBB",
+      title: "Bred By B&B",
+      sheet: 3,
+      where: "lower belly",
+      fields: [],
+      sample: {},
+      logo: true,
+      draw: (g, w, h2) => {
+        arcText(g, "BRED BY", w / 2, 50, 200, "Shrikhand", 40);
+        logo(g, "letters", w / 2, 138, 96);
+        text2(g, "\u2605 PREMIUM STOCK \u2605", w / 2, 216, "Rye", 20);
+      }
+    },
+    {
+      name: "LiveEarTag",
+      title: "B&B Ear Tag (your number)",
+      sheet: 3,
+      where: "a hip",
+      fields: ["num"],
+      sample: { num: 123456 },
+      logo: true,
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#e3b021";
+        earTag(g, w / 2, 22, 210, 206);
+        g.fill("nonzero");
+        g.strokeStyle = INK2;
+        g.lineWidth = 4;
+        earTag(g, w / 2, 22, 210, 206);
+        g.stroke();
+        cut(g, () => {
+          g.beginPath();
+          g.arc(w / 2, 46, 11, 0, Math.PI * 2);
+          g.fill();
+        });
+        g.fillStyle = INK2;
+        logo(g, "letters", w / 2, 128, 64);
+        text2(g, String(V.num), w / 2, 192, "Black Ops One", 34, { max: 180 });
+      }
+    },
+    {
+      name: "LiveCumTank",
+      title: "Cum Tank (how full you are)",
+      sheet: 4,
+      where: "the belly",
+      fields: ["n"],
+      auto: "tank",
+      sample: { n: 90 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 152, R = 104;
+        g.lineCap = "butt";
+        g.lineWidth = 7;
+        g.beginPath();
+        g.arc(cx, cy, R, Math.PI * 1.1, Math.PI * 1.9);
+        g.stroke();
+        for (let i = 0; i <= 8; i++) {
+          const a2 = Math.PI * (1.1 + 0.8 * i / 8), big = i % 4 === 0, r0 = big ? R - 26 : R - 15;
+          g.lineWidth = big ? 6 : 3.5;
+          g.beginPath();
+          g.moveTo(cx + Math.cos(a2) * r0, cy + Math.sin(a2) * r0);
+          g.lineTo(cx + Math.cos(a2) * (R - 3), cy + Math.sin(a2) * (R - 3));
+          g.stroke();
+        }
+        for (const [t, f] of [["E", 1.1], ["\xBD", 1.5], ["F", 1.9]]) {
+          const a2 = Math.PI * f;
+          text2(g, t, cx + Math.cos(a2) * (R - 46), cy + Math.sin(a2) * (R - 46), "Black Ops One", 24);
+        }
+        const a = Math.PI * (1.1 + 0.8 * pct(V.n));
+        g.lineWidth = 7;
+        g.lineCap = "round";
+        g.beginPath();
+        g.moveTo(cx, cy);
+        g.lineTo(cx + Math.cos(a) * (R - 24), cy + Math.sin(a) * (R - 24));
+        g.stroke();
+        g.beginPath();
+        g.arc(cx, cy, 11, 0, Math.PI * 2);
+        g.fill();
+        text2(g, "CUM TANK", cx, cy + 46, "Black Ops One", 30);
+        drop(g, cx - 106, cy + 44, 12);
+        drop(g, cx + 106, cy + 44, 12);
+      }
+    },
+    {
+      name: "LiveBreedingFacts",
+      title: "Breeding Facts (keeps count)",
+      sheet: 4,
+      where: "the small of the back",
+      fields: ["n"],
+      auto: "loads",
+      sample: { n: 23 },
+      draw: (g, w, h2, V) => {
+        const x0 = 94, y0 = 12, W12 = 192, H = 226;
+        g.lineWidth = 3;
+        g.strokeRect(x0, y0, W12, H);
+        const L = (t, size, bold, yy, right) => {
+          g.font = (bold ? "900 " : "") + size + "px Arial";
+          g.textAlign = "left";
+          g.textBaseline = "middle";
+          g.fillText(t, x0 + 8, yy);
+          if (right != null) {
+            g.textAlign = "right";
+            g.fillText(right, x0 + W12 - 8, yy);
+          }
+        };
+        L("Breeding Facts", 21, true, y0 + 21);
+        g.fillRect(x0 + 6, y0 + 37, W12 - 12, 1.5);
+        L("Serving size", 12, false, y0 + 49, "1 load");
+        L("Servings per day", 12, false, y0 + 64, "as many as fit");
+        g.fillRect(x0 + 6, y0 + 75, W12 - 12, 8);
+        L("Amount per serving", 11, true, y0 + 93);
+        L("Loads taken", 21, true, y0 + 113, String(V.n));
+        g.fillRect(x0 + 6, y0 + 126, W12 - 12, 4);
+        [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
+          L(a, 12, i < 2, y0 + 142 + i * 17, b);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W12 - 12, 1);
+        });
+        L("* bred fresh at B&B Farm", 10, false, y0 + 214);
+      }
+    },
+    {
+      name: "LiveLoading",
+      title: "Loading (how far along you are)",
+      sheet: 4,
+      where: "the belly",
+      fields: ["n"],
+      auto: "loading",
+      sample: { n: 80 },
+      draw: (g, w, h2, V) => {
+        text2(g, "LOADING...", w / 2, 62, "Press Start 2P", 22);
+        g.lineWidth = 5;
+        g.strokeRect(46, 96, 288, 50);
+        const k = Math.round(8 * pct(V.n));
+        for (let i = 0; i < k; i++) g.fillRect(56 + i * 34.5, 106, 28, 30);
+        text2(g, "BREEDING " + Math.min(100, V.n) + "%", w / 2, 178, "Press Start 2P", 15);
+        text2(g, "please do not unplug", w / 2, 210, "Press Start 2P", 9);
+      }
+    },
+    {
+      name: "LiveLipstickKisses",
+      title: "Lipstick Kisses (signed)",
+      sheet: 4,
+      where: "a butt cheek",
+      fields: ["t"],
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#c41e3a";
+        lips(g, 108, 84, 46, -0.32);
+        lips(g, 268, 74, 40, 0.28);
+        lips(g, 196, 150, 44, 0.06);
+        text2(g, "kissed by " + V.t, w / 2, 218, "Great Vibes", 36, { max: w - 20 });
+      }
+    },
+    {
+      name: "LiveWouldBreedAgain",
+      title: "\u2605\u2605\u2605\u2605\u2605 Would Breed Again (signed)",
+      sheet: 4,
+      where: "a thigh",
+      fields: ["t"],
+      sample: { t: "Big Red" },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.roundRect(34, 32, 312, 182, 16);
+        g.stroke();
+        g.fillStyle = "#d9a400";
+        for (let i = 0; i < 5; i++) {
+          star(g, w / 2 - 96 + i * 48, 80, 20);
+          g.fill();
+        }
+        g.lineWidth = 2;
+        g.strokeStyle = INK2;
+        for (let i = 0; i < 5; i++) {
+          star(g, w / 2 - 96 + i * 48, 80, 20);
+          g.stroke();
+        }
+        g.fillStyle = INK2;
+        text2(g, "\u201Cwould breed again\u201D", w / 2, 138, "Great Vibes", 40);
+        g.font = "13px Arial";
+        g.textAlign = "center";
+        g.fillText(V.t + ", verified owner \u2713", w / 2, 186);
+      }
+    },
+    {
+      name: "LiveGuestbook",
+      title: "Bred By (a guestbook)",
+      sheet: 5,
+      where: "an inner thigh",
+      fields: ["list", "more"],
+      auto: "studs",
+      sample: { list: ["Big Red", "the Bull", "Goblin #3", "Stud 7"], more: 19 },
+      draw: (g, w, h2, V) => {
+        text2(g, "Bred by:", 72, 30, "Pinyon Script", 32, { align: "left" });
+        const F = [["Great Vibes", 36], ["Permanent Marker", 24], ["Rye", 24], ["Special Elite", 22]];
+        (V.list || []).slice(0, 4).forEach((n, i) => {
+          const y = 72 + i * 38;
+          text2(g, n, 90, y, F[i][0], F[i][1], { align: "left", max: 220 });
+          g.fillRect(70, y + 15, 240, 1.4);
+        });
+        if (V.more) text2(g, "+ " + V.more + " more", 310, 232, "Pinyon Script", 22, { align: "right" });
+      }
+    },
+    {
+      name: "LiveBreedingCard",
+      title: "Breeding Card (a punch a load)",
+      sheet: 5,
+      where: "a butt cheek",
+      fields: ["n"],
+      auto: "punches",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2;
+        g.lineWidth = 3;
+        g.beginPath();
+        g.roundRect(36, 26, 308, 198, 14);
+        g.stroke();
+        text2(g, "B&B BREEDING CARD", cx, 54, "Black Ops One", 22);
+        text2(g, "every tenth load's on the house", cx, 80, "Special Elite", 15);
+        const k = Math.min(10, V.n);
+        for (let i = 0; i < 10; i++) {
+          const x = 96 + i % 5 * 47, y = 126 + Math.floor(i / 5) * 54;
+          g.lineWidth = 2.5;
+          g.beginPath();
+          g.arc(x, y, 18, 0, Math.PI * 2);
+          g.stroke();
+          if (i < k) {
+            heart(g, x, y + 4, 12);
+            g.fill();
+          } else if (i === 9) text2(g, "FREE", x, y, "Black Ops One", 12);
+        }
+      }
+    },
+    {
+      name: "LiveTrapPassport",
+      title: "Trap Passport (a stamp a trap)",
+      sheet: 5,
+      where: "a shoulder blade",
+      fields: ["list"],
+      sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
+      draw: (g, w, h2, V) => {
+        const L = (V.list || []).map((x) => String(x).toUpperCase());
+        if (L[0]) {
+          g.fillStyle = "#5b2a86";
+          g.strokeStyle = "#5b2a86";
+          g.lineWidth = 4;
+          g.beginPath();
+          g.arc(104, 92, 62, 0, Math.PI * 2);
+          g.stroke();
+          g.lineWidth = 2;
+          g.beginPath();
+          g.arc(104, 92, 40, 0, Math.PI * 2);
+          g.stroke();
+          arcText(g, L[0], 104, 41, 51, "Black Ops One", 15);
+          arcTextLow(g, "SURVIVED", 104, 143, 51, "Black Ops One", 14);
+          text2(g, "B&B", 104, 92, "Black Ops One", 15);
+        }
+        if (L[1]) {
+          g.fillStyle = "#b3122e";
+          g.strokeStyle = "#b3122e";
+          g.save();
+          g.translate(276, 74);
+          g.rotate(0.14);
+          g.lineWidth = 4;
+          g.strokeRect(-82, -40, 164, 80);
+          text2(g, L[1], 0, -12, "Black Ops One", 24, { max: 150 });
+          text2(g, "ENTERED \xB7 TAKEN", 0, 18, "Black Ops One", 13);
+          g.restore();
+        }
+        if (L[2]) {
+          g.fillStyle = "#1d3f8f";
+          g.strokeStyle = "#1d3f8f";
+          g.save();
+          g.translate(176, 196);
+          g.rotate(-0.08);
+          g.lineWidth = 4;
+          g.beginPath();
+          g.ellipse(0, 0, 84, 40, 0, 0, Math.PI * 2);
+          g.stroke();
+          text2(g, L[2], 0, -10, "Black Ops One", 22, { max: 140 });
+          text2(g, "WENT IN, CAME OUT", 0, 16, "Black Ops One", 13);
+          g.restore();
+        }
+        if (L[3]) {
+          g.fillStyle = GRN2;
+          g.strokeStyle = GRN2;
+          g.save();
+          g.translate(318, 182);
+          g.rotate(-0.2);
+          g.lineWidth = 3.5;
+          g.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const a = i / 6 * Math.PI * 2;
+            g.lineTo(Math.cos(a) * 46, Math.sin(a) * 46);
+          }
+          g.closePath();
+          g.stroke();
+          text2(g, L[3], 0, -8, "Black Ops One", 15, { max: 76 });
+          text2(g, "USED", 0, 12, "Black Ops One", 14);
+          g.restore();
+        }
+        speckle(g, 17, 1600, w, h2);
+      }
+    },
+    {
+      name: "LiveHighScores",
+      title: "High Scores (who's bred you most)",
+      sheet: 5,
+      where: "a thigh",
+      fields: ["rows"],
+      auto: "scores",
+      sample: { rows: [["BIG RED", 23], ["THE BULL", 17], ["GOBLIN", 12], ["STUD 7", 9]] },
+      draw: (g, w, h2, V) => {
+        text2(g, "HIGH SCORES", w / 2, 36, "Press Start 2P", 19);
+        g.font = fontCss(9, "Press Start 2P");
+        g.textBaseline = "middle";
+        g.textAlign = "left";
+        g.fillText("RANK", 44, 70);
+        g.fillText("NAME", 112, 70);
+        g.textAlign = "right";
+        g.fillText("LOADS", 336, 70);
+        (V.rows || []).slice(0, 4).forEach(([b, c], i) => {
+          const y = 100 + i * 28;
+          g.font = fontCss(13, "Press Start 2P");
+          g.textAlign = "left";
+          g.fillText(["1ST", "2ND", "3RD", "4TH"][i], 44, y);
+          g.fillText(String(b).toUpperCase().slice(0, 10), 112, y);
+          g.textAlign = "right";
+          g.fillText(String(c).padStart(2, "0"), 336, y);
+        });
+        text2(g, "PRESS START TO BREED", w / 2, 226, "Press Start 2P", 10);
+      }
+    },
+    {
+      name: "LiveTied",
+      title: "Tied \xD7 (keeps count)",
+      sheet: 5,
+      where: "a hip",
+      fields: ["n"],
+      auto: "tied",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        flash(g, () => canine(g, 70, 150, 190, -0.42), "#d9577a", 4);
+        g.fillStyle = INK2;
+        text2(g, "\xD7" + V.n, 296, 92, "Black Ops One", 64, { max: 150 });
+        banner(g, w / 2, 196, 180, 44, YEL3, YEL22, "TIED", "Rye", 30);
+      }
+    },
+    {
+      name: "LiveBredOn",
+      title: "Bred On (a date stamp)",
+      sheet: 6,
+      where: "a hip",
+      fields: ["d", "due"],
+      auto: "bredOn",
+      sample: { d: Date.UTC(2026, 10, 17, 12), due: Date.UTC(2027, 7, 9, 12) },
+      style: "stamp",
+      color: "#1d3f8f",
+      draw: (g, w, h2, V) => {
+        const cx = w / 2;
+        g.lineWidth = 5;
+        g.strokeRect(70, 46, 240, 160);
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(80, 124);
+        g.lineTo(300, 124);
+        g.stroke();
+        text2(g, "BRED ON", cx, 74, "Black Ops One", 26);
+        text2(g, dateWord(V.d), cx, 104, "Black Ops One", 30);
+        text2(g, "DUE", cx, 146, "Black Ops One", 20);
+        text2(g, V.due ? dateWord(V.due) : "SOON", cx, 178, "Black Ops One", 30);
+      }
+    },
+    {
+      name: "LiveHeatCrest",
+      title: "Heat Crest (fills as your heat rises)",
+      sheet: 7,
+      where: "over the womb",
+      fields: ["n"],
+      auto: "heat",
+      sample: { n: 66 },
+      style: "glow",
+      color: PINKGLOW2,
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 116, k = Math.round(12 * pct(V.n));
+        g.lineCap = "butt";
+        for (let i = 0; i < 12; i++) {
+          const a0 = -Math.PI / 2 + i / 12 * Math.PI * 2 + 0.04, a1 = a0 + Math.PI * 2 / 12 - 0.08;
+          g.lineWidth = 14;
+          g.beginPath();
+          g.arc(cx, cy, 84, a0, a1);
+          if (i < k) g.stroke();
+          else {
+            g.lineWidth = 2;
+            g.beginPath();
+            g.arc(cx, cy, 91, a0, a1);
+            g.arc(cx, cy, 77, a1, a0, true);
+            g.closePath();
+            g.stroke();
+          }
+        }
+        g.lineWidth = 5;
+        heart(g, cx, cy + 22, 44);
+        g.stroke();
+        g.lineWidth = 3;
+        arrowDown(g, cx, cy + 34, 20, 3);
+      }
+    },
+    {
+      name: "LiveWordsBlackletter",
+      title: "Your Words: Blackletter",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "Breeding Stock" },
+      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "UnifrakturMaguntia", 58, { max: 330 })
+    },
+    {
+      name: "LiveWordsScript",
+      title: "Your Words: Script",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "Good Girl" },
+      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "Great Vibes", 92, { max: 330 })
+    },
+    {
+      name: "LiveWordsTypewriter",
+      title: "Your Words: Typewriter",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "used goods" },
+      draw: (g, w, h2, V) => {
+        text2(g, V.t, w / 2, h2 / 2, "Special Elite", 48, { max: 300 });
+        g.lineWidth = 2;
+        g.strokeRect(34, h2 / 2 - 36, w - 68, 72);
+      }
+    },
+    {
+      name: "LiveWordsGraffiti",
+      title: "Your Words: Graffiti",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "cum dump" },
+      color: "#1d3f8f",
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#1d3f8f";
+        g.strokeStyle = "#1d3f8f";
+        text2(g, V.t, w / 2, h2 / 2, "Sedgwick Ave Display", 84, { max: 330 });
+        dripFrom(g, w, h2, 40, 340, 5, 6);
+      }
+    }
+  ];
+  var LIVE_BY = Object.fromEntries(LIVE.map((d) => [d.name, d]));
+  var isLive = (name) => !!LIVE_BY[name];
+  function valuesFor(d, written, who2) {
+    const V = Object.assign({}, d.sample, cleanValues(written));
+    if (d.fields.includes("num") && !(written && written.num != null) && who2 && who2.num) V.num = who2.num;
+    if (d.dflt === "owner" && !(written && written.t) && who2 && who2.owner) V.t = who2.owner;
+    if (V.n == null) V.n = 0;
+    delete V.sz;
+    delete V.sw;
+    delete V.sh;
+    return V;
+  }
+  var MID = "#808080";
+  var doc = null;
+  var mk = (w, h2) => {
+    const c = doc.createElement("canvas");
+    c.width = w || CW2;
+    c.height = h2 || CH2;
+    return c;
+  };
+  function tinted(src, col, blur, dx, dy, alpha) {
+    const c = mk(src.width, src.height), g = c.getContext("2d");
+    try {
+      g.filter = blur ? "blur(" + blur + "px)" : "none";
+    } catch (e) {
+    }
+    g.globalAlpha = alpha == null ? 1 : alpha;
+    g.drawImage(src, dx || 0, dy || 0);
+    try {
+      g.filter = "none";
+    } catch (e) {
+    }
+    g.globalAlpha = 1;
+    g.globalCompositeOperation = "source-in";
+    g.fillStyle = col;
+    g.fillRect(0, 0, c.width, c.height);
+    return c;
+  }
+  function speckled(src, seed) {
+    const c = tinted(src, MID), g = c.getContext("2d"), r = rng(seed), w = c.width, h2 = c.height;
+    g.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < 1400; i++) {
+      g.globalAlpha = 0.3 + r() * 0.7;
+      g.beginPath();
+      g.arc(r() * w, r() * h2, 0.5 + r() * 1.8, 0, Math.PI * 2);
+      g.fill();
+    }
+    for (let i = 0; i < 5; i++) {
+      g.globalAlpha = 0.18 + r() * 0.2;
+      g.fillRect(0, r() * h2, w, 6 + r() * 16);
+    }
+    return c;
+  }
+  var lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+  function splitColours(c, pal) {
+    if (!pal || !pal.length) pal = [[22, 18, 28]];
+    const w = c.width, h2 = c.height, src = c.getContext("2d").getImageData(0, 0, w, h2).data;
+    const outs = pal.map(() => {
+      const o = mk(w, h2), g = o.getContext("2d");
+      return { o, g, img: g.createImageData(w, h2) };
+    });
+    const L = pal.map((p) => lum(...p));
+    for (let i = 0; i < src.length; i += 4) {
+      const a = src[i + 3];
+      if (!a) continue;
+      const r = src[i], g = src[i + 1], b = src[i + 2];
+      let k = 0, bd = 1e12;
+      for (let j = 0; j < pal.length; j++) {
+        const p = pal[j], e = (p[0] - r) ** 2 + (p[1] - g) ** 2 + (p[2] - b) ** 2;
+        if (e < bd) {
+          bd = e;
+          k = j;
+        }
+      }
+      const v = L[k] < 40 ? 128 : Math.max(0, Math.min(255, Math.round(128 * lum(r, g, b) / L[k])));
+      const D = outs[k].img.data;
+      D[i] = D[i + 1] = D[i + 2] = v;
+      D[i + 3] = a;
+    }
+    return outs.map((x) => {
+      x.g.putImageData(x.img, 0, 0);
+      return x.o;
+    });
+  }
+  function colourName(rgb) {
+    const [r, g, b] = rgb, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = lum(r, g, b), s = mx ? (mx - mn) / mx : 0;
+    if (s < 0.18) return l < 70 ? "Ink" : l > 200 ? "White" : "Grey";
+    let hue = 0;
+    const dd = mx - mn;
+    if (mx === r) hue = (g - b) / dd % 6;
+    else if (mx === g) hue = (b - r) / dd + 2;
+    else hue = (r - g) / dd + 4;
+    hue = (hue * 60 + 360) % 360;
+    if (l < 60) return "Ink";
+    if (hue >= 15 && hue < 50 && l < 120) return "Brown";
+    if (hue < 15 || hue >= 345) return "Red";
+    if (hue < 40) return "Orange";
+    if (hue < 52) return "Gold";
+    if (hue < 70) return "Yellow";
+    if (hue < 165) return "Green";
+    if (hue < 200) return "Teal";
+    if (hue < 255) return "Blue";
+    if (hue < 290) return "Purple";
+    return "Pink";
+  }
+  function layersFor(pal, pre) {
+    const used = {};
+    return pal.map((p) => {
+      let n = pal.length === 1 ? "Ink" : colourName(p);
+      used[n] = (used[n] || 0) + 1;
+      if (used[n] > 1) n += used[n];
+      return { name: (pre || "") + n, color: "#" + p.map((v) => v.toString(16).padStart(2, "0")).join(""), colorize: true };
+    });
+  }
+  function layersOf(base, m) {
+    const out = {}, L = m.layers || [];
+    if (L.some((l) => l.name === "Stamp")) {
+      out.Stamp = speckled(base, 3);
+      return out;
+    }
+    if (L.some((l) => l.name === "Glow")) {
+      out.Glow = tinted(base, MID, 9, 0, 0, 0.95);
+      out.GlowInk = tinted(base, MID, 0.4);
+      return out;
+    }
+    const pal = m.pal && m.pal.length ? m.pal : [[22, 18, 28]];
+    const parts2 = splitColours(base, pal), names = layersFor(pal).map((l) => l.name);
+    names.forEach((n, i) => {
+      out[n] = parts2[i];
+    });
+    return out;
+  }
+  function drawCard(W12, d, V) {
+    doc = W12.document;
+    const c = mk(), g = c.getContext("2d");
+    g.fillStyle = INK2;
+    g.strokeStyle = INK2;
+    d.draw(g, CW2, CH2, V);
+    return c;
+  }
+  function shrink(c, box3, s) {
+    const [x0, y0, x1, y1] = box3;
+    let src = mk(x1 - x0, y1 - y0);
+    src.getContext("2d").drawImage(c, -x0, -y0);
+    let w = src.width, h2 = src.height;
+    const tw = Math.max(1, Math.round(w * s)), th = Math.max(1, Math.round(h2 * s));
+    while (w / 2 > tw) {
+      const n = mk(Math.round(w / 2), Math.round(h2 / 2)), g2 = n.getContext("2d");
+      g2.imageSmoothingQuality = "high";
+      g2.drawImage(src, 0, 0, n.width, n.height);
+      src = n;
+      w = n.width;
+      h2 = n.height;
+    }
+    const out = mk(tw, th), g = out.getContext("2d");
+    g.imageSmoothingQuality = "high";
+    g.drawImage(src, 0, 0, tw, th);
+    return out;
+  }
+  var cache = /* @__PURE__ */ new Map();
+  var CACHE_MAX = 80;
+  function picture(W12, d, m, layer, V) {
+    const key2 = d.name + "|" + JSON.stringify(V);
+    let set2 = cache.get(key2);
+    if (set2) {
+      cache.delete(key2);
+      cache.set(key2, set2);
+      return set2[layer] || null;
+    }
+    if (d.logo && !IMG.letters) return null;
+    const base = drawCard(W12, d, V), parts2 = layersOf(base, m);
+    set2 = {};
+    for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
+    cache.set(key2, set2);
+    while (cache.size > CACHE_MAX) {
+      const old = cache.keys().next().value, os = cache.get(old);
+      cache.delete(old);
+      for (const u of Object.values(os)) forget(W12, u);
+    }
+    return set2[layer] || null;
+  }
+  function forget(W12, url) {
+    try {
+      const m = W12.GLDrawImageCache;
+      if (m && typeof m.delete === "function") m.delete(url);
+    } catch (e) {
+    }
+    try {
+      const m = W12.DrawImageCache;
+      if (m && typeof m.delete === "function") m.delete(url);
+    } catch (e) {
+    }
+    try {
+      const gl = W12.GLDrawCanvas && W12.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      if (t) {
+        if (t.texture) gl.deleteTexture(t.texture);
+        tc.delete(url);
+      }
+    } catch (e) {
+    }
+  }
+  var logoAsked = null;
+  function loadLiveArt() {
+    if (!logoAsked) logoAsked = loadLogo().catch(() => null);
+    return logoAsked;
+  }
+
+  // shared/ink/panel.js
+  var CSS = `
+#fi-panel{position:fixed;left:50%;top:4%;transform:translateX(-50%);width:min(620px,96vw);max-height:92vh;max-height:92dvh;overflow-y:auto;z-index:2147483000;
+  padding:12px 16px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
+@media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fi-panel{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px}}
+#fi-panel h2{margin:0;flex:1;font-family:Bitter,Georgia,serif;color:#d9b3e6;font-size:19px}
+#fi-panel .fi-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#fi-panel .fi-card{background:#2b2230;border:1px solid #4a3a52;border-radius:8px;padding:9px 11px;margin:7px 0}
+#fi-panel .fi-muted{color:#b3a2b8;font-size:12.5px}
+#fi-panel label.fi-slide{display:grid;grid-template-columns:4.2em 1fr 3.4em;align-items:center;gap:8px;margin:3px 0}
+#fi-panel input[type=range]{width:100%}
+#fi-panel input[type=text],#fi-panel input[type=number]{font:inherit;padding:4px 6px;border-radius:6px;background:#1b151e;color:#ecdfe8;border:1px solid #6e5a78;min-width:0;flex:1}
+#fi-panel button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid #8e6aa0;background:#3a2c42;color:#ecdfe8;padding:4px 11px;min-height:30px}
+@media (pointer:coarse){#fi-panel input{font-size:16px}#fi-panel button{min-height:40px}}
+`;
+  var SLOTS = [["FarmInk1", "Ink 1"], ["FarmInk2", "Ink 2"], ["FarmInk3", "Ink 3"], ["FarmInk4", "Ink 4"], ["FarmBrand", "Brand"]];
+  var box = null;
+  var api = null;
+  var Wd = null;
+  var note = "";
+  var el = (tag, attrs, ...kids) => {
+    const e = Wd.document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+      else if (k === "style") e.style.cssText = v;
+      else e.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) e.append(typeof k === "string" ? Wd.document.createTextNode(k) : k);
+    return e;
+  };
+  var pct2 = (v) => Math.round((Number(v) || 1) * 100);
+  function slide(label, min, max, val, onSet) {
+    const out = el("span", { class: "fi-muted" }, val + "%");
+    const r = el("input", { type: "range", min, max, step: 5, value: val, "aria-label": label, oninput: (e) => {
+      out.textContent = e.target.value + "%";
+    }, onchange: (e) => onSet(Number(e.target.value) / 100) });
+    return el("label", { class: "fi-slide" }, el("span", null, label), r, out);
+  }
+  function slotCard(slot, name) {
+    const w = api.worn().find((x) => x.slot === slot);
+    if (!w) return el("div", { class: "fi-card" }, el("b", null, name + ": "), el("span", { class: "fi-muted" }, "empty. Pick a design in the wardrobe (Farm " + name + ")."));
+    const own = w.values || {}, kids = [el("div", { class: "fi-row" }, el("b", null, name + ": " + w.title))];
+    kids.push(slide("Size", 25, 400, pct2(own.sz), (v) => set(slot, { sz: v === 1 ? null : v })));
+    kids.push(slide("Width", 50, 200, pct2(own.sw), (v) => set(slot, { sw: v === 1 ? null : v })));
+    kids.push(slide("Height", 50, 200, pct2(own.sh), (v) => set(slot, { sh: v === 1 ? null : v })));
+    if (w.live) {
+      const f = w.fields || [];
+      if (f.includes("t") || f.includes("list") || f.includes("num") || f.includes("n")) {
+        const cur = f.includes("t") ? own.t || "" : f.includes("list") ? (own.list || []).join(", ") : f.includes("num") ? own.num != null ? String(own.num) : "" : own.n != null ? String(own.n) : "";
+        const hint = f.includes("t") ? "Your words, or a name" : f.includes("list") ? "Names, with commas between" : f.includes("num") ? "A number (yours if empty)" : "A number of your own";
+        const inp = el("input", { type: f.includes("t") || f.includes("list") ? "text" : "number", value: cur, placeholder: hint, "aria-label": hint, maxlength: 60 });
+        kids.push(el("div", { class: "fi-row", style: "margin-top:6px" }, inp, el("button", { onclick: () => {
+          api.command(slotKey(slot) + " " + (String(inp.value).trim() || "clear"));
+          note = "Written on " + w.title + ".";
+          draw();
+        } }, "Write")));
+      }
+      if (w.auto) kids.push(el(
+        "label",
+        { class: "fi-row", style: "margin-top:4px" },
+        el("input", { type: "checkbox", checked: !own.manual, onchange: (e) => {
+          api.command(slotKey(slot) + (e.target.checked ? " auto" : " " + (own.n != null ? own.n : 0)));
+          draw();
+        } }),
+        el("span", null, "Follow the farm's count")
+      ));
+    }
+    kids.push(el("div", { class: "fi-row", style: "margin-top:6px" }, el("button", { onclick: () => {
+      set(slot, { sz: null, sw: null, sh: null });
+      draw();
+    } }, "Normal size")));
+    return el("div", { class: "fi-card" }, kids);
+  }
+  var slotKey = (slot) => slot === "FarmBrand" ? "brand" : slot.slice(-1);
+  function set(slot, v) {
+    if (api.write(slot, v)) note = "";
+    draw();
+  }
+  function view() {
+    return [
+      el("div", { class: "fi-row", style: "margin-bottom:6px" }, el("h2", null, "\u{1F58B}\uFE0F Your farm ink"), el("button", { onclick: () => close() }, "Close")),
+      note ? el("div", { class: "fi-muted", style: "color:#e6c37a" }, note) : null,
+      SLOTS.map(([s, n]) => slotCard(s, n)),
+      el("div", { class: "fi-muted", style: "margin-top:8px" }, "Colours: the wardrobe's colour picker, a layer for each colour. Moving, turning and over or under clothes: the game's Layering button. Everybody with the Companion or the Dispensary sees your ink as you set it.")
+    ];
+  }
+  function draw() {
+    if (box) box.replaceChildren(...view().flat().filter(Boolean));
+  }
+  function openInkPanel(W12, a) {
+    Wd = W12;
+    api = a;
+    close();
+    if (!W12.document.getElementById("fi-style")) {
+      const s = W12.document.createElement("style");
+      s.id = "fi-style";
+      s.textContent = CSS;
+      W12.document.head.appendChild(s);
+    }
+    box = W12.document.createElement("div");
+    box.id = "fi-panel";
+    W12.document.body.appendChild(box);
+    draw();
+    return true;
+  }
+  function close() {
+    if (box) {
+      box.remove();
+      box = null;
+    }
+    note = "";
+  }
+
   // shared/ink/ink.js
-  var INK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v1/";
+  var INK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/";
+  var LIVE_HOST = INK_HOST + "live/";
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
   var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
+  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
+  var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_[A-Za-z0-9]+\.png$/;
+  var stillItem = (C, kind, name) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var TITLES = {};
-  for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) TITLES[kind + ":" + a.name] = a.title;
+  var MANIFEST = {};
+  for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) {
+    TITLES[kind + ":" + a.name] = a.title;
+    if (a.live) MANIFEST[a.name] = a;
+  }
   function assetDef(a) {
     return {
       Name: a.name,
@@ -2785,9 +7199,165 @@ One of mods you are using is using an old version of SDK. It will work for now b
     describe(W12);
     return true;
   }
+  var itemIn = (C, slot) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
+  var whoOf = (C) => ({ num: C && C.MemberNumber, owner: C && C.Ownership && typeof C.Ownership.Name === "string" ? C.Ownership.Name : "" });
+  function liveSrc(W12, C, slot, name, layer) {
+    const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C, slot);
+    if (!d || !m || !it || it.Asset.Name !== name) return null;
+    try {
+      return picture(W12, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
+    } catch (e) {
+      console.warn("[Farm ink] couldn't draw " + name, e);
+      return null;
+    }
+  }
+  function wornLive(W12) {
+    const P = W12.Player, out = [];
+    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+      const it = itemIn(P, slot);
+      if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
+    }
+    return out;
+  }
+  var lastWrite = {};
+  function write(W12, slot, values, now) {
+    const it = itemIn(W12.Player, slot);
+    if (!it || !kindOf(slot)) return false;
+    const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
+    for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
+    const next = cleanValues(merged);
+    if (merged.manual === true) next.manual = true;
+    if (JSON.stringify(next) === JSON.stringify(cur)) return false;
+    const since2 = Date.now() - (lastWrite[slot] || 0);
+    if (!now && since2 < 6e4) {
+      clearTimeout(retry[slot]);
+      retry[slot] = setTimeout(() => refreshAuto(W12), 60500 - since2);
+      return false;
+    }
+    lastWrite[slot] = Date.now();
+    it.Property = Object.assign({}, it.Property, { FarmInk: next });
+    try {
+      if (typeof W12.CharacterRefresh === "function") W12.CharacterRefresh(W12.Player);
+    } catch (e) {
+    }
+    try {
+      if (typeof W12.ChatRoomCharacterItemUpdate === "function") W12.ChatRoomCharacterItemUpdate(W12.Player, slot);
+    } catch (e) {
+    }
+    return true;
+  }
+  var retry = {};
+  var counts = {};
+  var DAY = 864e5;
+  var cumKey = (W12) => "farmink-lastcum-" + (W12.Player && W12.Player.MemberNumber);
+  function daysDenied(W12) {
+    let t = 0;
+    try {
+      t = Number(W12.localStorage.getItem(cumKey(W12))) || 0;
+    } catch (e) {
+    }
+    return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
+  }
+  function autoOf(W12, auto) {
+    if (auto === "denied") return { n: daysDenied(W12) };
+    const c = counts[auto];
+    if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
+    if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
+    if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
+    return typeof c === "number" ? { n: c } : null;
+  }
+  function refreshAuto(W12) {
+    for (const { slot, name, item } of wornLive(W12)) {
+      const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
+      if (!d.auto || own && own.manual) continue;
+      const v = autoOf(W12, d.auto);
+      if (v) write(W12, slot, v);
+    }
+  }
+  var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
+  var say = (W12, t) => {
+    try {
+      if (typeof W12.ChatRoomSendLocal === "function") {
+        const d = W12.document.createElement("div");
+        d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
+        d.textContent = "\u{1F58B}\uFE0F " + t;
+        W12.ChatRoomSendLocal(d.outerHTML);
+      }
+    } catch (e) {
+    }
+  };
+  function wornAll(W12) {
+    const out = [];
+    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+      const it = itemIn(W12.Player, slot);
+      if (!it) continue;
+      const d = LIVE_BY[it.Asset.Name];
+      out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
+    }
+    return out;
+  }
+  var panelApi = (W12) => ({ worn: () => wornAll(W12), write: (slot, v) => write(W12, slot, v, true), command: (a) => inkCommand(W12, a) });
+  function inkCommand(W12, args) {
+    const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
+    const worn = wornLive(W12);
+    if (!a && W12.document && W12.document.body) {
+      openInkPanel(W12, panelApi(W12));
+      return;
+    }
+    if (/^why$/i.test(a)) return say(W12, whyText());
+    const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
+    if (sm) {
+      const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
+      const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
+      if (!itemIn(W12.Player, slot2)) return say(W12, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W12, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W12, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+    }
+    if (!m) {
+      if (!worn.length) return say(W12, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W12, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+        const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
+        return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
+      }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
+    }
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W12.Player, slot);
+    if (!it) return say(W12, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W12, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const d = LIVE_BY[it.Asset.Name];
+    let v;
+    if (!rest) return inkCommand(W12, "");
+    if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
+    else if (/^auto$/i.test(rest)) {
+      v = { manual: null, n: null, list: null, more: null, rows: null };
+    } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
+    else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
+    else if (d.fields.includes("t")) v = { t: rest };
+    else return say(W12, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W12, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W12);
+    say(W12, "Written on " + d.title + ".");
+  }
   function registerInk(W12, mod2) {
     if (W12.__farmInk) return W12.__farmInk;
-    const st2 = W12.__farmInk = { ready: false, slots: [...INK_SLOTS, BRAND_SLOT], designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length, live: ink_designs_default.live.length };
+    const st2 = W12.__farmInk = {
+      ready: false,
+      slots: [...INK_SLOTS, BRAND_SLOT],
+      designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
+      live: Object.keys(MANIFEST).length,
+      // for the Companion: the farm's counts for live ink (state.ink from the farm girl)
+      counts: (c) => {
+        if (c && typeof c === "object") {
+          counts = c;
+          try {
+            refreshAuto(W12);
+          } catch (e) {
+          }
+        }
+      },
+      write: (slot, v) => write(W12, slot, v, true),
+      command: (a) => inkCommand(W12, a),
+      worn: () => wornLive(W12).map(({ slot, name }) => ({ slot, name }))
+    };
     const hooks = () => {
       const hook = (name, pri, fn) => {
         try {
@@ -2798,8 +7368,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       };
       hook("AssetBaseURL", 0, (args, next) => {
-        const kind = kindOf(args[2] || args[1] && args[1].Name);
-        return kind ? INK_HOST + kind + "/" : next(args);
+        const slot = args[2] || args[1] && args[1].Name, kind = kindOf(slot);
+        if (!kind) return next(args);
+        return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
       });
       hook("AssetGetPreviewPath", 0, (args, next) => {
         const A = args[0], kind = A && A.Group && kindOf(A.Group.Name);
@@ -2813,19 +7384,72 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      if (RES !== 1) hook("CommonDrawAppearanceBuild", 0, (args, next) => {
-        const cb = args[1];
+      hook("CommonDrawAppearanceBuild", 5, (args, next) => {
+        const C = args[0], cb = args[1];
         if (!cb || typeof cb !== "object") return next(args);
+        const sized = (o, it) => {
+          const f = it && it.Property && it.Property.FarmInk || {}, sz = f.sz || 1, kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
+          o = Object.assign({}, o);
+          o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) * kx;
+          o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) * ky;
+          return o;
+        };
+        const seen = /* @__PURE__ */ new Set(), notReady = [];
+        const ready = (u) => {
+          try {
+            const c = W12.GLDrawImageCache;
+            if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
+          } catch (e) {
+          }
+          return true;
+        };
         const wrap = (f) => typeof f !== "function" ? f : function(src, x, y, o) {
-          if (typeof src === "string" && OURS.test(src)) {
-            o = Object.assign({}, o);
-            o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) / RES;
-            o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) / RES;
+          if (typeof src === "string") {
+            const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
+            if (lm) {
+              const u = liveSrc(W12, C, lm[1], lm[2], lm[3]);
+              seen.add(lm[2]);
+              if (!u) {
+                notReady.push(lm[2] + " (not drawn yet)");
+                return void 0;
+              }
+              if (!ready(u)) notReady.push(lm[2]);
+              return f.call(this, u, x, y, sized(o, itemIn(C, lm[1])));
+            }
+            const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
+            if (sm) {
+              o = sized(o, stillItem(C, sm[1], sm[2]));
+              seen.add(sm[2]);
+              if (!ready(src)) notReady.push(sm[2]);
+            }
           }
           return f.call(this, src, x, y, o);
         };
-        return next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        try {
+          note2(W12, C, seen, notReady);
+        } catch (e) {
+        }
+        return out;
       });
+      const keepInk = (name) => hook(name, 0, (args, next) => {
+        const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
+        const r = next(args);
+        try {
+          let back = 0;
+          if (keep.length && C && Array.isArray(C.Appearance)) {
+            for (const it of keep) if (!C.Appearance.includes(it) && !itemIn(C, it.Asset.Group.Name)) {
+              C.Appearance.push(it);
+              back++;
+            }
+          }
+          if (back && typeof W12.CharacterLoadCanvas === "function") W12.CharacterLoadCanvas(C);
+        } catch (e) {
+        }
+        return r;
+      });
+      keepInk("CharacterAppearanceNaked");
+      keepInk("CharacterAppearanceStripLayer");
       hook("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
@@ -2834,6 +7458,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
+      });
+      hook("ActivityOrgasmStart", 0, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W12.ActivityOrgasmRuined) {
+            W12.localStorage.setItem(cumKey(W12), String(Date.now()));
+            setTimeout(() => refreshAuto(W12), 1e3);
+          }
+        } catch (e) {
+        }
+        return next(args);
       });
     };
     const t = setInterval(() => {
@@ -2846,15 +7481,47 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
+      loadLiveArt().then(() => {
+        try {
+          for (const C of W12.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W12.CharacterLoadCanvas === "function") W12.CharacterLoadCanvas(C);
+        } catch (e) {
+        }
+      });
+      try {
+        if (typeof W12.CommandCombine === "function") W12.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W12, a) }]);
+      } catch (e) {
+      }
     }, 50);
+    setInterval(() => {
+      try {
+        if (W12.Player && W12.Player.Appearance) refreshAuto(W12);
+      } catch (e) {
+      }
+    }, 10 * 6e4);
     return st2;
   }
+  var DIAG = [];
+  function note2(W12, C, seen, notReady) {
+    if (!C || !Array.isArray(C.Appearance)) return;
+    const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
+    if (/AllFours|Hogtied/.test(pose)) return;
+    const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+    const missing = worn.filter((n) => !seen.has(n));
+    if (!missing.length && !notReady.length) return;
+    DIAG.push({ t: Date.now(), who: C.MemberNumber, name: String(C.Nickname || C.Name || ""), missing, notReady: [...new Set(notReady)] });
+    if (DIAG.length > 40) DIAG.shift();
+  }
+  function whyText() {
+    if (!DIAG.length) return "No ink has gone missin' since you logged in.";
+    return "Ink that didn't show, newest last:\n" + DIAG.slice(-10).map((d) => new Date(d.t).toLocaleTimeString() + " \xB7 " + d.name + " (" + d.who + ")" + (d.missing.length ? " \xB7 not drawn at all: " + d.missing.join(", ") : "") + (d.notReady.length ? " \xB7 picture not loaded yet: " + d.notReady.join(", ") : "")).join("\n");
+  }
+  var wornByLogo = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.some((it) => it && it.Asset && LIVE_BY[it.Asset.Name] && LIVE_BY[it.Asset.Name].logo) : false;
 
   // dispensary/src/index.js
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.3.0";
+  var VERSION = "0.4.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -3443,21 +8110,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var pick = (a) => a[Math.floor(Math.random() * a.length)];
   var fill = (t, v) => String(t).replace(/%t/g, myName()).replace(/%b/g, v && v.by || "somebody").replace(/%d/g, v && v.dose || "a dose");
-  function local(text, color) {
+  function local(text3, color) {
     try {
       if (typeof W2.ChatRoomSendLocal !== "function" || W2.CurrentScreen !== "ChatRoom") return false;
       const d = W2.document.createElement("div");
       d.style.cssText = "color:" + (color || "#c79bd8") + ";white-space:pre-wrap";
-      d.textContent = "\u{1F489} " + text;
+      d.textContent = "\u{1F489} " + text3;
       W2.ChatRoomSendLocal(d.outerHTML);
       return true;
     } catch (e) {
       return false;
     }
   }
-  function action(text) {
-    if (!inRoom() || !text) return false;
-    const msg = String(text).slice(0, 900);
+  function action(text3) {
+    if (!inRoom() || !text3) return false;
+    const msg = String(text3).slice(0, 900);
     try {
       W2.ServerSend("ChatRoomChat", { Content: "Beep", Type: "Action", Dictionary: [
         { Tag: "Beep", Text: "msg" },
@@ -3511,9 +8178,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/later.js
   var MIN = 6e4;
-  var DAY = 864e5;
+  var DAY2 = 864e5;
   var LATER_WORDS = /\b(time[- ]?release\w*|slow[- ]?release\w*|delayed|capsules?)\b/;
-  var isLater = (text) => LATER_WORDS.test(String(text || "").toLowerCase());
+  var isLater = (text3) => LATER_WORDS.test(String(text3 || "").toLowerCase());
   var LATER_MAX = 5;
   var FUSE_MINS = [5, 40];
   var CRAVE_AFTER = 6;
@@ -3556,7 +8223,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     craveTick(now);
   }
   function since() {
-    const S2 = st(), from = Math.max(S2.cravings || 0, Date.now() - CRAVE_DAYS * DAY), out = {};
+    const S2 = st(), from = Math.max(S2.cravings || 0, Date.now() - CRAVE_DAYS * DAY2), out = {};
     for (const [id, list] of Object.entries(S2.taken || {})) {
       const n = list.filter((t) => t >= from).length;
       if (n) out[id] = n;
@@ -3623,7 +8290,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var LSCG_WAIT_MS = 1500;
   function onNeedle(by, item) {
-    const text = craftText(item), list = dosesIn(text), at = Date.now(), done = [], later = isLater(text);
+    const text3 = craftText(item), list = dosesIn(text3), at = Date.now(), done = [], later = isLater(text3);
     for (const { id, x, p } of list) {
       const B = BOOK[id];
       if (B.farm && botHere()) continue;
@@ -3676,9 +8343,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // shared/protocol.js
   var FARM_MSG = "FarmhandMsg";
   var PROTOCOL = 2;
-  function makeMsg(type, data = {}, target) {
+  function makeMsg(type, data = {}, target2) {
     const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
-    if (target) m.Target = target;
+    if (target2) m.Target = target2;
     return m;
   }
   function readMsg(data) {
@@ -3690,7 +8357,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/hardcore.js
   var W5 = window;
-  var DAY2 = 864e5;
+  var DAY3 = 864e5;
   var CHECK_DAYS = 30;
   var me = () => W5.Player && W5.Player.MemberNumber || 0;
   var here = (mn) => (W5.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
@@ -3746,7 +8413,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var isKey = (mn) => typeof mn === "number" && keyholders().includes(mn);
   function dueAt() {
     const H = st().hard || {};
-    return H.until ? H.until : (H.checkAt || H.since || Date.now()) + CHECK_DAYS * DAY2;
+    return H.until ? H.until : (H.checkAt || H.since || Date.now()) + CHECK_DAYS * DAY3;
   }
   function log(by, what) {
     const H = st().hard;
@@ -3763,10 +8430,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return false;
   }
-  function beepTo(mn, text) {
+  function beepTo(mn, text3) {
     try {
       if (typeof W5.ServerSend === "function") {
-        W5.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text).slice(0, 900) });
+        W5.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text3).slice(0, 900) });
         return true;
       }
     } catch (e) {
@@ -3781,7 +8448,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (hardOn()) return { ok: false, why: "on" };
     if (!keyholders().length) return { ok: false, why: "nokey" };
     const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
-    st().hard = { on: true, since: now, until: d ? now + d * DAY2 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
+    st().hard = { on: true, since: now, until: d ? now + d * DAY3 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
     log(me(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
     save(true);
     announce();
@@ -3804,7 +8471,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!hardOn() || !isKey(by)) return false;
     const H = st().hard, now = Date.now(), last = H.checkAt || 0;
     H.checkAt = now;
-    if (now - last > DAY2) log(by, "checked in");
+    if (now - last > DAY3) log(by, "checked in");
     save();
     onChange();
     return true;
@@ -3813,7 +8480,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!hardOn()) return;
     const H = st().hard, now = Date.now();
     if (H.until && now >= H.until) unlock(me(), "the end date came");
-    else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY2) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
+    else if (!H.until && now - (H.checkAt || H.since || now) >= CHECK_DAYS * DAY3) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
   }
   var askedAt = 0;
   function askOut() {
@@ -3861,7 +8528,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (m.do === "extend") {
       const d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(m.days) || 0)));
-      H.until = d ? Date.now() + d * DAY2 : 0;
+      H.until = d ? Date.now() + d * DAY3 : 0;
       H.checkAt = Date.now();
       log(by, d ? "set the end to " + d + " day" + (d === 1 ? "" : "s") + " from now" : "took the end date away");
       save();
@@ -3998,7 +8665,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/lscg.js
   var W6 = window;
-  var api = null;
+  var api2 = null;
   var caps = null;
   var syncing = null;
   var REG = {};
@@ -4015,14 +8682,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return false;
   }
-  var lscgApi = () => !!(api && caps && caps.has("drugs"));
+  var lscgApi = () => !!(api2 && caps && caps.has("drugs"));
   var lscgHas = (id) => lscgApi() && !!REG[id];
   var lastLscgDose = (id) => lastLscg[id] || 0;
   function lscgDose(type, o) {
     if (!lscgApi()) return false;
     o = o || {};
     try {
-      return !!api.drugs.dose(type, { multiplier: Math.max(0.2, Math.min(3, Number(o.x) || 1)), method: o.method || "inject", sender: o.by, minigame: false });
+      return !!api2.drugs.dose(type, { multiplier: Math.max(0.2, Math.min(3, Number(o.x) || 1)), method: o.method || "inject", sender: o.by, minigame: false });
     } catch (e) {
       return false;
     }
@@ -4031,7 +8698,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!lscgHas(id) || syncing) return;
     syncing = id;
     try {
-      api.drugs.dose(ours2(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
+      api2.drugs.dose(ours2(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
     } catch (e) {
     } finally {
       syncing = null;
@@ -4039,9 +8706,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function setUp(L) {
     try {
-      api = L.getModApi({ id: LSCG_ID, name: "The Farmhand's Dispensary", version: VERSION });
+      api2 = L.getModApi({ id: LSCG_ID, name: "The Farmhand's Dispensary", version: VERSION });
     } catch (e) {
-      api = null;
+      api2 = null;
       return;
     }
     caps = L.capabilities || /* @__PURE__ */ new Set();
@@ -4049,7 +8716,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       for (const [id, B] of Object.entries(BOOK)) {
         if (B.lscg || B.instant || REG[id]) continue;
         try {
-          api.drugs.register({
+          api2.drugs.register({
             name: id,
             label: B.label,
             description: B.desc,
@@ -4071,8 +8738,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return;
               }
               const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
-              const text = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text) || void 0;
-              if (text && isLater(text)) {
+              const text3 = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text3) || void 0;
+              if (text3 && isLater(text3)) {
                 queue(id, { by: ctx.sender, x: 1, p });
                 ctx.setLevel(active(id) ? minsLeft(id) : 0);
                 return;
@@ -4097,14 +8764,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (caps.has("events")) {
       try {
-        api.events.on("safeword", () => {
+        api2.events.on("safeword", () => {
           if (hardOn()) askOut();
           else clearAll("safeword");
         });
       } catch (e) {
       }
       try {
-        api.events.before("drug.beforeApply", (c) => {
+        api2.events.before("drug.beforeApply", (c) => {
           const p = c && c.payload;
           if (!p || !Array.isArray(p.types) || syncing) return;
           for (let i = p.types.length - 1; i >= 0; i--) {
@@ -4356,8 +9023,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   };
   var doseIds = () => Object.keys(BOOK);
-  function stackOf(text) {
-    const t = String(text || "").toLowerCase(), m = /\bx\s?([2-5])\b|\b([2-5])\s?x\b/.exec(t);
+  function stackOf(text3) {
+    const t = String(text3 || "").toLowerCase(), m = /\bx\s?([2-5])\b|\b([2-5])\s?x\b/.exec(t);
     if (m) return Number(m[1] || m[2]);
     return /\btriple\b/.test(t) ? 3 : /\bdouble\b/.test(t) ? 2 : 1;
   }
@@ -4376,8 +9043,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   var TENDER_DEFAULT = "nipples";
   var PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
-  function partFor(id, text) {
-    const t = String(text || "").toLowerCase();
+  function partFor(id, text3) {
+    const t = String(text3 || "").toLowerCase();
     if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
     if (id === "tender") {
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
@@ -4385,8 +9052,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return "";
   }
-  function dosesIn(text) {
-    const t = String(text || "").toLowerCase(), x = stackOf(t);
+  function dosesIn(text3) {
+    const t = String(text3 || "").toLowerCase(), x = stackOf(t);
     return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => {
       const p = partFor(id, t);
       return p ? { id, x, p } : { id, x };
@@ -4987,18 +9654,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ENDINGS = /(girl|boy|gal|guy|kin|slut|sluts|whore|toy|pet|bimbo|s)$/;
   var known = (w) => {
     if (WORDS[w]) return WORDS[w];
-    const cut = w.replace(ENDINGS, "");
-    if (cut !== w && cut.length > 1) {
-      if (WORDS[cut]) return WORDS[cut];
-      const again = cut.replace(ENDINGS, "");
+    const cut2 = w.replace(ENDINGS, "");
+    if (cut2 !== w && cut2.length > 1) {
+      if (WORDS[cut2]) return WORDS[cut2];
+      const again = cut2.replace(ENDINGS, "");
       if (WORDS[again]) return WORDS[again];
     }
     if (/ves$/.test(w) && WORDS[w.replace(/ves$/, "f")]) return WORDS[w.replace(/ves$/, "f")];
     return null;
   };
   var INSIDE = Object.keys(WORDS).filter((w) => w.length >= 3).sort((a, b) => b.length - a.length);
-  function speciesKeyOf(text) {
-    const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+  function speciesKeyOf(text3) {
+    const low = String(text3 || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
     if (!low) return null;
     const whole = low.replace(/[\s\/-]+/g, "");
     if (known(whole)) return known(whole);
@@ -5038,12 +9705,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kitt: ["mew", "nya", "mrrp"]
   };
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
-  function mooify(text, species, share) {
-    const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+  function mooify(text3, species, share) {
+    const say2 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
     const keep = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
-    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+    return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep) return w;
-      const n = say[Math.floor(Math.random() * say.length)];
+      const n = say2[Math.floor(Math.random() * say2.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
   }
@@ -5091,9 +9758,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var AIR_LOST = ["um... thingy", "big-word thing", "whatchamacallit", "the, um...", "whatever it's called"];
   var AIR_OPEN = ["Um, ", "Sooo, ", "Like, ", "Omg, ", "Okay so, "];
   var AIR_END = ["*giggles*", "hehe", "...wait, what was I sayin'?", "*twirls hair*", "lol", "*giggle*"];
-  function airhead(text, x) {
+  function airhead(text3, x) {
     const p = Math.min(0.6, 0.2 + 0.08 * (x || 1));
-    const words = String(text).split(" ");
+    const words = String(text3).split(" ");
     const out = words.map((w, i) => {
       const m = parts(w);
       if (!m) return w;
@@ -5190,9 +9857,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "\u2014spank me\u2014",
     "\u2014mount me\u2014"
   ];
-  function babble(text, x) {
+  function babble(text3, x) {
     const p = Math.min(0.55, 0.15 + 0.08 * (x || 1));
-    const words = String(text).split(" "), out = [];
+    const words = String(text3).split(" "), out = [];
     let blurted = false, slipped = false;
     words.forEach((w, i) => {
       const m = parts(w);
@@ -5213,9 +9880,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var xOf2 = (id) => st().doses[id] && st().doses[id].x || 1;
   var GIGGLES = ["hehe", "*giggle*", "hee", "*snrk*", "ahaha", "*giggles*"];
   var pickOf2 = (a) => a[Math.floor(Math.random() * a.length)];
-  function sprinkle(text, bits, every) {
-    const words = String(text).split(" ");
-    if (words.length < 2) return text + " " + pickOf2(bits);
+  function sprinkle(text3, bits, every) {
+    const words = String(text3).split(" ");
+    if (words.length < 2) return text3 + " " + pickOf2(bits);
     const out = [];
     let since2 = 0;
     words.forEach((w, i) => {
@@ -5229,8 +9896,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!out.some((w) => bits.includes(w))) out.splice(1 + Math.floor(Math.random() * (out.length - 1)), 0, pickOf2(bits));
     return out.join(" ");
   }
-  function dosedSpeech(text) {
-    let t = String(text);
+  function dosedSpeech(text3) {
+    let t = String(text3);
     if (active("moo")) t = mooify(t, st().species || st().speciesFarm || "cow", Math.min(0.9, 0.4 + 0.1 * xOf2("moo")));
     if (active("hiccup")) t = sprinkle(t, ["*hic*", "*hic!*", "\u2014hic\u2014"], 4);
     if (active("feather")) t = sprinkle(t, GIGGLES, 5);
@@ -5258,9 +9925,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // dispensary/src/screen.js
   var W9 = window;
-  var el = null;
+  var el2 = null;
   var styled = false;
-  var CSS = `
+  var CSS2 = `
 #fd-screen{position:fixed;inset:0;pointer-events:none;z-index:2147482000;transition:opacity 1.5s ease}
 #fd-screen.breathe{animation:fd-breathe 7s ease-in-out infinite}
 #fd-screen.pulse{animation:fd-pulse 2.4s ease-in-out infinite}
@@ -5271,17 +9938,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function ensure() {
     if (!styled) {
       const s = W9.document.createElement("style");
-      s.textContent = CSS;
+      s.textContent = CSS2;
       W9.document.head.appendChild(s);
       styled = true;
     }
-    if (!el) {
-      el = W9.document.createElement("div");
-      el.id = "fd-screen";
-      el.setAttribute("aria-hidden", "true");
-      W9.document.body.appendChild(el);
+    if (!el2) {
+      el2 = W9.document.createElement("div");
+      el2.id = "fd-screen";
+      el2.setAttribute("aria-hidden", "true");
+      W9.document.body.appendChild(el2);
     }
-    return el;
+    return el2;
   }
   var arousal = () => {
     const A = W9.Player && W9.Player.ArousalSettings;
@@ -5300,9 +9967,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function screenTick() {
     const s = screenNow();
     if (!s) {
-      if (el) {
-        el.remove();
-        el = null;
+      if (el2) {
+        el2.remove();
+        el2 = null;
       }
       return null;
     }
@@ -5317,34 +9984,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // extension/src/dom.js
   function h(tag, props, ...kids) {
-    const el2 = window.document.createElement(tag);
+    const el3 = window.document.createElement(tag);
     for (const [k, v] of Object.entries(props || {})) {
       if (v === void 0 || v === null || v === false) continue;
-      if (k.startsWith("on") && typeof v === "function") el2.addEventListener(k.slice(2), v);
-      else if (k === "class") el2.className = v;
-      else if (k === "style" && typeof v === "object") Object.assign(el2.style, v);
+      if (k.startsWith("on") && typeof v === "function") el3.addEventListener(k.slice(2), v);
+      else if (k === "class") el3.className = v;
+      else if (k === "style" && typeof v === "object") Object.assign(el3.style, v);
       else if (k === "value") {
-        el2.value = v;
-        el2.setAttribute("value", v);
-      } else el2.setAttribute(k, v === true ? "" : String(v));
+        el3.value = v;
+        el3.setAttribute("value", v);
+      } else el3.setAttribute(k, v === true ? "" : String(v));
     }
-    add(el2, kids);
-    return el2;
+    add(el3, kids);
+    return el3;
   }
-  function add(el2, kids) {
+  function add(el3, kids) {
     for (const k of kids) {
       if (k === null || k === void 0 || k === false) continue;
-      if (Array.isArray(k)) add(el2, k);
-      else el2.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
+      if (Array.isArray(k)) add(el3, k);
+      else el3.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
     }
   }
 
   // dispensary/src/page.js
   var W10 = window;
   var ID = "FarmhandDispensary";
-  var box = null;
-  var note = "";
-  var CSS2 = `
+  var box2 = null;
+  var note3 = "";
+  var CSS3 = `
 #fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(760px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;z-index:2147483000;padding:14px 18px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;
   border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
@@ -5365,7 +10032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (W10.document.getElementById("fd-style")) return;
     const s = W10.document.createElement("style");
     s.id = "fd-style";
-    s.textContent = CSS2;
+    s.textContent = CSS3;
     W10.document.head.appendChild(s);
   }
   var clockTip = (mode) => {
@@ -5407,8 +10074,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
     for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
       removeKey(mn);
-      note = "";
-      draw();
+      note3 = "";
+      draw2();
     } }, "Remove")));
     if (!rows.length) rows.push(h("div", { class: "fd-muted" }, "Nobody yet."));
     const input = h("input", {
@@ -5432,9 +10099,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         input,
         h("button", { onclick: () => {
           const n = Number(String(keyInput).trim()), r = addKey(n);
-          note = r.ok ? "\u{1F5DD}\uFE0F " + keyName(n) + " holds your key now." : WHY_NOT[r.why] || "Couldn't add them.";
+          note3 = r.ok ? "\u{1F5DD}\uFE0F " + keyName(n) + " holds your key now." : WHY_NOT[r.why] || "Couldn't add them.";
           if (r.ok) keyInput = "";
-          draw();
+          draw2();
         } }, "Add")
       ),
       h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Keyholders can let you out of hardcore, change your settings while you're locked in, or end it. Your limits stay yours: nobody changes them while you're locked in, not even them.")
@@ -5464,8 +10131,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const days = Number(endPick) || 0;
             if (typeof W10.confirm === "function" && !W10.confirm(hardWarning(days, keys))) return;
             const r = lock(days);
-            note = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
-            draw();
+            note3 = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
+            draw2();
           } }, "\u{1F512} Lock me in")
         )
       ));
@@ -5490,8 +10157,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const mn = Number(k), inRoom2 = (W10.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
       const go = (what, data) => {
         const how = keyDo(mn, what, data);
-        note = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
-        draw();
+        note3 = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
+        draw2();
       };
       const kids = [
         h("div", null, "\u{1F5DD}\uFE0F " + name + ": " + (x.until ? "ends " + inDays(x.until) : "lets go " + inDays(x.due) + " without a check-in") + (x.asked && Date.now() - x.asked < DAY_MS ? " \xB7 askin' to be let out" : "")),
@@ -5506,7 +10173,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           inRoom2 ? h("button", { onclick: () => {
             editing = { mn };
             keyDo(mn, "state");
-            draw();
+            draw2();
           } }, "Their settings") : null
         )
       ];
@@ -5553,7 +10220,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               } }, "Save their settings"),
               h("button", { onclick: () => {
                 editing = null;
-                draw();
+                draw2();
               } }, "Close")
             )
           ));
@@ -5563,7 +10230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return out;
   }
-  function view() {
+  function view2() {
     const S2 = st(), now = doseIds().filter(active), locked = hardOn() ? true : void 0;
     const kids = [];
     kids.push(h(
@@ -5572,10 +10239,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
         if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
-        else close();
+        else close2();
       } }, "Back")
     ));
-    if (note) kids.push(h("div", { class: "fd-note" }, note));
+    if (note3) kids.push(h("div", { class: "fd-note" }, note3));
     if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "\u{1F512} Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
     kids.push(h("h3", null, "In you now"));
     kids.push(h(
@@ -5588,12 +10255,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fd-row", style: { marginTop: "8px" } },
         locked ? h("button", { class: "fd-safe", onclick: () => {
           safeword("page");
-          note = "\u{1F5DD}\uFE0F Your keyholders have been asked to let you out.";
-          draw();
+          note3 = "\u{1F5DD}\uFE0F Your keyholders have been asked to let you out.";
+          draw2();
         } }, "\u{1F5DD}\uFE0F Ask to be let out") : h("button", { class: "fd-safe", onclick: () => {
           safeword("page");
-          note = "Safeword: every dose lifted.";
-          draw();
+          note3 = "Safeword: every dose lifted.";
+          draw2();
         } }, "\u{1F534} Safeword: lift every dose"),
         h("span", { class: "fd-muted" }, locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does." : "The game's own safeword does it too, and so does /dispensary safeword.")
       )
@@ -5604,8 +10271,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { "aria-label": "Who can dose you", disabled: locked, onchange: (e) => {
         st().who = e.target.value;
         save();
-        note = "";
-        draw();
+        note3 = "";
+        draw2();
       } },
       LADDER.map((r) => h("option", { value: r.id, selected: r.id === S2.who ? true : void 0 }, r.label))
     );
@@ -5616,7 +10283,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { title: clockTip(mode) },
       h("input", { type: "radio", name: "fd-clock", disabled: locked, checked: S2.clock === mode ? true : void 0, onchange: () => {
         setClock(mode);
-        draw();
+        draw2();
       } }),
       label
     );
@@ -5633,7 +10300,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("label", null, h("input", { type: "checkbox", checked: S2.screen !== false ? true : void 0, onchange: (e) => {
         st().screen = e.target.checked;
         save();
-        draw();
+        draw2();
       } }), h("b", null, "Screen touches")),
       h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
       h(
@@ -5645,7 +10312,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           { "aria-label": "Your animal", onchange: (e) => {
             st().species = e.target.value;
             save();
-            draw();
+            draw2();
           } },
           [h("option", { value: "", selected: !S2.species ? true : void 0 }, S2.speciesFarm ? "The farm's word (" + S2.speciesFarm + ")" : "Cow, till the farm says")].concat(ANIMALS.map((a) => h("option", { value: a, selected: S2.species === a ? true : void 0 }, a)))
         )
@@ -5669,7 +10336,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (e.target.checked) delete st().off[id];
               else st().off[id] = true;
               save();
-              draw();
+              draw2();
             }
           }),
           h("b", null, B.icon + " " + B.label)
@@ -5693,7 +10360,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           { "aria-label": "Where Tender goes", disabled: locked, onchange: (e) => {
             st().tenderSpot = e.target.value;
             save();
-            draw();
+            draw2();
           } },
           Object.entries(TENDER_SPOTS).map(([k, s2]) => h("option", { value: k, selected: (S2.tenderSpot || TENDER_DEFAULT) === k ? true : void 0 }, s2.word))
         )
@@ -5702,13 +10369,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.tolerance ? true : void 0, onchange: (e) => {
         st().tolerance = e.target.checked;
         save();
-        draw();
+        draw2();
       } }), h("b", null, "Tolerance")),
       h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
       h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.cravings ? true : void 0, onchange: (e) => {
         st().cravings = e.target.checked ? Date.now() : 0;
         save();
-        draw();
+        draw2();
       } }), h("b", null, "Cravings")),
       h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")
     ));
@@ -5719,29 +10386,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kids.push(h("div", { class: "fd-muted", style: { marginTop: "14px" } }, "The Farmhand's Dispensary v" + VERSION + " \xB7 B&B Farm. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest."));
     return kids;
   }
-  function draw() {
-    if (box) box.replaceChildren(...view());
+  function draw2() {
+    if (box2) box2.replaceChildren(...view2());
   }
   function open() {
-    close();
+    close2();
     styles();
-    box = W10.document.createElement("div");
-    box.id = "fd-page";
-    W10.document.body.appendChild(box);
-    draw();
+    box2 = W10.document.createElement("div");
+    box2.id = "fd-page";
+    W10.document.body.appendChild(box2);
+    draw2();
   }
-  function close() {
-    if (box) {
-      box.remove();
-      box = null;
+  function close2() {
+    if (box2) {
+      box2.remove();
+      box2 = null;
     }
-    note = "";
+    note3 = "";
   }
-  var pageOpen = () => !!box;
+  var pageOpen = () => !!box2;
   function redrawPage(force) {
     const a = W10.document.activeElement;
-    if (!force && box && a && box.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
-    draw();
+    if (!force && box2 && a && box2.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
+    draw2();
   }
   function initPage() {
     if (typeof W10.PreferenceRegisterExtensionSetting !== "function") return false;
@@ -5755,10 +10422,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         click: () => {
         },
         exit: () => {
-          close();
+          close2();
           return true;
         },
-        unload: () => close()
+        unload: () => close2()
       });
       return true;
     } catch (e) {

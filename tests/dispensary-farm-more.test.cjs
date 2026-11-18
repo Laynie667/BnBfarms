@@ -57,6 +57,11 @@ const roomText=(from)=>sent.slice(from||0).filter(([e,d])=>e==='ChatRoomChat'&&d
   ok(rutted > plain*1.4 && rutted < plain*1.6, "Rut: a stud's load comes half again as big ("+Math.round(plain)+" → "+Math.round(rutted)+" mL)");
   big(); tight(); prod(700).fills=[Date.now(),Date.now(),Date.now(),Date.now(),Date.now(),Date.now()]; g0=prod(700).totals.given; await say(700,'?cum hana mouth',1500);
   ok(prod(700).totals.given-g0 >= rutted*0.99, "...and a busy hour doesn't run him dry");
+  // ---- LIVE INK's counts go to her Companion with her panel (07b-companion-sync.js inkCounts)
+  const ink=(W.__stateFor(600)||{}).ink;
+  ok(ink && ink.loads >= 5 && ink.punches === (ink.loads % 10 || 10), "her live ink's counts go to her Companion: loads taken ("+(ink&&ink.loads)+"), the punch card");
+  ok(ink && ink.scores && ink.scores[0][0] === 'Rex' && ink.scores[0][1] >= 5 && ink.studs.list[0] === 'Rex', "...the high scores and the guestbook (Rex, "+(ink&&ink.scores&&ink.scores[0][1])+" loads)");
+  ok(ink && typeof ink.tank === 'number' && ink.tank % 10 === 0, "...and how full she is, rounded so it doesn't resend every minute ("+(ink&&ink.tank)+"%)");
   // ---- ?myshots shows the Dispensary's doses
   n=sent.length; await say(700,'?myshots',1200);
   ok(/From your Dispensary: Rut/.test(roomText(n)+' '+sent.slice(n).map(([e,d])=>String(d&&(d.Content||d.Message)||'')).join(' ')), "?myshots lists what their Dispensary says is in them");

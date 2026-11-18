@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.56.0
+// @version      0.57.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -31,20 +31,24 @@
   var __commonJS = (cb, mod2) => function __require() {
     return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
   };
+  var __export = (target2, all) => {
+    for (var name in all)
+      __defProp(target2, name, { get: all[name], enumerable: true });
+  };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
-      for (let key of __getOwnPropNames(from))
-        if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+      for (let key2 of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key2) && key2 !== except)
+          __defProp(to, key2, { get: () => from[key2], enumerable: !(desc = __getOwnPropDesc(from, key2)) || desc.enumerable });
     }
     return to;
   };
-  var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+  var __toESM = (mod2, isNodeMode, target2) => (target2 = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
     // If the importer is in node compatibility mode or this is not an ESM
     // file that has been converted to a CommonJS file using a Babel-
     // compatible transform (i.e. "__esModule" has not been set), then set
     // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
+    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target2, "default", { value: mod2, enumerable: true }) : target2,
     mod2
   ));
 
@@ -216,8 +220,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // shared/ink/ink-designs.json
   var ink_designs_default = {
-    made: "2026-11-18T00:49:11.491Z",
-    res: 2,
+    made: "2026-11-18T06:17:25.015Z",
+    res: 3,
     groups: {
       FarmInk: [
         {
@@ -227,16 +231,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "blackletter, with a knot under it",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 465,
-          w: 220,
-          h: 126,
+          left: 85,
+          top: 434,
+          w: 330,
+          h: 189,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -246,16 +257,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "flowing script on a curve, a heart and a snout",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 515,
-          w: 144,
-          h: 66,
+          left: 98,
+          top: 499,
+          w: 216,
+          h: 99,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -265,16 +283,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "drippin' graffiti, paw prints",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 632,
-          w: 120,
-          h: 60,
+          left: 118,
+          top: 618,
+          w: 180,
+          h: 89,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -284,16 +309,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "western, a horseshoe for luck",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 483,
-          w: 220,
-          h: 91,
+          left: 85,
+          top: 461,
+          w: 330,
+          h: 135,
           layers: [
             {
               name: "Ink",
-              color: "#19151f",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -303,16 +335,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "bubble graffiti, paw prints",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 485,
-          w: 220,
-          h: 87,
+          left: 85,
+          top: 463,
+          w: 330,
+          h: 131,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#fbfbfb",
+              colorize: true
+            },
+            {
+              name: "Grey",
+              color: "#737177",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              251,
+              251,
+              251
+            ],
+            [
+              115,
+              113,
+              119
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -322,16 +381,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "flowing script, a heart with ears",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 448,
-          w: 220,
-          h: 161,
+          left: 85,
+          top: 408,
+          w: 330,
+          h: 241,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -341,16 +407,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the lewd crest, glowin' pink",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 423,
+          w: 330,
+          h: 210,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
@@ -360,16 +433,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "marker scrawl and an arrow",
           sheet: 1,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 422,
+          w: 330,
+          h: 212,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -379,16 +459,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "blackletter, with arrows",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 514,
-          w: 144,
-          h: 69,
+          left: 98,
+          top: 497,
+          w: 216,
+          h: 103,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -398,16 +485,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "graffiti, with a curl of tentacle",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 506,
-          w: 144,
-          h: 85,
+          left: 98,
+          top: 485,
+          w: 216,
+          h: 127,
           layers: [
             {
               name: "Ink",
-              color: "#1b1720",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -417,16 +511,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a wolf's paw and the pack's words",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 609,
-          w: 120,
-          h: 106,
+          left: 118,
+          top: 584,
+          w: 180,
+          h: 157,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -436,16 +537,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a crown in flames",
           sheet: 1,
           spot: "hip",
-          left: 134,
-          top: 503,
-          w: 144,
-          h: 91,
+          left: 98,
+          top: 480,
+          w: 216,
+          h: 136,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              23,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -455,16 +573,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a warning label",
           sheet: 1,
           spot: "thigh",
-          left: 148,
-          top: 633,
-          w: 120,
-          h: 58,
+          left: 118,
+          top: 619,
+          w: 180,
+          h: 87,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e8c21a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              232,
+              194,
+              26
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -474,16 +609,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dairy-print badge",
           sheet: 1,
           spot: "chest",
-          left: 154,
-          top: 209,
-          w: 192,
-          h: 146,
+          left: 106,
+          top: 172,
+          w: 288,
+          h: 220,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#f4f3f4",
+              colorize: true
+            },
+            {
+              name: "Grey",
+              color: "#89878c",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              244,
+              243,
+              244
+            ],
+            [
+              137,
+              135,
+              140
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -493,35 +655,49 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the crest once you've taken: an egg in the heart",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 458,
-          w: 220,
-          h: 141,
+          left: 85,
+          top: 414,
+          w: 330,
+          h: 229,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
           name: "GoblinLoot",
           title: "Goblin Loot",
-          where: "anywhere they could reach",
-          desc: "a crude stick-and-poke, crossed daggers",
+          where: "wherever they reached",
+          desc: "crude stick-and-poke, daggers",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 509,
-          w: 144,
-          h: 79,
+          left: 98,
+          top: 462,
+          w: 216,
+          h: 173,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -531,16 +707,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "little hand-poked dots",
           sheet: 2,
           spot: "cheek",
-          left: 202,
-          top: 171,
-          w: 48,
-          h: 19,
+          left: 190,
+          top: 166,
+          w: 72,
+          h: 28,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -550,16 +733,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "inside a cow-print patch",
           sheet: 2,
           spot: "shoulder",
-          left: 140,
-          top: 272,
-          w: 84,
-          h: 56,
+          left: 119,
+          top: 259,
+          w: 126,
+          h: 83,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "White",
+              color: "#ffffff",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -569,16 +769,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "wet marker, still shiny",
           sheet: 2,
           spot: "thigh",
-          left: 148,
-          top: 648,
-          w: 120,
-          h: 28,
+          left: 118,
+          top: 641,
+          w: 180,
+          h: 42,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Blue",
+              color: "#63687e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#151c3c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              99,
+              104,
+              126
+            ],
+            [
+              21,
+              28,
+              60
+            ]
           ]
         },
         {
@@ -588,10 +805,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "UV ink, glowin'",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 475,
-          w: 220,
-          h: 106,
+          left: 85,
+          top: 449,
+          w: 330,
+          h: 159,
           layers: [
             {
               name: "Glow",
@@ -612,16 +829,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a ruler, inches, BIGGER at the top",
           sheet: 2,
           spot: "innerThigh",
-          left: 182,
-          top: 610,
-          w: 96,
-          h: 60,
+          left: 158,
+          top: 596,
+          w: 144,
+          h: 89,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -631,16 +855,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bullseye and a slot",
           sheet: 2,
           spot: "womb",
-          left: 140,
-          top: 410,
-          w: 220,
-          h: 237,
+          left: 85,
+          top: 352,
+          w: 330,
+          h: 352,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -650,16 +881,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "hoof prints trailin' down",
           sheet: 2,
           spot: "belly",
-          left: 158,
-          top: 366,
-          w: 184,
-          h: 192,
+          left: 112,
+          top: 318,
+          w: 276,
+          h: 288,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -669,16 +907,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the whole sign: Farm \xB7 Dairy \xB7 Kennel",
           sheet: 3,
           spot: "hip",
-          left: 136,
-          top: 465,
-          w: 140,
-          h: 166,
+          left: 102,
+          top: 424,
+          w: 209,
+          h: 248,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -688,16 +933,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "stencil words round the BB",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 493,
-          w: 144,
-          h: 111,
+          left: 98,
+          top: 465,
+          w: 216,
+          h: 166,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -707,10 +959,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a purple inspection stamp",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "Stamp",
@@ -726,16 +978,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the crest, with the BB in its heart",
           sheet: 3,
           spot: "womb",
-          left: 140,
-          top: 456,
-          w: 220,
-          h: 144,
+          left: 85,
+          top: 420,
+          w: 330,
+          h: 216,
           layers: [
             {
               name: "Ink",
               color: "#d4237a",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              35,
+              122
+            ]
           ]
         },
         {
@@ -745,16 +1004,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the bell, an arrow, an invitation",
           sheet: 3,
           spot: "womb",
-          left: 140,
-          top: 445,
-          w: 220,
-          h: 166,
+          left: 85,
+          top: 405,
+          w: 330,
+          h: 247,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -764,10 +1030,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the BB so wet it runs, still shinin'",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 603,
-          w: 120,
-          h: 119,
+          left: 118,
+          top: 573,
+          w: 180,
+          h: 178,
           layers: [
             {
               name: "Ink",
@@ -775,10 +1041,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
               colorize: true
             },
             {
-              name: "Wet",
+              name: "WetInk",
               color: "#ffffff",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -788,16 +1061,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the sign's bone, with praise in it",
           sheet: 3,
           spot: "chest",
-          left: 154,
-          top: 229,
-          w: 192,
-          h: 106,
+          left: 106,
+          top: 203,
+          w: 288,
+          h: 159,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -807,16 +1087,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the bone, and the bell hung off it",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 624,
-          w: 120,
-          h: 77,
+          left: 118,
+          top: 605,
+          w: 180,
+          h: 115,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -826,16 +1113,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dairy bottle cap in dairy blue",
           sheet: 3,
           spot: "chest",
-          left: 154,
-          top: 186,
-          w: 192,
-          h: 192,
+          left: 106,
+          top: 138,
+          w: 288,
+          h: 288,
           layers: [
             {
               name: "Ink",
               color: "#1d3f8f",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              29,
+              63,
+              143
+            ]
           ]
         },
         {
@@ -845,16 +1139,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a prize ribbon from the county fair",
           sheet: 3,
           spot: "thigh",
-          left: 153,
-          top: 593,
-          w: 111,
-          h: 138,
+          left: 125,
+          top: 559,
+          w: 167,
+          h: 207,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e8d29a",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#2a4fb5",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141e",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              232,
+              210,
+              154
+            ],
+            [
+              42,
+              79,
+              181
+            ],
+            [
+              24,
+              20,
+              30
+            ]
           ]
         },
         {
@@ -864,16 +1185,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "curls, hearts and the BB",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 517,
-          w: 144,
-          h: 62,
+          left: 98,
+          top: 502,
+          w: 216,
+          h: 92,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -883,10 +1211,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paddle with BB cut through it",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 466,
-          w: 144,
-          h: 165,
+          left: 98,
+          top: 424,
+          w: 216,
+          h: 248,
           layers: [
             {
               name: "Welt",
@@ -912,10 +1240,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "our biggest cup out a porthole, a B seared on each",
           sheet: 3,
           spot: "chest",
-          left: 156,
-          top: 172,
-          w: 189,
-          h: 221,
+          left: 110,
+          top: 117,
+          w: 281,
+          h: 331,
           layers: [
             {
               name: "Ink",
@@ -937,6 +1265,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
               color: "#f2b9a8",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -946,10 +1281,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a red inspection stamp: didn't take, go again",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 502,
-          w: 144,
-          h: 93,
+          left: 98,
+          top: 479,
+          w: 216,
+          h: 139,
           layers: [
             {
               name: "Stamp",
@@ -965,16 +1300,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a laundry tag: how to treat her",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 489,
-          w: 144,
-          h: 118,
+          left: 98,
+          top: 460,
+          w: 216,
+          h: 176,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -984,16 +1326,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "shipping arrows, handle roughly",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 492,
-          w: 144,
-          h: 113,
+          left: 98,
+          top: 464,
+          w: 216,
+          h: 169,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1003,16 +1362,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a yellow wet-floor sign",
           sheet: 4,
           spot: "innerThigh",
-          left: 182,
-          top: 589,
-          w: 96,
-          h: 102,
+          left: 158,
+          top: 564,
+          w: 144,
+          h: 153,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#f2c230",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              242,
+              194,
+              48
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1022,16 +1398,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an arcade coin slot",
           sheet: 4,
           spot: "womb",
-          left: 143,
-          top: 402,
-          w: 215,
-          h: 253,
+          left: 90,
+          top: 339,
+          w: 321,
+          h: 379,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1041,16 +1424,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a sign taped on: use the other hole",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 494,
-          w: 144,
-          h: 109,
+          left: 98,
+          top: 466,
+          w: 216,
+          h: 164,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1060,16 +1450,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a made-up code: it scans as nothin'",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 487,
-          w: 144,
-          h: 122,
+          left: 98,
+          top: 457,
+          w: 216,
+          h: 182,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1079,16 +1476,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a collar inked on for good, a bone tag hangin'",
           sheet: 4,
           spot: "neck",
-          left: 180,
-          top: 205,
-          w: 140,
-          h: 70,
+          left: 145,
+          top: 188,
+          w: 210,
+          h: 104,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1098,16 +1502,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a milk carton notice",
           sheet: 4,
           spot: "hip",
-          left: 145,
-          top: 465,
-          w: 122,
-          h: 166,
+          left: 115,
+          top: 424,
+          w: 183,
+          h: 248,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#1d3f8f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              29,
+              63,
+              143
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1117,16 +1548,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a spray-painted tag, crown and drips",
           sheet: 4,
           spot: "belly",
-          left: 158,
-          top: 416,
-          w: 184,
-          h: 92,
+          left: 112,
+          top: 393,
+          w: 276,
+          h: 138,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Pink",
+              color: "#dc2188",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1e1321",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              33,
+              136
+            ],
+            [
+              30,
+              19,
+              33
+            ]
           ]
         },
         {
@@ -1136,16 +1584,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a steel horseshoe, a yellow banner",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 505,
-          w: 144,
-          h: 86,
+          left: 98,
+          top: 484,
+          w: 216,
+          h: 128,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dcae21",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#7b8fa6",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#5e4b1f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              174,
+              33
+            ],
+            [
+              123,
+              143,
+              166
+            ],
+            [
+              94,
+              75,
+              31
+            ],
+            [
+              24,
+              20,
+              29
+            ]
           ]
         },
         {
@@ -1155,16 +1640,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw print in flames",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#e5af21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#d7261f",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1d151c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              229,
+              175,
+              33
+            ],
+            [
+              215,
+              38,
+              31
+            ],
+            [
+              29,
+              21,
+              28
+            ]
           ]
         },
         {
@@ -1174,16 +1686,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "two cherries and a banner",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 490,
-          w: 144,
-          h: 116,
+          left: 98,
+          top: 462,
+          w: 216,
+          h: 173,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#ddaf21",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#3d852d",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              221,
+              175,
+              33
+            ],
+            [
+              61,
+              133,
+              45
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              24,
+              20,
+              28
+            ]
           ]
         },
         {
@@ -1193,21 +1742,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a ripe peach, crease and all, drippin' white",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 475,
-          w: 144,
-          h: 146,
+          left: 98,
+          top: 439,
+          w: 216,
+          h: 218,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Orange",
+              color: "#f08f67",
+              colorize: true
             },
             {
-              name: "Wet",
+              name: "Red",
+              color: "#e56757",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#3e872e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141d",
+              colorize: true
+            },
+            {
+              name: "WetInk",
               color: "#f7f2ea",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              240,
+              143,
+              103
+            ],
+            [
+              229,
+              103,
+              87
+            ],
+            [
+              62,
+              135,
+              46
+            ],
+            [
+              24,
+              20,
+              29
+            ]
           ]
         },
         {
@@ -1217,16 +1803,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bunny with her ears up",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 501,
-          w: 144,
-          h: 95,
+          left: 98,
+          top: 477,
+          w: 216,
+          h: 143,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Pink",
+              color: "#edb8c7",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#ddb023",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              237,
+              184,
+              199
+            ],
+            [
+              221,
+              176,
+              35
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1236,16 +1849,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a nest of eggs, for the ovipositor girls",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 506,
-          w: 144,
-          h: 85,
+          left: 98,
+          top: 484,
+          w: 216,
+          h: 128,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Teal",
+              color: "#a9d6cf",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#dfb121",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#885a2a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              169,
+              214,
+              207
+            ],
+            [
+              223,
+              177,
+              33
+            ],
+            [
+              136,
+              90,
+              42
+            ],
+            [
+              24,
+              20,
+              28
+            ]
           ]
         },
         {
@@ -1255,16 +1905,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a name-tag sticker, filled in",
           sheet: 5,
           spot: "chest",
-          left: 154,
-          top: 218,
-          w: 192,
-          h: 128,
+          left: 106,
+          top: 186,
+          w: 288,
+          h: 192,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1274,16 +1941,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a door hanger: breedin' in progress, walk right in",
           sheet: 5,
           spot: "hip",
-          left: 148,
-          top: 465,
-          w: 117,
-          h: 166,
+          left: 118,
+          top: 424,
+          w: 176,
+          h: 248,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1293,16 +1977,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a price tag on a string",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 511,
-          w: 144,
-          h: 75,
+          left: 98,
+          top: 492,
+          w: 216,
+          h: 113,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Red",
+              color: "#d42020",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              212,
+              32,
+              32
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1312,16 +2013,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a tip jar, half full",
           sheet: 5,
           spot: "womb",
-          left: 171,
-          top: 402,
-          w: 158,
-          h: 253,
+          left: 132,
+          top: 339,
+          w: 236,
+          h: 379,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dfb43a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              223,
+              180,
+              58
+            ],
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1331,16 +2049,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a reserved sign: everyone else gets milked",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 479,
-          w: 144,
-          h: 138,
+          left: 98,
+          top: 445,
+          w: 216,
+          h: 207,
           layers: [
             {
               name: "Ink",
               color: "#1f4fa8",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              31,
+              79,
+              168
+            ]
           ]
         },
         {
@@ -1350,16 +2075,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a mandala in tiny dots",
           sheet: 5,
           spot: "belly",
-          left: 158,
-          top: 362,
-          w: 184,
-          h: 201,
+          left: 112,
+          top: 312,
+          w: 276,
+          h: 300,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1369,16 +2101,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "mehndi vines and paisleys",
           sheet: 5,
           spot: "thigh",
-          left: 106,
-          top: 596,
-          w: 204,
-          h: 133,
+          left: 55,
+          top: 563,
+          w: 306,
+          h: 198,
           layers: [
             {
               name: "Ink",
               color: "#7a3410",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              122,
+              52,
+              16
+            ]
           ]
         },
         {
@@ -1388,16 +2127,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a fine-line womb in a wash of colour",
           sheet: 5,
           spot: "womb",
-          left: 140,
-          top: 456,
-          w: 220,
-          h: 145,
+          left: 85,
+          top: 420,
+          w: 330,
+          h: 217,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Ink",
+              color: "#1a1420",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              26,
+              20,
+              32
+            ]
           ]
         },
         {
@@ -1407,16 +2153,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "tiny script and a tiny heart",
           sheet: 5,
           spot: "hip",
-          left: 134,
-          top: 525,
-          w: 144,
-          h: 47,
+          left: 98,
+          top: 513,
+          w: 216,
+          h: 70,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1426,16 +2179,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the classic MOM heart, for a cow",
           sheet: 6,
           spot: "shoulder",
-          left: 140,
-          top: 274,
-          w: 84,
-          h: 52,
+          left: 119,
+          top: 262,
+          w: 126,
+          h: 77,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#ddaf21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1f171d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              221,
+              175,
+              33
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              31,
+              23,
+              29
+            ]
           ]
         },
         {
@@ -1445,16 +2225,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "two swallows, for the girls who do",
           sheet: 6,
           spot: "chest",
-          left: 154,
-          top: 225,
-          w: 192,
-          h: 115,
+          left: 106,
+          top: 196,
+          w: 288,
+          h: 172,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dcae21",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#d8261f",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#2a5faf",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              220,
+              174,
+              33
+            ],
+            [
+              216,
+              38,
+              31
+            ],
+            [
+              42,
+              95,
+              175
+            ],
+            [
+              23,
+              19,
+              29
+            ]
           ]
         },
         {
@@ -1464,16 +2281,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the sailor's anchor, rope and all",
           sheet: 6,
           spot: "forearm",
-          left: 140,
-          top: 299,
-          w: 80,
-          h: 63,
+          left: 120,
+          top: 283,
+          w: 120,
+          h: 95,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Gold",
+              color: "#dfb122",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#7a8ea5",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#4e4535",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18141e",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              223,
+              177,
+              34
+            ],
+            [
+              122,
+              142,
+              165
+            ],
+            [
+              78,
+              69,
+              53
+            ],
+            [
+              24,
+              20,
+              30
+            ]
           ]
         },
         {
@@ -1483,16 +2337,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a heart with a dagger through it",
           sheet: 6,
           spot: "heart",
-          left: 228,
-          top: 251,
-          w: 108,
-          h: 83,
+          left: 201,
+          top: 230,
+          w: 162,
+          h: 125,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Grey",
+              color: "#b9c7d6",
+              colorize: true
+            },
+            {
+              name: "Gold",
+              color: "#e0b122",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#c7102e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#18131c",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              185,
+              199,
+              214
+            ],
+            [
+              224,
+              177,
+              34
+            ],
+            [
+              199,
+              16,
+              46
+            ],
+            [
+              24,
+              19,
+              28
+            ]
           ]
         },
         {
@@ -1502,16 +2393,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a shibari harness that never comes off",
           sheet: 6,
           spot: "chest",
-          left: 106,
-          top: 188,
-          w: 288,
-          h: 189,
+          left: 34,
+          top: 140,
+          w: 432,
+          h: 284,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1521,16 +2419,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a chain inked round, a padlock hangin' off it",
           sheet: 6,
           spot: "thigh",
-          left: 130,
-          top: 630,
-          w: 156,
-          h: 65,
+          left: 91,
+          top: 614,
+          w: 234,
+          h: 97,
           layers: [
             {
               name: "Ink",
-              color: "#19151f",
+              color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1540,16 +2445,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "leather cuffs inked on, D-ring and all",
           sheet: 6,
           spot: "wrist",
-          left: 126,
-          top: 331,
-          w: 108,
-          h: 39,
+          left: 99,
+          top: 321,
+          w: 162,
+          h: 59,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1559,16 +2471,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a zipper inked down her front, half open",
           sheet: 6,
           spot: "belly",
-          left: 140,
-          top: 343,
-          w: 221,
-          h: 239,
+          left: 85,
+          top: 283,
+          w: 331,
+          h: 359,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1578,16 +2497,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an elevator plate: this cow has no limit",
           sheet: 6,
           spot: "belly",
-          left: 158,
-          top: 399,
-          w: 184,
-          h: 127,
+          left: 112,
+          top: 367,
+          w: 276,
+          h: 191,
           layers: [
             {
-              name: "InkArt",
-              color: null,
-              colorize: false
+              name: "Grey",
+              color: "#9aa3ad",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131d",
+              colorize: true
             }
+          ],
+          pal: [
+            [
+              154,
+              163,
+              173
+            ],
+            [
+              23,
+              19,
+              29
+            ]
           ]
         },
         {
@@ -1597,16 +2533,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a dotted line and scissors",
           sheet: 6,
           spot: "womb",
-          left: 140,
-          top: 489,
-          w: 220,
-          h: 78,
+          left: 85,
+          top: 471,
+          w: 330,
+          h: 115,
           layers: [
             {
               name: "Ink",
               color: "#16121c",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
           ]
         },
         {
@@ -1616,16 +2559,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a green farm-shop sticker",
           sheet: 6,
           spot: "shoulder",
-          left: 140,
-          top: 258,
-          w: 84,
-          h: 84,
+          left: 119,
+          top: 237,
+          w: 126,
+          h: 126,
           layers: [
             {
               name: "Ink",
               color: "#3f8a2e",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              63,
+              138,
+              46
+            ]
           ]
         },
         {
@@ -1635,10 +2585,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a rose in a heart, thorny vines",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 483,
-          w: 220,
-          h: 91,
+          left: 85,
+          top: 460,
+          w: 330,
+          h: 136,
           layers: [
             {
               name: "Glow",
@@ -1659,10 +2609,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "wings and a chain of hearts",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 452,
-          w: 220,
-          h: 153,
+          left: 85,
+          top: 413,
+          w: 330,
+          h: 230,
           layers: [
             {
               name: "Glow",
@@ -1683,10 +2633,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns, bat wings, a spade tail",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 460,
-          w: 220,
-          h: 137,
+          left: 85,
+          top: 426,
+          w: 330,
+          h: 205,
           layers: [
             {
               name: "Glow",
@@ -1707,10 +2657,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "tribal blades round a heart",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 473,
-          w: 220,
-          h: 110,
+          left: 85,
+          top: 446,
+          w: 330,
+          h: 165,
           layers: [
             {
               name: "Glow",
@@ -1731,10 +2681,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a heart and a chain of eggs",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 465,
-          w: 220,
-          h: 127,
+          left: 85,
+          top: 433,
+          w: 330,
+          h: 190,
           layers: [
             {
               name: "Glow",
@@ -1755,16 +2705,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "its own words, veins creepin' out",
           sheet: 7,
           spot: "hip",
-          left: 134,
-          top: 497,
-          w: 144,
-          h: 103,
+          left: 98,
+          top: 471,
+          w: 216,
+          h: 154,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1774,16 +2731,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the corruption's own words",
           sheet: 7,
           spot: "thigh",
-          left: 148,
-          top: 605,
-          w: 120,
-          h: 114,
+          left: 118,
+          top: 576,
+          w: 180,
+          h: 172,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1793,16 +2757,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the corruption's own words",
           sheet: 7,
           spot: "belly",
-          left: 158,
-          top: 387,
-          w: 184,
-          h: 151,
+          left: 112,
+          top: 349,
+          w: 276,
+          h: 227,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
         },
         {
@@ -1812,17 +2783,1039 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "one word, spreadin'",
           sheet: 7,
           spot: "womb",
-          left: 140,
-          top: 459,
-          w: 220,
-          h: 138,
+          left: 85,
+          top: 425,
+          w: 330,
+          h: 207,
           layers: [
             {
               name: "Ink",
               color: "#3a0d52",
               colorize: true
             }
+          ],
+          pal: [
+            [
+              58,
+              13,
+              82
+            ]
           ]
+        },
+        {
+          name: "LiveFarmProperty",
+          title: "Farm Property (your number)",
+          where: "neck or hip",
+          sheet: 1,
+          spot: "neck",
+          left: 125,
+          top: 179,
+          w: 250,
+          h: 123,
+          box: [
+            4,
+            34,
+            376,
+            216
+          ],
+          s: 0.6731,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveUsedByStrangers",
+          title: "Used By Strangers (keeps count)",
+          where: "inner thigh",
+          sheet: 1,
+          spot: "innerThigh",
+          left: 146,
+          top: 609,
+          w: 165,
+          h: 62,
+          box: [
+            0,
+            41,
+            380,
+            184
+          ],
+          s: 0.435,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTimesBred",
+          title: "Times Bred (keeps count)",
+          where: "inner thigh",
+          sheet: 2,
+          spot: "innerThigh",
+          left: 144,
+          top: 595,
+          w: 173,
+          h: 89,
+          box: [
+            17,
+            29,
+            378,
+            216
+          ],
+          s: 0.4784,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLitters",
+          title: "Litters (keeps count)",
+          where: "lower belly",
+          sheet: 2,
+          spot: "womb",
+          left: 44,
+          top: 410,
+          w: 411,
+          h: 235,
+          box: [
+            38,
+            38,
+            342,
+            212
+          ],
+          s: 1.3525,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLitresMilked",
+          title: "Litres Milked (keeps count)",
+          where: "above a breast",
+          sheet: 2,
+          spot: "chest",
+          left: 72,
+          top: 222,
+          w: 357,
+          h: 120,
+          box: [
+            24,
+            74,
+            336,
+            179
+          ],
+          s: 1.1429,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveEggsLaid",
+          title: "Eggs Laid (keeps count)",
+          where: "a hip",
+          sheet: 2,
+          spot: "hip",
+          left: 74,
+          top: 500,
+          w: 265,
+          h: 96,
+          box: [
+            21,
+            69,
+            348,
+            188
+          ],
+          s: 0.809,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveDaysDenied",
+          title: "Days Since Last Orgasm (keeps count)",
+          where: "low belly",
+          sheet: 2,
+          spot: "womb",
+          left: 53,
+          top: 428,
+          w: 393,
+          h: 201,
+          box: [
+            4,
+            30,
+            376,
+            220
+          ],
+          s: 1.0577,
+          layers: [
+            {
+              name: "White",
+              color: "#fdfdfd",
+              colorize: true
+            },
+            {
+              name: "Green",
+              color: "#1f6b3a",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              253,
+              253,
+              253
+            ],
+            [
+              31,
+              107,
+              58
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveOwnedBy",
+          title: "Owned By (a name)",
+          where: "a hip or above the heart",
+          sheet: 2,
+          spot: "hip",
+          left: 69,
+          top: 459,
+          w: 273,
+          h: 179,
+          box: [
+            49,
+            37,
+            335,
+            224
+          ],
+          s: 0.9558,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveStockNumber",
+          title: "Stock Number (your number)",
+          where: "back of the neck",
+          sheet: 2,
+          spot: "neck",
+          left: 121,
+          top: 165,
+          w: 258,
+          h: 150,
+          box: [
+            29,
+            30,
+            349,
+            216
+          ],
+          s: 0.8077,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLocked",
+          title: "Locked (keyholder's name)",
+          where: "above the heart",
+          sheet: 2,
+          spot: "heart",
+          left: 179,
+          top: 228,
+          w: 206,
+          h: 129,
+          box: [
+            57,
+            70,
+            340,
+            247
+          ],
+          s: 0.7265,
+          layers: [
+            {
+              name: "White",
+              color: "#fefefe",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              254,
+              254,
+              254
+            ],
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBredByBB",
+          title: "Bred By B&B",
+          where: "lower belly",
+          sheet: 3,
+          spot: "womb",
+          left: 41,
+          top: 373,
+          w: 418,
+          h: 311,
+          box: [
+            48,
+            21,
+            332,
+            232
+          ],
+          s: 1.4732,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveEarTag",
+          title: "B&B Ear Tag (your number)",
+          where: "a hip",
+          sheet: 3,
+          spot: "hip",
+          left: 68,
+          top: 432,
+          w: 277,
+          h: 232,
+          box: [
+            53,
+            10,
+            327,
+            240
+          ],
+          s: 1.0093,
+          layers: [
+            {
+              name: "Gold",
+              color: "#e3b021",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17131c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              227,
+              176,
+              33
+            ],
+            [
+              23,
+              19,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveCumTank",
+          title: "Cum Tank (how full you are)",
+          where: "the belly",
+          sheet: 4,
+          spot: "belly",
+          left: 76,
+          top: 351,
+          w: 348,
+          h: 222,
+          box: [
+            45,
+            34,
+            335,
+            219
+          ],
+          s: 1.2,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBreedingFacts",
+          title: "Breeding Facts (keeps count)",
+          where: "the small of the back",
+          sheet: 4,
+          spot: "hip",
+          left: 68,
+          top: 413,
+          w: 276,
+          h: 270,
+          box: [
+            62,
+            0,
+            318,
+            250
+          ],
+          s: 1.08,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLoading",
+          title: "Loading (how far along you are)",
+          where: "the belly",
+          sheet: 4,
+          spot: "belly",
+          left: 84,
+          top: 375,
+          w: 332,
+          h: 174,
+          box: [
+            13,
+            40,
+            367,
+            225
+          ],
+          s: 0.9388,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveLipstickKisses",
+          title: "Lipstick Kisses (signed)",
+          where: "a butt cheek",
+          sheet: 4,
+          spot: "hip",
+          left: 71,
+          top: 457,
+          w: 269,
+          h: 182,
+          box: [
+            34,
+            41,
+            337,
+            246
+          ],
+          s: 0.8889,
+          layers: [
+            {
+              name: "Ink",
+              color: "#c41e3a",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              196,
+              30,
+              58
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWouldBreedAgain",
+          title: "\u2605\u2605\u2605\u2605\u2605 Would Breed Again (signed)",
+          where: "a thigh",
+          sheet: 4,
+          spot: "thigh",
+          left: 101,
+          top: 603,
+          w: 214,
+          h: 117,
+          box: [
+            2,
+            20,
+            378,
+            226
+          ],
+          s: 0.5696,
+          layers: [
+            {
+              name: "Gold",
+              color: "#d8a300",
+              colorize: true
+            },
+            {
+              name: "Brown",
+              color: "#75590e",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              216,
+              163,
+              0
+            ],
+            [
+              117,
+              89,
+              14
+            ],
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveGuestbook",
+          title: "Bred By (a guestbook)",
+          where: "an inner thigh",
+          sheet: 5,
+          spot: "innerThigh",
+          left: 140,
+          top: 567,
+          w: 180,
+          h: 146,
+          box: [
+            40,
+            1,
+            342,
+            246
+          ],
+          s: 0.595,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBreedingCard",
+          title: "Breeding Card (a punch a load)",
+          where: "a butt cheek",
+          sheet: 5,
+          spot: "hip",
+          left: 77,
+          top: 471,
+          w: 258,
+          h: 154,
+          box: [
+            4,
+            14,
+            376,
+            236
+          ],
+          s: 0.6923,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTrapPassport",
+          title: "Trap Passport (a stamp a trap)",
+          where: "a shoulder blade",
+          sheet: 5,
+          spot: "hip",
+          left: 78,
+          top: 469,
+          w: 245,
+          h: 158,
+          box: [
+            10,
+            10,
+            380,
+            249
+          ],
+          s: 0.6626,
+          layers: [
+            {
+              name: "Green",
+              color: "#3f8a2e",
+              colorize: true
+            },
+            {
+              name: "Red",
+              color: "#b3122e",
+              colorize: true
+            },
+            {
+              name: "Purple",
+              color: "#5b2a86",
+              colorize: true
+            },
+            {
+              name: "Blue",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              63,
+              138,
+              46
+            ],
+            [
+              179,
+              18,
+              46
+            ],
+            [
+              91,
+              42,
+              134
+            ],
+            [
+              29,
+              63,
+              143
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveHighScores",
+          title: "High Scores (who's bred you most)",
+          where: "a thigh",
+          sheet: 5,
+          spot: "thigh",
+          left: 100,
+          top: 594,
+          w: 217,
+          h: 137,
+          box: [
+            13,
+            17,
+            366,
+            240
+          ],
+          s: 0.6143,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveTied",
+          title: "Tied \xD7 (keeps count)",
+          where: "a hip",
+          sheet: 5,
+          spot: "hip",
+          left: 75,
+          top: 475,
+          w: 262,
+          h: 146,
+          box: [
+            22,
+            56,
+            365,
+            247
+          ],
+          s: 0.7633,
+          layers: [
+            {
+              name: "Gold",
+              color: "#deb021",
+              colorize: true
+            },
+            {
+              name: "Pink",
+              color: "#d9577a",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#17121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              222,
+              176,
+              33
+            ],
+            [
+              217,
+              87,
+              122
+            ],
+            [
+              23,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveBredOn",
+          title: "Bred On (a date stamp)",
+          where: "a hip",
+          sheet: 6,
+          spot: "hip",
+          left: 72,
+          top: 466,
+          w: 269,
+          h: 163,
+          box: [
+            37,
+            33,
+            343,
+            219
+          ],
+          s: 0.878,
+          layers: [
+            {
+              name: "Stamp",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          live: true
+        },
+        {
+          name: "LiveHeatCrest",
+          title: "Heat Crest (fills as your heat rises)",
+          where: "over the womb",
+          sheet: 7,
+          spot: "womb",
+          left: 31,
+          top: 345,
+          w: 438,
+          h: 366,
+          box: [
+            68,
+            14,
+            311,
+            217
+          ],
+          s: 1.8033,
+          layers: [
+            {
+              name: "Glow",
+              color: "#ff4fd8",
+              colorize: true
+            },
+            {
+              name: "GlowInk",
+              color: "#ff4fd8",
+              colorize: true
+            }
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsBlackletter",
+          title: "Your Words: Blackletter",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 43,
+          top: 518,
+          w: 325,
+          h: 60,
+          box: [
+            0,
+            90,
+            380,
+            160
+          ],
+          s: 0.8561,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsScript",
+          title: "Your Words: Script",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 39,
+          top: 491,
+          w: 330,
+          h: 115,
+          box: [
+            4,
+            56,
+            380,
+            187
+          ],
+          s: 0.8775,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsTypewriter",
+          title: "Your Words: Typewriter",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 52,
+          top: 509,
+          w: 309,
+          h: 78,
+          box: [
+            3,
+            78,
+            377,
+            172
+          ],
+          s: 0.8255,
+          layers: [
+            {
+              name: "Ink",
+              color: "#16121c",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              22,
+              18,
+              28
+            ]
+          ],
+          live: true
+        },
+        {
+          name: "LiveWordsGraffiti",
+          title: "Your Words: Graffiti",
+          where: "anywhere",
+          sheet: 7,
+          spot: "hip",
+          left: 38,
+          top: 484,
+          w: 336,
+          h: 127,
+          box: [
+            8,
+            72,
+            372,
+            210
+          ],
+          s: 0.9237,
+          layers: [
+            {
+              name: "Ink",
+              color: "#1d3f8f",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              29,
+              63,
+              143
+            ]
+          ],
+          live: true
         }
       ],
       FarmBrand: [
@@ -1833,10 +3826,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a tentacle in a ring: the pond had you",
           sheet: 2,
           spot: "thigh",
-          left: 148,
-          top: 602,
-          w: 120,
-          h: 120,
+          left: 118,
+          top: 572,
+          w: 180,
+          h: 180,
           layers: [
             {
               name: "BrandEdge",
@@ -1862,10 +3855,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw under a moon: the pack's",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 145,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 217,
           layers: [
             {
               name: "BrandEdge",
@@ -1891,10 +3884,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout in a ring",
           sheet: 2,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -1920,10 +3913,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the BB and its bell, seared in",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 472,
-          w: 144,
-          h: 153,
+          left: 98,
+          top: 434,
+          w: 216,
+          h: 229,
           layers: [
             {
               name: "BrandEdge",
@@ -1949,10 +3942,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a lucky horseshoe round the BB",
           sheet: 3,
           spot: "thigh",
-          left: 148,
-          top: 617,
-          w: 120,
-          h: 91,
+          left: 118,
+          top: 594,
+          w: 180,
+          h: 136,
           layers: [
             {
               name: "BrandEdge",
@@ -1978,10 +3971,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a bone in a ring, a paw cut through",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -2007,10 +4000,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: the BB on a rocker",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 495,
-          w: 144,
-          h: 107,
+          left: 98,
+          top: 468,
+          w: 216,
+          h: 161,
           layers: [
             {
               name: "BrandEdge",
@@ -2036,10 +4029,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "iron letters in a frame",
           sheet: 3,
           spot: "hip",
-          left: 134,
-          top: 511,
-          w: 144,
-          h: 75,
+          left: 98,
+          top: 492,
+          w: 216,
+          h: 112,
           layers: [
             {
               name: "BrandEdge",
@@ -2065,10 +4058,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an oval brand: no need to ask",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
               name: "BrandEdge",
@@ -2094,10 +4087,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "the words and an arrow, burned in",
           sheet: 4,
           spot: "womb",
-          left: 140,
-          top: 454,
-          w: 220,
-          h: 149,
+          left: 85,
+          top: 417,
+          w: 330,
+          h: 223,
           layers: [
             {
               name: "BrandEdge",
@@ -2123,10 +4116,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "an udder in a ring",
           sheet: 4,
           spot: "chest",
-          left: 154,
-          top: 186,
-          w: 192,
-          h: 192,
+          left: 106,
+          top: 138,
+          w: 288,
+          h: 288,
           layers: [
             {
               name: "BrandEdge",
@@ -2152,10 +4145,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a knot in a ring, for the farm's studs",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 476,
-          w: 144,
-          h: 144,
+          left: 98,
+          top: 440,
+          w: 216,
+          h: 216,
           layers: [
             {
               name: "BrandEdge",
@@ -2181,10 +4174,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a cattle brand: rated for the rough stuff",
           sheet: 4,
           spot: "hip",
-          left: 134,
-          top: 504,
-          w: 144,
-          h: 89,
+          left: 98,
+          top: 482,
+          w: 216,
+          h: 133,
           layers: [
             {
               name: "BrandEdge",
@@ -2210,10 +4203,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a muzzle",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2239,10 +4232,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a horseshoe; STALLION for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2268,10 +4261,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a paw; STUD DOG for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2297,10 +4290,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a snout; BOAR for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2326,10 +4319,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a brush of a tail",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2355,10 +4348,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up; BUCK for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2384,10 +4377,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears and whiskers; TOM for studs",
           sheet: 6,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2413,10 +4406,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a wing",
           sheet: 6,
           spot: "shoulder",
-          left: 141,
-          top: 252,
-          w: 83,
-          h: 97,
+          left: 120,
+          top: 228,
+          w: 124,
+          h: 145,
           layers: [
             {
               name: "BrandEdge",
@@ -2442,10 +4435,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "horns and a beard; BILLY for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2471,10 +4464,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a curly fleece; RAM for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2500,10 +4493,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "ears up and a long muzzle",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2529,10 +4522,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "big soft ears and a spotted brow; BUCK for studs",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2558,10 +4551,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "round ears and a long tail",
           sheet: 7,
           spot: "shoulder",
-          left: 141,
-          top: 252,
-          w: 83,
-          h: 97,
+          left: 120,
+          top: 228,
+          w: 124,
+          h: 145,
           layers: [
             {
               name: "BrandEdge",
@@ -2587,10 +4580,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           desc: "a goblin's ear, earring and all: their plunder",
           sheet: 7,
           spot: "hip",
-          left: 135,
-          top: 465,
-          w: 142,
-          h: 166,
+          left: 100,
+          top: 424,
+          w: 213,
+          h: 248,
           layers: [
             {
               name: "BrandEdge",
@@ -2610,134 +4603,2555 @@ One of mods you are using is using an old version of SDK. It will work for now b
           ]
         }
       ]
-    },
-    live: [
-      {
-        sheet: 1,
-        title: "FARM PROPERTY"
-      },
-      {
-        sheet: 1,
-        title: "USED BY STRANGERS"
-      },
-      {
-        sheet: 2,
-        title: "TIMES BRED (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "LITTERS (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "LITRES MILKED (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "EGGS LAID (keeps count)"
-      },
-      {
-        sheet: 2,
-        title: "DAYS SINCE LAST ORGASM"
-      },
-      {
-        sheet: 2,
-        title: "OWNED BY (the crafter signs it)"
-      },
-      {
-        sheet: 2,
-        title: "STOCK NUMBER"
-      },
-      {
-        sheet: 2,
-        title: "LOCKED (keyholder's name)"
-      },
-      {
-        sheet: 3,
-        title: "BRED BY B&B"
-      },
-      {
-        sheet: 3,
-        title: "B&B EAR TAG"
-      },
-      {
-        sheet: 4,
-        title: "CUM TANK (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "BREEDING FACTS (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "LOADING (keeps count)"
-      },
-      {
-        sheet: 4,
-        title: "LIPSTICK KISSES"
-      },
-      {
-        sheet: 4,
-        title: "\u2605\u2605\u2605\u2605\u2605 WOULD BREED AGAIN"
-      },
-      {
-        sheet: 5,
-        title: "BRED BY (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "BREEDING CARD (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "TRAP PASSPORT (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "HIGH SCORES (keeps count)"
-      },
-      {
-        sheet: 5,
-        title: "TIED \xD77 (keeps count)"
-      },
-      {
-        sheet: 6,
-        title: "BRED ON"
-      },
-      {
-        sheet: 7,
-        title: "HEAT CREST (keeps count)"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: blackletter"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: script"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: typewriter"
-      },
-      {
-        sheet: 7,
-        title: "YOUR WORDS: graffiti"
-      }
-    ]
+    }
   };
 
+  // shared/ink/live-art.js
+  var live_art_exports = {};
+  __export(live_art_exports, {
+    CH: () => CH,
+    CW: () => CW,
+    DRIPS: () => DRIPS,
+    GRN: () => GRN,
+    ICON: () => ICON,
+    IMG: () => IMG,
+    INK: () => INK,
+    PINK: () => PINK,
+    PINKGLOW: () => PINKGLOW,
+    RED: () => RED,
+    RED2: () => RED2,
+    YEL: () => YEL,
+    YEL2: () => YEL2,
+    arcText: () => arcText,
+    arcTextLow: () => arcTextLow,
+    arrowDown: () => arrowDown,
+    banner: () => banner,
+    barcode: () => barcode,
+    bigS: () => bigS,
+    blossom: () => blossom,
+    boneOutline: () => boneOutline,
+    boneShape: () => boneShape,
+    canine: () => canine,
+    care: () => care,
+    corrupted: () => corrupted,
+    cowSpots: () => cowSpots,
+    crop: () => crop,
+    crown: () => crown,
+    cut: () => cut,
+    daggers: () => daggers,
+    dripFrom: () => dripFrom,
+    drips: () => drips,
+    drop: () => drop,
+    earTag: () => earTag,
+    egg: () => egg,
+    flame: () => flame,
+    flash: () => flash,
+    flourish: () => flourish,
+    glow: () => glow,
+    heart: () => heart,
+    hoof: () => hoof,
+    horseshoe: () => horseshoe,
+    jug: () => jug,
+    key: () => key,
+    knotBulb: () => knotBulb,
+    leaf: () => leaf,
+    lips: () => lips,
+    loadImg: () => loadImg,
+    loadLogo: () => loadLogo,
+    logo: () => logo,
+    ownSide: () => ownSide,
+    ownWords: () => ownWords,
+    padlock: () => padlock,
+    paisley: () => paisley,
+    paw: () => paw,
+    pigRing: () => pigRing,
+    poked: () => poked,
+    qr: () => qr,
+    rng: () => rng,
+    rope: () => rope,
+    rosette: () => rosette,
+    scar: () => scar,
+    setFontOf: () => setFontOf,
+    shield: () => shield,
+    snout: () => snout,
+    speciesBrand: () => speciesBrand,
+    speckle: () => speckle,
+    stamp: () => stamp,
+    star: () => star,
+    swallow: () => swallow,
+    tally: () => tally,
+    target: () => target,
+    tentacle: () => tentacle,
+    text: () => text,
+    tie: () => tie,
+    titArc: () => titArc,
+    titPath: () => titPath,
+    titPt: () => titPt,
+    upArrow: () => upArrow,
+    veins: () => veins,
+    welt: () => welt,
+    wolfMark: () => wolfMark,
+    wombCrest: () => wombCrest
+  });
+  var LOGO_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/shared/brand/";
+  var FONT_OF = (f) => "'" + f + "'";
+  function setFontOf(fn) {
+    FONT_OF = fn;
+  }
+  var fontOf = (f) => FONT_OF(f);
+  var INK = "#16121c";
+  var PINK = "#d4237a";
+  var RED = "#b3122e";
+  var CW = 380;
+  var CH = 250;
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => ((s = Math.imul(s ^ s >>> 15, 2246822507) ^ Math.imul(s ^ s >>> 13, 3266489909)) >>> 0) / 4294967295;
+  }
+  function heart(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y + s * 0.35);
+    g.bezierCurveTo(x - s, y - s * 0.4, x - s * 0.45, y - s * 1.05, x, y - s * 0.45);
+    g.bezierCurveTo(x + s * 0.45, y - s * 1.05, x + s, y - s * 0.4, x, y + s * 0.35);
+    g.closePath();
+  }
+  function paw(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x, y + s * 0.25, s * 0.42, s * 0.34, 0, 0, Math.PI * 2);
+    g.fill();
+    for (const [dx, dy] of [[-0.48, -0.28], [-0.17, -0.55], [0.17, -0.55], [0.48, -0.28]]) {
+      g.beginPath();
+      g.ellipse(x + dx * s, y + dy * s, s * 0.15, s * 0.19, dx * 0.6, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function hoof(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x - s * 0.22, y, s * 0.2, s * 0.36, -0.15, 0, Math.PI * 2);
+    g.fill();
+    g.beginPath();
+    g.ellipse(x + s * 0.22, y, s * 0.2, s * 0.36, 0.15, 0, Math.PI * 2);
+    g.fill();
+  }
+  function horseshoe(g, x, y, s) {
+    const r = s * 0.55;
+    g.lineWidth = s * 0.24;
+    g.lineCap = "butt";
+    g.beginPath();
+    g.arc(x, y, r, -Math.PI * 0.1, Math.PI * 1.1, false);
+    g.stroke();
+    const fs = g.fillStyle;
+    g.fillStyle = "#fff";
+    for (let i = 0; i < 6; i++) {
+      const a = -Math.PI * 0.02 + i * (Math.PI * 1.04 / 5);
+      g.beginPath();
+      g.arc(x + Math.cos(a) * r, y + Math.sin(a) * r, s * 0.04, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = fs;
+  }
+  function arrowDown(g, x, y, len, w) {
+    g.lineWidth = w;
+    g.lineCap = "round";
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x, y + len);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x - w * 2.6, y + len - w * 2.6);
+    g.lineTo(x, y + len + w * 0.8);
+    g.lineTo(x + w * 2.6, y + len - w * 2.6);
+    g.stroke();
+  }
+  function tally(g, x, y, n, h2) {
+    g.lineWidth = 3.2;
+    g.lineCap = "round";
+    for (let i = 0; i < n; i++) {
+      const grp = Math.floor(i / 5), k = i % 5, gx = x + grp * (h2 * 0.95);
+      if (k < 4) {
+        g.beginPath();
+        g.moveTo(gx + k * h2 * 0.17, y);
+        g.lineTo(gx + k * h2 * 0.17 + 2, y + h2);
+        g.stroke();
+      } else {
+        g.beginPath();
+        g.moveTo(gx - h2 * 0.08, y + h2 * 0.85);
+        g.lineTo(gx + h2 * 0.62, y + h2 * 0.12);
+        g.stroke();
+      }
+    }
+  }
+  function barcode(g, x, y, w, h2, seed) {
+    const r = rng(seed);
+    let cx = x;
+    while (cx < x + w) {
+      const bw = 1 + Math.floor(r() * 4);
+      if (r() > 0.35) g.fillRect(cx, y, bw, h2);
+      cx += bw + 1;
+    }
+  }
+  function crown(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x - s, y);
+    g.lineTo(x - s, y - s * 0.6);
+    g.lineTo(x - s * 0.5, y - s * 0.2);
+    g.lineTo(x, y - s * 0.85);
+    g.lineTo(x + s * 0.5, y - s * 0.2);
+    g.lineTo(x + s, y - s * 0.6);
+    g.lineTo(x + s, y);
+    g.closePath();
+    g.fill();
+  }
+  function flame(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y);
+    g.bezierCurveTo(x - s * 0.6, y - s * 0.3, x - s * 0.2, y - s * 0.7, x, y - s * 1.2);
+    g.bezierCurveTo(x + s * 0.15, y - s * 0.7, x + s * 0.65, y - s * 0.5, x, y);
+    g.fill();
+  }
+  function tentacle(g, x, y, s, dir) {
+    const pts = [];
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60, a = t * Math.PI * 1.6;
+      pts.push([x + dir * (s * 1.1 * t + Math.sin(a) * s * 0.18 * t), y - s * 0.95 * t + Math.cos(a * 1.4) * s * 0.1 * t, s * 0.16 * (1 - t) + 2]);
+    }
+    const fs = g.fillStyle;
+    for (const [px, py, r] of pts) {
+      g.beginPath();
+      g.arc(px, py, r, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = "#fff";
+    for (let i = 4; i < 44; i += 6) {
+      const [px, py, r] = pts[i];
+      g.beginPath();
+      g.arc(px + dir * r * 0.15, py + r * 0.55, r * 0.32, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.fillStyle = fs;
+  }
+  function knotBulb(g, x, y, w, h2) {
+    const L = x - w, R = x + w;
+    g.beginPath();
+    g.moveTo(L, y - h2 * 0.32);
+    g.lineTo(L + w * 0.35, y - h2 * 0.32);
+    g.bezierCurveTo(L + w * 0.42, y - h2 * 1.1, L + w * 0.9, y - h2 * 1.1, L + w * 0.95, y - h2 * 0.4);
+    g.lineTo(R - w * 0.25, y - h2 * 0.34);
+    g.quadraticCurveTo(R, y - h2 * 0.3, R + h2 * 0.2, y);
+    g.quadraticCurveTo(R, y + h2 * 0.3, R - w * 0.25, y + h2 * 0.34);
+    g.lineTo(L + w * 0.95, y + h2 * 0.4);
+    g.bezierCurveTo(L + w * 0.9, y + h2 * 1.1, L + w * 0.42, y + h2 * 1.1, L + w * 0.35, y + h2 * 0.32);
+    g.lineTo(L, y + h2 * 0.32);
+    g.closePath();
+    g.fill();
+  }
+  function wombCrest(g, x, y, s, col) {
+    g.strokeStyle = col;
+    g.fillStyle = col;
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.lineWidth = s * 0.06;
+    heart(g, x, y, s * 0.42);
+    g.stroke();
+    g.lineWidth = s * 0.035;
+    heart(g, x, y + s * 0.02, s * 0.26);
+    g.stroke();
+    for (const d of [-1, 1]) {
+      g.lineWidth = s * 0.05;
+      g.beginPath();
+      g.moveTo(x + d * s * 0.3, y - s * 0.12);
+      g.bezierCurveTo(x + d * s * 0.75, y - s * 0.38, x + d * s * 1.05, y - s * 0.05, x + d * s * 0.92, y + s * 0.18);
+      g.bezierCurveTo(x + d * s * 0.85, y + s * 0.3, x + d * s * 0.68, y + s * 0.28, x + d * s * 0.7, y + s * 0.15);
+      g.stroke();
+      g.lineWidth = s * 0.03;
+      g.beginPath();
+      g.moveTo(x + d * s * 0.36, y + s * 0.12);
+      g.quadraticCurveTo(x + d * s * 0.7, y + s * 0.42, x + d * s * 1.12, y + s * 0.22);
+      g.stroke();
+      g.beginPath();
+      g.arc(x + d * s * 1.15, y + s * 0.2, s * 0.04, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.lineWidth = s * 0.035;
+    arrowDown(g, x, y + s * 0.42, s * 0.28, s * 0.035);
+    for (let i = 0; i < 3; i++) {
+      g.beginPath();
+      g.arc(x, y - s * 0.62 - i * s * 0.1, s * (0.03 - i * 7e-3), 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function arcText(g, t, cx, textY, R, font, size) {
+    g.font = size + "px " + fontOf(font);
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY + R;
+    let a = -Math.PI / 2 - span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a + da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid + Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a += da;
+    }
+  }
+  function snout(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.ellipse(x, y, s, s * 0.72, 0, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.ellipse(x - s * 0.33, y, s * 0.16, s * 0.26, 0, 0, Math.PI * 2);
+    g.fill();
+    g.beginPath();
+    g.ellipse(x + s * 0.33, y, s * 0.16, s * 0.26, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  function text(g, t, x, y, font, size, opt) {
+    opt = opt || {};
+    g.font = (opt.weight || "") + " " + size + "px " + fontOf(font);
+    g.textAlign = opt.align || "center";
+    g.textBaseline = "middle";
+    let s = size;
+    while (opt.max && g.measureText(t).width > opt.max && s > 10) {
+      s -= 2;
+      g.font = (opt.weight || "") + " " + s + "px " + fontOf(font);
+    }
+    if (opt.stroke) {
+      g.lineWidth = opt.stroke;
+      g.strokeStyle = opt.strokeColor || INK;
+      g.lineJoin = "round";
+      g.strokeText(t, x, y);
+    }
+    g.fillText(t, x, y);
+    return s;
+  }
+  function drips(g, x0, x1, y, seed, n) {
+    const r = rng(seed);
+    for (let i = 0; i < n; i++) {
+      const x = x0 + r() * (x1 - x0), len = 6 + r() * 22;
+      g.lineWidth = 2 + r() * 2.5;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x, y);
+      g.lineTo(x, y + len);
+      g.stroke();
+      g.beginPath();
+      g.arc(x, y + len, g.lineWidth * 0.7, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function scar(g, ink, x0, y0) {
+    const w = ink.width, h2 = ink.height, tint = (col, blur, dx, dy, a) => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h2;
+      const cg = c.getContext("2d");
+      cg.filter = blur ? "blur(" + blur + "px)" : "none";
+      cg.drawImage(ink, 0, 0);
+      cg.filter = "none";
+      cg.globalCompositeOperation = "source-in";
+      cg.fillStyle = col;
+      cg.fillRect(0, 0, w, h2);
+      g.globalAlpha = a;
+      g.drawImage(c, x0 + dx, y0 + dy);
+      g.globalAlpha = 1;
+    };
+    tint("#5e1414", 3, 0, 1, 0.75);
+    tint("#b4524a", 0.6, 0, 0, 0.95);
+    tint("#f2b9a8", 0.8, -1, -1.4, 0.45);
+  }
+  function glow(g, ink, x0, y0, col) {
+    const c = document.createElement("canvas");
+    c.width = ink.width;
+    c.height = ink.height;
+    const cg = c.getContext("2d");
+    cg.drawImage(ink, 0, 0);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col;
+    cg.fillRect(0, 0, c.width, c.height);
+    g.save();
+    g.shadowColor = col;
+    g.shadowBlur = 18;
+    g.drawImage(c, x0, y0);
+    g.shadowBlur = 8;
+    g.drawImage(c, x0, y0);
+    g.restore();
+  }
+  function poked(g, t, x, y, font, size, seed) {
+    const c = document.createElement("canvas");
+    c.width = 380;
+    c.height = 250;
+    const cg = c.getContext("2d");
+    cg.fillStyle = "#000";
+    text(cg, t, x, y, font, size, { max: 340 });
+    const d = cg.getImageData(0, 0, c.width, c.height).data, r = rng(seed);
+    for (let yy = 0; yy < c.height; yy += 3) for (let xx = 0; xx < c.width; xx += 3) if (d[(yy * c.width + xx) * 4 + 3] > 120 && r() > 0.15) {
+      g.beginPath();
+      g.arc(xx + (r() - 0.5) * 1.6, yy + (r() - 0.5) * 1.6, 1.3 + r() * 0.6, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+  function cowSpots(g, x, y, w, h2, seed) {
+    const r = rng(seed);
+    for (let i = 0; i < 7; i++) {
+      g.beginPath();
+      const cx = x + r() * w, cy = y + r() * h2, rr = 10 + r() * 20;
+      for (let k = 0; k <= 12; k++) {
+        const a = k / 12 * Math.PI * 2, q2 = rr * (0.7 + r() * 0.5);
+        if (k) g.lineTo(cx + Math.cos(a) * q2, cy + Math.sin(a) * q2);
+        else g.moveTo(cx + Math.cos(a) * q2, cy + Math.sin(a) * q2);
+      }
+      g.closePath();
+      g.fill();
+    }
+  }
+  function egg(g, x, y, s) {
+    g.beginPath();
+    g.ellipse(x, y, s * 0.36, s * 0.48, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+  function jug(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x - s * 0.3, y - s * 0.55);
+    g.lineTo(x + s * 0.3, y - s * 0.55);
+    g.lineTo(x + s * 0.32, y - s * 0.35);
+    g.quadraticCurveTo(x + s * 0.55, y - s * 0.1, x + s * 0.5, y + s * 0.5);
+    g.lineTo(x - s * 0.5, y + s * 0.5);
+    g.quadraticCurveTo(x - s * 0.55, y - s * 0.1, x - s * 0.32, y - s * 0.35);
+    g.closePath();
+    g.fill();
+  }
+  function padlock(g, x, y, s) {
+    g.lineWidth = s * 0.14;
+    g.beginPath();
+    g.arc(x, y - s * 0.25, s * 0.32, Math.PI, 0);
+    g.stroke();
+    heart(g, x, y + s * 0.38, s * 0.62);
+    g.fill();
+    const fs = g.fillStyle;
+    g.fillStyle = "#fff";
+    g.beginPath();
+    g.arc(x, y + s * 0.18, s * 0.08, 0, Math.PI * 2);
+    g.fill();
+    g.fillRect(x - s * 0.03, y + s * 0.2, s * 0.06, s * 0.18);
+    g.fillStyle = fs;
+  }
+  function key(g, x, y, s) {
+    g.lineWidth = s * 0.1;
+    g.beginPath();
+    g.arc(x, y, s * 0.22, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x + s * 0.22, y);
+    g.lineTo(x + s * 0.95, y);
+    g.lineTo(x + s * 0.95, y + s * 0.18);
+    g.moveTo(x + s * 0.75, y);
+    g.lineTo(x + s * 0.75, y + s * 0.14);
+    g.stroke();
+  }
+  function target(g, x, y, s) {
+    g.lineWidth = s * 0.07;
+    for (const k of [1, 0.68, 0.36]) {
+      g.beginPath();
+      g.arc(x, y, s * k, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.beginPath();
+    g.arc(x, y, s * 0.12, 0, Math.PI * 2);
+    g.fill();
+  }
+  function pigRing(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.arc(x, y, s, 0, Math.PI * 2);
+    g.stroke();
+    snout(g, x, y, s * 0.55);
+  }
+  function wolfMark(g, x, y, s) {
+    g.lineWidth = s * 0.12;
+    g.beginPath();
+    g.arc(x, y, s, Math.PI * 0.62, Math.PI * 1.88);
+    g.arc(x + s * 0.32, y - s * 0.12, s * 0.78, Math.PI * 1.75, Math.PI * 0.72, true);
+    g.closePath();
+    g.stroke();
+    paw(g, x - s * 0.15, y + s * 0.08, s * 0.5);
+  }
+  function daggers(g, x, y, s) {
+    g.lineWidth = s * 0.09;
+    g.lineCap = "round";
+    for (const d of [-1, 1]) {
+      g.beginPath();
+      g.moveTo(x - d * s * 0.7, y - s * 0.7);
+      g.lineTo(x + d * s * 0.55, y + s * 0.55);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x + d * s * 0.32 - s * 0.18, y + s * 0.32 + d * s * 0.18 * 0);
+      g.lineTo(x + d * s * 0.32 + s * 0.18, y + s * 0.32);
+      g.stroke();
+    }
+  }
+  var IMG = {};
+  function loadImg(src) {
+    return new Promise((res) => {
+      const i = new Image();
+      i.crossOrigin = "anonymous";
+      i.onload = () => res(i);
+      i.onerror = () => res(null);
+      i.src = src;
+    });
+  }
+  function crop(img2, sx, sy, sw, sh, erase) {
+    const c = document.createElement("canvas");
+    c.width = sw;
+    c.height = sh;
+    const cg = c.getContext("2d");
+    cg.drawImage(img2, sx, sy, sw, sh, 0, 0, sw, sh);
+    if (erase) {
+      cg.globalCompositeOperation = "destination-out";
+      for (const [x, y, w, h2] of erase) cg.fillRect(x - sx, y - sy, w, h2);
+    }
+    return c;
+  }
+  async function loadLogo() {
+    const mark = await loadImg(LOGO_HOST + "brand-mark.png"), full = await loadImg(LOGO_HOST + "brand-full.png");
+    IMG.mark = mark;
+    IMG.full = full;
+    IMG.letters = crop(mark, 0, 0, 205, 168, [[154, 121, 14, 15], [149, 135, 60, 40], [140, 148, 20, 30]]);
+    IMG.bell = crop(mark, 128, 150, 66, 70);
+    IMG.bellOnly = crop(mark, 128, 158, 66, 62);
+    const GAP = [[112, 0], [112, 30], [113, 72], [110, 84], [107, 96], [105, 108], [101, 120], [96, 128], [90, 168]];
+    const half = (left2) => {
+      const c = document.createElement("canvas");
+      c.width = 205;
+      c.height = 168;
+      const cg = c.getContext("2d");
+      cg.beginPath();
+      cg.moveTo(left2 ? 0 : 205, 0);
+      for (const [x, y] of GAP) cg.lineTo(x, y);
+      cg.lineTo(left2 ? 0 : 205, 168);
+      cg.closePath();
+      cg.clip();
+      cg.drawImage(IMG.letters, 0, 0);
+      return c;
+    };
+    IMG.b1 = half(true);
+    IMG.b2 = half(false);
+  }
+  function bigS(apart) {
+    const i = 14, k = 1, r = 44 + 2.6 * i, sag = 0.06 + 0.22 * k, top = 1.34 + 0.16 * k;
+    return { k, r, sag, top, bx: r * (1.03 - 0.13 * k) * (apart || 1), by: r * top };
+  }
+  function titPt(S3, s, t) {
+    const sn = Math.sin(t), cs = Math.cos(t);
+    if (sn >= 0) return [s * S3.bx + S3.r * cs * (1 + S3.sag * 0.3 * sn * sn) + s * S3.r * 0.06 * S3.k * sn * sn, S3.by + S3.r * sn * (1 + S3.sag)];
+    const up = -sn;
+    return [s * S3.bx + S3.r * cs * (1 - 0.5 * up * up) - s * S3.r * 0.2 * up * up, S3.by - S3.r * S3.top * up];
+  }
+  function titArc(g, S3, s, ox, oy, sc, a0, a1) {
+    g.beginPath();
+    for (let j = 0; j <= 120; j++) {
+      let t = (a0 + (a1 - a0) * j / 120) * Math.PI;
+      if (s < 0) t = Math.PI - t;
+      const p = titPt(S3, s, t), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      if (j) g.lineTo(X, Y);
+      else g.moveTo(X, Y);
+    }
+  }
+  function titPath(g, S3, s, ox, oy, sc) {
+    g.beginPath();
+    for (let j = 0; j <= 160; j++) {
+      const p = titPt(S3, s, j / 160 * Math.PI * 2), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      if (j) g.lineTo(X, Y);
+      else g.moveTo(X, Y);
+    }
+    g.closePath();
+  }
+  function ownSide(g, s, ox, f) {
+    g.save();
+    g.beginPath();
+    if (s < 0) g.rect(-9999, -9999, 9999 + ox, 99999);
+    else g.rect(ox, -9999, 9999, 99999);
+    g.clip();
+    f();
+    g.restore();
+  }
+  var DRIPS = [];
+  function dripFrom(g, w, h2, x0, x1, seed, n) {
+    const data = g.getImageData(0, 0, w, h2).data, r = rng(seed), lows = [];
+    for (let x = x0; x < x1; x += 3) {
+      for (let y = h2 - 1; y > 0; y--) if (data[(y * w + x) * 4 + 3] > 140) {
+        lows.push([x, y]);
+        break;
+      }
+    }
+    const picked = [];
+    for (const [x, y] of lows) if (r() < n / lows.length * 1.6 && !picked.some(([px]) => Math.abs(px - x) < 16)) picked.push([x, y]);
+    DRIPS.length = 0;
+    for (const [x, y] of picked) {
+      const wd = 8 + r() * 6, len = r() < 0.3 ? 4 + r() * 8 : 16 + Math.pow(r(), 1.4) * 58, wob = (r() - 0.5) * 3;
+      g.beginPath();
+      g.moveTo(x - wd * 1.5, y - 2);
+      g.quadraticCurveTo(x - wd * 0.5, y, x - wd * 0.45, y + Math.min(len, wd * 1.2));
+      g.bezierCurveTo(x - wd * 0.42 + wob, y + len * 0.6, x - wd * 0.5, y + len * 0.85, x - wd * 0.62, y + len);
+      g.arc(x, y + len, wd * 0.62, Math.PI, 0, true);
+      g.bezierCurveTo(x + wd * 0.5, y + len * 0.85, x + wd * 0.42 + wob, y + len * 0.6, x + wd * 0.45, y + Math.min(len, wd * 1.2));
+      g.quadraticCurveTo(x + wd * 0.5, y, x + wd * 1.5, y - 2);
+      g.closePath();
+      g.fill();
+      DRIPS.push([x, y, wd, len]);
+    }
+  }
+  function logo(g, which, cx, cy, h2, col) {
+    const src = IMG[which], s = h2 / src.height, w = src.width * s;
+    const c = document.createElement("canvas");
+    c.width = Math.ceil(w);
+    c.height = Math.ceil(h2);
+    const cg = c.getContext("2d");
+    cg.drawImage(src, 0, 0, w, h2);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col || INK;
+    cg.fillRect(0, 0, c.width, c.height);
+    g.drawImage(c, cx - w / 2, cy - h2 / 2);
+    return w;
+  }
+  function arcTextLow(g, t, cx, textY, R, font, size) {
+    g.font = size + "px " + fontOf(font);
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY - R;
+    let a = Math.PI / 2 + span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a - da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid - Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a -= da;
+    }
+  }
+  function boneShape(g, cx, cy, w, h2) {
+    const r = h2 * 0.36, L = cx - w / 2 + r, R = cx + w / 2 - r;
+    g.beginPath();
+    g.rect(L, cy - h2 * 0.3, R - L, h2 * 0.6);
+    for (const [x, y] of [[L, cy - h2 * 0.26], [L, cy + h2 * 0.26], [R, cy - h2 * 0.26], [R, cy + h2 * 0.26]]) {
+      g.moveTo(x + r, y);
+      g.arc(x, y, r, 0, Math.PI * 2);
+    }
+  }
+  function boneOutline(g, cx, cy, w, h2, lw) {
+    boneShape(g, cx, cy, w, h2);
+    g.fill("nonzero");
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    boneShape(g, cx, cy, w - lw * 2, h2 - lw * 2);
+    g.fill("nonzero");
+    g.restore();
+  }
+  function cut(g, f) {
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    f();
+    g.restore();
+  }
+  function earTag(g, cx, top, w, h2) {
+    g.beginPath();
+    g.roundRect(cx - w * 0.18, top, w * 0.36, h2 * 0.34, 14);
+    g.roundRect(cx - w / 2, top + h2 * 0.24, w, h2 * 0.76, 26);
+  }
+  function rosette(g, cx, cy, r, ring, tails, mid) {
+    g.fillStyle = tails;
+    for (const d of [-1, 1]) {
+      g.beginPath();
+      g.moveTo(cx + d * r * 0.15, cy + r * 0.3);
+      g.lineTo(cx + d * r * 0.75, cy + r * 1.55);
+      g.lineTo(cx + d * r * 0.45, cy + r * 1.35);
+      g.lineTo(cx + d * r * 0.25, cy + r * 1.62);
+      g.lineTo(cx - d * r * 0.2, cy + r * 0.45);
+      g.closePath();
+      g.fill();
+    }
+    g.fillStyle = ring;
+    for (let i = 0; i < 22; i++) {
+      const a = i / 22 * Math.PI * 2;
+      g.beginPath();
+      g.arc(cx + Math.cos(a) * r * 0.86, cy + Math.sin(a) * r * 0.86, r * 0.2, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.beginPath();
+    g.arc(cx, cy, r * 0.88, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = mid;
+    g.beginPath();
+    g.arc(cx, cy, r * 0.62, 0, Math.PI * 2);
+    g.fill();
+  }
+  function flourish(g, x, y, s, d) {
+    g.lineCap = "round";
+    g.lineWidth = s * 0.07;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.bezierCurveTo(x + d * s * 0.6, y - s * 0.5, x + d * s * 1.2, y + s * 0.3, x + d * s * 1.6, y - s * 0.1);
+    g.bezierCurveTo(x + d * s * 1.8, y - s * 0.25, x + d * s * 1.65, y - s * 0.45, x + d * s * 1.5, y - s * 0.32);
+    g.stroke();
+    g.lineWidth = s * 0.045;
+    g.beginPath();
+    g.moveTo(x + d * s * 0.3, y + s * 0.12);
+    g.bezierCurveTo(x + d * s * 0.8, y + s * 0.55, x + d * s * 1.3, y + s * 0.45, x + d * s * 1.55, y + s * 0.22);
+    g.stroke();
+    g.beginPath();
+    g.arc(x + d * s * 1.62, y + s * 0.2, s * 0.06, 0, Math.PI * 2);
+    g.fill();
+  }
+  function stamp(g, ink, x0, y0, col, seed) {
+    const c = document.createElement("canvas");
+    c.width = ink.width;
+    c.height = ink.height;
+    const cg = c.getContext("2d");
+    cg.drawImage(ink, 0, 0);
+    cg.globalCompositeOperation = "source-in";
+    cg.fillStyle = col;
+    cg.fillRect(0, 0, c.width, c.height);
+    cg.globalCompositeOperation = "destination-out";
+    const r = rng(seed);
+    for (let i = 0; i < 1400; i++) {
+      cg.globalAlpha = 0.3 + r() * 0.7;
+      cg.beginPath();
+      cg.arc(r() * c.width, r() * c.height, 0.5 + r() * 1.8, 0, Math.PI * 2);
+      cg.fill();
+    }
+    for (let i = 0; i < 5; i++) {
+      cg.globalAlpha = 0.18 + r() * 0.2;
+      cg.fillRect(0, r() * c.height, c.width, 6 + r() * 16);
+    }
+    g.globalCompositeOperation = "multiply";
+    g.globalAlpha = 0.9;
+    g.drawImage(c, x0, y0);
+    g.globalCompositeOperation = "source-over";
+    g.globalAlpha = 1;
+  }
+  function welt(g, ink, x0, y0) {
+    const w = ink.width, h2 = ink.height, tint = (col, blur, a, op) => {
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h2;
+      const cg = c.getContext("2d");
+      cg.filter = blur ? "blur(" + blur + "px)" : "none";
+      cg.drawImage(ink, 0, 0);
+      cg.filter = "none";
+      cg.globalCompositeOperation = "source-in";
+      cg.fillStyle = col;
+      cg.fillRect(0, 0, w, h2);
+      g.globalCompositeOperation = op || "source-over";
+      g.globalAlpha = a;
+      g.drawImage(c, x0, y0);
+      g.globalAlpha = 1;
+      g.globalCompositeOperation = "source-over";
+    };
+    tint("#c22f3a", 9, 0.55, "multiply");
+    tint("#d8434c", 3, 0.5, "multiply");
+    tint("#ff8f8a", 2, 0.22);
+  }
+  function upArrow(g, x, y0, y1, wd) {
+    g.lineWidth = wd;
+    g.lineCap = "butt";
+    g.beginPath();
+    g.moveTo(x, y1);
+    g.lineTo(x, y0 + wd * 2);
+    g.stroke();
+    g.beginPath();
+    g.moveTo(x - wd * 2.4, y0 + wd * 2.6);
+    g.lineTo(x, y0);
+    g.lineTo(x + wd * 2.4, y0 + wd * 2.6);
+    g.closePath();
+    g.fill();
+  }
+  function star(g, x, y, r) {
+    g.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / 5, q2 = i % 2 ? r * 0.45 : r;
+      if (i) g.lineTo(x + Math.cos(a) * q2, y + Math.sin(a) * q2);
+      else g.moveTo(x + Math.cos(a) * q2, y + Math.sin(a) * q2);
+    }
+    g.closePath();
+  }
+  function drop(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y - s);
+    g.bezierCurveTo(x + s * 0.2, y - s * 0.5, x + s * 0.7, y - s * 0.05, x + s * 0.7, y + s * 0.35);
+    g.arc(x, y + s * 0.35, s * 0.7, 0, Math.PI);
+    g.bezierCurveTo(x - s * 0.7, y - s * 0.05, x - s * 0.2, y - s * 0.5, x, y - s);
+    g.closePath();
+    g.fill();
+  }
+  function lips(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    g.beginPath();
+    g.moveTo(-s, 0);
+    g.bezierCurveTo(-s * 0.6, -s * 0.55, -s * 0.25, -s * 0.6, 0, -s * 0.28);
+    g.bezierCurveTo(s * 0.25, -s * 0.6, s * 0.6, -s * 0.55, s, 0);
+    g.bezierCurveTo(s * 0.5, -s * 0.1, -s * 0.5, -s * 0.1, -s, 0);
+    g.fill();
+    g.beginPath();
+    g.moveTo(-s, s * 0.03);
+    g.bezierCurveTo(-s * 0.5, s * 0.1, s * 0.5, s * 0.1, s, s * 0.03);
+    g.bezierCurveTo(s * 0.6, s * 0.66, -s * 0.6, s * 0.66, -s, s * 0.03);
+    g.fill();
+    g.globalCompositeOperation = "destination-out";
+    g.lineWidth = Math.max(1, s * 0.035);
+    g.lineCap = "round";
+    for (let i = -4; i <= 4; i++) {
+      g.beginPath();
+      g.moveTo(i * s * 0.17, s * 0.14);
+      g.lineTo(i * s * 0.2, s * 0.44);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(i * s * 0.15, -s * 0.1);
+      g.lineTo(i * s * 0.18, -s * 0.34);
+      g.stroke();
+    }
+    g.restore();
+  }
+  function care(g, kind, x, y) {
+    g.lineWidth = 2.6;
+    g.lineJoin = "round";
+    if (kind === "tub") {
+      g.beginPath();
+      g.moveTo(x - 17, y - 9);
+      g.lineTo(x - 13, y + 12);
+      g.lineTo(x + 13, y + 12);
+      g.lineTo(x + 17, y - 9);
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x - 15, y - 4);
+      g.quadraticCurveTo(x - 8, y - 9, x - 2, y - 4);
+      g.quadraticCurveTo(x + 6, y + 1, x + 15, y - 4);
+      g.stroke();
+      g.font = "bold 11px Arial";
+      g.textAlign = "center";
+      g.textBaseline = "middle";
+      g.fillText("69", x, y + 5);
+    }
+    if (kind === "noBleach") {
+      g.beginPath();
+      g.moveTo(x, y - 12);
+      g.lineTo(x + 15, y + 12);
+      g.lineTo(x - 15, y + 12);
+      g.closePath();
+      g.stroke();
+      g.beginPath();
+      g.moveTo(x - 15, y - 12);
+      g.lineTo(x + 15, y + 14);
+      g.moveTo(x + 15, y - 12);
+      g.lineTo(x - 15, y + 14);
+      g.stroke();
+    }
+    if (kind === "tumble") {
+      g.strokeRect(x - 13, y - 13, 26, 26);
+      g.beginPath();
+      g.arc(x, y, 9, 0, Math.PI * 2);
+      g.stroke();
+      for (const d of [-3, 3]) {
+        g.beginPath();
+        g.arc(x + d, y, 1.6, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+    if (kind === "noDry") {
+      g.strokeRect(x - 13, y - 13, 26, 26);
+      g.beginPath();
+      g.moveTo(x - 13, y - 13);
+      g.lineTo(x + 13, y + 13);
+      g.moveTo(x + 13, y - 13);
+      g.lineTo(x - 13, y + 13);
+      g.stroke();
+    }
+  }
+  function qr(g, x, y, cell, seed) {
+    const N2 = 21, r = rng(seed), finder = (cx, cy) => {
+      g.fillRect(x + cx * cell, y + cy * cell, 7 * cell, 7 * cell);
+      g.save();
+      g.globalCompositeOperation = "destination-out";
+      g.fillRect(x + (cx + 1) * cell, y + (cy + 1) * cell, 5 * cell, 5 * cell);
+      g.restore();
+      g.fillRect(x + (cx + 2) * cell, y + (cy + 2) * cell, 3 * cell, 3 * cell);
+    };
+    for (let i = 0; i < N2; i++) for (let j = 0; j < N2; j++) {
+      const inF = i < 8 && j < 8 || i > N2 - 9 && j < 8 || i < 8 && j > N2 - 9;
+      if (!inF && r() < 0.48) g.fillRect(x + i * cell, y + j * cell, cell, cell);
+    }
+    finder(0, 0);
+    finder(N2 - 7, 0);
+    finder(0, N2 - 7);
+  }
+  var YEL = "#efc02a";
+  var YEL2 = "#c4950f";
+  var GRN = "#3f8a2e";
+  var RED2 = "#d42020";
+  function banner(g, cx, cy, bw, bh, col, tail, t, font, size) {
+    const L = cx - bw / 2, R = cx + bw / 2;
+    for (const d of [-1, 1]) {
+      const x0 = d < 0 ? L : R;
+      g.beginPath();
+      g.moveTo(x0 - d * 12, cy - bh * 0.15);
+      g.lineTo(x0 + d * bh * 1.05, cy - bh * 0.15);
+      g.lineTo(x0 + d * bh * 0.62, cy + bh * 0.38);
+      g.lineTo(x0 + d * bh * 1.05, cy + bh * 0.9);
+      g.lineTo(x0 - d * 12, cy + bh * 0.9);
+      g.closePath();
+      g.fillStyle = tail;
+      g.fill();
+      g.strokeStyle = INK;
+      g.lineWidth = 3;
+      g.lineJoin = "round";
+      g.stroke();
+    }
+    g.beginPath();
+    g.moveTo(L, cy - bh / 2);
+    g.quadraticCurveTo(cx, cy - bh / 2 - 12, R, cy - bh / 2);
+    g.lineTo(R, cy + bh / 2);
+    g.quadraticCurveTo(cx, cy + bh / 2 - 12, L, cy + bh / 2);
+    g.closePath();
+    g.fillStyle = col;
+    g.fill();
+    g.strokeStyle = INK;
+    g.lineWidth = 3.5;
+    g.stroke();
+    g.fillStyle = INK;
+    text(g, t, cx, cy - 5, font, size, { max: bw - 22 });
+  }
+  function canine(g, x, y, L, a) {
+    const hh = L * 0.13, pt = (u, v) => [x + Math.cos(a) * u - Math.sin(a) * v, y + Math.sin(a) * u + Math.cos(a) * v];
+    const P5 = [];
+    const M = (u, v) => P5.push(pt(u, v));
+    g.beginPath();
+    let p = pt(0, -hh * 0.7);
+    g.moveTo(p[0], p[1]);
+    const seg = (c1, c2, e) => {
+      const a1 = pt(...c1), a2 = pt(...c2), b = pt(...e);
+      g.bezierCurveTo(a1[0], a1[1], a2[0], a2[1], b[0], b[1]);
+    };
+    seg([L * 0.04, -hh * 1.6], [L * 0.26, -hh * 1.7], [L * 0.32, -hh * 0.82]);
+    seg([L * 0.55, -hh * 0.9], [L * 0.86, -hh * 0.62], [L, 0]);
+    seg([L * 0.86, hh * 0.62], [L * 0.55, hh * 0.9], [L * 0.32, hh * 0.82]);
+    seg([L * 0.26, hh * 1.7], [L * 0.04, hh * 1.6], [0, hh * 0.7]);
+    g.closePath();
+  }
+  function flash(g, path, col, lw) {
+    path();
+    g.fillStyle = col;
+    g.fill();
+    path();
+    g.strokeStyle = INK;
+    g.lineWidth = lw || 4;
+    g.lineJoin = "round";
+    g.stroke();
+  }
+  function speckle(g, seed, n, w, h2) {
+    const r = rng(seed);
+    g.save();
+    g.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < n; i++) {
+      g.globalAlpha = 0.4 + r() * 0.6;
+      g.beginPath();
+      g.arc(r() * w, r() * h2, 0.5 + r() * 1.6, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.restore();
+  }
+  function paisley(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    const shape = (k) => {
+      g.beginPath();
+      g.moveTo(0, -s * k);
+      g.bezierCurveTo(s * 0.95 * k, -s * 0.85 * k, s * 0.9 * k, s * 0.65 * k, 0, s * 0.72 * k);
+      g.bezierCurveTo(-s * 0.72 * k, s * 0.75 * k, -s * 0.82 * k, 0, -s * 0.22 * k, -s * 0.22 * k);
+      g.quadraticCurveTo(-s * 0.04 * k, -s * 0.5 * k, 0, -s * k);
+    };
+    g.lineWidth = 2.6;
+    shape(1);
+    g.stroke();
+    g.lineWidth = 1.5;
+    shape(0.62);
+    g.stroke();
+    g.beginPath();
+    g.arc(s * 0.08, s * 0.12, s * 0.12, 0, Math.PI * 2);
+    g.fill();
+    for (let i = 0; i < 9; i++) {
+      const a = -0.3 + i * 0.36;
+      g.beginPath();
+      g.arc(Math.cos(a) * s * 1.05 + s * 0.1, Math.sin(a) * s * 1 + s * 0.05, 1.5, 0, Math.PI * 2);
+      g.fill();
+    }
+    g.restore();
+  }
+  function leaf(g, x, y, s, rot) {
+    g.save();
+    g.translate(x, y);
+    g.rotate(rot);
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.quadraticCurveTo(s * 0.5, -s * 0.45, s, 0);
+    g.quadraticCurveTo(s * 0.5, s * 0.45, 0, 0);
+    g.fill();
+    g.restore();
+  }
+  function blossom(g, x, y, s, petals) {
+    g.lineWidth = 1.8;
+    for (let i = 0; i < (petals || 8); i++) {
+      const a = i / (petals || 8) * Math.PI * 2;
+      g.beginPath();
+      g.ellipse(x + Math.cos(a) * s * 0.55, y + Math.sin(a) * s * 0.55, s * 0.42, s * 0.2, a, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.beginPath();
+    g.arc(x, y, s * 0.18, 0, Math.PI * 2);
+    g.fill();
+  }
+  function shield(g, cx, cy, W16, H) {
+    const t = cy - H / 2, L = cx - W16 / 2, R = cx + W16 / 2;
+    g.beginPath();
+    g.moveTo(L + 14, t);
+    g.lineTo(R - 14, t);
+    g.quadraticCurveTo(R, t, R, t + 14);
+    g.lineTo(R, cy + H * 0.1);
+    g.quadraticCurveTo(R - 8, cy + H * 0.36, cx, cy + H / 2);
+    g.quadraticCurveTo(L + 8, cy + H * 0.36, L, cy + H * 0.1);
+    g.lineTo(L, t + 14);
+    g.quadraticCurveTo(L, t, L + 14, t);
+    g.closePath();
+  }
+  function speciesBrand(word, icon) {
+    return (g, w, h2) => {
+      const cx = w / 2, cy = h2 / 2 + 2;
+      g.fillStyle = INK;
+      g.strokeStyle = INK;
+      g.lineWidth = 8;
+      shield(g, cx, cy, 172, 206);
+      g.stroke();
+      icon(g, cx, cy - 30);
+      text(g, word, cx, cy + 44, "Black Ops One", 29, { max: 132 });
+    };
+  }
+  var ICON = {
+    cow: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 18, y - 18);
+        g.quadraticCurveTo(x + d * 58, y - 22, x + d * 52, y - 56);
+        g.quadraticCurveTo(x + d * 44, y - 30, x + d * 12, y - 6);
+        g.closePath();
+        g.fill();
+        g.beginPath();
+        g.ellipse(x + d * 40, y - 4, 16, 7, d * 0.35, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 4, 26, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      g.beginPath();
+      g.ellipse(x, y + 28, 23, 14, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 9, y + 29, 3.6, 5, 0, 0, Math.PI * 2);
+          g.fill();
+          g.beginPath();
+          g.arc(x + d * 12, y - 2, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    horse: (g, x, y) => {
+      g.lineCap = "butt";
+      g.lineWidth = 22;
+      g.beginPath();
+      g.arc(x, y - 4, 36, -0.12 * Math.PI, 1.12 * Math.PI);
+      g.stroke();
+      cut(g, () => {
+        for (let i = 0; i < 6; i++) {
+          const a = -0.03 * Math.PI + i * (1.06 * Math.PI / 5);
+          g.beginPath();
+          g.arc(x + Math.cos(a) * 36, y - 4 + Math.sin(a) * 36, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    dog: (g, x, y) => paw(g, x, y + 4, 72),
+    pig: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x, y, 42, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 13, y, 6.5, 11, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    fox: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 30, y + 34);
+      g.bezierCurveTo(x - 64, y - 6, x - 16, y - 56, x + 44, y - 42);
+      g.bezierCurveTo(x + 6, y - 30, x - 22, y - 2, x - 8, y + 34);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(x + 10, y - 50);
+        g.lineTo(x + 4, y - 40);
+        g.lineTo(x + 14, y - 36);
+        g.lineTo(x + 8, y - 26);
+        g.stroke();
+      });
+    },
+    bunny: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 15, y - 26, 10, 30, d * 0.18, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 16, 32, 26, 0, 0, Math.PI * 2);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.arc(x + d * 12, y + 12, 3.6, 0, Math.PI * 2);
+          g.fill();
+        }
+        heart(g, x, y + 24, 5);
+        g.fill();
+      });
+    },
+    cat: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x, y + 8, 38, 30, 0, 0, Math.PI * 2);
+      g.fill();
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 36, y - 6);
+        g.lineTo(x + d * 38, y - 40);
+        g.lineTo(x + d * 8, y - 18);
+        g.closePath();
+        g.fill();
+      }
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 14, y + 4, 4, 7, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.beginPath();
+        g.moveTo(x - 5, y + 16);
+        g.lineTo(x + 5, y + 16);
+        g.lineTo(x, y + 21);
+        g.closePath();
+        g.fill();
+        g.lineWidth = 2;
+        for (const d of [-1, 1]) for (const k of [-1, 1]) {
+          g.beginPath();
+          g.moveTo(x + d * 14, y + 22 + k * 3);
+          g.lineTo(x + d * 34, y + 20 + k * 7);
+          g.stroke();
+        }
+      });
+    },
+    dragon: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 44, y + 26);
+      g.lineTo(x - 30, y - 36);
+      g.lineTo(x + 48, y - 44);
+      g.quadraticCurveTo(x + 30, y - 14, x + 40, y + 4);
+      g.quadraticCurveTo(x + 14, y + 2, x + 16, y + 30);
+      g.quadraticCurveTo(x - 10, y + 16, x - 44, y + 26);
+      g.closePath();
+      g.fill();
+      g.beginPath();
+      g.moveTo(x - 30, y - 36);
+      g.lineTo(x - 38, y - 50);
+      g.lineTo(x - 22, y - 40);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.moveTo(x - 28, y - 32);
+        g.lineTo(x + 36, y + 2);
+        g.moveTo(x - 30, y - 28);
+        g.lineTo(x + 14, y + 26);
+        g.stroke();
+      });
+    }
+  };
+  function swallow(g, x, y, s, flip) {
+    g.save();
+    g.translate(x, y);
+    g.scale(flip ? -1 : 1, 1);
+    const body2 = () => {
+      g.beginPath();
+      g.moveTo(s * 0.9, -s * 0.02);
+      g.quadraticCurveTo(s * 0.62, -s * 0.3, s * 0.28, -s * 0.2);
+      g.quadraticCurveTo(-s * 0.1, -s * 0.12, -s * 0.42, -s * 0.06);
+      g.lineTo(-s * 1.25, -s * 0.36);
+      g.lineTo(-s * 0.7, s * 0.03);
+      g.lineTo(-s * 1.2, s * 0.3);
+      g.lineTo(-s * 0.38, s * 0.14);
+      g.quadraticCurveTo(s * 0.35, s * 0.34, s * 0.9, -s * 0.02);
+      g.closePath();
+    };
+    const wing = () => {
+      g.beginPath();
+      g.moveTo(s * 0.3, -s * 0.18);
+      g.quadraticCurveTo(s * 0, -s * 0.95, -s * 0.75, -s * 1.05);
+      g.quadraticCurveTo(-s * 0.35, -s * 0.6, -s * 0.18, -s * 0.08);
+      g.closePath();
+    };
+    flash(g, body2, "#2a5fb0", 3);
+    g.save();
+    body2();
+    g.clip();
+    g.fillStyle = "#d8261f";
+    g.beginPath();
+    g.ellipse(s * 0.3, s * 0.14, s * 0.42, s * 0.2, 0.15, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    body2();
+    g.strokeStyle = INK;
+    g.lineWidth = 3;
+    g.stroke();
+    flash(g, wing, "#2a5fb0", 3);
+    g.fillStyle = INK;
+    g.beginPath();
+    g.arc(s * 0.6, -s * 0.12, s * 0.05, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+  }
+  function rope(g, pts) {
+    const seg = (f) => {
+      for (let i = 0; i < pts.length - 1; i++) f(pts[i], pts[i + 1]);
+    };
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.strokeStyle = INK;
+    g.lineWidth = 11;
+    g.beginPath();
+    g.moveTo(pts[0][0], pts[0][1]);
+    for (const p of pts.slice(1)) g.lineTo(p[0], p[1]);
+    g.stroke();
+    cut(g, () => {
+      g.lineWidth = 6.5;
+      g.beginPath();
+      g.moveTo(pts[0][0], pts[0][1]);
+      for (const p of pts.slice(1)) g.lineTo(p[0], p[1]);
+      g.stroke();
+    });
+    g.lineWidth = 1.6;
+    seg(([x0, y0], [x1, y1]) => {
+      const L = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / L, uy = (y1 - y0) / L;
+      for (let t = 5; t < L - 3; t += 7) {
+        const x = x0 + ux * t, y = y0 + uy * t;
+        g.beginPath();
+        g.moveTo(x - uy * 4 - ux * 2.5, y + ux * 4 - uy * 2.5);
+        g.lineTo(x + uy * 4 + ux * 2.5, y - ux * 4 + uy * 2.5);
+        g.stroke();
+      }
+    });
+  }
+  function tie(g, x, y) {
+    g.fillStyle = INK;
+    g.beginPath();
+    g.ellipse(x, y, 9, 7, 0.3, 0, Math.PI * 2);
+    g.fill();
+    cut(g, () => {
+      g.lineWidth = 1.5;
+      g.beginPath();
+      g.moveTo(x - 5, y - 3);
+      g.lineTo(x + 5, y + 3);
+      g.stroke();
+    });
+  }
+  Object.assign(ICON, {
+    goat: (g, x, y) => {
+      g.lineCap = "round";
+      g.lineWidth = 9;
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.moveTo(x + d * 10, y - 22);
+        g.bezierCurveTo(x + d * 18, y - 56, x + d * 50, y - 54, x + d * 46, y - 22);
+        g.stroke();
+        g.beginPath();
+        g.ellipse(x + d * 32, y - 6, 15, 6, d * 0.4, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.moveTo(x - 20, y - 18);
+      g.quadraticCurveTo(x, y - 30, x + 20, y - 18);
+      g.quadraticCurveTo(x + 18, y + 18, x + 8, y + 30);
+      g.lineTo(x - 8, y + 30);
+      g.quadraticCurveTo(x - 18, y + 18, x - 20, y - 18);
+      g.fill();
+      g.beginPath();
+      g.moveTo(x - 8, y + 26);
+      g.lineTo(x + 8, y + 26);
+      g.lineTo(x, y + 50);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 9, y - 4, 4, 2.6, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    sheep: (g, x, y) => {
+      for (const [dx, dy, r] of [[-28, -24, 15], [-12, -34, 16], [8, -35, 16], [26, -26, 15], [36, -10, 12], [-36, -10, 12]]) {
+        g.beginPath();
+        g.arc(x + dx, y + dy, r, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.ellipse(x, y + 8, 20, 28, 0, 0, Math.PI * 2);
+      g.fill();
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 30, y + 4, 14, 6, d * 0.3, 0, Math.PI * 2);
+        g.fill();
+      }
+      cut(g, () => {
+        g.lineWidth = 2.5;
+        for (const [dx, dy] of [[-20, -26], [0, -34], [20, -26]]) {
+          g.beginPath();
+          g.arc(x + dx, y + dy, 6, 0.2, 2.8);
+          g.stroke();
+        }
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.arc(x + d * 8, y + 2, 3.2, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    wolf: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x, y + 40);
+      g.lineTo(x - 14, y + 26);
+      g.lineTo(x - 34, y + 10);
+      g.lineTo(x - 40, y - 8);
+      g.lineTo(x - 36, y - 48);
+      g.lineTo(x - 16, y - 26);
+      g.lineTo(x, y - 30);
+      g.lineTo(x + 16, y - 26);
+      g.lineTo(x + 36, y - 48);
+      g.lineTo(x + 40, y - 8);
+      g.lineTo(x + 34, y + 10);
+      g.lineTo(x + 14, y + 26);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.moveTo(x + d * 8, y - 4);
+          g.lineTo(x + d * 24, y - 10);
+          g.lineTo(x + d * 20, y - 2);
+          g.closePath();
+          g.fill();
+        }
+        g.beginPath();
+        g.ellipse(x, y + 30, 6, 4, 0, 0, Math.PI * 2);
+        g.fill();
+      });
+    },
+    deer: (g, x, y) => {
+      for (const d of [-1, 1]) {
+        g.beginPath();
+        g.ellipse(x + d * 32, y - 22, 20, 10, d * -0.5, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.beginPath();
+      g.moveTo(x - 22, y - 24);
+      g.quadraticCurveTo(x, y - 36, x + 22, y - 24);
+      g.quadraticCurveTo(x + 24, y + 4, x + 8, y + 36);
+      g.quadraticCurveTo(x, y + 42, x - 8, y + 36);
+      g.quadraticCurveTo(x - 24, y + 4, x - 22, y - 24);
+      g.fill();
+      cut(g, () => {
+        for (const d of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(x + d * 11, y - 8, 4, 5.5, 0, 0, Math.PI * 2);
+          g.fill();
+        }
+        for (const [dx, dy] of [[-6, -22], [6, -24], [0, -14]]) {
+          g.beginPath();
+          g.arc(x + dx, y + dy, 2.2, 0, Math.PI * 2);
+          g.fill();
+        }
+      });
+    },
+    rat: (g, x, y) => {
+      g.beginPath();
+      g.ellipse(x - 4, y + 4, 34, 22, -0.1, 0, Math.PI * 2);
+      g.fill();
+      g.beginPath();
+      g.moveTo(x + 22, y - 10);
+      g.quadraticCurveTo(x + 48, y - 4, x + 54, y + 8);
+      g.quadraticCurveTo(x + 40, y + 18, x + 22, y + 18);
+      g.fill();
+      g.beginPath();
+      g.arc(x + 22, y - 14, 11, 0, Math.PI * 2);
+      g.fill();
+      g.lineWidth = 4;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x - 36, y + 8);
+      g.bezierCurveTo(x - 64, y + 10, x - 60, y - 30, x - 34, y - 34);
+      g.stroke();
+      cut(g, () => {
+        g.beginPath();
+        g.arc(x + 36, y + 2, 2.6, 0, Math.PI * 2);
+        g.fill();
+        g.beginPath();
+        g.arc(x + 22, y - 14, 5, 0, Math.PI * 2);
+        g.fill();
+      });
+    },
+    goblin: (g, x, y) => {
+      g.beginPath();
+      g.moveTo(x - 26, y + 30);
+      g.quadraticCurveTo(x - 30, y - 2, x - 10, y - 14);
+      g.lineTo(x + 50, y - 46);
+      g.lineTo(x + 34, y - 18);
+      g.lineTo(x + 42, y - 14);
+      g.quadraticCurveTo(x + 18, y + 26, x - 26, y + 30);
+      g.closePath();
+      g.fill();
+      cut(g, () => {
+        g.beginPath();
+        g.moveTo(x - 6, y + 6);
+        g.quadraticCurveTo(x + 8, y - 10, x + 30, y - 22);
+        g.lineWidth = 4;
+        g.stroke();
+      });
+      g.lineWidth = 3.5;
+      g.beginPath();
+      g.arc(x - 18, y + 38, 8, 0, Math.PI * 2);
+      g.stroke();
+    }
+  });
+  function veins(g, x, y, ang, len, wd, depth, r) {
+    if (depth <= 0 || len < 4) return;
+    let px = x, py = y, a = ang;
+    g.lineCap = "round";
+    for (let i = 0; i < 6; i++) {
+      a += (r() - 0.5) * 0.7;
+      const nx = px + Math.cos(a) * len / 6, ny = py + Math.sin(a) * len / 6;
+      g.lineWidth = Math.max(0.6, wd * (1 - i / 7));
+      g.beginPath();
+      g.moveTo(px, py);
+      g.lineTo(nx, ny);
+      g.stroke();
+      px = nx;
+      py = ny;
+      if (r() < 0.32) veins(g, px, py, a + (r() < 0.5 ? -1 : 1) * (0.5 + r() * 0.6), len * 0.55, wd * 0.6, depth - 1, r);
+    }
+  }
+  function corrupted(lines, size, seed) {
+    return (g, w, h2) => {
+      const C2 = "#3a0d52", r = rng(seed);
+      g.fillStyle = C2;
+      g.strokeStyle = C2;
+      const ys = lines.length === 1 ? [h2 / 2] : [h2 / 2 - size * 0.55, h2 / 2 + size * 0.55];
+      let maxW = 0;
+      lines.forEach((t, i) => {
+        const s = text(g, t, w / 2, ys[i], "Pirata One", size, { max: 320 });
+        g.font = s + "px 'Pirata One'";
+        maxW = Math.max(maxW, g.measureText(t).width);
+      });
+      const top = ys[0] - size * 0.42, bot = ys[ys.length - 1] + size * 0.42, L = w / 2 - maxW / 2, R = w / 2 + maxW / 2;
+      for (let i = 0; i < 11; i++) {
+        const side = r();
+        let x, y, a;
+        if (side < 0.35) {
+          x = L + r() * (R - L);
+          y = top;
+          a = -Math.PI / 2;
+        } else if (side < 0.7) {
+          x = L + r() * (R - L);
+          y = bot;
+          a = Math.PI / 2;
+        } else if (side < 0.85) {
+          x = L;
+          y = top + r() * (bot - top);
+          a = Math.PI;
+        } else {
+          x = R;
+          y = top + r() * (bot - top);
+          a = 0;
+        }
+        veins(g, x, y, a + (r() - 0.5) * 0.8, 20 + r() * 30, 2.6, 2, r);
+      }
+    };
+  }
+  function ownWords(t, font, size, col, extra) {
+    return (g, w, h2) => {
+      g.fillStyle = col || INK;
+      g.strokeStyle = col || INK;
+      text(g, t, w / 2, h2 / 2, font, size, { max: 330 });
+      if (extra) extra(g, w, h2);
+    };
+  }
+  var PINKGLOW = "#ff4fd8";
+
+  // shared/ink/live.js
+  var { INK: INK2, YEL: YEL3, YEL2: YEL22, GRN: GRN2, PINKGLOW: PINKGLOW2, CW: CW2, CH: CH2 } = live_art_exports;
+  var GAME_FONT = {
+    "Black Ops One": "'Saira Stencil One', 'Archivo Black', sans-serif",
+    "Stardos Stencil": "'Saira Stencil One', sans-serif",
+    "Rye": "'Archivo Black', serif",
+    "Bungee": "'Archivo Black', sans-serif",
+    "Shrikhand": "'Pacifico', cursive",
+    "Pinyon Script": "'Satisfy', cursive",
+    "Great Vibes": "'Satisfy', cursive",
+    "Permanent Marker": "'Caveat-Bold', 'Caveat', cursive",
+    "Press Start 2P": "'Courier New', monospace",
+    "Special Elite": "'Courier New', monospace",
+    "Sedgwick Ave Display": "'Calligraffitti', cursive",
+    "UnifrakturMaguntia": "'Old English Text MT', serif"
+  };
+  var loadedFonts = /* @__PURE__ */ new Set();
+  setFontOf((f) => (loadedFonts.has(f) ? "'" + f + "', " : "") + (GAME_FONT[f] || "'" + f + "', sans-serif"));
+  var fontCss = (size, f) => size + "px " + ((loadedFonts.has(f) ? "'" + f + "', " : "") + (GAME_FONT[f] || "sans-serif"));
+  var num0 = (v, d, max) => {
+    const x = Number(v);
+    return v === "" || v == null || !Number.isFinite(x) ? d : Math.max(0, Math.min(max || 999999999, Math.round(x)));
+  };
+  var txt0 = (v, d, max) => typeof v === "string" && v.trim() ? v.replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, max || 24) : d;
+  var MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  var dateWord = (ms) => {
+    const d = new Date(Number(ms));
+    return isNaN(d) ? "" : MONTHS[d.getMonth()] + " " + String(d.getDate()).padStart(2, "0");
+  };
+  function cleanValues(v) {
+    const o = {};
+    if (!v || typeof v !== "object") return o;
+    if (v.n != null) {
+      const n = num0(v.n, null, 99999);
+      if (n != null) o.n = n;
+    }
+    if (v.num != null) {
+      const n = num0(v.num, null);
+      if (n != null) o.num = n;
+    }
+    if (typeof v.t === "string") {
+      const t = txt0(v.t, null, 28);
+      if (t) o.t = t;
+    }
+    for (const k2 of ["d", "due"]) if (v[k2] != null) {
+      const n = num0(v[k2], null, 4e12);
+      if (n) o[k2] = n;
+    }
+    if (Array.isArray(v.list)) {
+      const l = v.list.map((x) => txt0(x, null, 16)).filter(Boolean).slice(0, 6);
+      if (l.length) o.list = l;
+    }
+    if (v.more != null) {
+      const n = num0(v.more, null, 9999);
+      if (n) o.more = n;
+    }
+    if (Array.isArray(v.rows)) {
+      const r = v.rows.filter((x) => Array.isArray(x)).map((x) => [txt0(x[0], null, 10), num0(x[1], 0, 999)]).filter((x) => x[0]).slice(0, 4);
+      if (r.length) o.rows = r;
+    }
+    const k = (x, lo, hi) => {
+      const n = Number(x);
+      return Number.isFinite(n) && n > 0 ? Math.round(Math.max(lo, Math.min(hi, n)) * 100) / 100 : null;
+    };
+    if (v.sz != null) {
+      const n = k(v.sz, 0.25, 4);
+      if (n && n !== 1) o.sz = n;
+    }
+    if (v.sw != null) {
+      const n = k(v.sw, 0.5, 2);
+      if (n && n !== 1) o.sw = n;
+    }
+    if (v.sh != null) {
+      const n = k(v.sh, 0.5, 2);
+      if (n && n !== 1) o.sh = n;
+    }
+    return o;
+  }
+  var text2 = text;
+  var pct = (n) => Math.max(0, Math.min(100, n)) / 100;
+  function tallyCount(g, x, y, n, h2, w, font) {
+    tally(g, x, y, Math.min(n, 25), h2);
+  }
+  var LIVE = [
+    {
+      name: "LiveFarmProperty",
+      title: "Farm Property (your number)",
+      sheet: 1,
+      where: "neck or hip",
+      fields: ["num"],
+      sample: { num: 123456 },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 4;
+        g.strokeRect(36, 46, w - 72, h2 - 92);
+        text2(g, "PROPERTY OF B&B FARM", w / 2, 84, "Stardos Stencil", 30, { max: w - 100 });
+        barcode(g, 70, 108, w - 140, 58, V.num || 7);
+        text2(g, "N\xBA " + V.num, w / 2, 186, "Black Ops One", 24);
+      }
+    },
+    {
+      name: "LiveUsedByStrangers",
+      title: "Used By Strangers (keeps count)",
+      sheet: 1,
+      where: "inner thigh",
+      fields: ["n"],
+      auto: "used",
+      sample: { n: 17 },
+      draw: (g, w, h2, V) => {
+        text2(g, "USED BY STRANGERS", w / 2, 62, "Permanent Marker", 32, { max: w - 30 });
+        tallyCount(g, 60, 108, V.n, 64);
+        if (V.n > 25) text2(g, String(V.n), w - 40, 212, "Permanent Marker", 30);
+      }
+    },
+    {
+      name: "LiveTimesBred",
+      title: "Times Bred (keeps count)",
+      sheet: 2,
+      where: "inner thigh",
+      fields: ["n"],
+      auto: "loads",
+      sample: { n: 23 },
+      draw: (g, w, h2, V) => {
+        text2(g, "BRED", w / 2, 56, "Black Ops One", 40);
+        tallyCount(g, 54, 96, V.n, 62);
+        text2(g, String(V.n), w - 50, 200, "Black Ops One", 26);
+      }
+    },
+    {
+      name: "LiveLitters",
+      title: "Litters (keeps count)",
+      sheet: 2,
+      where: "lower belly",
+      fields: ["n"],
+      auto: "litters",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 4;
+        g.beginPath();
+        g.roundRect(70, 50, w - 140, h2 - 100, 24);
+        g.stroke();
+        text2(g, "LITTERS", w / 2, 92, "Rye", 34);
+        text2(g, String(V.n), w / 2, 140, "Rye", 58, { max: w - 170 });
+        const k = Math.min(7, V.n);
+        for (let i = 0; i < k; i++) {
+          heart(g, w / 2 - (k - 1) * 15 + i * 30, 188, 7);
+          g.fill();
+        }
+      }
+    },
+    {
+      name: "LiveLitresMilked",
+      title: "Litres Milked (keeps count)",
+      sheet: 2,
+      where: "above a breast",
+      fields: ["n"],
+      auto: "milked",
+      sample: { n: 412 },
+      draw: (g, w, h2, V) => {
+        jug(g, 92, h2 / 2, 74);
+        text2(g, V.n + " L", 236, 112, "Bungee", 50, { max: 200 });
+        text2(g, "MILKED", 236, 162, "Bungee", 26);
+      }
+    },
+    {
+      name: "LiveEggsLaid",
+      title: "Eggs Laid (keeps count)",
+      sheet: 2,
+      where: "a hip",
+      fields: ["n"],
+      auto: "eggs",
+      sample: { n: 96 },
+      draw: (g, w, h2, V) => {
+        for (const [x, y] of [[70, 120], [100, 104], [96, 146], [128, 128], [66, 158]]) egg(g, x, y, 40);
+        text2(g, String(V.n), 250, 108, "Bungee", 62, { max: 190 });
+        text2(g, "EGGS LAID", 250, 166, "Bungee", 24);
+      }
+    },
+    {
+      name: "LiveDaysDenied",
+      title: "Days Since Last Orgasm (keeps count)",
+      sheet: 2,
+      where: "low belly",
+      fields: ["n"],
+      auto: "denied",
+      sample: { n: 12 },
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#1f6b3a";
+        g.fillRect(34, 40, w - 68, h2 - 80);
+        g.fillStyle = "#fff";
+        text2(g, "THIS SLUT HAS GONE", w / 2, 72, "Black Ops One", 18);
+        g.fillRect(w / 2 - 44, 92, 88, 64);
+        g.fillStyle = "#1f6b3a";
+        text2(g, String(V.n), w / 2, 125, "Black Ops One", 48, { max: 80 });
+        g.fillStyle = "#fff";
+        text2(g, V.n === 1 ? "DAY WITHOUT CUMMING" : "DAYS WITHOUT CUMMING", w / 2, 180, "Black Ops One", 18);
+      }
+    },
+    {
+      name: "LiveOwnedBy",
+      title: "Owned By (a name)",
+      sheet: 2,
+      where: "a hip or above the heart",
+      fields: ["t"],
+      dflt: "owner",
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        text2(g, "owned by", w / 2, 64, "Pinyon Script", 30);
+        text2(g, V.t, w / 2, 126, "Great Vibes", 72, { max: 300 });
+        g.lineWidth = 2.5;
+        g.beginPath();
+        g.moveTo(80, 172);
+        g.quadraticCurveTo(w / 2, 150, w - 80, 172);
+        g.stroke();
+        padlock(g, w / 2, 200, 22);
+      }
+    },
+    {
+      name: "LiveStockNumber",
+      title: "Stock Number (your number)",
+      sheet: 2,
+      where: "back of the neck",
+      fields: ["num"],
+      sample: { num: 123456 },
+      draw: (g, w, h2, V) => {
+        g.save();
+        g.translate(w * 0.72, h2 / 2);
+        g.rotate(-Math.PI / 2);
+        barcode(g, -90, -45, 180, 90, V.num || 11);
+        g.restore();
+        text2(g, "STOCK", 112, 105, "Stardos Stencil", 30);
+        text2(g, "N\xBA " + V.num, 112, 145, "Stardos Stencil", 22, { max: 170 });
+      }
+    },
+    {
+      name: "LiveLocked",
+      title: "Locked (keyholder's name)",
+      sheet: 2,
+      where: "above the heart",
+      fields: ["t"],
+      dflt: "owner",
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        padlock(g, w / 2 - 50, h2 / 2, 70);
+        key(g, w / 2 + 30, h2 / 2 + 10, 90);
+        text2(g, "keyholder: " + V.t, w / 2, h2 - 30, "Pinyon Script", 30, { max: w - 20 });
+      }
+    },
+    {
+      name: "LiveBredByBB",
+      title: "Bred By B&B",
+      sheet: 3,
+      where: "lower belly",
+      fields: [],
+      sample: {},
+      logo: true,
+      draw: (g, w, h2) => {
+        arcText(g, "BRED BY", w / 2, 50, 200, "Shrikhand", 40);
+        logo(g, "letters", w / 2, 138, 96);
+        text2(g, "\u2605 PREMIUM STOCK \u2605", w / 2, 216, "Rye", 20);
+      }
+    },
+    {
+      name: "LiveEarTag",
+      title: "B&B Ear Tag (your number)",
+      sheet: 3,
+      where: "a hip",
+      fields: ["num"],
+      sample: { num: 123456 },
+      logo: true,
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#e3b021";
+        earTag(g, w / 2, 22, 210, 206);
+        g.fill("nonzero");
+        g.strokeStyle = INK2;
+        g.lineWidth = 4;
+        earTag(g, w / 2, 22, 210, 206);
+        g.stroke();
+        cut(g, () => {
+          g.beginPath();
+          g.arc(w / 2, 46, 11, 0, Math.PI * 2);
+          g.fill();
+        });
+        g.fillStyle = INK2;
+        logo(g, "letters", w / 2, 128, 64);
+        text2(g, String(V.num), w / 2, 192, "Black Ops One", 34, { max: 180 });
+      }
+    },
+    {
+      name: "LiveCumTank",
+      title: "Cum Tank (how full you are)",
+      sheet: 4,
+      where: "the belly",
+      fields: ["n"],
+      auto: "tank",
+      sample: { n: 90 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 152, R = 104;
+        g.lineCap = "butt";
+        g.lineWidth = 7;
+        g.beginPath();
+        g.arc(cx, cy, R, Math.PI * 1.1, Math.PI * 1.9);
+        g.stroke();
+        for (let i = 0; i <= 8; i++) {
+          const a2 = Math.PI * (1.1 + 0.8 * i / 8), big = i % 4 === 0, r0 = big ? R - 26 : R - 15;
+          g.lineWidth = big ? 6 : 3.5;
+          g.beginPath();
+          g.moveTo(cx + Math.cos(a2) * r0, cy + Math.sin(a2) * r0);
+          g.lineTo(cx + Math.cos(a2) * (R - 3), cy + Math.sin(a2) * (R - 3));
+          g.stroke();
+        }
+        for (const [t, f] of [["E", 1.1], ["\xBD", 1.5], ["F", 1.9]]) {
+          const a2 = Math.PI * f;
+          text2(g, t, cx + Math.cos(a2) * (R - 46), cy + Math.sin(a2) * (R - 46), "Black Ops One", 24);
+        }
+        const a = Math.PI * (1.1 + 0.8 * pct(V.n));
+        g.lineWidth = 7;
+        g.lineCap = "round";
+        g.beginPath();
+        g.moveTo(cx, cy);
+        g.lineTo(cx + Math.cos(a) * (R - 24), cy + Math.sin(a) * (R - 24));
+        g.stroke();
+        g.beginPath();
+        g.arc(cx, cy, 11, 0, Math.PI * 2);
+        g.fill();
+        text2(g, "CUM TANK", cx, cy + 46, "Black Ops One", 30);
+        drop(g, cx - 106, cy + 44, 12);
+        drop(g, cx + 106, cy + 44, 12);
+      }
+    },
+    {
+      name: "LiveBreedingFacts",
+      title: "Breeding Facts (keeps count)",
+      sheet: 4,
+      where: "the small of the back",
+      fields: ["n"],
+      auto: "loads",
+      sample: { n: 23 },
+      draw: (g, w, h2, V) => {
+        const x0 = 94, y0 = 12, W16 = 192, H = 226;
+        g.lineWidth = 3;
+        g.strokeRect(x0, y0, W16, H);
+        const L = (t, size, bold, yy, right) => {
+          g.font = (bold ? "900 " : "") + size + "px Arial";
+          g.textAlign = "left";
+          g.textBaseline = "middle";
+          g.fillText(t, x0 + 8, yy);
+          if (right != null) {
+            g.textAlign = "right";
+            g.fillText(right, x0 + W16 - 8, yy);
+          }
+        };
+        L("Breeding Facts", 21, true, y0 + 21);
+        g.fillRect(x0 + 6, y0 + 37, W16 - 12, 1.5);
+        L("Serving size", 12, false, y0 + 49, "1 load");
+        L("Servings per day", 12, false, y0 + 64, "as many as fit");
+        g.fillRect(x0 + 6, y0 + 75, W16 - 12, 8);
+        L("Amount per serving", 11, true, y0 + 93);
+        L("Loads taken", 21, true, y0 + 113, String(V.n));
+        g.fillRect(x0 + 6, y0 + 126, W16 - 12, 4);
+        [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
+          L(a, 12, i < 2, y0 + 142 + i * 17, b);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W16 - 12, 1);
+        });
+        L("* bred fresh at B&B Farm", 10, false, y0 + 214);
+      }
+    },
+    {
+      name: "LiveLoading",
+      title: "Loading (how far along you are)",
+      sheet: 4,
+      where: "the belly",
+      fields: ["n"],
+      auto: "loading",
+      sample: { n: 80 },
+      draw: (g, w, h2, V) => {
+        text2(g, "LOADING...", w / 2, 62, "Press Start 2P", 22);
+        g.lineWidth = 5;
+        g.strokeRect(46, 96, 288, 50);
+        const k = Math.round(8 * pct(V.n));
+        for (let i = 0; i < k; i++) g.fillRect(56 + i * 34.5, 106, 28, 30);
+        text2(g, "BREEDING " + Math.min(100, V.n) + "%", w / 2, 178, "Press Start 2P", 15);
+        text2(g, "please do not unplug", w / 2, 210, "Press Start 2P", 9);
+      }
+    },
+    {
+      name: "LiveLipstickKisses",
+      title: "Lipstick Kisses (signed)",
+      sheet: 4,
+      where: "a butt cheek",
+      fields: ["t"],
+      sample: { t: "Mistress" },
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#c41e3a";
+        lips(g, 108, 84, 46, -0.32);
+        lips(g, 268, 74, 40, 0.28);
+        lips(g, 196, 150, 44, 0.06);
+        text2(g, "kissed by " + V.t, w / 2, 218, "Great Vibes", 36, { max: w - 20 });
+      }
+    },
+    {
+      name: "LiveWouldBreedAgain",
+      title: "\u2605\u2605\u2605\u2605\u2605 Would Breed Again (signed)",
+      sheet: 4,
+      where: "a thigh",
+      fields: ["t"],
+      sample: { t: "Big Red" },
+      draw: (g, w, h2, V) => {
+        g.lineWidth = 3;
+        g.beginPath();
+        g.roundRect(34, 32, 312, 182, 16);
+        g.stroke();
+        g.fillStyle = "#d9a400";
+        for (let i = 0; i < 5; i++) {
+          star(g, w / 2 - 96 + i * 48, 80, 20);
+          g.fill();
+        }
+        g.lineWidth = 2;
+        g.strokeStyle = INK2;
+        for (let i = 0; i < 5; i++) {
+          star(g, w / 2 - 96 + i * 48, 80, 20);
+          g.stroke();
+        }
+        g.fillStyle = INK2;
+        text2(g, "\u201Cwould breed again\u201D", w / 2, 138, "Great Vibes", 40);
+        g.font = "13px Arial";
+        g.textAlign = "center";
+        g.fillText(V.t + ", verified owner \u2713", w / 2, 186);
+      }
+    },
+    {
+      name: "LiveGuestbook",
+      title: "Bred By (a guestbook)",
+      sheet: 5,
+      where: "an inner thigh",
+      fields: ["list", "more"],
+      auto: "studs",
+      sample: { list: ["Big Red", "the Bull", "Goblin #3", "Stud 7"], more: 19 },
+      draw: (g, w, h2, V) => {
+        text2(g, "Bred by:", 72, 30, "Pinyon Script", 32, { align: "left" });
+        const F = [["Great Vibes", 36], ["Permanent Marker", 24], ["Rye", 24], ["Special Elite", 22]];
+        (V.list || []).slice(0, 4).forEach((n, i) => {
+          const y = 72 + i * 38;
+          text2(g, n, 90, y, F[i][0], F[i][1], { align: "left", max: 220 });
+          g.fillRect(70, y + 15, 240, 1.4);
+        });
+        if (V.more) text2(g, "+ " + V.more + " more", 310, 232, "Pinyon Script", 22, { align: "right" });
+      }
+    },
+    {
+      name: "LiveBreedingCard",
+      title: "Breeding Card (a punch a load)",
+      sheet: 5,
+      where: "a butt cheek",
+      fields: ["n"],
+      auto: "punches",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2;
+        g.lineWidth = 3;
+        g.beginPath();
+        g.roundRect(36, 26, 308, 198, 14);
+        g.stroke();
+        text2(g, "B&B BREEDING CARD", cx, 54, "Black Ops One", 22);
+        text2(g, "every tenth load's on the house", cx, 80, "Special Elite", 15);
+        const k = Math.min(10, V.n);
+        for (let i = 0; i < 10; i++) {
+          const x = 96 + i % 5 * 47, y = 126 + Math.floor(i / 5) * 54;
+          g.lineWidth = 2.5;
+          g.beginPath();
+          g.arc(x, y, 18, 0, Math.PI * 2);
+          g.stroke();
+          if (i < k) {
+            heart(g, x, y + 4, 12);
+            g.fill();
+          } else if (i === 9) text2(g, "FREE", x, y, "Black Ops One", 12);
+        }
+      }
+    },
+    {
+      name: "LiveTrapPassport",
+      title: "Trap Passport (a stamp a trap)",
+      sheet: 5,
+      where: "a shoulder blade",
+      fields: ["list"],
+      sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
+      draw: (g, w, h2, V) => {
+        const L = (V.list || []).map((x) => String(x).toUpperCase());
+        if (L[0]) {
+          g.fillStyle = "#5b2a86";
+          g.strokeStyle = "#5b2a86";
+          g.lineWidth = 4;
+          g.beginPath();
+          g.arc(104, 92, 62, 0, Math.PI * 2);
+          g.stroke();
+          g.lineWidth = 2;
+          g.beginPath();
+          g.arc(104, 92, 40, 0, Math.PI * 2);
+          g.stroke();
+          arcText(g, L[0], 104, 41, 51, "Black Ops One", 15);
+          arcTextLow(g, "SURVIVED", 104, 143, 51, "Black Ops One", 14);
+          text2(g, "B&B", 104, 92, "Black Ops One", 15);
+        }
+        if (L[1]) {
+          g.fillStyle = "#b3122e";
+          g.strokeStyle = "#b3122e";
+          g.save();
+          g.translate(276, 74);
+          g.rotate(0.14);
+          g.lineWidth = 4;
+          g.strokeRect(-82, -40, 164, 80);
+          text2(g, L[1], 0, -12, "Black Ops One", 24, { max: 150 });
+          text2(g, "ENTERED \xB7 TAKEN", 0, 18, "Black Ops One", 13);
+          g.restore();
+        }
+        if (L[2]) {
+          g.fillStyle = "#1d3f8f";
+          g.strokeStyle = "#1d3f8f";
+          g.save();
+          g.translate(176, 196);
+          g.rotate(-0.08);
+          g.lineWidth = 4;
+          g.beginPath();
+          g.ellipse(0, 0, 84, 40, 0, 0, Math.PI * 2);
+          g.stroke();
+          text2(g, L[2], 0, -10, "Black Ops One", 22, { max: 140 });
+          text2(g, "WENT IN, CAME OUT", 0, 16, "Black Ops One", 13);
+          g.restore();
+        }
+        if (L[3]) {
+          g.fillStyle = GRN2;
+          g.strokeStyle = GRN2;
+          g.save();
+          g.translate(318, 182);
+          g.rotate(-0.2);
+          g.lineWidth = 3.5;
+          g.beginPath();
+          for (let i = 0; i < 6; i++) {
+            const a = i / 6 * Math.PI * 2;
+            g.lineTo(Math.cos(a) * 46, Math.sin(a) * 46);
+          }
+          g.closePath();
+          g.stroke();
+          text2(g, L[3], 0, -8, "Black Ops One", 15, { max: 76 });
+          text2(g, "USED", 0, 12, "Black Ops One", 14);
+          g.restore();
+        }
+        speckle(g, 17, 1600, w, h2);
+      }
+    },
+    {
+      name: "LiveHighScores",
+      title: "High Scores (who's bred you most)",
+      sheet: 5,
+      where: "a thigh",
+      fields: ["rows"],
+      auto: "scores",
+      sample: { rows: [["BIG RED", 23], ["THE BULL", 17], ["GOBLIN", 12], ["STUD 7", 9]] },
+      draw: (g, w, h2, V) => {
+        text2(g, "HIGH SCORES", w / 2, 36, "Press Start 2P", 19);
+        g.font = fontCss(9, "Press Start 2P");
+        g.textBaseline = "middle";
+        g.textAlign = "left";
+        g.fillText("RANK", 44, 70);
+        g.fillText("NAME", 112, 70);
+        g.textAlign = "right";
+        g.fillText("LOADS", 336, 70);
+        (V.rows || []).slice(0, 4).forEach(([b, c], i) => {
+          const y = 100 + i * 28;
+          g.font = fontCss(13, "Press Start 2P");
+          g.textAlign = "left";
+          g.fillText(["1ST", "2ND", "3RD", "4TH"][i], 44, y);
+          g.fillText(String(b).toUpperCase().slice(0, 10), 112, y);
+          g.textAlign = "right";
+          g.fillText(String(c).padStart(2, "0"), 336, y);
+        });
+        text2(g, "PRESS START TO BREED", w / 2, 226, "Press Start 2P", 10);
+      }
+    },
+    {
+      name: "LiveTied",
+      title: "Tied \xD7 (keeps count)",
+      sheet: 5,
+      where: "a hip",
+      fields: ["n"],
+      auto: "tied",
+      sample: { n: 7 },
+      draw: (g, w, h2, V) => {
+        flash(g, () => canine(g, 70, 150, 190, -0.42), "#d9577a", 4);
+        g.fillStyle = INK2;
+        text2(g, "\xD7" + V.n, 296, 92, "Black Ops One", 64, { max: 150 });
+        banner(g, w / 2, 196, 180, 44, YEL3, YEL22, "TIED", "Rye", 30);
+      }
+    },
+    {
+      name: "LiveBredOn",
+      title: "Bred On (a date stamp)",
+      sheet: 6,
+      where: "a hip",
+      fields: ["d", "due"],
+      auto: "bredOn",
+      sample: { d: Date.UTC(2026, 10, 17, 12), due: Date.UTC(2027, 7, 9, 12) },
+      style: "stamp",
+      color: "#1d3f8f",
+      draw: (g, w, h2, V) => {
+        const cx = w / 2;
+        g.lineWidth = 5;
+        g.strokeRect(70, 46, 240, 160);
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(80, 124);
+        g.lineTo(300, 124);
+        g.stroke();
+        text2(g, "BRED ON", cx, 74, "Black Ops One", 26);
+        text2(g, dateWord(V.d), cx, 104, "Black Ops One", 30);
+        text2(g, "DUE", cx, 146, "Black Ops One", 20);
+        text2(g, V.due ? dateWord(V.due) : "SOON", cx, 178, "Black Ops One", 30);
+      }
+    },
+    {
+      name: "LiveHeatCrest",
+      title: "Heat Crest (fills as your heat rises)",
+      sheet: 7,
+      where: "over the womb",
+      fields: ["n"],
+      auto: "heat",
+      sample: { n: 66 },
+      style: "glow",
+      color: PINKGLOW2,
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 116, k = Math.round(12 * pct(V.n));
+        g.lineCap = "butt";
+        for (let i = 0; i < 12; i++) {
+          const a0 = -Math.PI / 2 + i / 12 * Math.PI * 2 + 0.04, a1 = a0 + Math.PI * 2 / 12 - 0.08;
+          g.lineWidth = 14;
+          g.beginPath();
+          g.arc(cx, cy, 84, a0, a1);
+          if (i < k) g.stroke();
+          else {
+            g.lineWidth = 2;
+            g.beginPath();
+            g.arc(cx, cy, 91, a0, a1);
+            g.arc(cx, cy, 77, a1, a0, true);
+            g.closePath();
+            g.stroke();
+          }
+        }
+        g.lineWidth = 5;
+        heart(g, cx, cy + 22, 44);
+        g.stroke();
+        g.lineWidth = 3;
+        arrowDown(g, cx, cy + 34, 20, 3);
+      }
+    },
+    {
+      name: "LiveWordsBlackletter",
+      title: "Your Words: Blackletter",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "Breeding Stock" },
+      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "UnifrakturMaguntia", 58, { max: 330 })
+    },
+    {
+      name: "LiveWordsScript",
+      title: "Your Words: Script",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "Good Girl" },
+      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "Great Vibes", 92, { max: 330 })
+    },
+    {
+      name: "LiveWordsTypewriter",
+      title: "Your Words: Typewriter",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "used goods" },
+      draw: (g, w, h2, V) => {
+        text2(g, V.t, w / 2, h2 / 2, "Special Elite", 48, { max: 300 });
+        g.lineWidth = 2;
+        g.strokeRect(34, h2 / 2 - 36, w - 68, 72);
+      }
+    },
+    {
+      name: "LiveWordsGraffiti",
+      title: "Your Words: Graffiti",
+      sheet: 7,
+      where: "anywhere",
+      fields: ["t"],
+      sample: { t: "cum dump" },
+      color: "#1d3f8f",
+      draw: (g, w, h2, V) => {
+        g.fillStyle = "#1d3f8f";
+        g.strokeStyle = "#1d3f8f";
+        text2(g, V.t, w / 2, h2 / 2, "Sedgwick Ave Display", 84, { max: 330 });
+        dripFrom(g, w, h2, 40, 340, 5, 6);
+      }
+    }
+  ];
+  var LIVE_BY = Object.fromEntries(LIVE.map((d) => [d.name, d]));
+  var isLive = (name) => !!LIVE_BY[name];
+  function valuesFor(d, written, who2) {
+    const V = Object.assign({}, d.sample, cleanValues(written));
+    if (d.fields.includes("num") && !(written && written.num != null) && who2 && who2.num) V.num = who2.num;
+    if (d.dflt === "owner" && !(written && written.t) && who2 && who2.owner) V.t = who2.owner;
+    if (V.n == null) V.n = 0;
+    delete V.sz;
+    delete V.sw;
+    delete V.sh;
+    return V;
+  }
+  var MID = "#808080";
+  var doc = null;
+  var mk = (w, h2) => {
+    const c = doc.createElement("canvas");
+    c.width = w || CW2;
+    c.height = h2 || CH2;
+    return c;
+  };
+  function tinted(src, col, blur, dx, dy, alpha) {
+    const c = mk(src.width, src.height), g = c.getContext("2d");
+    try {
+      g.filter = blur ? "blur(" + blur + "px)" : "none";
+    } catch (e) {
+    }
+    g.globalAlpha = alpha == null ? 1 : alpha;
+    g.drawImage(src, dx || 0, dy || 0);
+    try {
+      g.filter = "none";
+    } catch (e) {
+    }
+    g.globalAlpha = 1;
+    g.globalCompositeOperation = "source-in";
+    g.fillStyle = col;
+    g.fillRect(0, 0, c.width, c.height);
+    return c;
+  }
+  function speckled(src, seed) {
+    const c = tinted(src, MID), g = c.getContext("2d"), r = rng(seed), w = c.width, h2 = c.height;
+    g.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < 1400; i++) {
+      g.globalAlpha = 0.3 + r() * 0.7;
+      g.beginPath();
+      g.arc(r() * w, r() * h2, 0.5 + r() * 1.8, 0, Math.PI * 2);
+      g.fill();
+    }
+    for (let i = 0; i < 5; i++) {
+      g.globalAlpha = 0.18 + r() * 0.2;
+      g.fillRect(0, r() * h2, w, 6 + r() * 16);
+    }
+    return c;
+  }
+  var lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+  function splitColours(c, pal) {
+    if (!pal || !pal.length) pal = [[22, 18, 28]];
+    const w = c.width, h2 = c.height, src = c.getContext("2d").getImageData(0, 0, w, h2).data;
+    const outs = pal.map(() => {
+      const o = mk(w, h2), g = o.getContext("2d");
+      return { o, g, img: g.createImageData(w, h2) };
+    });
+    const L = pal.map((p) => lum(...p));
+    for (let i = 0; i < src.length; i += 4) {
+      const a = src[i + 3];
+      if (!a) continue;
+      const r = src[i], g = src[i + 1], b = src[i + 2];
+      let k = 0, bd = 1e12;
+      for (let j = 0; j < pal.length; j++) {
+        const p = pal[j], e = (p[0] - r) ** 2 + (p[1] - g) ** 2 + (p[2] - b) ** 2;
+        if (e < bd) {
+          bd = e;
+          k = j;
+        }
+      }
+      const v = L[k] < 40 ? 128 : Math.max(0, Math.min(255, Math.round(128 * lum(r, g, b) / L[k])));
+      const D = outs[k].img.data;
+      D[i] = D[i + 1] = D[i + 2] = v;
+      D[i + 3] = a;
+    }
+    return outs.map((x) => {
+      x.g.putImageData(x.img, 0, 0);
+      return x.o;
+    });
+  }
+  function colourName(rgb2) {
+    const [r, g, b] = rgb2, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = lum(r, g, b), s = mx ? (mx - mn) / mx : 0;
+    if (s < 0.18) return l < 70 ? "Ink" : l > 200 ? "White" : "Grey";
+    let hue = 0;
+    const dd = mx - mn;
+    if (mx === r) hue = (g - b) / dd % 6;
+    else if (mx === g) hue = (b - r) / dd + 2;
+    else hue = (r - g) / dd + 4;
+    hue = (hue * 60 + 360) % 360;
+    if (l < 60) return "Ink";
+    if (hue >= 15 && hue < 50 && l < 120) return "Brown";
+    if (hue < 15 || hue >= 345) return "Red";
+    if (hue < 40) return "Orange";
+    if (hue < 52) return "Gold";
+    if (hue < 70) return "Yellow";
+    if (hue < 165) return "Green";
+    if (hue < 200) return "Teal";
+    if (hue < 255) return "Blue";
+    if (hue < 290) return "Purple";
+    return "Pink";
+  }
+  function layersFor(pal, pre) {
+    const used2 = {};
+    return pal.map((p) => {
+      let n = pal.length === 1 ? "Ink" : colourName(p);
+      used2[n] = (used2[n] || 0) + 1;
+      if (used2[n] > 1) n += used2[n];
+      return { name: (pre || "") + n, color: "#" + p.map((v) => v.toString(16).padStart(2, "0")).join(""), colorize: true };
+    });
+  }
+  function layersOf(base, m) {
+    const out = {}, L = m.layers || [];
+    if (L.some((l) => l.name === "Stamp")) {
+      out.Stamp = speckled(base, 3);
+      return out;
+    }
+    if (L.some((l) => l.name === "Glow")) {
+      out.Glow = tinted(base, MID, 9, 0, 0, 0.95);
+      out.GlowInk = tinted(base, MID, 0.4);
+      return out;
+    }
+    const pal = m.pal && m.pal.length ? m.pal : [[22, 18, 28]];
+    const parts2 = splitColours(base, pal), names = layersFor(pal).map((l) => l.name);
+    names.forEach((n, i) => {
+      out[n] = parts2[i];
+    });
+    return out;
+  }
+  function drawCard(W16, d, V) {
+    doc = W16.document;
+    const c = mk(), g = c.getContext("2d");
+    g.fillStyle = INK2;
+    g.strokeStyle = INK2;
+    d.draw(g, CW2, CH2, V);
+    return c;
+  }
+  function shrink(c, box3, s) {
+    const [x0, y0, x1, y1] = box3;
+    let src = mk(x1 - x0, y1 - y0);
+    src.getContext("2d").drawImage(c, -x0, -y0);
+    let w = src.width, h2 = src.height;
+    const tw = Math.max(1, Math.round(w * s)), th = Math.max(1, Math.round(h2 * s));
+    while (w / 2 > tw) {
+      const n = mk(Math.round(w / 2), Math.round(h2 / 2)), g2 = n.getContext("2d");
+      g2.imageSmoothingQuality = "high";
+      g2.drawImage(src, 0, 0, n.width, n.height);
+      src = n;
+      w = n.width;
+      h2 = n.height;
+    }
+    const out = mk(tw, th), g = out.getContext("2d");
+    g.imageSmoothingQuality = "high";
+    g.drawImage(src, 0, 0, tw, th);
+    return out;
+  }
+  var cache = /* @__PURE__ */ new Map();
+  var CACHE_MAX = 80;
+  function picture(W16, d, m, layer, V) {
+    const key2 = d.name + "|" + JSON.stringify(V);
+    let set2 = cache.get(key2);
+    if (set2) {
+      cache.delete(key2);
+      cache.set(key2, set2);
+      return set2[layer] || null;
+    }
+    if (d.logo && !IMG.letters) return null;
+    const base = drawCard(W16, d, V), parts2 = layersOf(base, m);
+    set2 = {};
+    for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
+    cache.set(key2, set2);
+    while (cache.size > CACHE_MAX) {
+      const old = cache.keys().next().value, os = cache.get(old);
+      cache.delete(old);
+      for (const u of Object.values(os)) forget(W16, u);
+    }
+    return set2[layer] || null;
+  }
+  function forget(W16, url) {
+    try {
+      const m = W16.GLDrawImageCache;
+      if (m && typeof m.delete === "function") m.delete(url);
+    } catch (e) {
+    }
+    try {
+      const m = W16.DrawImageCache;
+      if (m && typeof m.delete === "function") m.delete(url);
+    } catch (e) {
+    }
+    try {
+      const gl = W16.GLDrawCanvas && W16.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      if (t) {
+        if (t.texture) gl.deleteTexture(t.texture);
+        tc.delete(url);
+      }
+    } catch (e) {
+    }
+  }
+  var logoAsked = null;
+  function loadLiveArt() {
+    if (!logoAsked) logoAsked = loadLogo().catch(() => null);
+    return logoAsked;
+  }
+
+  // shared/ink/panel.js
+  var CSS = `
+#fi-panel{position:fixed;left:50%;top:4%;transform:translateX(-50%);width:min(620px,96vw);max-height:92vh;max-height:92dvh;overflow-y:auto;z-index:2147483000;
+  padding:12px 16px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
+@media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fi-panel{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px}}
+#fi-panel h2{margin:0;flex:1;font-family:Bitter,Georgia,serif;color:#d9b3e6;font-size:19px}
+#fi-panel .fi-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#fi-panel .fi-card{background:#2b2230;border:1px solid #4a3a52;border-radius:8px;padding:9px 11px;margin:7px 0}
+#fi-panel .fi-muted{color:#b3a2b8;font-size:12.5px}
+#fi-panel label.fi-slide{display:grid;grid-template-columns:4.2em 1fr 3.4em;align-items:center;gap:8px;margin:3px 0}
+#fi-panel input[type=range]{width:100%}
+#fi-panel input[type=text],#fi-panel input[type=number]{font:inherit;padding:4px 6px;border-radius:6px;background:#1b151e;color:#ecdfe8;border:1px solid #6e5a78;min-width:0;flex:1}
+#fi-panel button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid #8e6aa0;background:#3a2c42;color:#ecdfe8;padding:4px 11px;min-height:30px}
+@media (pointer:coarse){#fi-panel input{font-size:16px}#fi-panel button{min-height:40px}}
+`;
+  var SLOTS = [["FarmInk1", "Ink 1"], ["FarmInk2", "Ink 2"], ["FarmInk3", "Ink 3"], ["FarmInk4", "Ink 4"], ["FarmBrand", "Brand"]];
+  var box = null;
+  var api = null;
+  var Wd = null;
+  var note = "";
+  var el = (tag, attrs, ...kids) => {
+    const e = Wd.document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+      else if (k === "style") e.style.cssText = v;
+      else e.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) e.append(typeof k === "string" ? Wd.document.createTextNode(k) : k);
+    return e;
+  };
+  var pct2 = (v) => Math.round((Number(v) || 1) * 100);
+  function slide(label, min, max, val, onSet) {
+    const out = el("span", { class: "fi-muted" }, val + "%");
+    const r = el("input", { type: "range", min, max, step: 5, value: val, "aria-label": label, oninput: (e) => {
+      out.textContent = e.target.value + "%";
+    }, onchange: (e) => onSet(Number(e.target.value) / 100) });
+    return el("label", { class: "fi-slide" }, el("span", null, label), r, out);
+  }
+  function slotCard(slot, name) {
+    const w = api.worn().find((x) => x.slot === slot);
+    if (!w) return el("div", { class: "fi-card" }, el("b", null, name + ": "), el("span", { class: "fi-muted" }, "empty. Pick a design in the wardrobe (Farm " + name + ")."));
+    const own = w.values || {}, kids = [el("div", { class: "fi-row" }, el("b", null, name + ": " + w.title))];
+    kids.push(slide("Size", 25, 400, pct2(own.sz), (v) => set(slot, { sz: v === 1 ? null : v })));
+    kids.push(slide("Width", 50, 200, pct2(own.sw), (v) => set(slot, { sw: v === 1 ? null : v })));
+    kids.push(slide("Height", 50, 200, pct2(own.sh), (v) => set(slot, { sh: v === 1 ? null : v })));
+    if (w.live) {
+      const f = w.fields || [];
+      if (f.includes("t") || f.includes("list") || f.includes("num") || f.includes("n")) {
+        const cur = f.includes("t") ? own.t || "" : f.includes("list") ? (own.list || []).join(", ") : f.includes("num") ? own.num != null ? String(own.num) : "" : own.n != null ? String(own.n) : "";
+        const hint = f.includes("t") ? "Your words, or a name" : f.includes("list") ? "Names, with commas between" : f.includes("num") ? "A number (yours if empty)" : "A number of your own";
+        const inp = el("input", { type: f.includes("t") || f.includes("list") ? "text" : "number", value: cur, placeholder: hint, "aria-label": hint, maxlength: 60 });
+        kids.push(el("div", { class: "fi-row", style: "margin-top:6px" }, inp, el("button", { onclick: () => {
+          api.command(slotKey(slot) + " " + (String(inp.value).trim() || "clear"));
+          note = "Written on " + w.title + ".";
+          draw();
+        } }, "Write")));
+      }
+      if (w.auto) kids.push(el(
+        "label",
+        { class: "fi-row", style: "margin-top:4px" },
+        el("input", { type: "checkbox", checked: !own.manual, onchange: (e) => {
+          api.command(slotKey(slot) + (e.target.checked ? " auto" : " " + (own.n != null ? own.n : 0)));
+          draw();
+        } }),
+        el("span", null, "Follow the farm's count")
+      ));
+    }
+    kids.push(el("div", { class: "fi-row", style: "margin-top:6px" }, el("button", { onclick: () => {
+      set(slot, { sz: null, sw: null, sh: null });
+      draw();
+    } }, "Normal size")));
+    return el("div", { class: "fi-card" }, kids);
+  }
+  var slotKey = (slot) => slot === "FarmBrand" ? "brand" : slot.slice(-1);
+  function set(slot, v) {
+    if (api.write(slot, v)) note = "";
+    draw();
+  }
+  function view() {
+    return [
+      el("div", { class: "fi-row", style: "margin-bottom:6px" }, el("h2", null, "\u{1F58B}\uFE0F Your farm ink"), el("button", { onclick: () => close() }, "Close")),
+      note ? el("div", { class: "fi-muted", style: "color:#e6c37a" }, note) : null,
+      SLOTS.map(([s, n]) => slotCard(s, n)),
+      el("div", { class: "fi-muted", style: "margin-top:8px" }, "Colours: the wardrobe's colour picker, a layer for each colour. Moving, turning and over or under clothes: the game's Layering button. Everybody with the Companion or the Dispensary sees your ink as you set it.")
+    ];
+  }
+  function draw() {
+    if (box) box.replaceChildren(...view().flat().filter(Boolean));
+  }
+  function openInkPanel(W16, a) {
+    Wd = W16;
+    api = a;
+    close();
+    if (!W16.document.getElementById("fi-style")) {
+      const s = W16.document.createElement("style");
+      s.id = "fi-style";
+      s.textContent = CSS;
+      W16.document.head.appendChild(s);
+    }
+    box = W16.document.createElement("div");
+    box.id = "fi-panel";
+    W16.document.body.appendChild(box);
+    draw();
+    return true;
+  }
+  function close() {
+    if (box) {
+      box.remove();
+      box = null;
+    }
+    note = "";
+  }
+
   // shared/ink/ink.js
-  var INK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v1/";
+  var INK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/";
+  var LIVE_HOST = INK_HOST + "live/";
   var INK_SLOTS = ["FarmInk1", "FarmInk2", "FarmInk3", "FarmInk4"];
   var BRAND_SLOT = "FarmBrand";
   var SLOT_NAMES = { FarmInk1: "Farm Ink 1", FarmInk2: "Farm Ink 2", FarmInk3: "Farm Ink 3", FarmInk4: "Farm Ink 4", FarmBrand: "Farm Brand" };
   var RES = ink_designs_default.res || 1;
   var OURS = /\/ink[^/]*\/(?:v\d+\/)?Farm(?:Ink|Brand)\//;
+  var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
+  var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_[A-Za-z0-9]+\.png$/;
+  var stillItem = (C2, kind, name) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var TITLES = {};
-  for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) TITLES[kind + ":" + a.name] = a.title;
+  var MANIFEST = {};
+  for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) {
+    TITLES[kind + ":" + a.name] = a.title;
+    if (a.live) MANIFEST[a.name] = a;
+  }
   function assetDef(a) {
     return {
       Name: a.name,
@@ -2788,9 +7202,165 @@ One of mods you are using is using an old version of SDK. It will work for now b
     describe(W16);
     return true;
   }
+  var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
+  var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
+  function liveSrc(W16, C2, slot, name, layer) {
+    const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
+    if (!d || !m || !it || it.Asset.Name !== name) return null;
+    try {
+      return picture(W16, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+    } catch (e) {
+      console.warn("[Farm ink] couldn't draw " + name, e);
+      return null;
+    }
+  }
+  function wornLive(W16) {
+    const P5 = W16.Player, out = [];
+    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+      const it = itemIn(P5, slot);
+      if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
+    }
+    return out;
+  }
+  var lastWrite = {};
+  function write(W16, slot, values, now) {
+    const it = itemIn(W16.Player, slot);
+    if (!it || !kindOf(slot)) return false;
+    const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
+    for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
+    const next = cleanValues(merged);
+    if (merged.manual === true) next.manual = true;
+    if (JSON.stringify(next) === JSON.stringify(cur)) return false;
+    const since2 = Date.now() - (lastWrite[slot] || 0);
+    if (!now && since2 < 6e4) {
+      clearTimeout(retry[slot]);
+      retry[slot] = setTimeout(() => refreshAuto(W16), 60500 - since2);
+      return false;
+    }
+    lastWrite[slot] = Date.now();
+    it.Property = Object.assign({}, it.Property, { FarmInk: next });
+    try {
+      if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(W16.Player);
+    } catch (e) {
+    }
+    try {
+      if (typeof W16.ChatRoomCharacterItemUpdate === "function") W16.ChatRoomCharacterItemUpdate(W16.Player, slot);
+    } catch (e) {
+    }
+    return true;
+  }
+  var retry = {};
+  var counts = {};
+  var DAY = 864e5;
+  var cumKey = (W16) => "farmink-lastcum-" + (W16.Player && W16.Player.MemberNumber);
+  function daysDenied(W16) {
+    let t = 0;
+    try {
+      t = Number(W16.localStorage.getItem(cumKey(W16))) || 0;
+    } catch (e) {
+    }
+    return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
+  }
+  function autoOf(W16, auto) {
+    if (auto === "denied") return { n: daysDenied(W16) };
+    const c = counts[auto];
+    if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
+    if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
+    if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
+    return typeof c === "number" ? { n: c } : null;
+  }
+  function refreshAuto(W16) {
+    for (const { slot, name, item } of wornLive(W16)) {
+      const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
+      if (!d.auto || own && own.manual) continue;
+      const v = autoOf(W16, d.auto);
+      if (v) write(W16, slot, v);
+    }
+  }
+  var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
+  var say = (W16, t) => {
+    try {
+      if (typeof W16.ChatRoomSendLocal === "function") {
+        const d = W16.document.createElement("div");
+        d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
+        d.textContent = "\u{1F58B}\uFE0F " + t;
+        W16.ChatRoomSendLocal(d.outerHTML);
+      }
+    } catch (e) {
+    }
+  };
+  function wornAll(W16) {
+    const out = [];
+    for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
+      const it = itemIn(W16.Player, slot);
+      if (!it) continue;
+      const d = LIVE_BY[it.Asset.Name];
+      out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
+    }
+    return out;
+  }
+  var panelApi = (W16) => ({ worn: () => wornAll(W16), write: (slot, v) => write(W16, slot, v, true), command: (a) => inkCommand(W16, a) });
+  function inkCommand(W16, args) {
+    const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
+    const worn = wornLive(W16);
+    if (!a && W16.document && W16.document.body) {
+      openInkPanel(W16, panelApi(W16));
+      return;
+    }
+    if (/^why$/i.test(a)) return say(W16, whyText());
+    const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
+    if (sm) {
+      const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
+      const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
+      if (!itemIn(W16.Player, slot2)) return say(W16, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W16, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W16, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+    }
+    if (!m) {
+      if (!worn.length) return say(W16, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W16, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+        const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
+        return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
+      }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
+    }
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W16.Player, slot);
+    if (!it) return say(W16, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W16, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const d = LIVE_BY[it.Asset.Name];
+    let v;
+    if (!rest) return inkCommand(W16, "");
+    if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
+    else if (/^auto$/i.test(rest)) {
+      v = { manual: null, n: null, list: null, more: null, rows: null };
+    } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
+    else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
+    else if (d.fields.includes("t")) v = { t: rest };
+    else return say(W16, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W16, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W16);
+    say(W16, "Written on " + d.title + ".");
+  }
   function registerInk(W16, mod2) {
     if (W16.__farmInk) return W16.__farmInk;
-    const st2 = W16.__farmInk = { ready: false, slots: [...INK_SLOTS, BRAND_SLOT], designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length, live: ink_designs_default.live.length };
+    const st2 = W16.__farmInk = {
+      ready: false,
+      slots: [...INK_SLOTS, BRAND_SLOT],
+      designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
+      live: Object.keys(MANIFEST).length,
+      // for the Companion: the farm's counts for live ink (state.ink from the farm girl)
+      counts: (c) => {
+        if (c && typeof c === "object") {
+          counts = c;
+          try {
+            refreshAuto(W16);
+          } catch (e) {
+          }
+        }
+      },
+      write: (slot, v) => write(W16, slot, v, true),
+      command: (a) => inkCommand(W16, a),
+      worn: () => wornLive(W16).map(({ slot, name }) => ({ slot, name }))
+    };
     const hooks = () => {
       const hook3 = (name, pri, fn) => {
         try {
@@ -2801,8 +7371,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       };
       hook3("AssetBaseURL", 0, (args, next) => {
-        const kind = kindOf(args[2] || args[1] && args[1].Name);
-        return kind ? INK_HOST + kind + "/" : next(args);
+        const slot = args[2] || args[1] && args[1].Name, kind = kindOf(slot);
+        if (!kind) return next(args);
+        return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
       });
       hook3("AssetGetPreviewPath", 0, (args, next) => {
         const A = args[0], kind = A && A.Group && kindOf(A.Group.Name);
@@ -2816,19 +7387,72 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      if (RES !== 1) hook3("CommonDrawAppearanceBuild", 0, (args, next) => {
-        const cb = args[1];
+      hook3("CommonDrawAppearanceBuild", 5, (args, next) => {
+        const C2 = args[0], cb = args[1];
         if (!cb || typeof cb !== "object") return next(args);
+        const sized = (o, it) => {
+          const f = it && it.Property && it.Property.FarmInk || {}, sz = f.sz || 1, kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
+          o = Object.assign({}, o);
+          o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) * kx;
+          o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) * ky;
+          return o;
+        };
+        const seen2 = /* @__PURE__ */ new Set(), notReady = [];
+        const ready2 = (u) => {
+          try {
+            const c = W16.GLDrawImageCache;
+            if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
+          } catch (e) {
+          }
+          return true;
+        };
         const wrap = (f) => typeof f !== "function" ? f : function(src, x, y, o) {
-          if (typeof src === "string" && OURS.test(src)) {
-            o = Object.assign({}, o);
-            o.ScaleX = (o.ScaleX == null ? 1 : o.ScaleX) / RES;
-            o.ScaleY = (o.ScaleY == null ? 1 : o.ScaleY) / RES;
+          if (typeof src === "string") {
+            const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
+            if (lm) {
+              const u = liveSrc(W16, C2, lm[1], lm[2], lm[3]);
+              seen2.add(lm[2]);
+              if (!u) {
+                notReady.push(lm[2] + " (not drawn yet)");
+                return void 0;
+              }
+              if (!ready2(u)) notReady.push(lm[2]);
+              return f.call(this, u, x, y, sized(o, itemIn(C2, lm[1])));
+            }
+            const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
+            if (sm) {
+              o = sized(o, stillItem(C2, sm[1], sm[2]));
+              seen2.add(sm[2]);
+              if (!ready2(src)) notReady.push(sm[2]);
+            }
           }
           return f.call(this, src, x, y, o);
         };
-        return next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        try {
+          note2(W16, C2, seen2, notReady);
+        } catch (e) {
+        }
+        return out;
       });
+      const keepInk = (name) => hook3(name, 0, (args, next) => {
+        const C2 = args[0], keep2 = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
+        const r = next(args);
+        try {
+          let back = 0;
+          if (keep2.length && C2 && Array.isArray(C2.Appearance)) {
+            for (const it of keep2) if (!C2.Appearance.includes(it) && !itemIn(C2, it.Asset.Group.Name)) {
+              C2.Appearance.push(it);
+              back++;
+            }
+          }
+          if (back && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C2);
+        } catch (e) {
+        }
+        return r;
+      });
+      keepInk("CharacterAppearanceNaked");
+      keepInk("CharacterAppearanceStripLayer");
       hook3("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
@@ -2837,6 +7461,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
+      });
+      hook3("ActivityOrgasmStart", 0, (args, next) => {
+        try {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W16.ActivityOrgasmRuined) {
+            W16.localStorage.setItem(cumKey(W16), String(Date.now()));
+            setTimeout(() => refreshAuto(W16), 1e3);
+          }
+        } catch (e) {
+        }
+        return next(args);
       });
     };
     const t = setInterval(() => {
@@ -2849,16 +7484,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
+      loadLiveArt().then(() => {
+        try {
+          for (const C2 of W16.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C2);
+        } catch (e) {
+        }
+      });
+      try {
+        if (typeof W16.CommandCombine === "function") W16.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W16, a) }]);
+      } catch (e) {
+      }
     }, 50);
+    setInterval(() => {
+      try {
+        if (W16.Player && W16.Player.Appearance) refreshAuto(W16);
+      } catch (e) {
+      }
+    }, 10 * 6e4);
     return st2;
   }
+  var DIAG = [];
+  function note2(W16, C2, seen2, notReady) {
+    if (!C2 || !Array.isArray(C2.Appearance)) return;
+    const pose = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
+    if (/AllFours|Hogtied/.test(pose)) return;
+    const worn = C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+    const missing2 = worn.filter((n) => !seen2.has(n));
+    if (!missing2.length && !notReady.length) return;
+    DIAG.push({ t: Date.now(), who: C2.MemberNumber, name: String(C2.Nickname || C2.Name || ""), missing: missing2, notReady: [...new Set(notReady)] });
+    if (DIAG.length > 40) DIAG.shift();
+  }
+  function whyText() {
+    if (!DIAG.length) return "No ink has gone missin' since you logged in.";
+    return "Ink that didn't show, newest last:\n" + DIAG.slice(-10).map((d) => new Date(d.t).toLocaleTimeString() + " \xB7 " + d.name + " (" + d.who + ")" + (d.missing.length ? " \xB7 not drawn at all: " + d.missing.join(", ") : "") + (d.notReady.length ? " \xB7 picture not loaded yet: " + d.notReady.join(", ") : "")).join("\n");
+  }
+  var wornByLogo = (C2) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.some((it) => it && it.Asset && LIVE_BY[it.Asset.Name] && LIVE_BY[it.Asset.Name].logo) : false;
 
   // shared/protocol.js
   var FARM_MSG = "FarmhandMsg";
   var PROTOCOL = 2;
-  function makeMsg(type, data = {}, target) {
+  function makeMsg(type, data = {}, target2) {
     const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
-    if (target) m.Target = target;
+    if (target2) m.Target = target2;
     return m;
   }
   function readMsg(data) {
@@ -2869,7 +7536,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.56.0";
+  var VERSION = "0.57.0";
 
   // shared/species.js
   var WORDS = {
@@ -2979,18 +7646,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ENDINGS = /(girl|boy|gal|guy|kin|slut|sluts|whore|toy|pet|bimbo|s)$/;
   var known = (w) => {
     if (WORDS[w]) return WORDS[w];
-    const cut = w.replace(ENDINGS, "");
-    if (cut !== w && cut.length > 1) {
-      if (WORDS[cut]) return WORDS[cut];
-      const again = cut.replace(ENDINGS, "");
+    const cut2 = w.replace(ENDINGS, "");
+    if (cut2 !== w && cut2.length > 1) {
+      if (WORDS[cut2]) return WORDS[cut2];
+      const again = cut2.replace(ENDINGS, "");
       if (WORDS[again]) return WORDS[again];
     }
     if (/ves$/.test(w) && WORDS[w.replace(/ves$/, "f")]) return WORDS[w.replace(/ves$/, "f")];
     return null;
   };
   var INSIDE = Object.keys(WORDS).filter((w) => w.length >= 3).sort((a, b) => b.length - a.length);
-  function speciesKeyOf(text) {
-    const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+  function speciesKeyOf(text3) {
+    const low = String(text3 || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
     if (!low) return null;
     const whole2 = low.replace(/[\s\/-]+/g, "");
     if (known(whole2)) return known(whole2);
@@ -3030,12 +7697,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kitt: ["mew", "nya", "mrrp"]
   };
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
-  function mooify(text, species, share) {
-    const say2 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
+  function mooify(text3, species, share) {
+    const say3 = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
     const keep2 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
-    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+    return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep2) return w;
-      const n = say2[Math.floor(Math.random() * say2.length)];
+      const n = say3[Math.floor(Math.random() * say3.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
   }
@@ -3076,14 +7743,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     for (const [k, [label, inv]] of Object.entries(HARD_PREFS)) out[k] = { label, on: inv ? !prefs2[k] : !!prefs2[k] };
     return out;
   }
-  function setHardPrefsOn(prefs2, want, set, after) {
+  function setHardPrefsOn(prefs2, want, set2, after) {
     const said = [];
     for (const [k, on3] of Object.entries(want || {})) {
       const def = HARD_PREFS[k];
       if (!def || typeof on3 !== "boolean") continue;
       const [label, inv] = def, now = inv ? !prefs2[k] : !!prefs2[k];
       if (now === on3) continue;
-      set(k, inv ? !on3 : on3);
+      set2(k, inv ? !on3 : on3);
       try {
         if (after) after(k);
       } catch (e) {
@@ -3105,7 +7772,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     alert: "#b8403a",
     well: "#140e09"
   };
-  var CSS = `
+  var CSS2 = `
 #fhc-settings{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(860px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;z-index:2147483000;padding:14px 18px;border-radius:10px;box-shadow:0 6px 30px rgba(0,0,0,0.6);box-sizing:border-box;background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif}
 @media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fhc-settings{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}#fhc-settings h2{font-size:18px}#fhc-settings .fhc-row{position:sticky;top:-10px;background:var(--fh-ground);z-index:1}}
 @media (pointer:coarse){#fhc-settings input,#fhc-settings select,#fhc-settings textarea{font-size:16px}#fhc-settings button{min-height:38px}}
@@ -3239,25 +7906,25 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // extension/src/dom.js
   function h(tag, props, ...kids) {
-    const el = window.document.createElement(tag);
+    const el2 = window.document.createElement(tag);
     for (const [k, v] of Object.entries(props || {})) {
       if (v === void 0 || v === null || v === false) continue;
-      if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
-      else if (k === "class") el.className = v;
-      else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+      if (k.startsWith("on") && typeof v === "function") el2.addEventListener(k.slice(2), v);
+      else if (k === "class") el2.className = v;
+      else if (k === "style" && typeof v === "object") Object.assign(el2.style, v);
       else if (k === "value") {
-        el.value = v;
-        el.setAttribute("value", v);
-      } else el.setAttribute(k, v === true ? "" : String(v));
+        el2.value = v;
+        el2.setAttribute("value", v);
+      } else el2.setAttribute(k, v === true ? "" : String(v));
     }
-    add(el, kids);
-    return el;
+    add(el2, kids);
+    return el2;
   }
-  function add(el, kids) {
+  function add(el2, kids) {
     for (const k of kids) {
       if (k === null || k === void 0 || k === false) continue;
-      if (Array.isArray(k)) add(el, k);
-      else el.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
+      if (Array.isArray(k)) add(el2, k);
+      else el2.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
     }
   }
   var FOLD_KEY = "fhc-folded";
@@ -3279,43 +7946,43 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   };
   var card = (...kids) => {
-    const box2 = h("div", { class: "fhc-box" }, ...kids);
-    const first = box2.firstElementChild, t = first && (first.classList.contains("fhc-h") ? first : first.querySelector(":scope > .fhc-h"));
-    if (!t || box2.children.length < 2) return box2;
-    const key = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
-    if (!key) return box2;
+    const box3 = h("div", { class: "fhc-box" }, ...kids);
+    const first = box3.firstElementChild, t = first && (first.classList.contains("fhc-h") ? first : first.querySelector(":scope > .fhc-h"));
+    if (!t || box3.children.length < 2) return box3;
+    const key2 = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
+    if (!key2) return box3;
     t.classList.add("fhc-fold");
     t.setAttribute("role", "button");
     t.setAttribute("tabindex", "0");
-    const set = (on3) => {
-      box2.classList.toggle("fold", on3);
+    const set2 = (on3) => {
+      box3.classList.toggle("fold", on3);
       t.setAttribute("aria-expanded", on3 ? "false" : "true");
     };
-    set(foldSet().has(key));
+    set2(foldSet().has(key2));
     const flip = (e) => {
       e.preventDefault();
-      const on3 = !box2.classList.contains("fold");
-      if (on3) foldSet().add(key);
-      else foldSet().delete(key);
+      const on3 = !box3.classList.contains("fold");
+      if (on3) foldSet().add(key2);
+      else foldSet().delete(key2);
       foldSave();
-      set(on3);
+      set2(on3);
     };
     t.addEventListener("click", flip);
     t.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") flip(e);
     });
-    return box2;
+    return box3;
   };
-  var title = (text) => h("div", { class: "fhc-h" }, text);
-  var muted = (text) => h("div", { class: "fhc-muted" }, text);
+  var title = (text3) => h("div", { class: "fhc-h" }, text3);
+  var muted = (text3) => h("div", { class: "fhc-muted" }, text3);
   var btn = (label, onclick, accent) => h("button", { type: "button", class: accent ? "fhc-b fhc-b-acc" : "fhc-b", onclick }, label);
-  var chip = (text, kind) => h("span", { class: "fhc-chip" + (kind ? " fhc-chip-" + kind : "") }, text);
-  function bar(label, value, pct2, kind) {
+  var chip = (text3, kind) => h("span", { class: "fhc-chip" + (kind ? " fhc-chip-" + kind : "") }, text3);
+  function bar(label, value, pct4, kind) {
     return h(
       "div",
       { class: "fhc-bar" },
       h("div", { class: "fhc-bar-row" }, h("span", null, label), h("span", { class: "fhc-muted" }, value)),
-      h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (kind ? " fhc-fill-" + kind : ""), style: { width: Math.max(0, Math.min(100, pct2)) + "%" } }))
+      h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (kind ? " fhc-fill-" + kind : ""), style: { width: Math.max(0, Math.min(100, pct4)) + "%" } }))
     );
   }
   function toggle(label, desc, on3, onflip) {
@@ -3337,8 +8004,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h("div", { class: "fhc-m-t" }, h("div", { class: m.kind ? "fhc-fill-" + m.kind : "", style: { width: Math.max(0, Math.min(100, m.pct || 0)) + "%" } }))
     ))) : null;
   };
-  function rows(ctx3, key, list) {
-    const items = list.filter(Boolean), openId = ctx3.ui["open_" + key];
+  function rows(ctx3, key2, list) {
+    const items = list.filter(Boolean), openId = ctx3.ui["open_" + key2];
     if (!items.length) return null;
     return h("div", { class: "fhc-rows" }, items.map((r) => {
       const open2 = r.id === openId && r.body;
@@ -3348,7 +8015,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           type: "button",
           class: "fhc-r" + (open2 ? " open" : ""),
           "aria-expanded": r.body ? open2 ? "true" : "false" : null,
-          onclick: () => r.go ? r.go() : ctx3.setUi({ ["open_" + key]: open2 ? null : r.id })
+          onclick: () => r.go ? r.go() : ctx3.setUi({ ["open_" + key2]: open2 ? null : r.id })
         },
         h("span", { class: "fhc-r-k" }, r.label, r.dot ? h("span", { class: "fhc-dot", "aria-label": "new" }) : null),
         r.sum ? h("span", { class: "fhc-r-s" }, r.sum) : null,
@@ -3357,8 +8024,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return open2 ? [head, h("div", { class: "fhc-open" }, r.body())] : head;
     }));
   }
-  function quick(ctx3, key, list, more) {
-    const isOpen = !!ctx3.ui["more_" + key];
+  function quick(ctx3, key2, list, more) {
+    const isOpen = !!ctx3.ui["more_" + key2];
     return h(
       "div",
       null,
@@ -3370,11 +8037,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           type: "button",
           class: "fhc-b" + (isOpen ? " on" : ""),
           "aria-expanded": isOpen ? "true" : "false",
-          onclick: () => ctx3.setUi({ ["more_" + key]: !isOpen })
+          onclick: () => ctx3.setUi({ ["more_" + key2]: !isOpen })
         }, isOpen ? "More \u25B4" : "More \u25BE") : null
       ),
       isOpen ? h("div", { class: "fhc-menu", role: "menu", "aria-label": "More" }, more.filter(Boolean).map(([label, fn]) => h("button", { type: "button", role: "menuitem", class: "fhc-b", onclick: () => {
-        ctx3.setUi({ ["more_" + key]: false }, true);
+        ctx3.setUi({ ["more_" + key2]: false }, true);
         fn();
       } }, label))) : null
     );
@@ -3429,11 +8096,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // extension/src/views/common.js
   function safetyTab(ctx3) {
-    const big = (label, cmd, red, note2) => h(
+    const big = (label, cmd, red, note4) => h(
       "div",
       { style: { marginBottom: "10px" } },
       h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx3.send(cmd) }, label),
-      muted(note2)
+      muted(note4)
     );
     return [
       card(
@@ -3448,7 +8115,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function sayCard(ctx3) {
     if (!ctx3.api || !ctx3.api.say) return null;
-    const box2 = h("textarea", {
+    const box3 = h("textarea", {
       class: "fhc-in",
       rows: 2,
       maxlength: 300,
@@ -3457,12 +8124,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       oninput: (e) => ctx3.setUi({ sayText: e.target.value }, true)
     });
     const go = (to) => {
-      if (ctx3.api.say(box2.value, to)) ctx3.setUi({ sayText: "" });
+      if (ctx3.api.say(box3.value, to)) ctx3.setUi({ sayText: "" });
     };
     return card(
       title("\u{1F5E3}\uFE0F Say it"),
       muted("Gagged, made to moo, or held silent? Type it here and it gets through exactly as you typed it. A trap that wants a line said hears it, and so do yes, no and commands. Nobody else sees it."),
-      box2,
+      box3,
       h("div", { style: { marginTop: "6px" } }, btn("Say it to the farm", () => go("farm"), true), btn("Tell staff", () => go("staff"))),
       muted("Tell staff sends it to whoever's on duty, and your herd leader.")
     );
@@ -3546,7 +8213,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         it.gift ? btn("Gift it", () => who2() ? ctx3.send("buy " + it.id + " for " + who2()) : ctx3.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
-    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
+    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink2 = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
     const messWho = () => String(ctx3.ui.messWho || "").trim();
     const messRow = (it) => h(
       "div",
@@ -3563,7 +8230,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const shelves = [
       treats.length && { id: "treats", label: "\u{1F6CD}\uFE0F Treats and favors", n: treats.length, body: () => treats.map(row) },
       shots.length && { id: "shots", label: "\u{1F489} Shots", n: shots.length, body: () => shots.map(row) },
-      shrink.length && { id: "shrink", label: "\u{1F53B} Shrinkin' shots", n: shrink.length, body: () => shrink.map(row) },
+      shrink2.length && { id: "shrink", label: "\u{1F53B} Shrinkin' shots", n: shrink2.length, body: () => shrink2.map(row) },
       // a size back down, for good (Oct 27)
       potions.length && { id: "potions", label: "\u{1F9EA} Potions", n: potions.length, body: () => [
         muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their farm switches."),
@@ -3591,9 +8258,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/views/extras.js
-  function modsFor(ctx3, view) {
+  function modsFor(ctx3, view2) {
     const mods = ctx3.s.mods || {};
-    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff && !c.me)) })]).filter(([, m]) => m.cards.length);
+    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view2)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view2 === "staff" ? true : !c.staff && !c.me)) })]).filter(([, m]) => m.cards.length);
   }
   function mePieces(ctx3) {
     const bars = [], chips = [], cards = [], labels = [];
@@ -3603,18 +8270,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!c || !c.me || c.staff) return;
         if (Array.isArray(c.bars)) bars.push(...c.bars);
         if (Array.isArray(c.chips)) chips.push(...c.chips);
-        cards.push(drawCard(ctx3, name, Object.assign({}, c, { bars: null, chips: null }), i));
+        cards.push(drawCard2(ctx3, name, Object.assign({}, c, { bars: null, chips: null }), i));
         labels.push(String(c.title || m.label || name));
       });
     }
     for (const [name, m] of modsFor(ctx3, "livestock")) {
       labels.push(String(m.label || name));
-      cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)), m.cards.map((c, i) => drawCard(ctx3, name, c, i))));
+      cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)), m.cards.map((c, i) => drawCard2(ctx3, name, c, i))));
     }
     return { bars, chips, cards, labels: [...new Set(labels)] };
   }
-  function drawCard(ctx3, name, c, i) {
-    const key = "x_" + name + "_" + i;
+  function drawCard2(ctx3, name, c, i) {
+    const key2 = "x_" + name + "_" + i;
     return card(
       c.title && title(String(c.title)),
       c.text && h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, String(c.text)),
@@ -3625,31 +8292,31 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.input && h(
         "div",
         null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }),
         btn(String(c.input.label || "Send"), () => {
-          const v = (ctx3.ui[key] || "").trim();
+          const v = (ctx3.ui[key2] || "").trim();
           if (!v) return ctx3.hint("Type somethin' in the box first.");
           ctx3.send(String(c.input.cmd) + " " + v);
-          ctx3.setUi({ [key]: "" });
+          ctx3.setUi({ [key2]: "" });
         }, true)
       ),
       Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx3.send(String(b.cmd)), !!b.accent))) : null,
       c.note && muted(String(c.note))
     );
   }
-  function render(ctx3, view) {
-    const list = modsFor(ctx3, view);
+  function render(ctx3, view2) {
+    const list = modsFor(ctx3, view2);
     if (!list.length) return [muted("No farm extras for you right now.")];
     return list.map(([name, m]) => h(
       "div",
       null,
       h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
-      m.cards.map((c, i) => drawCard(ctx3, name, c, i))
+      m.cards.map((c, i) => drawCard2(ctx3, name, c, i))
     ));
   }
-  function withExtras(tabs, view, ctx3) {
-    if (!modsFor(ctx3, view).length) return tabs;
-    const t = { id: "extras", label: "\u{1F9E9} Farm extras", render: (c) => render(c, view) };
+  function withExtras(tabs, view2, ctx3) {
+    if (!modsFor(ctx3, view2).length) return tabs;
+    const t = { id: "extras", label: "\u{1F9E9} Farm extras", render: (c) => render(c, view2) };
     const at = tabs.findIndex((x) => x.id === "guides");
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
   }
@@ -3803,7 +8470,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function localSaveNow(version) {
     return writeNow(version, true);
   }
-  function localSaveLoad(say2) {
+  function localSaveLoad(say3) {
     const inp = W2.document.createElement("input");
     inp.type = "file";
     inp.accept = ".json,application/json";
@@ -3817,7 +8484,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         } catch (e) {
         }
         if (!d || d.kind !== "farmhand-companion" || !d.data || typeof d.data !== "object") {
-          say2 && say2("That file isn't a Farmhand Companion save.");
+          say3 && say3("That file isn't a Farmhand Companion save.");
           return;
         }
         const keys = Object.keys(d.data).filter((k) => MINE.test(k) && typeof d.data[k] === "string");
@@ -3829,7 +8496,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
           for (const k of keys) W2.localStorage.setItem(k, d.data[k]);
         } catch (e) {
-          say2 && say2("Couldn't load it: " + (e && e.message || e));
+          say3 && say3("Couldn't load it: " + (e && e.message || e));
           return;
         }
         W2.location.reload();
@@ -3922,13 +8589,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       cv.ax = ox;
       cv.ay = oy;
       cv.nips = nipples(S3);
-      const side = (s, draw2) => {
+      const side = (s, draw3) => {
         g.save();
         g.beginPath();
         if (s < 0) g.rect(0, 0, ox, cv.height);
         else g.rect(ox, 0, cv.width - ox, cv.height);
         g.clip();
-        draw2();
+        draw3();
         g.restore();
       };
       const whole2 = (s) => {
@@ -4139,11 +8806,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const fitNow = () => BELLY.fits[poseKey()];
       function bellySkin(src, hex, pose) {
-        const key = src + "|" + (hex || ""), v = BELLY.skin.get(key);
+        const key2 = src + "|" + (hex || ""), v = BELLY.skin.get(key2);
         if (Array.isArray(v)) return v;
         const guess = /_Black\./.test(src) ? FarmBelly.FALLBACK.Black : /_Asian\./.test(src) ? FarmBelly.FALLBACK.Asian : FarmBelly.FALLBACK.White;
         if (!v) {
-          BELLY.skin.set(key, "loading");
+          BELLY.skin.set(key2, "loading");
           const img2 = new Image();
           img2.onload = () => {
             let c = guess;
@@ -4162,10 +8829,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               }
             } catch (e) {
             }
-            BELLY.skin.set(key, c);
+            BELLY.skin.set(key2, c);
             bellyDraw();
           };
-          img2.onerror = () => BELLY.skin.set(key, guess);
+          img2.onerror = () => BELLY.skin.set(key2, guess);
           img2.src = src;
         }
         return guess;
@@ -4286,8 +8953,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       function bellyCover(src, x, y, ctx3) {
         const im = mouldImg(src);
         if (!im) return 0;
-        const b = ctx3.belly, key = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
-        let v = MOULD.cover.get(key);
+        const b = ctx3.belly, key2 = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
+        let v = MOULD.cover.get(key2);
         if (v != null) return v;
         const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
         c.width = w;
@@ -4304,7 +8971,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         v = all ? hit / all : 0;
         if (MOULD.cover.size > 400) MOULD.cover.clear();
-        MOULD.cover.set(key, v);
+        MOULD.cover.set(key2, v);
         return v;
       }
       function bellyAuto(src, x, y, ctx3, behind, pieceKey) {
@@ -4356,8 +9023,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         } catch (e) {
           return cv.formF = null;
         }
-        const lum = (i) => d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11, ls = [];
-        for (let i = 0; i < d.length; i += 4 * 5) if (d[i + 3] > 250) ls.push(lum(i));
+        const lum2 = (i) => d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11, ls = [];
+        for (let i = 0; i < d.length; i += 4 * 5) if (d[i + 3] > 250) ls.push(lum2(i));
         if (ls.length < 50) return cv.formF = null;
         ls.sort((p, q2) => p - q2);
         const med = ls[Math.floor(ls.length * 0.6)] || 1;
@@ -4366,7 +9033,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         c.height = h2;
         const g = c.getContext("2d", { willReadFrequently: true }), im = g.createImageData(w, h2);
         for (let i = 0; i < d.length; i += 4) {
-          const a = d[i + 3] / 255, fr = Math.max(0.62, Math.min(1.1, lum(i) / med)), v = 1 + (fr - 1) * a;
+          const a = d[i + 3] / 255, fr = Math.max(0.62, Math.min(1.1, lum2(i) / med)), v = 1 + (fr - 1) * a;
           im.data[i] = im.data[i + 1] = im.data[i + 2] = Math.round(v * 200);
           im.data[i + 3] = 255;
         }
@@ -4444,8 +9111,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       function bellyUnder(cv, dx, dy, src, ux, uy) {
         const u = gameUnder(src);
         if (!u) return cv;
-        const key = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|");
-        if (cv.underKey === key) return cv.under;
+        const key2 = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|");
+        if (cv.underKey === key2) return cv.under;
         const c = document.createElement("canvas");
         c.width = cv.width;
         c.height = cv.height;
@@ -4454,10 +9121,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         for (let cx = 0; cx < cv.width; cx++) {
           const px = Math.round(cx + dx - ux);
           if (px < 0 || px >= u.length || u[px] < 0) continue;
-          const cut = Math.round(uy + u[px] + 1 - dy);
-          if (cut > 0) g.clearRect(cx, 0, 1, cut);
+          const cut2 = Math.round(uy + u[px] + 1 - dy);
+          if (cut2 > 0) g.clearRect(cx, 0, 1, cut2);
         }
-        cv.underKey = key;
+        cv.underKey = key2;
         cv.under = c;
         return c;
       }
@@ -4469,9 +9136,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!fm) return null;
         const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
         if (!w || !h2) return null;
-        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx3.sig + "|" + (ctx3.breast ? ctx3.breast.sig : "");
+        const key2 = Math.round(sx) + "," + Math.round(sy) + "|" + ctx3.sig + "|" + (ctx3.breast ? ctx3.breast.sig : "");
         let e = shadeSeen.get(img2);
-        if (e && e.key === key) return e.out;
+        if (e && e.key === key2) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
         let out = null;
         if (x1 > x0 && y1 > y0) {
@@ -4509,7 +9176,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             out = c;
           }
         }
-        shadeSeen.set(img2, { key, out });
+        shadeSeen.set(img2, { key: key2, out });
         return out;
       }
       function bellyRows(ctx3) {
@@ -4544,10 +9211,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
           }
         }
-        const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
-        if (MOULD.out.has(key)) return MOULD.out.get(key);
+        const key2 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
+        if (MOULD.out.has(key2)) return MOULD.out.get(key2);
         const keep2 = (res) => {
-          keepIn(MOULD.out, key, res);
+          keepIn(MOULD.out, key2, res);
           return res;
         };
         if (mode === "under") {
@@ -4635,8 +9302,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             clearTimeout(MOULD.t);
             MOULD.t = setTimeout(bellyDraw, 60);
           }
-          const key2 = key + "|span" + span.v;
-          if (MOULD.out.has(key2)) return MOULD.out.get(key2);
+          const key22 = key2 + "|span" + span.v;
+          if (MOULD.out.has(key22)) return MOULD.out.get(key22);
           const rowOf = (yy) => {
             if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null;
             const j = yy - Math.round(b.dy);
@@ -4674,7 +9341,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
           }
           const res2 = changed2 ? c : false;
-          keepIn(MOULD.out, key2, res2);
+          keepIn(MOULD.out, key22, res2);
           return res2;
         }
         for (let j = 0; j < h2; j++) {
@@ -4702,9 +9369,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return n;
       };
-      function keepIn(map, key, v) {
-        map.delete(key);
-        map.set(key, v);
+      function keepIn(map, key2, v) {
+        map.delete(key2);
+        map.set(key2, v);
         return v;
       }
       function trim() {
@@ -4782,8 +9449,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return n < 0 ? 3 : n;
       }
       function nipHalves(src, split) {
-        const key = src + "|" + split;
-        let v = BREAST.halves.get(key);
+        const key2 = src + "|" + split;
+        let v = BREAST.halves.get(key2);
         if (v) return v;
         const im = mouldImg(src);
         if (!im) return null;
@@ -4800,11 +9467,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           a[2]++;
         }
         v = acc.map((a) => a[2] ? [a[0] / a[2], a[1] / a[2]] : null);
-        BREAST.halves.set(key, v);
+        BREAST.halves.set(key2, v);
         return v;
       }
       const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };
-      function draw2(C2, cb, game) {
+      function draw3(C2, cb, game) {
         trim();
         {
           let finish = null, seenNow = null, handFNow = null;
@@ -4873,22 +9540,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (br) {
                   const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S32 = isHeld ? FarmBreasts.held(freeS) : freeS;
-                  const key = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
-                  if (BREAST.cvKey !== key) {
+                  const key2 = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
+                  if (BREAST.cvKey !== key2) {
                     BREAST.cv = FarmBreasts.canvas(S32, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
-                    BREAST.cvKey = key;
+                    BREAST.cvKey = key2;
                   }
                   const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
                   let bc = BREAST.cv;
                   if (bpose === "AllFours" && ry - bc.ay + bc.height > ground) {
-                    if (BREAST.flatKey !== key + "|" + Math.round(ry)) {
+                    if (BREAST.flatKey !== key2 + "|" + Math.round(ry)) {
                       const fc = document.createElement("canvas");
                       fc.width = bc.width;
                       fc.height = bc.height;
-                      const fg = fc.getContext("2d"), cut = Math.round(ground - (ry - bc.ay));
+                      const fg = fc.getContext("2d"), cut2 = Math.round(ground - (ry - bc.ay));
                       fg.drawImage(bc, 0, 0);
-                      fg.clearRect(0, cut, fc.width, fc.height - cut);
-                      const row = fg.getImageData(0, Math.max(0, cut - 3), fc.width, 1).data;
+                      fg.clearRect(0, cut2, fc.width, fc.height - cut2);
+                      const row = fg.getImageData(0, Math.max(0, cut2 - 3), fc.width, 1).data;
                       let x0 = -1, x1 = -1;
                       for (let i = 0; i < fc.width; i++) if (row[i * 4 + 3] > 120) {
                         if (x0 < 0) x0 = i;
@@ -4897,30 +9564,30 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       if (x0 >= 0) {
                         const soft = 16, mid = (x0 + x1) / 2, half = (x1 - x0) / 2;
                         fg.globalCompositeOperation = "destination-out";
-                        const fade = fg.createLinearGradient(0, cut - soft, 0, cut);
+                        const fade = fg.createLinearGradient(0, cut2 - soft, 0, cut2);
                         fade.addColorStop(0, "rgba(0,0,0,0)");
                         fade.addColorStop(1, "rgba(0,0,0,0.9)");
                         fg.fillStyle = fade;
-                        fg.fillRect(0, cut - soft, fc.width, soft);
+                        fg.fillRect(0, cut2 - soft, fc.width, soft);
                         for (const sd of [-1, 1]) {
-                          const cx = mid + sd * half, rg = fg.createRadialGradient(cx, cut, 0, cx, cut, soft * 1.8);
+                          const cx = mid + sd * half, rg = fg.createRadialGradient(cx, cut2, 0, cx, cut2, soft * 1.8);
                           rg.addColorStop(0, "rgba(0,0,0,1)");
                           rg.addColorStop(1, "rgba(0,0,0,0)");
                           fg.fillStyle = rg;
-                          fg.fillRect(cx - soft * 2, cut - soft * 2, soft * 4, soft * 2);
+                          fg.fillRect(cx - soft * 2, cut2 - soft * 2, soft * 4, soft * 2);
                         }
                         fg.globalCompositeOperation = "destination-over";
-                        const sh = fg.createRadialGradient(mid, cut - 3, 0, mid, cut - 3, half * 1.05);
+                        const sh = fg.createRadialGradient(mid, cut2 - 3, 0, mid, cut2 - 3, half * 1.05);
                         sh.addColorStop(0, "rgba(70,40,36,0.34)");
                         sh.addColorStop(0.75, "rgba(70,40,36,0.2)");
                         sh.addColorStop(1, "rgba(70,40,36,0)");
                         fg.save();
-                        fg.translate(0, cut - 3);
+                        fg.translate(0, cut2 - 3);
                         fg.scale(1, 0.09);
-                        fg.translate(0, -(cut - 3));
+                        fg.translate(0, -(cut2 - 3));
                         fg.fillStyle = sh;
                         fg.beginPath();
-                        fg.arc(mid, cut - 3, half * 1.05, 0, Math.PI * 2);
+                        fg.arc(mid, cut2 - 3, half * 1.05, 0, Math.PI * 2);
                         fg.fill();
                         fg.restore();
                         fg.globalCompositeOperation = "source-over";
@@ -4930,7 +9597,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       fc.nips = bc.nips;
                       fc.mask = bc.mask;
                       BREAST.flat = fc;
-                      BREAST.flatKey = key + "|" + Math.round(ry);
+                      BREAST.flatKey = key2 + "|" + Math.round(ry);
                     }
                     bc = BREAST.flat;
                   }
@@ -4947,7 +9614,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] over the breasts:", e);
                     }
                   }
-                  ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key2 + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
                     const B = ctx3.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
                     let nc = BREAST.nc;
@@ -4983,8 +9650,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               const handHidden = (src, x, y) => {
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return null;
-                const key = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let v = BREAST.cover.get(key);
+                const key2 = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let v = BREAST.cover.get(key2);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -5002,7 +9669,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 g.drawImage(B.mask, B.mx - x, B.my - y);
                 const under = count();
                 v = all ? under / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
@@ -5016,8 +9683,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
-                let c = BREAST.out.get(key);
+                const key2 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   c = document.createElement("canvas");
                   c.width = base.naturalWidth || base.width;
@@ -5034,24 +9701,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] belly form:", e);
                     }
                   }
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - ox, y, o, src);
                 return true;
               };
               const frameCover = (src, im, x, y, B) => {
-                const key = "fr|" + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key);
+                const key2 = "fr|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key2);
                 if (v != null) return v;
                 const fm = frameMeasure(src, im, x, y, B);
                 v = fm ? fm.share : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const FRAME_N = 96;
               const frameMeasure = (src, im, x, y, B) => {
-                const key = "fm|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
-                let v = BREAST.out.get(key);
+                const key2 = "fm|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.out.get(key2);
                 if (v !== void 0) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -5125,7 +9792,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   for (const [p, q2] of [[0, 1], [1, 0]]) if (!sides[p].att.length && sides[q2].att.length) sides[p].att = sides[q2].att.map((at) => ({ a: at.a, x: 2 * (B.mid - x) - at.x, y: at.y }));
                 }
                 if (!runs.length) {
-                  BREAST.out.set(key, null);
+                  BREAST.out.set(key2, null);
                   return null;
                 }
                 runs.sort((p, q2) => p - q2);
@@ -5145,12 +9812,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                 }
                 v = { sides, width: runs[runs.length >> 1] + 1, col: [rr / n, gg / n, bb / n], hi: hiC, share: tAll ? top / tAll : 0, all: hits / all };
-                BREAST.out.set(key, v);
+                BREAST.out.set(key2, v);
                 return v;
               };
               const herOutline = (B) => {
-                const key = "ho|" + B.sig;
-                let v = BREAST.out.get(key);
+                const key2 = "ho|" + B.sig;
+                let v = BREAST.out.get(key2);
                 if (v) return v;
                 const m = B.mask, w = m.width, h2 = m.height, d = m.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h2).data, mid = B.mid - B.mx, cs = [];
                 for (const sd of [-1, 1]) {
@@ -5184,7 +9851,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge });
                 }
                 v = cs;
-                keepIn(BREAST.out, key, v);
+                keepIn(BREAST.out, key2, v);
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
@@ -5192,8 +9859,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;
                 const fm = frameMeasure(src, im, x, y, B);
                 if (!fm) return false;
-                const key = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key);
+                const key2 = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -5269,14 +9936,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       g.globalAlpha = 1;
                     }
                   }
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const underBand = (src, im, x, y, B) => {
-                const key = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key);
+                const key2 = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key2);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -5299,14 +9966,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   if (any) hit++;
                 }
                 v = all ? hit / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const bandDraw = (name, src, x, y, o) => {
                 const B = ctx3.breast, im = mouldImg(src);
                 if (!B || !im) return false;
-                const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key);
+                const key2 = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -5327,14 +9994,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                     g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0);
                   }
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const chestCover = (src, im, x, y, B, wide) => {
-                const key = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y);
-                let v = BREAST.cover.get(key);
+                const key2 = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key2);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -5353,7 +10020,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                 }
                 v = all ? hit / all : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const distMap = (alpha, w, h2) => {
@@ -5386,8 +10053,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 return d;
               };
               const strapHalf = (src, im, x, y, B) => {
-                const key = "thin|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
-                let v = BREAST.cover.get(key);
+                const key2 = "thin|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.cover.get(key2);
                 if (v != null) return v;
                 const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
                 c.width = w;
@@ -5410,7 +10077,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 ridge.sort((m, n) => m - n);
                 v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0;
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };
@@ -5436,8 +10103,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
-                let c = BREAST.out.get(key);
+                const key2 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
                   c = document.createElement("canvas");
@@ -5446,7 +10113,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   c.MX = MX;
                   c.MY = MY;
                   const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
-                  const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
+                  const pk = (pieceOf(src) || {}).key || src, CW3 = c.width, CH3 = c.height;
                   const overBelly = bellyAuto(src, x, y, ctx3, fit.behind, pk);
                   if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY);
                   else g.drawImage(im, MX, MY);
@@ -5454,16 +10121,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   if (pc0 && pc0.flat) {
                     const fsrc = String(B.upperSrc).replace("/XLarge", "/FlatMedium").replace("XLarge_", "FlatMedium_").replace(/XLarge(?=[_.])/, "FlatMedium"), fp = edgesOf(fsrc);
                     if (!fp) return false;
-                    const fux = MX + B.ux - x, r0 = Math.max(0, Math.round(uyc + G.y1 - 40)), r1 = Math.min(CH, Math.round(uyc + G.y3 + 30));
+                    const fux = MX + B.ux - x, r0 = Math.max(0, Math.round(uyc + G.y1 - 40)), r1 = Math.min(CH3, Math.round(uyc + G.y3 + 30));
                     sleeves = document.createElement("canvas");
-                    sleeves.width = CW;
-                    sleeves.height = CH;
-                    const id = g.getImageData(0, r0, CW, r1 - r0), d = id.data, sg0 = sleeves.getContext("2d"), sd = sg0.createImageData(CW, r1 - r0), e = sd.data;
+                    sleeves.width = CW3;
+                    sleeves.height = CH3;
+                    const id = g.getImageData(0, r0, CW3, r1 - r0), d = id.data, sg0 = sleeves.getContext("2d"), sd = sg0.createImageData(CW3, r1 - r0), e = sd.data;
                     for (let j = 0; j < r1 - r0; j++) {
                       const pj = r0 + j - uyc;
                       if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue;
-                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW * 4;
-                      for (let xx = 0; xx < CW; xx++) {
+                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW3 * 4;
+                      for (let xx = 0; xx < CW3; xx++) {
                         if (xx >= L - 1 && xx <= R + 1) continue;
                         const p = o2 + xx * 4;
                         if (!d[p + 3]) continue;
@@ -5475,16 +10142,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       }
                     }
                     g.putImageData(id, 0, r0);
-                    spA = g.getImageData(0, 0, CW, CH).data;
+                    spA = g.getImageData(0, 0, CW3, CH3).data;
                     for (let j = 0; j < r1 - r0; j++) {
                       const pj = r0 + j - uyc;
                       if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue;
-                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW * 4;
+                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW3 * 4;
                       for (const [edge, step] of [[R, 1], [L, -1]]) {
                         let src2 = -1;
                         for (let k = 6; k < 12; k++) {
                           const xx = edge - step * k, p = o2 + xx * 4;
-                          if (xx >= 0 && xx < CW && d[p + 3] > 200) {
+                          if (xx >= 0 && xx < CW3 && d[p + 3] > 200) {
                             src2 = p;
                             break;
                           }
@@ -5492,7 +10159,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (src2 < 0) continue;
                         for (let k = 1; k <= 40; k++) {
                           const xx = edge + step * k;
-                          if (xx < 0 || xx >= CW) break;
+                          if (xx < 0 || xx >= CW3) break;
                           const p = o2 + xx * 4;
                           if (d[p + 3] > 200) break;
                           d[p] = d[src2];
@@ -5505,24 +10172,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.putImageData(id, 0, r0);
                     sg0.putImageData(sd, 0, r0);
                   }
-                  const sp = g.getImageData(0, 0, CW, CH).data;
-                  if (spA) g.putImageData(new ImageData(spA, CW, CH), 0, 0);
+                  const sp = g.getImageData(0, 0, CW3, CH3).data;
+                  if (spA) g.putImageData(new ImageData(spA, CW3, CH3), 0, 0);
                   const spb = (() => {
                     const cb2 = document.createElement("canvas");
-                    cb2.width = CW;
-                    cb2.height = CH;
+                    cb2.width = CW3;
+                    cb2.height = CH3;
                     const gb = cb2.getContext("2d", { willReadFrequently: true });
                     gb.filter = "blur(1.5px)";
                     gb.drawImage(c, 0, 0);
                     gb.filter = "none";
-                    return gb.getImageData(0, 0, CW, CH).data;
+                    return gb.getImageData(0, 0, CW3, CH3).data;
                   })();
                   const sharp = (t, w2) => {
                     const u = Math.max(0, Math.min(1, (t - 0.5 + w2) / (2 * w2)));
                     return u * u * (3 - 2 * u);
                   };
                   const sample = (fx, fy, mag, od, o4) => {
-                    const ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
+                    const ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, p00 = (iy * CW3 + ix) * 4, p10 = p00 + 4, p01 = p00 + CW3 * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     let r = 0, gg = 0, bl = 0;
                     if (at >= 1) {
@@ -5536,8 +10203,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       const b00 = spb[p00 + 3] * (1 - ax) * (1 - ay), b10 = spb[p10 + 3] * ax * (1 - ay), b01 = spb[p01 + 3] * (1 - ax) * ay, b11 = spb[p11 + 3] * ax * ay, bt = b00 + b10 + b01 + b11;
                       let amin = 255, amax = 0, aEnds = 0, aN = 0;
                       for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
-                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
-                        const a = sp[(yy * CW + xx) * 4 + 3];
+                        if (xx < 0 || yy < 0 || xx >= CW3 || yy >= CH3) continue;
+                        const a = sp[(yy * CW3 + xx) * 4 + 3];
                         aN++;
                         if (a < 20 || a > 235) aEnds++;
                         if (a < amin) amin = a;
@@ -5547,8 +10214,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       let lo = -1, hi = -1, lmin = 1e9, lmax = -1, n = 0;
                       const Q = [];
                       for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
-                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
-                        const p = (yy * CW + xx) * 4;
+                        if (xx < 0 || yy < 0 || xx >= CW3 || yy >= CH3) continue;
+                        const p = (yy * CW3 + xx) * 4;
                         if (sp[p + 3] < 200) continue;
                         Q.push(p);
                         n++;
@@ -5567,8 +10234,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (dd > 900) {
                           let two2 = true, ends = 0;
                           for (const p of Q) {
-                            const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db2) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db2;
-                            if (qr * qr + qg * qg + qb * qb > dd * 0.03 + 60) {
+                            const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db2) / dd)), qr2 = er - u * dr, qg = eg - u * dg, qb = eb - u * db2;
+                            if (qr2 * qr2 + qg * qg + qb * qb > dd * 0.03 + 60) {
                               two2 = false;
                               break;
                             }
@@ -5601,7 +10268,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   };
                   const grown = (yn) => 1 + (sc - 1) * sm((yn - y1) / (y2 - y1));
                   const lands = (yn) => uyc + mapYp(yn - uyc);
-                  const ynMax = y3, yEnd = Math.min(CH - 2, Math.floor(flapEnd));
+                  const ynMax = y3, yEnd = Math.min(CH3 - 2, Math.floor(flapEnd));
                   const prof = edgesOf(B.upperSrc), ux = MX + B.ux - x, bcy = MY + B.ry - y + S22.by, bcx = [midX + (B.rx - B.mid) - S22.bx, midX + (B.rx - B.mid) + S22.bx];
                   const onBreast = (qx, qy) => {
                     for (let k = 0; k < 2; k++) {
@@ -5610,7 +10277,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                     return false;
                   };
-                  const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S22.by + S22.rv * 2.4) : 0))) - y0 + 1;
+                  const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW3 - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH3 - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S22.by + S22.rv * 2.4) : 0))) - y0 + 1;
                   if (bw > 0 && bh > 0) {
                     const out2 = g.createImageData(bw, bh), od = out2.data, hi = g.createImageData(bw, bh);
                     const fxA = new Float32Array(bw * bh).fill(-1), fyA = new Float32Array(bw * bh), magA = new Float32Array(bw * bh);
@@ -5654,7 +10321,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       let n = 0, k = 0;
                       for (let xx = Math.round(midX - hb * 0.9); xx <= Math.round(midX + hb * 0.9); xx += 2) {
                         k++;
-                        if (xx >= 0 && xx < CW && yy >= 0 && yy < CH && sp[(yy * CW + xx) * 4 + 3] > 60) n++;
+                        if (xx >= 0 && xx < CW3 && yy >= 0 && yy < CH3 && sp[(yy * CW3 + xx) * 4 + 3] > 60) n++;
                       }
                       v = k > 0 && n / k >= 0.85;
                       solidRows.set(qy, v);
@@ -5687,10 +10354,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         }
                         const asIs = !onB && !onTent && !bridge && qy > bcy;
                         const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy);
-                        if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                        if (ix < 0 || iy < 0 || ix >= CW3 - 1 || iy >= CH3 - 1) continue;
                         const mg = asIs ? 1 : Math.max(sg, kyAt(yn));
                         if (asIs && spA) {
-                          const p = (qy * CW + qx) * 4;
+                          const p = (qy * CW3 + qx) * 4;
                           if (spA[p + 3] < 1) {
                             od[o4 + 3] = 0;
                             continue;
@@ -5720,19 +10387,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       const BL = tx.bl || 7, S4 = tx.cell || 30;
                       const spL = (() => {
                         const cb2 = document.createElement("canvas");
-                        cb2.width = CW;
-                        cb2.height = CH;
+                        cb2.width = CW3;
+                        cb2.height = CH3;
                         const gb = cb2.getContext("2d", { willReadFrequently: true });
                         gb.filter = "blur(" + BL + "px)";
                         gb.drawImage(c, 0, 0);
                         gb.filter = "none";
-                        return gb.getImageData(0, 0, CW, CH).data;
+                        return gb.getImageData(0, 0, CW3, CH3).data;
                       })();
-                      const lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                      const lum2 = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
                       const ch = [[], [], []];
                       for (const sd of [-1, 1]) for (let yy = Math.round(uyc + G.cy - G.rv * 0.6); yy < Math.round(uyc + G.cy + G.rv * 0.6); yy += 2) for (let xx = Math.round(midX + sd * G.dx - G.ro * 0.6); xx < Math.round(midX + sd * G.dx + G.ro * 0.6); xx += 2) {
-                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
-                        const p = (yy * CW + xx) * 4;
+                        if (xx < 0 || yy < 0 || xx >= CW3 || yy >= CH3) continue;
+                        const p = (yy * CW3 + xx) * 4;
                         if (sp[p + 3] < 250) continue;
                         const t = spL[p] + spL[p + 1] + spL[p + 2] || 1;
                         ch[0].push(spL[p] / t);
@@ -5744,20 +10411,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         a.sort((p, q2) => p - q2);
                         return a[a.length >> 1];
                       });
-                      const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH - 2, Math.round(uyc + G.y3 + 90));
+                      const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW3 - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH3 - 2, Math.round(uyc + G.y3 + 90));
                       const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean3 = new Uint8Array(RW * RH);
                       let nC = 0, sD = 0, bl = 0;
                       for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
-                        const p = (yy * CW + xx) * 4;
+                        const p = (yy * CW3 + xx) * 4;
                         if (sp[p + 3] < 250) continue;
                         const t = spL[p] + spL[p + 1] + spL[p + 2] || 1;
                         if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
-                        const gr = Math.abs(lum(spL, p + 4) - lum(spL, p - 4)) + Math.abs(lum(spL, p + CW * 4) - lum(spL, p - CW * 4));
+                        const gr = Math.abs(lum2(spL, p + 4) - lum2(spL, p - 4)) + Math.abs(lum2(spL, p + CW3 * 4) - lum2(spL, p - CW3 * 4));
                         if (gr > 9) continue;
                         clean3[(yy - ry0) * RW + (xx - rx0)] = 1;
                         nC++;
-                        sD += Math.abs(lum(sp, p) - lum(spL, p));
-                        bl += lum(spL, p);
+                        sD += Math.abs(lum2(sp, p) - lum2(spL, p));
+                        bl += lum2(spL, p);
                       }
                       if (nC < 800) return null;
                       const det = sD / nC;
@@ -5770,12 +10437,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
-                      const box2 = (x2, y4, r) => {
+                      const box3 = (x2, y4, r) => {
                         const a = Math.max(0, x2 - r), b = Math.max(0, y4 - r), c2 = Math.min(RW, x2 + r + 1), d2 = Math.min(RH, y4 + r + 1);
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box2(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box3(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S4, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
@@ -5783,12 +10450,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       } };
                     })();
                     if (texOf) {
-                      const { S: S4, spL, srcs, bn, base, cleanAt } = texOf, lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                      const { S: S4, spL, srcs, bn, base, cleanAt } = texOf, lum2 = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
                       const bil = (A, fx, fy, k) => {
                         const ix = Math.floor(fx), iy = Math.floor(fy);
-                        if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) return -1;
-                        const ax = fx - ix, ay = fy - iy, p = (iy * CW + ix) * 4 + k;
-                        return A[p] * (1 - ax) * (1 - ay) + A[p + 4] * ax * (1 - ay) + A[p + CW * 4] * (1 - ax) * ay + A[p + CW * 4 + 4] * ax * ay;
+                        if (ix < 0 || iy < 0 || ix >= CW3 - 1 || iy >= CH3 - 1) return -1;
+                        const ax = fx - ix, ay = fy - iy, p = (iy * CW3 + ix) * 4 + k;
+                        return A[p] * (1 - ax) * (1 - ay) + A[p + 4] * ax * (1 - ay) + A[p + CW3 * 4] * (1 - ax) * ay + A[p + CW3 * 4 + 4] * ax * ay;
                       };
                       const pick2 = (ci, cj) => {
                         let hsh = ci * 73856093 ^ cj * 19349663 ^ srcs.length;
@@ -5819,7 +10486,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                           if (bwt <= 1e-3) continue;
                           const P5 = pick2(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P5[0] + (qx - cx), sy = P5[1] + (qy - cy);
                           if (!cleanAt(sx, sy)) continue;
-                          const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
+                          const p = (Math.round(sy) * CW3 + Math.round(sx)) * 4;
                           sr += bwt * (sp[p] - spL[p]);
                           sg2 += bwt * (sp[p + 1] - spL[p + 1]);
                           sb += bwt * (sp[p + 2] - spL[p + 2]);
@@ -5885,10 +10552,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.globalCompositeOperation = "destination-out";
                     g.drawImage(hole, x0, y0);
                     g.globalCompositeOperation = "source-over";
-                    const atop = (draw3) => {
+                    const atop = (draw4) => {
                       g.save();
                       g.globalCompositeOperation = "source-atop";
-                      draw3();
+                      draw4();
                       g.restore();
                     };
                     const ell = (k, grow, dy) => {
@@ -5898,16 +10565,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.drawImage(T, x0, y0);
                     if (pc0 && pc0.flat && chestCover(src, im, x, y, B, false) >= 0.5) {
                       const bl = document.createElement("canvas");
-                      bl.width = CW;
-                      bl.height = CH;
+                      bl.width = CW3;
+                      bl.height = CH3;
                       const bg2 = bl.getContext("2d");
                       bg2.filter = "blur(6px)";
                       bg2.drawImage(c, 0, 0);
                       bg2.filter = "none";
-                      const mk = document.createElement("canvas");
-                      mk.width = CW;
-                      mk.height = CH;
-                      const mg2 = mk.getContext("2d");
+                      const mk2 = document.createElement("canvas");
+                      mk2.width = CW3;
+                      mk2.height = CH3;
+                      const mg2 = mk2.getContext("2d");
                       mg2.filter = "blur(5px)";
                       mg2.fillStyle = "#000";
                       for (let k = 0; k < 2; k++) {
@@ -5916,7 +10583,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         mg2.fill();
                       }
                       bg2.globalCompositeOperation = "destination-in";
-                      bg2.drawImage(mk, 0, 0);
+                      bg2.drawImage(mk2, 0, 0);
                       g.save();
                       g.globalCompositeOperation = "source-atop";
                       g.drawImage(bl, 0, 0);
@@ -5924,11 +10591,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                     atop(() => {
                       g.beginPath();
-                      g.rect(0, 0, CW, CH);
+                      g.rect(0, 0, CW3, CH3);
                       for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy, (S22.ro + S22.ri) / 2 + 1, S22.rv + 1, 0, 0, Math.PI * 2);
                       g.clip("evenodd");
                       g.beginPath();
-                      g.rect(0, bcy + S22.rv * 0.55, CW, CH);
+                      g.rect(0, bcy + S22.rv * 0.55, CW3, CH3);
                       g.clip();
                       g.filter = "blur(4px)";
                       g.fillStyle = "rgba(0,0,0,0.20)";
@@ -5946,12 +10613,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         under.addColorStop(0, "rgba(0,0,0,0)");
                         under.addColorStop(1, "rgba(0,0,0,0.16)");
                         g.fillStyle = under;
-                        g.fillRect(0, bcy, CW, S22.rv + 4);
+                        g.fillRect(0, bcy, CW3, S22.rv + 4);
                         const hx = bcx[k] - S22.ro * 0.18, hy = bcy - S22.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S22.rv * 0.6);
                         light.addColorStop(0, "rgba(255,255,255,0.04)");
                         light.addColorStop(1, "rgba(255,255,255,0)");
                         g.fillStyle = light;
-                        g.fillRect(0, 0, CW, CH);
+                        g.fillRect(0, 0, CW3, CH3);
                         g.restore();
                       }
                       const cl = g.createLinearGradient(midX - S22.ri * 0.3, 0, midX + S22.ri * 0.3, 0);
@@ -5993,14 +10660,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] belly form:", e);
                     }
                   }
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const ownColour = (src, im) => {
-                const key = "col|" + src;
-                let v = BREAST.cover.get(key);
+                const key2 = "col|" + src;
+                let v = BREAST.cover.get(key2);
                 if (v) return v;
                 const c = document.createElement("canvas");
                 c.width = im.naturalWidth;
@@ -6011,7 +10678,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) px.push([d[i], d[i + 1], d[i + 2]]);
                 px.sort((a, b) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]));
                 v = px.length ? px[Math.floor(px.length * 0.6)] : [40, 40, 44];
-                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key, v);
+                BREAST.cover.size > 2e3 && BREAST.cover.clear(), BREAST.cover.set(key2, v);
                 return v;
               };
               const strapBase = {};
@@ -6019,9 +10686,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 if (!strapBase[piece.key]) strapBase[piece.key] = src;
-                const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted = !!(o && o.HexColor);
-                const key = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted ? 1 : 0);
-                let c = BREAST.out.get(key);
+                const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted2 = !!(o && o.HexColor);
+                const key2 = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted2 ? 1 : 0);
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const MX = 220, MY = 420, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -6051,7 +10718,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.globalCompositeOperation = "source-over";
                   if (base) {
-                    const col = tinted ? [205, 205, 205] : ownColour(src, im), k = (m) => "rgb(" + col.map((v) => Math.max(0, Math.min(255, Math.round(v * m)))).join(",") + ")";
+                    const col = tinted2 ? [205, 205, 205] : ownColour(src, im), k = (m) => "rgb(" + col.map((v) => Math.max(0, Math.min(255, Math.round(v * m)))).join(",") + ")";
                     const grow = 1 + 0.5 * S22.k;
                     const strap = (wd, path) => {
                       g.lineCap = "round";
@@ -6064,7 +10731,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       g.lineWidth = wd;
                       path();
                       g.stroke();
-                      g.strokeStyle = tinted ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)";
+                      g.strokeStyle = tinted2 ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)";
                       g.lineWidth = Math.max(1, wd * 0.22);
                       g.save();
                       g.translate(-wd * 0.18, -wd * 0.18);
@@ -6072,13 +10739,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       g.stroke();
                       g.restore();
                     };
-                    const side = (sd, draw3) => {
+                    const side = (sd, draw4) => {
                       g.save();
                       g.beginPath();
                       if (sd < 0) g.rect(0, 0, ox, c.height);
                       else g.rect(ox, 0, c.width - ox, c.height);
                       g.clip();
-                      draw3();
+                      draw4();
                       g.restore();
                     };
                     const nipY = oy + S22.by + S22.r * (-0.15 + 0.42 * S22.k), topY = oy + S22.by - S22.r * S22.top, botY = oy + S22.by + S22.r * (1 + S22.sag);
@@ -6127,18 +10794,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       });
                     }
                   }
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
               };
               const held = [];
+              const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;
+              const flushInk = () => {
+                for (const h2 of inkHeld.splice(0)) {
+                  try {
+                    real[h2[0]](h2[1], h2[2], h2[3], h2[4]);
+                  } catch (e) {
+                    warnSome2("[studio] ink:", e);
+                  }
+                }
+              };
               const PUMP = { cups: [[188, 296, 40, 42], [272, 296, 40, 42]], cupMid: [[207, 316], [293, 316]], join: [250, 376], pumpTop: 700 };
               const pumpDraw = (name, src, x, y, o) => {
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im || im.naturalHeight < 900) return false;
-                const key = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key);
+                const key2 = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const MX = 320, MY = 200, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -6166,7 +10843,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                   }
                   PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N2[i][0] - (PUMP.cupMid[i][0] - sx), MY + N2[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
@@ -6184,8 +10861,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
                 if (!own) return false;
                 if (!ctx3.native && groupOf3(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
-                const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
-                let c = BREAST.out.get(key);
+                const key2 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
+                let c = BREAST.out.get(key2);
                 if (!c) {
                   const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
                   c = document.createElement("canvas");
@@ -6201,7 +10878,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     const T = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N2[0]) * kN, MY + (T[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
                   });
-                  keepIn(BREAST.out, key, c);
+                  keepIn(BREAST.out, key2, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o, src);
                 return true;
@@ -6233,6 +10910,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const wrap = (name) => typeof real[name] === "function" ? (src, x, y, o) => {
                 const blink = /Blink$/.test(name);
+                if (!done && typeof src === "string" && INK_SRC.test(src)) {
+                  inkHeld.push([name, src, x, y, o]);
+                  return;
+                }
                 if (!blink) {
                   try {
                     before(src, x, y, o);
@@ -6240,6 +10921,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     warnSome2("[studio] belly:", e);
                   }
                 }
+                if (done && inkHeld.length) flushInk();
                 if (br && typeof src === "string") {
                   const gname = groupOf3(src);
                   if (!done && gname === "Nipples") {
@@ -6310,10 +10992,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf3(src) === "Pussy" && /Penis/.test(src)) {
                   try {
                     const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
-                    const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
-                    if (GEN.cvKey !== key) {
+                    const key2 = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
+                    if (GEN.cvKey !== key2) {
                       GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin });
-                      GEN.cvKey = key;
+                      GEN.cvKey = key2;
                     }
                     if (hard) {
                       if (!blink) ctx3.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
@@ -6351,7 +11033,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
               } : real[name];
               cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
-              finish = paint;
+              finish = () => {
+                paint();
+                flushInk();
+              };
             }
           } catch (e) {
             warnSome2("[studio] belly hook:", e);
@@ -6420,7 +11105,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         cupNow,
         nipHalves,
         GEN,
-        draw: draw2
+        draw: draw3
       };
     };
   })();
@@ -6449,8 +11134,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function bellyPoint(S3, cx, cy, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
     const wide = 1 + S3.sag * sn - S3.sag * 0.55 * (sn < 0 ? sn * sn : 0);
-    const drop = sn > 0 ? 1 + S3.sag * 0.35 * sn : 1 - S3.sag * 0.25 * -sn;
-    return [cx + S3.rx * cs * wide / (1 + S3.sag), cy + S3.ry * sn * drop / (1 + S3.sag * 0.35)];
+    const drop2 = sn > 0 ? 1 + S3.sag * 0.35 * sn : 1 - S3.sag * 0.25 * -sn;
+    return [cx + S3.rx * cs * wide / (1 + S3.sag), cy + S3.ry * sn * drop2 / (1 + S3.sag * 0.35)];
   }
   function bellyPath(g, S3, cx, cy, from, to) {
     const steps = 72;
@@ -6555,12 +11240,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.globalAlpha = 1;
     }
     if (pressed) {
-      const cut = Math.round(cy + S3.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
-      g.clearRect(0, cut, w, hgt - cut);
+      const cut2 = Math.round(cy + S3.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
+      g.clearRect(0, cut2, w, hgt - cut2);
       let x0 = cx, x1 = cx;
       for (let t = 0; t <= Math.PI; t += 0.01) {
         const p = bellyPoint(S3, cx, cy, t);
-        if (p[1] >= cut) {
+        if (p[1] >= cut2) {
           x0 = Math.min(x0, p[0]);
           x1 = Math.max(x1, p[0]);
         }
@@ -6569,10 +11254,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.lineWidth = 2;
       g.lineCap = "round";
       g.beginPath();
-      g.moveTo(x0, cut - 1);
-      g.lineTo(x1, cut - 1);
+      g.moveTo(x0, cut2 - 1);
+      g.lineTo(x1, cut2 - 1);
       g.stroke();
-      cv.cut = cut;
+      cv.cut = cut2;
     }
     return cv;
   }
@@ -6613,13 +11298,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin, pressed) {
-    const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
-    let p = pictures.get(key);
+    const key2 = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+    let p = pictures.get(key2);
     if (!p) {
       const cv = bellyCanvas(size, skin, pressed);
       p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut };
       if (pictures.size > 24) pictures.clear();
-      pictures.set(key, p);
+      pictures.set(key2, p);
     }
     return p;
   }
@@ -6651,16 +11336,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function skinFor(src, hex) {
     hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
-    const key = src + "|" + hex, v = skinSeen.get(key);
+    const key2 = src + "|" + hex, v = skinSeen.get(key2);
     if (Array.isArray(v)) return v;
     if (!v) {
       if (skinSeen.size > 16) skinSeen.clear();
-      skinSeen.set(key, "loading");
-      skinLoad(key, src, hex);
+      skinSeen.set(key2, "loading");
+      skinLoad(key2, src, hex);
     }
     return skinGuess(src, hex);
   }
-  function skinLoad(key, src, hex) {
+  function skinLoad(key2, src, hex) {
     const img2 = new Image();
     img2.onload = () => {
       let c = skinGuess(src, hex);
@@ -6679,13 +11364,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       } catch (e) {
       }
-      skinSeen.set(key, c);
+      skinSeen.set(key2, c);
       try {
         if (trial && W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
       } catch (e) {
       }
     };
-    img2.onerror = () => skinSeen.set(key, skinGuess(src, hex));
+    img2.onerror = () => skinSeen.set(key2, skinGuess(src, hex));
     img2.src = src;
   }
   var hooked = false;
@@ -6745,12 +11430,27 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
               if (src.includes("/BodyLower/")) lower = true;
             };
+            const inkHeld = [], INK_SRC = /\/ink[^/]*\/(?:v\d+\/)?(?:live\/)?Farm(?:Ink[1-4]?|Brand)\//;
+            const flushInk = () => {
+              for (const h2 of inkHeld.splice(0)) {
+                try {
+                  cb[h2[0]](h2[1], h2[2], h2[3], h2[4]);
+                } catch (e) {
+                  warnSome("[Farmhand Companion] ink:", e);
+                }
+              }
+            };
             const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
+              if (!done && typeof src === "string" && INK_SRC.test(src)) {
+                inkHeld.push([name, src, x, y, o]);
+                return;
+              }
               try {
                 before(src, x, y, o);
               } catch (e) {
                 warnSome("[Farmhand Companion] belly:", e);
               }
+              if (done && inkHeld.length) flushInk();
               cb[name](src, x, y, o);
               try {
                 after(src, x, y, o);
@@ -6759,7 +11459,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               }
             } : cb[name];
             args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
-            finish = paint;
+            finish = () => {
+              paint();
+              flushInk();
+            };
           }
         } catch (e) {
           warnSome("[Farmhand Companion] belly hook:", e);
@@ -6778,7 +11481,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] belly test unavailable:", e);
     }
   }
-  function bellyTrial(n, say2) {
+  function bellyTrial(n, say3) {
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
     scrubCache();
     if (trial) hookBelly(sdk);
@@ -6792,7 +11495,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     redraw3();
     setTimeout(redraw3, 500);
     setTimeout(redraw3, 1800);
-    if (say2) say2(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
+    if (say3) say3(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 
   // extension/src/bcr.js
@@ -6807,12 +11510,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const zones2 = W4.BodyMarksZonesOf(C2), state = zones2 && zones2.Breasts;
       if (!state) return null;
       const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C2.MemberNumber) : void 0;
-      const def = ZONES.Breasts, box2 = W4.BodyMarksZoneBox(C2, def, measured);
-      if (!box2 || box2.Hidden) return null;
+      const def = ZONES.Breasts, box3 = W4.BodyMarksZoneBox(C2, def, measured);
+      if (!box3 || box3.Hidden) return null;
       const size = typeof W4.BodyMarksSizeOf === "function" ? W4.BodyMarksSizeOf(C2, def) || 1 : 1;
-      const key = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box2.Top) + "|" + size;
+      const key2 = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box3.Top) + "|" + size;
       const was = kept.get(C2.MemberNumber);
-      if (was && was.key === key) return was.res;
+      if (was && was.key === key2) return was.res;
       const H = (typeof CanvasDrawHeight !== "undefined" ? CanvasDrawHeight : 0) || C2.Canvas && C2.Canvas.height || 1700;
       const raw = W4.document.createElement("canvas");
       raw.width = 500;
@@ -6824,7 +11527,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       } finally {
         MainCanvas = prev;
       }
-      const sx = 250 + (box2.X || 0) - 130 * size, sw = 260 * size, sy = box2.Top - box2.Height * 0.35, sh = box2.Height * 1.9;
+      const sx = 250 + (box3.X || 0) - 130 * size, sw = 260 * size, sy = box3.Top - box3.Height * 0.35, sh = box3.Height * 1.9;
       const out = W4.document.createElement("canvas");
       out.width = bc.width;
       out.height = bc.height;
@@ -6840,7 +11543,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         break;
       }
       const res = any ? { cv: out, x: bx, y: by } : null;
-      kept.set(C2.MemberNumber, { key, res });
+      kept.set(C2.MemberNumber, { key: key2, res });
       if (kept.size > 40) kept.delete(kept.keys().next().value);
       return res;
     } catch (e) {
@@ -7025,7 +11728,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var used = /* @__PURE__ */ new Map();
   var fresh = false;
   var gone = /* @__PURE__ */ new Set();
-  function picture(cv) {
+  function picture2(cv) {
     let p = made.get(cv);
     if (p) {
       if (!p.src) return null;
@@ -7144,7 +11847,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       },
       // never: their body items are theirs
       redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
-      picture,
+      picture: picture2,
       overBreast: bcrOverBreast,
       // BCR's marks on the drawn breasts (bcr.js)
       budget: mn == null ? 192e6 : 96e6
@@ -7382,32 +12085,32 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function onFarmLook() {
   }
-  function drawnBodyBelly(mode, say2) {
+  function drawnBodyBelly(mode, say3) {
     S2.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
     delete S2.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say2) say2({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
+    if (say3) say3({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
   }
-  function drawnBodyUseFarm(say2) {
+  function drawnBodyUseFarm(say3) {
     delete S2.saved;
     S2.cupSet = false;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say2) say2("Back to the farm's look.");
+    if (say3) say3("Back to the farm's look.");
   }
-  function drawnBodySet(on3, say2) {
+  function drawnBodySet(on3, say3) {
     S2.on = !!on3;
     save();
     if (S2.on) {
       if (!engine()) {
         S2.on = false;
         save();
-        return say2 && say2("The drawn body didn't load. Reload the page and try again.");
+        return say3 && say3("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
       W5.__farmDrawnBody = true;
@@ -7416,14 +12119,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
-    if (say2) {
+    if (say3) {
       const st2 = drawnBodyState();
-      if (!S2.on) say2("Drawn body off. You're the game's own picture again, for you and everybody else.");
-      else if (S2.cup >= 6 && st2.chest !== "XLarge") say2("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
-      else say2("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
+      if (!S2.on) say3("Drawn body off. You're the game's own picture again, for you and everybody else.");
+      else if (S2.cup >= 6 && st2.chest !== "XLarge") say3("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
+      else say3("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
   }
-  function drawnBodySeeOthers(on3, say2) {
+  function drawnBodySeeOthers(on3, say3) {
     seeOthers = !!on3;
     try {
       W5.localStorage.setItem(SEE_KEY, on3 ? "1" : "0");
@@ -7434,9 +12137,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       hook();
       ask();
     }
-    if (say2) say2(on3 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
+    if (say3) say3(on3 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
-  function drawnBodyCup(i, say2) {
+  function drawnBodyCup(i, say3) {
     const n = W5.FarmBreasts ? W5.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
       S2.cupSet = false;
@@ -7444,7 +12147,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (mine.E) apply(mine.E, eff());
       redraw(60);
       tell(true);
-      if (say2) say2("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
+      if (say3) say3("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
     }
     S2.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
@@ -7453,9 +12156,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say2) say2("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
+    if (say3) say3("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
   }
-  function take(d, say2, from) {
+  function take(d, say3, from) {
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
     s.on = S2.on;
@@ -7470,23 +12173,23 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say2) say2("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
+    if (say3) say3("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
     return true;
   }
-  function drawnBodyPaste(text, say2) {
+  function drawnBodyPaste(text3, say3) {
     try {
-      const t = String(text || "").trim();
+      const t = String(text3 || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
       const raw = W5.LZString && typeof W5.LZString.decompressFromBase64 === "function" ? W5.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
-      return take(d, say2, "from the code");
+      return take(d, say3, "from the code");
     } catch (e) {
-      if (say2) say2("I couldn't read that code: " + (e && e.message || e));
+      if (say3) say3("I couldn't read that code: " + (e && e.message || e));
       return false;
     }
   }
-  async function drawnBodyFromStudio(say2) {
+  async function drawnBodyFromStudio(say3) {
     try {
       const get2 = async (f) => {
         const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" });
@@ -7495,9 +12198,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const [br, be, it, bd] = await Promise.all([get2("breasts.json"), get2("belly.json").catch(() => null), get2("items.json").catch(() => null), get2("brand.json").catch(() => null)]);
       if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
-      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say2, "from your studio");
+      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say3, "from your studio");
     } catch (e) {
-      if (say2) say2("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
+      if (say3) say3("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
       return false;
     }
   }
@@ -7516,7 +12219,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // studio/web/splatters.js
   (function(root) {
     "use strict";
-    function rng(seed) {
+    function rng2(seed) {
       let a = seed >>> 0 || 1;
       return () => {
         a |= 0;
@@ -7670,9 +12373,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const len = size * (0.25 + r() * 0.55) * (0.6 + K.run * 0.4), w = Math.max(1.6, size * 0.032 * K.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
       const pts = strandPts(r, x, y, len, w, ang);
       if (r() < 0.3) {
-        const cut = 4 + Math.floor(r() * 4);
-        strandDraw(ctx3, K, pts.slice(0, cut));
-        strandDraw(ctx3, K, pts.slice(cut + 2));
+        const cut2 = 4 + Math.floor(r() * 4);
+        strandDraw(ctx3, K, pts.slice(0, cut2));
+        strandDraw(ctx3, K, pts.slice(cut2 + 2));
       } else strandDraw(ctx3, K, pts);
       {
         const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
@@ -7728,7 +12431,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         run(ctx3, r, K, sx, y + h2 * 0.3, len, sw);
       }
     }
-    function rope(ctx3, r, K, x, y, size) {
+    function rope2(ctx3, r, K, x, y, size) {
       const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
       for (let i = 0; i <= 10; i++) {
         const t = i / 10;
@@ -7832,10 +12535,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return STAMPS.length;
     }
     const tintCache = /* @__PURE__ */ new Map();
-    function tinted(st2, K) {
+    function tinted2(st2, K) {
       if (!K.tint) return st2;
-      const key = STAMPS.indexOf(st2) + K.tint;
-      if (tintCache.has(key)) return tintCache.get(key);
+      const key2 = STAMPS.indexOf(st2) + K.tint;
+      if (tintCache.has(key2)) return tintCache.get(key2);
       const c = document.createElement("canvas");
       c.width = st2.width;
       c.height = st2.height;
@@ -7848,9 +12551,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       x.drawImage(st2, 0, 0);
       if (K.texture) {
         x.globalCompositeOperation = "source-atop";
-        TEXTURES[K.texture](x, c.width, c.height, rng(st2.width * 31 + st2.height));
+        TEXTURES[K.texture](x, c.width, c.height, rng2(st2.width * 31 + st2.height));
       }
-      tintCache.set(key, c);
+      tintCache.set(key2, c);
       return c;
     }
     const TEXTURES = {
@@ -7926,8 +12629,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       }
     };
-    function stamp(ctx3, r, K, x, y, size) {
-      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
+    function stamp2(ctx3, r, K, x, y, size) {
+      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted2(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
       const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
       ctx3.save();
       ctx3.translate(x, y);
@@ -7938,7 +12641,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       ctx3.restore();
     }
     function paint(ctx3, kind, opt) {
-      const K0 = KINDS2[kind] || KINDS2.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      const K0 = KINDS2[kind] || KINDS2.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng2(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
       ctx3.save();
       ctx3.lineJoin = "round";
       for (const [ax, ay, size] of at) {
@@ -7954,12 +12657,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
           if (K.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
             const [x, y] = spot();
-            stamp(ctx3, r, K, x, y, size);
+            stamp2(ctx3, r, K, x, y, size);
           }
         } else if (STAMPS.length && K.stamp !== false) {
           for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
             const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
-            stamp(ctx3, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
+            stamp2(ctx3, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
           }
           for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K.run - 0.2)); i < n; i++) {
             const [x, y] = spot();
@@ -7983,7 +12686,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
           for (let i = 0, n = K.ropes ? Math.round(r() * 2 * K.ropes * amount) : 0; i < n; i++) {
             const [x, y] = spot();
-            rope(ctx3, r, K, x, y, size);
+            rope2(ctx3, r, K, x, y, size);
           }
         }
         for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K.droplets || 0.5)); i < n; i++) {
@@ -8081,7 +12784,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       armR: [350, 380, 22],
       back: [250, 380, 60]
     };
-    root.FarmMess = { KINDS: KINDS2, AREAS: AREAS3, paint, paintOn, rng, loadStamps, STAMPS };
+    root.FarmMess = { KINDS: KINDS2, AREAS: AREAS3, paint, paintOn, rng: rng2, loadStamps, STAMPS };
   })(typeof window !== "undefined" ? window : globalThis);
 
   // studio/web/brand-drawing.js
@@ -8130,8 +12833,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     const brandReady2 = (b) => !!art(b && b.art || "mark");
     const made3 = /* @__PURE__ */ new Map();
-    function stamp(b) {
-      const key = b.art + "|" + b.look + "|" + Math.round(b.size), was = made3.get(key);
+    function stamp2(b) {
+      const key2 = b.art + "|" + b.look + "|" + Math.round(b.size), was = made3.get(key2);
       if (was) return was;
       const i = art(b.art);
       if (!i) return null;
@@ -8166,14 +12869,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         tint("#7a2418", 0.85, 0.8);
         tint("#3a120c", 0.55, 0.3);
       }
-      made3.set(key, c);
+      made3.set(key2, c);
       if (made3.size > 24) made3.delete(made3.keys().next().value);
       return c;
     }
     function paintBrand2(g, mask, brand, ox, oy, over) {
       const b = cleanBrand2(brand);
       if (!b) return false;
-      const s = stamp(b);
+      const s = stamp2(b);
       if (!s) return false;
       const P5 = BRAND_PLACES[b.place].at, x = P5[0] + b.dx + (ox || 0), y = P5[1] + b.dy + (over || 0) + (oy || 0);
       const W0 = g.canvas.width, H0 = g.canvas.height;
@@ -8221,7 +12924,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     redrawMe();
     if (nb && !brandReady(nb)) setTimeout(redrawMe, 600);
   }
-  var DIAG = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };
+  var DIAG2 = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };
   var others2 = /* @__PURE__ */ new Map();
   var BY_COLOR = {
     "#fff4dc": "cream",
@@ -8269,8 +12972,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var ok = (e) => e && typeof e.k === "string" && W6.FarmMess && W6.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
   var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W6.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
-    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W6.FarmMess });
-    if (DIAG.marks.length > 5) DIAG.marks.shift();
+    DIAG2.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W6.FarmMess });
+    if (DIAG2.marks.length > 5) DIAG2.marks.shift();
     if (!m || !Array.isArray(m.splat) || !m.splat.length || !W6.FarmMess) return false;
     const kind = typeof m.mess === "string" && W6.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
@@ -8376,7 +13079,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var BODY = /(?:^|\/)(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\/[^?#]*\.(?:png|webp|jpe?g)/i;
   var made2 = /* @__PURE__ */ new Map();
   var skinOf = /* @__PURE__ */ new Map();
-  function forget(src) {
+  function forget2(src) {
     if (!src || typeof src !== "string") return;
     setTimeout(() => {
       for (const p of made2.values()) if (p.src === src) return;
@@ -8404,15 +13107,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function keep(mn, p) {
     const was = made2.get(mn);
     made2.set(mn, p);
-    if (was && was.src && was.src !== p.src) forget(was.src);
+    if (was && was.src && was.src !== p.src) forget2(was.src);
   }
   function messPicture(C2, list, body2, brand) {
     const over = W6.CanvasUpperOverflow || 700, h2 = C2.Canvas && C2.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
-    const key = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const key2 = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C2.MemberNumber);
-    if (was && was.key === key) return was;
+    if (was && was.key === key2) return was;
     let mask = null;
     if (body2.length) {
       mask = W6.document.createElement("canvas");
@@ -8440,7 +13143,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     for (const e of list) W6.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
     if (typeof W6.GLDrawLoadTransient === "function") {
-      const p2 = { key, src: c, dx: 0, dy: 0 };
+      const p2 = { key: key2, src: c, dx: 0, dy: 0 };
       keep(C2.MemberNumber, p2);
       return p2;
     }
@@ -8453,7 +13156,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (y > y1) y1 = y;
     }
     if (x1 < 0) {
-      const p2 = { key, src: null };
+      const p2 = { key: key2, src: null };
       keep(C2.MemberNumber, p2);
       return p2;
     }
@@ -8461,7 +13164,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
-    const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
+    const p = { key: key2, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
     keep(C2.MemberNumber, p);
     return p;
   }
@@ -8500,7 +13203,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const C2 = args[0], real = args[1];
         if (!C2 || !real || typeof real.drawImage !== "function" || !W6.FarmMess || onBot2()) return next(args);
         const list = listFor(C2), brand = brandFor(C2);
-        if (C2 === W6.Player) DIAG.got++;
+        if (C2 === W6.Player) DIAG2.got++;
         if (!list.length && !brand) return next(args);
         const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
@@ -8516,8 +13219,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
             const p = messPicture(C2, list, body2, brand);
             if (C2 === W6.Player) {
-              DIAG.draws++;
-              DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
+              DIAG2.draws++;
+              DIAG2.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
             if (p && p.src) {
               real.drawImage(p.src, p.dx, p.dy, {});
@@ -8530,7 +13233,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               }
             }
           } catch (e) {
-            DIAG.lastErr = String(e && e.message || e);
+            DIAG2.lastErr = String(e && e.message || e);
             console.warn("[Farmhand Companion] messes:", e);
           }
         };
@@ -8569,7 +13272,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return r;
       });
     } catch (e) {
-      DIAG.lastErr = "hook: " + String(e && e.message || e);
+      DIAG2.lastErr = "hook: " + String(e && e.message || e);
       console.warn("[Farmhand Companion] messes unavailable:", e);
       hooked3 = false;
     }
@@ -8601,10 +13304,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const L = [];
     L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W6.FarmMess + (W6.FarmMess && W6.FarmMess.KINDS ? " (" + Object.keys(W6.FarmMess.KINDS).length + " kinds)" : ""));
     L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
-    L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
-    L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
-    if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE") + "; first pictures: " + (DIAG.draw.sample || []).join(" ") + "; drawings handed over: " + (DIAG.draw.canv || 0));
-    if (DIAG.lastErr) L.push("last error: " + DIAG.lastErr);
+    L.push("marks from the bot: " + (DIAG2.marks.length ? DIAG2.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
+    L.push("your body drawn: " + DIAG2.got + " times, with a mess " + DIAG2.draws + " times");
+    if (DIAG2.draw) L.push("last mess drawing: " + ago(DIAG2.draw.at) + ", " + DIAG2.draw.list + " messes, " + DIAG2.draw.pic + "; skin pictures seen: " + (DIAG2.draw.body.join(" ") || "NONE") + "; first pictures: " + (DIAG2.draw.sample || []).join(" ") + "; drawings handed over: " + (DIAG2.draw.canv || 0));
+    if (DIAG2.lastErr) L.push("last error: " + DIAG2.lastErr);
     L.push("others with messes: " + others2.size);
     return L.join("\n");
   }
@@ -8640,7 +13343,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     return { n, loaded, mb: Math.round(b / 1e6), made: made3, madeKB: Math.round(madeK / 1e3) };
   }
-  function trimNew(force, idle, target) {
+  function trimNew(force, idle, target2) {
     const caches = [W7.GLDrawImageCache, W7.DrawImageCache].filter(isCache);
     if (!caches.length) return 0;
     const now = Date.now(), wait2 = idle ?? IDLE, old = [];
@@ -8656,7 +13359,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     if (!force && total <= LIMIT) return 0;
     old.sort((a, b) => a[0] - b[0]);
-    const goal = target ?? TARGET;
+    const goal = target2 ?? TARGET;
     let n = 0;
     for (const [, url, c, b] of old) {
       if (goal > 0 && total <= goal) break;
@@ -8676,11 +13379,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4;
     return n;
   }
-  function trimPictures(force, idle, target) {
-    const cache = W7.GLDrawImageCache;
-    if (isCache(cache) || isCache(W7.DrawImageCache)) return trimNew(force, idle, target);
+  function trimPictures(force, idle, target2) {
+    const cache2 = W7.GLDrawImageCache;
+    if (isCache(cache2) || isCache(W7.DrawImageCache)) return trimNew(force, idle, target2);
     const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache;
-    if (!cache || !tc || typeof tc.forEach !== "function") return 0;
+    if (!cache2 || !tc || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
     if (!force && total <= LIMIT) return 0;
     const now = Date.now(), old = [];
@@ -8688,20 +13391,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (typeof url !== "string") continue;
       const t = seen.get(url) || started;
       if (now - t < (idle ?? IDLE)) continue;
-      const img2 = cache.get(url);
+      const img2 = cache2.get(url);
       if (img2 && img2.complete === false) continue;
       old.push([t, url, v]);
     }
     old.sort((a, b) => a[0] - b[0]);
     let n = 0;
     for (const [, url, v] of old) {
-      if (total <= (target ?? TARGET)) break;
+      if (total <= (target2 ?? TARGET)) break;
       try {
         if (v.texture) gl.deleteTexture(v.texture);
       } catch (e) {
       }
       tc.delete(url);
-      cache.delete(url);
+      cache2.delete(url);
       seen.delete(url);
       total -= (v.width || 0) * (v.height || 0) * 4;
       n++;
@@ -9325,27 +14028,27 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (typeof W11.CommandCombine === "function") {
       W11.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
-        const text = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+        const text3 = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
         try {
           W11.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {
         }
-        if (typeof W11.ChatRoomSendLocal === "function") W11.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
-        else console.log(text);
+        if (typeof W11.ChatRoomSendLocal === "function") W11.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text3, 12e4);
+        else console.log(text3);
       } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
-        let text = "";
+        let text3 = "";
         try {
-          text = messDiag();
+          text3 = messDiag();
         } catch (e) {
-          text = "couldn't check: " + e.message;
+          text3 = "couldn't check: " + e.message;
         }
-        text = "Companion v" + VERSION + "\n" + text;
+        text3 = "Companion v" + VERSION + "\n" + text3;
         try {
-          W11.navigator.clipboard.writeText(text);
+          W11.navigator.clipboard.writeText(text3);
         } catch (e) {
         }
-        if (typeof W11.ChatRoomSendLocal === "function") W11.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
-        else console.log(text);
+        if (typeof W11.ChatRoomSendLocal === "function") W11.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text3, 12e4);
+        else console.log(text3);
       } }]);
     }
   }
@@ -11097,9 +15800,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function summonReady(bot) {
     try {
-      const api2 = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
-      if (!api2) return null;
-      const r = api2.getRuleState("alt_forced_summoning");
+      const api3 = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
+      if (!api3) return null;
+      const r = api3.getRuleState("alt_forced_summoning");
       if (!r || !r.inEffect) return { ok: false, why: "BCX's Ready to be summoned rule is off" };
       const allowed = r.customData && r.customData.allowedMembers || [];
       return allowed.includes(bot) ? { ok: true, why: "ready" } : { ok: false, why: "the farm bot (" + bot + ") isn't on the rule's allowed list" };
@@ -11182,11 +15885,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
   }
   var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
-  var input = (ph, key, ctx3) => h("input", { class: "fhc-in", placeholder: ph, value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
-  var select = (key, opts, ctx3) => h(
+  var input = (ph, key2, ctx3) => h("input", { class: "fhc-in", placeholder: ph, value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) });
+  var select = (key2, opts, ctx3) => h(
     "select",
-    { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) },
-    opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
+    { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key2]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key2] || opts[0][0]) === v ? "selected" : null }, l))
   );
   function duty(ctx3) {
     const s = ctx3.s;
@@ -11326,8 +16029,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if ((u.ctOnly || "").trim()) p.push("only=" + u.ctOnly.trim().replace(/\s+/g, ""));
       return p.length ? " when " + p.join(" ") : "";
     };
-    const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || "") === v ? "selected" : null }, l)));
-    const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
+    const sel = (key2, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key2] || "") === v ? "selected" : null }, l)));
+    const timeIn = (key2) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key2] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) });
     const rn = ctx3.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
     const renewCard = rn.length ? card(
       title("\u{1F4DC} Renewals"),
@@ -11483,12 +16186,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
   ];
-  var pref = (ctx3, key, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key], () => {
-    ctx3.setPref(key, !ctx3.prefs[key]);
+  var pref = (ctx3, key2, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key2], () => {
+    ctx3.setPref(key2, !ctx3.prefs[key2]);
     if (after) after();
   });
-  var prefNot = (ctx3, key, label, desc) => toggle(label, desc, !ctx3.prefs[key], () => {
-    ctx3.setPref(key, !ctx3.prefs[key]);
+  var prefNot = (ctx3, key2, label, desc) => toggle(label, desc, !ctx3.prefs[key2], () => {
+    ctx3.setPref(key2, !ctx3.prefs[key2]);
     ctx3.api.rehello && ctx3.api.rehello();
   });
   var rehello = (ctx3) => () => ctx3.api.rehello && ctx3.api.rehello();
@@ -11611,7 +16314,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   function saveCard(ctx3) {
-    const ls = localSaveState(), say2 = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+    const ls = localSaveState(), say3 = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
     const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
     return card(
       title("\u{1F4BE} Your settings file"),
@@ -11621,10 +16324,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         { style: { marginTop: "6px" } },
         ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
         ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
-        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say2("Saved."))) : null,
+        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say3("Saved."))) : null,
         btn("Load my settings from a file\u2026", () => {
-          say2("Pick the farmhand-companion file to load\u2026");
-          localSaveLoad(say2);
+          say3("Pick the farmhand-companion file to load\u2026");
+          localSaveLoad(say3);
         })
       )
     );
@@ -11702,8 +16405,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const out = [], want = q2.trim().toLowerCase();
     for (const p of pagesFor(ctx3)) {
       if (p.id === "guides") continue;
-      const box2 = h("div", null, drawPage(p, ctx3));
-      const hits = [...box2.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
+      const box3 = h("div", null, drawPage(p, ctx3));
+      const hits = [...box3.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
       if (hits.length) out.push(card(title(p.label), hits));
     }
     return out.length ? out : [muted(`Nothin' matches "` + q2.trim() + '". Try fewer letters, or look through the pages.')];
@@ -11746,7 +16449,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var W12 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
-  var box = null;
+  var box2 = null;
   var page = "switches";
   var settingsAvailable = () => typeof W12.PreferenceRegisterExtensionSetting === "function";
   function ctx() {
@@ -11754,60 +16457,60 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return Object.assign({}, c, {
       setPref: (k, v) => {
         c.setPref(k, v);
-        draw();
+        draw2();
       },
       setUi: (p, quiet) => {
         c.setUi(p, true);
-        if (!quiet) draw();
+        if (!quiet) draw2();
       },
       send: (cmd) => {
         c.send(cmd);
-        setTimeout(draw, 1500);
+        setTimeout(draw2, 1500);
       },
       hint: (m) => {
         c.hint(m);
-        note(m);
+        note3(m);
       }
     });
   }
-  function note(m) {
-    const n = box && box.querySelector("#fhc-set-note");
+  function note3(m) {
+    const n = box2 && box2.querySelector("#fhc-set-note");
     if (n) {
       n.textContent = m;
       n.style.display = "block";
     }
   }
-  function draw() {
-    if (!box) return;
+  function draw2() {
+    if (!box2) return;
     const c = ctx();
-    box.replaceChildren(
+    box2.replaceChildren(
       h(
         "div",
         { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
         h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
         btn("Back", () => {
           if (typeof W12.PreferenceSubscreenExtensionsClear === "function") W12.PreferenceSubscreenExtensionsClear();
-          else close();
+          else close2();
         }, true)
       ),
       h("div", { id: "fhc-set-note", style: { display: "none", margin: "6px 0", color: "#c9a35b" } }),
       settingsView(c, page, (p) => {
         page = p;
-        draw();
+        draw2();
       })
     );
   }
   function open() {
-    close();
-    box = W12.document.createElement("div");
-    box.id = "fhc-settings";
-    W12.document.body.appendChild(box);
-    draw();
+    close2();
+    box2 = W12.document.createElement("div");
+    box2.id = "fhc-settings";
+    W12.document.body.appendChild(box2);
+    draw2();
   }
-  function close() {
-    if (box) {
-      box.remove();
-      box = null;
+  function close2() {
+    if (box2) {
+      box2.remove();
+      box2 = null;
     }
   }
   function initSettings(p) {
@@ -11823,10 +16526,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         click: () => {
         },
         exit: () => {
-          close();
+          close2();
           return true;
         },
-        unload: () => close()
+        unload: () => close2()
       });
       return true;
     } catch (e) {
@@ -11847,7 +16550,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/views/livestock.js
-  var pct = (a, b) => b ? 100 * a / b : 0;
+  var pct3 = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
   var minsLeft2 = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
   var till = (t) => {
@@ -11890,15 +16593,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       sub ? h("div", { class: "fhc-muted", style: { marginTop: "-6px" } }, sub) : null,
       chips.length ? h("div", { class: "fhc-chips", "aria-label": "Right now" }, chips) : null,
       meters([
-        s.milk && { label: "Milk", right: String(s.milk.grade || ""), value: of(s.milk.ml, s.milk.cap), pct: pct(s.milk.ml, s.milk.cap) },
-        s.quota && { label: "Quota", right: s.quota.streak ? "\xD7" + s.quota.streak : "", value: of(s.quota.ml, s.quota.goal), pct: pct(s.quota.ml, s.quota.goal), kind: "good" },
-        s.semen && { label: "Seed", value: of(s.semen.ml, s.semen.cap), pct: pct(s.semen.ml, s.semen.cap) },
-        s.holding && s.holding.ml > 0 && { label: "Holding", value: ml(s.holding.ml), pct: pct(s.holding.ml, s.holding.cap), kind: "alert" },
+        s.milk && { label: "Milk", right: String(s.milk.grade || ""), value: of(s.milk.ml, s.milk.cap), pct: pct3(s.milk.ml, s.milk.cap) },
+        s.quota && { label: "Quota", right: s.quota.streak ? "\xD7" + s.quota.streak : "", value: of(s.quota.ml, s.quota.goal), pct: pct3(s.quota.ml, s.quota.goal), kind: "good" },
+        s.semen && { label: "Seed", value: of(s.semen.ml, s.semen.cap), pct: pct3(s.semen.ml, s.semen.cap) },
+        s.holding && s.holding.ml > 0 && { label: "Holding", value: ml(s.holding.ml), pct: pct3(s.holding.ml, s.holding.cap), kind: "alert" },
         ...x.bars.map((b) => ({ label: plain(b.label), value: String(b.value ?? ""), pct: Number(b.pct) || 0, kind: b.kind === "good" || b.kind === "alert" ? b.kind : "" }))
       ])
     );
     const fresh2 = ctx3.feed.filter((m) => m.kind !== "mine" && m.at > (ctx3.ui.inboxSeen || 0)).length;
-    const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
+    const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
     const hp = s.happening || [];
     return [
       errCard(s),
@@ -12001,8 +16704,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const milk = s.milk ? section(
       "\u{1F95B} Milk",
       "grade " + s.milk.grade,
-      bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap) + (s.milk.lastAt ? " \xB7 milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""), pct(s.milk.ml, s.milk.cap)),
-      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
+      bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap) + (s.milk.lastAt ? " \xB7 milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""), pct3(s.milk.ml, s.milk.cap)),
+      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct3(s.quota.ml, s.quota.goal), "good"),
       // what you're hooked up to right now, read off you by the farm
       g.milk ? [
         h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, h("span", null, g.milk.name), h("span", { class: "fhc-muted" }, ["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + " \xB7 " + g.milk.ml + " mL a minute")),
@@ -12037,11 +16740,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     );
     const hold = s.holding && s.holding.cap ? section(
       "\u{1FAD9} Holdin'",
-      Math.round(pct(s.holding.ml, s.holding.cap)) + "% full",
-      bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert"),
+      Math.round(pct3(s.holding.ml, s.holding.cap)) + "% full",
+      bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct3(s.holding.ml, s.holding.cap), "alert"),
       h("div", null, btn("\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx3.send("wash")))
     ) : null;
-    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
+    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct3(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
     return [milk, breed, hold, seed];
   }
   function trapThemesCard(ctx3) {
@@ -12176,7 +16879,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         { class: "fhc-box" },
         h("div", { class: "fhc-kv" }, h("b", null, t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
-        t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
+        t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
         muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
         t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx3.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
       ))
@@ -12254,7 +16957,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     });
   }
   function drawnBodyCard(ctx3) {
-    const st2 = drawnBodyState(), say2 = (t) => ctx3.hint(t);
+    const st2 = drawnBodyState(), say3 = (t) => ctx3.hint(t);
     const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
     return card(
       title("Drawn body (outfit studio)"),
@@ -12263,7 +16966,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, on your character. Everyone here with the Companion sees it; people without it see the game's own picture of you. Off takes it away.",
         st2.on,
         () => {
-          drawnBodySet(!st2.on, say2);
+          drawnBodySet(!st2.on, say3);
           ctx3.setPref("drawnBody", !st2.on);
         }
       ),
@@ -12275,7 +16978,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "select",
           { class: "fhc-sel", onchange: (e) => {
             const v = e.target.value;
-            drawnBodyCup(v === "auto" ? "auto" : Number(v), say2);
+            drawnBodyCup(v === "auto" ? "auto" : Number(v), say3);
             ctx3.setPref("drawnBodyCup", v);
           } },
           [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
@@ -12291,7 +16994,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h(
           "select",
           { class: "fhc-sel", onchange: (e) => {
-            drawnBodyBelly(e.target.value, say2);
+            drawnBodyBelly(e.target.value, say3);
             ctx3.setPref("drawnBodyBelly", e.target.value);
           } },
           [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
@@ -12300,26 +17003,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       muted("Following the farm, your cup is the size the farm has grown your udder to, and your belly shows and grows as you fill up, carry eggs or get bred."),
       muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
       st2.fromStudio ? btn("Use the farm's look instead", () => {
-        drawnBodyUseFarm(say2);
+        drawnBodyUseFarm(say3);
         ctx3.setPref("drawnBodyAt", Date.now());
       }) : null,
       h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
       h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
-        drawnBodyFromStudio(say2).then((ok2) => {
+        drawnBodyFromStudio(say3).then((ok2) => {
           if (ok2) ctx3.setPref("drawnBodyAt", Date.now());
         });
       }, true)),
       muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
       h("div", { style: { marginTop: "6px" } }, code),
       btn("Put in the pasted code", () => {
-        if (drawnBodyPaste(code.value, say2)) ctx3.setPref("drawnBodyAt", Date.now());
+        if (drawnBodyPaste(code.value, say3)) ctx3.setPref("drawnBodyAt", Date.now());
       }),
       toggle(
         "See other people's drawn bodies",
         "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
         st2.seeOthers,
         () => {
-          drawnBodySeeOthers(!st2.seeOthers, say2);
+          drawnBodySeeOthers(!st2.seeOthers, say3);
           ctx3.setPref("drawnBodySee", !st2.seeOthers);
         }
       )
@@ -12357,7 +17060,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
-    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
+    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key2, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key2)), muted(d))) },
     { id: "rules", label: "\u{1F4CF} Rules", render: (ctx3) => [
       h(
         "div",
@@ -12376,23 +17079,23 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   ];
 
   // extension/src/views/dashboard.js
-  var field2 = (label, el) => h("label", { class: "fhc-label" }, label, el);
+  var field2 = (label, el2) => h("label", { class: "fhc-label" }, label, el2);
   var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
   function settingControl(ctx3, rule, s) {
-    const key = "set:" + rule.id + ":" + s.name, cur = ctx3.ui[key];
-    const set = (v) => ctx3.setUi({ [key]: v }, true);
+    const key2 = "set:" + rule.id + ":" + s.name, cur = ctx3.ui[key2];
+    const set2 = (v) => ctx3.setUi({ [key2]: v }, true);
     const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
     switch (s.type) {
       case "checkbox":
         return h(
           "select",
-          { class: "fhc-sel", onchange: (e) => set(e.target.value) },
+          { class: "fhc-sel", onchange: (e) => set2(e.target.value) },
           ["on", "off"].map((v) => h("option", { value: v, selected: (cur || (s.default ? "on" : "off")) === v ? "selected" : null }, v))
         );
       case "option":
         return h(
           "select",
-          { class: "fhc-sel", onchange: (e) => set(e.target.value) },
+          { class: "fhc-sel", onchange: (e) => set2(e.target.value) },
           s.options.map((o) => h("option", { value: o, selected: (cur || s.default) === o ? "selected" : null }, o))
         );
       case "stringList":
@@ -12400,18 +17103,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           class: "fhc-in",
           rows: 3,
           placeholder: "one " + (s.entryLabel || "entry") + " per line" + (s.maxEntries ? " \xB7 up to " + s.maxEntries : ""),
-          oninput: (e) => set(e.target.value)
+          oninput: (e) => set2(e.target.value)
         }, cur !== void 0 ? cur : def);
       case "members":
-        return h("input", { class: "fhc-in", placeholder: "farm, staff, or member numbers", value: cur !== void 0 ? cur : "farm", oninput: (e) => set(e.target.value) });
+        return h("input", { class: "fhc-in", placeholder: "farm, staff, or member numbers", value: cur !== void 0 ? cur : "farm", oninput: (e) => set2(e.target.value) });
       default:
-        return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set(e.target.value) });
+        return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set2(e.target.value) });
     }
   }
   function addCommand(ctx3, name, rule) {
     const pairs2 = rule.settings.map((s) => {
-      const key = "set:" + rule.id + ":" + s.name;
-      let v = ctx3.ui[key];
+      const key2 = "set:" + rule.id + ":" + s.name;
+      let v = ctx3.ui[key2];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
@@ -12522,16 +17225,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function outfits(ctx3) {
     const saved = ctx3.s.outfits || {}, rules = ctx3.s.outfitRules || {};
     const sp = ctx3.ui.oSp || "cow";
-    const slotBox = (key, label) => h(
+    const slotBox = (key2, label) => h(
       "div",
-      { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
+      { class: "fhc-box", style: { padding: "8px", borderColor: saved[key2] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key2] ? "solid" : "dashed" } },
       h("b", null, label),
-      muted(saved[key] ? saved[key].items + " pieces" + (saved[key].locks ? ", " + saved[key].locks + " locked" : "") : "Not set \xB7 uses the fallback"),
+      muted(saved[key2] ? saved[key2].items + " pieces" + (saved[key2].locks ? ", " + saved[key2].locks + " locked" : "") : "Not set \xB7 uses the fallback"),
       h(
         "div",
         { style: { marginTop: "6px" } },
-        btn("Save what I'm wearin'", () => ctx3.api.save && ctx3.api.save(key)),
-        saved[key] ? btn("Clear", () => ctx3.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+        btn("Save what I'm wearin'", () => ctx3.api.save && ctx3.api.save(key2)),
+        saved[key2] ? btn("Clear", () => ctx3.send("outfit clear " + key2.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
       )
     );
     const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
@@ -12684,10 +17387,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return [
       h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("lines", "\u{1F44E}\u2764\uFE0F Lines"), pill("all", "Everything")),
       shown.length ? shown.map((x) => {
-        const key = "fbnote_" + x.id, act = (what) => {
-          const note2 = (ctx3.ui[key] || "").trim();
-          ctx3.send("feedback " + what + " " + x.id + (note2 ? " " + note2 : ""));
-          ctx3.setUi({ [key]: "" });
+        const key2 = "fbnote_" + x.id, act = (what) => {
+          const note4 = (ctx3.ui[key2] || "").trim();
+          ctx3.send("feedback " + what + " " + x.id + (note4 ? " " + note4 : ""));
+          ctx3.setUi({ [key2]: "" });
         };
         return card(
           h(
@@ -12699,7 +17402,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
           x.why && muted("Why: " + x.why),
           x.note && muted("Your note: " + x.note),
-          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
+          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx3.ui[key2] || "", oninput: (e) => ctx3.setUi({ [key2]: e.target.value }, true) }),
           h(
             "div",
             { style: { marginTop: "6px" } },
@@ -12906,7 +17609,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   function inviteTab(ctx3) {
-    const box2 = h("input", { class: "fhc-in", placeholder: "Their name or member number", value: ctx3.ui.nurseryWho || "", oninput: (e) => ctx3.setUi({ nurseryWho: e.target.value }, true) });
+    const box3 = h("input", { class: "fhc-in", placeholder: "Their name or member number", value: ctx3.ui.nurseryWho || "", oninput: (e) => ctx3.setUi({ nurseryWho: e.target.value }, true) });
     const go = (cmd) => {
       const v = (ctx3.ui.nurseryWho || "").trim();
       if (!v) return ctx3.hint("Type their name first.");
@@ -12916,7 +17619,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       card(
         title("\u2795 Invite a little"),
         muted("They get a Yes / Not now card first. Once they say yes, they're in the nursery and paired with you."),
-        box2,
+        box3,
         h("div", { style: { marginTop: "6px" } }, btn("Invite as a little", () => go("nursery add"), true), btn("Ask to be their grown-up", () => go("nursery pair")))
       ),
       ctx3.s.proprietor ? card(
@@ -12978,9 +17681,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   var Panel = class {
-    constructor(onCommand, api2) {
+    constructor(onCommand, api3) {
       this.onCommand = onCommand;
-      this.api = api2 || {};
+      this.api = api3 || {};
       this.outfit = null;
       this.unread = 0;
       this.welcome = {};
@@ -12993,10 +17696,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       this.prefs = loadPrefs();
       if (this.prefs.chatToo === void 0) this.prefs.chatToo = true;
       this.status = "\u2026";
-      const doc = window.document;
-      const style = doc.createElement("style");
-      style.textContent = CSS + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
-      doc.head.appendChild(style);
+      const doc2 = window.document;
+      const style = doc2.createElement("style");
+      style.textContent = CSS2 + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
+      doc2.head.appendChild(style);
       this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel" }, "\u{1F33E}");
       this.btn.style.touchAction = "none";
       this.btn.addEventListener("pointerdown", (e) => this.dragButton(e));
@@ -13014,22 +17717,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       for (const ev of ["touchmove", "wheel", "scroll"]) this.el.addEventListener(ev, busy, { passive: true, capture: true });
       this.el.addEventListener("focusout", () => setTimeout(() => this.later(), 300));
-      const vp = () => doc.querySelector('meta[name="viewport"]');
+      const vp = () => doc2.querySelector('meta[name="viewport"]');
       let vpWas = null;
-      doc.addEventListener("focusin", (e) => {
+      doc2.addEventListener("focusin", (e) => {
         const t = e.target;
         if (!t || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
         let m = vp();
         if (!m) {
-          m = doc.createElement("meta");
+          m = doc2.createElement("meta");
           m.name = "viewport";
           m.content = "width=device-width, initial-scale=1";
-          doc.head.appendChild(m);
+          doc2.head.appendChild(m);
         }
         if (vpWas === null) vpWas = m.getAttribute("content") || "";
         if (!/maximum-scale/.test(vpWas)) m.setAttribute("content", (vpWas ? vpWas + ", " : "") + "maximum-scale=1");
       });
-      doc.addEventListener("focusout", (e) => {
+      doc2.addEventListener("focusout", (e) => {
         const t = e.target;
         if (vpWas === null || !t || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
         const m = vp();
@@ -13056,8 +17759,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       this.grip = h("div", { class: "fhc-grip", title: "Drag to resize", "aria-hidden": "true" });
       this.grip.addEventListener("pointerdown", (e) => this.resize(e));
       this.el.append(this.top, this.form, this.grip);
-      doc.body.appendChild(this.btn);
-      doc.body.appendChild(this.el);
+      doc2.body.appendChild(this.btn);
+      doc2.body.appendChild(this.el);
       this.placeButton();
       this.render();
     }
@@ -13126,10 +17829,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       this.render();
     }
     /* ── what the rest of the Companion calls ── */
-    setStatus(text) {
-      this.status = text;
+    setStatus(text3) {
+      this.status = text3;
       const s = this.el.querySelector("#fhc-status");
-      if (s) s.textContent = text;
+      if (s) s.textContent = text3;
     }
     setWelcome(w) {
       this.welcome = w || {};
@@ -13139,9 +17842,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       this.s = s || this.s;
       this.renderSoon();
     }
-    add(text, kind = "reply") {
-      this.feed.push({ text: String(text), kind, at: Date.now() });
-      if (kind !== "mine") this.fresh = { text: String(text), kind };
+    add(text3, kind = "reply") {
+      this.feed.push({ text: String(text3), kind, at: Date.now() });
+      if (kind !== "mine") this.fresh = { text: String(text3), kind };
       while (this.feed.length > HISTORY_MAX) this.feed.shift();
       if (kind !== "mine") this.ping();
       if (kind === "mine") this.render();
@@ -13239,11 +17942,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         send: (cmd) => this.ask(cmd),
         // a button that can't do anything yet says why, instead of quietly doin' nothin'
         hint: (msg) => this.add("\u{1F449} " + msg, "notice"),
-        fillBox: (text) => {
-          this.add("\u{1F449} Finish it in the box at the bottom, then press Send: ?" + text + "\u2026", "notice");
+        fillBox: (text3) => {
+          this.add("\u{1F449} Finish it in the box at the bottom, then press Send: ?" + text3 + "\u2026", "notice");
           const i = this.form.querySelector("#fhc-input");
           if (i) {
-            i.value = text;
+            i.value = text3;
             if (!touchScreen()) i.focus();
           }
         },
@@ -13297,9 +18000,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     // the tabs this view shows: + "Farm extras" when an add-on has somethin' (not on the Livestock panel: there it's a row
     // on Me); a tab with show() only when it says so (the Log tab); and ⚙ Settings in the panel where the game has no
     // settings page of its own
-    tabsFor(view, ctx3) {
-      const V = VIEWS[view];
-      const tabs = (view === "guest" || view === "nursery" || V.extrasInside ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
+    tabsFor(view2, ctx3) {
+      const V = VIEWS[view2];
+      const tabs = (view2 === "guest" || view2 === "nursery" || V.extrasInside ? V.tabs : withExtras(V.tabs, view2, ctx3)).filter((t) => !t.show || t.show(ctx3));
       if (!settingsAvailable() && !tabs.some((t) => t.id === "settings"))
         tabs.push({ id: "settings", label: "\u2699 Settings", offRow: true, render: (c) => settingsView(c, c.ui.setPage || "switches", (p) => c.setUi({ setPage: p })) });
       return tabs;
@@ -13314,9 +18017,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     render() {
       this.pending = false;
-      const ctx3 = this.ctx(), view = this.view();
-      const tabs = this.tabsFor(view, ctx3);
-      const tabKey = "tab_" + view;
+      const ctx3 = this.ctx(), view2 = this.view();
+      const tabs = this.tabsFor(view2, ctx3);
+      const tabKey = "tab_" + view2;
       if (this.ui.goTab) {
         this.ui[tabKey] = this.ui.goTab;
         delete this.ui.goTab;
@@ -13326,7 +18029,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
-      const onRow = tabs.filter((t) => !t.offRow), seg = !VIEWS[view].keepRow;
+      const onRow = tabs.filter((t) => !t.offRow), seg = !VIEWS[view2].keepRow;
       const front = seg && onRow.length > 4 ? onRow.slice(0, 4) : onRow, rest = onRow.filter((t) => !front.includes(t));
       const badge = (t) => t.badge ? t.badge(ctx3) : 0;
       const tabBtn = (t) => {
@@ -13380,7 +18083,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "div",
           { class: "fhc-row" },
           h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
-          this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => {
+          this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view2 ? " on" : ""), onclick: () => {
             this.prefs.view = v;
             savePrefs(this.prefs);
             this.render();
@@ -13408,7 +18111,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           safeRender(tab, ctx3)
         )
       ].filter(Boolean));
-      const here2 = view + ":" + tab.id, body2 = this.el.querySelector(".fhc-body");
+      const here2 = view2 + ":" + tab.id, body2 = this.el.querySelector(".fhc-body");
       if (body2) body2.scrollTop = here2 === this.lastTab ? keep2 : 0;
       this.lastTab = here2;
       const nav = this.el.querySelector("nav.fhc-tabs");
@@ -13420,23 +18123,23 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     // 🆘: the Safety tab, from whichever panel they're on (staff go to it in their Livestock panel)
     goSafety() {
-      let view = this.view();
-      if (!VIEWS[view].tabs.some((t) => t.id === "safety")) {
+      let view2 = this.view();
+      if (!VIEWS[view2].tabs.some((t) => t.id === "safety")) {
         const alt = this.views().find((v) => VIEWS[v].tabs.some((t) => t.id === "safety"));
         if (alt) {
-          view = alt;
+          view2 = alt;
           this.prefs.view = alt;
           savePrefs(this.prefs);
         }
       }
-      this.ui["tab_" + view] = "safety";
+      this.ui["tab_" + view2] = "safety";
       this.render();
     }
     // questions waitin' on you, on every tab
     banners() {
       const out = [];
-      const view = this.view(), tabNow = this.ui["tab_" + view] || (this.tabsFor(view, this.ctx())[0] || {}).id;
-      const meCard = view === "livestock" && tabNow === "me", inboxOpen = tabNow === "inbox" || meCard && this.ui.open_me === "inbox";
+      const view2 = this.view(), tabNow = this.ui["tab_" + view2] || (this.tabsFor(view2, this.ctx())[0] || {}).id;
+      const meCard = view2 === "livestock" && tabNow === "me", inboxOpen = tabNow === "inbox" || meCard && this.ui.open_me === "inbox";
       const now = (this.s.now || []).filter((x) => !x.until || x.until > Date.now());
       if (now.length && !meCard) out.push(h(
         "div",
@@ -13826,8 +18529,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         if (it) {
           const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-          const put2 = (place, line3, text) => {
-            pr["Text" + (place * 3 + line3)] = cleanText(text).toUpperCase();
+          const put2 = (place, line3, text3) => {
+            pr["Text" + (place * 3 + line3)] = cleanText(text3).toUpperCase();
             tr[String.fromCharCode(97 + place)] = 1;
           };
           if (m.tally) {
@@ -14564,7 +19267,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   var me3 = () => W14.Player && W14.Player.MemberNumber || 0;
   var here = (mn) => (W14.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
-  var say = () => {
+  var say2 = () => {
   };
   function sendTo(mn, data) {
     try {
@@ -14611,7 +19314,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (m.type === "dispAsk" && wards[from]) {
       wards[from].asked = Date.now();
       save5();
-      say("\u{1F5DD}\uFE0F " + (wards[from].name || "#" + from) + " is askin' to be let out of hardcore. /keys letout " + from + " lifts every dose in them; /keys end " + from + " ends their hardcore.");
+      say2("\u{1F5DD}\uFE0F " + (wards[from].name || "#" + from) + " is askin' to be let out of hardcore. /keys letout " + from + " lifts every dose in them; /keys end " + from + " ends their hardcore.");
       return true;
     }
     return m.type === "dispKeyState";
@@ -14633,16 +19336,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const [a0, ...rest] = String(args || "").trim().split(/\s+/), what = (a0 || "").toLowerCase();
     if (!what || what === "list") {
       const list = Object.entries(wards);
-      say(list.length ? "\u{1F5DD}\uFE0F You hold keys for: " + list.map(([mn2, x]) => (x.name || "#" + mn2) + " (" + mn2 + ", " + (x.until ? "ends " : "lets go without a check-in ") + when2(x.due) + (x.asked ? ", askin' to be let out" : "") + ")").join("; ") + ". /keys check|letout|end <who>." : "\u{1F5DD}\uFE0F Nobody's told your Companion you hold their key yet. It hears when you share a room with somebody in hardcore who names you.");
+      say2(list.length ? "\u{1F5DD}\uFE0F You hold keys for: " + list.map(([mn2, x]) => (x.name || "#" + mn2) + " (" + mn2 + ", " + (x.until ? "ends " : "lets go without a check-in ") + when2(x.due) + (x.asked ? ", askin' to be let out" : "") + ")").join("; ") + ". /keys check|letout|end <who>." : "\u{1F5DD}\uFE0F Nobody's told your Companion you hold their key yet. It hears when you share a room with somebody in hardcore who names you.");
       return;
     }
     if (!WORDS2[what]) {
-      say("\u{1F5DD}\uFE0F /keys, /keys check <who>, /keys letout <who>, /keys end <who>.");
+      say2("\u{1F5DD}\uFE0F /keys, /keys check <who>, /keys letout <who>, /keys end <who>.");
       return;
     }
     const mn = find(rest.join(" "));
     if (!mn) {
-      say("\u{1F5DD}\uFE0F Who? A member number or the name of somebody you hold a key for.");
+      say2("\u{1F5DD}\uFE0F Who? A member number or the name of somebody you hold a key for.");
       return;
     }
     const how = keyDo(mn, what);
@@ -14654,10 +19357,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       delete wards[mn];
       save5();
     }
-    say(how ? "\u{1F5DD}\uFE0F Sent " + how + ". Their Dispensary does it if you really hold their key." : "\u{1F5DD}\uFE0F Couldn't reach them just now.");
+    say2(how ? "\u{1F5DD}\uFE0F Sent " + how + ". Their Dispensary does it if you really hold their key." : "\u{1F5DD}\uFE0F Couldn't reach them just now.");
   }
   function initKeys(sayLocal) {
-    say = sayLocal;
+    say2 = sayLocal;
     if (typeof W14.CommandCombine === "function") {
       try {
         W14.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
@@ -14833,10 +19536,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const hear = others3().filter((c) => typeof W15.ChatRoomMapViewCharacterIsHearable === "function" && W15.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
       const LS = W15.Player && W15.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
-      const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
-      if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
+      const key2 = see.join(",") + "|" + hear.join(",") + "|" + splat;
+      if (key2 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       if (Date.now() - (sightTick.at || 0) < 8e3) return;
-      lastSight = key;
+      lastSight = key2;
       sightTick.at = Date.now();
       ctx2.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
     } catch (e) {
@@ -14853,26 +19556,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function findPath(from, to) {
-    const wide = W15.ChatRoomMapViewWidth || 40, high = W15.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W15.ChatRoomMapViewWidth || 40, high = W15.ChatRoomMapViewHeight || 40, key2 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
-    const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
+    const prev = /* @__PURE__ */ new Map([[key2(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
       const [x, y] = q2.shift();
       if (goal(x, y)) {
         const path = [];
-        let k = key(x, y);
+        let k = key2(x, y);
         while (prev.get(k)) {
           const [px, py, d] = prev.get(k);
           path.unshift(d);
-          k = key(px, py);
+          k = key2(px, py);
         }
         return path;
       }
       if (prev.size > 4e3) break;
       for (const [d, dx, dy] of DIRS) {
         const nx = x + dx, ny = y + dy;
-        if (nx < 0 || ny < 0 || nx >= wide || ny >= high || prev.has(key(nx, ny)) || !canStep(nx, ny)) continue;
-        prev.set(key(nx, ny), [x, y, d]);
+        if (nx < 0 || ny < 0 || nx >= wide || ny >= high || prev.has(key2(nx, ny)) || !canStep(nx, ny)) continue;
+        prev.set(key2(nx, ny), [x, y, d]);
         q2.push([nx, ny]);
       }
     }
@@ -15056,28 +19759,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function trance(m) {
-    let el = W15.document.getElementById("fhc-trance");
+    let el2 = W15.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
-      if (el) el.remove();
+      if (el2) el2.remove();
       return;
     }
-    if (!el) {
-      el = W15.document.createElement("div");
-      el.id = "fhc-trance";
-      el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
+    if (!el2) {
+      el2 = W15.document.createElement("div");
+      el2.id = "fhc-trance";
+      el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
       if (!W15.document.getElementById("fhc-trance-css")) {
         const s = W15.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
         W15.document.head.appendChild(s);
       }
-      W15.document.body.appendChild(el);
+      W15.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
-    el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
+    el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
     (W15.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
-      el.style.opacity = "1";
+      el2.style.opacity = "1";
     });
   }
   var FEEL = {
@@ -15310,17 +20013,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/index.js
+  var inkCounts = (c) => {
+    try {
+      if (c && window.__farmInk && typeof window.__farmInk.counts === "function") window.__farmInk.counts(c);
+    } catch (e) {
+      console.warn("[Farmhand Companion] ink counts:", e);
+    }
+  };
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
   function twoCopies(running) {
-    const note2 = "\u{1F33E} Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") + ". Open Tampermonkey's dashboard and delete the older one, then reload.";
-    console.warn("[Farmhand Companion] " + note2);
+    const note4 = "\u{1F33E} Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") + ". Open Tampermonkey's dashboard and delete the older one, then reload.";
+    console.warn("[Farmhand Companion] " + note4);
     const t = setInterval(() => {
       if (window.CurrentScreen !== "ChatRoom" || typeof window.ChatRoomSendLocal !== "function") return;
       clearInterval(t);
       try {
         const p = window.document.createElement("div");
         p.style.cssText = "color:#c9a35b;white-space:pre-wrap";
-        p.textContent = note2;
+        p.textContent = note4;
         window.ChatRoomSendLocal(p.outerHTML);
       } catch (e) {
       }
@@ -15338,9 +20048,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   window.__farmhandCompanion = VERSION;
   registerInk(window, mod);
   var st = { panel: null, welcomed: false, lastHello: 0, parts: /* @__PURE__ */ new Map() };
-  function dumbDown(text, depth) {
+  function dumbDown(text3, depth) {
     const max = depth >= 4 ? 4 : depth === 3 ? 6 : 8, fillers = ["mm", "uh", "...", "nn"];
-    let out = String(text).replace(/[A-Za-z']+/g, (w) => {
+    let out = String(text3).replace(/[A-Za-z']+/g, (w) => {
       if (w.length <= max) return w;
       if (depth >= 4) return Math.random() < 0.5 ? fillers[Math.floor(Math.random() * fillers.length)] : w.slice(0, 3) + "...";
       return Math.random() < (depth === 3 ? 0.7 : 0.4) ? w.slice(0, Math.max(3, max - 2)) + "..." : w;
@@ -15386,7 +20096,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var forChat = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*]?)[ \t]+/gm, "$1").trim();
   var inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
   function relay(m) {
-    const text = inCharacter(forChat(m.text || "")).slice(0, 900);
+    const text3 = inCharacter(forChat(m.text || "")).slice(0, 900);
     const P5 = window.Player || {}, names = [P5.Nickname, P5.Name].filter(Boolean).map((n) => String(n).toLowerCase());
     const now = Date.now();
     st.relayed = (st.relayed || []).filter((t) => now - t < 6e4);
@@ -15397,28 +20107,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return false;
       }
     })();
-    const ok2 = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
+    const ok2 = text3 && names.some((n) => text3.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
     if (!ok2) {
       toBot("relayNo", { id: m.id });
       return;
     }
     st.relayed.push(now);
-    window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
+    window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text3 });
   }
-  function sendCommand(text, typed) {
-    text = String(text || "").trim();
-    if (!text) return;
+  function sendCommand(text3, typed) {
+    text3 = String(text3 || "").trim();
+    if (!text3) return;
     if (botHere2()) {
       if (!st.welcomed) hello();
-      toBot("cmd", typed ? { text } : { text, btn: true });
+      toBot("cmd", typed ? { text: text3 } : { text: text3, btn: true });
       const sentAt = Date.now();
       st.lastSent = sentAt;
       setTimeout(() => {
         if (st.lastHeard >= sentAt || st.lastSent !== sentAt) return;
-        st.panel.add('No answer to "' + text + `" yet. The farm girl may be busy, or not runnin' the newest bot. ` + (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
+        st.panel.add('No answer to "' + text3 + `" yet. The farm girl may be busy, or not runnin' the newest bot. ` + (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
       }, 1e4);
     } else {
-      window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text });
+      window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text3 });
       st.panel.add("The farm girl isn't in your room, so I beeped her. Her answer comes back as a beep.", "notice");
     }
   }
@@ -15431,11 +20141,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     st.parts.delete(m.id);
     return got.join("\n");
   }
-  function toChat(text, color, italic) {
+  function toChat(text3, color, italic) {
     if (typeof window.ChatRoomSendLocal !== "function") return false;
     const p = window.document.createElement("div");
     p.style.cssText = "color:" + color + ";white-space:pre-wrap;margin:0.25em 0" + (italic ? ";font-style:italic" : "");
-    p.textContent = forChat(text);
+    p.textContent = forChat(text3);
     window.ChatRoomSendLocal(p.outerHTML);
     return true;
   }
@@ -15464,10 +20174,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const n = st.panel && st.panel.s && st.panel.s.nursery;
       if (!n || n.role !== "little" || !botHere2()) return;
-      const s = nurseryStatsNow(), key = JSON.stringify(s);
-      if (!force && key === nurseryLast && Date.now() - nurseryLastAt < 10 * 6e4) return;
+      const s = nurseryStatsNow(), key2 = JSON.stringify(s);
+      if (!force && key2 === nurseryLast && Date.now() - nurseryLastAt < 10 * 6e4) return;
       if (!s.abcl && !s.mommy && !(s.carers || []).length && !force) return;
-      nurseryLast = key;
+      nurseryLast = key2;
       nurseryLastAt = Date.now();
       toBot("nurseryStats", s);
     } catch (e) {
@@ -15568,6 +20278,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               console.warn("[Farmhand Companion] reins:", e);
             }
           }
+          if ("ink" in m.set) inkCounts(s.ink);
         } else askWhole();
         break;
       case "state":
@@ -15593,20 +20304,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           } catch (e) {
             console.warn("[Farmhand Companion] reins:", e);
           }
+          inkCounts(m.state.ink);
         }
         break;
       case "reply":
       case "notice": {
-        const text = collect(m);
-        if (text === null) break;
-        logRow("farm", BOT_MEMBER, text);
-        st.panel.add(text, m.type);
-        if (m.type === "notice" && st.panel.prefs.chatToo !== false) toChat(text, "#c9a35b");
+        const text3 = collect(m);
+        if (text3 === null) break;
+        logRow("farm", BOT_MEMBER, text3);
+        st.panel.add(text3, m.type);
+        if (m.type === "notice" && st.panel.prefs.chatToo !== false) toChat(text3, "#c9a35b");
         break;
       }
       case "doc": {
-        const text = collect(m);
-        if (text !== null) st.panel.addDoc({ text, kind: String(m.kind || "record"), who: String(m.who || "?"), about: m.about });
+        const text3 = collect(m);
+        if (text3 !== null) st.panel.addDoc({ text: text3, kind: String(m.kind || "record"), who: String(m.who || "?"), about: m.about });
         break;
       }
       case "ask":
@@ -15619,7 +20331,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         break;
       case "outfit":
         if (m.auto) {
-          const ok2 = api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
+          const ok2 = api2.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
           if (ok2) toChat("\u{1F457} You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b");
           break;
         }
@@ -15757,7 +20469,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
     }
   }
-  var api = {
+  var api2 = {
     wear(o) {
       let r;
       try {
@@ -15775,16 +20487,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     },
     // Say it: their words straight to the farm (or to staff) as a hidden message, so no gag, speech rule or trance
     // rewrites them on the way (Laynie, Oct 23: "speech impaired pets need a guaranteed way to be able to say what they need to say")
-    say(text, to) {
-      text = String(text || "").trim().slice(0, 300);
-      if (!text) return false;
+    say(text3, to) {
+      text3 = String(text3 || "").trim().slice(0, 300);
+      if (!text3) return false;
       if (!botHere2()) {
         st.panel.add("\u{1F449} The farm girl isn't in this room, so nobody's there to hear it.", "notice");
         return false;
       }
       if (!st.welcomed) hello();
-      toBot("say", { text, to: to === "staff" ? "staff" : "farm" });
-      st.panel.add("\u{1F5E3}\uFE0F You said" + (to === "staff" ? ", to staff" : "") + ": " + text, "mine");
+      toBot("say", { text: text3, to: to === "staff" ? "staff" : "farm" });
+      st.panel.add("\u{1F5E3}\uFE0F You said" + (to === "staff" ? ", to staff" : "") + ": " + text3, "mine");
       return true;
     },
     back() {
@@ -15885,7 +20597,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function start() {
     loadStore();
-    st.panel = new Panel(sendCommand, api);
+    st.panel = new Panel(sendCommand, api2);
     initSettings(st.panel);
     if (st.panel.prefs.off) {
       st.panel.show(false);
@@ -15979,11 +20691,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         try {
           const d = args[1], s = st.panel && st.panel.s;
           if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
-            let text = d.Content;
-            if (s.under >= 2) text = dumbDown(text, s.under);
-            if (s.corrWord && Math.random() < 0.17) text = text.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
-            if (s.corrNoise && Math.random() < 0.12) text = text.replace(/\s+$/, "") + " ..." + String(s.corrNoise).slice(0, 12) + ".";
-            if (text !== d.Content) args = [args[0], Object.assign({}, d, { Content: text })];
+            let text3 = d.Content;
+            if (s.under >= 2) text3 = dumbDown(text3, s.under);
+            if (s.corrWord && Math.random() < 0.17) text3 = text3.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
+            if (s.corrNoise && Math.random() < 0.12) text3 = text3.replace(/\s+$/, "") + " ..." + String(s.corrNoise).slice(0, 12) + ".";
+            if (text3 !== d.Content) args = [args[0], Object.assign({}, d, { Content: text3 })];
           }
         } catch (e) {
         }
@@ -16036,7 +20748,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] map clicks unavailable:", e);
     }
     window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && st.pick) api.cancelPick();
+      if (e.key === "Escape" && st.pick) api2.cancelPick();
     });
     initKeys((t) => toChat(t, "#c79bd8"));
     window.FarmhandCompanion = Object.freeze({
@@ -16047,8 +20759,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const said = setHardPrefsOn(p, want, (k, v) => {
           p[k] = v;
         }, (k) => {
-          if (k === "brandOff") api.brandSync();
-          if (/^no/.test(k)) api.rehello();
+          if (k === "brandOff") api2.brandSync();
+          if (/^no/.test(k)) api2.rehello();
         });
         if (said.length) {
           try {

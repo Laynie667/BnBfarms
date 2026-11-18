@@ -1060,6 +1060,14 @@
     if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud), kept + spilt);
     if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
     if (hole === "mouth" && kept >= CFG.HUNGRY_ML){ tp.boosts = tp.boosts || {}; tp.boosts.hungry = Date.now() + 3600000; }
+    // LIVE INK's counts (07b-companion-sync.js inkCounts): loads taken, who gave them (the 40 most recent studs), knots
+    if (load >= 1){
+      tp.totals.loads = (tp.totals.loads || 0) + 1;
+      const by = tp.totals.by || (tp.totals.by = {}), e = by[stud] || (by[stud] = { n: 0, at: 0 });
+      e.n++; e.at = Date.now();
+      const ks = Object.keys(by); if (ks.length > 40) ks.sort((a, b) => by[a].at - by[b].at).slice(0, ks.length - 40).forEach(k => { delete by[k]; });
+      if (knot) tp.totals.tied = (tp.totals.tied || 0) + 1;
+    }
     const sc0 = state.scenes.get(stud);
     // the scene stays open till ?breed stop (or 2 quiet hours), even after a hand ?cum
     const F = L.life && L.life.fair;

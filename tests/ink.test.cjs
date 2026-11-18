@@ -22,7 +22,7 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   W.AssetBuildDescription = () => { for (const g of W.AssetGroup) { g.Description = 'MISSING ASSETGROUP DESCRIPTION: ' + g.Name; for (const a of g.Asset) a.Description = 'MISSING ASSET DESCRIPTION'; } };
   W.AssetLoadAll = () => { for (const n of [...W.AssetGroupMap.keys()]) if (/^Farm/.test(n)) W.AssetGroupMap.delete(n); W.AssetGroup = W.AssetGroup.filter((g) => !/^Farm/.test(g.Name)); };
   let drawn = [];
-  W.CommonDrawAppearanceBuild = (C, cb) => { cb.drawImage('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v1/FarmInk/KnotSlave_Ink.png', 175, 477, { ScaleX: 1.5 }); cb.drawImage('Assets/Female3DCG/Cloth/Dress.png', 0, 0, {}); cb.drawImageColorize('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v1/FarmBrand/Hucow_Brand.png', 0, 0, undefined); };
+  W.CommonDrawAppearanceBuild = (C, cb) => { cb.drawImage('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/KnotSlave_Ink.png', 175, 477, { ScaleX: 1.5 }); cb.drawImage('Assets/Female3DCG/Cloth/Dress.png', 0, 0, {}); cb.drawImageColorize('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmBrand/Hucow_Brand.png', 0, 0, undefined); };
   // a ModSDK handle that wraps the functions on W the way the real one does
   const mod = (name) => ({ hookFunction(fn, pri, h) { const orig = W[fn]; W[fn] = function (...args) { return h(args, (a) => orig.apply(this, a)); }; } });
 
@@ -46,17 +46,19 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ok(W.AssetGetPreviewPath(G1.Asset[0]) === INK.INK_HOST + 'FarmInk/Preview' && W.AssetGetPreviewPath({ Group: { Name: 'Cloth' } }) === 'Assets/Female3DCG/Cloth/Preview', "the wardrobe's previews too");
   // drawn at half the size they're stored at
   drawn = []; W.CommonDrawAppearanceBuild({}, { drawImage: (s, x, y, o) => drawn.push([s, o]), drawImageColorize: (s, x, y, o) => drawn.push([s, o]) });
-  ok(LIST.res === 2 && drawn[0][1].ScaleX === 0.75 && drawn[0][1].ScaleY === 0.5, "a design's drawn at half its stored size, times whatever the Layering screen says (1.5 → " + drawn[0][1].ScaleX + ')');
-  ok(drawn[1][1].ScaleX === undefined && drawn[2][1].ScaleX === 0.5, "...the game's own pictures untouched, and a recoloured layer halved too");
+  const near = (v, x) => Math.abs(v - x) < 1e-9;
+  ok(LIST.res === 3 && near(drawn[0][1].ScaleX, 0.5) && near(drawn[0][1].ScaleY, 1 / 3), "a design's drawn at a third of its stored size, times whatever the Layering screen says (1.5 → " + drawn[0][1].ScaleX + ')');
+  ok(drawn[1][1].ScaleX === undefined && near(drawn[2][1].ScaleX, 1 / 3), "...the game's own pictures untouched, and a recoloured layer at a third too");
   // the game rebuilding its lists
   W.AssetBuildDescription(); ok(G1.Description === 'Farm Ink 1' && G1.Asset[0].Description !== 'MISSING ASSET DESCRIPTION', 'when the game re-reads its names (a language change), ours are put back');
   W.AssetLoadAll(); ok(W.AssetGroupMap.has('FarmInk1') && W.AssetGroupMap.has('FarmBrand'), 'when the game reloads its items, the slots are added again');
   // the pictures themselves
   const missing = [];
-  for (const kind of ['FarmInk', 'FarmBrand']) for (const a of LIST.groups[kind]) { for (const l of a.layers) { const f = path.join(__dirname, '../ink/v1', kind, a.name + '_' + l.name + '.png'); if (!fs.existsSync(f)) missing.push(f); } if (!fs.existsSync(path.join(__dirname, '../ink/v1', kind, 'Preview', a.name + '.png'))) missing.push(kind + '/Preview/' + a.name); }
+  for (const kind of ['FarmInk', 'FarmBrand']) for (const a of LIST.groups[kind]) { if (!a.live) for (const l of a.layers) { const f = path.join(__dirname, '../ink/v2', kind, a.name + '_' + l.name + '.png'); if (!fs.existsSync(f)) missing.push(f); } if (!fs.existsSync(path.join(__dirname, '../ink/v2', kind, 'Preview', a.name + '.png'))) missing.push(kind + '/Preview/' + a.name); }
   ok(!missing.length, 'every layer and preview picture is in the repo' + (missing.length ? ': missing ' + missing.slice(0, 3).join(', ') : ''));
   const text = JSON.stringify(LIST);
-  ok(!/221397|232922|Alexia|Laynie/.test(text), 'no name or member number in the list (the ones that print a name or number are drawn live, later)');
-  ok(LIST.live.length >= 20 && LIST.live.some((x) => /FARM PROPERTY/.test(x.title)), 'the designs with live names, numbers and counts are kept back for drawing live (' + LIST.live.length + ')');
+  ok(!/221397|232922|Alexia|Laynie/.test(text), 'no name or member number in the list (the ones that print a name or number are drawn live)');
+  const liveN = LIST.groups.FarmInk.filter((x) => x.live).length;
+  ok(liveN === 28 && LIST.groups.FarmInk.some((x) => x.live && /Farm Property/.test(x.title)), 'the designs with live names, numbers and counts are drawn live, not from pictures (' + liveN + '; tests/ink-live.test.cjs)');
   out(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })().catch((e) => { out('CRASHED ' + (e && e.stack || e)); process.exit(1); });

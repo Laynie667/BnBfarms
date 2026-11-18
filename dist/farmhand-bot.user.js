@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.80.0
+// @version      0.81.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,7 +2960,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.80.0";
+  var VERSION = "0.81.0";
   var COMPANION_VERSION = "0.64.0";
 
   // bot-parts:farmhand-bot-parts
@@ -4856,6 +4856,7 @@
     }
     function teleport(mn, pt, urgent, force) {
       if (!pt || !charFor(mn)) return false;
+      if (!force && hitchedNow(mn)) return false;
       if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
       return teleportNow(mn, pt, urgent);
     }
@@ -14076,6 +14077,7 @@
       if (!r || !p) return out;
       if (r.benched && r.benched.until > now) out.push({ icon: "\u{1FAB5}", text: "On the bench \xB7 " + r.benched.uses + " used you", until: r.benched.until });
       if (r.penned && r.penned.until > now) out.push({ icon: "\u{1F6A7}", text: "Penned", until: r.penned.until });
+      for (const h of hitchNow(mn)) out.push(h);
       if (r.stocked && r.stocked.until > now) out.push({ icon: "\u26D3\uFE0F", text: "In the stocks", until: r.stocked.until });
       if (p.stall && p.stall.until) out.push({ icon: "\u{1F95B}", text: "In the milkin' stall", until: p.stall.until });
       if (inHeat(p)) out.push({ icon: "\u{1F525}", text: "In heat", until: p.heat.until });
@@ -41900,7 +41902,7 @@
     }
     function reinsHeld(mn) {
       const r = rec(mn) || {}, p = prodOf(mn) || {}, now = Date.now();
-      return !!(heldByTrap(mn) || r.penned && r.penned.until > now || r.stocked && r.stocked.until > now || r.benched && r.benched.until > now || p.stall && p.stall.until || p.tieUntil > now);
+      return !!(heldByTrap(mn) || r.penned && r.penned.until > now || r.stocked && r.stocked.until > now || r.benched && r.benched.until > now || p.stall && p.stall.until || p.tieUntil > now || hitchedNow(mn));
     }
     function reinsLet(mn, why, by) {
       const r = rec(mn), x = r && r.reins;
@@ -42233,6 +42235,280 @@
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __renewTick: () => renewTick(), __renewable: (m) => renewable(m), __renewals: () => renewalsList() });
     addCommand("renew renewal renewals", { topic: "contracts", run: (c) => renewCommand(c.sender, c.args, c.R) });
+    if (CFG.HITCH_MIN === void 0) CFG.HITCH_MIN = 30;
+    if (CFG.HITCH_MAX_MIN === void 0) CFG.HITCH_MAX_MIN = 240;
+    if (CFG.HITCH_WAIT_S === void 0) CFG.HITCH_WAIT_S = 60;
+    const HITCH_LIMIT = /\b(leash\w*|tether\w*|hitch\w*|tied up|tying up)\b/i;
+    const hitchBook = () => L2.hitch = L2.hitch || {};
+    const POST_WORD = {
+      Pole: "pole",
+      NordicPillar: "post",
+      Pillar: "pillar",
+      Totem: "totem",
+      Barrel: "barrel",
+      "X-Cross": "cross",
+      VelourRopeBarrier: "rope",
+      FarmFenceSingle: "rail",
+      HomeFenceSingle: "rail",
+      PicketFence: "fence",
+      BarbFence: "fence",
+      LampPost: "lamp post",
+      OakTree: "tree",
+      OakTree_Fall: "tree",
+      PineTree: "pine",
+      Sakura: "tree",
+      LeaflessTree: "tree",
+      PalmTree: "palm",
+      Bush: "bush",
+      Fountain: "fountain",
+      WishingWell: "well",
+      ParkBench: "bench",
+      Chest: "chest",
+      StonePile: "stones",
+      Rocks: "rocks"
+    };
+    const PLACE_OF = (n) => /^milking/.test(n) ? "parlour" : /^(home|rescue)$/.test(n) ? "barn door" : /^(stocks|bench)$/.test(n) ? "stockade" : /^trough/.test(n) ? "trough" : /^glory/.test(n) ? "glory stalls" : /^(barn|speaker-barn)$/.test(n) ? "barn" : /^water-/.test(n) ? "pond" : /^(summon)$/.test(n) ? "house" : /^(trap|post-)/.test(n) ? null : n.replace(/[-_]?\d+$/, "");
+    const postInZone = (z, X, Y) => z && z.a && z.b && X >= Math.min(z.a.X, z.b.X) && X <= Math.max(z.a.X, z.b.X) && Y >= Math.min(z.a.Y, z.b.Y) && Y <= Math.max(z.a.Y, z.b.Y);
+    const postDist = (a, b) => Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y));
+    function hitchPosts() {
+      const M = W.ChatRoomData && W.ChatRoomData.MapData, cells = M && M.CellData || {}, wide = W.ChatRoomMapViewWidth || 40, out = [];
+      for (const [k, c] of Object.entries(cells)) {
+        if (!c || c.Type !== "Tether") continue;
+        const i = Number(k), X = i % wide, Y = Math.floor(i / wide);
+        let style = "";
+        try {
+          const MM = W.MapManager && W.MapManager.Map;
+          if (MM && typeof MM.isValidObjectConfig === "function" && !MM.isValidObjectConfig(i, "Tether")) continue;
+          const o = MM && MM.getObject && MM.getObject(i);
+          style = o && o.Style || "";
+        } catch (e) {
+        }
+        const at = { X, Y }, words = [];
+        const named = Object.entries(L2.spots || {}).find(([n, s]) => /^post-/.test(n) && s && postDist(s, at) <= 1);
+        let place = named ? named[0].slice(5).replace(/-/g, " ") : null;
+        const near2 = Object.entries(L2.spots || {}).filter(([n, s]) => s && postDist(s, at) <= 2).sort((a, b) => postDist(a[1], at) - postDist(b[1], at));
+        const parlour = near2.some(([n]) => /^milking/.test(n));
+        if (!place && parlour) place = "parlour";
+        const zones = Object.entries(L2.zones || {}).filter(([, z]) => postInZone(z, X, Y)).map(([n, z]) => z.group || n);
+        if (!place && zones.length) place = zones[0];
+        if (!place) {
+          const s = near2.map(([n]) => PLACE_OF(n)).find(Boolean);
+          if (s) place = s;
+        }
+        const thing = POST_WORD[style] || "post";
+        for (const w of [place, thing, ...zones, ...near2.map(([n]) => PLACE_OF(n))]) if (w && !words.includes(w)) words.push(w);
+        out.push({ X, Y, i, parlour, words, name: "the " + (place ? place + " " : "") + thing });
+      }
+      return out;
+    }
+    function mayHitch(by, t) {
+      if (isStaff(by) || isProprietor(by) || membership(t, by)) return true;
+      const C2 = charFor(t);
+      return !!(C2 && C2.Ownership && C2.Ownership.MemberNumber === by);
+    }
+    const hasLead = (C2) => (C2.Appearance || []).some((it) => {
+      try {
+        return typeof W.InventoryItemHasEffect === "function" ? W.InventoryItemHasEffect(it, "Leash", true) : /Leash|Chain/.test(it.Asset.Name) && it.Asset.Group.Name === "ItemNeckRestraints";
+      } catch (e) {
+        return false;
+      }
+    });
+    const hasCollar = (C2) => (C2.Appearance || []).some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemNeck");
+    const gearLets = (t) => {
+      const c = state.companions.get(t);
+      return !!(hasCompanion(t) && c && !(c.off && c.off.gear));
+    };
+    function hitchWhyNot(t) {
+      const C2 = charFor(t), n = plainName(t);
+      if (!C2) return n + " isn't here, sugar.";
+      if (C2.OnlineSharedSettings && C2.OnlineSharedSettings.AllowPlayerLeashing === false) return n + "'s game has leashing switched off, so nobody can tie them to a post.";
+      if (W.ChatRoomData && Array.isArray(W.ChatRoomData.BlockCategory) && W.ChatRoomData.BlockCategory.includes("Leashing")) return "This room blocks leashing, so there's no hitchin' in it.";
+      try {
+        if (typeof W.ServerChatRoomGetAllowItem === "function" && !W.ServerChatRoomGetAllowItem(W.Player, C2)) return n + "'s game won't let me use items on them, so I can't tie them up.";
+      } catch (e) {
+      }
+      if (!hasLead(C2)) return gearLets(t) && hasCollar(C2) ? "lead" : n + " needs a lead on their collar first (a collar leash or chain)" + (hasCollar(C2) ? "" : ", and a collar to clip it to") + '. With "Farm can put real gear on me" on in their Companion I clip one on myself.';
+      try {
+        if (typeof W.ChatRoomCanBeLeashedBy === "function" && !W.ChatRoomCanBeLeashedBy(CFG.BOT_MEMBER, C2)) return n + "'s lead is locked to somebody else, or somethin' already has hold of them.";
+      } catch (e) {
+      }
+      return "";
+    }
+    const hitchedNow = (mn) => !!hitchBook()[mn];
+    function besidePost(post, avoid) {
+      const taken = new Set((W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== avoid && c.MapData && c.MapData.Pos).map((c) => c.MapData.Pos.X + "," + c.MapData.Pos.Y));
+      const free = [];
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const X = post.X + dx, Y = post.Y + dy;
+        if (!dx && !dy || taken.has(X + "," + Y) || X < 0 || Y < 0) continue;
+        let ok = true;
+        try {
+          const MM = W.MapManager && W.MapManager.Map;
+          if (MM && typeof MM.canEnterTile === "function") ok = MM.canEnterTile(X, Y) !== false;
+          else if (typeof W.MapCanEnterTile === "function") ok = !!W.MapCanEnterTile(X, Y);
+        } catch (e) {
+          ok = true;
+        }
+        if (ok) free.push({ X, Y, d: Math.abs(dx) + Math.abs(dy) });
+      }
+      free.sort((a, b) => a.d - b.d);
+      return free.length ? free[0] : { X: post.X, Y: post.Y };
+    }
+    const HITCH_ON = [
+      "\u{1FAA2} %b clips a lead to %n's collar, walks them over to %p and ties it off with a hard tug. %n's not goin' anywhere.",
+      "\u{1FAA2} %b ties %n to %p, short enough that they can turn round and present, and not much else.",
+      "\u{1FAA2} A lead from %n's collar to %p, a knot %b pulls tight, and that's %n parked like a heifer at the rail.",
+      "\u{1FAA2} %b hitches %n to %p and gives the knot a pat. Stay put, sugar."
+    ];
+    const HITCH_MILK = [
+      "\u{1FAA2} %b ties %n to %p by the stalls. Milkin' time: they're stayin' right there till those teats have been emptied.",
+      "\u{1FAA2} %n gets hitched to %p, udder first. %b's not untyin' that knot till somebody's milked 'em dry."
+    ];
+    const HITCH_OFF = {
+      time: ["\u{1FAA2} %b unties %n from %p. Time's up, sugar, off you go.", "\u{1FAA2} The knot comes loose and %n's free of %p again."],
+      milked: ["\u{1FAA2} Milked and done: %b unties %n from %p and sends 'em off with a pat on the rump.", "\u{1FAA2} Emptied out, %n gets untied from %p. Good girl."],
+      off: ["\u{1FAA2} %b unhitches %n from %p.", "\u{1FAA2} %n's lead comes off %p, and they can wander again."],
+      safe: ["\u{1FAA2} %n's untied from %p, right away."]
+    };
+    const hitchFill = (t, mn, by, post) => t.replace(/%n/g, plainName(mn)).replace(/%b/g, by === CFG.BOT_MEMBER ? "The farm girl" : plainName(by)).replace(/%p/g, post || "the post");
+    function tieRequest(C2, tether) {
+      if (typeof W.ChatRoomMapViewSendTetherRequest === "function") {
+        W.ChatRoomMapViewSendTetherRequest(C2, tether);
+        return true;
+      }
+      send("ChatRoomChat", { Content: "ChatRoomMapViewTether", Type: "Hidden", Dictionary: [{ Tag: "MapViewTether", Tether: tether }], Target: C2.MemberNumber }, true);
+      return true;
+    }
+    function hitchCmd(by, args, R) {
+      if (!args.length) return R(hitchList());
+      const t = resolveTarget(args[0]);
+      if (!t || !charFor(t)) return R("Hitch who, sugar? They need to be here on the map: ?hitch <who> [post] [minutes|milk].");
+      if (!mayHitch(by, t)) return R("Only staff, " + plainName(t) + "'s owner or their herd's leader can hitch them, hon.");
+      if (!mapRoom() || !posOf(t)) return R("The room isn't on its map right now, so there's nothin' to tie to.");
+      const r = rec(t) || {};
+      if (HITCH_LIMIT.test(r.limits || "")) return R(plainName(t) + "'s limits rule out bein' tied up like that, sugar.");
+      if (hitchedNow(t) || charFor(t).MapData && charFor(t).MapData.Tether) return R(plainName(t) + "'s already tied to a post, sugar. ?unhitch " + plainName(t) + " first.");
+      let mins = null, milk = false, word = "";
+      for (const a of args.slice(1)) {
+        if (/^\d{1,3}$/.test(a)) mins = Number(a);
+        else if (/^milk(ed|ing)?$/i.test(a)) milk = true;
+        else word += (word ? " " : "") + String(a).toLowerCase();
+      }
+      const posts = hitchPosts();
+      if (!posts.length) return R("There's no hitchin' post on the farm's map yet, hon. A room admin makes one: click a pole, a fence, a barrel or a tree in the map editor and make it a tether point.");
+      const cands = word ? posts.filter((p) => p.words.some((w) => w === word || w.includes(word) || word.includes(w))) : posts;
+      if (!cands.length) return R("No post by that name, sugar. The farm's posts: " + posts.map((p) => p.name).join(", ") + ".");
+      const from = posOf(t), post = cands.slice().sort((a, b) => postDist(a, from) - postDist(b, from))[0];
+      if (!mins && !milk && post.parlour && makesMilk(t)) milk = true;
+      if (milk && !makesMilk(t)) return R(plainName(t) + " doesn't make milk, hon, so there's nothin' to wait for. Give me minutes instead: ?hitch " + plainName(t) + " " + (word || "") + " 30");
+      const why = hitchWhyNot(t);
+      if (why && why !== "lead") return R(why);
+      mins = Math.max(5, Math.min(CFG.HITCH_MAX_MIN, mins || CFG.HITCH_MIN));
+      if (why === "lead") gearOn(t, "leash", "Hitchin' Lead", "A lead clipped to the collar, the other end knotted round a post.", (milk ? CFG.HITCH_MAX_MIN : mins) + 10, "hitch", { items: ["CollarLeash", "CollarChainLong"] });
+      state.hitchWant = state.hitchWant || /* @__PURE__ */ new Map();
+      state.hitchWant.set(t, { by, post: { X: post.X, Y: post.Y }, name: post.name, mins, milk, at: Date.now(), asked: 0 });
+      teleport(t, besidePost(post, t), true);
+      R("\u{1FAA2} Bringin' " + plainName(t) + " to " + post.name + (milk ? ", till they're milked." : ", for " + mins + " minutes."));
+    }
+    function unhitchCmd(by, args, R) {
+      const t = args.length ? resolveTarget(args[0]) : by;
+      const h = t && hitchBook()[t];
+      if (!h) return R((t === by ? "You're" : plainName(t) + " isn't") + (t === by ? " not hitched, sugar." : " hitched, sugar."));
+      if (!(mayHitch(by, t) || h.by === by)) return R("Only whoever could hitch " + plainName(t) + " can untie them, hon. Your safeword always does.");
+      hitchLet(t, "off", by);
+      R("\u{1FAA2} " + plainName(t) + "'s untied.");
+    }
+    function hitchList() {
+      const posts = hitchPosts(), book = hitchBook();
+      if (!posts.length) return "\u{1FAA2} No hitchin' posts on the map yet. A room admin makes a pole, a fence, a barrel or a tree a tether point in the map editor.";
+      const who = Object.entries(book).map(([mn, h]) => plainName(Number(mn)) + " at " + h.name + (h.milk ? " (till milked)" : " (" + Math.max(1, Math.ceil((h.until - Date.now()) / 6e4)) + " min)"));
+      return "\u{1FAA2} The farm's hitchin' posts: " + posts.map((p) => p.name).join(", ") + "." + (who.length ? "\nTied up now: " + who.join(", ") + "." : "") + "\n?hitch <who> [post] [minutes|milk] \xB7 ?unhitch <who> \xB7 staff, their owner, or their herd's leader";
+    }
+    function hitchLet(mn, why, by) {
+      const book = hitchBook(), h = book[mn];
+      if (!h) return false;
+      delete book[mn];
+      gearOff(mn, "leash", "hitch");
+      saveLedger();
+      syncCompanions(true);
+      const C2 = charFor(mn);
+      if (C2 && C2.MapData && C2.MapData.Tether && why !== "slipped") {
+        try {
+          tieRequest(C2, null);
+        } catch (e) {
+          warn("unhitch:", e);
+        }
+      }
+      const pool = HITCH_OFF[why];
+      if (pool && C2) emote(hitchFill(pickFresh("hitch:off:" + why, pool), mn, by || CFG.BOT_MEMBER, h.name), mn);
+      return true;
+    }
+    function hitchTick() {
+      const now = Date.now();
+      const want = state.hitchWant || /* @__PURE__ */ new Map();
+      for (const [t, w] of want) {
+        const C2 = charFor(t);
+        if (!C2 || now - w.at > CFG.HITCH_WAIT_S * 1e3) {
+          want.delete(t);
+          gearOff(t, "leash", "hitch");
+          if (C2) tell(w.by, "\u{1FAA2} " + plainName(t) + " never got tied to " + w.name + (hitchWhyNot(t) && hitchWhyNot(t) !== "lead" ? ": " + hitchWhyNot(t) : ": their game didn't take the knot (it decides who can tie them)."));
+          continue;
+        }
+        const tied = C2.MapData && C2.MapData.Tether;
+        if (tied && tied.Position && tied.Position.X === w.post.X && tied.Position.Y === w.post.Y) {
+          want.delete(t);
+          const p = prodOf(t) || {};
+          hitchBook()[t] = { X: w.post.X, Y: w.post.Y, name: w.name, by: w.by, at: now, milk: w.milk, milkAt: p.lastMilkAt || 0, until: now + (w.milk ? CFG.HITCH_MAX_MIN : w.mins) * 6e4 };
+          saveLedger();
+          syncCompanions(true);
+          emote(hitchFill(pickFresh(w.milk ? "hitch:milk" : "hitch:on", w.milk ? HITCH_MILK : HITCH_ON), t, w.by, w.name), t);
+          tell(t, "\u{1FAA2} You're hitched to " + w.name + (w.milk ? " till you're milked" : " for " + w.mins + " minutes") + ": two steps from it and no further. Your safeword unties you.");
+          continue;
+        }
+        const at = posOf(t);
+        if (!at || postDist(at, w.post) > 1 || now - w.asked < 5e3) continue;
+        const me = charFor(CFG.BOT_MEMBER);
+        if (me && me.MapData && me.MapData.Pos && postDist(me.MapData.Pos, w.post) > 1) {
+          const spot = besidePost(w.post, CFG.BOT_MEMBER);
+          me.MapData.Pos = { X: spot.X, Y: spot.Y };
+          send("ChatRoomCharacterMapDataUpdate", me.MapData, true);
+          state.walkedAt = now;
+          w.asked = now - 3500;
+          continue;
+        }
+        w.asked = now;
+        if (hitchWhyNot(t)) continue;
+        try {
+          tieRequest(C2, { Position: { X: w.post.X, Y: w.post.Y }, MemberNumber: CFG.BOT_MEMBER });
+        } catch (e) {
+          warn("hitch:", e);
+        }
+      }
+      for (const [k, h] of Object.entries(hitchBook())) {
+        const mn = Number(k), C2 = charFor(mn);
+        if (!C2) {
+          delete hitchBook()[k];
+          saveLedger();
+          continue;
+        }
+        if (!(C2.MapData && C2.MapData.Tether) && now - h.at > 2e4) {
+          hitchLet(mn, "slipped");
+          continue;
+        }
+        if (h.milk && ((prodOf(mn) || {}).lastMilkAt || 0) > h.at) {
+          hitchLet(mn, "milked");
+          continue;
+        }
+        if (now >= h.until) hitchLet(mn, "time");
+      }
+    }
+    function hitchNow(mn) {
+      const h = hitchBook()[mn];
+      return h ? [{ icon: "\u{1FAA2}", text: "Hitched to " + h.name + (h.milk ? " till you're milked" : ""), until: h.milk ? void 0 : h.until }] : [];
+    }
+    addCommand("hitch", { topic: "farmlife", run: (c) => hitchCmd(c.sender, c.args, c.R) });
+    addCommand("unhitch", { topic: "farmlife", run: (c) => unhitchCmd(c.sender, c.args, c.R) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __hitchPosts: () => hitchPosts(), __hitchTick: () => hitchTick(), __hitchBook: () => hitchBook(), __hitchWant: () => state.hitchWant });
     Object.assign(MESS, { icing: "#FFFDF8", cocoa: "#6E4128", eggnog: "#F1E0AA", peppermint: "#E23A52" });
     season("winter", {
       label: "Winter",
@@ -62169,6 +62445,10 @@ HANDLIN' 'EM
      behind you wherever you go (their Companion walks them, or
      I hop them along). ?reins off [who] lets go; so does their
      safeword. An hour unless you say (up to 4)
+  ?hitch <who> [post] [minutes|milk] \xB7 tie their lead to a post on
+     the map (staff, their owner, or their herd's leader): parlour,
+     barn door, stockade, pasture... Two steps and no further. Milk:
+     till they're milked. ?unhitch <who> \xB7 ?hitch alone lists posts
   ?brand <who> <mark> \xB7 up to 12 characters, shows on ?who
      ?brand <who> clear takes it off
   ?turnout <who> [note] \xB7 keep claimed staff out in pasture
@@ -64968,6 +65248,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             warn("safeword reins:", e);
           }
           try {
+            hitchLet(sender, "safe");
+          } catch (e) {
+            warn("safeword hitch:", e);
+          }
+          try {
             dispSafe(sender);
           } catch (e) {
             warn("safeword dispensary:", e);
@@ -67591,6 +67876,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (inRoom()) reinsTick();
         } catch (e) {
           warn("reins:", e);
+        }
+        try {
+          if (inRoom()) hitchTick();
+        } catch (e) {
+          warn("hitch:", e);
         }
       }, CFG.LEASH_TICK_MS);
       later(heartbeat, 3e3);

@@ -122,6 +122,7 @@
   // (stuck rescues, someone pinned or in the stocks)
   function teleport(mn, pt, urgent, force){
     if (!pt || !charFor(mn)) return false;
+    if (!force && hitchedNow(mn)) return false;   // hitched to a post: they stay put till they're untied (10y9u-hitch.js)
     if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
     return teleportNow(mn, pt, urgent);
   }

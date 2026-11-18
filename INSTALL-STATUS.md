@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.80.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.81.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.81.0: hitchin' posts** BC R134's tether points (Laynie, Nov 18: the game's own leash setting decides, "any staff or owner", "until the time's up, or milked according to their settings").
+  - `?hitch <who> [post] [minutes|milk]`: staff, their owner or their herd's leader. The farm girl brings them to the post (their Companion walks them over) and ties their lead to it. Two steps from it and no further.
+  - Posts are whatever a room admin makes a tether point (a pole, a fence, a barrel, a tree, a cross...), named for where they stand: the parlour pole, the stockade cross, the pasture post. `?hitch` alone lists them, and who's tied where.
+  - It lasts the minutes given (30 if nobody says, 4 hours at most). At a post by the milkin' stalls, for anybody who makes milk, it's till they're milked.
+  - The game decides who can be tied: a lead on them, leashing allowed in their game, and the farm girl allowed to use items on them. With a collar and "Farm can put real gear on me" on, her Companion clips a lead on for the hitch and takes it off after.
+  - `?unhitch <who>`, the safeword, the time running out or bein' milked unties them. While they're hitched, summons, feedin' time and the reins leave them be. Their limits can rule it out.
+  - Tests: `tests/hitch.test.cjs`.
 
 - **Bot 0.80.0 + Companion 0.64.0 + Dispensary 0.12.0: ready for BC R134, every load takes, and nipples that open up**
   - **Fixed for BC R134** (out Nov 18), which broke the farm's ink in two ways:

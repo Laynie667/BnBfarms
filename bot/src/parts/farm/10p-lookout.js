@@ -125,6 +125,7 @@
     if (!r || !p) return out;
     if (r.benched && r.benched.until > now) out.push({ icon: "🪵", text: "On the bench · "+r.benched.uses+" used you", until: r.benched.until });
     if (r.penned && r.penned.until > now) out.push({ icon: "🚧", text: "Penned", until: r.penned.until });
+    for (const h of hitchNow(mn)) out.push(h);   // hitched to a post (10y9u-hitch.js)
     if (r.stocked && r.stocked.until > now) out.push({ icon: "⛓️", text: "In the stocks", until: r.stocked.until });
     if (p.stall && p.stall.until) out.push({ icon: "🥛", text: "In the milkin' stall", until: p.stall.until });
     if (inHeat(p)) out.push({ icon: "🔥", text: "In heat", until: p.heat.until });

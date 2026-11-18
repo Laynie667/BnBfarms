@@ -29,6 +29,7 @@ The daily farm: milk, breeding, chores and the scenes that go with them.
 | 10y9g-lines-keepers-udders.js | more keepers and udders lines |
 | 10y9l-tile-care.js | the water rinsin' a little off |
 | 10y9s-reins.js | ?reins: a herd leader keeps a pet at heel |
+| 10y9u-hitch.js | ?hitch: tie somebody's lead to a hitchin' post on the map (BC R134's tether points), till time's up or they're milked |
 | 11-work.js | shift clock, chores, wheel, begging, fair |
 
 The build joins every part by file name, not folder: see [the parts README](../README.md).

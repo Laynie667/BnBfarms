@@ -698,6 +698,10 @@ HANDLIN' 'EM
      behind you wherever you go (their Companion walks them, or
      I hop them along). ?reins off [who] lets go; so does their
      safeword. An hour unless you say (up to 4)
+  ?hitch <who> [post] [minutes|milk] · tie their lead to a post on
+     the map (staff, their owner, or their herd's leader): parlour,
+     barn door, stockade, pasture... Two steps and no further. Milk:
+     till they're milked. ?unhitch <who> · ?hitch alone lists posts
   ?brand <who> <mark> · up to 12 characters, shows on ?who
      ?brand <who> clear takes it off
   ?turnout <who> [note] · keep claimed staff out in pasture

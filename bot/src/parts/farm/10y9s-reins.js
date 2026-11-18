@@ -36,7 +36,7 @@
   function reinsHeld(mn){
     const r = rec(mn) || {}, p = prodOf(mn) || {}, now = Date.now();
     return !!(heldByTrap(mn) || (r.penned && r.penned.until > now) || (r.stocked && r.stocked.until > now) || (r.benched && r.benched.until > now) ||
-              (p.stall && p.stall.until) || p.tieUntil > now);
+              (p.stall && p.stall.until) || p.tieUntil > now || hitchedNow(mn));   // (or hitched to a post: 10y9u-hitch.js)
   }
   // let go: why is off (the leader), staff, left (the leader went), gone (they went), time, safe
   function reinsLet(mn, why, by){

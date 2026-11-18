@@ -1,14 +1,19 @@
 # 🌾 B&B Farm: Farmhand
 
-> ## 👉 Players: the only script you need is the Farmhand Companion.
-> **[Install the Farmhand Companion](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js)** with Tampermonkey, and it keeps itself up to date. That's it. Everything else on this page is for the farm bot's own computer, except the Farm Watcher, which you'd only install if staff ask you to.
+> ## 👉 Players: the script you need is the Farmhand Companion.
+> **[Install the Farmhand Companion](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js)** with Tampermonkey, and it keeps itself up to date.
+>
+> **Want doses from crafted items anywhere in the club?** Add **[The Farmhand's Dispensary](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js)** too. It works on its own or alongside the Companion.
+>
+> Everything else on this page is for the farm bot's own computer, except the Farm Watcher, which you'd only install if staff ask you to.
 
-Two scripts that run the B&B Farm map room in Bondage Club:
+The scripts that run the B&B Farm map room in Bondage Club:
 
 | Script | Who runs it | What it does |
 |---|---|---|
 | **Farmhand Bot** (`dist/farmhand-bot.user.js`) | Only the bot account (260239) | Keeps the farm's records, answers commands, runs milk, breeding, shots, keys, summons, emotes. |
-| **Farmhand Companion** (`dist/farmhand-companion.user.js`) | Any farm player who wants it | Adds a 🌾 button and panel to the game. The bot's answers land there instead of in whispers and beeps. Adds `/farm <command>`. |
+| **Farmhand Companion** (`dist/farmhand-companion.user.js`) | Any farm player who wants it | Adds a 🌾 button and panel to the game. The bot's answers land there instead of in whispers and beeps. Adds `/farm <command>`. Adds the farm's tattoos and brands to the wardrobe. |
+| **The Farmhand's Dispensary** (`dist/farmhand-dispensary.user.js`) | Any player who wants it, on the farm or off it | Doses from crafted items, anywhere in the club. You pick who may dose you, and your safeword clears every dose. Works alongside LSCG. Adds the farm's tattoos and brands to the wardrobe too. Settings: Preferences → Extensions. |
 
 Players without the Companion still get beeps and whispers, exactly like before.
 
@@ -22,6 +27,7 @@ Then click a link below. Tampermonkey opens its install page; press **Install**.
 | Script | What it does |
 |---|---|
 | [**Farmhand Companion**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js) | **The one players need.** The 🌾 button and panel: your farm life, your record, your herd, the staff tabs for staff. Without it the farm still works, with beeps and whispers instead. |
+| [**The Farmhand's Dispensary**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js) | **Optional, with or without the Companion.** Doses from crafted items anywhere in the club: Denial Serum, Needy Nectar, Moo Juice, Rut, Fill-Out and the rest. You choose who can dose you, the safeword clears everything, and LSCG's own drugs stay LSCG's. Its page is under Preferences → Extensions, or `/dispensary`. ([how it works](docs/DISPENSARY.md)) |
 | [**Farm Watcher**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js) | Not needed to play. Diagnostics only, if staff ask: records what your game sees for a while and saves a text file to send in when something's wrong. |
 
 **The farm bot's computer only** (account 260239). Players: don't install these.

@@ -49,6 +49,13 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   const near = (v, x) => Math.abs(v - x) < 1e-9;
   ok(LIST.res === 3 && near(drawn[0][1].ScaleX, 0.5) && near(drawn[0][1].ScaleY, 1 / 3), "a design's drawn at a third of its stored size, times whatever the Layering screen says (1.5 → " + drawn[0][1].ScaleX + ')');
   ok(drawn[1][1].ScaleX === undefined && near(drawn[2][1].ScaleX, 1 / 3), "...the game's own pictures untouched, and a recoloured layer at a third too");
+  // (Nov 18) somebody under the Statue Serum: the Companion hands back the ink cut into the material, drawn plain at the same size
+  const stoneInk = { stone: true }, plain = [];
+  W.__farmInkTint = (C, src) => (/Farm(Ink|Brand)\//.test(src) ? stoneInk : undefined);
+  W.CommonDrawAppearanceBuild({}, { drawImage: (s, x, y, o) => plain.push([s, o, 'plain']), drawImageColorize: (s, x, y, o) => plain.push([s, o, 'colour']) });
+  delete W.__farmInkTint;
+  ok(plain[0][0] === stoneInk && near(plain[0][1].ScaleX, 0.5) && plain[2][0] === stoneInk && plain[2][2] === 'plain' && plain[2][1].HexColor === undefined, "a statue's ink: in the material, at its own size, drawn plain (not recoloured over)");
+  ok(plain[1][0] === drawn[1][0], "...and the game's own pictures still as they are");
   // the game rebuilding its lists
   W.AssetBuildDescription(); ok(G1.Description === 'Farm Ink 1' && G1.Asset[0].Description !== 'MISSING ASSET DESCRIPTION', 'when the game re-reads its names (a language change), ours are put back');
   W.AssetLoadAll(); ok(W.AssetGroupMap.has('FarmInk1') && W.AssetGroupMap.has('FarmBrand'), 'when the game reloads its items, the slots are added again');

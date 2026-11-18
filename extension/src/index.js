@@ -21,6 +21,7 @@ import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck } from "./drawnbody.js";
+import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initBotScreen, screenNapping } from "./botscreen.js";
@@ -206,6 +207,7 @@ function nurseryStatsSend(force) {
 }
 function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
+  if (m.type === "statue" || m.type === "statueAsk") { try { onStatueMsg(m); } catch (e) { console.warn("[Farmhand Companion] statue:", e); } return; }   // somebody under the Statue Serum (statue.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
   if (/^disp(Hard|Ask|KeyState)$/.test(m.type)) { try { onWardMsg(m.from, m); } catch (e) { console.warn("[Farmhand Companion] keys:", e); } return; }   // somebody's Dispensary hardcore names you a keyholder (keys.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
@@ -439,6 +441,7 @@ function start() {
   setInterval(() => { nurseryPowderTick(); nurseryStatsSend(false); }, 30000);   // a little's paddin' (ABCL) for the nursery, and the baby powder brushin' off
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
+  initStatue(mod);     // the Statue Serum, on you and on anybody else under it (statue.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)
   initBotScreen(mod, () => (st.panel && st.panel.prefs) || {});   // on the bot's own account the room isn't drawn (botscreen.js)
   initAllocWatch(() => onBotAccount(), mod);   // the bot tab's flight recorder (allocwatch.js)
@@ -573,6 +576,7 @@ function start() {
     try {
       if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
       if ((d.type === "dose" && d.id === "fillout") || d.type === "grow") drawnBodyFillCheck();   // (Fill-Out, and growth off the farm)
+      if (d.type === "dose" && d.id === "statue") statueCheck();   // (the Statue Serum)
     } catch (err) { console.warn("[Farmhand Companion] the Dispensary's doses:", err); }
   });
 

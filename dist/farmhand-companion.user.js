@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.58.0
+// @version      0.59.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5751,8 +5751,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W16, H) {
-    const t = cy - H / 2, L = cx - W16 / 2, R = cx + W16 / 2;
+  function shield(g, cx, cy, W17, H) {
+    const t = cy - H / 2, L = cx - W17 / 2, R = cx + W17 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6587,9 +6587,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W16 = 192, H = 226;
+        const x0 = 94, y0 = 12, W17 = 192, H = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W16, H);
+        g.strokeRect(x0, y0, W17, H);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6597,20 +6597,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W16 - 8, yy);
+            g.fillText(right, x0 + W17 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W16 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W17 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W16 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W17 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W16 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W17 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W16 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W17 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7081,8 +7081,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W16, d, V) {
-    doc = W16.document;
+  function drawCard(W17, d, V) {
+    doc = W17.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7110,7 +7110,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W16, d, m, layer, V) {
+  function picture(W17, d, m, layer, V) {
     const key2 = d.name + "|" + JSON.stringify(V);
     let set2 = cache.get(key2);
     if (set2) {
@@ -7119,30 +7119,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W16, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W17, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key2, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W16, u);
+      for (const u of Object.values(os)) forget(W17, u);
     }
     return set2[layer] || null;
   }
-  function forget(W16, url) {
+  function forget(W17, url) {
     try {
-      const m = W16.GLDrawImageCache;
+      const m = W17.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W16.DrawImageCache;
+      const m = W17.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W16.GLDrawCanvas && W16.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W17.GLDrawCanvas && W17.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7246,19 +7246,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W16, a) {
-    Wd = W16;
+  function openInkPanel(W17, a) {
+    Wd = W17;
     api = a;
     close();
-    if (!W16.document.getElementById("fi-style")) {
-      const s = W16.document.createElement("style");
+    if (!W17.document.getElementById("fi-style")) {
+      const s = W17.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W16.document.head.appendChild(s);
+      W17.document.head.appendChild(s);
     }
-    box = W16.document.createElement("div");
+    box = W17.document.createElement("div");
     box.id = "fi-panel";
-    W16.document.body.appendChild(box);
+    W17.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7318,9 +7318,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[kindOf(slot)].map(assetDef)
     };
   }
-  function describe(W16) {
+  function describe(W17) {
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const G = W16.AssetGroupMap && W16.AssetGroupMap.get(slot);
+      const G = W17.AssetGroupMap && W17.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7329,33 +7329,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W16) => typeof W16.AssetGroupAdd === "function" && typeof W16.AssetAdd === "function" && W16.AssetGroupMap && W16.AssetGroupMap.size > 30;
-  function addSlots(W16) {
-    if (W16.AssetGroupMap.has(INK_SLOTS[0])) {
-      describe(W16);
+  var gameReady = (W17) => typeof W17.AssetGroupAdd === "function" && typeof W17.AssetAdd === "function" && W17.AssetGroupMap && W17.AssetGroupMap.size > 30;
+  function addSlots(W17) {
+    if (W17.AssetGroupMap.has(INK_SLOTS[0])) {
+      describe(W17);
       return false;
     }
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const def = groupDef(slot), G = W16.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W16.AssetAdd(G, a, W16.AssetFemale3DCGExtended || {}, def);
+      const def = groupDef(slot), G = W17.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W17.AssetAdd(G, a, W17.AssetFemale3DCGExtended || {}, def);
     }
-    describe(W16);
+    describe(W17);
     return true;
   }
   var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
-  function liveSrc(W16, C2, slot, name, layer) {
+  function liveSrc(W17, C2, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W16, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+      return picture(W17, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W16) {
-    const P5 = W16.Player, out = [];
+  function wornLive(W17) {
+    const P5 = W17.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P5, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7363,8 +7363,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W16, slot, values, now) {
-    const it = itemIn(W16.Player, slot);
+  function write(W17, slot, values, now) {
+    const it = itemIn(W17.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7374,17 +7374,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W16), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W17), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(W16.Player);
+      if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(W17.Player);
     } catch (e) {
     }
     try {
-      if (typeof W16.ChatRoomCharacterItemUpdate === "function") W16.ChatRoomCharacterItemUpdate(W16.Player, slot);
+      if (typeof W17.ChatRoomCharacterItemUpdate === "function") W17.ChatRoomCharacterItemUpdate(W17.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7392,97 +7392,97 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var retry = {};
   var counts = {};
   var DAY = 864e5;
-  var cumKey = (W16) => "farmink-lastcum-" + (W16.Player && W16.Player.MemberNumber);
-  function daysDenied(W16) {
+  var cumKey = (W17) => "farmink-lastcum-" + (W17.Player && W17.Player.MemberNumber);
+  function daysDenied(W17) {
     let t = 0;
     try {
-      t = Number(W16.localStorage.getItem(cumKey(W16))) || 0;
+      t = Number(W17.localStorage.getItem(cumKey(W17))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W16, auto) {
-    if (auto === "denied") return { n: daysDenied(W16) };
+  function autoOf(W17, auto) {
+    if (auto === "denied") return { n: daysDenied(W17) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W16) {
-    for (const { slot, name, item } of wornLive(W16)) {
+  function refreshAuto(W17) {
+    for (const { slot, name, item } of wornLive(W17)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W16, d.auto);
-      if (v) write(W16, slot, v);
+      const v = autoOf(W17, d.auto);
+      if (v) write(W17, slot, v);
     }
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W16, t) => {
+  var say = (W17, t) => {
     try {
-      if (typeof W16.ChatRoomSendLocal === "function") {
-        const d = W16.document.createElement("div");
+      if (typeof W17.ChatRoomSendLocal === "function") {
+        const d = W17.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W16.ChatRoomSendLocal(d.outerHTML);
+        W17.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W16) {
+  function wornAll(W17) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W16.Player, slot);
+      const it = itemIn(W17.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W16) => ({ worn: () => wornAll(W16), write: (slot, v) => write(W16, slot, v, true), command: (a) => inkCommand(W16, a) });
-  function inkCommand(W16, args) {
+  var panelApi = (W17) => ({ worn: () => wornAll(W17), write: (slot, v) => write(W17, slot, v, true), command: (a) => inkCommand(W17, a) });
+  function inkCommand(W17, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W16);
-    if (!a && W16.document && W16.document.body) {
-      openInkPanel(W16, panelApi(W16));
+    const worn = wornLive(W17);
+    if (!a && W17.document && W17.document.body) {
+      openInkPanel(W17, panelApi(W17));
       return;
     }
-    if (/^why$/i.test(a)) return say(W16, whyText());
+    if (/^why$/i.test(a)) return say(W17, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W16.Player, slot2)) return say(W16, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W16, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W16, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W17.Player, slot2)) return say(W17, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W17, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W17, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W16, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W16, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W17, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W17, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W16.Player, slot);
-    if (!it) return say(W16, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W16, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W17.Player, slot);
+    if (!it) return say(W17, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W17, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W16, "");
+    if (!rest) return inkCommand(W17, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W16, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W16, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W16);
-    say(W16, "Written on " + d.title + ".");
+    else return say(W17, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W17, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W17);
+    say(W17, "Written on " + d.title + ".");
   }
-  function registerInk(W16, mod2) {
-    if (W16.__farmInk) return W16.__farmInk;
-    const st2 = W16.__farmInk = {
+  function registerInk(W17, mod2) {
+    if (W17.__farmInk) return W17.__farmInk;
+    const st2 = W17.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7492,42 +7492,42 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W16);
+            refreshAuto(W17);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W16, slot, v, true),
-      command: (a) => inkCommand(W16, a),
-      worn: () => wornLive(W16).map(({ slot, name }) => ({ slot, name }))
+      write: (slot, v) => write(W17, slot, v, true),
+      command: (a) => inkCommand(W17, a),
+      worn: () => wornLive(W17).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
-      const hook3 = (name, pri, fn) => {
+      const hook4 = (name, pri, fn) => {
         try {
-          if (typeof W16[name] === "function") mod2.hookFunction(name, pri, fn);
+          if (typeof W17[name] === "function") mod2.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
         }
       };
-      hook3("AssetBaseURL", 0, (args, next) => {
+      hook4("AssetBaseURL", 0, (args, next) => {
         const slot = args[2] || args[1] && args[1].Name, kind = kindOf(slot);
         if (!kind) return next(args);
         return args[6] && isLive(args[6].Name) ? LIVE_HOST + slot + "/" : INK_HOST + kind + "/";
       });
-      hook3("AssetGetPreviewPath", 0, (args, next) => {
+      hook4("AssetGetPreviewPath", 0, (args, next) => {
         const A = args[0], kind = A && A.Group && kindOf(A.Group.Name);
         return kind ? INK_HOST + kind + "/Preview" : next(args);
       });
-      hook3("AssetBuildDescription", 0, (args, next) => {
+      hook4("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W16);
+          describe(W17);
         } catch (e) {
         }
         return r;
       });
-      hook3("CommonDrawAppearanceBuild", 5, (args, next) => {
+      hook4("CommonDrawAppearanceBuild", 5, (args, next) => {
         const C2 = args[0], cb = args[1];
         if (!cb || typeof cb !== "object") return next(args);
         const sized = (o, it) => {
@@ -7540,42 +7540,61 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen2 = /* @__PURE__ */ new Set(), notReady = [];
         const ready2 = (u) => {
           try {
-            const c = W16.GLDrawImageCache;
+            const c = W17.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
-        const wrap = (f) => typeof f !== "function" ? f : function(src, x, y, o) {
+        const statue = (plain2, self, u, x, y, o) => {
+          const T2 = W17.__farmInkTint;
+          if (typeof T2 !== "function") return false;
+          let t2;
+          try {
+            t2 = T2(C2, u, x, y);
+          } catch (e) {
+            t2 = void 0;
+          }
+          if (!t2) return false;
+          const o2 = Object.assign({}, o || {});
+          delete o2.HexColor;
+          delete o2.FullAlpha;
+          plain2.call(self, t2, x, y, o2);
+          return true;
+        };
+        const wrap = (f, plain2) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W16, C2, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W17, C2, lm[1], lm[2], lm[3]);
               seen2.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
                 return void 0;
               }
               if (!ready2(u)) notReady.push(lm[2]);
-              return f.call(this, u, x, y, sized(o, itemIn(C2, lm[1])));
+              const o3 = sized(o, itemIn(C2, lm[1]));
+              if (statue(plain2, this, u, x, y, o3)) return void 0;
+              return f.call(this, u, x, y, o3);
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
               o = sized(o, stillItem(C2, sm[1], sm[2]));
               seen2.add(sm[2]);
               if (!ready2(src)) notReady.push(sm[2]);
+              if (statue(plain2, this, src, x, y, o)) return void 0;
             }
           }
           return f.call(this, src, x, y, o);
         };
-        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W16, C2, seen2, notReady);
+          note2(W17, C2, seen2, notReady);
         } catch (e) {
         }
         return out;
       });
-      const keepInk = (name) => hook3(name, 0, (args, next) => {
+      const keepInk = (name) => hook4(name, 0, (args, next) => {
         const C2 = args[0], keep2 = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && kindOf(it.Asset.Group.Name)) : [];
         const r = next(args);
         try {
@@ -7586,28 +7605,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C2);
+          if (back && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
       });
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
-      hook3("AssetLoadAll", 0, (args, next) => {
+      hook4("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W16);
+          addSlots(W17);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      hook3("ActivityOrgasmStart", 0, (args, next) => {
+      hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
-          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W16.ActivityOrgasmRuined) {
-            W16.localStorage.setItem(cumKey(W16), String(Date.now()));
-            setTimeout(() => refreshAuto(W16), 1e3);
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W17.ActivityOrgasmRuined) {
+            W17.localStorage.setItem(cumKey(W17), String(Date.now()));
+            setTimeout(() => refreshAuto(W17), 1e3);
           }
         } catch (e) {
         }
@@ -7615,36 +7634,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W16)) return;
+      if (!gameReady(W17)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W16);
+        addSlots(W17);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C2 of W16.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C2);
+          for (const C2 of W17.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W16.CommandCombine === "function") W16.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W16, a) }]);
+        if (typeof W17.CommandCombine === "function") W17.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W17, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W16.Player && W16.Player.Appearance) refreshAuto(W16);
+        if (W17.Player && W17.Player.Appearance) refreshAuto(W17);
       } catch (e) {
       }
     }, 10 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W16, C2, seen2, notReady) {
+  function note2(W17, C2, seen2, notReady) {
     if (!C2 || !Array.isArray(C2.Appearance)) return;
     const pose = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
@@ -7676,7 +7695,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.58.0";
+  var VERSION = "0.59.0";
 
   // shared/species.js
   var WORDS = {
@@ -8979,11 +8998,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W16 = window;
-      const takesDrawings = () => typeof W16.GLDrawLoadTransient === "function";
+      const W17 = window;
+      const takesDrawings = () => typeof W17.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W16.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W16.DrawCacheImage, W16.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W17.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W17.DrawCacheImage, W17.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen2 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -8992,7 +9011,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W16.DrawGetImage(src);
+          W17.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -9342,9 +9361,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             e = j;
           }
           if (t >= 0) {
-            const T = Math.round(y) + t, B = Math.round(y) + e;
-            if (!ext || T < ext.top || B > ext.bottom) {
-              ext = { top: ext ? Math.min(ext.top, T) : T, bottom: ext ? Math.max(ext.bottom, B) : B };
+            const T2 = Math.round(y) + t, B = Math.round(y) + e;
+            if (!ext || T2 < ext.top || B > ext.bottom) {
+              ext = { top: ext ? Math.min(ext.top, T2) : T2, bottom: ext ? Math.max(ext.bottom, B) : B };
               MOULD.ext.set(piece, ext);
               clearTimeout(MOULD.t);
               MOULD.t = setTimeout(bellyDraw, 60);
@@ -9639,24 +9658,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 } };
               }
               const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
-              const groupOf3 = (src) => {
+              const groupOf4 = (src) => {
                 const m = slot.exec(src);
                 return m ? m[1] : "";
               };
               const mouldList = S3.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
               const wornList = S3.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, desc: String(it.Asset.Description || ""), key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S3.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
               const pieceOf = (src) => {
-                const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
+                const g = groupOf4(src), file = src.slice(src.lastIndexOf("/") + 1);
                 return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null;
               };
               const isMoulded = (src) => {
                 if (!mouldList.length) return null;
-                const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
+                const g = groupOf4(src), file = src.slice(src.lastIndexOf("/") + 1);
                 return mouldList.find((q2) => q2.folders.includes(g) && file.startsWith(q2.name)) || null;
               };
               const gate = FarmBelly.skinGate(C2);
               const prio = (src) => {
-                const g = AssetGroupGet(C2.AssetFamily, groupOf3(src));
+                const g = AssetGroupGet(C2.AssetFamily, groupOf4(src));
                 return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
               };
               const paint = () => {
@@ -9818,7 +9837,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!im) return false;
                 let bv = null;
                 try {
-                  bv = ctx3.belly && !fit.behind && LOWER_GROUPS.test(groupOf3(src)) ? bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key) : null;
+                  bv = ctx3.belly && !fit.behind && LOWER_GROUPS.test(groupOf4(src)) ? bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key) : null;
                 } catch (e) {
                   bv = null;
                 }
@@ -9833,7 +9852,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   g.drawImage(base, 0, 0);
                   g.globalCompositeOperation = "destination-out";
                   g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
-                  if (ctx3.belly && !fit.behind && chestSlot(groupOf3(src)) && groupOf3(src) !== "Panties") {
+                  if (ctx3.belly && !fit.behind && chestSlot(groupOf4(src)) && groupOf4(src) !== "Panties") {
                     try {
                       const sh = bellyShade(c, x - ox, y, ctx3);
                       if (sh) c = sh;
@@ -10024,7 +10043,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W17 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W18 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -10033,7 +10052,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on3 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on3) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W17 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W18 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -10052,26 +10071,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W17 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W18 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W17 + 1.5;
+                      g.lineWidth = W18 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W17;
+                      g.lineWidth = W18;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W17 * 0.18, p[1] + dx / L * W17 * 0.18];
+                        return [p[0] - dy / L * W18 * 0.18, p[1] + dx / L * W18 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W17 * 0.22);
+                      g.lineWidth = Math.max(1, W18 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -10681,10 +10700,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         }
                       }
                     }
-                    const T = document.createElement("canvas");
-                    T.width = bw;
-                    T.height = bh;
-                    T.getContext("2d").putImageData(out2, 0, 0);
+                    const T2 = document.createElement("canvas");
+                    T2.width = bw;
+                    T2.height = bh;
+                    T2.getContext("2d").putImageData(out2, 0, 0);
                     const hole = document.createElement("canvas");
                     hole.width = bw;
                     hole.height = bh;
@@ -10702,7 +10721,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       g.beginPath();
                       g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy + (dy || 0), (S22.ro + S22.ri) / 2 + grow, S22.rv + grow, 0, 0, Math.PI * 2);
                     };
-                    g.drawImage(T, x0, y0);
+                    g.drawImage(T2, x0, y0);
                     if (pc0 && pc0.flat && chestCover(src, im, x, y, B, false) >= 0.5) {
                       const bl = document.createElement("canvas");
                       bl.width = CW3;
@@ -11000,7 +11019,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!im) return false;
                 const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
                 if (!own) return false;
-                if (!ctx3.native && groupOf3(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
+                if (!ctx3.native && groupOf4(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
                 const key2 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
                 let c = BREAST.out.get(key2);
                 if (!c) {
@@ -11015,8 +11034,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     if (sw <= 0) return;
                     const N2 = ctx3.native && ctx3.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
                     if (!N2) return;
-                    const T = B.nips[i];
-                    g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N2[0]) * kN, MY + (T[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
+                    const T2 = B.nips[i];
+                    g.drawImage(im, sx, 0, sw, h2, MX + (T2[0] - x) + (sx + x - N2[0]) * kN, MY + (T2[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
                   });
                   keepIn(BREAST.out, key2, c);
                 }
@@ -11063,7 +11082,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (done && inkHeld.length) flushInk();
                 if (br && typeof src === "string") {
-                  const gname = groupOf3(src);
+                  const gname = groupOf4(src);
                   if (!done && gname === "Nipples") {
                     held.push([name, src, x, y, o]);
                     return;
@@ -11129,7 +11148,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     }
                   }
                 }
-                if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf3(src) === "Pussy" && /Penis/.test(src)) {
+                if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf4(src) === "Pussy" && /Penis/.test(src)) {
                   try {
                     const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
                     const key2 = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
@@ -11141,7 +11160,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       if (!blink) ctx3.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
-                    put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
+                    put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}, "skin");
                     return;
                   } catch (e) {
                     warnSome2("[studio] cock:", e);
@@ -11151,7 +11170,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 try {
                   if (ctx3.belly && !fit.behind && typeof src === "string") {
                     const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx3, q2.key, q2.mode) : bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key);
-                    const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx3) : bellyShade(mouldImg(src), x, y, ctx3) : null;
+                    const gname2 = groupOf4(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx3) : bellyShade(mouldImg(src), x, y, ctx3) : null;
                     if (formed) {
                       put2(name, formed, m ? x - MOULD.M : x, y, o, src);
                       drawn = true;
@@ -11420,16 +11439,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function skinGate(C2) {
     const layers = C2 && C2.AppearanceLayers;
     if (!Array.isArray(layers) || !layers.length) return null;
-    const groupOf3 = (l) => l && l.Asset && l.Asset.Group && l.Asset.Group.Name || "";
+    const groupOf4 = (l) => l && l.Asset && l.Asset.Group && l.Asset.Group.Name || "";
     let last2 = -1, at = 0;
-    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf3(layers[i])]) last2 = i;
+    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf4(layers[i])]) last2 = i;
     if (last2 < 0) return null;
     const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
     return (src) => {
       const m = slot.exec(String(src));
       if (!m) return false;
       let i = at;
-      while (i < layers.length && groupOf3(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
+      while (i < layers.length && groupOf4(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
       if (i >= layers.length) return false;
       at = i + 1;
       return i > last2;
@@ -12634,14 +12653,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W16 = c.width, H = c.height, d = x.getImageData(0, 0, W16, H).data, seen2 = new Uint8Array(W16 * H), out = [];
-      for (let i = 0; i < W16 * H; i++) {
+      const W17 = c.width, H = c.height, d = x.getImageData(0, 0, W17, H).data, seen2 = new Uint8Array(W17 * H), out = [];
+      for (let i = 0; i < W17 * H; i++) {
         if (seen2[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen2[i] = 1;
-        let x0 = W16, y0 = H, x1 = 0, y1 = 0, n = 0;
+        let x0 = W17, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W16, py = p / W16 | 0;
+          const p = q2.pop(), px = p % W17, py = p / W17 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -12649,8 +12668,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W16 || ny >= H) continue;
-            const k = ny * W16 + nx;
+            if (nx < 0 || ny < 0 || nx >= W17 || ny >= H) continue;
+            const k = ny * W17 + nx;
             if (!seen2[k] && d[k * 4 + 3] >= 16) {
               seen2[k] = 1;
               q2.push(k);
@@ -12971,12 +12990,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         flip: !!b.flip
       };
     }
-    const imgs2 = {};
+    const imgs3 = {};
     function art(which) {
       const A = BRAND_ART[which] || BRAND_ART.mark;
-      let i = imgs2[which];
+      let i = imgs3[which];
       if (!i) {
-        i = imgs2[which] = new Image();
+        i = imgs3[which] = new Image();
         i.src = A.src;
       }
       return i.complete && i.naturalWidth ? i : null;
@@ -19275,20 +19294,380 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return { ok: true, did: ["dress"] };
   }
 
-  // extension/src/chatlog.js
+  // extension/src/statue.js
   var W13 = window;
+  var MATS = ["stone", "porcelain", "gold", "latex", "marble", "bronze"];
+  var TURN = /^(BodyUpper|BodyLower|ArmsLeft|ArmsRight|HandsLeft|HandsRight|Head|Nipples|Pussy|Mouth|BodyMarkings)$/;
+  var HAIR = /^(HairFront|HairBack|Eyebrows)$/;
+  var EYES = /^(Eyes|Eyes2)$/;
+  var HIDE = /^(Blush|Fluids)$/;
+  var groupOf3 = (src) => {
+    const i = src.indexOf("/Female3DCG/");
+    if (i < 0) return "";
+    const seg = src.slice(i + 12).split("/");
+    seg.pop();
+    if (seg[0] === "Override") seg.splice(0, 2);
+    return seg[0] || "";
+  };
+  var onBot4 = () => !!(W13.Player && W13.Player.MemberNumber === BOT_MEMBER);
+  var others3 = /* @__PURE__ */ new Map();
+  var RAMPS = {
+    stone: [[0, 40, 38, 36], [0.45, 96, 92, 88], [0.8, 150, 145, 138], [0.92, 172, 167, 159], [1, 200, 195, 187]],
+    marble: [[0, 110, 106, 102], [0.5, 196, 192, 186], [0.85, 232, 229, 224], [1, 250, 248, 245]],
+    porcelain: [[0, 104, 112, 130], [0.5, 200, 206, 218], [0.86, 238, 240, 246], [0.97, 252, 252, 255], [1, 255, 255, 255]],
+    gold: [[0, 60, 34, 4], [0.35, 140, 92, 16], [0.7, 214, 162, 44], [0.9, 246, 208, 96], [1, 255, 246, 200]],
+    bronze: [[0, 44, 24, 12], [0.4, 120, 70, 34], [0.75, 182, 112, 56], [0.92, 226, 166, 104], [1, 246, 208, 160]],
+    latex: [[0, 4, 4, 6], [0.55, 16, 16, 20], [0.8, 34, 34, 42], [0.92, 90, 90, 104], [1, 220, 220, 232]]
+  };
+  var CURVE = { stone: (t) => t, marble: (t) => t, porcelain: (t) => Math.pow(t, 0.9), gold: (t) => Math.pow(t, 1.35), bronze: (t) => Math.pow(t, 1.25), latex: (t) => Math.pow(t, 2.4) };
+  var ramp = (R, t) => {
+    for (let k = 1; k < R.length; k++) if (t <= R[k][0]) {
+      const a = R[k - 1], b = R[k], f = (t - a[0]) / (b[0] - a[0] || 1);
+      return [a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, a[3] + (b[3] - a[3]) * f];
+    }
+    const z = R[R.length - 1];
+    return [z[1], z[2], z[3]];
+  };
+  var hash = (x, y) => {
+    let h2 = x * 374761393 + y * 668265263 | 0;
+    h2 = Math.imul(h2 ^ h2 >>> 13, 1274126177);
+    return ((h2 ^ h2 >>> 16) & 65535) / 65535;
+  };
+  var smooth = (x, y, p) => {
+    const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy), w = (v) => (v % p + p) % p;
+    const a = hash(w(xi), w(yi)), b = hash(w(xi + 1), w(yi)), c = hash(w(xi), w(yi + 1)), d = hash(w(xi + 1), w(yi + 1));
+    return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
+  };
+  var T = 512;
+  var FIELDS = {};
+  function field3(mat) {
+    if (FIELDS[mat]) return FIELDS[mat];
+    const f = new Float32Array(T * T);
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+      const i = y * T + x;
+      if (mat === "stone") f[i] = (hash(x, y) - 0.5) * 16 + (smooth(x / 16, y / 16, T / 16) * 0.6 + smooth(x / 8, y / 8, T / 8) * 0.4 - 0.5) * 24;
+      else if (mat === "marble") {
+        const n = smooth(x / 64, y / 64, T / 64) * 0.6 + smooth(x / 32, y / 32, T / 32) * 0.3 + smooth(x / 16, y / 16, T / 16) * 0.1, v = Math.abs(Math.sin((x + y * 0.6) * Math.PI * 4 / T + 5.5 * n));
+        f[i] = v < 0.1 ? Math.pow(1 - v / 0.1, 1.6) : 0;
+      } else if (mat === "env") f[i] = 0.5 + 0.5 * Math.sin((y + x * 0.3) / T * Math.PI * 2 * 3 + 3 * smooth(x / 64, y / 64, T / 64));
+    }
+    return FIELDS[mat] = f;
+  }
+  var hexRGB2 = (h2) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(h2 || ""));
+    if (!m) return null;
+    const v = parseInt(m[1], 16);
+    return [v >> 16 & 255, v >> 8 & 255, v & 255];
+  };
+  function inMaterial(img2, mat, ox, oy, how, hex) {
+    const ink = how === "ink";
+    const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
+    if (!w || !h2) return null;
+    const c = W13.document.createElement("canvas");
+    c.width = w;
+    c.height = h2;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    g.drawImage(img2, 0, 0);
+    let id;
+    try {
+      id = g.getImageData(0, 0, w, h2);
+    } catch (e) {
+      return null;
+    }
+    const d = id.data, R = RAMPS[mat] || RAMPS.stone, curve = CURVE[mat] || CURVE.stone;
+    const eye = how === "eyes" ? hexRGB2(hex) : null;
+    const bins = new Uint32Array(64);
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4 * 3) if (d[i + 3] > 200) {
+      const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+      if (l > 24) {
+        bins[l >> 2]++;
+        n++;
+      }
+    }
+    if (!n) return c;
+    let peak = 6, best = 0;
+    for (let k = 6; k < 64; k++) {
+      const v = bins[k - 1] + 2 * bins[k] + (bins[k + 1] || 0);
+      if (v > best) {
+        best = v;
+        peak = k;
+      }
+    }
+    let ref = (peak * 4 + 2) / 0.86;
+    if (how !== "skin") {
+      const lums = [];
+      for (let i = 0; i < d.length; i += 4 * 5) if (d[i + 3] > 128) lums.push(d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11);
+      lums.sort((a, b) => a - b);
+      ref = Math.max(24, lums[Math.floor(lums.length * 0.9)] || 24) / 0.92;
+    }
+    ox = (Math.round(ox || 0) % T + T) % T;
+    oy = (Math.round(oy || 0) % T + T) % T;
+    const F = mat === "stone" || mat === "marble" ? field3(mat) : null, E = mat === "gold" || mat === "bronze" ? field3("env") : null;
+    for (let y = 0, i = 0; y < h2; y++) for (let x = 0; x < w; x++, i += 4) {
+      if (!d[i + 3]) continue;
+      let t = Math.min(1, (d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) / ref);
+      if (ink) t = 0.12 + t * 0.3;
+      else if (E) {
+        const e = E[(y + oy & T - 1) * T + (x + ox & T - 1)];
+        t = Math.max(0, Math.min(1, 0.6 + Math.tanh((t - 0.86) * 3) * 0.42 + (e - 0.5) * 0.3));
+      }
+      let [r, gg, b] = ramp(R, curve(t));
+      if (eye) {
+        const sum = d[i] + d[i + 1] + d[i + 2];
+        if (sum >= 305 && sum <= 458) {
+          const f = sum / 383;
+          r = eye[0] * f;
+          gg = eye[1] * f;
+          b = eye[2] * f;
+        }
+      }
+      if (F) {
+        const v = F[(y + oy & T - 1) * T + (x + ox & T - 1)];
+        if (mat === "stone") {
+          r += v;
+          gg += v;
+          b += v;
+        } else if (mat === "marble" && v) {
+          const k = v * 0.32;
+          r += (118 - r) * k;
+          gg += (112 - gg) * k;
+          b += (108 - b) * k;
+        }
+      }
+      d[i] = r < 0 ? 0 : r > 255 ? 255 : r;
+      d[i + 1] = gg < 0 ? 0 : gg > 255 ? 255 : gg;
+      d[i + 2] = b < 0 ? 0 : b > 255 ? 255 : b;
+    }
+    g.putImageData(id, 0, 0);
+    return c;
+  }
+  var imgs2 = /* @__PURE__ */ new Map();
+  var turned = /* @__PURE__ */ new Map();
+  var turnedCv = /* @__PURE__ */ new WeakMap();
+  var KEEP = 40;
+  function imgOf(src) {
+    let im = imgs2.get(src);
+    if (!im) {
+      im = new W13.Image();
+      im.crossOrigin = "anonymous";
+      im.onload = () => redrawAll(400);
+      im.src = src;
+      imgs2.set(src, im);
+      if (imgs2.size > 160) imgs2.delete(imgs2.keys().next().value);
+    }
+    return im.complete && im.naturalWidth ? im : null;
+  }
+  function turnedOf(src, mat, x, y, how, hex) {
+    if (typeof src === "string") {
+      const key3 = mat + "|" + how + "|" + (how === "eyes" ? (hex || "") + "|" : "") + src + "|" + Math.round(x) + "|" + Math.round(y);
+      let c = turned.get(key3);
+      if (c) {
+        turned.delete(key3);
+        turned.set(key3, c);
+        return c;
+      }
+      const im = imgOf(src);
+      if (!im) return null;
+      c = inMaterial(im, mat, x, y, how, hex);
+      if (!c) return null;
+      turned.set(key3, c);
+      if (turned.size > KEEP) turned.delete(turned.keys().next().value);
+      return c;
+    }
+    if (!src || typeof src !== "object") return null;
+    let by = turnedCv.get(src);
+    if (!by) {
+      by = {};
+      turnedCv.set(src, by);
+    }
+    const key2 = mat + "|" + how + "|" + Math.round(x) + "|" + Math.round(y);
+    return by[key2] || (by[key2] = inMaterial(src, mat, x, y, how));
+  }
+  function forget3() {
+    turned.clear();
+    imgs2.clear();
+  }
+  function mineNow() {
+    try {
+      const D = W13.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("statue") : null;
+      return d ? { mat: MATS.includes(d.p) ? d.p : "stone", left: d.left } : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function statueOf(C2) {
+    if (!C2 || onBot4()) return null;
+    if (C2 === W13.Player || typeof C2.IsPlayer === "function" && C2.IsPlayer()) {
+      const m = mineNow();
+      return m ? m.mat : null;
+    }
+    const o = typeof C2.MemberNumber === "number" ? others3.get(C2.MemberNumber) : null;
+    if (!o) return null;
+    if (o.until < Date.now()) {
+      others3.delete(C2.MemberNumber);
+      return null;
+    }
+    return o.mat;
+  }
+  var charOf3 = (mn) => Array.isArray(W13.ChatRoomCharacter) ? W13.ChatRoomCharacter.find((c) => c && c.MemberNumber === mn) : null;
+  var redrawT = /* @__PURE__ */ new Map();
+  function redrawC(C2, soon) {
+    if (!C2) return;
+    const key2 = C2.MemberNumber;
+    clearTimeout(redrawT.get(key2));
+    redrawT.set(key2, setTimeout(() => {
+      try {
+        if (typeof W13.CharacterLoadCanvas === "function") W13.CharacterLoadCanvas(C2);
+      } catch (e) {
+        warnSome("[Farmhand Companion] statue redraw:", e);
+      }
+    }, soon || 0));
+  }
+  function redrawAll(soon) {
+    for (const C2 of W13.ChatRoomCharacter || []) if (statueOf(C2)) redrawC(C2, soon);
+    if (W13.Player && statueOf(W13.Player) && !(W13.ChatRoomCharacter || []).includes(W13.Player)) redrawC(W13.Player, soon);
+  }
+  function kindOf2(src) {
+    if (typeof src === "string") {
+      const g = groupOf3(src);
+      return g ? TURN.test(g) ? "skin" : HAIR.test(g) ? "hair" : EYES.test(g) ? "eyes" : HIDE.test(g) ? "hide" : null : null;
+    }
+    return src && typeof src === "object" && src.__farmFrom === "skin" ? "skin" : null;
+  }
+  var sdk5 = null;
+  var hooked4 = false;
+  function hook3() {
+    if (hooked4 || !sdk5) return;
+    hooked4 = true;
+    try {
+      sdk5.hookFunction("CommonDrawAppearanceBuild", 4, (args, next) => {
+        const C2 = args[0], cb = args[1], mat = statueOf(C2);
+        if (!mat || !cb || typeof cb !== "object") return next(args);
+        const wrap = (f, plain2) => typeof f !== "function" ? f : function(src, x, y, o) {
+          const k = kindOf2(src);
+          if (!k) return f.call(this, src, x, y, o);
+          if (k === "hide") return void 0;
+          let t = null;
+          try {
+            t = turnedOf(src, mat, x, y, k, o && o.HexColor);
+          } catch (e) {
+            warnSome("[Farmhand Companion] statue:", e);
+          }
+          if (!t) return f.call(this, src, x, y, o);
+          const o2 = Object.assign({}, o || {});
+          delete o2.HexColor;
+          delete o2.FullAlpha;
+          return plain2.call(this, t, x, y, o2);
+        };
+        args[1] = Object.assign({}, cb, {
+          drawImage: wrap(cb.drawImage, cb.drawImage),
+          drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink),
+          drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage),
+          drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink)
+        });
+        return next(args);
+      });
+      sdk5.hookFunction("ChatRoomSync", 0, (args, next) => {
+        const r = next(args);
+        others3.clear();
+        setTimeout(() => {
+          tell3("sync");
+          send3("statueAsk", {});
+        }, 2600);
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] the Statue Serum can't draw:", e);
+      hooked4 = false;
+    }
+  }
+  W13.__farmInkTint = (C2, src, x, y) => {
+    const mat = statueOf(C2);
+    if (!mat) return void 0;
+    try {
+      return turnedOf(src, mat, x, y, "ink");
+    } catch (e) {
+      return void 0;
+    }
+  };
+  var send3 = (type, data) => {
+    try {
+      if (W13.ServerSend && (!W13.ServerPlayerIsInChatRoom || W13.ServerPlayerIsInChatRoom())) W13.ServerSend("ChatRoomChat", makeMsg(type, data));
+    } catch (e) {
+    }
+  };
+  var told = "";
+  function tell3(why) {
+    if (onBot4()) return;
+    const m = mineNow(), sig2 = m ? m.mat : "";
+    if (why === "change" && sig2 === told) return;
+    const was = told;
+    told = sig2;
+    if (m) send3("statue", { mat: m.mat, left: Math.round(m.left) });
+    else if (why === "change" && was) send3("statue", { mat: "" });
+  }
+  function statueCheck() {
+    const sig2 = (mineNow() || {}).mat || "";
+    if (sig2 === told) return false;
+    tell3("change");
+    redrawC(W13.Player, 0);
+    if (!sig2 && !others3.size) forget3();
+    return true;
+  }
+  function onStatueMsg(m) {
+    const mn = m.from;
+    if (!mn || W13.Player && mn === W13.Player.MemberNumber || onBot4()) return;
+    if (m.type === "statueAsk") {
+      if (mineNow()) setTimeout(() => tell3("ask"), 300 + Math.random() * 1500);
+      return;
+    }
+    if (m.type !== "statue") return;
+    const mat = MATS.includes(m.mat) ? m.mat : "", left2 = Math.max(0, Math.min(31 * 6e4, Number(m.left) || 0));
+    const had = others3.get(mn);
+    if (!mat || !left2) {
+      if (others3.delete(mn)) {
+        redrawC(charOf3(mn), 0);
+        if (!others3.size && !mineNow()) forget3();
+      }
+      return;
+    }
+    others3.set(mn, { mat, until: Date.now() + left2 });
+    if (!had || had.mat !== mat) {
+      hook3();
+      redrawC(charOf3(mn), 0);
+    }
+  }
+  function initStatue(mod2) {
+    sdk5 = mod2;
+    hook3();
+    setInterval(() => {
+      try {
+        statueCheck();
+        for (const [mn, o] of others3) if (o.until < Date.now()) {
+          others3.delete(mn);
+          redrawC(charOf3(mn), 0);
+        }
+      } catch (e) {
+      }
+    }, 5e3);
+  }
+  if (W13.__FARMHAND_TEST__) W13.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf2, turnedOf };
+
+  // extension/src/chatlog.js
+  var W14 = window;
   var KEY5 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
   var rows2 = [];
-  var sdk5 = null;
+  var sdk6 = null;
   var on2 = () => false;
   var botMn = 0;
   var botHere = () => false;
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W13.localStorage.getItem(KEY5));
+    const v = JSON.parse(W14.localStorage.getItem(KEY5));
     if (Array.isArray(v)) rows2 = v.slice(-MAX3);
   } catch (e) {
     rows2 = [];
@@ -19297,7 +19676,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W13.localStorage.setItem(KEY5, JSON.stringify(rows2));
+        W14.localStorage.setItem(KEY5, JSON.stringify(rows2));
       } catch (e) {
         rows2 = rows2.slice(-300);
       }
@@ -19325,7 +19704,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function flush() {
-    if (!on2() || !rows2.length || !botHere() || typeof W13.ServerSend !== "function") return;
+    if (!on2() || !rows2.length || !botHere() || typeof W14.ServerSend !== "function") return;
     let sent = 0;
     for (let part = 0; part < 4 && rows2.length; part++) {
       const batch = [];
@@ -19337,7 +19716,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         size += s;
       }
       try {
-        W13.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W14.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent += batch.length;
       } catch (e) {
         rows2 = batch.concat(rows2);
@@ -19347,12 +19726,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (sent) saveSoon();
   }
   function initChatlog(mod2, opts) {
-    sdk5 = mod2;
+    sdk6 = mod2;
     on2 = opts.on;
     botMn = opts.botMn;
     botHere = opts.botHere;
     try {
-      sdk5.hookFunction("ChatRoomAppendChat", 0, (args, next) => {
+      sdk6.hookFunction("ChatRoomAppendChat", 0, (args, next) => {
         try {
           const div = args[0];
           if (div && div.classList && on2()) {
@@ -19367,7 +19746,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] record: chat log unavailable:", e);
     }
     try {
-      sdk5.hookFunction("ServerAccountBeep", 0, (args, next) => {
+      sdk6.hookFunction("ServerAccountBeep", 0, (args, next) => {
         try {
           const d = args[0];
           if (d && on2() && !d.BeepType) {
@@ -19382,7 +19761,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] record: beeps unavailable:", e);
     }
     try {
-      sdk5.hookFunction("ServerSend", 0, (args, next) => {
+      sdk6.hookFunction("ServerSend", 0, (args, next) => {
         try {
           const [ev, d] = args;
           if (on2() && d) {
@@ -19401,28 +19780,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/keys.js
-  var W14 = window;
+  var W15 = window;
   var KEY6 = "fhc-wards";
   var wards = {};
   try {
-    wards = JSON.parse(W14.localStorage.getItem(KEY6)) || {};
+    wards = JSON.parse(W15.localStorage.getItem(KEY6)) || {};
   } catch (e) {
     wards = {};
   }
   var save5 = () => {
     try {
-      W14.localStorage.setItem(KEY6, JSON.stringify(wards));
+      W15.localStorage.setItem(KEY6, JSON.stringify(wards));
     } catch (e) {
     }
   };
-  var me3 = () => W14.Player && W14.Player.MemberNumber || 0;
-  var here = (mn) => (W14.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var me3 = () => W15.Player && W15.Player.MemberNumber || 0;
+  var here = (mn) => (W15.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
   var say2 = () => {
   };
   function sendTo(mn, data) {
     try {
-      if (here(mn) && typeof W14.ServerSend === "function") {
-        W14.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
+      if (here(mn) && typeof W15.ServerSend === "function") {
+        W15.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
         return true;
       }
     } catch (e) {
@@ -19433,9 +19812,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function keyDo(mn, what) {
     if (sendTo(mn, { do: what })) return "in the room";
     try {
-      if (typeof W14.ServerSend !== "function") return null;
-      const nm = W14.Player && (W14.Player.Nickname || W14.Player.Name) || "Your keyholder";
-      W14.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
+      if (typeof W15.ServerSend !== "function") return null;
+      const nm = W15.Player && (W15.Player.Nickname || W15.Player.Name) || "Your keyholder";
+      W15.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
       return "by beep";
     } catch (e) {
       return null;
@@ -19511,9 +19890,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function initKeys(sayLocal) {
     say2 = sayLocal;
-    if (typeof W14.CommandCombine === "function") {
+    if (typeof W15.CommandCombine === "function") {
       try {
-        W14.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
+        W15.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
       } catch (e) {
       }
     }
@@ -19658,7 +20037,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/cues.js
-  var W15 = window;
+  var W16 = window;
   var ctx2 = null;
   function initCues(c) {
     ctx2 = c;
@@ -19676,15 +20055,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     stir: ctx2.panel.prefs.stir ? void 0 : true,
     gear: ctx2.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W15.ChatRoomMapViewIsActive === "function" && W15.ChatRoomMapViewIsActive() && W15.Player && W15.Player.MapData && W15.Player.MapData.Pos;
-  var others3 = () => (W15.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W15.Player && W15.Player.MemberNumber));
+  var mapOn = () => typeof W16.ChatRoomMapViewIsActive === "function" && W16.ChatRoomMapViewIsActive() && W16.Player && W16.Player.MapData && W16.Player.MapData.Pos;
+  var others4 = () => (W16.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W16.Player && W16.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W15.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W15.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W15.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W15.ChatRoomMapViewCharacterIsHearable === "function" && W15.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W15.Player && W15.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W16.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W16.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others4().filter((c) => W16.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others4().filter((c) => typeof W16.ChatRoomMapViewCharacterIsHearable === "function" && W16.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W16.Player && W16.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key2 = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key2 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -19700,13 +20079,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W15.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W16.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W15.ChatRoomMapViewWidth || 40, high = W15.ChatRoomMapViewHeight || 40, key2 = (x, y) => x + "," + y;
+    const wide = W16.ChatRoomMapViewWidth || 40, high = W16.ChatRoomMapViewHeight || 40, key2 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key2(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -19736,8 +20115,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref2("noLead") || !mapOn() || typeof W15.ChatRoomMapViewMove !== "function") return no();
-    const from = W15.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref2("noLead") || !mapOn() || typeof W16.ChatRoomMapViewMove !== "function") return no();
+    const from = W16.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -19756,7 +20135,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function stepWalk() {
-    const w = walk, p = W15.Player && W15.Player.MapData && W15.Player.MapData.Pos;
+    const w = walk, p = W16.Player && W16.Player.MapData && W16.Player.MapData.Pos;
     const end = (ok2) => {
       if (walk === w) walk = null;
       stepping = false;
@@ -19783,9 +20162,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W15.ChatRoomMapViewMovement == null) {
+    if (W16.ChatRoomMapViewMovement == null) {
       try {
-        W15.ChatRoomMapViewMove(w.path[w.i]);
+        W16.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -19807,19 +20186,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W15.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W15.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W16.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W16.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
       }
-      const C2 = others3().find((c) => c.MemberNumber === heel.mn), lp = C2 && C2.MapData && C2.MapData.Pos;
+      const C2 = others4().find((c) => c.MemberNumber === heel.mn), lp = C2 && C2.MapData && C2.MapData.Pos;
       if (!lp || lp.X < 0) return;
       const t = heel.trail, last2 = t[t.length - 1];
       if (!last2 || last2.X !== lp.X || last2.Y !== lp.Y) {
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me4 = W15.Player.MapData.Pos;
+      const me4 = W16.Player.MapData.Pos;
       if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
@@ -19847,12 +20226,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref2("noFace") || typeof W15.CharacterSetFacialExpression !== "function" || !W15.Player) return;
+    if (!f || !pref2("noFace") || typeof W16.CharacterSetFacialExpression !== "function" || !W16.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W15.CharacterSetFacialExpression(W15.Player, g, e, secs);
-        if (g === "Eyes") W15.CharacterSetFacialExpression(W15.Player, "Eyes2", e, secs);
+        W16.CharacterSetFacialExpression(W16.Player, g, e, secs);
+        if (g === "Eyes") W16.CharacterSetFacialExpression(W16.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -19901,35 +20280,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref2("noSound") || typeof W15.AudioPlayInstantSound !== "function") return;
-    const vol = W15.Player && W15.Player.AudioSettings && W15.Player.AudioSettings.Volume || 0;
+    if (!f || !pref2("noSound") || typeof W16.AudioPlayInstantSound !== "function") return;
+    const vol = W16.Player && W16.Player.AudioSettings && W16.Player.AudioSettings.Volume || 0;
     try {
-      W15.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W16.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el2 = W15.document.getElementById("fhc-trance");
+    let el2 = W16.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el2) el2.remove();
       return;
     }
     if (!el2) {
-      el2 = W15.document.createElement("div");
+      el2 = W16.document.createElement("div");
       el2.id = "fhc-trance";
       el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W15.document.getElementById("fhc-trance-css")) {
-        const s = W15.document.createElement("style");
+      if (!W16.document.getElementById("fhc-trance-css")) {
+        const s = W16.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W15.document.head.appendChild(s);
+        W16.document.head.appendChild(s);
       }
-      W15.document.body.appendChild(el2);
+      W16.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W15.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W16.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el2.style.opacity = "1";
     });
   }
@@ -20001,13 +20380,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref2("noFeelings") || W15.CurrentScreen !== "ChatRoom" || !W15.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W16.CurrentScreen !== "ChatRoom" || !W16.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx2.panel.s, items = (W15.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W16.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W15.Player.ArousalSettings && W15.Player.ArousalSettings.Progress || 0;
+      const arousal = W16.Player.ArousalSettings && W16.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -20031,11 +20410,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W15.DrawText !== "function") return;
-      const R = W15.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W15.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W16.DrawText !== "function") return;
+      const R = W16.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W16.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C2 = (W15.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W15.ChatRoomMapViewCharacterIsVisible(C2)) continue;
+        const C2 = (W16.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W16.ChatRoomMapViewCharacterIsVisible(C2)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -20044,7 +20423,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me4.X + R) * tile, sy = (C2.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W15.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W16.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -20061,11 +20440,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W15.Player || !W15.Player.ArousalSettings || typeof W15.ActivitySetArousal !== "function") return;
-      if (W15.Player.ArousalSettings.Active === "Inactive" || W15.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W15.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W16.Player || !W16.Player.ArousalSettings || typeof W16.ActivitySetArousal !== "function") return;
+      if (W16.Player.ArousalSettings.Active === "Inactive" || W16.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W16.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W15.ActivitySetArousal(W15.Player, next);
+      if (next > cur || m.add < 0) W16.ActivitySetArousal(W16.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -20073,11 +20452,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W15.Player && Array.isArray(W15.Player.Appearance) ? W15.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W15.DialogCanUnlock === "function" && !W15.DialogCanUnlock(W15.Player, it)));
+  var vibeToys = () => (W16.Player && Array.isArray(W16.Player.Appearance) ? W16.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W16.DialogCanUnlock === "function" && !W16.DialogCanUnlock(W16.Player, it)));
   function vibePush(toys) {
-    if (typeof W15.CharacterRefresh === "function") W15.CharacterRefresh(W15.Player, false);
-    if (typeof W15.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W15.ChatRoomCharacterItemUpdate(W15.Player, it.Asset.Group.Name));
-    else if (typeof W15.ChatRoomCharacterUpdate === "function") W15.ChatRoomCharacterUpdate(W15.Player);
+    if (typeof W16.CharacterRefresh === "function") W16.CharacterRefresh(W16.Player, false);
+    if (typeof W16.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W16.ChatRoomCharacterItemUpdate(W16.Player, it.Asset.Group.Name));
+    else if (typeof W16.ChatRoomCharacterUpdate === "function") W16.ChatRoomCharacterUpdate(W16.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -20133,7 +20512,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W15.ChatRoomMapViewHasSuperPowers === "function" && W15.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W16.ChatRoomMapViewHasSuperPowers === "function" && W16.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -20340,6 +20719,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         onBodyMsg(m);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body:", e);
+      }
+      return;
+    }
+    if (m.type === "statue" || m.type === "statueAsk") {
+      try {
+        onStatueMsg(m);
+      } catch (e) {
+        console.warn("[Farmhand Companion] statue:", e);
       }
       return;
     }
@@ -20763,6 +21150,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }, 3e4);
     initBelly(mod);
     initDrawnBody(mod);
+    initStatue(mod);
     initMesses(mod);
     initBotScreen(mod, () => st.panel && st.panel.prefs || {});
     initAllocWatch(() => onBotAccount(), mod);
@@ -20928,6 +21316,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       try {
         if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
         if (d.type === "dose" && d.id === "fillout" || d.type === "grow") drawnBodyFillCheck();
+        if (d.type === "dose" && d.id === "statue") statueCheck();
       } catch (err) {
         console.warn("[Farmhand Companion] the Dispensary's doses:", err);
       }

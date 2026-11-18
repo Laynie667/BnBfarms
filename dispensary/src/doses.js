@@ -18,6 +18,7 @@ import { st, save } from "./store.js";
 import { LINES, NOTES } from "./lines.js";
 import { TOLERANCE_NOTE } from "./lines-more.js";
 import "./lines-senses.js";
+import "./lines-statue.js";
 import { settle } from "./senses.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
@@ -229,6 +230,15 @@ export const BOOK = {
     keywords: ["haze drops", "haze mist"], soak: ["haze"],
     desc: "Everything soft and blurry: the game's picture goes hazy (not the chat). Fifteen minutes a dose.",
   },
+  // ── Nov 18: the STATUE SERUM (Laynie approved the defaults). Half an hour as a statue: skin and hair turn to stone, or
+  // whatever the bottle names (porcelain, gold, black latex, marble, bronze); the eyes are glass set in it; the ink turns with the skin;
+  // arousal stops right where it is. The Companion draws it (statue.js), for everybody in the room with one. ──
+  statue: {
+    label: "Statue Serum", icon: "🗿", mins: 30, color: "#9a9a9a", every: [6, 10],
+    words: /\b(statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot))\b/,
+    keywords: ["statue serum", "petrifying draught"], soak: ["petrifying"],
+    desc: "Half an hour as a statue: your skin and hair turn to stone, or porcelain, gold, black latex, marble or bronze if the bottle says. Your eyes are glass set in it, still your own colour; your ink turns with your skin, and your arousal stops right where it is. Everybody with the Companion sees it.",
+  },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
     words: /\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/,
@@ -261,9 +271,16 @@ export const TENDER_SPOTS = {
 export const TENDER_DEFAULT = "nipples";
 // FILL-OUT's parts
 const PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
+// the Statue Serum's material, off the bottle (stone if it doesn't say)
+export const STATUE_MATS = { stone: "stone", porcelain: "porcelain", gold: "gold", latex: "black latex", marble: "marble", bronze: "bronze" };
+export function statueMat(t) {
+  t = String(t || "").toLowerCase();
+  return /porcelain|china doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
+}
 export function partFor(id, text) {
   const t = String(text || "").toLowerCase();
   if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+  if (id === "statue") return statueMat(t);
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   return "";
@@ -276,6 +293,7 @@ export function dosesIn(text) {
 export function partOf(id) {
   const d = st().doses[id];
   if (id === "fillout") return (d && d.p) || "cup";
+  if (id === "statue") return (d && d.p) || "stone";
   if (id === "tender") { const p = (d && d.p) || st().tenderSpot; return TENDER_SPOTS[p] ? p : TENDER_DEFAULT; }
   return "";
 }
@@ -285,7 +303,7 @@ export const tenderZones = () => TENDER_SPOTS[partOf("tender")].zones;
 const voiceOf = (id) => (BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice]) || null;
 const nameIn = (t) => String(t).replace(/%n/g, myName());
 const poolOf = (id, p) => (id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id]);
-const spotIn = (t, id, p) => (id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : t);
+const spotIn = (t, id, p) => (id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : t);
 const ours = (id, kind, p) => { const L = poolOf(id, p); return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : ""; };
 export function takeLine(id) { const v = voiceOf(id); return v && v.seen.length ? nameIn(pick(v.seen)) : ours(id, "take"); }
 function nowLine(id) { const v = voiceOf(id); return v && v.now.length ? nameIn(pick(v.now)) : ours(id, "now"); }
@@ -489,6 +507,12 @@ function feltOnce(id, kind, gap) {
   const l = ours(id, kind); if (l) local(l);
 }
 export function initDoses(mod) {
+  // the Statue Serum: your arousal stops right where it is. Nothin' raises it, nothin' lets it fall, and you don't go
+  // over, for as long as it's in you (these run before the doses' own, so they don't count either)
+  const stone = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("statue"));
+  for (const fn of ["ActivitySetArousal", "ActivitySetArousalTimer", "ActivityTimerProgress", "ActivityOrgasmPrepare"]) {
+    try { if (typeof W[fn] === "function") mod.hookFunction(fn, 7, (args, next) => (stone(args[0]) ? undefined : next(args))); } catch (e) { console.warn("[Dispensary] the Statue Serum can't hold " + fn + ":", e); }
+  }
   // Denial Serum: held at the edge instead of goin' over
   try {
     mod.hookFunction("ActivityOrgasmPrepare", 6, (args, next) => {

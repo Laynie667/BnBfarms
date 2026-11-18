@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.75.0
+// @version      0.76.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.75.0";
-  var COMPANION_VERSION = "0.58.0";
+  var VERSION = "0.76.0";
+  var COMPANION_VERSION = "0.59.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -25860,9 +25860,10 @@
       honey: "Honey Tongue",
       golden: "Golden Hour",
       musk: "Blue Ribbon Musk",
-      echo: "Echo Elixir"
+      echo: "Echo Elixir",
+      statue: "Statue Serum"
     };
-    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir/i;
+    const DISP_WORDS = /let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
     const CRAVE_OFFER_MS = 45 * 6e4;
     const CRAVE_OFFERS = [
       "\u{1F489} You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

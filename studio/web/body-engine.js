@@ -1212,7 +1212,7 @@ window.FarmBodyEngine = function (host) {
                 const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
                 if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin }); GEN.cvKey = key; }
                 if (hard) { if (!blink) ctx.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay]; return; }   // standing: held back, and drawn once the belly is on, in front of it
-                put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { warnSome("[studio] cock:", e); }
+                put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}, "skin"); return; } catch (e) { warnSome("[studio] cock:", e); }   // ("skin": a statue's turns with the rest of them, Nov 18)
             }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);

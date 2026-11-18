@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.75.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.76.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.58.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.6.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.59.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.7.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,21 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.76.0 + Companion 0.59.0 + Dispensary 0.7.0: the Statue Serum** Laynie approved the defaults, then: "it needs to work on the cock and balls too", and for the eyes, "glass is great".
+  - **Half an hour as a statue,** from a crafted bottle: stone, or what the bottle names (porcelain, gold, black latex, marble, bronze).
+  - **What turns:** skin and hair, lips and brows, cock and balls: the game's body, Echo's body, the drawn belly, breasts and cock. Gold and bronze shine like metal, stone has grain, marble has veins.
+  - **The eyes** are glass set in the material: the whites turn, the iris keeps your colour.
+  - **What doesn't:** blush and tears go, and clothes stay as they are.
+  - **Ink** is cut into the material, at its own size.
+  - **Arousal** stops right where it was: nothin' raises it or lets it fall, and no climax, till it wears off.
+  - **Everybody with the Companion sees it:** yours tells the room when it starts and ends, and when you come into a room.
+  - The farm girl stays quiet about Statue Serum bottles (they're the Dispensary's).
+  - Tests: `tests/statue.test.cjs`, and a check in `tests/ink.test.cjs`.
+  - **The studio's drawn cock** (Laynie: "the balls should scale too, and it should blend better at the base", then "looked great"):
+    - The balls grow with the length as well as the farm's ball size: half as big again at 13 inches, two and a half times at 28.
+    - Where it comes out of her is soft now: the shaft's root and the top of the sack melt into her skin instead of ending on a hard line.
+    - Studio only for now (`studio/web/cock-drawing.js`). In the game it's still the game's own picture till the Companion draws it.
 
 - **Bot 0.75.0 + Companion 0.58.0 + Dispensary 0.6.0: the farm girl's voice potions and growth shots, off the farm** Laynie: "seems good".
   - **Voice potions from a crafted bottle, anywhere (on the farm too):** Honey Tongue, Golden Hour, Blue Ribbon Musk, Echo Elixir.

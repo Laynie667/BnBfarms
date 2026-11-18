@@ -134,6 +134,19 @@ and running timers follow you between your phone and your PC, and clearing the b
    - **Echo Elixir:** twice in 20 minutes (at least three apart, half the time), somethin' you said is said back to the
      room. Never OOC or commands.
    - Her lines for these four now live in shared/potion-voice.js, so the farm and the Dispensary say the same.
+   **The Statue Serum** (built Nov 18; Laynie approved the defaults). Half an hour as a statue, from a crafted bottle.
+   - **The material** is what the bottle says: stone (if it doesn't say), porcelain, gold, black latex, marble or bronze.
+   - **What turns:** skin and hair (the game's body pictures, Echo's body, the drawn belly, breasts and cock), lips and brows.
+     Each picture is shaded from its own light, so it keeps its shape on any skin colour. Gold and bronze catch the
+     light like metal; stone has grain; marble has veins.
+   - **The eyes** are glass set in the material (Laynie picked it from carved, glint and glass): the whites and lids
+     turn, the iris keeps its own colour. The cock and balls turn with the skin, soft or hard.
+   - **What doesn't:** blush and tears go. Clothes and everything worn stay as they are.
+   - **Ink** is cut into the material, at its own size (ink.js asks the Companion, `W.__farmInkTint`).
+   - **Arousal** stops right where it was: nothin' raises it, nothin' lets it fall, no climax, till it wears off.
+   - **Everybody sees it:** the Companion draws it (extension/src/statue.js) and tells the room
+     (`statue { mat, left }`, and `statueAsk` on comin' into a room). Without the Companion you're only told.
+   - The safeword ends it like any dose.
 7. **Every way to dose** (built Nov 18, worn.js). Crafted gear you wear doses you when its words name a dose and say
    how. Whoever crafted it (the game keeps their number on the item) has to be on your list. LSCG's own soaked and laced
    gear stays LSCG's.

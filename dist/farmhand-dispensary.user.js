@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.6.0
+// @version      0.7.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7543,7 +7543,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           return true;
         };
-        const wrap = (f) => typeof f !== "function" ? f : function(src, x, y, o) {
+        const statue = (plain, self, u, x, y, o) => {
+          const T = W16.__farmInkTint;
+          if (typeof T !== "function") return false;
+          let t2;
+          try {
+            t2 = T(C, u, x, y);
+          } catch (e) {
+            t2 = void 0;
+          }
+          if (!t2) return false;
+          const o2 = Object.assign({}, o || {});
+          delete o2.HexColor;
+          delete o2.FullAlpha;
+          plain.call(self, t2, x, y, o2);
+          return true;
+        };
+        const wrap = (f, plain) => typeof f !== "function" ? f : function(src, x, y, o) {
           if (typeof src === "string") {
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
@@ -7554,18 +7570,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return void 0;
               }
               if (!ready(u)) notReady.push(lm[2]);
-              return f.call(this, u, x, y, sized(o, itemIn(C, lm[1])));
+              const o3 = sized(o, itemIn(C, lm[1]));
+              if (statue(plain, this, u, x, y, o3)) return void 0;
+              return f.call(this, u, x, y, o3);
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
               o = sized(o, stillItem(C, sm[1], sm[2]));
               seen.add(sm[2]);
               if (!ready(src)) notReady.push(sm[2]);
+              if (statue(plain, this, src, x, y, o)) return void 0;
             }
           }
           return f.call(this, src, x, y, o);
         };
-        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+        const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
           note2(W16, C, seen, notReady);
         } catch (e) {
@@ -7661,7 +7680,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.6.0";
+  var VERSION = "0.7.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -8260,6 +8279,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
       off: ["The haze clears. Everything's sharp again."]
     }
   });
+
+  // dispensary/src/lines-statue.js
+  LINES.statue = {
+    take: [
+      "%t goes still as the serum takes. Cold creeps over their skin, and in a few heartbeats they're %m from head to toe, hair and all. Only their eyes still move.",
+      "A chill runs up %t's legs and keeps on goin'. Skin, hair, every curve sets into smooth %m. They're a statue now, and a pretty one.",
+      "%t stiffens mid-breath. Their skin hardens into %m, their hair right along with it, till there's nothin' left but a lovely statue with very much alive eyes.",
+      "The serum sets fast. %t turns to %m right where they stand, froze in place for anybody who cares to admire 'em."
+    ],
+    now: [
+      "You're %m all over. You can feel every touch, but you can't so much as twitch.",
+      "Whatever you were feelin' when it took, you're stuck right there. No higher, no lower. Just hangin'.",
+      "Cold, hard and gorgeous. Folks keep lookin' at you like you're on display, 'cause you are.",
+      "Somebody could dust you off and you couldn't do a thing about it.",
+      "Your eyes are the only part of you still yours. Everything else is %m.",
+      "You'd squirm if you could. You can't. You're just a pretty %m thing to look at."
+    ],
+    off: [
+      "Warmth seeps back in. The %m softens to skin, your hair falls loose, and you can breathe all the way down again.",
+      "The serum lets go. You're flesh again, and every bit of what you were feelin' comes rushin' right back.",
+      "Little by little the %m gives way to skin. You're you again: a bit stiff, and a whole lot worked up."
+    ]
+  };
 
   // dispensary/src/senses.js
   var W2 = window;
@@ -10024,6 +10066,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
       soak: ["haze"],
       desc: "Everything soft and blurry: the game's picture goes hazy (not the chat). Fifteen minutes a dose."
     },
+    // ── Nov 18: the STATUE SERUM (Laynie approved the defaults). Half an hour as a statue: skin and hair turn to stone, or
+    // whatever the bottle names (porcelain, gold, black latex, marble, bronze); the eyes are glass set in it; the ink turns with the skin;
+    // arousal stops right where it is. The Companion draws it (statue.js), for everybody in the room with one. ──
+    statue: {
+      label: "Statue Serum",
+      icon: "\u{1F5FF}",
+      mins: 30,
+      color: "#9a9a9a",
+      every: [6, 10],
+      words: /\b(statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot))\b/,
+      keywords: ["statue serum", "petrifying draught"],
+      soak: ["petrifying"],
+      desc: "Half an hour as a statue: your skin and hair turn to stone, or porcelain, gold, black latex, marble or bronze if the bottle says. Your eyes are glass set in it, still your own colour; your ink turns with your skin, and your arousal stops right where it is. Everybody with the Companion sees it."
+    },
     purge: {
       label: "Purge",
       icon: "\u{1F9FC}",
@@ -10057,9 +10113,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   var TENDER_DEFAULT = "nipples";
   var PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
+  var STATUE_MATS = { stone: "stone", porcelain: "porcelain", gold: "gold", latex: "black latex", marble: "marble", bronze: "bronze" };
+  function statueMat(t) {
+    t = String(t || "").toLowerCase();
+    return /porcelain|china doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
+  }
   function partFor(id, text3) {
     const t = String(text3 || "").toLowerCase();
     if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
+    if (id === "statue") return statueMat(t);
     if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
     if (id === "tender") {
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
@@ -10077,6 +10139,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function partOf(id) {
     const d = st().doses[id];
     if (id === "fillout") return d && d.p || "cup";
+    if (id === "statue") return d && d.p || "stone";
     if (id === "tender") {
       const p = d && d.p || st().tenderSpot;
       return TENDER_SPOTS[p] ? p : TENDER_DEFAULT;
@@ -10087,7 +10150,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var voiceOf = (id) => BOOK[id] && BOOK[id].voice && POTION_VOICE[BOOK[id].voice] || null;
   var nameIn = (t) => String(t).replace(/%n/g, myName());
   var poolOf = (id, p) => id === "fillout" ? LINES["fillout_" + (p || partOf(id))] || LINES.fillout_cup : LINES[id];
-  var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : t;
+  var spotIn = (t, id, p) => id === "tender" ? String(t).replace(/%s/g, TENDER_SPOTS[TENDER_SPOTS[p] ? p : partOf(id)].word) : id === "statue" ? String(t).replace(/%m/g, STATUE_MATS[p] || STATUE_MATS[partOf(id)] || "stone") : t;
   var ours4 = (id, kind, p) => {
     const L = poolOf(id, p);
     return L && L[kind] && L[kind].length ? spotIn(fill(pick(L[kind])), id, p) : "";
@@ -10356,6 +10419,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (l) local(l);
   }
   function initDoses(mod2) {
+    const stone = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("statue"));
+    for (const fn of ["ActivitySetArousal", "ActivitySetArousalTimer", "ActivityTimerProgress", "ActivityOrgasmPrepare"]) {
+      try {
+        if (typeof W10[fn] === "function") mod2.hookFunction(fn, 7, (args, next) => stone(args[0]) ? void 0 : next(args));
+      } catch (e) {
+        console.warn("[Dispensary] the Statue Serum can't hold " + fn + ":", e);
+      }
+    }
     try {
       mod2.hookFunction("ActivityOrgasmPrepare", 6, (args, next) => {
         try {

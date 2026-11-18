@@ -211,16 +211,24 @@ export function registerInk(W, mod) {
       };
       const seen = new Set(), notReady = [];
       const ready = (u) => { try { const c = W.GLDrawImageCache; if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false; } catch (e) { /* fine */ } return true; };
-      const wrap = (f) => (typeof f !== "function" ? f : function (src, x, y, o) {
+      // (Nov 18) somebody under the Statue Serum: their ink is cut into the material. The Companion's statue.js hands
+      // back the picture in it (W.__farmInkTint: a picture, or undefined to leave it be), drawn plain, at the same size.
+      const statue = (plain, self, u, x, y, o) => {
+        const T = W.__farmInkTint; if (typeof T !== "function") return false;
+        let t; try { t = T(C, u, x, y); } catch (e) { t = undefined; }
+        if (!t) return false;
+        const o2 = Object.assign({}, o || {}); delete o2.HexColor; delete o2.FullAlpha; plain.call(self, t, x, y, o2); return true;
+      };
+      const wrap = (f, plain) => (typeof f !== "function" ? f : function (src, x, y, o) {
         if (typeof src === "string") {
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
-          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); return f.call(this, u, x, y, sized(o, itemIn(C, lm[1]))); }
+          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const o3 = sized(o, itemIn(C, lm[1])); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
-          if (sm) { o = sized(o, stillItem(C, sm[1], sm[2])); seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); }
+          if (sm) { o = sized(o, stillItem(C, sm[1], sm[2])); seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
         }
         return f.call(this, src, x, y, o);
       });
-      const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink) }), ...args.slice(2)]);
+      const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
       try { note(W, C, seen, notReady); } catch (e) { /* fine */ }
       return out;
     });

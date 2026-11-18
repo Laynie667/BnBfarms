@@ -74,7 +74,7 @@
     // a hanging sack's neck: from its top down to where it starts to widen out (a quarter wider than at the top)
     const topW = [0, 5, 10, 15, 20].map((k) => wide(Math.min(h - 1, top + k))).sort((a, b) => a - b)[2];
     let neck = top + 20; while (neck < h * 0.6 && wide(neck) < topW * 1.25) neck++;
-    return { img: c, w, h, ref, jx: jx < 0 ? w / 2 : jx, nx: nx < 0 ? w / 2 : nx, neck };
+    return { img: c, w, h, ref, jx: jx < 0 ? w / 2 : jx, nx: nx < 0 ? w / 2 : nx, neck, jw: wide(Math.round(h * 0.85)) || w * 0.6 };
   }
   // base: where the folders are ("/__studio/_stamps/"); or pics: { kind: { name: a data: URL } }, as the Companion would
   // carry them. done is called each time a kind is complete.
@@ -103,6 +103,19 @@
   }
   // the sack's width across for a farm ball level: about as wide as the drawn one; pent up, swollen a third wider
   const sackW = (level, pent) => 3.6 * ballR(level || 3) * (pent ? 1.3 : 1);
+  // (Nov 18, Laynie: "the balls should scale too".) The sack grows with the length as well as with the farm's ball size:
+  // at the starting 6 inches it's as it was, at 13 about half as big again, at 28 two and a half times. Never past what the
+  // farm's own biggest balls would be anyway, so a big ball size doesn't double up.
+  const lenK = (inches) => Math.pow(Math.max(3, Math.min(40, inches || 6)) / 6, 0.6);
+  const sackFor = (level, pent, inches) => { const own = sackW(level, pent); return Math.max(own, Math.min(own * lenK(inches), 240)); };
+  // a picture's edge faded to nothing over a stretch (top: from its top down; bottom: from its bottom up)
+  function meltEdge(cv, from, len, top) {
+    if (len <= 0) return cv;
+    const g = cv.getContext("2d"), y0 = top ? from : from - len, gr = g.createLinearGradient(0, top ? from + len : from - len, 0, from);
+    gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(0.55, "rgba(0,0,0,0.55)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+    g.save(); g.globalCompositeOperation = "destination-out"; g.fillStyle = gr;
+    g.fillRect(0, y0, cv.width, len); g.fillRect(0, top ? 0 : from, cv.width, top ? from : cv.height - from); g.restore(); return cv;
+  }
   function stampCanvas(st, o, bellyLit) {
     const inches = o.inches || 6, girth = o.girth || 1;
     // the skin colour handed over is read off the lit belly; between her legs the game's skin is a touch rosier (5% less
@@ -110,20 +123,29 @@
     const skin = [bellyLit[0], bellyLit[1] * 0.948, bellyLit[2] * 0.955];
     if (o.hard) {
       // the shaft stands root to tip at inches x 9 x 1.06 pixels (as the drawn one does), its own shape, made thicker or
-      // thinner by the girth; the sack hangs behind its root with its top tucked up behind it
+      // thinner by the girth; the sack hangs behind its root with its top tucked up behind it.
+      // (Nov 18, Laynie: "it should blend better at the base".) It used to end on the picture's own bottom edge, a hard
+      // line across the sack, and the sack's top made a cap beside it. Now both melt into her: the shaft's last stretch
+      // (about as long as it is wide) fades out, and so does the top of the sack, so where it comes out of her is her
+      // own skin, soft, the way the game's own picture melts into the body.
       const n = st.hard.length, pic = st.hard[(((o.style | 0) % n) + n) % n], sack = o.pent ? st.pent : st.drained;
       const k = (inches * PX_PER_INCH * 1.06) / pic.h, sw = pic.w * k * girth, sh = pic.h * k;
-      const bw = sackW(o.balls, o.pent), bh = (sack.h * bw) / sack.w;
+      const bw = sackFor(o.balls, o.pent, inches), bh = (sack.h * bw) / sack.w;
       const cv = mk(Math.max(sw, bw) + 8, sh + bh + 10), g = cv.getContext("2d"), ax = cv.width / 2, ay = sh + 3;
-      g.drawImage(tinted(sack, bw, bh, skin), ax - bw / 2, ay - bh * 0.22);
-      g.drawImage(tinted(pic, sw, sh, skin), ax - pic.jx * k * girth, ay - sh);
+      // (Four ways tried side by side; this one: the sack sits a little higher behind the root, so the shaft fades
+      // straight into it rather than into a strip of skin above it.)
+      const rw = Math.max(5, pic.jw * k * girth), fade = Math.min(sh * 0.3, Math.max(5, rw * 0.45));   // how wide the root is; how far up it melts
+      const sc = tinted(sack, bw, bh, skin), tuck = bh * 0.36;
+      g.drawImage(meltEdge(sc, 0, Math.max(4, tuck * 0.5 + rw * 0.15), true), ax - bw / 2, ay - tuck);
+      const shc = tinted(pic, sw, sh, skin);
+      g.drawImage(meltEdge(shc, sh - Math.min(3, sh * 0.02), fade, false), ax - pic.jx * k * girth, ay - sh);
       cv.ax = ax; cv.ay = ay - bh * 0.05; return cv;
     }
     // soft: at 7 inches and the farm's starting balls this is 24.4 as she picked it (two thirds of the whole picture at
     // inches x 9 x 1.15); the cock follows the inches and the sack the ball size, both hung from the top middle, and
     // both moved to her skin by the same amount so the two halves stay one colour
     const sack = st.softSack, cock = st.softShaft, k7 = (7 * PX_PER_INCH * 1.15 * 0.67) / sack.h;
-    const kc = (k7 * inches) / 7, ks = (k7 * ballR(o.balls || 3)) / ballR(3) * (o.pent ? 1.15 : 1);
+    const kc = (k7 * inches) / 7, ks = (k7 * sackFor(o.balls, false, inches)) / sackW(3) * (o.pent ? 1.15 : 1);   // (the sack grows with the length too)
     // a big sack hangs from a short neck: the neck is stretched no longer than the cock's own size (or the picked one),
     // so heavy balls sit up against her instead of dangling off a long tube
     const kn = Math.min(ks, Math.max(kc, k7)), neckH = sack.neck * kn, sw = sack.w * ks, sh = neckH + (sack.h - sack.neck) * ks;
@@ -132,11 +154,12 @@
     const cv = mk(left + right + 8, Math.max(sh, chh) + 8), g = cv.getContext("2d"), ax = left + 4, ay = 2;
     const twoPart = (sg, w, h) => { sg.drawImage(sack.img, 0, 0, sack.w, sack.neck, 0, 0, w, neckH); sg.drawImage(sack.img, 0, sack.neck, sack.w, sack.h - sack.neck, 0, neckH, w, h - neckH); };
     // the sack's top melts into her: a little at the picked size, more as it grows, so a big one has no cap on it
-    const sc = tinted(sack, sw, sh, skin, null, twoPart), sg = sc.getContext("2d"), melt = Math.min(0.3, 0.05 * ks / k7);
+    const sc = tinted(sack, sw, sh, skin, null, twoPart), sg = sc.getContext("2d"), melt = Math.min(0.3, Math.max(0.22, 0.11 * ks / k7));   // (Nov 18: twice what it was, so it doesn't start on a cap)
     sg.globalCompositeOperation = "destination-out"; const mg = sg.createLinearGradient(0, 0, 0, sc.height * melt);
     mg.addColorStop(0, "rgba(0,0,0,1)"); mg.addColorStop(1, "rgba(0,0,0,0)"); sg.fillStyle = mg; sg.fillRect(0, 0, sc.width, sc.height * melt);
     g.drawImage(sc, ax - nx * ks, ay);
-    g.drawImage(tinted(cock, cw, chh, skin, sack.ref), ax - nx * kc * girth, ay);
+    // (Nov 18) the cock's own top melts into her too, so a long one doesn't start on a cap line
+    g.drawImage(meltEdge(tinted(cock, cw, chh, skin, sack.ref), 0, Math.max(3, Math.min(chh * 0.26, cw * 0.8)), true), ax - nx * kc * girth, ay);
     cv.ax = ax; cv.ay = ay + 2 + chh * 0.1; return cv;   // (hung from a little below its top, as the whole picture was)
   }
 

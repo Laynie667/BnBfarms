@@ -77,6 +77,8 @@
       // big their belly is (0 to 4: pregnant, eggs, a full load). Laynie, Oct 14: "the belly sizes in game need to
       // automatically adjust based on how full or pregnant each player is", "same for tit sizes and growth".
       s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
+      // and the cock (Nov 18): its length in inches, the balls (1 to 20), and pent up, for the drawn cock
+      if (bodyParts(mn).includes("penis")) { s.drawn.cock = sizeOf(mn, "penis"); s.drawn.balls = sizeOf(mn, "testes"); s.drawn.pent = !!p.pentUp; }
       // LIVE INK (shared/ink/live.js, Nov 17): the counts their live tattoos print, for their Companion to write on them
       s.ink = inkCounts(mn, p, now);
       if (inHeat(p)) s.heatUntil = p.heat.until;

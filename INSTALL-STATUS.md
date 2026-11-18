@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.76.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.77.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.59.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.7.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.60.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.8.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.77.0 + Companion 0.60.0 + Dispensary 0.8.0: the drawn cock in the game** Laynie: the studio's "looked great", and the pictures going on GitHub, "yes, they can".
+  - **The studio's cock, in the game:** with the drawn body on, the Companion draws it where the game would draw its own, soft or standing. It's the human pictures she picked, in your skin.
+  - **Its size is the farm's:** your length, your balls, and the swollen sack when you're pent up. The bot says them with your cup and belly.
+    - Not counted by the farm? The farm's starting 6 inches and 3.
+  - **Cock and Balls Growth** from the Dispensary go on top (two inches a dose for the cock). Never longer than 36 inches: the farm's biggest, 30, already stands past the middle of the chest.
+  - **Everybody with the Companion sees it at your size:** it goes round the room with your cup.
+  - **A statue's turns** with the rest of the skin.
+  - The pictures load from GitHub (`cock/v1/human/`), the way the ink's do. Till they're in, it's the game's own picture.
+  - Tests: `tests/drawn-cock.test.cjs`.
 
 - **Bot 0.76.0 + Companion 0.59.0 + Dispensary 0.7.0: the Statue Serum** Laynie approved the defaults, then: "it needs to work on the cock and balls too", and for the eyes, "glass is great".
   - **Half an hour as a statue,** from a crafted bottle: stone, or what the bottle names (porcelain, gold, black latex, marble, bronze).

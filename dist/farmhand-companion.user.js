@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.59.0
+// @version      0.60.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7695,7 +7695,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.59.0";
+  var VERSION = "0.60.0";
 
   // shared/species.js
   var WORDS = {
@@ -11269,6 +11269,503 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     };
   })();
 
+  // studio/web/cock-drawing.js
+  (() => {
+    const PX_PER_INCH = 9;
+    const KINDS2 = {
+      human: {
+        label: "Human",
+        col: null,
+        tipCol: [240, 140, 132],
+        sheath: null,
+        soft: 1,
+        w: (t) => {
+          if (t < 0.66) return 1 - 0.04 * t;
+          if (t < 0.71) return 0.97 - (t - 0.66) * 1.4;
+          if (t < 0.735) return 0.9 + (t - 0.71) / 0.025 * 0.28;
+          const h2 = (t - 0.735) / 0.265;
+          return 1.18 * Math.pow(Math.max(5e-4, 1 - Math.pow(h2, 2.2)), 0.5);
+        },
+        headAt: 0.735,
+        cleft: true
+      },
+      // (a taller head: about a quarter of the length, as the game's is)
+      canine: {
+        label: "Canine",
+        col: [226, 118, 120],
+        tipCol: [232, 108, 112],
+        sheath: "skin",
+        soft: 0.3,
+        knot: true,
+        w: (t) => 0.7 + 0.2 * Math.sin(Math.min(1, t / 0.8) * Math.PI) - (t > 0.8 ? Math.pow((t - 0.8) / 0.2, 1.3) * 0.62 : 0) + (t > 0.93 ? 0.1 * Math.sin((t - 0.93) / 0.07 * Math.PI) : 0)
+      },
+      equine: {
+        label: "Flared equine",
+        col: [150, 116, 112],
+        tipCol: [196, 150, 150],
+        sheath: [118, 92, 90],
+        soft: 0.6,
+        ring: 0.5,
+        w: (t, hard) => 1 + 0.07 * Math.exp(-Math.pow((t - 0.5) / 0.03, 2)) - 0.1 * Math.exp(-Math.pow((t - 0.86) / 0.07, 2)) + (t > 0.9 ? (hard ? 0.55 : 0.16) * Math.pow((t - 0.9) / 0.1, 0.7) : 0),
+        flat: true
+      },
+      feline: {
+        label: "Barbed feline",
+        col: [238, 164, 166],
+        tipCol: [240, 150, 154],
+        sheath: "skin",
+        soft: 0.25,
+        barbs: true,
+        slim: 0.78,
+        w: (t) => 0.95 - 0.62 * Math.pow(t, 1.25)
+      },
+      draconic: {
+        label: "Ridged draconic",
+        col: [176, 140, 196],
+        tipCol: [206, 150, 200],
+        sheath: [150, 120, 170],
+        soft: 0.5,
+        ridges: true,
+        w: (t) => (1.08 - 0.72 * Math.pow(t, 1.5)) * (1 + 0.075 * Math.sin(t * Math.PI * 14) * (t < 0.9 ? 1 : 0))
+      },
+      double: {
+        label: "Double",
+        col: [236, 160, 162],
+        tipCol: [240, 148, 152],
+        sheath: "skin",
+        soft: 0.5,
+        two: true,
+        slim: 0.8,
+        w: (t) => 0.92 - 0.5 * Math.pow(t, 2.2)
+      }
+    };
+    const clamp2 = (v) => Math.max(0, Math.min(255, Math.round(v)));
+    const rgb2 = (c, k) => "rgb(" + clamp2(c[0] * k) + "," + clamp2(c[1] * k) + "," + clamp2(c[2] * k) + ")";
+    const line3 = (c) => "rgb(" + clamp2(c[0] * 0.74) + "," + clamp2(c[1] * 0.62) + "," + clamp2(c[2] * 0.6) + ")";
+    const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+    const ballR = (level) => 5 + 2.1 * Math.max(0, level - 1) + 0.18 * Math.pow(Math.max(0, level - 6), 2);
+    const STAMP_FILES = { human: { hard: ["hard-18-1", "hard-35-3", "hard-33-2"], drained: "balls-4-3", pent: "balls-37-16", softShaft: "soft-24-4-shaft", softSack: "soft-24-4-sack" } };
+    const stamps = {};
+    let ver = 0;
+    const mk2 = (w, h2) => {
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.ceil(w));
+      c.height = Math.max(1, Math.ceil(h2));
+      return c;
+    };
+    function picOf(img2) {
+      const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height, c = mk2(w, h2), g = c.getContext("2d");
+      g.drawImage(img2, 0, 0);
+      const d = g.getImageData(0, 0, w, h2).data, ch = [[], [], []];
+      for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) for (let k = 0; k < 3; k++) ch[k].push(d[i + k]);
+      const ref = ch.map((a) => a.sort((x, y) => x - y)[Math.floor(a.length * 0.6)] || 200);
+      const span = (y) => {
+        let l = -1, r = -1;
+        for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 120) {
+          if (l < 0) l = x;
+          r = x;
+        }
+        return l < 0 ? null : [l, r];
+      };
+      const mid = (y) => {
+        const s = span(y);
+        return s ? (s[0] + s[1]) / 2 : -1;
+      }, wide = (y) => {
+        const s = span(y);
+        return s ? s[1] - s[0] : 0;
+      };
+      let top = 0;
+      while (top < h2 - 1 && mid(top) < 0) top++;
+      const jx = mid(Math.round(h2 * 0.85)), nx = mid(top);
+      const topW = [0, 5, 10, 15, 20].map((k) => wide(Math.min(h2 - 1, top + k))).sort((a, b) => a - b)[2];
+      let neck = top + 20;
+      while (neck < h2 * 0.6 && wide(neck) < topW * 1.25) neck++;
+      return { img: c, w, h: h2, ref, jx: jx < 0 ? w / 2 : jx, nx: nx < 0 ? w / 2 : nx, neck, jw: wide(Math.round(h2 * 0.85)) || w * 0.6 };
+    }
+    function loadStamps(base, done, pics) {
+      for (const [kind, files] of Object.entries(STAMP_FILES)) {
+        const names = Object.values(files).flat(), got = {};
+        for (const n of names) {
+          const im = new Image(), src = pics && pics[kind] && pics[kind][n];
+          if (!src && /^https?:/.test(base)) im.crossOrigin = "anonymous";
+          im.onload = () => {
+            got[n] = picOf(im);
+            if (Object.keys(got).length < names.length) return;
+            stamps[kind] = { hard: files.hard.map((x) => got[x]), drained: got[files.drained], pent: got[files.pent], softShaft: got[files.softShaft], softSack: got[files.softSack] };
+            ver++;
+            if (done) done(kind);
+          };
+          im.onerror = () => {
+          };
+          im.src = src || base + kind + "/" + n + ".png";
+        }
+      }
+    }
+    const hasStamps = (kind) => !!stamps[kind];
+    function tinted2(pic, w, h2, skin, ref, draw3) {
+      const c = mk2(w, h2), g = c.getContext("2d");
+      g.imageSmoothingQuality = "high";
+      if (draw3) draw3(g, c.width, c.height);
+      else g.drawImage(pic.img, 0, 0, c.width, c.height);
+      const r = ref || pic.ref, k = [skin[0] / r[0], skin[1] / r[1], skin[2] / r[2]], img2 = g.getImageData(0, 0, c.width, c.height), d = img2.data;
+      for (let i = 0; i < d.length; i += 4) {
+        d[i] = Math.min(255, d[i] * k[0]);
+        d[i + 1] = Math.min(255, d[i + 1] * k[1]);
+        d[i + 2] = Math.min(255, d[i + 2] * k[2]);
+      }
+      g.putImageData(img2, 0, 0);
+      return c;
+    }
+    const sackW = (level, pent) => 3.6 * ballR(level || 3) * (pent ? 1.3 : 1);
+    const lenK = (inches) => Math.pow(Math.max(3, Math.min(40, inches || 6)) / 6, 0.6);
+    const sackFor = (level, pent, inches) => {
+      const own = sackW(level, pent);
+      return Math.max(own, Math.min(own * lenK(inches), 240));
+    };
+    function meltEdge(cv, from, len, top) {
+      if (len <= 0) return cv;
+      const g = cv.getContext("2d"), y0 = top ? from : from - len, gr = g.createLinearGradient(0, top ? from + len : from - len, 0, from);
+      gr.addColorStop(0, "rgba(0,0,0,0)");
+      gr.addColorStop(0.55, "rgba(0,0,0,0.55)");
+      gr.addColorStop(1, "rgba(0,0,0,1)");
+      g.save();
+      g.globalCompositeOperation = "destination-out";
+      g.fillStyle = gr;
+      g.fillRect(0, y0, cv.width, len);
+      g.fillRect(0, top ? 0 : from, cv.width, top ? from : cv.height - from);
+      g.restore();
+      return cv;
+    }
+    function stampCanvas(st2, o, bellyLit) {
+      const inches = o.inches || 6, girth = o.girth || 1;
+      const skin = [bellyLit[0], bellyLit[1] * 0.948, bellyLit[2] * 0.955];
+      if (o.hard) {
+        const n = st2.hard.length, pic = st2.hard[((o.style | 0) % n + n) % n], sack2 = o.pent ? st2.pent : st2.drained;
+        const k = inches * PX_PER_INCH * 1.06 / pic.h, sw2 = pic.w * k * girth, sh2 = pic.h * k;
+        const bw = sackFor(o.balls, o.pent, inches), bh = sack2.h * bw / sack2.w;
+        const cv2 = mk2(Math.max(sw2, bw) + 8, sh2 + bh + 10), g2 = cv2.getContext("2d"), ax2 = cv2.width / 2, ay2 = sh2 + 3;
+        const rw = Math.max(5, pic.jw * k * girth), fade = Math.min(sh2 * 0.3, Math.max(5, rw * 0.45));
+        const sc2 = tinted2(sack2, bw, bh, skin), tuck = bh * 0.36;
+        g2.drawImage(meltEdge(sc2, 0, Math.max(4, tuck * 0.5 + rw * 0.15), true), ax2 - bw / 2, ay2 - tuck);
+        const shc = tinted2(pic, sw2, sh2, skin);
+        g2.drawImage(meltEdge(shc, sh2 - Math.min(3, sh2 * 0.02), fade, false), ax2 - pic.jx * k * girth, ay2 - sh2);
+        cv2.ax = ax2;
+        cv2.ay = ay2 - bh * 0.05;
+        return cv2;
+      }
+      const sack = st2.softSack, cock = st2.softShaft, k7 = 7 * PX_PER_INCH * 1.15 * 0.67 / sack.h;
+      const kc = k7 * inches / 7, ks = k7 * sackFor(o.balls, false, inches) / sackW(3) * (o.pent ? 1.15 : 1);
+      const kn = Math.min(ks, Math.max(kc, k7)), neckH = sack.neck * kn, sw = sack.w * ks, sh = neckH + (sack.h - sack.neck) * ks;
+      const cw = cock.w * kc * girth, chh = cock.h * kc, nx = sack.nx;
+      const left2 = Math.max(nx * ks, nx * kc * girth), right = Math.max((sack.w - nx) * ks, (cock.w - nx) * kc * girth);
+      const cv = mk2(left2 + right + 8, Math.max(sh, chh) + 8), g = cv.getContext("2d"), ax = left2 + 4, ay = 2;
+      const twoPart = (sg2, w, h2) => {
+        sg2.drawImage(sack.img, 0, 0, sack.w, sack.neck, 0, 0, w, neckH);
+        sg2.drawImage(sack.img, 0, sack.neck, sack.w, sack.h - sack.neck, 0, neckH, w, h2 - neckH);
+      };
+      const sc = tinted2(sack, sw, sh, skin, null, twoPart), sg = sc.getContext("2d"), melt = Math.min(0.3, Math.max(0.22, 0.11 * ks / k7));
+      sg.globalCompositeOperation = "destination-out";
+      const mg = sg.createLinearGradient(0, 0, 0, sc.height * melt);
+      mg.addColorStop(0, "rgba(0,0,0,1)");
+      mg.addColorStop(1, "rgba(0,0,0,0)");
+      sg.fillStyle = mg;
+      sg.fillRect(0, 0, sc.width, sc.height * melt);
+      g.drawImage(sc, ax - nx * ks, ay);
+      g.drawImage(meltEdge(tinted2(cock, cw, chh, skin, sack.ref), 0, Math.max(3, Math.min(chh * 0.26, cw * 0.8)), true), ax - nx * kc * girth, ay);
+      cv.ax = ax;
+      cv.ay = ay + 2 + chh * 0.1;
+      return cv;
+    }
+    function canvas(o) {
+      const st2 = o.stamps !== false && stamps[o.kind || "human"];
+      if (st2) return stampCanvas(st2, o, o.skin || [236, 204, 196]);
+      const K2 = KINDS2[o.kind] || KINDS2.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
+      const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K2.soft));
+      const W17 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
+      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W17 * 1.25 : 0;
+      const col = K2.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K2.sheath === "skin" || !K2.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K2.sheath;
+      const bend = (hard ? 0.11 : 0.09) * L;
+      const widest = W17 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
+      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W17 : W17 * 1.2) + 10, down = Math.max(hard ? W17 * 1.5 : L + W17, drop2 + br * 1.5) + 12;
+      const cv = document.createElement("canvas");
+      cv.width = Math.ceil(half * 2);
+      cv.height = Math.ceil(up + down);
+      const g = cv.getContext("2d"), ox = cv.width / 2, oy = up;
+      cv.ax = ox;
+      cv.ay = oy;
+      g.lineJoin = "round";
+      g.lineCap = "round";
+      const sack = () => {
+        const top = oy + W17 * 0.2, cy = top + drop2, r = br;
+        const path = () => {
+          g.beginPath();
+          g.moveTo(ox - W17 * 0.9, top);
+          g.bezierCurveTo(ox - r * 1.1, top + drop2 * 0.35, ox - r * 2.05, cy - r * 0.5, ox - r * 1.75, cy + r * 0.45);
+          g.bezierCurveTo(ox - r * 1.5, cy + r * 1.3, ox - r * 0.35, cy + r * 1.4, ox, cy + r * 0.95);
+          g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);
+          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W17 * 0.9, top);
+          g.closePath();
+        };
+        const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
+        grad.addColorStop(0, rgb2(skin, 1.02));
+        grad.addColorStop(0.55, rgb2(skin, 0.99));
+        grad.addColorStop(1, rgb2([skin[0], skin[1] * 0.86, skin[2] * 0.84], 0.86));
+        g.fillStyle = grad;
+        path();
+        g.fill();
+        g.save();
+        path();
+        g.clip();
+        const cleft = g.createLinearGradient(ox - r * 0.5, 0, ox + r * 0.5, 0);
+        cleft.addColorStop(0, "rgba(120,60,55,0)");
+        cleft.addColorStop(0.5, "rgba(140,70,66,0.30)");
+        cleft.addColorStop(1, "rgba(120,60,55,0)");
+        g.fillStyle = cleft;
+        g.fillRect(ox - r * 0.5, cy - r * 0.6, r, r * 2.2);
+        const und = g.createLinearGradient(0, cy + r * 0.3, 0, cy + r * 1.4);
+        und.addColorStop(0, "rgba(120,60,55,0)");
+        und.addColorStop(1, "rgba(140,70,66,0.26)");
+        g.fillStyle = und;
+        g.fillRect(0, cy, cv.width, r * 2);
+        g.restore();
+        g.fillStyle = "rgba(255,255,255,0.6)";
+        for (const sd of [-1, 1]) {
+          g.beginPath();
+          g.ellipse(ox + sd * r * 0.95 - r * 0.28, cy + r * 0.05 + (sd < 0 ? r * 0.12 : 0), r * 0.11, r * 0.3, 0.35, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.strokeStyle = line3(skin);
+        g.lineWidth = 1.2;
+        path();
+        g.stroke();
+        g.strokeStyle = line3(skin);
+        g.globalAlpha = 0.6;
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(ox, cy + r * 0.2);
+        g.quadraticCurveTo(ox + r * 0.08, cy + r * 0.3, ox, cy + r * 0.93);
+        g.stroke();
+        g.globalAlpha = 1;
+      };
+      const shaft = (dx, lean) => {
+        const dir = hard ? -1 : 1, N2 = 56, kn = (t) => knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0;
+        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W17 * 0.15)];
+        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W17;
+        const L0 = [], R0 = [];
+        for (let i = 0; i <= N2; i++) {
+          const t = i / N2, c = cen(t), c2 = cen(Math.min(1, t + 0.01)), c1 = cen(Math.max(0, t - 0.01));
+          let nx = -(c2[1] - c1[1]), ny = c2[0] - c1[0];
+          const nl = Math.hypot(nx, ny) || 1;
+          nx /= nl;
+          ny /= nl;
+          const w = wd(t);
+          L0.push([c[0] + nx * w, c[1] + ny * w]);
+          R0.push([c[0] - nx * w, c[1] - ny * w]);
+        }
+        const tipC = cen(1), outline = () => {
+          g.beginPath();
+          g.moveTo(L0[0][0], L0[0][1]);
+          for (let i = 1; i <= N2; i++) g.lineTo(L0[i][0], L0[i][1]);
+          if (K2.flat) g.lineTo(R0[N2][0], R0[N2][1]);
+          else g.quadraticCurveTo(tipC[0], tipC[1] + dir * wd(1) * 1.3, R0[N2][0], R0[N2][1]);
+          for (let i = N2 - 1; i >= 0; i--) g.lineTo(R0[i][0], R0[i][1]);
+          g.closePath();
+        };
+        g.save();
+        outline();
+        g.clip();
+        const along = g.createLinearGradient(0, oy, 0, oy + dir * L);
+        const hA = K2.headAt || 0.7;
+        along.addColorStop(0, rgb2(col, 1));
+        along.addColorStop(Math.max(0.05, hA - 0.04), rgb2(mix(col, K2.tipCol, 0.15), 1));
+        along.addColorStop(Math.min(0.99, hA + 0.03), rgb2(K2.tipCol, 1));
+        along.addColorStop(1, rgb2(K2.tipCol, 1.04));
+        g.fillStyle = along;
+        g.fillRect(0, 0, cv.width, cv.height);
+        const across = g.createLinearGradient(ox + dx - W17 * 1.6, 0, ox + dx + W17 * 1.6, 0);
+        across.addColorStop(0.12, "rgba(110,50,48,0.34)");
+        across.addColorStop(0.36, "rgba(255,255,255,0.10)");
+        across.addColorStop(0.6, "rgba(0,0,0,0)");
+        across.addColorStop(0.9, "rgba(110,50,48,0.42)");
+        g.fillStyle = across;
+        g.fillRect(0, 0, cv.width, cv.height);
+        if (K2.ring) {
+          const c = cen(K2.ring);
+          g.strokeStyle = line3(col);
+          g.lineWidth = 1.2;
+          g.beginPath();
+          g.moveTo(c[0] - W17 * 1.4, c[1]);
+          g.quadraticCurveTo(c[0], c[1] + dir * W17 * 0.5, c[0] + W17 * 1.4, c[1]);
+          g.stroke();
+          g.fillStyle = "rgba(222,150,152,0.45)";
+          for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) {
+            const c3 = cen(b2);
+            g.beginPath();
+            g.ellipse(c3[0] + a * W17, c3[1], r * W17, r * W17 * 1.5, 0, 0, Math.PI * 2);
+            g.fill();
+          }
+        }
+        if (K2.ridges) {
+          g.strokeStyle = line3(col);
+          g.lineWidth = 1.1;
+          for (let t = 0.1; t < 0.9; t += 1 / 7) {
+            const c = cen(t), w = wd(t);
+            g.beginPath();
+            g.moveTo(c[0] - w, c[1] - dir * w * 0.2);
+            g.quadraticCurveTo(c[0], c[1] + dir * w * 0.6, c[0] + w, c[1] - dir * w * 0.2);
+            g.stroke();
+          }
+        }
+        if (K2.headAt) {
+          const c = cen(K2.headAt), w = wd(K2.headAt) * 1.25;
+          g.strokeStyle = line3(K2.tipCol);
+          g.lineWidth = 1.1;
+          g.beginPath();
+          g.moveTo(c[0] - w, c[1] - dir * w * 0.1);
+          g.quadraticCurveTo(c[0], c[1] - dir * w * 0.55, c[0] + w, c[1] - dir * w * 0.1);
+          g.stroke();
+          const e = cen(0.985);
+          g.beginPath();
+          g.moveTo(e[0], e[1] - dir * W17 * 0.25);
+          g.lineTo(e[0], e[1] + dir * W17 * 0.12);
+          g.stroke();
+          if (K2.cleft) {
+            const a = cen(K2.headAt + 0.02), b2 = cen(0.97);
+            g.globalAlpha = 0.5;
+            g.beginPath();
+            g.moveTo(a[0], a[1]);
+            g.quadraticCurveTo(a[0] + W17 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
+            g.stroke();
+            g.globalAlpha = 1;
+          }
+        }
+        if (!K2.ridges) {
+          const top = K2.headAt ? K2.headAt - 0.06 : 0.7, P22 = (t, k) => {
+            const c = cen(t), w = wd(t);
+            return [c[0] + k * w, c[1]];
+          };
+          g.strokeStyle = line3(col);
+          g.globalAlpha = hard ? 0.55 : 0.3;
+          g.lineWidth = 1;
+          const vein = (pts) => {
+            g.beginPath();
+            pts.forEach(([t, k], i) => {
+              const p = P22(Math.min(top, t), k);
+              if (i) g.lineTo(p[0], p[1]);
+              else g.moveTo(p[0], p[1]);
+            });
+            g.stroke();
+          };
+          vein([[0.16, -0.25], [0.26, -0.5], [0.38, -0.3], [0.5, -0.55], [0.62, -0.25], [0.74, -0.4]]);
+          vein([[0.38, -0.3], [0.46, 0.1], [0.56, 0.3]]);
+          vein([[0.2, 0.45], [0.32, 0.6], [0.44, 0.4]]);
+          g.globalAlpha = 1;
+        }
+        if (false) {
+          g.beginPath();
+          const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68);
+          g.moveTo(a[0] - W17 * 0.3, a[1]);
+          g.bezierCurveTo(b2[0] - W17 * 0.8, b2[1], b2[0] + W17 * 0.4, b2[1], c4[0] - W17 * 0.1, c4[1]);
+          g.stroke();
+        }
+        {
+          g.fillStyle = "rgba(255,255,255,0.72)";
+          g.beginPath();
+          const A0 = 0.16, A1 = (K2.headAt || 0.8) - 0.08, pts = [];
+          for (let t = A0; t <= A1; t += 0.02) {
+            const c = cen(t), w = wd(t), u = (t - A0) / (A1 - A0), th = w * 0.13 * Math.sin(u * Math.PI);
+            pts.push([c[0] - w * 0.5, c[1], th]);
+          }
+          pts.forEach((p, i) => i ? g.lineTo(p[0] - p[2], p[1]) : g.moveTo(p[0] - p[2], p[1]));
+          for (let i = pts.length - 1; i >= 0; i--) g.lineTo(pts[i][0] + pts[i][2], pts[i][1]);
+          g.closePath();
+          g.fill();
+          if (K2.headAt) {
+            const c = cen(K2.headAt + (1 - K2.headAt) * 0.45), w = wd(K2.headAt + 0.05);
+            g.beginPath();
+            g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2);
+            g.fill();
+            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W17 * 0.9);
+            sh2.addColorStop(0, "rgba(110,50,48,0.30)");
+            sh2.addColorStop(1, "rgba(110,50,48,0)");
+            g.fillStyle = sh2;
+            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W17 * 0.9), cv.width, W17 * 0.9);
+          }
+        }
+        g.restore();
+        if (K2.barbs) {
+          g.fillStyle = line3(col);
+          for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) {
+            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W17 * 0.22);
+            g.beginPath();
+            g.moveTo(p[0], p[1] - dir * s2 * 0.6);
+            g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4);
+            g.lineTo(p[0], p[1] + dir * s2 * 0.5);
+            g.closePath();
+            g.fill();
+          }
+        }
+        g.strokeStyle = line3(mix(col, K2.tipCol, 0.5));
+        g.lineWidth = 1.2;
+        outline();
+        g.stroke();
+        if (!K2.sheath && hard) return;
+        const sl = hard ? Math.min(0.11, 10 / L + 0.03) : K2.sheath ? 0.62 : 0.14, M = Math.max(2, Math.round(sl * N2)), sw = 1.16;
+        const sp = () => {
+          g.beginPath();
+          for (let i = 0; i <= M; i++) {
+            const c = cen(i / N2), p = L0[i];
+            g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
+          }
+          const cE = cen(M / N2);
+          g.quadraticCurveTo(cE[0], cE[1] + dir * W17 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
+          for (let i = M; i >= 0; i--) {
+            const c = cen(i / N2), p = R0[i];
+            g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
+          }
+          g.closePath();
+        };
+        const sg = g.createLinearGradient(ox + dx - W17 * 1.6, 0, ox + dx + W17 * 1.6, 0);
+        sg.addColorStop(0, rgb2(sh, 0.97));
+        sg.addColorStop(0.36, rgb2(sh, 1));
+        sg.addColorStop(1, rgb2(sh, 0.96));
+        g.fillStyle = sg;
+        sp();
+        g.fill();
+        g.strokeStyle = line3(sh);
+        g.lineWidth = 1.2;
+        sp();
+        g.stroke();
+      };
+      const shafts = () => {
+        if (K2.two) {
+          shaft(-gap * 0.5, 0.6);
+          shaft(gap * 0.5, 0.6);
+        } else shaft(0, 0);
+      };
+      if (hard) {
+        shafts();
+        sack();
+      } else {
+        sack();
+        shafts();
+      }
+      g.globalCompositeOperation = "destination-out";
+      const melt = g.createLinearGradient(0, oy - W17 * 0.5, 0, oy + W17 * 0.7);
+      melt.addColorStop(0, "rgba(0,0,0,1)");
+      melt.addColorStop(1, "rgba(0,0,0,0)");
+      if (!hard) {
+        g.fillStyle = melt;
+        g.fillRect(0, oy - W17 * 1.4, cv.width, W17 * 2.1);
+      }
+      g.globalCompositeOperation = "source-over";
+      return cv;
+    }
+    window.FarmCock = { KINDS: KINDS2, PX_PER_INCH, ballR, canvas, loadStamps, hasStamps, STAMP_FILES, get ver() {
+      return ver;
+    } };
+  })();
+
   // extension/src/warn.js
   var WARNED = /* @__PURE__ */ new Map();
   function warnSome(what, e) {
@@ -11792,6 +12289,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var onBot = () => !!(W5.Player && W5.Player.MemberNumber === BOT_MEMBER);
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
+  if (W5.__FARMHAND_TEST__) W5.__drawnBody = { mine, others };
   function load() {
     try {
       const d = JSON.parse(W5.localStorage.getItem(KEY));
@@ -11838,7 +12336,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
     const mode = bellyMode();
     e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, bellyStage());
+    e.gen = genOf();
     return e;
+  }
+  var GEN_IN = [3, 36];
+  var GEN_BALLS = [1, 20];
+  var clampTo = (v, r) => Math.max(r[0], Math.min(r[1], Math.round(Number(v) || 0)));
+  function genOf() {
+    const f = farmMe && farmMe.cock > 0 ? farmMe : null, g = grownAll();
+    return { inches: clampTo((f ? f.cock : 6) + 2 * g.cock, GEN_IN), balls: clampTo((f && f.balls > 0 ? f.balls : 3) + g.balls, GEN_BALLS), pent: !!(f && f.pent), style: clampTo(S2.genStyle, [0, 2]) };
   }
   var FILL_EASE_MS = 3 * 6e4;
   function fillOut() {
@@ -11850,14 +12356,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return null;
     }
   }
-  function grownCup() {
+  function grownAll() {
+    const out = { cup: 0, cock: 0, balls: 0 };
     try {
       const D = W5.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null;
-      return g ? Math.round(Number(g.cup) || 0) : 0;
+      if (g) for (const k of Object.keys(out)) out[k] = Math.round(Number(g[k]) || 0);
     } catch (e) {
-      return 0;
     }
+    return out;
   }
+  var grownCup = () => grownAll().cup;
   function cupWithFill(cup, f) {
     const add3 = Math.min(6, 2 * f.x);
     return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add3 / 2) : add3));
@@ -11868,7 +12376,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   var fillSig = "";
   function drawnBodyFillCheck() {
-    const f = fillOut(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + grownCup();
+    const f = fillOut(), g = grownAll(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;
     if (sig2 === fillSig) return false;
     fillSig = sig2;
     if (!S2.on) return false;
@@ -11880,8 +12388,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function drawnBodyFarmState(d) {
     if (!d || typeof d !== "object") return;
     const cup = Math.max(0, Math.min(20, Math.round(Number(d.cup) || 0))), belly = Math.max(0, Math.min(4, Math.round(Number(d.belly) || 0)));
-    if (farmMe && farmMe.cup === cup && farmMe.belly === belly) return;
-    farmMe = { cup, belly };
+    const cock = Math.max(0, Math.min(60, Math.round(Number(d.cock) || 0))), balls = Math.max(0, Math.min(20, Math.round(Number(d.balls) || 0))), pent = !!d.pent;
+    if (farmMe && farmMe.cup === cup && farmMe.belly === belly && farmMe.cock === cock && farmMe.balls === balls && farmMe.pent === pent) return;
+    farmMe = { cup, belly, cock, balls, pent };
     if (!S2.on) return;
     if (mine.E) apply(mine.E, eff());
     redraw(60);
@@ -12006,6 +12515,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function makeEngine(mn) {
     if (!W5.FarmBelly) W5.FarmBelly = bellyDrawing;
     if (typeof W5.FarmBodyEngine !== "function" || !W5.FarmBreasts) return null;
+    loadCock();
     const who2 = mn == null ? () => W5.Player || null : () => charOf(mn);
     return W5.FarmBodyEngine({
       S: { get C() {
@@ -12058,7 +12568,33 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (refit) E.MOULD.out.clear();
     for (const it of s.mould && s.mould.items || []) E.MOULD.items.add(String(it));
     for (const [k, m] of Object.entries(s.mould && s.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
-    E.GEN.drawn = false;
+    const g = s.gen || {};
+    E.GEN.drawn = !!(W5.FarmCock && W5.FarmCock.hasStamps("human"));
+    E.GEN.kind = "human";
+    E.GEN.knot = false;
+    E.GEN.girth = 1;
+    E.GEN.inches = clampTo(g.inches || 6, GEN_IN);
+    E.GEN.balls = clampTo(g.balls || 3, GEN_BALLS);
+    E.GEN.pent = !!g.pent;
+    E.GEN.style = clampTo(g.style, [0, 2]);
+  }
+  var COCK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/cock/v1/";
+  var cockAsked = false;
+  function loadCock() {
+    if (cockAsked || !W5.FarmCock || typeof W5.FarmCock.loadStamps !== "function") return;
+    cockAsked = true;
+    try {
+      W5.FarmCock.loadStamps(COCK_HOST, () => {
+        if (mine.E) apply(mine.E, eff());
+        if (S2.on) redraw(60);
+        for (const [mn, o] of others) if (o.E) {
+          apply(o.E, o.S);
+          redrawMn(mn, 60);
+        }
+      });
+    } catch (e) {
+      warnSome("[Farmhand Companion] drawn cock:", e);
+    }
   }
   function clean(d) {
     if (!d || typeof d !== "object") return null;
@@ -12083,6 +12619,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     s.auto = d.auto !== false;
     s.tuck = d.tuck !== false;
     s.dress = d.dress !== false;
+    if (d.gen && typeof d.gen === "object") s.gen = { inches: Math.round(num(d.gen.inches, GEN_IN[0], GEN_IN[1], 6)), balls: Math.round(num(d.gen.balls, GEN_BALLS[0], GEN_BALLS[1], 3)), pent: !!d.gen.pent, style: Math.round(num(d.gen.style, 0, 2, 0)) };
     s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
     for (const [k, m] of Object.entries(d.mould && d.mould.mode || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
     if (d.brand && typeof d.brand === "object") {
@@ -12092,7 +12629,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     return s;
   }
-  var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
+  var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould, gen: s.gen });
   var send = (type, data) => {
     try {
       if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
@@ -12112,7 +12649,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function tell(force) {
     if (onBot()) return;
     if (!force && Date.now() - toldAt < 8e3) return;
-    const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
+    const e = S2.on ? eff() : null, gn = e && e.gen;
+    const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(e) } : { on: true, farm: farm.at, cup: e.cup, bm: bellyMode(), bs: bellyStage(), ck: gn.inches, bl: gn.balls, pt: gn.pent ? 1 : 0, sy: gn.style };
     const sig2 = JSON.stringify(msg);
     if (!force && sig2 === lastTold) return;
     toldAt = Date.now();
@@ -12125,6 +12663,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!s) return null;
     s.cup = Math.round(Math.max(0, Math.min(20, Number(m.cup) || 0)));
     s.belly = m.bm === "studio" ? farm.body.belly : bellyAt(farm.body.belly, Math.max(0, Math.min(4, Math.round(Number(m.bs) || 0))));
+    s.gen = { inches: clampTo(m.ck || 6, GEN_IN), balls: clampTo(m.bl || 3, GEN_BALLS), pent: !!m.pt, style: clampTo(m.sy, [0, 2]) };
     return s;
   }
   function ask() {

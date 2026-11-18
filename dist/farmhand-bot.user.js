@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.76.0
+// @version      0.77.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.76.0";
-  var COMPANION_VERSION = "0.59.0";
+  var VERSION = "0.77.0";
+  var COMPANION_VERSION = "0.60.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6385,6 +6385,11 @@
         s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
         s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
         s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
+        if (bodyParts(mn).includes("penis")) {
+          s.drawn.cock = sizeOf(mn, "penis");
+          s.drawn.balls = sizeOf(mn, "testes");
+          s.drawn.pent = !!p.pentUp;
+        }
         s.ink = inkCounts(mn, p, now);
         if (inHeat(p)) s.heatUntil = p.heat.until;
         if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };

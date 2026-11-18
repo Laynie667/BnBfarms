@@ -83,6 +83,7 @@
       const names = Object.values(files).flat(), got = {};
       for (const n of names) {
         const im = new Image(), src = pics && pics[kind] && pics[kind][n];
+        if (!src && /^https?:/.test(base)) im.crossOrigin = "anonymous";   // (from GitHub, in the game: so its colours can be read)
         im.onload = () => { got[n] = picOf(im); if (Object.keys(got).length < names.length) return;
           stamps[kind] = { hard: files.hard.map((x) => got[x]), drained: got[files.drained], pent: got[files.pent], softShaft: got[files.softShaft], softSack: got[files.softSack] };
           ver++; if (done) done(kind); };

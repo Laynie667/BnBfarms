@@ -162,7 +162,8 @@ export const BOOK = {
   },
   // ── Nov 18: GROWTH OFF THE FARM (Laynie: "seems good"). The farm's own growth shots, anywhere: on the farm with
   // the farm girl in the room they're hers (her books); anywhere else your Dispensary keeps the size, and it stays.
-  // Your cup shows on the Companion's drawn breasts; the rest is counted till they're drawn too. ──
+  // Your cup shows on the Companion's drawn breasts, your cock and balls on its drawn cock; the ass is counted till
+  // it's drawn too. ──
   growcup: {
     label: "Udder Growth", icon: "🍈", mins: 0, color: "#f2b6c6", farm: true, instant: true, grow: "cup",
     words: /\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/,
@@ -179,13 +180,13 @@ export const BOOK = {
     label: "Cock Growth", icon: "🍆", mins: 0, color: "#c07090", farm: true, instant: true, grow: "cock",
     words: /\b(cock|penis|dick|shaft) (growth|enlarger)\b/,
     keywords: ["cock growth"],
-    desc: "A size longer for every dose, and it stays (counted now; drawn with the drawn cock).",
+    desc: "Two inches longer for every dose, and it stays. The Companion's drawn cock shows it.",
   },
   growballs: {
     label: "Balls Growth", icon: "🥚", mins: 0, color: "#d8a0b0", farm: true, instant: true, grow: "balls",
     words: /\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/,
     keywords: ["balls growth"],
-    desc: "A size heavier for every dose, and it stays (counted now; drawn with the drawn cock).",
+    desc: "A size heavier for every dose, and it stays. The Companion's drawn balls show it.",
   },
   reducing: {
     label: "Reducing Serum", icon: "🔻", mins: 0, color: "#90a0c0", farm: true, instant: true, grow: "less",

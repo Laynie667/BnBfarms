@@ -124,8 +124,9 @@ and running timers follow you between your phone and your PC, and clearing the b
    - **Limits:** 10 cups up and 6 down; 6 up and 3 down for the rest.
    - On the farm with the farm girl in the room, growth is hers, on her own books. Anywhere else the Dispensary keeps
      it, and the Purge doesn't undo it.
-   - The cup goes on top of whatever cup the Companion draws, yours or the farm's, and goes round the room with it. The
-     rest is counted for now and drawn once the drawn cock and hips are in.
+   - The cup goes on top of whatever cup the Companion draws, yours or the farm's, and goes round the room with it.
+     Cock and Balls Growth go on the Companion's drawn cock the same way (two inches a dose for the cock). The ass is
+     counted for now and drawn once the drawn body learns hips.
    **The farm girl's four voice potions** (built Nov 18): Honey Tongue, Golden Hour, Blue Ribbon Musk and Echo Elixir,
    from a crafted bottle, anywhere (on the farm too). Bought at her store, they're still hers.
    - **Honey Tongue:** her praise in your ear every few minutes, for 45 minutes. Only you hear it.

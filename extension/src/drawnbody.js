@@ -21,9 +21,16 @@
    handed over as itself broke every character refresh once (Companion 0.16.2, see belly.js). So every drawing of ours
    is trimmed to what's on it, turned into a picture address, and handed over by that. The game keeps every picture it
    was ever given, so the ones we no longer use are taken back out of its lists after a while.
+
+   THE DRAWN COCK (Nov 18, Laynie: "the balls should scale too, and it should blend better at the base", then "looked
+   great"). Where the game would draw its own cock, soft or hard, the studio's is drawn instead (studio/web/cock-drawing.js,
+   the human pictures she picked), at the length and ball size the farm has you at, with the pent-up sack when you're
+   pent up. Cock and Balls Growth from the Dispensary go on top, the same as the cup. Its pictures come from GitHub
+   (cock/v1/), the way the ink's do; till they've loaded it's the game's own picture.
 */
 import "../../studio/web/breasts-drawing.js";   // window.FarmBreasts: the breasts themselves
 import "../../studio/web/body-engine.js";       // window.FarmBodyEngine: the studio's drawing
+import "../../studio/web/cock-drawing.js";      // window.FarmCock: the drawn cock and balls (Nov 18)
 import { bellyDrawing, bellyTrial } from "./belly.js";
 import { makeMsg } from "../../shared/protocol.js";
 import { bcrOverBreast } from "./bcr.js";
@@ -44,6 +51,7 @@ let farm = null;                                   // { at, body }: the farm's l
 const onBot = () => !!(W.Player && W.Player.MemberNumber === BOT_MEMBER);
 const mine = { S: null, E: null };                 // you
 const others = new Map();                          // member number → { S, E, at }: what other Companions told us
+if (W.__FARMHAND_TEST__) W.__drawnBody = { mine, others };   // (for the tests)
 
 function load() {
   try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
@@ -57,7 +65,7 @@ function load() {
 // sizes in game need to automatically adjust based on how full or pregnant each player is", "same for tit sizes and
 // growth"): the bot says your cup as it counts it (1 AA ... 20 R, the same scale as here) and how big your belly is
 // (0 none ... 4 huge), and both change as the farm changes you.
-let farmMe = null;                                 // { cup, belly } for you, from the bot (state.drawn)
+let farmMe = null;                                 // { cup, belly, cock, balls, pent } for you, from the bot (state.drawn)
 const BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
 const bellyMode = () => S.bellyMode || (S.bellyOn ? "on" : "farm");
 function bellyAt(base, stage) {
@@ -80,7 +88,17 @@ function eff() {
   if (f && f.p === "cup") e.cup = cupWithFill(e.cup, f);
   const mode = bellyMode();
   e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, bellyStage());
+  e.gen = genOf();
   return e;
+}
+/* THE COCK'S SIZE: the farm's, if it counts one for you (inches, its ball size 1 to 20, pent up), or the farm's starting
+   6 inches and 3; then Cock and Balls Growth off the farm on top (2 inches a size, as the farm's own shots). The longest
+   is 36: at the farm's biggest (30) it already stands past the middle of her chest. */
+const GEN_IN = [3, 36], GEN_BALLS = [1, 20];
+const clampTo = (v, r) => Math.max(r[0], Math.min(r[1], Math.round(Number(v) || 0)));
+function genOf() {
+  const f = farmMe && farmMe.cock > 0 ? farmMe : null, g = grownAll();
+  return { inches: clampTo((f ? f.cock : 6) + 2 * g.cock, GEN_IN), balls: clampTo((f && f.balls > 0 ? f.balls : 3) + g.balls, GEN_BALLS), pent: !!(f && f.pent), style: clampTo(S.genStyle, [0, 2]) };
 }
 /* FILL-OUT (The Farmhand's Dispensary, Laynie Nov 17: "a temporary swell of cup, belly or ass over the dose, drawn by
    the engine, then it shrinks back"). While it's in you your drawn tits (two cups a dose, up to six) or belly (a stage or
@@ -97,9 +115,12 @@ function fillOut() {
 /* GROWTH OFF THE FARM (The Farmhand's Dispensary, Nov 18): Udder Growth taken anywhere but the farm stays, cup by cup,
    in the Dispensary's own book (on the farm it's the farm girl's, in the farm's cup above). It goes on top of whatever
    cup you'd have, yours or the farm's, and goes out with it like any cup, so every Companion draws it. */
-function grownCup() {
-  try { const D = W.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null; return g ? Math.round(Number(g.cup) || 0) : 0; } catch (e) { return 0; }
+function grownAll() {
+  const out = { cup: 0, cock: 0, balls: 0 };
+  try { const D = W.FarmhandDispensary, g = D && typeof D.grow === "function" ? D.grow() : null; if (g) for (const k of Object.keys(out)) out[k] = Math.round(Number(g[k]) || 0); } catch (e) { /* none */ }
+  return out;
 }
+const grownCup = () => grownAll().cup;
 function cupWithFill(cup, f) { const add = Math.min(6, 2 * f.x); return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add / 2) : add)); }
 function bellyWithFill(stage, f) {
   if (f.half) return Math.min(4, Math.max(stage + 1, 1));
@@ -108,7 +129,7 @@ function bellyWithFill(stage, f) {
 let fillSig = "";
 // every few seconds (index.js), and when the Dispensary says Fill-Out started or ended: redraw if it changed
 export function drawnBodyFillCheck() {
-  const f = fillOut(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + grownCup();   // (and growth off the farm)
+  const f = fillOut(), g = grownAll(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;   // (and growth off the farm)
   if (sig === fillSig) return false;
   fillSig = sig;
   if (!S.on) return false;
@@ -119,8 +140,9 @@ export function drawnBodyFillCheck() {
 export function drawnBodyFarmState(d) {
   if (!d || typeof d !== "object") return;
   const cup = Math.max(0, Math.min(20, Math.round(Number(d.cup) || 0))), belly = Math.max(0, Math.min(4, Math.round(Number(d.belly) || 0)));
-  if (farmMe && farmMe.cup === cup && farmMe.belly === belly) return;
-  farmMe = { cup, belly };
+  const cock = Math.max(0, Math.min(60, Math.round(Number(d.cock) || 0))), balls = Math.max(0, Math.min(20, Math.round(Number(d.balls) || 0))), pent = !!d.pent;   // (Nov 18: and the cock)
+  if (farmMe && farmMe.cup === cup && farmMe.belly === belly && farmMe.cock === cock && farmMe.balls === balls && farmMe.pent === pent) return;
+  farmMe = { cup, belly, cock, balls, pent };
   if (!S.on) return;
   if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
 }
@@ -194,6 +216,7 @@ const redraw = (soon) => { if (W.Player) redrawMn(W.Player.MemberNumber, soon); 
 function makeEngine(mn) {
   if (!W.FarmBelly) W.FarmBelly = bellyDrawing;
   if (typeof W.FarmBodyEngine !== "function" || !W.FarmBreasts) return null;
+  loadCock();   // (the cock's pictures, the first time anybody's drawn)
   const who = mn == null ? () => W.Player || null : () => charOf(mn);
   return W.FarmBodyEngine({
     S: { get C() { return who(); } },
@@ -226,7 +249,22 @@ function apply(E, s) {
   E.MOULD.items.clear(); E.MOULD.mode.clear(); if (refit) E.MOULD.out.clear();
   for (const it of (s.mould && s.mould.items) || []) E.MOULD.items.add(String(it));
   for (const [k, m] of Object.entries((s.mould && s.mould.mode) || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
-  E.GEN.drawn = false;          // the game's own cock: the drawn ones aren't ready
+  // the drawn cock, once its pictures are here (till then, and for a kind with none, the game's own)
+  const g = s.gen || {};
+  E.GEN.drawn = !!(W.FarmCock && W.FarmCock.hasStamps("human")); E.GEN.kind = "human"; E.GEN.knot = false; E.GEN.girth = 1;
+  E.GEN.inches = clampTo(g.inches || 6, GEN_IN); E.GEN.balls = clampTo(g.balls || 3, GEN_BALLS); E.GEN.pent = !!g.pent; E.GEN.style = clampTo(g.style, [0, 2]);
+}
+// the cock's pictures, from GitHub (as the ink's are), once; everybody drawn again when they're in
+export const COCK_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/cock/v1/";
+let cockAsked = false;
+function loadCock() {
+  if (cockAsked || !W.FarmCock || typeof W.FarmCock.loadStamps !== "function") return; cockAsked = true;
+  try {
+    W.FarmCock.loadStamps(COCK_HOST, () => {
+      if (mine.E) apply(mine.E, eff()); if (S.on) redraw(60);
+      for (const [mn, o] of others) if (o.E) { apply(o.E, o.S); redrawMn(mn, 60); }
+    });
+  } catch (e) { warnSome("[Farmhand Companion] drawn cock:", e); }
 }
 
 // settings from anywhere (the studio's code, the studio itself, another Companion): only what's expected, in range
@@ -239,6 +277,7 @@ function clean(d) {
   let n = 0; for (const [k, v] of Object.entries(d.wear || {})) if (n < 80 && /^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) { s.wear[k] = v; n++; }
   s.belly = {}; for (const k of ["std", "AllFours", "Hogtied"]) { const f = d.belly && d.belly[k]; if (!f || typeof f !== "object") continue; s.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) }; }
   s.auto = d.auto !== false; s.tuck = d.tuck !== false; s.dress = d.dress !== false;
+  if (d.gen && typeof d.gen === "object") s.gen = { inches: Math.round(num(d.gen.inches, GEN_IN[0], GEN_IN[1], 6)), balls: Math.round(num(d.gen.balls, GEN_BALLS[0], GEN_BALLS[1], 3)), pent: !!d.gen.pent, style: Math.round(num(d.gen.style, 0, 2, 0)) };
   s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
   for (const [k, m] of Object.entries((d.mould && d.mould.mode) || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
   // the farm's brand, as the studio placed it (on the bot's account this becomes the farm's: 10y9e-farm-look.js, 10uq-brand.js)
@@ -250,7 +289,7 @@ function clean(d) {
   return s;
 }
 // what's shared with the room: the settings, no more
-const shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
+const shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould, gen: s.gen });
 
 // ── telling the room, and hearing from it ──
 const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };
@@ -267,7 +306,8 @@ let lastTold = "";
 function tell(force) {
   if (onBot()) return;
   if (!force && Date.now() - toldAt < 8000) return;
-  const msg = !S.on ? { on: false } : S.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
+  const e = S.on ? eff() : null, gn = e && e.gen;
+  const msg = !S.on ? { on: false } : S.saved || !farm ? { on: true, body: shareOf(e) } : { on: true, farm: farm.at, cup: e.cup, bm: bellyMode(), bs: bellyStage(), ck: gn.inches, bl: gn.balls, pt: gn.pent ? 1 : 0, sy: gn.style };
   const sig = JSON.stringify(msg); if (!force && sig === lastTold) return;
   toldAt = Date.now(); lastTold = sig;
   send("body", msg);
@@ -278,6 +318,7 @@ function fromFarm(m) {
   const s = clean(farm.body); if (!s) return null;
   s.cup = Math.round(Math.max(0, Math.min(20, Number(m.cup) || 0)));
   s.belly = m.bm === "studio" ? farm.body.belly : bellyAt(farm.body.belly, Math.max(0, Math.min(4, Math.round(Number(m.bs) || 0))));
+  s.gen = { inches: clampTo(m.ck || 6, GEN_IN), balls: clampTo(m.bl || 3, GEN_BALLS), pent: !!m.pt, style: clampTo(m.sy, [0, 2]) };   // (an older Companion sends none: the farm's starting one)
   return s;
 }
 function ask() { if (onBot() || Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("bodyAsk", {}); }

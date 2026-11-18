@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.7.0
+// @version      0.8.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7680,7 +7680,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.7.0";
+  var VERSION = "0.8.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -9937,7 +9937,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     },
     // ── Nov 18: GROWTH OFF THE FARM (Laynie: "seems good"). The farm's own growth shots, anywhere: on the farm with
     // the farm girl in the room they're hers (her books); anywhere else your Dispensary keeps the size, and it stays.
-    // Your cup shows on the Companion's drawn breasts; the rest is counted till they're drawn too. ──
+    // Your cup shows on the Companion's drawn breasts, your cock and balls on its drawn cock; the ass is counted till
+    // it's drawn too. ──
     growcup: {
       label: "Udder Growth",
       icon: "\u{1F348}",
@@ -9972,7 +9973,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       grow: "cock",
       words: /\b(cock|penis|dick|shaft) (growth|enlarger)\b/,
       keywords: ["cock growth"],
-      desc: "A size longer for every dose, and it stays (counted now; drawn with the drawn cock)."
+      desc: "Two inches longer for every dose, and it stays. The Companion's drawn cock shows it."
     },
     growballs: {
       label: "Balls Growth",
@@ -9984,7 +9985,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       grow: "balls",
       words: /\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/,
       keywords: ["balls growth"],
-      desc: "A size heavier for every dose, and it stays (counted now; drawn with the drawn cock)."
+      desc: "A size heavier for every dose, and it stays. The Companion's drawn balls show it."
     },
     reducing: {
       label: "Reducing Serum",

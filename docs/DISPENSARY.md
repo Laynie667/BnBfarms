@@ -217,6 +217,21 @@ and running timers follow you between your phone and your PC, and clearing the b
      (`dispCream`). It wells back out (a line for the room, cum on your chest for the Companion) and is counted, its own
      count (Laynie: "its own count"). On the farm the farm girl's told (`dispNipLoad`): her own count on `?stats`, and it
      comes back out creamy with the next milkin'.
+   - **Nipple toys** (built Nov 18; Laynie: "maybe make them plug able with certain toys? like beads, dildos,
+     vibrators, etc?", "I mean art for existing items", "the dildos could look more like how the plugs do"): fifteen of
+     the game's own toys made to fit an open nipple, in the game's own nipple slot (toys-list.js, toys.js): the silver
+     and black beads, the black, heart, demon-tail, lock and vibrating plugs, the pump-up plug and dildo, the vibrating and
+     wired eggs, the Ben Wa balls, the dildo and the vibrating dildo (both front-on, like the plugs), and the sound.
+     - They're in the normal item menu. Whoever owns the game's toy owns its nipple version.
+     - They copy their game toy's settings: the beads' count (1 to 5 in), the pump-ups' inflate and vibrate levels,
+       the vibrators' remote, the lock plug's lock.
+     - Only into open nipples ("Those nipples aren't open" otherwise). Once in, they hold them open (a pump-up wider the
+       more it's pumped), so the stretch trains while they're in. Nobody can fuck or finger a plugged nipple.
+     - Closin' them up (the page, `/dispensary nips close`, a Tightening Balm) pushes the toy out; a locked one stays,
+       holdin' them open, till whoever holds its key takes it out.
+     - Pictures: the repo's toys/v1, one per breast size and state, drawn by tools/nipple-toys-art.js. The Companion's
+       drawn breasts carry them like any nipple item. Only people with the Dispensary see them; in chat everybody reads
+       the toy's name.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

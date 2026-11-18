@@ -36,6 +36,7 @@ import { allowed } from "./ladder.js";
 import { action } from "./say.js";
 import { LINES } from "./lines.js";
 import { local, pick, fill, nameOf } from "./say.js";
+import { toyIn, toyOf, toyOpen, toyLocked } from "./toys-list.js";
 
 const W = window;
 const me = () => (W.Player && W.Player.MemberNumber) || 0;
@@ -48,7 +49,7 @@ function heldOpen() {
   let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
   const p = mine().nips;
   if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
-  return n;
+  return Math.max(n, toyOpen(W.Player));   // (a toy in them holds them open too: toys-list.js)
 }
 // THE STRETCH THAT STAYS: st().nipTrain { lvl (0 to 3), at (last looked at), open (last held open), used (last used) }
 const MIN = 60000, HOUR = 3600000, DAY = 86400000;
@@ -66,8 +67,17 @@ export function nipsTrainTick(now) {
   else if (st().nipsHeal !== false && T.lvl > 0 && now - Math.max(T.open || 0, T.used || 0) > TRAIN.grace) T.lvl = Math.max(0, T.lvl - TRAIN.perDay * dt / DAY);
 }
 // put them back as they were: the Dilator out, the leeches off, the stretch gone
+// A toy in them comes out with it (the game's item off); a locked one won't, and holds them open: its key first.
+let popped = "";
+export const lastPopped = () => popped;
 export function nipsClose(quiet) {
+  const toy = toyIn(W.Player); popped = "";
+  if (toy && toyLocked(toy)) return 0;
   const was = nipsOpen();
+  if (toy) {
+    popped = toyOf(toy).label;
+    try { W.InventoryRemove(W.Player, "ItemNipples", false); if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(W.Player); if (typeof W.ChatRoomCharacterItemUpdate === "function") W.ChatRoomCharacterItemUpdate(W.Player, "ItemNipples"); } catch (e) { /* fine */ }
+  }
   st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 };
   try { if (active("dilator")) end("dilator", "quiet"); } catch (e) { /* fine */ }
   try { if (mine().nips) letGo("nips", "quiet"); } catch (e) { /* fine */ }
@@ -156,7 +166,7 @@ export const nipLoads = () => ({ n: st().nipLoads || 0, by: Object.assign({}, st
 export function nipsLscg(api, caps) {
   if (!api || !caps || !caps.has("activities") || mode) return false;
   try {
-    api.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 });
+    api.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 && !toyIn(acted) });   // (open, and nothin' plugged in them)
     api.activities.registerPrerequisite({ name: "hascock", check: ({ acting }) => hasCock(charOf(acting && acting.MemberNumber)) });
     for (const k of Object.keys(ACTS)) {
       const A = ACTS[k];
@@ -195,7 +205,7 @@ function addOwn(mod) {
   }
   const hook = (fn, pri, f) => { try { mod.hookFunction(fn, pri, f); } catch (e) { console.warn("[Dispensary] nipples can't hook " + fn + ":", e); } };
   hook("ActivityCheckPrerequisite", 5, (args, next) => {
-    if (args[0] === "FarmDispNipsOpen") { try { return openOf(args[2] && args[2].MemberNumber) > 0; } catch (e) { return false; } }
+    if (args[0] === "FarmDispNipsOpen") { try { return openOf(args[2] && args[2].MemberNumber) > 0 && !toyIn(args[2]); } catch (e) { return false; } }
     if (args[0] === "FarmDispHasCock") return hasCock(args[1]);
     return next(args);
   });

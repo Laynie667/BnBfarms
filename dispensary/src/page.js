@@ -15,7 +15,8 @@ import { lscgPresent, lscgApi } from "./lscg.js";
 import { safeword } from "./safeword.js";
 import { ANIMALS } from "../../shared/noises.js";
 import { hardOn, keyholders, lock, dueAt, hardLog, wards, keyDo, wardState, CHECK_DAYS, addKey, removeKey } from "./hardcore.js";
-import { nipsOpen, trainedLevel, nipsClose, nipLoads } from "./nipples.js";
+import { nipsOpen, trainedLevel, nipsClose, lastPopped, nipLoads } from "./nipples.js";
+import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 
 const W = window, ID = "FarmhandDispensary";
 let box = null, note = "";
@@ -238,13 +239,13 @@ function view() {
   kids.push(h("h3", null, "Nipples"));
   { const n = nipsOpen(), t = trainedLevel(), loads = nipLoads();
     kids.push(h("div", { class: "fd-card" },
-      h("div", null, (n ? "⭕ Open, " + n + " wide" : "Closed") + (t ? " · trained to stay " + t + " wide" : "") + (loads.n ? " · loads taken in them: " + loads.n : "")),
+      h("div", null, (n ? "⭕ Open, " + n + " wide" : "Closed") + (t ? " · trained to stay " + t + " wide" : "") + (loads.n ? " · loads taken in them: " + loads.n : "") + (mineToy() ? " · the " + toyOf(mineToy()).label + " in them" : "")),
       h("label", { style: { marginTop: "6px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.nipsHeal !== false ? true : undefined, onchange: (e) => { st().nipsHeal = e.target.checked; save(); draw(); } }),
         h("b", null, "They close up slowly on their own")),
       h("div", { class: "fd-muted" }, "Held open (the Nipple Dilator, the leeches) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
       h("div", { class: "fd-row", style: { marginTop: "6px" } },
-        h("button", { disabled: locked || !n ? true : undefined, onclick: () => { nipsClose(true); note = "Your nipples are closed back up, snug as they ever were."; draw(); } }, "Close them up"),
-        h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : "The Dilator out, the leeches off, the stretch undone. A Tightening Balm does it too."))));
+        h("button", { disabled: locked || !n || toyLocked(mineToy()) ? true : undefined, onclick: () => { nipsClose(true); const out = lastPopped(); note = (out ? "The " + out + " slides out, and your" : "Your") + " nipples are closed back up, snug as they ever were."; draw(); } }, "Close them up"),
+        h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : toyLocked(mineToy()) ? "The " + toyOf(mineToy()).label + "'s locked in, holdin' them open: its key first." : "The Dilator out, the leeches off, any toy out, the stretch undone. A Tightening Balm does it too."))));
   }
   // crafted parasites (Nov 18, parasites.js): each kind yours to switch on
   kids.push(h("h3", null, "Parasites"));

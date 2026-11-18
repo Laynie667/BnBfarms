@@ -13,7 +13,9 @@ import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, mo
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
-import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel } from "./nipples.js";
+import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped } from "./nipples.js";
+import { initToys } from "./toys.js";
+import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import "./lines-nips.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
@@ -40,6 +42,7 @@ if (W.__farmDispensary) {
 const mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
 W.__farmDispensary = VERSION;
 registerInk(W, mod);   // the ink and brand slots, the same as the Companion's (whichever loads first adds them)
+initToys(mod, { nipsOpen: () => nipsOpen(), openOf: (mn) => openOf(mn) });   // the nipple toys, in the game's nipple slot (before your own clothes load)
 
 // LSCG can load before or after us, and before login: its queue waits either way
 initLscg();
@@ -60,9 +63,13 @@ function commands() {
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
         const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
         if (nm) {
-          if (nm[1] === "close" || nm[1] === "reset") { if (hardOn()) { local("🔒 Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it)."); return; } local(nipsClose(true) ? "Your nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar."); return; }
+          if (nm[1] === "close" || nm[1] === "reset") { if (hardOn()) { local("🔒 Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it)."); return; }
+            const lt = mineToy(); if (lt && toyLocked(lt)) { local("🔒 The " + toyOf(lt).label + "'s locked in, holdin' them open. Whoever holds its key has to take it out first."); return; }
+            const was = nipsClose(true), out = lastPopped();
+            local(was ? (out ? "The " + out + " slides out, and your" : "Your") + " nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar."); return; }
           if (nm[1] === "heal" && nm[2]) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().nipsHeal = nm[2] === "on"; save(); local(nm[2] === "on" ? "Your nipples will close up slowly on their own, once they've been left be a while." : "Your nipples stay as stretched as they're trained, till somebody closes them up."); return; }
-          const L2 = nipLoads(); local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " +
+          const L2 = nipLoads(), tw = mineToy(); local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " +
+            (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") +
             (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close · /dispensary nips heal on|off"); return;
         }
         if (/^(safe|safeword|red)$/.test(a)) { safeword("command"); return; }

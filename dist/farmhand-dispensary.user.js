@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.14.0
+// @version      0.15.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5748,8 +5748,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W17, H) {
-    const t = cy - H / 2, L = cx - W17 / 2, R = cx + W17 / 2;
+  function shield(g, cx, cy, W19, H) {
+    const t = cy - H / 2, L = cx - W19 / 2, R = cx + W19 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6591,9 +6591,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W17 = 192, H = 226;
+        const x0 = 94, y0 = 12, W19 = 192, H = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W17, H);
+        g.strokeRect(x0, y0, W19, H);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6601,20 +6601,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W17 - 8, yy);
+            g.fillText(right, x0 + W19 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W17 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W19 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W17 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W19 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W17 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W19 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W17 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W19 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7086,8 +7086,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W17, d, V) {
-    doc = W17.document;
+  function drawCard(W19, d, V) {
+    doc = W19.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7115,7 +7115,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W17, d, m, layer, V) {
+  function picture(W19, d, m, layer, V) {
     const key2 = d.name + "|" + JSON.stringify(V);
     let set2 = cache.get(key2);
     if (set2) {
@@ -7124,30 +7124,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W17, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W19, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key2, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W17, u);
+      for (const u of Object.values(os)) forget(W19, u);
     }
     return set2[layer] || null;
   }
-  function forget(W17, url) {
+  function forget(W19, url) {
     try {
-      const m = W17.GLDrawImageCache;
+      const m = W19.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W17.DrawImageCache;
+      const m = W19.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W17.GLDrawCanvas && W17.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W19.GLDrawCanvas && W19.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7251,19 +7251,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W17, a) {
-    Wd = W17;
+  function openInkPanel(W19, a) {
+    Wd = W19;
     api = a;
     close();
-    if (!W17.document.getElementById("fi-style")) {
-      const s = W17.document.createElement("style");
+    if (!W19.document.getElementById("fi-style")) {
+      const s = W19.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W17.document.head.appendChild(s);
+      W19.document.head.appendChild(s);
     }
-    box = W17.document.createElement("div");
+    box = W19.document.createElement("div");
     box.id = "fi-panel";
-    W17.document.body.appendChild(box);
+    W19.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7359,9 +7359,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
-  function describe(W17) {
+  function describe(W19) {
     for (const slot of ALL_SLOTS) {
-      const G = W17.AssetGroupMap && W17.AssetGroupMap.get(slot);
+      const G = W19.AssetGroupMap && W19.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7370,32 +7370,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W17) => typeof W17.AssetGroupAdd === "function" && typeof W17.AssetAdd === "function" && W17.AssetGroupMap && W17.AssetGroupMap.size > 30;
-  function addSlots(W17) {
+  var gameReady = (W19) => typeof W19.AssetGroupAdd === "function" && typeof W19.AssetAdd === "function" && W19.AssetGroupMap && W19.AssetGroupMap.size > 30;
+  function addSlots(W19) {
     let added = false;
     for (const slot of ALL_SLOTS) {
-      if (W17.AssetGroupMap.has(slot)) continue;
-      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W17.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W17.AssetAdd(G, a, W17.AssetFemale3DCGExtended || {}, def);
+      if (W19.AssetGroupMap.has(slot)) continue;
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W19.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W19.AssetAdd(G, a, W19.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
-    describe(W17);
+    describe(W19);
     return added;
   }
   var itemIn = (C, slot) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C) => ({ num: C && C.MemberNumber, owner: C && C.Ownership && typeof C.Ownership.Name === "string" ? C.Ownership.Name : "" });
-  function liveSrc(W17, C, slot, name, layer) {
+  function liveSrc(W19, C, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W17, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
+      return picture(W19, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W17) {
-    const P = W17.Player, out = [];
+  function wornLive(W19) {
+    const P = W19.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7403,8 +7403,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W17, slot, values, now) {
-    const it = itemIn(W17.Player, slot);
+  function write(W19, slot, values, now) {
+    const it = itemIn(W19.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7414,17 +7414,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W17), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W19), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(W17.Player);
+      if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(W19.Player);
     } catch (e) {
     }
     try {
-      if (typeof W17.ChatRoomCharacterItemUpdate === "function") W17.ChatRoomCharacterItemUpdate(W17.Player, slot);
+      if (typeof W19.ChatRoomCharacterItemUpdate === "function") W19.ChatRoomCharacterItemUpdate(W19.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7432,17 +7432,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var retry = {};
   var counts = {};
   var DAY = 864e5;
-  var cumKey = (W17) => "farmink-lastcum-" + (W17.Player && W17.Player.MemberNumber);
-  function daysDenied(W17) {
+  var cumKey = (W19) => "farmink-lastcum-" + (W19.Player && W19.Player.MemberNumber);
+  function daysDenied(W19) {
     let t = 0;
     try {
-      t = Number(W17.localStorage.getItem(cumKey(W17))) || 0;
+      t = Number(W19.localStorage.getItem(cumKey(W19))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W17, auto) {
-    if (auto === "denied") return { n: daysDenied(W17) };
+  function autoOf(W19, auto) {
+    if (auto === "denied") return { n: daysDenied(W19) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
@@ -7450,12 +7450,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W17) {
-    for (const { slot, name, item } of wornLive(W17)) {
+  function refreshAuto(W19) {
+    for (const { slot, name, item } of wornLive(W19)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W17, d.auto);
-      if (v) write(W17, slot, v);
+      const v = autoOf(W19, d.auto);
+      if (v) write(W19, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7490,7 +7490,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W17) => "farmink-done-" + (W17.Player && W17.Player.MemberNumber);
+  var doneKey = (W19) => "farmink-done-" + (W19.Player && W19.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
@@ -7503,21 +7503,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W17, list, on2, now, opts) {
+  function farmInkSync(W19, list, on2, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P = W17.Player;
-    if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W17.InventoryWear !== "function") return null;
+    const P = W19.Player;
+    if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W19.InventoryWear !== "function") return null;
     now = now || Date.now();
     const want = on2 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed = [];
     let done = {};
     try {
-      done = JSON.parse(W17.localStorage.getItem(doneKey(W17))) || {};
+      done = JSON.parse(W19.localStorage.getItem(doneKey(W19))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W17.InventoryRemove === "function") W17.InventoryRemove(P, slot, false);
+        if (typeof W19.InventoryRemove === "function") W19.InventoryRemove(P, slot, false);
         else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7564,7 +7564,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (itemIn(P, slot)) remove(slot);
       const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W17.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false);
+        W19.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
@@ -7579,29 +7579,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W17.localStorage.setItem(doneKey(W17), JSON.stringify(done));
+      W19.localStorage.setItem(doneKey(W19), JSON.stringify(done));
     } catch (e) {
     }
     if (changed.length) {
       try {
-        if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(P);
+        if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(P);
       } catch (e) {
       }
       try {
-        if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(P);
+        if (typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(P);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W17) => {
-    const id = farmOf(itemIn(W17.Player, BRAND_SLOT));
+  var farmBrandWorn = (W19) => {
+    const id = farmOf(itemIn(W19.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W17, C) => {
+  var dosed = (W19, C) => {
     try {
-      const D = W17.FarmhandDispensary;
+      const D = W19.FarmhandDispensary;
       return !!(D && typeof D.dosedOf === "function" && C && D.dosedOf(C.MemberNumber));
     } catch (e) {
       return false;
@@ -7619,29 +7619,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.trophy === "string" ? f.trophy : null;
   };
-  function trophyWorn(W17) {
+  function trophyWorn(W19) {
     const o = {};
     for (const s of INK_SLOTS) {
-      const id = trophyOf(itemIn(W17.Player, s));
+      const id = trophyOf(itemIn(W19.Player, s));
       if (id) o[id] = s;
     }
     return o;
   }
-  var roomSees = (W17, P) => {
+  var roomSees = (W19, P) => {
     try {
-      if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(P);
+      if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(P);
     } catch (e) {
     }
     try {
-      if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(P);
+      if (typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(P);
     } catch (e) {
     }
   };
-  function trophyWear(W17, t, slot) {
-    const P = W17.Player;
-    if (!P || !Array.isArray(P.Appearance) || typeof W17.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  function trophyWear(W19, t, slot) {
+    const P = W19.Player;
+    if (!P || !Array.isArray(P.Appearance) || typeof W19.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
     if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
-    const worn = trophyWorn(W17);
+    const worn = trophyWorn(W19);
     if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
     if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
     slot = slot || INK_SLOTS.find((s) => !itemIn(P, s));
@@ -7651,100 +7651,100 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }) };
     if (itemIn(P, slot)) {
       try {
-        W17.InventoryRemove(P, slot, false);
+        W19.InventoryRemove(P, slot, false);
       } catch (e) {
         return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
       }
     }
     try {
-      W17.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false);
+      W19.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false);
     } catch (e) {
       return { ok: false, why: "the game wouldn't take it" };
     }
     const it = itemIn(P, slot);
     if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
-    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W17, d.auto) : null;
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W19, d.auto) : null;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
-    roomSees(W17, P);
+    roomSees(W19, P);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
-  function trophyOff(W17, id) {
-    const P = W17.Player, slot = P && trophyWorn(W17)[id];
+  function trophyOff(W19, id) {
+    const P = W19.Player, slot = P && trophyWorn(W19)[id];
     if (!slot) return { ok: true, already: true };
     try {
-      if (typeof W17.InventoryRemove === "function") W17.InventoryRemove(P, slot, false);
+      if (typeof W19.InventoryRemove === "function") W19.InventoryRemove(P, slot, false);
       else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
     } catch (e) {
       return { ok: false, why: "it wouldn't come off" };
     }
-    roomSees(W17, P);
+    roomSees(W19, P);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W17, t) => {
+  var say = (W19, t) => {
     try {
-      if (typeof W17.ChatRoomSendLocal === "function") {
-        const d = W17.document.createElement("div");
+      if (typeof W19.ChatRoomSendLocal === "function") {
+        const d = W19.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W17.ChatRoomSendLocal(d.outerHTML);
+        W19.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W17) {
+  function wornAll(W19) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W17.Player, slot);
+      const it = itemIn(W19.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W17) => ({ worn: () => wornAll(W17), write: (slot, v) => write(W17, slot, v, true), command: (a) => inkCommand(W17, a) });
-  function inkCommand(W17, args) {
+  var panelApi = (W19) => ({ worn: () => wornAll(W19), write: (slot, v) => write(W19, slot, v, true), command: (a) => inkCommand(W19, a) });
+  function inkCommand(W19, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W17);
-    if (!a && W17.document && W17.document.body) {
-      openInkPanel(W17, panelApi(W17));
+    const worn = wornLive(W19);
+    if (!a && W19.document && W19.document.body) {
+      openInkPanel(W19, panelApi(W19));
       return;
     }
-    if (/^why$/i.test(a)) return say(W17, whyText());
+    if (/^why$/i.test(a)) return say(W19, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W17.Player, slot2)) return say(W17, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W17, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W17, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W19.Player, slot2)) return say(W19, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W19, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W19, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W17, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W17, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W19, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W19, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W17.Player, slot);
-    if (!it) return say(W17, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W17, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W19.Player, slot);
+    if (!it) return say(W19, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W19, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W17, "");
+    if (!rest) return inkCommand(W19, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W17, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W17, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W17);
-    say(W17, "Written on " + d.title + ".");
+    else return say(W19, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W19, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W19);
+    say(W19, "Written on " + d.title + ".");
   }
-  function farmInkEntry(W17) {
-    const PD = W17.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W17.PropertyDataEntry;
+  function farmInkEntry(W19) {
+    const PD = W19.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W19.PropertyDataEntry;
     if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
     const same = (a, b) => {
       try {
@@ -7767,9 +7767,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return true;
   }
-  function registerInk(W17, mod2) {
-    if (W17.__farmInk) return W17.__farmInk;
-    const st2 = W17.__farmInk = {
+  function registerInk(W19, mod2) {
+    if (W19.__farmInk) return W19.__farmInk;
+    const st2 = W19.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7779,26 +7779,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W17);
+            refreshAuto(W19);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W17, slot, v, true),
-      command: (a) => inkCommand(W17, a),
+      write: (slot, v) => write(W19, slot, v, true),
+      command: (a) => inkCommand(W19, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on2, opts) => farmInkSync(W17, list, on2, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W17),
+      farm: (list, on2, opts) => farmInkSync(W19, list, on2, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W19),
       // trophies (the Companion's 🏆 Trophies row)
-      trophyWear: (t2, slot) => trophyWear(W17, t2, slot),
-      trophyOff: (id) => trophyOff(W17, id),
-      trophyWorn: () => trophyWorn(W17),
-      worn: () => wornLive(W17).map(({ slot, name }) => ({ slot, name }))
+      trophyWear: (t2, slot) => trophyWear(W19, t2, slot),
+      trophyOff: (id) => trophyOff(W19, id),
+      trophyWorn: () => trophyWorn(W19),
+      worn: () => wornLive(W19).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook = (name, pri, fn) => {
         try {
-          if (typeof W17[name] === "function") mod2.hookFunction(name, pri, fn);
+          if (typeof W19[name] === "function") mod2.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7819,7 +7819,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W17);
+          describe(W19);
         } catch (e) {
         }
         return r;
@@ -7837,14 +7837,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen = /* @__PURE__ */ new Set(), notReady = [];
         const ready = (u) => {
           try {
-            const c = W17.GLDrawImageCache;
+            const c = W19.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain, self, u, x, y, o) => {
-          const T = W17.__farmInkTint;
+          const T = W19.__farmInkTint;
           if (typeof T !== "function") return false;
           let t2;
           try {
@@ -7884,7 +7884,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W17, C, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W19, C, lm[1], lm[2], lm[3]);
               seen.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
@@ -7898,7 +7898,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W17, C)) return void 0;
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W19, C)) return void 0;
               const it = stillItem(C, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -7911,7 +7911,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W17, C, seen, notReady);
+          note2(W19, C, seen, notReady);
         } catch (e) {
         }
         return out;
@@ -7927,7 +7927,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C);
+          if (back && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C);
         } catch (e) {
         }
         return r;
@@ -7944,8 +7944,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             back++;
           }
           if (back) {
-            if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(C, false);
-            if (args[2] && typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(C);
+            if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(C, false);
+            if (args[2] && typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(C);
           }
         } catch (e) {
         }
@@ -7954,13 +7954,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W17);
+          addSlots(W19);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      if (typeof W17.ItemPropertiesGetBundleProperties === "function") hook("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+      if (typeof W19.ItemPropertiesGetBundleProperties === "function") hook("ItemPropertiesGetBundleProperties", 0, (args, next) => {
         const r = next(args);
         try {
           const it = args[0];
@@ -7969,13 +7969,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      farmInkEntry(W17);
+      farmInkEntry(W19);
       hook("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W17.ActivityOrgasmRuined) {
-            W17.localStorage.setItem(cumKey(W17), String(Date.now()));
-            setTimeout(() => refreshAuto(W17), 1e3);
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W19.ActivityOrgasmRuined) {
+            W19.localStorage.setItem(cumKey(W19), String(Date.now()));
+            setTimeout(() => refreshAuto(W19), 1e3);
           }
         } catch (e) {
         }
@@ -7983,53 +7983,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W17)) return;
+      if (!gameReady(W19)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W17);
+        addSlots(W19);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C of W17.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C);
+          for (const C of W19.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C);
         } catch (e) {
         }
       });
       try {
-        if (typeof W17.CommandCombine === "function") W17.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W17, a) }]);
+        if (typeof W19.CommandCombine === "function") W19.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W19, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W17.Player && W17.Player.Appearance) refreshAuto(W17);
+        if (W19.Player && W19.Player.Appearance) refreshAuto(W19);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W17.addEventListener("farmhand-dispensary", (e) => {
+      W19.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W17.Player && W17.Player.MemberNumber;
-        const C = (W17.Player && W17.Player.MemberNumber === mn ? W17.Player : (W17.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C && wearsDosedOnly(C) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C);
+        const mn = d.type === "icons" ? d.from : W19.Player && W19.Player.MemberNumber;
+        const C = (W19.Player && W19.Player.MemberNumber === mn ? W19.Player : (W19.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C && wearsDosedOnly(C) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C of W17.ChatRoomCharacter || []) if (stillChanging(C, now) && typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C);
+        for (const C of W19.ChatRoomCharacter || []) if (stillChanging(C, now) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W17, C, seen, notReady) {
+  function note2(W19, C, seen, notReady) {
     if (!C || !Array.isArray(C.Appearance)) return;
     const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
@@ -8049,7 +8049,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.14.0";
+  var VERSION = "0.15.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -9929,17 +9929,51 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
-  // dispensary/src/nipples.js
+  // dispensary/src/toys-list.js
   var W9 = window;
-  var me4 = () => W9.Player && W9.Player.MemberNumber || 0;
-  var charOf3 = (mn) => (mn === me4() ? W9.Player : (W9.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-  var inRoom2 = () => W9.CurrentScreen === "ChatRoom" && typeof W9.ServerSend === "function";
+  var TOYS = [
+    { id: "FarmNipBeadsXL", from: ["ItemButt", "AnalBeads2"], label: "Nipple Beads XL", open: 2, states: "typed" },
+    { id: "FarmNipBeads", from: ["ItemButt", "AnalBeads"], label: "Nipple Beads", open: 3 },
+    { id: "FarmNipPlug", from: ["ItemButt", "BlackButtPlug"], label: "Black Nipple Plug", open: 3 },
+    { id: "FarmNipHeartPlug", from: ["ItemButt", "SuccubusHeartButtPlug"], label: "Succubus Heart Nipple Plug", open: 2 },
+    { id: "FarmNipDemonPlug", from: ["ItemButt", "DemonPlug"], label: "Demon Tail Nipple Plug", open: 2 },
+    { id: "FarmNipLockPlug", from: ["ItemButt", "ButtPlugLock"], label: "Nipple Plug Lock", open: 3, lock: true },
+    { id: "FarmNipPumpPlug", from: ["ItemButt", "InflVibeButtPlug"], label: "Inflatable Vibrating Nipple Plug", open: 2, states: "pump", vibe: "modular" },
+    { id: "FarmNipVibePlug", from: ["ItemButt", "VibratingButtplug"], label: "Vibrating Nipple Plug", open: 3, vibe: true },
+    { id: "FarmNipEgg", from: ["ItemVulva", "VibratingEgg"], label: "Nipple Vibrating Egg", open: 2, vibe: true },
+    { id: "FarmNipWiredEgg", from: ["ItemVulva", "WiredEgg"], label: "Wired Nipple Egg", open: 2, vibe: true },
+    { id: "FarmNipBenWa", from: ["ItemVulva", "BenWaBalls"], label: "Nipple Ben Wa Balls", open: 2 },
+    { id: "FarmNipDildo", from: ["ItemVulva", "PenisDildo"], label: "Nipple Dildo", open: 3 },
+    { id: "FarmNipVibeDildo", from: ["ItemVulva", "VibratingDildo"], label: "Vibrating Nipple Dildo", open: 3, vibe: true },
+    { id: "FarmNipPumpDildo", from: ["ItemVulva", "InflatableVibeDildo"], label: "Inflatable Vibrating Nipple Dildo", open: 3, states: "pump", vibe: "modular" },
+    { id: "FarmNipSound", from: ["ItemVulvaPiercings", "UrethralSound"], label: "Nipple Sound", open: 1 }
+  ];
+  var TOY_BY = Object.fromEntries(TOYS.map((t) => [t.id, t]));
+  function toyIn(C) {
+    const it = C && Array.isArray(C.Appearance) ? C.Appearance.find((i) => i && i.Asset && i.Asset.Group && i.Asset.Group.Name === "ItemNipples") : null;
+    return it && TOY_BY[it.Asset.Name] ? it : null;
+  }
+  var toyOf = (it) => it && it.Asset ? TOY_BY[it.Asset.Name] || null : null;
+  var toyLocked = (it) => !!(it && it.Property && it.Property.LockedBy);
+  function toyOpen(C) {
+    const it = toyIn(C), T = toyOf(it);
+    if (!T) return 0;
+    const f = T.states === "pump" ? Number(it.Property && it.Property.InflateLevel) || 0 : 0;
+    return Math.max(1, Math.min(3, T.open + Math.ceil(f / 2)));
+  }
+  var mineToy = () => toyIn(W9.Player);
+
+  // dispensary/src/nipples.js
+  var W10 = window;
+  var me4 = () => W10.Player && W10.Player.MemberNumber || 0;
+  var charOf3 = (mn) => (mn === me4() ? W10.Player : (W10.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+  var inRoom2 = () => W10.CurrentScreen === "ChatRoom" && typeof W10.ServerSend === "function";
   var others = /* @__PURE__ */ new Map();
   function heldOpen() {
     let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
     const p = mine().nips;
     if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
-    return n;
+    return Math.max(n, toyOpen(W10.Player));
   }
   var MIN4 = 6e4;
   var HOUR2 = 36e5;
@@ -9959,8 +9993,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (T.lvl < held) T.lvl = Math.min(held, T.lvl + TRAIN.step * dt / TRAIN.every);
     } else if (st().nipsHeal !== false && T.lvl > 0 && now - Math.max(T.open || 0, T.used || 0) > TRAIN.grace) T.lvl = Math.max(0, T.lvl - TRAIN.perDay * dt / DAY4);
   }
+  var popped = "";
+  var lastPopped = () => popped;
   function nipsClose(quiet) {
+    const toy = toyIn(W10.Player);
+    popped = "";
+    if (toy && toyLocked(toy)) return 0;
     const was = nipsOpen();
+    if (toy) {
+      popped = toyOf(toy).label;
+      try {
+        W10.InventoryRemove(W10.Player, "ItemNipples", false);
+        if (typeof W10.CharacterRefresh === "function") W10.CharacterRefresh(W10.Player);
+        if (typeof W10.ChatRoomCharacterItemUpdate === "function") W10.ChatRoomCharacterItemUpdate(W10.Player, "ItemNipples");
+      } catch (e) {
+      }
+    }
     st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 };
     try {
       if (active("dilator")) end("dilator", "quiet");
@@ -9984,7 +10032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var told2 = 0;
   var tellPage = (detail) => {
     try {
-      W9.dispatchEvent(new W9.CustomEvent("farmhand-dispensary", { detail }));
+      W10.dispatchEvent(new W10.CustomEvent("farmhand-dispensary", { detail }));
     } catch (e) {
     }
   };
@@ -9998,7 +10046,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!inRoom2() || !force && n === told2 || force && !n) return false;
     told2 = n;
     try {
-      W9.ServerSend("ChatRoomChat", makeMsg("dispNips", { n }));
+      W10.ServerSend("ChatRoomChat", makeMsg("dispNips", { n }));
       return true;
     } catch (e) {
       return false;
@@ -10065,10 +10113,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function onMyClimax() {
     const f = lastFuck;
     lastFuck = null;
-    if (!f || Date.now() - f.at > CREAM_WINDOW || W9.ActivityOrgasmRuined) return;
-    if (!hasCock(W9.Player) || !charOf3(f.target)) return;
+    if (!f || Date.now() - f.at > CREAM_WINDOW || W10.ActivityOrgasmRuined) return;
+    if (!hasCock(W10.Player) || !charOf3(f.target)) return;
     try {
-      W9.ServerSend("ChatRoomChat", makeMsg("dispCream", {}, f.target));
+      W10.ServerSend("ChatRoomChat", makeMsg("dispCream", {}, f.target));
     } catch (e) {
       return;
     }
@@ -10091,7 +10139,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     save();
     action(fill(pick(LINES.nips.creamed), { by: nameOf(from) }));
     try {
-      W9.dispatchEvent(new W9.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["chest"], amount: 1 } }));
+      W10.dispatchEvent(new W10.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["chest"], amount: 1 } }));
     } catch (e) {
     }
     if (onFarmLoad) {
@@ -10105,7 +10153,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function nipsLscg(api3, caps2) {
     if (!api3 || !caps2 || !caps2.has("activities") || mode) return false;
     try {
-      api3.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 });
+      api3.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 && !toyIn(acted) });
       api3.activities.registerPrerequisite({ name: "hascock", check: ({ acting }) => hasCock(charOf3(acting && acting.MemberNumber)) });
       for (const k of Object.keys(ACTS)) {
         const A = ACTS[k];
@@ -10141,9 +10189,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var TEXT = {};
   function addOwn(mod2) {
     if (mode) return false;
-    const list = W9.ActivityFemale3DCG || (typeof ActivityFemale3DCG !== "undefined" ? ActivityFemale3DCG : null);
-    const order = W9.ActivityFemale3DCGOrdering || (typeof ActivityFemale3DCGOrdering !== "undefined" ? ActivityFemale3DCGOrdering : null);
-    if (!Array.isArray(list) || !Array.isArray(order) || typeof W9.ActivityCheckPrerequisite !== "function") return false;
+    const list = W10.ActivityFemale3DCG || (typeof ActivityFemale3DCG !== "undefined" ? ActivityFemale3DCG : null);
+    const order = W10.ActivityFemale3DCGOrdering || (typeof ActivityFemale3DCGOrdering !== "undefined" ? ActivityFemale3DCGOrdering : null);
+    if (!Array.isArray(list) || !Array.isArray(order) || typeof W10.ActivityCheckPrerequisite !== "function") return false;
     mode = "own";
     for (const k of Object.keys(ACTS)) {
       const A = ACTS[k], n = gameName(k);
@@ -10175,7 +10223,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hook("ActivityCheckPrerequisite", 5, (args, next) => {
       if (args[0] === "FarmDispNipsOpen") {
         try {
-          return openOf(args[2] && args[2].MemberNumber) > 0;
+          return openOf(args[2] && args[2].MemberNumber) > 0 && !toyIn(args[2]);
         } catch (e) {
           return false;
         }
@@ -10282,7 +10330,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var nipsAddOwn = (mod2) => addOwn(mod2);
 
   // dispensary/src/lscg.js
-  var W10 = window;
+  var W11 = window;
   var api2 = null;
   var caps = null;
   var syncing = null;
@@ -10292,9 +10340,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
   var BREATH_MINS = 10;
   function lscgPresent() {
-    if (W10.LSCG) return true;
+    if (W11.LSCG) return true;
     try {
-      const sdk = W10.bcModSdk;
+      const sdk = W11.bcModSdk;
       if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
     } catch (e) {
     }
@@ -10407,7 +10455,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function initLscg() {
-    const q = W10.LSCG_OnLoad = W10.LSCG_OnLoad || [];
+    const q = W11.LSCG_OnLoad = W11.LSCG_OnLoad || [];
     q.push((L) => {
       try {
         setUp(L);
@@ -10418,7 +10466,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/doses.js
-  var W11 = window;
+  var W12 = window;
   var MIN5 = 6e4;
   var CAP = 48 * 60 * MIN5;
   var BOOK = {
@@ -10957,7 +11005,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function tellPage2(detail) {
     try {
-      W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail }));
+      W12.dispatchEvent(new W12.CustomEvent("farmhand-dispensary", { detail }));
     } catch (e) {
     }
   }
@@ -11043,8 +11091,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, n, lscg };
   }
   function balm(o) {
-    const was = nipsClose(true);
-    if (!o.quiet) action(o.line || fill(was ? "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were." : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
+    const lt = mineToy();
+    if (lt && toyLocked(lt)) {
+      if (!o.quiet) action(fill("The tightening balm goes on cool, but %t's nipples can't close round the " + toyOf(lt).label.toLowerCase() + " locked in them. They stay stretched, achin' for it."));
+      return { ok: true, was: 0, locked: true };
+    }
+    const was = nipsClose(true), out = lastPopped();
+    if (!o.quiet) action(o.line || fill(was ? out ? "The tightening balm goes on cool, and %t's nipples draw closed so tight they squeeze the " + out.toLowerCase() + " right out. Then they're as snug as they ever were." : "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were." : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
     return { ok: true, was };
   }
   function end(id, why) {
@@ -11114,12 +11167,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var face = (group, expr, secs) => {
     try {
-      if (typeof W11.CharacterSetFacialExpression === "function" && W11.Player) W11.CharacterSetFacialExpression(W11.Player, group, expr, secs);
+      if (typeof W12.CharacterSetFacialExpression === "function" && W12.Player) W12.CharacterSetFacialExpression(W12.Player, group, expr, secs);
     } catch (e) {
     }
   };
   var meter = () => {
-    const A = W11.Player && W11.Player.ArousalSettings;
+    const A = W12.Player && W12.Player.ArousalSettings;
     return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
   };
   function setArousal(v) {
@@ -11127,7 +11180,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const A = meter();
       if (!A) return;
       const n = Math.max(0, Math.min(100, Math.round(v)));
-      if (typeof W11.ActivitySetArousal === "function") W11.ActivitySetArousal(W11.Player, n);
+      if (typeof W12.ActivitySetArousal === "function") W12.ActivitySetArousal(W12.Player, n);
       else A.Progress = n;
     } catch (e) {
     }
@@ -11215,7 +11268,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const stone = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("statue"));
     for (const fn of ["ActivitySetArousal", "ActivitySetArousalTimer", "ActivityTimerProgress", "ActivityOrgasmPrepare"]) {
       try {
-        if (typeof W11[fn] === "function") mod2.hookFunction(fn, 7, (args, next) => stone(args[0]) ? void 0 : next(args));
+        if (typeof W12[fn] === "function") mod2.hookFunction(fn, 7, (args, next) => stone(args[0]) ? void 0 : next(args));
       } catch (e) {
         console.warn("[Dispensary] the Statue Serum can't hold " + fn + ":", e);
       }
@@ -11244,12 +11297,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mod2.hookFunction("ActivityOrgasmStart", 6, (args, next) => {
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W11.ActivityOrgasmRuined = true;
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W12.ActivityOrgasmRuined = true;
         } catch (e) {
         }
         try {
           const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("golden") && !W11.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500);
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("golden") && !W12.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500);
         } catch (e) {
         }
         return next(args);
@@ -11311,6 +11364,147 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     } catch (e) {
       console.warn("[Dispensary] the Sedative can't slow you:", e);
+    }
+  }
+
+  // dispensary/src/toys.js
+  var W13 = window;
+  var TOY_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/toys/v1/";
+  var host = () => typeof W13.__farmToyHost === "string" ? W13.__farmToyHost : TOY_HOST;
+  var ours6 = (group, name) => group === "ItemNipples" && !!TOY_BY[name];
+  var defsAll = () => W13.AssetFemale3DCG || (typeof AssetFemale3DCG !== "undefined" ? AssetFemale3DCG : null);
+  var extAll = () => W13.AssetFemale3DCGExtended || (typeof AssetFemale3DCGExtended !== "undefined" ? AssetFemale3DCGExtended : null);
+  function extOf(T) {
+    if (T.states === "typed") return {
+      Archetype: "typed",
+      CopyConfig: { GroupName: T.from[0], AssetName: T.from[1] },
+      DialogPrefix: { Header: T.from[0] + T.from[1] + "Select", Option: T.from[0] + T.from[1], Chat: T.from[0] + T.from[1] + "Set" }
+    };
+    if (T.vibe === "modular") return { Archetype: "modular", CopyConfig: { GroupName: "ItemButt", AssetName: "InflVibeButtPlug" } };
+    if (T.vibe) return { Archetype: "vibrating" };
+    return null;
+  }
+  function defOf(T, orig) {
+    const o = orig && typeof orig === "object" ? orig : {};
+    const d = {
+      Name: T.id,
+      Value: -1,
+      Random: false,
+      Time: o.Time || 10,
+      Prerequisite: ["AccessBreast", "FarmNipsOpen"],
+      Hide: ["ItemNipplesPiercings"],
+      Effect: T.vibe ? ["UseRemote", "Wiggling"] : ["Wiggling"],
+      PoseMapping: { AllFours: "Hide", Hogtied: "Hide" },
+      // (the breasts are drawn another way there)
+      Extended: !!extOf(T),
+      Layer: [Object.assign({ Name: "Toy", AllowColorize: false }, T.states === "pump" ? { CreateLayerTypes: ["f"] } : {})]
+    };
+    if (o.Audio) d.Audio = o.Audio;
+    if (Array.isArray(o.ExpressionTrigger)) d.ExpressionTrigger = o.ExpressionTrigger;
+    if (Array.isArray(o.Fetish)) d.Fetish = o.Fetish;
+    if (T.states === "typed") d.CreateLayerTypes = ["typed"];
+    if (T.lock) Object.assign(d, { AllowLock: true, IsRestraint: true, Difficulty: o.Difficulty || 50, RemoveTime: o.RemoveTime || 50 });
+    return d;
+  }
+  function describe2() {
+    const G = W13.AssetGroupMap && W13.AssetGroupMap.get("ItemNipples");
+    if (!G) return;
+    for (const A of G.Asset || []) {
+      const T = TOY_BY[A.Name];
+      if (T) A.Description = T.label;
+    }
+  }
+  function addToys() {
+    const G = W13.AssetGroupMap && W13.AssetGroupMap.get("ItemNipples"), defs = defsAll();
+    if (!G || typeof W13.AssetAdd !== "function" || !Array.isArray(defs)) return false;
+    const gdef = defs.find((g) => g && g.Group === "ItemNipples");
+    if (!gdef) return false;
+    const EXT = extAll() || {};
+    let added = 0;
+    for (const T of TOYS) {
+      if ((G.Asset || []).some((a) => a && a.Name === T.id)) continue;
+      const og = defs.find((g) => g && g.Group === T.from[0]), orig = og && Array.isArray(og.Asset) ? og.Asset.find((a) => a && (a.Name || a) === T.from[1]) : null;
+      const x = extOf(T);
+      if (x) {
+        EXT.ItemNipples = EXT.ItemNipples || {};
+        EXT.ItemNipples[T.id] = x;
+      }
+      try {
+        W13.AssetAdd(G, defOf(T, orig), EXT, gdef);
+        added++;
+      } catch (e) {
+        console.warn("[Dispensary] couldn't add the " + T.label, e);
+      }
+    }
+    describe2();
+    return added > 0 || TOYS.every((T) => (G.Asset || []).some((a) => a && a.Name === T.id));
+  }
+  var SHUT = "PrerequisiteFarmNipsShut";
+  var SHUT_TEXT = "Those nipples aren't open. A Nipple Dilator or the nipple leeches open them up first.";
+  function initToys(mod2, deps) {
+    const hook = (fn, pri, f) => {
+      try {
+        if (typeof W13[fn] === "function") mod2.hookFunction(fn, pri, f);
+      } catch (e) {
+        console.warn("[Dispensary] nipple toys can't hook " + fn + ":", e);
+      }
+    };
+    hook("AssetBaseURL", 0, (args, next) => {
+      const A = args[6];
+      return A && ours6(args[2], A.Name) ? host() + "ItemNipples/" + (args[3] ? args[3] + "/" : "") : next(args);
+    });
+    hook("AssetGetPreviewPath", 0, (args, next) => {
+      const A = args[0];
+      return A && A.Group && ours6(A.Group.Name, A.Name) ? host() + "ItemNipples/Preview" : next(args);
+    });
+    hook("AssetBuildDescription", 0, (args, next) => {
+      const r = next(args);
+      try {
+        describe2();
+      } catch (e) {
+      }
+      return r;
+    });
+    hook("AssetLoadAll", 0, (args, next) => {
+      const r = next(args);
+      try {
+        addToys();
+      } catch (e) {
+      }
+      return r;
+    });
+    hook("InventoryAvailable", 0, (args, next) => {
+      const T = args[2] === "ItemNipples" && TOY_BY[args[1]];
+      return T ? next([args[0], T.from[1], T.from[0], ...args.slice(3)]) : next(args);
+    });
+    hook("InventoryPrerequisiteMessage", 0, (args, next) => {
+      if (args[1] !== "FarmNipsOpen") return next(args);
+      try {
+        const C = args[0];
+        if (!C || toyIn(C)) return "";
+        const n = typeof C.IsPlayer === "function" && C.IsPlayer() ? deps.nipsOpen() : deps.openOf(C.MemberNumber);
+        return n > 0 ? "" : "FarmNipsShut";
+      } catch (e) {
+        return "FarmNipsShut";
+      }
+    });
+    hook("InterfaceTextGet", 0, (args, next) => args[0] === SHUT ? SHUT_TEXT : next(args));
+    hook("ServerSend", 0, (args, next) => {
+      try {
+        const d = args[1];
+        if (args[0] === "ChatRoomChat" && d && Array.isArray(d.Dictionary) && d.Dictionary.some((e) => e && e.Tag && ours6(e.GroupName, e.AssetName))) {
+          const D = d.Dictionary.map((e) => e && e.Tag && ours6(e.GroupName, e.AssetName) ? { Tag: e.Tag, Text: TOY_BY[e.AssetName].label.toLowerCase() } : e);
+          args = [args[0], Object.assign({}, d, { Dictionary: D }), ...args.slice(2)];
+        }
+      } catch (e) {
+      }
+      return next(args);
+    });
+    if (!addToys()) {
+      let n = 0;
+      const t = setInterval(() => {
+        if (addToys() || ++n > 120) clearInterval(t);
+      }, 500);
     }
   }
 
@@ -11432,10 +11626,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
 
   // dispensary/src/icons.js
-  var W12 = window;
+  var W14 = window;
   var others2 = /* @__PURE__ */ new Map();
-  var me5 = () => W12.Player && W12.Player.MemberNumber || 0;
-  var inRoom3 = () => W12.CurrentScreen === "ChatRoom" && typeof W12.ServerSend === "function";
+  var me5 = () => W14.Player && W14.Player.MemberNumber || 0;
+  var inRoom3 = () => W14.CurrentScreen === "ChatRoom" && typeof W14.ServerSend === "function";
   var mineNow = () => ({ ids: doseIds().filter(active).slice(0, 8), para: Object.keys(st().para || {}).length > 0 });
   var lastSig = "";
   var lastAt2 = 0;
@@ -11446,7 +11640,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     lastSig = sig;
     lastAt2 = Date.now();
     try {
-      W12.ServerSend("ChatRoomChat", makeMsg("dispIcons", m));
+      W14.ServerSend("ChatRoomChat", makeMsg("dispIcons", m));
       return true;
     } catch (e) {
       return false;
@@ -11459,7 +11653,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     else others2.set(from, { ids, para: !!m.para, at: Date.now() });
     if (was !== iconsDosed(from)) {
       try {
-        W12.dispatchEvent(new W12.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } }));
+        W14.dispatchEvent(new W14.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } }));
       } catch (e) {
       }
     }
@@ -11473,7 +11667,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!e) return "";
     return e.ids.slice(0, 5).map((id) => BOOK[id].icon).join("") + (e.para ? "\u{1FAB1}" : "");
   }
-  var canvas = () => typeof MainCanvas !== "undefined" && MainCanvas || W12.MainCanvas || null;
+  var canvas = () => typeof MainCanvas !== "undefined" && MainCanvas || W14.MainCanvas || null;
   var fontOf2 = (px) => {
     try {
       if (typeof CommonGetFont === "function") return CommonGetFont(px);
@@ -11504,7 +11698,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (it.icon[0] === "+") M.strokeText(it.icon, x, y);
         M.fillText(it.icon, x, y);
       });
-      if (typeof W12.MouseIn === "function" && W12.MouseIn(x0, Y, s * shown2.length, s)) {
+      if (typeof W14.MouseIn === "function" && W14.MouseIn(x0, Y, s * shown2.length, s)) {
         const px = 22, lh = px + 8;
         M.font = fontOf2(px);
         M.textAlign = "left";
@@ -11560,7 +11754,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         setTimeout(() => {
           iconsTell(true);
           try {
-            W12.ServerSend("ChatRoomChat", makeMsg("dispIconsAsk", {}));
+            W14.ServerSend("ChatRoomChat", makeMsg("dispIconsAsk", {}));
           } catch (e) {
           }
         }, 3e3);
@@ -11691,11 +11885,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
 
   // dispensary/src/farm.js
-  var W13 = window;
+  var W15 = window;
   function send2(type, data) {
     try {
-      if (botHere() && typeof W13.ServerSend === "function") {
-        W13.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
+      if (botHere() && typeof W15.ServerSend === "function") {
+        W15.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
         return true;
       }
     } catch (e) {
@@ -12231,7 +12425,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/screen.js
-  var W14 = window;
+  var W16 = window;
   var el2 = null;
   var styled = false;
   var CSS2 = `
@@ -12244,26 +12438,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
 `;
   function ensure() {
     if (!styled) {
-      const s = W14.document.createElement("style");
+      const s = W16.document.createElement("style");
       s.textContent = CSS2;
-      W14.document.head.appendChild(s);
+      W16.document.head.appendChild(s);
       styled = true;
     }
     if (!el2) {
-      el2 = W14.document.createElement("div");
+      el2 = W16.document.createElement("div");
       el2.id = "fd-screen";
       el2.setAttribute("aria-hidden", "true");
-      W14.document.body.appendChild(el2);
+      W16.document.body.appendChild(el2);
     }
     return el2;
   }
   var arousal = () => {
-    const A = W14.Player && W14.Player.ArousalSettings;
+    const A = W16.Player && W16.Player.ArousalSettings;
     return A ? Number(A.Progress) || 0 : 0;
   };
   function screenNow() {
-    if (active("tunnel") && W14.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
-    if (st().screen === false || W14.CurrentScreen !== "ChatRoom") return null;
+    if (active("tunnel") && W16.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
+    if (st().screen === false || W16.CurrentScreen !== "ChatRoom") return null;
     if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
     if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
     if (active("rut")) return { bg: "radial-gradient(ellipse at center, transparent 45%, rgba(170,40,20,.42) 100%)", cls: "breathe", id: "rut" };
@@ -12315,7 +12509,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/page.js
-  var W15 = window;
+  var W17 = window;
   var ID = "FarmhandDispensary";
   var box2 = null;
   var note3 = "";
@@ -12337,11 +12531,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
-    if (W15.document.getElementById("fd-style")) return;
-    const s = W15.document.createElement("style");
+    if (W17.document.getElementById("fd-style")) return;
+    const s = W17.document.createElement("style");
     s.id = "fd-style";
     s.textContent = CSS3;
-    W15.document.head.appendChild(s);
+    W17.document.head.appendChild(s);
   }
   var clockTip = (mode2) => {
     const p = st().penalty;
@@ -12365,9 +12559,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return d <= 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days (" + dateOf(t) + ")";
   };
   var keyName = (mn) => {
-    const P = W15.Player || {};
+    const P = W17.Player || {};
     const own = P.Ownership && P.Ownership.MemberNumber === mn;
-    const c = (W15.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
+    const c = (W17.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
     return (c ? c.Nickname || c.Name : "#" + mn) + (own ? " (your owner)" : PROPRIETORS.includes(mn) ? " (proprietor)" : "");
   };
   var endPick = "7";
@@ -12377,7 +12571,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var keyInput = "";
   var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
   function keyholdersCard() {
-    const S2 = st(), locked = hardOn(), P = W15.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
+    const S2 = st(), locked = hardOn(), P = W17.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
     if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
     if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
     for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
@@ -12437,7 +12631,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           endSel,
           h("button", { disabled: keys.length ? void 0 : true, onclick: () => {
             const days = Number(endPick) || 0;
-            if (typeof W15.confirm === "function" && !W15.confirm(hardWarning(days, keys))) return;
+            if (typeof W17.confirm === "function" && !W17.confirm(hardWarning(days, keys))) return;
             const r = lock(days);
             note3 = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
             draw2();
@@ -12452,7 +12646,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-card" },
       h("div", null, "\u{1F512} Locked in since " + dateOf(H.since) + ". " + (H.until ? "It ends " + inDays(H.until) + "." : "No end date: it lets go " + inDays(dueAt()) + " unless a keyholder checks in before then.")),
       h("div", { class: "fd-muted" }, "Your keyholders: " + keys.map(keyName).join(", ") + ". They can change your settings, let you out, or end it."),
-      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W15.Player && W15.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
+      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W17.Player && W17.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
     ));
     return out;
   }
@@ -12462,7 +12656,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!list.length) return [];
     const out = [h("h3", null, "Keys you hold")];
     for (const [k, x] of list) {
-      const mn = Number(k), inRoom4 = (W15.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
+      const mn = Number(k), inRoom4 = (W17.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
       const go = (what, data) => {
         const how = keyDo(mn, what, data);
         note3 = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
@@ -12476,7 +12670,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { onclick: () => go("check") }, "Check in"),
           h("button", { onclick: () => go("letout") }, "Let out (lift every dose)"),
           h("button", { onclick: () => {
-            if (typeof W15.confirm !== "function" || W15.confirm("End " + name + "'s hardcore?")) go("end");
+            if (typeof W17.confirm !== "function" || W17.confirm("End " + name + "'s hardcore?")) go("end");
           } }, "End hardcore"),
           inRoom4 ? h("button", { onclick: () => {
             editing = { mn };
@@ -12546,7 +12740,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-row", style: { marginBottom: "6px" } },
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
-        if (typeof W15.PreferenceSubscreenExtensionsClear === "function") W15.PreferenceSubscreenExtensionsClear();
+        if (typeof W17.PreferenceSubscreenExtensionsClear === "function") W17.PreferenceSubscreenExtensionsClear();
         else close2();
       } }, "Back")
     ));
@@ -12717,7 +12911,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       kids.push(h(
         "div",
         { class: "fd-card" },
-        h("div", null, (n ? "\u2B55 Open, " + n + " wide" : "Closed") + (t ? " \xB7 trained to stay " + t + " wide" : "") + (loads.n ? " \xB7 loads taken in them: " + loads.n : "")),
+        h("div", null, (n ? "\u2B55 Open, " + n + " wide" : "Closed") + (t ? " \xB7 trained to stay " + t + " wide" : "") + (loads.n ? " \xB7 loads taken in them: " + loads.n : "") + (mineToy() ? " \xB7 the " + toyOf(mineToy()).label + " in them" : "")),
         h(
           "label",
           { style: { marginTop: "6px" } },
@@ -12732,12 +12926,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           { class: "fd-row", style: { marginTop: "6px" } },
-          h("button", { disabled: locked || !n ? true : void 0, onclick: () => {
+          h("button", { disabled: locked || !n || toyLocked(mineToy()) ? true : void 0, onclick: () => {
             nipsClose(true);
-            note3 = "Your nipples are closed back up, snug as they ever were.";
+            const out = lastPopped();
+            note3 = (out ? "The " + out + " slides out, and your" : "Your") + " nipples are closed back up, snug as they ever were.";
             draw2();
           } }, "Close them up"),
-          h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : "The Dilator out, the leeches off, the stretch undone. A Tightening Balm does it too.")
+          h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : toyLocked(mineToy()) ? "The " + toyOf(mineToy()).label + "'s locked in, holdin' them open: its key first." : "The Dilator out, the leeches off, any toy out, the stretch undone. A Tightening Balm does it too.")
         )
       ));
     }
@@ -12790,9 +12985,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function open() {
     close2();
     styles();
-    box2 = W15.document.createElement("div");
+    box2 = W17.document.createElement("div");
     box2.id = "fd-page";
-    W15.document.body.appendChild(box2);
+    W17.document.body.appendChild(box2);
     draw2();
   }
   function close2() {
@@ -12804,14 +12999,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var pageOpen = () => !!box2;
   function redrawPage(force) {
-    const a = W15.document.activeElement;
+    const a = W17.document.activeElement;
     if (!force && box2 && a && box2.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
     draw2();
   }
   function initPage() {
-    if (typeof W15.PreferenceRegisterExtensionSetting !== "function") return false;
+    if (typeof W17.PreferenceRegisterExtensionSetting !== "function") return false;
     try {
-      W15.PreferenceRegisterExtensionSetting({
+      W17.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "The Farmhand's Dispensary",
         load: () => open(),
@@ -12833,8 +13028,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function openPage() {
     try {
-      if (typeof W15.PreferenceSubscreenExtensionsOpen === "function") {
-        W15.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W17.PreferenceSubscreenExtensionsOpen === "function") {
+        W17.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -12844,24 +13039,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/index.js
-  var W16 = window;
+  var W18 = window;
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  if (W16.__farmDispensary) {
+  if (W18.__farmDispensary) {
     console.warn("[Dispensary] Two copies of the Farmhand's Dispensary are installed. Delete the older one in Tampermonkey, then reload.");
     throw new Error("The Farmhand's Dispensary: another copy is already running");
   }
   var mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
-  W16.__farmDispensary = VERSION;
-  registerInk(W16, mod);
+  W18.__farmDispensary = VERSION;
+  registerInk(W18, mod);
+  initToys(mod, { nipsOpen: () => nipsOpen(), openOf: (mn) => openOf(mn) });
   initLscg();
   function status() {
     const on2 = doseIds().filter(active);
     local((on2.length ? "In you now: " + on2.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
   }
   function commands() {
-    if (typeof W16.CommandCombine !== "function") return;
+    if (typeof W18.CommandCombine !== "function") return;
     try {
-      W16.CommandCombine([{
+      W18.CommandCombine([{
         Tag: "dispensary",
         Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off]]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples",
         Action: (args) => {
@@ -12873,7 +13069,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 local("\u{1F512} Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it).");
                 return;
               }
-              local(nipsClose(true) ? "Your nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar.");
+              const lt = mineToy();
+              if (lt && toyLocked(lt)) {
+                local("\u{1F512} The " + toyOf(lt).label + "'s locked in, holdin' them open. Whoever holds its key has to take it out first.");
+                return;
+              }
+              const was = nipsClose(true), out = lastPopped();
+              local(was ? (out ? "The " + out + " slides out, and your" : "Your") + " nipples close up again, snug and tender, as if they'd never been stretched." : "Your nipples aren't stretched, sugar.");
               return;
             }
             if (nm[1] === "heal" && nm[2]) {
@@ -12886,8 +13088,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
               local(nm[2] === "on" ? "Your nipples will close up slowly on their own, once they've been left be a while." : "Your nipples stay as stretched as they're trained, till somebody closes them up.");
               return;
             }
-            const L2 = nipLoads();
-            local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " + (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close \xB7 /dispensary nips heal on|off");
+            const L2 = nipLoads(), tw = mineToy();
+            local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " + (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") + (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close \xB7 /dispensary nips heal on|off");
             return;
           }
           if (/^(safe|safeword|red)$/.test(a)) {
@@ -12925,7 +13127,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function mouthTarget(w) {
     if (/^\d+$/.test(w)) return Number(w);
-    const low = String(w).toLowerCase(), C = (W16.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W16.Player && W16.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
+    const low = String(w).toLowerCase(), C = (W18.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W18.Player && W18.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
     return C ? C.MemberNumber : 0;
   }
   var started = false;
@@ -12972,7 +13174,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => hello(true), 3e3);
   }
   var boot = setInterval(() => {
-    const P = W16.Player;
+    const P = W18.Player;
     if (!P || typeof P.MemberNumber !== "number" || !P.ExtensionSettings) return;
     clearInterval(boot);
     try {
@@ -12981,7 +13183,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       console.warn("[Dispensary] didn't start:", e);
     }
   }, 1e3);
-  if (W16.__FARMHAND_TEST__) W16.__disp = {
+  if (W18.__FARMHAND_TEST__) W18.__disp = {
     st: () => st(),
     give: (...a) => give(...a),
     tick: () => {
@@ -13032,7 +13234,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     nipsTell: (f) => nipsTell(f),
     suckled: (from) => paraSuckled(from)
   };
-  W16.FarmhandDispensary = Object.freeze({
+  W18.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     dosedOf: (mn) => iconsDosed(Number(mn)),
@@ -13053,6 +13255,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null,
     // open nipples (Nov 18, nipples.js): 0 shut, 1 to 3 open, yours or what somebody's Dispensary told the room. The
     // Companion's drawn breasts can read it.
-    nipples: (mn) => openOf(mn == null ? W16.Player && W16.Player.MemberNumber : Number(mn))
+    nipples: (mn) => openOf(mn == null ? W18.Player && W18.Player.MemberNumber : Number(mn))
   });
 })();

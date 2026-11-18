@@ -23,7 +23,8 @@ import { settle } from "./senses.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
-import { nipsOpen, nipsClose } from "./nipples.js";
+import { nipsOpen, nipsClose, lastPopped } from "./nipples.js";
+import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -414,8 +415,10 @@ function purge(o) {
 
 // the Tightening Balm: stretched nipples closed back up (nipples.js)
 function balm(o) {
-  const was = nipsClose(true);
-  if (!o.quiet) action(o.line || fill(was ? "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were." : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
+  const lt = mineToy();
+  if (lt && toyLocked(lt)) { if (!o.quiet) action(fill("The tightening balm goes on cool, but %t's nipples can't close round the " + toyOf(lt).label.toLowerCase() + " locked in them. They stay stretched, achin' for it.")); return { ok: true, was: 0, locked: true }; }
+  const was = nipsClose(true), out = lastPopped();
+  if (!o.quiet) action(o.line || fill(was ? (out ? "The tightening balm goes on cool, and %t's nipples draw closed so tight they squeeze the " + out.toLowerCase() + " right out. Then they're as snug as they ever were." : "The tightening balm goes on cool, and %t's stretched nipples draw slowly closed until they're as snug as they ever were.") : "%t gets a dab of tightening balm on each nipple. Nothin' to tighten, but it tingles nicely."));
   return { ok: true, was };
 }
 // a dose ends: worn off ("done"), LSCG's antidote ("lscg"), a safeword ("safeword"), the Purge, or quietly ("quiet")

@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.66.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.14.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.15.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.15.0: nipple toys** Laynie, Nov 18: "maybe make them plug able with certain toys? like beads, dildos, vibrators, etc?", "I mean art for existing items", "the dildos could look more like how the plugs do".
+  - Fifteen of the game's own toys, made for an open nipple, in the game's nipple slot: beads (silver and black), plugs (black, heart, demon tail, lock, vibrating, pump-up), eggs (vibrating, wired), Ben Wa balls, dildos (plain, vibrating, pump-up; drawn front-on like the plugs), and the sound.
+  - Own the game's toy and you own its nipple version. The beads keep the game's bead count, the pump-ups its inflate and vibrate levels, the vibes its remote; the lock plug takes a lock.
+  - Only into open nipples. While one's in it holds them open (and the stretch trains), and nobody can fuck or finger them. Closin' them up pushes the toy out, unless it's locked in.
+  - Drawn at every breast size, on the game's body and on the Companion's drawn breasts. Only Dispensary users see them; in chat everybody reads the toy's name.
+  - Tests: `tests/nipple-toys.test.cjs` (new).
 
 - **Bot 0.83.0 + Companion 0.66.0 + Dispensary 0.14.0: every beast brands its own, the traps' tattoos, and smaller dose icons** Laynie, Nov 18: "need to make sure the traps use the proper brands and tattoos, plus the badges ... look noisey", then "looks good, add the tattoos, and its the dozen icons, ther are just big".
   - **Brands:** every beast that breeds them sears its own brand from the farm's brands (its animal's, or its keeper's), in the hidden Farm Mark slots, with its own lines. Not when they already wear that brand as their own.

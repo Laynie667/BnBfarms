@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.68.2
+// @version      0.68.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8064,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.68.2";
+  var VERSION = "0.68.3";
 
   // shared/species.js
   var WORDS = {
@@ -8380,6 +8380,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
 .fhc-ib{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--fh-muted);font-size:15px;flex-shrink:0}
 .fhc-ib:hover{background:var(--fh-card)}
 .fhc-ib.sos{border-color:var(--fh-alert);color:var(--fh-text)}
+.fhc-ib.fhc-ib-text{width:auto;padding:0 7px;font-size:12px;font-weight:700;letter-spacing:.02em;border-color:var(--fh-line);color:var(--fh-text)}
 nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:8px 12px 2px;border:1px solid var(--fh-line);border-radius:10px;overflow:hidden;padding:0}
 nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav.fhc-seg button:last-child{border-right:none}
@@ -16948,6 +16949,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const ver = [v.major, v.minor, v.patch].join(".");
     return { has: true, ver, match: ver === BCPLUS_VERSION, text: ver === BCPLUS_VERSION ? "BC+ " + ver + " matches the farm" : "BC+ " + ver + " (the farm knows " + BCPLUS_VERSION + ")" };
   }
+  function bcpCommand() {
+    try {
+      const list = Array.isArray(window.Commands) ? window.Commands : typeof Commands !== "undefined" && Array.isArray(Commands) ? Commands : [];
+      return list.find((c) => c && String(c.Tag).toLowerCase() === "bcp") || null;
+    } catch (e) {
+      return null;
+    }
+  }
+  var bcplusCanOpen = () => !!(window.BCPlus && window.BCPlus.loaded) && bcpCommand() != null;
+  function openBcplus() {
+    const c = bcpCommand();
+    try {
+      if (c && typeof c.Action === "function") {
+        c.Action.call(c, "menu", "/bcp menu", ["menu"]);
+        return true;
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] BC+ wouldn't open:", e);
+    }
+    try {
+      if (typeof window.CommandExecute === "function") {
+        window.CommandExecute("/bcp menu");
+        return true;
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] BC+ wouldn't open:", e);
+    }
+    return false;
+  }
   function summonReady(bot) {
     try {
       const api3 = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
@@ -19329,6 +19359,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "div",
           { class: "fhc-head", style: { touchAction: "none", gap: "4px" }, onpointerdown: (e) => this.drag(e) },
           h("div", { class: "fhc-grow", style: { minWidth: "0" } }, h("div", { class: "fhc-title" }, "\u{1F33E} B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+          // (Nov 19) BC+'s own window, when BC+ is loaded: its profile button stopped workin' for Laynie
+          bcplusCanOpen() ? ib("Open BC+", "BC+", () => {
+            if (!openBcplus()) this.setStatus("BC+ wouldn't open: try /bcp menu");
+          }, "fhc-ib-text") : null,
           ib("Settings", "\u2699", () => this.goSettings()),
           ib(full ? "Back to a panel" : "Full screen", full ? "\u{1F5D7}" : "\u26F6", () => {
             this.prefs.full = !full;

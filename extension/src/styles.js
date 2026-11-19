@@ -85,6 +85,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
 .fhc-ib{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--fh-muted);font-size:15px;flex-shrink:0}
 .fhc-ib:hover{background:var(--fh-card)}
 .fhc-ib.sos{border-color:var(--fh-alert);color:var(--fh-text)}
+.fhc-ib.fhc-ib-text{width:auto;padding:0 7px;font-size:12px;font-weight:700;letter-spacing:.02em;border-color:var(--fh-line);color:var(--fh-text)}
 nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:8px 12px 2px;border:1px solid var(--fh-line);border-radius:10px;overflow:hidden;padding:0}
 nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav.fhc-seg button:last-child{border-right:none}

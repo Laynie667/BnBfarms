@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.3** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.21.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -25,6 +25,9 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Companion 0.68.3: a BC+ button in the Companion**
+- **Bot 0.85.2 + Companion 0.68.3: a BC+ button in the Companion** Laynie, Nov 19: "can we add a button to the companion that opens bc plus? the recent bc plus update made it impossible to use the standard button".
+  - **BC+ in the Companion's top bar:** with BC+ loaded, a BC+ button sits just before ⚙ and opens your own BC+ window, the same as typin' /bcp menu (BC+'s own command, so its rules hold: in its hardcore your hands are bound, and BC+ says so). Without BC+ there's no button. The bot's bump is only the Companion version it carries.
 - **Bot 0.85.1 + Dispensary 0.21.0: Ass Growth, Booty Growth and the Reducing Serum, one meanin' each** Laynie, Nov 19, of the two words the farm and the Dispensary read differently: "choose the best options for me".
   - **Ass Growth opens your ass a size, everywhere:** the farm's own meanin', the way her traps, parasites and roulette have always used it ("%t's ass loosens and opens"). Anal Gape too, and Pussy Gape or Pussy Growth opens the pussy. On the farm it's the farm girl's shot, as ever, and hers can go past natural. Off the farm it's the Dispensary's now, through hole trainin', up to natural. A Tightening Balm closes it back up.
   - **A bigger behind has its own names:** Booty Growth, Hip Growth, Rear Growth. The farm keeps no size for a behind, so these are the Dispensary's on the farm too (before, they did nothin' there with the farm girl in the room). Counted, and drawn once the drawn body learns hips.

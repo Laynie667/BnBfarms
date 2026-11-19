@@ -19,6 +19,7 @@ import { DASHBOARD_TABS } from "./views/dashboard.js";
 import { withExtras } from "./views/extras.js";
 import { NURSERY_TABS } from "./views/nursery.js";
 import { settingsAvailable, openSettings } from "./settings.js";
+import { bcplusCanOpen, openBcplus } from "./addons.js";
 import { settingsView } from "./views/settingspages.js";
 
 const VIEWS = {
@@ -261,6 +262,8 @@ export class Panel {
     this.top.replaceChildren(...[
       h("div", { class: "fhc-head", style: { touchAction: "none", gap: "4px" }, onpointerdown: (e) => this.drag(e) },
         h("div", { class: "fhc-grow", style: { minWidth: "0" } }, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+        // (Nov 19) BC+'s own window, when BC+ is loaded: its profile button stopped workin' for Laynie
+        bcplusCanOpen() ? ib("Open BC+", "BC+", () => { if (!openBcplus()) this.setStatus("BC+ wouldn't open: try /bcp menu"); }, "fhc-ib-text") : null,
         ib("Settings", "⚙", () => this.goSettings()),
         ib(full ? "Back to a panel" : "Full screen", full ? "🗗" : "⛶", () => { this.prefs.full = !full; savePrefs(this.prefs); this.placePanel(); this.render(); }),
         // only 🆘 keeps a red edge

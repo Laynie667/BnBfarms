@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.84.1
+// @version      0.85.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2925,6 +2925,57 @@
     }
   };
 
+  // shared/dose-words.js
+  var SEP = "[\\s_\\-]*";
+  function loosen(re) {
+    const src = re.source.replace(/\[- \]\??/g, SEP).replace(/\\s[+*?]/g, SEP).replace(/ \?/g, SEP).replace(/ /g, SEP);
+    return new RegExp(src, re.flags);
+  }
+  var everyOf = (re) => new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g");
+  var DOSE_WORDS = {
+    denial: loosen(/\b(denial serum|edge serum|orgasm (?:block\w*|denial)|held at the edge)\b/),
+    sedative: loosen(/\b(sedat\w*|tranquili[sz]\w*|drowsy|sleepy serum)\b/),
+    needy: loosen(/\b(aphrodisiac|horny|lust serum|libido|needy nectar)\b/),
+    hairtrigger: loosen(/\b(hair[- ]?trigger|sensiti[sz]er|oversensitiv\w*)\b/),
+    bitterroot: loosen(/\b(bitterroot|ruin(?:ing|ed)? (?:serum|draught|tonic|shot))\b/),
+    moo: loosen(/\b(moo (?:serum|shot|juice))\b/),
+    hiccup: loosen(/\b(hiccup\w*)\b/),
+    feather: loosen(/\b(featherlight|tickl\w* (?:serum|draught|potion|shot))\b/),
+    heat: loosen(/\b(heat[- ]?inducer|heat mist|in heat serum)\b/),
+    suggestible: loosen(/\b(obedien\w*|docile|compliance|suggest[ia]ble)\b/),
+    letdown: loosen(/\b(let[- ]?down (?:tonic|serum|shot|draught|drops?|potion)|leaky (?:tits|teats|udders?) (?:tonic|serum|shot))\b/),
+    fillout: loosen(/\b(fill[-_]?out\b|fill[- ]?out (?:serum|shot|tonic|potion|drops?)|swell(?:ing)? (?:serum|shot|tonic|potion|drops?))\b/),
+    airhead: loosen(/\b((?:airhead|bimbo) (?:elixir|potion|serum|tonic|shot|juice|drops?))\b/),
+    kit: loosen(/\bkit\s*:\s*[a-z0-9]/),
+    tongue: loosen(/\b((?:animal|beast|puppy|pup|doggy|dog|kitty|kitten|cat|pony|horse|cow|bovine|bunny|rabbit|fox|vixen|goat|sheep|lamb|piggy|pig|wolf|dragon|rat)[- ]?tongue)\b/),
+    babble: loosen(/\b(babble (?:brew|potion|tonic|shot|serum)|potty[- ]?mouth (?:potion|tonic|brew|serum))\b/),
+    deepthroat: loosen(/\b(deep[- ]?throat (?:drops?|serum|spray|shot|tonic)|throat relax\w*|gag[- ]?reflex (?:blocker|drops?|serum))\b/),
+    rut: loosen(/\b(rut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut (?:serum|shot|tonic))\b/),
+    tender: loosen(/\b(tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er)\b/),
+    honey: loosen(/\bhoney[- ]tongue\b/),
+    golden: loosen(/\bgolden[- ]hour\b/),
+    musk: loosen(/\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/),
+    echo: loosen(/\becho[- ]elixir\b/),
+    growcup: loosen(/\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/),
+    growass: loosen(/\b(ass|butt|booty|hips?) (growth|enlarger)\b/),
+    growcock: loosen(/\b(cock|penis|dick|shaft) (growth|enlarger)\b/),
+    growballs: loosen(/\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/),
+    reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),
+    // (not "shrinking": that's LSCG's, and it shrinks all of you)
+    weakknees: loosen(/\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/),
+    allfours: loosen(/\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/),
+    blinder: loosen(/\b(blind(?:er|ing)? drops?|dim(?:ming)? drops?|darkness drops?)\b/),
+    cotton: loosen(/\b(cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|muffl\w* drops?)\b/),
+    tunnel: loosen(/\b(tunnel[- ]?vision(?: (?:drops?|serum|draught|tonic))?|blinker (?:drops?|serum))\b/),
+    haze: loosen(/\b(haze (?:drops?|serum|potion|mist|tonic)|hazy (?:drops?|serum|potion)|daze (?:drops?|serum))\b/),
+    statue: loosen(/\b(statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot))\b/),
+    surecatch: loosen(/\b(sure[- ]?catch(?: (?:serum|shot|tonic|potion|drops?))?|every[- ]load[- ]takes?|womb[- ]?opener)\b/),
+    dilator: loosen(/\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/),
+    balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
+    purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/)
+  };
+  var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "growass", "growcock", "growballs", "reducing", "purge"];
+
   // shared/guides.js
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
@@ -2960,8 +3011,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.84.1";
-  var COMPANION_VERSION = "0.68.1";
+  var VERSION = "0.85.0";
+  var COMPANION_VERSION = "0.68.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6745,6 +6796,20 @@
       }
       return { pairs: out, rest: w.filter((x, k) => !used.has(k)).join(" ") };
     }
+    const FARM_DOSE_TAG = {
+      denial: "denial",
+      sedative: "sedative",
+      needy: "aphro",
+      hairtrigger: "trigger",
+      bitterroot: "bitterroot",
+      moo: "mooserum",
+      hiccup: "hiccup",
+      feather: "feather",
+      heat: "heat",
+      suggestible: "obey",
+      purge: "purge"
+    };
+    const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
     function sizeTagsIn(text) {
       const out = [], flat = squash(text);
       for (const [part, d] of Object.entries(CFG.SIZE_TAGS)) {
@@ -6752,6 +6817,8 @@
         else if (d.down.some((w) => flat.includes(squash(w)))) out.push([part, -1]);
       }
       for (const pr of partShots(text).pairs) if (!out.some((o) => o[0] === pr[0])) out.push(pr);
+      const low = String(text || "").toLowerCase();
+      for (const [id, part] of FARM_DOSE_SIZE) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low) && !out.some((o) => o[0] === part)) out.push([part, 1]);
       return out;
     }
     function tagsIn(text) {
@@ -6762,6 +6829,8 @@
         if (words.some((w) => flat.includes(squash(w)))) out.add(tag);
       const plain = String(partShots(text).rest || text || "").toLowerCase();
       for (const [tag, re] of Object.entries(CFG.TAG_RE || {})) if (re.test(plain)) out.add(tag);
+      const low = String(text || "").toLowerCase();
+      for (const [id, tag] of Object.entries(FARM_DOSE_TAG)) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low)) out.add(tag);
       return out;
     }
     function tell(mn, text) {
@@ -8988,7 +9057,7 @@
       }
       const giver = charFor(data.Sender);
       const tool = giver && (giver.Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld");
-      const text = craftText(tool);
+      const raw = craftText(tool), text = dispStrip(target, raw);
       const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text);
       L2.shotLog = (L2.shotLog || []).concat({
         t: Date.now(),
@@ -9001,7 +9070,7 @@
       if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)) {
         saveLedger();
         try {
-          shotUnread(data.Sender, tool, text, target);
+          shotUnread(data.Sender, tool, raw, target);
         } catch (e) {
         }
         return;
@@ -9010,6 +9079,7 @@
     }
     const stackWord = (lv) => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' " + (lv + 1) + " times over";
     function applyShot(target, by, text, how) {
+      text = dispStrip(target, text);
       const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), krypto = kryptoHit(target, text);
       const x = shotTimes(text) * (kryptoNow(target) ? 2 : 1);
       if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !krypto) return false;
@@ -26043,6 +26113,9 @@
         done.push("moo, moo");
         fx0.push("mooserum");
       }
+      if (tags.has("bitterroot") && potion("bitterroot", "bitterroot")) done.push("ruined at the edge for half an hour");
+      if (tags.has("hiccup") && potion("hiccup", "hiccup fizz")) done.push("hiccuppin'");
+      if (tags.has("feather") && potion("feather", "featherlight")) done.push("ticklish all over");
       if (tags.has("futashot")) {
         if (r.futa && !r.futaShot) done.push("already futa");
         else if (limitBlocks(target, "futa")) done.push("no futa, their limits rule it out");
@@ -26431,7 +26504,17 @@
       return pickFresh("sure:" + (g.full ? "full" : "more"), g.full ? SURE_FULL : SURE_LINES).replace(/%t/g, plainName(t)).replace(/%s/g, plainName(stud)).replace(/%c/g, String(g.count || 1));
     }
     if (W.__FARMHAND_TEST__) W.__sureLine = (t, s) => sureLine(t, s);
-    const DISP_WORDS = /sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener|nipple[- ](?:dilat|stretch|opener|spreader)|teat[- ](?:dilat|opener|stretch)|let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
+    const DISP_ONLY = Object.keys(DOSE_WORDS).filter((id) => !FARM_DOSES.includes(id));
+    const DISP_WORDS = { test: (t) => {
+      const s = String(t || "").toLowerCase();
+      return DISP_ONLY.some((id) => DOSE_WORDS[id].test(s));
+    } };
+    function dispStrip(mn, text) {
+      if (!text || !dispFor(mn)) return text;
+      let t = String(text).toLowerCase();
+      for (const id of DISP_ONLY) t = t.replace(everyOf(DOSE_WORDS[id]), " ");
+      return t;
+    }
     const CRAVE_OFFER_MS = 45 * 6e4;
     const CRAVE_OFFERS = [
       "\u{1F489} You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

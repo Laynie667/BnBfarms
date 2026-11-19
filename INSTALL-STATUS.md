@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.84.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.85.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.1** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.19.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.2** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.20.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.85.0 + Companion 0.68.2 + Dispensary 0.20.0: every spellin', one door per dose, nipple gear, and nipples in the Body rows** Laynie, Nov 19: "the nipple clamps for the nipple dilation doesn't seem to work? I also dont see nipples as part of the body for stages in the companion", then "need to double check that everything gets routed correctly, and that its accurately checking the phrases, even if we need to hyphenate".
+  - **Nipple gear that dilates (Dispensary):** clamps crafted as "Dilator Clamps" or "Stretcher Clamps", or with only "dilator" in the description, did nothin': the words wanted "nipple dilator" in full, though the page said "dilator or stretcher". Now anythin' worn on the nipples (clamps, rings, piercings, toys) that says dilator, dilating, stretcher, spreader, opener or widener holds them open while it's on; x2 and x3 hold them wider.
+  - **Nipples in the Companion's Body rows:** from your Dispensary: closed, open, wide open or gapin', what they're trained to stay, how far along the trainin' is, the toy in them, and loads taken. Off the farm's books, the Body row is still there, with your Dispensary's holes and nipples.
+  - **Every spellin' (Dispensary):** every phrase reads however it's written between its words: spaces, hyphens, underscores, or run together ("Denial Serum", "denial-serum", "Denial_Serum", "DenialSerum"). That's the doses, the gear words (auto-injector, when-kissed, every-15-minutes, mystery-dose, lip-gloss, time-release), the parts and animals (Big-Booty, inner-thighs, China-Doll, Puppy-Tongue), the parasites (milk-moss, LeashVine, mouth piece) and the hole sizes (well-used, wide-open, past-gagging). Before, 93 spellings of the page's own keywords were missed. Plain English stays plain: "fill out", "a heat wave", "in a rut" aren't doses.
+  - **One door per dose (the farm girl and the Dispensary):** the Dispensary's dose words are one shared book now (shared/dose-words.js) that the farm girl reads too.
+    - With her in the room, the Dispensary leaves the farm's own doses to her, but she didn't know some of their names: Needy Nectar, Bitterroot, Hiccup Fizz, Featherlight, Heat Mist, and the hyphenated and run-together ones. On the farm those needles did nothin' at all. She reads every spellin' of every farm dose now.
+    - For somebody runnin' the Dispensary she leaves its own doses be: Deep Throat Drops and Throat Relaxer also trained her throat books, a Pussy or Ass Tightener also tightened, Sure-Catch also ripened, so they happened twice. Now once. Without a Dispensary, her own shots work as ever.
+    - She doesn't tell a doser she "couldn't read" a Dispensary dose that was written run together.
+  - Tests: dispensary-phrases (every keyword nine ways, the gear words, parts, parasites, sizes), dispensary-routing (the farm girl and every dose, every spellin'), nipple-gear-body.
 - **Bot 0.84.1 + Companion 0.68.1 + Dispensary 0.19.0: guides for everything, and the statue's hands** Laynie, Nov 19: "need to make guides in the dispensary for everything. statue render missed hands."
   - **Guides, in the Dispensary:** fifteen of them, one for every part: getting started, crafting a dose, dosing somebody, gear that doses, time-release and cravings, doses that pick, kits, horny gear, nipples, hole training, parasites, your list and safeword, hardcore and keyholders, the farm and LSCG, and every command. Each is step by step, with crafts to try word for word (a Copy button for the game's crafting) and the things worth knowin'.
   - **Where they are:** a Guides list at the top of the page (open the first time, folded away once you've read one), and a 📖 How it works on every section that opens its guide right there under the heading. `/dispensary guide <topic>` (or `/dispensary help`) opens the page at one: holes, kits, keyholders, statue, needle and so on.

@@ -40,6 +40,7 @@ import { lscgPresent } from "./lscg.js";
 import { LINES } from "./lines.js";
 import { local, action, fill, pick, nameOf, inRoom, myName } from "./say.js";
 import { hornyOf } from "./horny.js";
+import { loosen } from "../../shared/dose-words.js";
 
 const W = window, MIN = 60000, HOUR = 3600000;
 export const KINDS = {
@@ -49,9 +50,10 @@ export const KINDS = {
   nestling: { label: "The nestling", icon: "🐛", words: /\bnestling\b/, hours: 24, stages: 3 },
   brood: { label: "The brood mother", icon: "🥚", words: /\bbrood ?mother\b|\bbrood queen\b/, hours: 24, every: 45 },
   vine: { label: "The leash vine", icon: "🌿", words: /\bleash vine\b|\bvine leash\b/, worn: true, tiles: 3 },
-  mouth: { label: "The mouthpiece", icon: "🗣️", words: /\bmouthpiece\b/, worn: true },
+  mouth: { label: "The mouthpiece", icon: "🗣️", words: /\bmouth ?piece\b/, worn: true },
   nips: { label: "Nipple leeches", icon: "🍒", words: /\b(?:nipple|teat)[- ]?(?:leech|parasit|worm|tick)\w*|\bleech\w* (?:on|for) (?:the |your |her |his |their )?(?:nipples?|teats?)\b/, hours: 24, starve: 8 },
 };
+for (const K of Object.values(KINDS)) K.words = loosen(K.words);   // (Nov 19: "milk-moss", "LeashVine", "brood_mother", "mouth piece")
 export const kindIds = () => Object.keys(KINDS);
 const DEFAULT_STRAIN = ["needy", "heat", "hairtrigger"];
 const me = () => (W.Player && W.Player.MemberNumber) || 0;

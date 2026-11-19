@@ -14,6 +14,7 @@
    The new ones tell the Companion (a "farmhand-dispensary" event on the page): Let-Down's leaks land as milk on you,
    Fill-Out swells your drawn body.
 */
+import { DOSE_WORDS, loosen } from "../../shared/dose-words.js";
 import { st, save } from "./store.js";
 import { LINES, NOTES } from "./lines.js";
 import { TOLERANCE_NOTE } from "./lines-more.js";
@@ -36,80 +37,80 @@ const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 export const BOOK = {
   denial: {
     label: "Denial Serum", icon: "🚫", mins: 120, color: "#b04a7a", farm: true,
-    words: /\b(denial serum|edge serum|orgasm (?:block\w*|denial)|held at the edge)\b/,
+    words: DOSE_WORDS.denial,
     keywords: ["denial serum", "edge serum", "orgasm block"], soak: ["denial", "edging"],
     desc: "Held right at the edge: you can climb all you like, but you can't go over till it wears off. Two hours a dose.",
   },
   sedative: {
     label: "Sedative", icon: "💤", mins: 60, color: "#6d7fa8", farm: true, lscg: "sedative",
-    words: /\b(sedat\w*|tranquili[sz]\w*|drowsy|sleepy serum)\b/,
+    words: DOSE_WORDS.sedative,
     keywords: ["sedative", "tranquilizer"],
     desc: "Heavy, drowsy and slow: a sleepy face, slow feet, and eyes that keep wantin' to close. An hour a dose.",
   },
   needy: {
     label: "Needy Nectar", icon: "💗", mins: 30, color: "#e0607e", farm: true, lscg: "horny", voice: "needy", every: [4, 7],
-    words: /\b(aphrodisiac|horny|lust serum|libido|needy nectar)\b/,
+    words: DOSE_WORDS.needy,
     keywords: ["needy nectar", "aphrodisiac", "lust serum"],
     desc: "Achin' and squirmin': your arousal creeps up and won't settle, and your face gives you away. Half an hour a dose.",
   },
   hairtrigger: {
     label: "Hair Trigger", icon: "⚡", mins: 60, color: "#e8b04a", farm: true, every: [6, 10],
-    words: /\b(hair[- ]?trigger|sensiti[sz]er|oversensitiv\w*)\b/,
+    words: DOSE_WORDS.hairtrigger,
     keywords: ["hair trigger", "sensitizer"], soak: ["sensitizer", "sensitizing"],
     desc: "Every touch counts double: whatever anybody does to you works you up twice as fast. An hour a dose.",
   },
   bitterroot: {
     label: "Bitterroot", icon: "🌿", mins: 30, color: "#6f8f4a", farm: true, voice: "bitterroot", every: [5, 8],
-    words: /\b(bitterroot|ruin(?:ing|ed)? (?:serum|draught|tonic|shot))\b/,
+    words: DOSE_WORDS.bitterroot,
     keywords: ["bitterroot"], soak: ["bitterroot", "ruin"],
     desc: "Every orgasm slips away ruined: you go over, and get none of the relief. Half an hour a dose.",
   },
   moo: {
     label: "Moo Juice", icon: "🐄", mins: 20, color: "#c9a35b", farm: true, voice: "moo", every: [6, 10], room: true,
-    words: /\b(moo (?:serum|shot|juice))\b/,
+    words: DOSE_WORDS.moo,
     keywords: ["moo juice", "moo serum"], soak: ["moo"],
     desc: "Your words keep comin' out as the noises your animal makes. Twenty minutes a dose.",
   },
   hiccup: {
     label: "Hiccup Fizz", icon: "🫧", mins: 15, color: "#7ec8e3", farm: true, voice: "hiccup", every: [1, 3], room: true,
-    words: /\b(hiccup\w*)\b/,
+    words: DOSE_WORDS.hiccup,
     keywords: ["hiccup fizz"], soak: ["hiccup"],
     desc: "Hiccups. In every other sentence. At the worst possible moments. Fifteen minutes a dose.",
   },
   feather: {
     label: "Featherlight", icon: "🪶", mins: 15, color: "#d9c8f0", farm: true, voice: "feather", every: [2, 4], room: true,
-    words: /\b(featherlight|tickl\w* (?:serum|draught|potion|shot))\b/,
+    words: DOSE_WORDS.feather,
     keywords: ["featherlight"], soak: ["tickle", "tickling"],
     desc: "Unbearably ticklish: giggles slip into everything you say. Fifteen minutes a dose.",
   },
   heat: {
     label: "Heat", icon: "🔥", mins: 60, color: "#e0703a", farm: true, voice: "heatmist", every: [4, 6], room: true,
-    words: /\b(heat[- ]?inducer|heat mist|in heat serum)\b/,
+    words: DOSE_WORDS.heat,
     keywords: ["heat inducer", "heat mist"], soak: ["heat"],
     desc: "In heat: your arousal won't drop below a simmer, and everybody near can tell. On the farm, the farm keeps the heat itself. An hour a dose.",
   },
   suggestible: {
     label: "Suggestible", icon: "🌀", mins: 30, color: "#4cd964", farm: true, lscg: "suggestible", lscgOnly: true,
-    words: /\b(obedien\w*|docile|compliance|suggest[ia]ble)\b/,
+    words: DOSE_WORDS.suggestible,
     keywords: ["obedience", "docile"],
     desc: "LSCG's Suggestible: the more of it in you, the more you want to do as you're told. Only with LSCG; without it, the farm's obedience shot is the farm's trance.",
   },
   // ── Nov 17, more (none of these is a farm shot: on the farm too, your Dispensary reads the needle) ──
   letdown: {
     label: "Let-Down", icon: "🍼", mins: 30, color: "#efe3c8", every: [4, 7], room: true,
-    words: /\b(let[- ]?down (?:tonic|serum|shot|draught|drops?|potion)|leaky (?:tits|teats|udders?) (?:tonic|serum|shot))\b/,
+    words: DOSE_WORDS.letdown,
     keywords: ["let-down tonic", "letdown serum"], soak: ["let-down", "leaky"],
     desc: "Your tits go heavy and leak: fresh wet spots bloom through your top every few minutes. With the Companion and its \"Farm can mark my body\" on, the milk shows on your chest for everybody with a Companion. Half an hour a dose.",
   },
   fillout: {
     label: "Fill-Out", icon: "🎈", mins: 30, color: "#f0a0b8", every: [6, 10], room: true,
-    words: /\b(fill-out|fill[- ]?out (?:serum|shot|tonic|potion|drops?)|swell(?:ing)? (?:serum|shot|tonic|potion|drops?))\b/,
+    words: DOSE_WORDS.fillout,
     keywords: ["fill-out", "swelling serum"], soak: ["swelling", "fill-out"],
     desc: "A swell that comes and goes: your tits a few cups bigger, or your belly round and full, for as long as it lasts, then it shrinks back. Say which on the bottle (Fill-Out (belly), Fill-Out (ass)); it's the cup if it doesn't say. The Companion's drawn body draws your tits and belly swollen for everybody with a Companion (a swollen ass gets its lines, not a picture, for now). Half an hour a dose.",
   },
   airhead: {
     label: "Airhead Elixir", icon: "🎀", mins: 20, color: "#ff9ccf", every: [6, 10], room: true,
-    words: /\b((?:airhead|bimbo) (?:elixir|potion|serum|tonic|shot|juice|drops?))\b/,
+    words: DOSE_WORDS.airhead,
     keywords: ["airhead elixir", "bimbo serum"], soak: ["airhead", "bimbo"],
     desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose.",
   },
@@ -117,7 +118,7 @@ export const BOOK = {
   // its time, and your old outfit back after. Only with "Kits can dress me" on (off to start)
   kit: {
     label: "Kit", icon: "👗", mins: 30, color: "#b48ad8", optIn: "kitsOn", noLscg: true,
-    words: /\bkit\s*:\s*[a-z0-9]/,
+    words: DOSE_WORDS.kit,
     keywords: [], soak: [],
     desc: "\"Kit: <name>\" on the bottle: its crafter's saved outfit (in LSCG, or saved on their Dispensary) creeps onto you a piece at a time and stays on half an hour a dose. Anythin' taken off creeps back on. When it's over, your old outfit slips back on. Only with \"Kits can dress me\" on.",
   },
@@ -126,31 +127,31 @@ export const BOOK = {
   // in, then half the words go, then nothin' but noises
   tongue: {
     label: "Animal Tongue", icon: "👅", mins: 30, color: "#e07a9a", every: [6, 10], room: true,
-    words: /\b((?:animal|beast|puppy|pup|doggy|dog|kitty|kitten|cat|pony|horse|cow|bovine|bunny|rabbit|fox|vixen|goat|sheep|lamb|piggy|pig|wolf|dragon|rat)[- ]?tongue)\b/,
+    words: DOSE_WORDS.tongue,
     keywords: ["animal tongue", "puppy tongue", "kitty tongue", "pony tongue"], soak: ["tongue"],
     desc: "Your words come out as an animal's noises: the one on the bottle (Kitty Tongue, Puppy Tongue, Pony Tongue...) or your own. One dose and noises slip in between your words; two, half your words are noises; three, nothin' but. Thirty minutes a dose.",
   },
   babble: {
     label: "Babble Brew", icon: "💬", mins: 20, color: "#c0508a", every: [6, 10], room: true,
-    words: /\b(babble (?:brew|potion|tonic|shot|serum)|potty[- ]?mouth (?:potion|tonic|brew|serum))\b/,
+    words: DOSE_WORDS.babble,
     keywords: ["babble brew", "potty mouth potion"], soak: ["babble"],
     desc: "Filthy words keep slippin' out in the middle of what you say, and innocent ones come out wrong (the clock, the class, the bread...). The stronger the dose, the filthier your mouth. Twenty minutes a dose.",
   },
   deepthroat: {
     label: "Deep Throat Drops", icon: "👄", mins: 60, color: "#d06070", every: [8, 12],
-    words: /\b(deep[- ]?throat (?:drops?|serum|spray|shot|tonic)|throat relax\w*|gag[- ]?reflex (?:blocker|drops?|serum))\b/,
+    words: DOSE_WORDS.deepthroat,
     keywords: ["deep throat drops", "throat relaxer"], soak: ["deep throat"],
     desc: "No gag reflex: anything goes down easy, and whatever's done to your mouth counts double. On the farm, a dosed throat takes a load without gaggin', and the trainin' counts twice. An hour a dose.",
   },
   rut: {
     label: "Rut", icon: "🐂", mins: 60, color: "#a8432c", every: [5, 8], room: true,
-    words: /\b(rut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut (?:serum|shot|tonic))\b/,
+    words: DOSE_WORDS.rut,
     keywords: ["rut serum", "rutting tonic"], soak: ["rut", "rutting"],
     desc: "In rut: hot, hungry and ready again almost as soon as you've finished. Your arousal never cools right off, and after you go over it bounces straight back up. On the farm, your loads come bigger and you don't run dry. An hour a dose.",
   },
   tender: {
     label: "Tender", icon: "🌸", mins: 30, color: "#f2a6b8", every: [6, 9],
-    words: /\b(tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er)\b/,
+    words: DOSE_WORDS.tender,
     keywords: ["tender drops", "tenderizer"], soak: ["tender"],
     desc: "One spot goes sweetly tender: touches there count three times over. Say where on the bottle (Tender Drops (nipples)), or it's the spot you pick on this page. Half an hour a dose.",
   },
@@ -159,25 +160,25 @@ export const BOOK = {
   // Hour earns ribbons there) ──
   honey: {
     label: "Honey Tongue", icon: "🍯", mins: 45, color: "#e8b04a", farm: false, voice: "honey", every: [5, 9],
-    words: /\bhoney[- ]tongue\b/,
+    words: DOSE_WORDS.honey,
     keywords: ["honey tongue"], soak: ["honey tongue"],
     desc: "Forty-five minutes of the farm girl's sweet, filthy praise in your ear, every few minutes. Only you hear it.",
   },
   golden: {
     label: "Golden Hour", icon: "✨", mins: 60, color: "#f0c040", farm: false, voice: "golden", every: [5, 8],
-    words: /\bgolden[- ]hour\b/,
+    words: DOSE_WORDS.golden,
     keywords: ["golden hour"], soak: ["golden"],
     desc: "An hour of glowin' easy, and every time you cum you're doted on for it. On the farm it earns ribbons too.",
   },
   musk: {
     label: "Blue Ribbon Musk", icon: "💐", mins: 45, color: "#5a7fd0", farm: false, voice: "musk", every: [5, 9], room: true,
-    words: /\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/,
+    words: DOSE_WORDS.musk,
     keywords: ["blue ribbon musk"], soak: ["musk"],
     desc: "For 45 minutes everybody nearby keeps noticin' you, and the room hears about it now and then.",
   },
   echo: {
     label: "Echo Elixir", icon: "🗣️", mins: 20, color: "#a0d0e0", farm: false, voice: "echo",
-    words: /\becho[- ]elixir\b/,
+    words: DOSE_WORDS.echo,
     keywords: ["echo elixir"], soak: ["echo"],
     desc: "Twice in twenty minutes, somethin' you said is repeated back to the room. Sweetly.",
   },
@@ -187,68 +188,68 @@ export const BOOK = {
   // it's drawn too. ──
   growcup: {
     label: "Udder Growth", icon: "🍈", mins: 0, color: "#f2b6c6", farm: true, instant: true, grow: "cup",
-    words: /\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/,
+    words: DOSE_WORDS.growcup,
     keywords: ["udder growth", "breast growth"],
     desc: "A cup bigger for every dose, and it stays. Your Companion's drawn breasts show it. A reducing serum takes one back off.",
   },
   growass: {
     label: "Ass Growth", icon: "🍑", mins: 0, color: "#f0a080", farm: true, instant: true, grow: "ass",
-    words: /\b(ass|butt|booty|hips?) (growth|enlarger)\b/,
+    words: DOSE_WORDS.growass,
     keywords: ["ass growth"],
     desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips).",
   },
   growcock: {
     label: "Cock Growth", icon: "🍆", mins: 0, color: "#c07090", farm: true, instant: true, grow: "cock",
-    words: /\b(cock|penis|dick|shaft) (growth|enlarger)\b/,
+    words: DOSE_WORDS.growcock,
     keywords: ["cock growth"],
     desc: "Two inches longer for every dose, and it stays. The Companion's drawn cock shows it.",
   },
   growballs: {
     label: "Balls Growth", icon: "🥚", mins: 0, color: "#d8a0b0", farm: true, instant: true, grow: "balls",
-    words: /\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/,
+    words: DOSE_WORDS.growballs,
     keywords: ["balls growth"],
     desc: "A size heavier for every dose, and it stays. The Companion's drawn balls show it.",
   },
   reducing: {
     label: "Reducing Serum", icon: "🔻", mins: 0, color: "#90a0c0", farm: true, instant: true, grow: "less",
-    words: /\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/,   // (not "shrinking": that's LSCG's, and it shrinks all of you)
+    words: DOSE_WORDS.reducing,
     keywords: ["reducing serum"],
     desc: "Takes a size back off whatever the bottle names (Udder Reducer, Cock Reducer, Reducing Serum (ass)...; tits if it doesn't say).",
   },
   // ── Nov 18: poses and senses (senses.js) ──
   weakknees: {
     label: "Weak Knees", icon: "🦵", mins: 20, color: "#c9a0dc", every: [6, 10],
-    words: /\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/,
+    words: DOSE_WORDS.weakknees,
     keywords: ["weak knees", "jelly legs"], soak: ["weak knees"],
     desc: "Down on your knees, and you can't get up on your own: somebody has to help you up (the game's own \"with help\"). Twenty minutes a dose.",
   },
   allfours: {
     label: "Down Girl", icon: "🐾", mins: 20, color: "#a0785a", every: [6, 10],
-    words: /\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/,
+    words: DOSE_WORDS.allfours,
     keywords: ["down girl serum", "all fours tonic"], soak: ["all fours"],
     desc: "Down on all fours, and you stay down there: gettin' up needs a hand. Twenty minutes a dose.",
   },
   blinder: {
     label: "Blinder Drops", icon: "🕶️", mins: 15, color: "#3a3550", every: [6, 10],
-    words: /\b(blind(?:er|ing)? drops?|dim(?:ming)? drops?|darkness drops?)\b/,
+    words: DOSE_WORDS.blinder,
     keywords: ["blinder drops", "dimming drops"], soak: ["blinding"],
     desc: "Your sight dims: the game's own blindness, darker with a stronger dose. Fifteen minutes a dose.",
   },
   cotton: {
     label: "Cotton Ears", icon: "🦻", mins: 15, color: "#e8e2d0", every: [6, 10],
-    words: /\b(cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|muffl\w* drops?)\b/,
+    words: DOSE_WORDS.cotton,
     keywords: ["cotton ears", "deafening drops"], soak: ["deafening"],
     desc: "Everything muffled: the game's own deafness, deafer with a stronger dose. Fifteen minutes a dose.",
   },
   tunnel: {
     label: "Tunnel Vision", icon: "🔭", mins: 15, color: "#202030", every: [6, 10],
-    words: /\b(tunnel[- ]?vision(?: (?:drops?|serum|draught|tonic))?|blinker (?:drops?|serum))\b/,
+    words: DOSE_WORDS.tunnel,
     keywords: ["tunnel vision", "blinker drops"], soak: ["tunnel vision"],
     desc: "Only a small circle in the middle of your screen; the rest is dark. It's the dose itself, so the screen-touches switch doesn't take it away. Fifteen minutes a dose.",
   },
   haze: {
     label: "Haze", icon: "🌫️", mins: 15, color: "#c8c0d8", every: [6, 10],
-    words: /\b(haze (?:drops?|serum|potion|mist|tonic)|hazy (?:drops?|serum|potion)|daze (?:drops?|serum))\b/,
+    words: DOSE_WORDS.haze,
     keywords: ["haze drops", "haze mist"], soak: ["haze"],
     desc: "Everything soft and blurry: the game's picture goes hazy (not the chat). Fifteen minutes a dose.",
   },
@@ -257,7 +258,7 @@ export const BOOK = {
   // arousal stops right where it is. The Companion draws it (statue.js), for everybody in the room with one. ──
   statue: {
     label: "Statue Serum", icon: "🗿", mins: 30, color: "#9a9a9a", every: [6, 10],
-    words: /\b(statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot))\b/,
+    words: DOSE_WORDS.statue,
     keywords: ["statue serum", "petrifying draught"], soak: ["petrifying"],
     desc: "Half an hour as a statue: your skin and hair turn to stone, or porcelain, gold, black latex, marble or bronze if the bottle says. Your eyes are glass set in it, still your own colour; your ink turns with your skin, and your arousal stops right where it is. Everybody with the Companion sees it.",
   },
@@ -265,25 +266,25 @@ export const BOOK = {
   // dialator effect and parasite that makes nipples fuckable as a real action?") ──
   surecatch: {
     label: "Sure-Catch Serum", icon: "🤰", mins: 120, color: "#d58fb0", every: [8, 12],
-    words: /\b(sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener)\b/,
+    words: DOSE_WORDS.surecatch,
     keywords: ["sure-catch serum", "womb opener"], soak: ["sure-catch"],
     desc: "Every load takes. On the farm any load that can catch does (your Fertile switch still has to be on), and once you're carryin', every load after adds to the litter and brings it on, so you swell bigger with each one, up to the farm's hyper sizes. Off the farm your womb just aches for it. Two hours a dose.",
   },
   dilator: {
     label: "Nipple Dilator", icon: "⭕", mins: 60, color: "#e0809a", every: [7, 11],
-    words: /\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/,
+    words: DOSE_WORDS.dilator,
     keywords: ["nipple dilator", "nipple stretcher"], soak: ["dilating"],
     desc: "Your nipples stretch open while it's in you, wider for a stronger dose. While they're open, the game's action menu has a real Fuck nipple and Finger nipple on you, for anybody with the Dispensary, and touches there count double. Crafted nipple gear that says dilator or stretcher keeps them open while it's worn. An hour a dose.",
   },
   balm: {
     label: "Tightening Balm", icon: "🧴", mins: 0, color: "#f0d8c0", instant: true,
-    words: /\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/,
+    words: DOSE_WORDS.balm,
     keywords: ["tightening balm", "nipple tightener", "pussy tightener", "ass tightener", "virgin tonic"],
     desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone. A bottle that names your pussy, ass or throat (or says virgin, for all of them) tightens that instead: two sizes a dose off what it's trained to, and closed back up to it.",
   },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
-    words: /\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/,
+    words: DOSE_WORDS.purge,
     keywords: ["purge serum", "antidote"],
     desc: "Every dose in you flushed out at once (and LSCG's too, with its own antidote, when it's loaded).",
   },
@@ -310,19 +311,21 @@ export const TENDER_SPOTS = {
   thighs: { word: "thighs", zones: ["ItemLegs"], re: /\b(thighs?|legs?)\b/ },
   feet: { word: "feet", zones: ["ItemFeet", "ItemBoots"], re: /\b(feet|foot|toes?|soles?)\b/ },
 };
+for (const s of Object.values(TENDER_SPOTS)) s.re = loosen(s.re);   // (any spellin': "inner-thighs", "ear lobes")
 export const TENDER_DEFAULT = "nipples";
 // FILL-OUT's parts
 const PART_RE = { belly: /\b(belly|tummy|stomach|womb)\b/, ass: /\b(ass|butt|bum|rear|hips?|booty)\b/ };
+for (const k of Object.keys(PART_RE)) PART_RE[k] = loosen(PART_RE[k]);
 // the Statue Serum's material, off the bottle (stone if it doesn't say)
 export const STATUE_MATS = { stone: "stone", porcelain: "porcelain", gold: "gold", latex: "black latex", marble: "marble", bronze: "bronze" };
 export function statueMat(t) {
   t = String(t || "").toLowerCase();
-  return /porcelain|china doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
+  return /porcelain|china[\s_-]*doll|\bchina\b/.test(t) ? "porcelain" : /\bgold|gild/.test(t) ? "gold" : /latex|rubber/.test(t) ? "latex" : /marble/.test(t) ? "marble" : /bronze/.test(t) ? "bronze" : "stone";
 }
 // the Animal Tongue's animal, off the bottle (none: your own)
 const TONGUE_RE = [["pup", /\b(puppy|pup|doggy|dog)[- ]?tongue/], ["kitty", /\b(kitty|kitten|cat)[- ]?tongue/], ["pony", /\b(pony|horse)[- ]?tongue/], ["cow", /\b(cow|bovine)[- ]?tongue/],
   ["bunny", /\b(bunny|rabbit)[- ]?tongue/], ["fox", /\b(fox|vixen)[- ]?tongue/], ["goat", /\bgoat[- ]?tongue/], ["sheep", /\b(sheep|lamb)[- ]?tongue/], ["pig", /\b(piggy|pig)[- ]?tongue/],
-  ["wolf", /\bwolf[- ]?tongue/], ["dragon", /\bdragon[- ]?tongue/], ["rat", /\brat[- ]?tongue/]];
+  ["wolf", /\bwolf[- ]?tongue/], ["dragon", /\bdragon[- ]?tongue/], ["rat", /\brat[- ]?tongue/]].map(([k, re]) => [k, loosen(re)]);
 export const TONGUE_NOUN = { pup: "puppy", kitty: "kitty", pony: "pony", cow: "cow", bunny: "bunny", fox: "fox", goat: "goat", sheep: "lamb", pig: "piggy", wolf: "wolf", dragon: "dragon", rat: "rat" };
 export function partFor(id, text) {
   const t = String(text || "").toLowerCase();
@@ -333,14 +336,14 @@ export function partFor(id, text) {
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   if (id === "balm") {   // (Nov 18) which holes: "n" in front when it's for the nipples too
-    const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag reflex)\b/.test(t) && "throat"].filter(Boolean);
-    const which = /\b(virgin\w*|holes|every hole|all over)\b/.test(t) || hs.length > 1 ? "holes" : hs[0] || "";
+    const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag[\s_-]*reflex)\b/.test(t) && "throat"].filter(Boolean);
+    const which = /\b(virgin\w*|holes|every[\s_-]*hole|all[\s_-]*over)\b/.test(t) || hs.length > 1 ? "holes" : hs[0] || "";
     return which ? (/\b(nipples?|teats?)\b/.test(t) ? "n" : "") + which : "";
   }
   return "";
 }
 export function dosesIn(text) {
-  const t = String(text || "").toLowerCase(), x = stackOf(t);
+  const t = String(text || "").toLowerCase().replace(/_+/g, " "), x = stackOf(t);
   return doseIds().filter((id) => BOOK[id].words.test(t)).map((id) => { const p = partFor(id, t); return p ? { id, x, p } : { id, x }; });
 }
 // the part or spot a dose is on (Fill-Out: cup, belly or ass · Tender: the bottle's spot, or the one you picked)

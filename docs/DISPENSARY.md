@@ -304,6 +304,28 @@ and running timers follow you between your phone and your PC, and clearing the b
      (open till you've read one: `st().guided`), every section has a 📖 How it works that opens its guide under that
      heading, and `/dispensary guide <topic>` (or `help`) opens the page at one. Every "Try it" craft is checked against
      the real doses by `tests/dispensary-guides.test.cjs`: keep a guide's crafts and its words true when a dose changes.
+   - **Every spellin', one door per dose** (built Nov 19; Laynie: "need to double check that everything gets routed
+     correctly, and that its accurately checking the phrases, even if we need to hyphenate"):
+     - **One book of words**, `shared/dose-words.js`, read by the Dispensary and the farm girl alike. `loosen()` opens
+       every gap between a phrase's words to any run of spaces, hyphens and underscores, or none: "Denial Serum",
+       "denial-serum", "Denial_Serum" and "DenialSerum" are one dose. The gear words, time-release, the parasites, the
+       parts and animals, and the hole sizes read the same way, and a craft's underscores read as spaces. Plain English
+       stays plain: "fill out", "a heat wave", "in a rut" aren't doses.
+     - **The farm's doses** (`FARM_DOSES`, `farm: true` in the book): with the farm girl in the room your Dispensary
+       leaves these to her, and she reads every spellin' of them now (she missed Needy Nectar, Bitterroot, Hiccup Fizz,
+       Featherlight and Heat Mist before, so those needles did nothin' on the farm). Bitterroot, Hiccup Fizz and
+       Featherlight from a needle are her potions, handed to your Dispensary like the ones from her store.
+     - **The Dispensary's own doses:** for anybody runnin' a Dispensary she takes its words out of a needle before she
+       reads it (`dispStrip`), so nothin' happens twice: Deep Throat Drops and Throat Relaxer used to train her throat
+       books too, a Pussy or Ass Tightener to tighten, Sure-Catch to ripen. Without a Dispensary she reads her own words
+       as ever.
+     - **Nipple gear:** anythin' worn on the nipples that says dilator, dilating, stretcher, spreader, opener or widener
+       is the Nipple Dilator while it's on (it wanted "nipple dilator" in full before).
+     - **Still hers to decide:** "Ass Growth" (on the farm, her "Ass" is the hole: it stretches it; the Dispensary
+       grows a bigger rear) and a "Reducing Serum" that names no part (the farm: 500 mL less capacity; the Dispensary:
+       a cup size off). Both left as they were.
+     - Tests: `dispensary-phrases` (every keyword nine ways, and the rest), `dispensary-routing` (the farm girl and
+       every dose in every spellin'), `nipple-gear-body`.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

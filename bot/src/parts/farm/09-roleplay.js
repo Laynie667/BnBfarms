@@ -302,19 +302,20 @@
     }
     const giver = charFor(data.Sender);
     const tool = giver && (giver.Appearance||[]).find(it => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld");
-    const text = craftText(tool);
+    const raw = craftText(tool), text = dispStrip(target, raw);   // (their Dispensary's own doses are its to give: 10ur2-dispensary.js)
     const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text);
     L.shotLog = (L.shotLog||[]).concat({ t:Date.now(), by:data.Sender, to:target,
                   item: tool ? ((tool.Craft && tool.Craft.Name) || tool.Asset.Name) : "(nothing in hand)",
                   tags: Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?" up":" down"))) }).slice(-15);
     dbg("INJECT", data.Sender, "→", target, "item:", text || "(no crafted item)", "tags:", Array.from(tags).join(",") || "none");
-    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)){ saveLedger(); try { shotUnread(data.Sender, tool, text, target); } catch(e){} return; }   // a plain injector: LSCG's business, not ours (10ur-shots-more.js says so when it looked like a farm shot)
+    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)){ saveLedger(); try { shotUnread(data.Sender, tool, raw, target); } catch(e){} return; }   // a plain injector: LSCG's business, not ours (10ur-shots-more.js says so when it looked like a farm shot)
     applyShot(target, data.Sender, text);
   }
   const stackWord = lv => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' "+(lv + 1)+" times over";
   // one dose of whatever a crafted item's words say. by: who gave it (the bot, for a trap or a toy that doses on its own)
   // how: nothin' for a needle in the hand, or { open: the line that opens the emote, from: "the auto-injector's dose", heatH }
   function applyShot(target, by, text, how){
+    text = dispStrip(target, text);   // (one door per dose: 10ur2-dispensary.js)
     const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), krypto = kryptoHit(target, text);
     const x = shotTimes(text) * (kryptoNow(target) ? 2 : 1);   // a proprietor down to stock takes every shot double (10ur-shots-more.js)
     if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !krypto) return false;

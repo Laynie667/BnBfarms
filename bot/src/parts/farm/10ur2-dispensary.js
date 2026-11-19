@@ -71,8 +71,21 @@
     return pickFresh("sure:" + (g.full ? "full" : "more"), g.full ? SURE_FULL : SURE_LINES).replace(/%t/g, plainName(t)).replace(/%s/g, plainName(stud)).replace(/%c/g, String(g.count || 1));
   }
   if (W.__FARMHAND_TEST__) W.__sureLine = (t, s) => sureLine(t, s);
-  // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me)
-  const DISP_WORDS = /sure[- ]?catch|every[- ]load[- ]takes?|womb[- ]?opener|nipple[- ](?:dilat|stretch|opener|spreader)|teat[- ](?:dilat|opener|stretch)|let[- ]?down|fill[- ]?out|swell(?:ing)? (?:serum|shot|tonic|potion|drops?)|airhead|bimbo (?:elixir|potion|serum|tonic|shot|juice|drops?)|babble|potty[- ]?mouth|deep[- ]?throat|throat relax|gag[- ]?reflex|\brut(?:ting)? (?:serum|shot|tonic|potion|musk|drops?)|in[- ]rut|tender (?:drops?|serum|balm|oil|shot|tonic)|tenderi[sz]er|weak[- ]?knees?|jelly[- ]?legs?|down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?)|blind(?:er|ing)? drops?|dim(?:ming)? drops?|cotton[- ]?ears?|deaf(?:ening)? (?:drops?|serum|draught|tonic)|tunnel[- ]?vision|haze (?:drops?|serum|potion|mist|tonic)|honey[- ]tongue|golden[- ]hour|ribbon[- ]musk|echo[- ]elixir|statue (?:serum|potion|tonic|draught|drops?|elixir|shot)|petrif(?:y|ying|ication) (?:serum|potion|tonic|draught|drops?|elixir|shot)|stone[- ]?skin|gilding (?:serum|potion|tonic|draught|drops?|elixir|shot)/i;
+  // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me), straight
+  // out of its book (shared/dose-words.js), so every spellin' counts: "Rut Serum", "rut-serum", "RutSerum"
+  const DISP_ONLY = Object.keys(DOSE_WORDS).filter(id => !FARM_DOSES.includes(id));
+  const DISP_WORDS = { test: (t) => { const s = String(t || "").toLowerCase(); return DISP_ONLY.some(id => DOSE_WORDS[id].test(s)); } };
+  // ONE DOOR PER DOSE (Nov 19; Laynie: "need to double check that everything gets routed correctly"). For somebody
+  // runnin' the Dispensary, its own doses' words come out of a needle's text before I read it: "Deep Throat Drops" and
+  // "Throat Relaxer" read as my throat trainin' too, a "Pussy Tightener" as my tightenin' shot, "Sure-Catch" as my
+  // ripenin' one, so they happened twice. Their Dispensary gives those, and tells me what I keep (the hello, the hole
+  // books). Without a Dispensary I read it all, my own way, as ever.
+  function dispStrip(mn, text){
+    if (!text || !dispFor(mn)) return text;
+    let t = String(text).toLowerCase();
+    for (const id of DISP_ONLY) t = t.replace(everyOf(DOSE_WORDS[id]), " ");
+    return t;
+  }
   const CRAVE_OFFER_MS = 45 * 60000;
   const CRAVE_OFFERS = [
     "💉 You've got that look, sugar. Itchin' for another %d? Say ?fix and I'll see to it.",

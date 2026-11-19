@@ -17,9 +17,20 @@ import { settingsAvailable, openSettings } from "../settings.js";
 import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
 // the body sizes: the farm's, with your holes from your Dispensary when it's runnin' (Nov 18: it counts what happens
 // off the farm, so it's the fresher of the two): how open tonight, and trained when that's different
+// (Nov 19) and your nipples from your Dispensary, which keeps them (Laynie: "I also dont see nipples as part of the body for
+// stages in the companion"): how open, trained to stay, the toy in them, loads taken. Off the farm, the Dispensary's own
+// holes and nipples are the Body rows.
 function bodyNow(s) {
-  let dh = null; try { const D = window.FarmhandDispensary; dh = D && typeof D.holes === "function" ? D.holes() : null; } catch (e) { dh = null; }
-  return (s.body || []).map((b) => { const x = dh && dh[b.part]; return x ? Object.assign({}, b, { size: x.nowWord + " (" + x.now + "/20)", trained: x.now !== x.trained ? x.trainedWord : "" }) : b; });
+  let dh = null, dn = null; const D = window.FarmhandDispensary;
+  try { dh = D && typeof D.holes === "function" ? D.holes() : null; } catch (e) { dh = null; }
+  try { dn = D && typeof D.nipsInfo === "function" ? D.nipsInfo() : null; } catch (e) { dn = null; }
+  const hole = (x) => ({ size: x.nowWord + " (" + x.now + "/20)", trained: x.now !== x.trained ? x.trainedWord : "" });
+  const out = (s.body || []).length ? s.body.map((b) => { const x = dh && dh[b.part]; return x ? Object.assign({}, b, hole(x)) : b; })
+    : Object.entries(dh || {}).map(([part, x]) => Object.assign({ part, label: x.label }, hole(x)));
+  if (dn && typeof dn.word === "string") out.push({ part: "nipples", label: "Nipples", size: dn.word + (dn.open ? " (" + dn.open + "/3)" : ""),
+    trained: dn.trained && dn.trained !== dn.open ? dn.trainedWord : "",
+    note: [dn.toy ? "the " + dn.toy + " in them" + (dn.locked ? ", locked" : "") : "", dn.toward ? dn.toward + "% to " + (["", "open", "wide open", "gapin'"][Math.min(3, (dn.trained || 0) + 1)]) : "", dn.loads ? dn.loads + " load" + (dn.loads === 1 ? "" : "s") + " taken" : ""].filter(Boolean).join(" · ") });
+  return out;
 }
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
@@ -125,9 +136,9 @@ function me(ctx) {
           s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - now) / 86400000)) + " day(s)"),
           s.eggs && h("div", null, "🥚 " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
           h("div", null, btn("Pedigree", () => ctx.send("pedigree")), btn("Eggs", () => ctx.send("eggs")), btn("Body tab ›", () => ctx.setUi({ goTab: "body" })))] },
-      (s.body || []).length && { id: "body", label: "📏 Body", sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" · "),
-        body: () => [h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null))),
-          h("div", null, btn("Measure", () => ctx.send("measure")))] },
+      bodyNow(s).length && { id: "body", label: "📏 Body", sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" · "),
+        body: () => [h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null, b.note ? muted(b.note) : null))),
+          (s.body || []).length ? h("div", null, btn("Measure", () => ctx.send("measure"))) : null] },
       s.today && { id: "marks", label: "✍️ Today's marks", sum: "used " + s.today.tally + " · " + s.today.naughty + " naughty · praised " + s.today.praised,
         body: () => [pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),
           h("div", null, btn("My tally", () => ctx.send("tally")))] },

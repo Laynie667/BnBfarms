@@ -17,6 +17,7 @@
      • GOALS: "goal: gaping", "train her to loose", "until ruined" on a trainer, with "in 3 days" or "by friday" if it's
        in a hurry. Only from somebody who's allowed to dose you (Laynie: "anyone who can dose").
 */
+import { phrase } from "./dose-words.js";
 export const HOLES = ["vulva", "butt", "throat"];
 const GAPE = ["tight", "snug", "slightly gaped", "gaped", "loose", "well-used", "gaping", "wide open", "cavernous", "ruined",
   "hyper-gaped", "fist-wide", "yawning", "arm-deep", "sloppy and slack", "bottomless", "hollowed out", "endless", "abyssal", "impossibly gaped"];
@@ -150,7 +151,8 @@ export function goalSize(hole, words) {
   const m = /\b(?:size|level)\s*(\d{1,2})\b/.exec(w);
   if (m) return Math.max(S.start, Math.min(S.natural, Number(m[1])));
   const names = S.names.slice(0, S.natural).map((n, i) => [n, i + 1]).concat(Object.entries(SAY_TO)).sort((a, b) => b[0].length - a[0].length);
-  for (const [n, lvl] of names) { if (new RegExp("(^|[^a-z])" + n.replace(/[.*+?^${}()|[\]\\']/g, (c) => (c === "'" ? "'?" : "\\" + c)) + "(?![a-z])").test(w)) return Math.max(S.start, Math.min(S.natural, lvl)); }
+  // (Nov 19) any spellin' of a size: "well used", "well-used", "wellused", "wide-open", "past gagging"
+  for (const [n, lvl] of names) { if (new RegExp("(^|[^a-z])" + phrase(n) + "(?![a-z])").test(w)) return Math.max(S.start, Math.min(S.natural, lvl)); }
   return 0;
 }
 // how long it's got: "in 3 days", "in 12 hours", "in a week", "by friday", "by tomorrow" (ms from now, or 0)

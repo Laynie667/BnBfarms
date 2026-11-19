@@ -58,6 +58,16 @@ const trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now()
 export const trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
 // how open yours are: 0 shut, 1 to 3 (held open, or trained to stay that way)
 export function nipsOpen() { return Math.max(heldOpen(), trainedLevel()); }
+// (Nov 19) their stages, in words, for the page and the Companion's Body rows (Laynie: "I also dont see nipples as part
+// of the body for stages in the companion")
+export const NIP_WORDS = ["closed", "open", "wide open", "gapin'"];
+export function nipsInfo() {
+  const open = nipsOpen(), trained = trainedLevel(), lvl = (st().nipTrain || {}).lvl || 0, held = heldOpen();
+  const toy = toyIn(W.Player), T = toyOf(toy);
+  return { open, trained, held, word: NIP_WORDS[open], trainedWord: NIP_WORDS[trained],
+    toward: held > trained && trained < 3 ? Math.max(0, Math.min(99, Math.floor((lvl - trained) * 100))) : 0,
+    loads: nipLoads().n || 0, toy: T ? T.label : "", locked: !!(toy && toyLocked(toy)), heal: st().nipsHeal !== false };
+}
 // every few seconds: held open they train; left be (with your switch on) they close up slowly
 export function nipsTrainTick(now) {
   now = now || Date.now();

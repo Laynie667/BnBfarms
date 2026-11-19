@@ -20,7 +20,7 @@
    The safeword, the Purge, or a keyholder lettin' you out clears what's in you and stops your gear for 15 minutes.
 */
 import { st, save } from "./store.js";
-import { BOOK, doseIds, dosesIn, give, active, leftMs } from "./doses.js";
+import { BOOK, doseIds, dosesIn, give, active, leftMs, stackOf } from "./doses.js";
 import { allowed } from "./ladder.js";
 import { lscgPresent } from "./lscg.js";
 import { craftText, botHere } from "./needle.js";
@@ -28,16 +28,24 @@ import { isLater, queue } from "./later.js";
 import { LINES } from "./lines.js";
 import { local, action, fill, pick, nameOf, inRoom } from "./say.js";
 import { NOTES } from "./lines.js";
+import { loosen } from "../../shared/dose-words.js";
 
 const W = window, MIN = 60000;
 export const DRIP_MINS = 10, INJECT_EVERY = 30, TRIGGER_GAP = 2 * MIN, PAUSE_MINS = 15;
-export const DRIP_WORDS = /\b(drip\w*|iv|i\.v\.|laced|coated|soaked|infused|seeping)\b/;
-export const INJECT_WORDS = /\b(injector|auto[- ]?inject\w*|dosing|dispenser|pump)\b/;
-const EVERY = /\bevery\s+(\d{1,3})\s*(?:min|minutes?)\b/;
-const TRIGGERS = { climax: /\b(on|when|whenever|every)\s+(?:she |he |they |you )?(climax\w*|cum\w*|orgasm\w*)\b/, kissed: /\bwhen\s+kiss\w*\b/,
-  touched: /\bwhen\s+(touch\w*|groped|caressed|fondled)\b/, spanked: /\bwhen\s+(spank\w*|slapped|paddled)\b/ };
-export const ROULETTE_WORDS = /\b(roulette|mystery (?:dose|shot|serum|drink)|surprise (?:dose|shot))\b/;
-const GLOSS_WORDS = /\b(lip ?gloss|lipstick|lip balm|lip stain)\b/;
+// (Nov 19) every one of these reads however it's spelled between its words: "auto-injector", "when-kissed",
+// "mystery_dose", "LipGloss" (shared/dose-words.js loosen)
+export const DRIP_WORDS = loosen(/\b(drip\w*|iv|i\.v\.|laced|coated|soaked|infused|seeping)\b/);
+export const INJECT_WORDS = loosen(/\b(injector|auto[- ]?inject\w*|dosing|dispenser|pump)\b/);
+const EVERY = loosen(/\bevery\s+(\d{1,3})\s*(?:min|minutes?)\b/);
+const TRIGGERS = { climax: loosen(/\b(on|when|whenever|every)\s+(?:she |he |they |you )?(climax\w*|cum\w*|orgasm\w*)\b/), kissed: loosen(/\bwhen\s+kiss\w*\b/),
+  touched: loosen(/\bwhen\s+(touch\w*|groped|caressed|fondled)\b/), spanked: loosen(/\bwhen\s+(spank\w*|slapped|paddled)\b/) };
+export const ROULETTE_WORDS = loosen(/\b(roulette|mystery (?:dose|shot|serum|drink)|surprise (?:dose|shot))\b/);
+export const GLOSS_WORDS = loosen(/\b(lip ?gloss|lip ?stick|lip balm|lip stain)\b/);
+// (Nov 19) on the nipples, these alone are the Nipple Dilator: "Dilator Clamps", "Stretcher Clamps", "dilating rings".
+// Laynie: "the nipple clamps for the nipple dilation doesn't seem to work?". The page always said "says dilator or
+// stretcher", but the words wanted "nipple dilator" in full.
+// (no closing \b, so run-together names count too: "DilatorClamps", "SpreaderRings"; "stretchy" still isn't one)
+export const NIP_DILATE = /\b(dilat(?:or|ing|ion|e|es|ed)|stretch(?:er|ing)|spreader|opener|gaper|widener)/;
 // LSCG's own soaked and laced gear (LSCG 0.9.9) reads "soaked" or "laced" with its keywords: that's LSCG's to dose
 const LSCG_SOAKED = /\b(soaked|laced)\b/;
 
@@ -66,11 +74,13 @@ export function wornGear() {
     if (!item || !item.Craft) continue;
     const text = craftText(item); if (!text) continue;
     const list = dosesOf(text).filter((d) => ours(d.id));
+    // (Nov 18) crafted nipple gear that says dilator or stretcher: the Nipple Dilator stays in you while it's worn
+    const onNips = /^ItemNipples/.test(String(item.Asset && item.Asset.Group && item.Asset.Group.Name));
+    if (onNips && NIP_DILATE.test(text) && !list.some((d) => d.id === "dilator") && ours("dilator")) list.push({ id: "dilator", x: stackOf(text) });
     const roulette = ROULETTE_WORDS.test(text);
     if (!list.length && !roulette) continue;
     const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text));
-    // (Nov 18) crafted nipple gear that says dilator or stretcher: the Nipple Dilator stays in you while it's worn
-    const nipGear = /^ItemNipples/.test(String(item.Asset && item.Asset.Group && item.Asset.Group.Name)) && list.some((d) => d.id === "dilator");
+    const nipGear = onNips && list.some((d) => d.id === "dilator");
     const drip = nipGear || (DRIP_WORDS.test(text) && !(lscgPresent() && LSCG_SOAKED.test(text) && !/\bdrip|\biv\b/.test(text)));
     const inject = INJECT_WORDS.test(text);
     if (!drip && !inject && !trig.length) continue;   // (a dose's words on a worn thing that doesn't say how: nothin')

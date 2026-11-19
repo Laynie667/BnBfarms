@@ -7,6 +7,7 @@ import * as BCPLUS from "../../shared/bcplus.js";
 import * as FARM_OUTFITS from "../../shared/farm-outfits.js";
 import { speciesKeyOf } from "../../shared/species.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
+import { DOSE_WORDS, FARM_DOSES, everyOf } from "../../shared/dose-words.js";
 import { PUBLIC_GROUPS, STAFF_GROUPS, OWNER_GROUPS } from "../../shared/guides.js";
 import { VERSION, COMPANION_VERSION } from "./version.js";
 

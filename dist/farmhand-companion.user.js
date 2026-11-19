@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.68.1
+// @version      0.68.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8064,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.68.1";
+  var VERSION = "0.68.2";
 
   // shared/species.js
   var WORDS = {
@@ -17719,17 +17719,31 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // extension/src/views/livestock.js
   function bodyNow(s) {
-    let dh = null;
+    let dh = null, dn = null;
+    const D = window.FarmhandDispensary;
     try {
-      const D = window.FarmhandDispensary;
       dh = D && typeof D.holes === "function" ? D.holes() : null;
     } catch (e) {
       dh = null;
     }
-    return (s.body || []).map((b) => {
+    try {
+      dn = D && typeof D.nipsInfo === "function" ? D.nipsInfo() : null;
+    } catch (e) {
+      dn = null;
+    }
+    const hole = (x) => ({ size: x.nowWord + " (" + x.now + "/20)", trained: x.now !== x.trained ? x.trainedWord : "" });
+    const out = (s.body || []).length ? s.body.map((b) => {
       const x = dh && dh[b.part];
-      return x ? Object.assign({}, b, { size: x.nowWord + " (" + x.now + "/20)", trained: x.now !== x.trained ? x.trainedWord : "" }) : b;
+      return x ? Object.assign({}, b, hole(x)) : b;
+    }) : Object.entries(dh || {}).map(([part, x]) => Object.assign({ part, label: x.label }, hole(x)));
+    if (dn && typeof dn.word === "string") out.push({
+      part: "nipples",
+      label: "Nipples",
+      size: dn.word + (dn.open ? " (" + dn.open + "/3)" : ""),
+      trained: dn.trained && dn.trained !== dn.open ? dn.trainedWord : "",
+      note: [dn.toy ? "the " + dn.toy + " in them" + (dn.locked ? ", locked" : "") : "", dn.toward ? dn.toward + "% to " + ["", "open", "wide open", "gapin'"][Math.min(3, (dn.trained || 0) + 1)] : "", dn.loads ? dn.loads + " load" + (dn.loads === 1 ? "" : "s") + " taken" : ""].filter(Boolean).join(" \xB7 ")
     });
+    return out;
   }
   var pct3 = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
@@ -17874,13 +17888,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             h("div", null, btn("Pedigree", () => ctx3.send("pedigree")), btn("Eggs", () => ctx3.send("eggs")), btn("Body tab \u203A", () => ctx3.setUi({ goTab: "body" })))
           ]
         },
-        (s.body || []).length && {
+        bodyNow(s).length && {
           id: "body",
           label: "\u{1F4CF} Body",
           sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" \xB7 "),
           body: () => [
-            h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null))),
-            h("div", null, btn("Measure", () => ctx3.send("measure")))
+            h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null, b.note ? muted(b.note) : null))),
+            (s.body || []).length ? h("div", null, btn("Measure", () => ctx3.send("measure"))) : null
           ]
         },
         s.today && {

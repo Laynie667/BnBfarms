@@ -29,7 +29,7 @@ export function craftText(item) {
   if (!item || !item.Craft) return "";
   let d = item.Craft.Description || "";
   try { if (W.CraftingDescription && typeof W.CraftingDescription.Decode === "function") d = W.CraftingDescription.Decode(d); } catch (e) { /* as it is */ }
-  return ((item.Craft.Name || "") + " | " + d).toLowerCase();
+  return ((item.Craft.Name || "") + " | " + d).toLowerCase().replace(/_+/g, " ");   // (Nov 19: "iv_drip" reads as "iv drip")
 }
 const handOf = (C) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null);
 // the words on whatever somebody in the room has in their hand ("" if nothin' crafted)

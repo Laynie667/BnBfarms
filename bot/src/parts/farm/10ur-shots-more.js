@@ -261,6 +261,10 @@
       }
     }
     if (tags.has("mooserum") && potion("moo", "moo serum")){ done.push("moo, moo"); fx0.push("mooserum"); }
+    // (Nov 19) my other potions, from a needle with the Dispensary's name for them on it: the bottle's own lines
+    if (tags.has("bitterroot") && potion("bitterroot", "bitterroot")) done.push("ruined at the edge for half an hour");
+    if (tags.has("hiccup") && potion("hiccup", "hiccup fizz")) done.push("hiccuppin'");
+    if (tags.has("feather") && potion("feather", "featherlight")) done.push("ticklish all over");
     if (tags.has("futashot")){
       if (r.futa && !r.futaShot) done.push("already futa");
       else if (limitBlocks(target, "futa")) done.push("no futa, their limits rule it out");

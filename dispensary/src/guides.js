@@ -172,7 +172,7 @@ export const GUIDES = [
     id: "nipples", icon: "⭕", title: "Nipples",
     intro: "Nipples that open up, take toys and cocks, and learn to stay open.",
     steps: [
-      "Open them: a Nipple Dilator dose, wider the stronger it is; nipple gear crafted as a dilator drip; or nipple leeches.",
+      "Open them: a Nipple Dilator dose, wider the stronger it is; anythin' worn on the nipples crafted to say dilator or stretcher, like Dilator Clamps, which hold them open as long as they're on; or nipple leeches.",
       "While they're open, two new actions show on the nipples in the game's action menu: Fuck nipple, for somebody with a cock, and Finger nipple, for anybody, you too.",
       "Toys fit too. The nipple slot has nipple plugs, beads, eggs, dildos, a sound and pump-ups: the game's own toys made for an open nipple. Whoever owns the toy owns its nipple version. A toy in them holds them open.",
       "Held open and used, they train. The stretch stays after the dose wears off or the leeches drop.",
@@ -181,7 +181,7 @@ export const GUIDES = [
     ],
     craft: [
       { name: "Nipple Dilator x2", note: "held open wider, for two hours", expect: ["dilator"] },
-      { name: "Dilator Clamps", desc: "nipple dilator drip", note: "keeps them open the whole time they're clamped on", expect: ["dilator"] },
+      { name: "Dilator Clamps", note: "worn on the nipples: keeps them open the whole time they're clamped on", expect: [] },
     ],
     tips: [
       "Your switch: They close up slowly on their own, half a step a day once they've been left be twelve hours. Off, they stay as they're trained.",

@@ -14,9 +14,10 @@ import { LINES } from "./lines.js";
 import { BOOK, give, doseIds, active } from "./doses.js";
 import { lscgPresent } from "./lscg.js";
 import { local, action, fill, pick, inRoom } from "./say.js";
+import { loosen } from "../../shared/dose-words.js";
 
 const MIN = 60000, DAY = 86400000;
-export const LATER_WORDS = /\b(time[- ]?release\w*|slow[- ]?release\w*|delayed|capsules?)\b/;
+export const LATER_WORDS = loosen(/\b(time[- ]?release\w*|slow[- ]?release\w*|delayed|capsules?)\b/);   // ("Time_Release", "timerelease" too)
 export const isLater = (text) => LATER_WORDS.test(String(text || "").toLowerCase());
 export const LATER_MAX = 5;
 export const FUSE_MINS = [5, 40];

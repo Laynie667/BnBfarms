@@ -80,6 +80,12 @@
     }
     return { pairs: out, rest: w.filter((x,k) => !used.has(k)).join(" ") };
   }
+  // the Dispensary's names for my own shots (shared/dose-words.js): its book leaves these to me on my farm, so I read every
+  // spellin' of them (Nov 19: "Needy Nectar", "needy-nectar", "Bitterroot", "Hiccup Fizz", "Featherlight", "Heat Mist",
+  // "Cup Growth" all used to slip past me, and with me in the room their Dispensary left them to me: nothin' happened)
+  const FARM_DOSE_TAG = { denial: "denial", sedative: "sedative", needy: "aphro", hairtrigger: "trigger", bitterroot: "bitterroot", moo: "mooserum",
+    hiccup: "hiccup", feather: "feather", heat: "heat", suggestible: "obey", purge: "purge" };
+  const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
   function sizeTagsIn(text){
     const out = [], flat = squash(text);
     for (const [part, d] of Object.entries(CFG.SIZE_TAGS)){
@@ -87,6 +93,8 @@
       else if (d.down.some(w => flat.includes(squash(w)))) out.push([part, -1]);
     }
     for (const pr of partShots(text).pairs) if (!out.some(o => o[0] === pr[0])) out.push(pr);
+    const low = String(text || "").toLowerCase();
+    for (const [id, part] of FARM_DOSE_SIZE) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low) && !out.some(o => o[0] === part)) out.push([part, +1]);
     return out;
   }
   function tagsIn(text){
@@ -99,6 +107,8 @@
     // and the way a description says it, in whole words (10ur-shots-more.js: "keeps her lactating", "makes him virile")
     const plain = String(partShots(text).rest || text || "").toLowerCase();
     for (const [tag, re] of Object.entries(CFG.TAG_RE || {})) if (re.test(plain)) out.add(tag);
+    const low = String(text || "").toLowerCase();
+    for (const [id, tag] of Object.entries(FARM_DOSE_TAG)) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low)) out.add(tag);
     return out;
   }
   // a message that reaches them anywhere on the map: beep if we're friends, whisper otherwise

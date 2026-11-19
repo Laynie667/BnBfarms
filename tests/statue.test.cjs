@@ -130,6 +130,10 @@ function page(opts) {
   ok(k("Assets/Female3DCG/Blush/Blush.png") === "hide" && k("Assets/Female3DCG/Fluids/Fluids.png") === "hide", "...stone doesn't blush or cry");
   ok(k("Assets/Female3DCG/Cloth/Sweater/Large.png") === null && k("Assets/Female3DCG/ItemArms/Rope/Large.png") === null, "...and what's worn stays as it is");
   ok(k(Object.assign(w.document.createElement("canvas"), { __farmFrom: "skin" })) === "skin" && k(Object.assign(w.document.createElement("canvas"), { __farmFrom: "Assets/Female3DCG/Bra/x.png" })) === null, "...the drawn belly and breasts turn; a piece fitted to them doesn't");
+  const cv = (from) => Object.assign(w.document.createElement("canvas"), { __farmFrom: from });
+  ok(k(cv("Assets/Female3DCG/HandsLeft/Small_White.png")) === "skin" && k(cv("Assets/Female3DCG/HandsRight/Yoked/Large_White.png")) === "skin" && k(cv("Assets/Female3DCG/Override/EchoV2/ArmsLeft/XLarge_White.png")) === "skin" && k(cv("Assets/Female3DCG/Nipples/Nipples1.png")) === "skin",
+    "...and the hands, arms and nipples the drawn body draws again round the breasts turn too (Laynie, Nov 19: \"statue render missed hands\")");
+  ok(k(cv("Assets/Female3DCG/Gloves/Gloves1_Large.png")) === null && k(cv("Assets/Female3DCG/ItemHands/SpankingToys.png")) === null && k(cv("data:image/png;base64,AAAA")) === null, "...while gloves and what's held in them stay as they are");
   // drawin' one: blush gone, clothes as they are (and the eyes, till their picture's in: as they are for now)
   w.ChatRoomMessage({ Type: "Hidden", Sender: LOVER, Content: "FarmhandMsg", Dictionary: { v: 2, type: "statue", mat: "stone", left: 20 * 60000 } });
   const drawn = [];

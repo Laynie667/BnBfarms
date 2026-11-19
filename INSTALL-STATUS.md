@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.84.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.84.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.18.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.1** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.19.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.84.1 + Companion 0.68.1 + Dispensary 0.19.0: guides for everything, and the statue's hands** Laynie, Nov 19: "need to make guides in the dispensary for everything. statue render missed hands."
+  - **Guides, in the Dispensary:** fifteen of them, one for every part: getting started, crafting a dose, dosing somebody, gear that doses, time-release and cravings, doses that pick, kits, horny gear, nipples, hole training, parasites, your list and safeword, hardcore and keyholders, the farm and LSCG, and every command. Each is step by step, with crafts to try word for word (a Copy button for the game's crafting) and the things worth knowin'.
+  - **Where they are:** a Guides list at the top of the page (open the first time, folded away once you've read one), and a 📖 How it works on every section that opens its guide right there under the heading. `/dispensary guide <topic>` (or `/dispensary help`) opens the page at one: holes, kits, keyholders, statue, needle and so on.
+  - **Checked:** every craft in the guides is tested against the real Dispensary, so the words on it are the doses the guide says, it fits the game's 30-letter name, and the gear, horny and trainin' ones do what they say.
+  - **The statue's hands (Companion):** with the drawn breasts on, the hands tucked under or over them (and the nipples set on them) came to the Statue Serum as the drawn body's own drawings, so they stayed flesh. They turn with the rest of you now; gloves and whatever's in your hands stay as they are. Checked on the real game drawing.
+  - Also: horny gear has its own heading on the page now.
+  - Bot: only its note of the newest Companion, so it tells players on 0.68.0 to update.
 - **Bot 0.84.0 + Companion 0.68.0 + Dispensary 0.18.0: hole training anywhere** Laynie, Nov 18: "if we can do the hole training better, i would love to explore that idea", then all seven ideas, with "let it in, aching, sometimes even painful. A 'cruel' or 'sadist' tag might be fun".
   - **It trains anywhere:** your Dispensary counts your trainers and what's done to you in any room, and hands it to the farm girl next time you're in her room. Her books stay the only books.
   - **The toy's size matters:** every game plug, dildo, egg, bead and gag that goes in you has a size (craft words make it bigger or smaller). It stretches you to its size; one size bigger than you're trained is a good stretch, two aches, three or more hurts. A cruel or sadist one always hurts. "Too-big toys can hurt" is your switch.

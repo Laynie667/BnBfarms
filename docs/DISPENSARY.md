@@ -299,6 +299,11 @@ and running timers follow you between your phone and your PC, and clearing the b
      - Also in this release: a reload used to forget the newer settings (the nipples' trained stretch and switch, their
        loads, the Kits and Horny switches, kit speed and what kits put on, saved kits, and the kit on you with the old
        outfit it was holdin'). They're kept now (store.js).
+   - **Guides** (built Nov 19; Laynie: "need to make guides in the dispensary for everything"): `guides.js`, fifteen
+     guides, one for every part, each with steps, crafts to try word for word, and tips. A Guides list tops the page
+     (open till you've read one: `st().guided`), every section has a 📖 How it works that opens its guide under that
+     heading, and `/dispensary guide <topic>` (or `help`) opens the page at one. Every "Try it" craft is checked against
+     the real doses by `tests/dispensary-guides.test.cjs`: keep a guide's crafts and its words true when a dose changes.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

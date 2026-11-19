@@ -155,7 +155,14 @@ function redrawAll(soon) {
 // what a picture is to a statue: "skin", "hair" or "eyes" (turned), "hide", or null (left alone)
 function kindOf(src) {
   if (typeof src === "string") { const g = groupOf(src); return g ? (TURN.test(g) ? "skin" : HAIR.test(g) ? "hair" : EYES.test(g) ? "eyes" : HIDE.test(g) ? "hide" : null) : null; }
-  return src && typeof src === "object" && src.__farmFrom === "skin" ? "skin" : null;
+  if (!src || typeof src !== "object") return null;
+  const from = src.__farmFrom;
+  if (from === "skin") return "skin";
+  // a game picture the drawn body drew again, standin' in for it: the hands tucked under or over the drawn breasts, the
+  // nipples set on them, a piece shaped round the belly. Each is what it stands in for: hands are skin, a bra isn't.
+  // (Laynie, Nov 19: "statue render missed hands". These came as drawings marked with the hand's own picture, and only
+  // drawings marked "skin" turned.)
+  return typeof from === "string" && from !== "skin" ? kindOf(from) : null;
 }
 let sdk = null, hooked = false;
 function hook() {

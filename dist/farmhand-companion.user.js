@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.68.0
+// @version      0.68.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8064,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.68.0";
+  var VERSION = "0.68.1";
 
   // shared/species.js
   var WORDS = {
@@ -20611,7 +20611,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const g = groupOf3(src);
       return g ? TURN.test(g) ? "skin" : HAIR.test(g) ? "hair" : EYES.test(g) ? "eyes" : HIDE.test(g) ? "hide" : null : null;
     }
-    return src && typeof src === "object" && src.__farmFrom === "skin" ? "skin" : null;
+    if (!src || typeof src !== "object") return null;
+    const from = src.__farmFrom;
+    if (from === "skin") return "skin";
+    return typeof from === "string" && from !== "skin" ? kindOf2(from) : null;
   }
   var sdk5 = null;
   var hooked4 = false;

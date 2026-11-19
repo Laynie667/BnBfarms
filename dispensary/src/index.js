@@ -9,7 +9,7 @@ import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
 import { load, st, save } from "./store.js";
-import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown } from "./doses.js";
+import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown, dosesIn } from "./doses.js";
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
@@ -32,7 +32,8 @@ import { initSafeword, safeword } from "./safeword.js";
 import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
 import { initSpeech, dosedSpeech } from "./speech.js";
 import { screenTick } from "./screen.js";
-import { initPage, openPage, pageOpen, redrawPage, timeLeft } from "./page.js";
+import { initPage, openPage, pageOpen, redrawPage, timeLeft, guideNext } from "./page.js";
+import { GUIDES, guideFor } from "./guides.js";
 import { ladderWho, allowed } from "./ladder.js";
 import { local, nameOf } from "./say.js";
 
@@ -61,7 +62,7 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear",
+      Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
@@ -87,6 +88,13 @@ function commands() {
         // horny gear (Nov 18): its own switch
         const hm = /^horny\s+(on|off)$/.exec(a);
         if (hm) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().hornyOn = hm[1] === "on"; save(); local(hm[1] === "on" ? "Horny gear can use you: crafted gear that says horny or hungry has its way with you, now and then." : "Horny gear sits still on you now."); return; }
+        // the guides (Nov 19): the page, open at one
+        const gm = /^(?:guides?|help|how)(?:\s+(.+))?$/.exec(a);
+        if (gm) {
+          const G = gm[1] ? guideFor(gm[1].replace(/^(?:to|for|on|about)\s+/, "").split(/\s+/)[0]) || guideFor(gm[1]) : guideFor("start");
+          if (!G) { local("No guide for that. The guides: " + GUIDES.map((g) => g.id).join(", ") + ". /dispensary guide <one of those>, or /dispensary guide on its own to start."); return; }
+          guideNext(G.id); openPage(); return;
+        }
         if (/^(safe|safeword|red)$/.test(a)) { safeword("command"); return; }
         if (/^(page|settings|open)$/.test(a)) { openPage(); return; }
         // the mouthpiece: say what its crafter asked, or let it pass; or, as the crafter, send some words
@@ -190,7 +198,7 @@ const boot = setInterval(() => {
 }, 1000);
 
 // the tests reach in (only when a test page says so)
-if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
+if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), dosesIn: (t) => dosesIn(t), give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
   lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),
   speech: (t) => dosedSpeech(t), screen: () => screenTick(),
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },

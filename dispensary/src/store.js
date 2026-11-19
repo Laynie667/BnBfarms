@@ -93,6 +93,7 @@ export function clean(d) {
     s.holes = out;
   }
   s.mouthAuto = d.mouthAuto === true;
+  s.guided = d.guided === true;   // (Nov 19: you've opened a guide, so the guides fold away at the top of the page)
   s.iconsShow = d.iconsShow !== false; s.iconsShare = d.iconsShare !== false;   // (dose icons: both on till you switch them off)
   s.wornPause = num(d.wornPause, 0, 1e14, 0);
   if (Array.isArray(d.later)) {

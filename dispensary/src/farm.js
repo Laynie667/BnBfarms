@@ -27,6 +27,7 @@ import { botHere } from "./needle.js";
 import { local, action } from "./say.js";
 import { NOTES } from "./lines.js";
 import { hardOn, keyholders, dueAt } from "./hardcore.js";
+import { holesWelcome } from "./holes.js";
 
 const W = window;
 function send(type, data) {
@@ -42,7 +43,7 @@ export function hello(force) {
   const now = Date.now(), sig = sigNow();
   if (!force && sig === helloSig && now - helloAt < 30 * 60000) return false;
   if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off), hard: hardOn(),
-    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving() })) return false;
+    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving(), holes: 1 })) return false;   // (holes: we count your hole trainin', Nov 18)
   helloAt = now; helloSig = sig;
   return true;
 }
@@ -80,6 +81,7 @@ function onFarmMsg(m) {
     if (typeof m.species === "string" && /^[a-z]{2,20}$/.test(m.species)) S.speciesFarm = m.species;   // your animal, for Moo Juice
     S.farmAt = Date.now();
     save();
+    try { holesWelcome(m); } catch (e) { /* fine */ }   // (Nov 18) her numbers for your holes
     return;
   }
   if (m.type === "dispClear") {

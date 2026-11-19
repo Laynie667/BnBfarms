@@ -18,6 +18,8 @@ import { initToys } from "./toys.js";
 import { initKits, kitTick, kitNow, kitSave, kitDelete, kitNames, kitLookup, kitEnd, SPEEDS, SPEED_NAMES } from "./kits.js";
 import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset } from "./horny.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
+import { initHoles, holesTick, holesNow, holesUsed, holesClimaxOf, holesBalm, holesSet, holesReset, holesState, holesDrips, sendNow as holesSend, sendGoal, sendClear, setGoal, clearGoal, HOLE_OF_WORD, dueWords, toysNow } from "./holes.js";
+import { HOLE_WORD, sizeWord, HOLE_SIZES } from "../../shared/holes.js";
 import "./lines-nips.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
@@ -59,7 +61,7 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, horny gear",
+      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
@@ -74,6 +76,11 @@ function commands() {
             (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") +
             (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close · /dispensary nips heal on|off"); return;
         }
+        // your holes (Nov 18): how open, how trained, the switches; and trainin' goals for somebody
+        const hlm = /^holes?(?:\s+(heal|pain)\s+(on|off))?$/.exec(a);
+        if (hlm) { holesCommand(hlm[1], hlm[2]); return; }
+        const trm = /^train\s+(.+)$/i.exec(String(args || "").trim());
+        if (trm) { trainCommand(trm[1]); return; }
         // kits (Nov 18): yours to switch on, what they put on you, how fast; your own saved ones
         const km = /^kits?(?:\s+(.*))?$/.exec(String(args || "").trim());
         if (km) { kitCommand(String(km[1] || "").trim()); return; }
@@ -111,6 +118,36 @@ function kitCommand(rest) {
     "/dispensary kit on|off · speed slow|steady|fast|now · what clothes|binds|both · save <name> · del <name>");
 }
 
+// /dispensary holes [heal|pain on|off]
+function holesCommand(sw, v) {
+  if (sw) {
+    if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; }
+    if (sw === "heal") { st().holesHeal = v === "on"; save(); local(v === "on" ? "Your holes close up slowly on their own now, once they've been left be a day." : "Your holes stay as they're trained, till somethin' tightens them."); return; }
+    st().holesPain = v === "on"; save(); local(v === "on" ? "Too-big toys can hurt you now, and cruel ones mean it." : "Too-big toys only ache now, however big they are."); return;
+  }
+  const N = holesNow(), rows = Object.entries(N.holes).map(([h, x]) => "Your " + HOLE_WORD[h] + ": " + x.nowWord + (x.now !== x.trained ? " tonight, trained " + x.trainedWord : "") + (x.toward ? " (" + x.toward + "% to the next)" : "") +
+    (x.toy ? ", the " + x.toy.name + " in it" : "") + (x.goal ? ", goal " + x.goal.word + (x.goal.due ? " " + dueWords(x.goal.due) : "") : "") + ".");
+  local(rows.join(" ") + " Heal: " + (N.heal ? "on" : "off") + " · too-big toys hurt: " + (N.pain ? "yes" : "no") + (N.waiting ? " · " + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin' to hand the farm girl" : "") + ". /dispensary holes heal on|off · /dispensary holes pain on|off · /dispensary train <who> <ass|pussy|throat> <size> [in 3 days]");
+}
+// /dispensary train <who> <ass|pussy|throat> <size> [in 3 days | by friday] · /dispensary train <who> clear [hole]
+function trainCommand(rest) {
+  const m = /^(\S+)\s+(\S+)\s*(.*)$/.exec(String(rest || "").trim());
+  if (!m) { local("/dispensary train <who> <ass|pussy|throat> <size> [in 3 days | by friday], or /dispensary train <who> clear. The size is one of the farm's words: snug, loose, gaping, ruined, or size 1 to 10."); return; }
+  const who = /^(me|myself|self)$/i.test(m[1]) ? (W.Player && W.Player.MemberNumber) : mouthTarget(m[1]);
+  if (!who) { local("Who? Their name or member number, in this room (or me)."); return; }
+  const self = who === (W.Player && W.Player.MemberNumber);
+  if (/^(clear|stop|off|lift)$/i.test(m[2])) {
+    if (self && hardOn()) { local("🔒 Hardcore: your keyholders lift your goals."); return; }
+    const h = HOLE_OF_WORD(m[3].trim().split(/\s+/)[0]);
+    const r = sendClear(who, h); local(r.self ? (r.ok ? "Your trainin' goal" + (h ? " for your " + HOLE_WORD[h] : "s") + " lifted." : "You've no goal to lift.") : r.ok ? "Sent: their goal's lifted, if they've let you dose them." : "Couldn't reach them."); return;
+  }
+  const h = HOLE_OF_WORD(m[2]);
+  if (!h) { local("Which: ass, pussy or throat?"); return; }
+  const r = sendGoal(who, h, m[3]);
+  if (!r.ok) { local(r.why === "size" ? "What size? One of the farm's words: snug, loose, well-used, gaping, wide open, ruined (a throat: eager, trained, deep, past gaggin', bottomless), or size 1 to 10." : r.why === "already" ? "Your " + HOLE_WORD[h] + "'s already that open." : r.why === "hole" ? "You haven't got that." : "Couldn't reach them."); return; }
+  local(r.self ? "🎯 Your goal: your " + HOLE_WORD[h] + ", " + sizeWord(h, r.to) + ". Your trainers will work you there." : "🎯 Sent: a goal for their " + HOLE_WORD[h] + ", " + sizeWord(h, r.to) + ". Their Dispensary tells you if it took.");
+}
+
 // "mouth <who>": a member number, or somebody in the room by name
 function mouthTarget(w) {
   if (/^\d+$/.test(w)) return Number(w);
@@ -136,11 +173,12 @@ function start() {
   initNipples(mod); nipsOnSuckle(paraSuckled); nipsOnFarmLoad(tellNipLoad);
   initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => paraMine() });
   initKits(mod, { end: (id) => end(id, "quiet"), byOf: (id) => (st().doses[id] && st().doses[id].by) || 0 });
+  initHoles(mod);
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); holesTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -158,6 +196,8 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a)
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },
   worn: () => wornGear(), wornTick: () => wornTick(), wornReset: () => wornReset(), trigger: (k, f) => trigger(k, f), para: () => paraMine(), paraTick: () => paraTick(), latch: (k, o) => latch(k, o), climax: () => paraClimax(), haze: () => hazeTick(), icons: (mn) => iconsFor(mn), iconsTell: (f) => iconsTell(f),
   kit: () => kitNow(), kitTick: (now) => kitTick(now), kitSave: (n) => kitSave(n), kitLookup: (k) => kitLookup(k), kitEnd: () => kitEnd(false), kitCmd: (r) => kitCommand(r),
+  holes: () => holesNow(), holesTick: (now) => holesTick(now), holesUsed: (...a) => holesUsed(...a), holesClimax: (f) => holesClimaxOf(f), holesBalm: (w, x) => holesBalm(w, x), holesSet: (h, n) => holesSet(h, n),
+  holesReset: () => holesReset(), holesState: () => holesState(), holesDrips: () => holesDrips(), holesSend: (a) => holesSend(a), setGoal: (h, to, by, ms) => setGoal(h, to, by, ms), clearGoal: (h) => clearGoal(h), trainCmd: (r) => trainCommand(r), holesCmd: (s, v) => holesCommand(s, v), toys: () => toysNow(),
   horny: () => hornyGear(), hornyTick: (now) => { hornyTick(now); hornyParaTick(now); }, hornyBeat: (g) => hornyBeat(g), hornyClimax: () => hornyClimax(), hornyReset: () => hornyReset(),
   nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
@@ -180,4 +220,7 @@ W.FarmhandDispensary = Object.freeze({
   // open nipples (Nov 18, nipples.js): 0 shut, 1 to 3 open, yours or what somebody's Dispensary told the room. The
   // Companion's drawn breasts can read it.
   nipples: (mn) => openOf(mn == null ? (W.Player && W.Player.MemberNumber) : Number(mn)),
+  // your holes (Nov 18, holes.js): { vulva|butt|throat: { label, now, trained, nowWord, trainedWord, toward, toy, goal } }.
+  // The Companion's Body rows read it, so they're right off the farm too.
+  holes: () => holesNow().holes,
 });

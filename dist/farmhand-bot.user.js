@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.83.0
+// @version      0.84.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2960,8 +2960,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.83.0";
-  var COMPANION_VERSION = "0.67.0";
+  var VERSION = "0.84.0";
+  var COMPANION_VERSION = "0.68.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6386,7 +6386,11 @@
         if (p.stall && p.stall.until) s.stallUntil = Math.ceil(p.stall.until / 6e4) * 6e4;
         if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
         s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
-        s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
+        s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => {
+          const o = { part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) };
+          if (["vulva", "butt", "throat"].includes(k) && sizeOf(mn, k) !== sizeBase(mn, k)) o.trained = sizeWord(k, sizeBase(mn, k));
+          return o;
+        });
         s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
         if (bodyParts(mn).includes("penis")) {
           s.drawn.cock = sizeOf(mn, "penis");
@@ -7449,12 +7453,12 @@
             p.held[h] = (p.held[h] || 0) * Math.pow(0.5, dtH / halfLife(mn, h));
           }
         }
-        for (const h of ["vulva", "butt"]) {
+        for (const h of ["vulva", "butt", "throat"]) {
           const cur = sizeOf(mn, h), base = sizeBase(mn, h), at = p.gapeAt && p.gapeAt[h] || 0;
           if (cur > base && now - at > CFG.GAPE_TIGHTEN_H * 36e5) setSize(mn, h, cur - 1, false);
         }
         const Cs = charFor(mn);
-        if (Cs) {
+        if (Cs && !dispHolesOn(mn)) {
           if (!p.stretchMs) p.stretchMs = {};
           if (!p.stretchOn) p.stretchOn = {};
           for (const [h, groups] of [["vulva", ["ItemVulva"]], ["butt", ["ItemButt"]], ["throat", ["ItemMouth", "ItemMouth2", "ItemMouth3"]]]) {
@@ -26470,7 +26474,8 @@
         hard: m.hard === true,
         at: Date.now(),
         on: ids(m.on),
-        crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : ""
+        crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "",
+        holes: m.holes === 1
       });
       try {
         craveOffer(mn, dispMap().get(mn));
@@ -26493,7 +26498,12 @@
           audit(mn, "DISPHARD", m.hard === true ? "on" : "off");
         }
       }
-      enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length), species: r ? String(speciesKey(mn) || "").toLowerCase() : "" }, mn));
+      enqueue(makeMsg("dispWelcome", {
+        farm: dispFarmList(),
+        stock: !!(r && Array.isArray(r.roles) && r.roles.length),
+        species: r ? String(speciesKey(mn) || "").toLowerCase() : "",
+        holes: m.holes === 1 ? dispHoleSizes(mn) : void 0
+      }, mn));
     }
     const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
     function dispCall(mn, dose, o) {
@@ -26619,7 +26629,89 @@
       p.nipCream = null;
       if (charFor(mn)) emote(pickFresh("creamedmilk", CREAMED_MILK).replace(/%n/g, plainName(mn)).replace(/%s/g, c.by ? plainName(c.by) + "'s" : "somebody's"), mn);
     }
+    const DISP_HOLES = ["vulva", "butt", "throat"];
+    function dispHoleSizes(mn) {
+      const r = rec(mn), p = r && r.prod;
+      if (!p) return void 0;
+      const has = DISP_HOLES.filter((h) => CFG.SIZES[h] && (h !== "vulva" || hasVulva(mn))), sizes = {};
+      for (const h of has) sizes[h] = [sizeOf(mn, h), sizeBase(mn, h)];
+      return { sizes, has };
+    }
+    function dispHoleOp(mn, o) {
+      const h = String(o && o.h || ""), S = CFG.SIZES[h];
+      if (!DISP_HOLES.includes(h) || !S || h === "vulva" && !hasVulva(mn)) return false;
+      const p = prodOf(mn), k = (key) => Math.max(0, Math.min(20, Math.round(Number(o[key]) || 0)));
+      if (!p.size) p.size = {};
+      if (!p.sizeBase) p.sizeBase = {};
+      if (!p.gapeAt) p.gapeAt = {};
+      let base = sizeBase(mn, h), cur = sizeOf(mn, h);
+      if (typeof o.set === "number") {
+        const v = Math.max(S.start, Math.min(S.natural, k("set")));
+        base = v;
+        cur = v;
+      }
+      if (o.up) base = Math.max(base, Math.min(S.natural, base + k("up")));
+      if (o.down) base = Math.max(S.start, base - k("down"));
+      if (typeof o.tight === "number") {
+        base = Math.max(S.start, base - k("tight"));
+        cur = base;
+        p.gapeAt[h] = Date.now();
+      }
+      if (o.st) {
+        const v = Math.min(S.max, k("st"));
+        if (v > cur) {
+          cur = v;
+          p.gapeAt[h] = Date.now();
+        }
+      }
+      if (cur < base) cur = base;
+      p.sizeBase[h] = base;
+      p.size[h] = cur;
+      return true;
+    }
+    function onDispHoles(mn, m) {
+      const r = rec(mn), p = r && r.prod, id = Math.max(0, Math.floor(Number(m.id) || 0));
+      if (!p) {
+        enqueue(makeMsg("dispHolesOk", { id, none: true }, mn));
+        return;
+      }
+      const ep = typeof m.ep === "string" ? m.ep.slice(0, 16) : "";
+      if (ep && ep !== r.dispHoleEp) {
+        r.dispHoleEp = ep;
+        r.dispHoleSeq = 0;
+      }
+      if (id > (r.dispHoleSeq || 0) && Array.isArray(m.ops)) {
+        let n = 0;
+        for (const o of m.ops.slice(0, 60)) {
+          try {
+            if (dispHoleOp(mn, o)) n++;
+          } catch (e) {
+            warn("holes:", e);
+          }
+        }
+        r.dispHoleSeq = id;
+        saveLedger();
+        if (n) {
+          dbg("HOLES", mn, n + " change(s)");
+          try {
+            syncCompanions(true);
+          } catch (e) {
+          }
+        }
+      }
+      const hs = dispHoleSizes(mn);
+      enqueue(makeMsg("dispHolesOk", { id, sizes: hs.sizes, has: hs.has }, mn));
+    }
+    function dispHolesOn(mn) {
+      const d = dispFor(mn);
+      return !!(d && d.holes);
+    }
+    if (W.__FARMHAND_TEST__) W.__dispHoleOp = (mn, o) => dispHoleOp(mn, o);
     function onDispensaryMsg(mn, m) {
+      if (m.type === "dispHoles") {
+        onDispHoles(mn, m);
+        return true;
+      }
       if (m.type === "dispNipLoad") {
         onNipLoad(mn, m);
         return true;

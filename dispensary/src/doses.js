@@ -26,6 +26,7 @@ import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
 import { nipsOpen, nipsClose, lastPopped } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { kitPart } from "./kits.js";
+import { holesBalm, holesSafe } from "./holes.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -276,9 +277,9 @@ export const BOOK = {
   },
   balm: {
     label: "Tightening Balm", icon: "🧴", mins: 0, color: "#f0d8c0", instant: true,
-    words: /\b(tightening (?:balm|cream|gel|serum|salve)|nipple (?:tightener|closer|balm))\b/,
-    keywords: ["tightening balm", "nipple tightener"],
-    desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone.",
+    words: /\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/,
+    keywords: ["tightening balm", "nipple tightener", "pussy tightener", "ass tightener", "virgin tonic"],
+    desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone. A bottle that names your pussy, ass or throat (or says virgin, for all of them) tightens that instead: two sizes a dose off what it's trained to, and closed back up to it.",
   },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
@@ -331,6 +332,11 @@ export function partFor(id, text) {
   if (id === "kit") return kitPart(t);
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
+  if (id === "balm") {   // (Nov 18) which holes: "n" in front when it's for the nipples too
+    const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag reflex)\b/.test(t) && "throat"].filter(Boolean);
+    const which = /\b(virgin\w*|holes|every hole|all over)\b/.test(t) || hs.length > 1 ? "holes" : hs[0] || "";
+    return which ? (/\b(nipples?|teats?)\b/.test(t) ? "n" : "") + which : "";
+  }
   return "";
 }
 export function dosesIn(text) {
@@ -443,8 +449,10 @@ function purge(o) {
   return { ok: true, n, lscg };
 }
 
-// the Tightening Balm: stretched nipples closed back up (nipples.js)
+// the Tightening Balm: stretched nipples closed back up (nipples.js), or a hole that's named (holes.js)
 function balm(o) {
+  const hm = /^(n?)(vulva|butt|throat|holes)$/.exec(String(o.p || ""));
+  if (hm) { const done = holesBalm(hm[2], o.x, o.quiet); if (!hm[1]) return { ok: true, holes: done }; o = Object.assign({}, o, { line: undefined }); }
   const lt = mineToy();
   if (lt && toyLocked(lt)) { if (!o.quiet) action(fill("The tightening balm goes on cool, but %t's nipples can't close round the " + toyOf(lt).label.toLowerCase() + " locked in them. They stay stretched, achin' for it.")); return { ok: true, was: 0, locked: true }; }
   const was = nipsClose(true), out = lastPopped();
@@ -470,6 +478,7 @@ export function clearAll(why) {
   // (Nov 18) parasites let go, and worn gear rests 15 minutes so it doesn't dose you straight back up (worn.js, parasites.js)
   if (st().para && Object.keys(st().para).length) { n += Object.keys(st().para).length; st().para = {}; }
   st().wornPause = Date.now() + 15 * MIN; save();
+  if (why !== "purge") { try { if (holesSafe()) n++; } catch (e) { /* fine */ } }   // (Nov 18) trainin' goals lifted too
   return n;
 }
 

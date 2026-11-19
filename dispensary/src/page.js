@@ -18,6 +18,8 @@ import { hardOn, keyholders, lock, dueAt, hardLog, wards, keyDo, wardState, CHEC
 import { nipsOpen, trainedLevel, nipsClose, lastPopped, nipLoads } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { kitNow, kitNames, SPEED_NAMES } from "./kits.js";
+import { holesNow, holesSet, dueWords } from "./holes.js";
+import { sizeWord, HOLE_SIZES } from "../../shared/holes.js";
 
 const W = window, ID = "FarmhandDispensary";
 let box = null, note = "";
@@ -266,6 +268,22 @@ function view() {
       h("div", { class: "fd-row", style: { marginTop: "6px" } },
         h("button", { disabled: locked || !n || toyLocked(mineToy()) ? true : undefined, onclick: () => { nipsClose(true); const out = lastPopped(); note = (out ? "The " + out + " slides out, and your" : "Your") + " nipples are closed back up, snug as they ever were."; draw(); } }, "Close them up"),
         h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : toyLocked(mineToy()) ? "The " + toyOf(mineToy()).label + "'s locked in, holdin' them open: its key first." : "The Dilator out, the leeches off, any toy out, the stretch undone. A Tightening Balm does it too."))));
+  }
+  // your holes (Nov 18, holes.js): how open, how trained, what's in them, goals, your own pick, the two switches
+  kids.push(h("h3", null, "Holes"));
+  { const N = holesNow(), FEEL = { "0": "it fits", "1": "a good stretch", "2": "it aches", "3": "it hurts", cruel: "it's cruel to you" };
+    const rows = Object.entries(N.holes).map(([hk, x]) => h("div", { style: { margin: "4px 0 8px" } },
+      h("div", null, h("b", null, x.label + ": "), x.nowWord + (x.now !== x.trained ? " tonight · trained " + x.trainedWord : "") + (x.toward ? " · " + x.toward + "% to the next size" : "")),
+      x.toy ? h("div", { class: "fd-muted" }, "In it: the " + x.toy.name + ", holdin' you " + sizeWord(hk, x.toy.size) + ": " + FEEL[x.toy.feel] + (x.toy.trainer ? ", trainin' you" : "") + (x.toy.pump ? ", growin' with you" : "")) : null,
+      x.goal ? h("div", { class: "fd-muted" }, "🎯 Goal: " + x.goal.word + (x.goal.due ? ", " + dueWords(x.goal.due) : "") + (x.goal.by && x.goal.by !== (W.Player && W.Player.MemberNumber) ? ", set by " + keyName(x.goal.by) : "")) : null,
+      h("div", { class: "fd-row", style: { marginTop: "4px" } }, h("span", { class: "fd-muted" }, "Your own pick:"),
+        h("select", { "aria-label": "Your " + x.label.toLowerCase() + ", your own pick", disabled: locked, onchange: (e) => { if (e.target.value) { holesSet(hk, Number(e.target.value)); note = "Your " + x.label.toLowerCase() + " is " + sizeWord(hk, Number(e.target.value)) + " now."; } draw(); } },
+          [h("option", { value: "", selected: true }, "leave it")].concat(HOLE_SIZES[hk].names.slice(HOLE_SIZES[hk].start - 1, HOLE_SIZES[hk].natural).map((w, i) => h("option", { value: String(i + HOLE_SIZES[hk].start) }, w)))))));
+    kids.push(h("div", { class: "fd-card" }, rows,
+      h("label", { style: { marginTop: "6px" } }, h("input", { type: "checkbox", disabled: locked, checked: N.heal ? true : undefined, onchange: (e) => { st().holesHeal = e.target.checked; save(); draw(); } }), h("b", null, "They close up slowly on their own")),
+      h("label", null, h("input", { type: "checkbox", disabled: locked, checked: N.pain ? true : undefined, onchange: (e) => { st().holesPain = e.target.checked; save(); draw(); } }), h("b", null, "Too-big toys can hurt")),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A toy in you stretches you to its size. One size bigger than you're trained is a good stretch, two aches, three or more hurts (or only aches, with that switch off); a cruel or sadist one always means it. A trainer (crafted to say stretcher, trainer, gaper or dilator, or cruel, or with a goal like \"goal: gaping\" or \"train her to loose in 3 days\") trains you up while it's in, faster the bigger it is: a size every 12 hours at one size bigger, 6 hours at three. A pump or beads crafted as a trainer grows with you. Fingers, fists, cocks and toys count too, and a load in a loose hole drips back out. Healin' on: left be a day, they close half a size a day. Anybody who can dose you can set a goal: /dispensary train <who> <ass|pussy|throat> <size> [in 3 days]. A Tightening Balm that names a hole closes it up."),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, N.sync ? "On the farm's books: the farm girl keeps them, and gets what happens off the farm next time you're in her room" + (N.waiting ? " (" + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin')." : ".") : "These are your Dispensary's own numbers. On the farm, the farm girl keeps the books.")));
   }
   // crafted parasites (Nov 18, parasites.js): each kind yours to switch on
   kids.push(h("h3", null, "Parasites"));

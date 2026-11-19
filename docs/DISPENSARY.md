@@ -260,6 +260,45 @@ and running timers follow you between your phone and your PC, and clearing the b
      - Pictures: the repo's toys/v1, one per breast size and state, drawn by tools/nipple-toys-art.js. The Companion's
        drawn breasts carry them like any nipple item. Only people with the Dispensary see them; in chat everybody reads
        the toy's name.
+   - **Hole training, anywhere** (built Nov 18; Laynie: "if we can do the hole training better, i would love to explore
+     that idea", then all seven, with: too big goes in "aching, sometimes even painful", "A 'cruel' or 'sadist' tag might
+     be fun", the heal switch off to start, goals from "anyone who can dose"). The rules are in `shared/holes.js`, read by
+     the farm girl and the Dispensary alike; the Dispensary's side is holes.js and lines-holes.js.
+     - **The farm's books.** A pussy, an ass and a throat each have a size, 1 to 20 (10 natural, past that only the
+       farm's shots): how open now ("stretched", tightens back a size a day) and its usual ("trained"). The Dispensary
+       keeps a copy, counts what happens anywhere, and hands the changes to the farm girl in one batch when she's in the
+       room (`dispHoles { ep, id, ops }`; ops are up, down, tight, set, st). She applies a batch once, by its number, and
+       sends her numbers back (`dispHolesOk { id, sizes, has }`, or `{ none }` for somebody not on her books, whose
+       Dispensary keeps its own). Her welcome carries her numbers too. Their trainers on the farm are the Dispensary's to
+       count, so she leaves a stretcher on them alone (08-production.js); without a newer Dispensary she does it as ever.
+     - **The toy's size.** Every plug, dildo, egg, bead and gag of the game's that goes in you has a size, and a pump or
+       beads one per notch. Words on a crafted one move it (small -1, big +1, huge +2, monster +3, colossal +5). It
+       stretches you to its size. One size bigger than you're trained is a good stretch, two aches, three or more hurts;
+       a cruel or sadist one always hurts. Hurtin' knocks your arousal down; a good stretch nudges it up. "Too-big toys
+       can hurt" is a switch (on to start): off, it only ever aches.
+     - **Training.** A trainer (stretcher, trainer, gaper, dilator and such, or cruel, or with a goal) trains your usual
+       up while it's in: a size every 12 hours at one size bigger, 8 at two, 6 at three or more, half again as fast if
+       cruel. Never past its own size, nor past 10.
+     - **It grows with you.** A pump or beads crafted as a trainer pumps up a notch (or slides in another bead) once
+       you've caught up with it, up to its goal; a cruel one doesn't wait. Once its goal's met it's done with you.
+     - **Goals.** On the trainer ("goal: gaping", "train her to loose in 3 days", "until ruined by friday"), or sent:
+       `/dispensary train <who> <ass|pussy|throat> <size> [in 3 days | by friday]` (`dispTrain`, answered `dispTrainOk`),
+       only from somebody allowed to dose you. In a hurry, it works you harder, up to four times.
+     - **Use.** The game's own fingers, tongue, fist, cock (Penetrate with a penis) and toys from somebody's hand stretch
+       you to their size and train you a little when they're bigger than you're trained (at most six hours' worth an
+       hour; your own hands half). A cock that cums within a minute and a half: a tight hole keeps the load, a loose one
+       (5 and up, nothin' in it) drips it back out a minute or two later, for the room and the Companion's messes.
+     - **Stretched and trained, both shown:** the page's Holes card, `/dispensary holes`, and the Companion's Body rows
+       (from the Dispensary when it's runnin', `FarmhandDispensary.holes()`).
+     - **Healin'** ("They close up slowly on their own", off to start): left be a day, the usual closes half a size a day.
+     - **The room notices** a loose hole now and then when it's bare; only you hear about it covered or plugged.
+     - **The Tightening Balm** names a hole ("Ass Tightener", "Pussy Tightener", "Virgin Tonic" for all of them): two
+       sizes a dose off its usual, closed back up to it. A balm that names nipples too does both.
+     - **Your own pick** on the page, like the farm's `?size`, up to natural. Hardcore locks it and the switches; the
+       safeword lifts every goal.
+     - Also in this release: a reload used to forget the newer settings (the nipples' trained stretch and switch, their
+       loads, the Kits and Horny switches, kit speed and what kits put on, saved kits, and the kit on you with the old
+       outfit it was holdin'). They're kept now (store.js).
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the

@@ -662,15 +662,15 @@
           p.held[h] = (p.held[h]||0) * Math.pow(0.5, dtH / halfLife(mn, h));
         }
       }
-      // stretched holes slowly tighten back to their usual
-      for (const h of ["vulva","butt"]){
+      // stretched holes slowly tighten back to their usual (a throat too, Nov 18: one held open never closed back)
+      for (const h of ["vulva","butt","throat"]){
         const cur = sizeOf(mn, h), base = sizeBase(mn, h), at = (p.gapeAt && p.gapeAt[h]) || 0;
         if (cur > base && now - at > CFG.GAPE_TIGHTEN_H*3600000) setSize(mn, h, cur-1, false);
       }
       // a stretcher worn in the vulva or butt slot (or a mouth slot, for the throat) opens that hole
       // up a level the moment it goes in, and trains its usual a level every 12 hours worn, up to natural
       const Cs = charFor(mn);
-      if (Cs){
+      if (Cs && !dispHolesOn(mn)){   // (their Dispensary does their trainers, Nov 18: 10ur2-dispensary.js)
         if (!p.stretchMs) p.stretchMs = {};
         if (!p.stretchOn) p.stretchOn = {};
         for (const [h, groups] of [["vulva",["ItemVulva"]],["butt",["ItemButt"]],["throat",["ItemMouth","ItemMouth2","ItemMouth3"]]]){

@@ -73,7 +73,12 @@
       if (p.stall && p.stall.until) s.stallUntil = Math.ceil(p.stall.until / 60000) * 60000;   // milkin' stall timer (to the minute)
       if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
       s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
-      s.body = bodyParts(mn).filter(k => CFG.SIZES[k]).map(k => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
+      s.body = bodyParts(mn).filter(k => CFG.SIZES[k]).map(k => {
+        const o = { part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) };
+        // a hole stretched past its usual: both (Nov 18, "stretched and trained, both shown")
+        if (["vulva", "butt", "throat"].includes(k) && sizeOf(mn, k) !== sizeBase(mn, k)) o.trained = sizeWord(k, sizeBase(mn, k));
+        return o;
+      });
       // for the drawn body (extension/src/drawnbody.js): their cup as the farm counts it (1 AA ... 20 R, 0 none) and how
       // big their belly is (0 to 4: pregnant, eggs, a full load). Laynie, Oct 14: "the belly sizes in game need to
       // automatically adjust based on how full or pregnant each player is", "same for tit sizes and growth".

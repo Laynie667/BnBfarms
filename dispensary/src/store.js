@@ -56,6 +56,42 @@ export function clean(d) {
     }
   }
   if (d.grow && typeof d.grow === "object") for (const k of ["cup", "ass", "cock", "balls"]) { const v = num(d.grow[k], -10, 10, 0); if (v) s.grow[k] = Math.round(v); }   // (growth off the farm)
+  // (Nov 18, later: these were saved but never read back, so a reload forgot them. Your nipples' trained stretch and
+  // whether they close up, their loads; kits: the switch, what they put on, how fast, your saved ones, and the kit on
+  // you now with your old outfit it's holdin'; horny gear's switch. Hole training's books and its two switches.)
+  if (d.nipTrain && typeof d.nipTrain === "object") s.nipTrain = { lvl: num(d.nipTrain.lvl, 0, 3, 0), at: num(d.nipTrain.at, 0, 1e14, 0), open: num(d.nipTrain.open, 0, 1e14, 0), used: num(d.nipTrain.used, 0, 1e14, 0) };
+  if (typeof d.nipsHeal === "boolean") s.nipsHeal = d.nipsHeal;
+  if (d.nipLoads) s.nipLoads = Math.round(num(d.nipLoads, 0, 1e7, 0));
+  if (d.nipLoadsBy && typeof d.nipLoadsBy === "object") { s.nipLoadsBy = {}; for (const [k, v] of Object.entries(d.nipLoadsBy).slice(-40)) if (/^\d{1,9}$/.test(k)) s.nipLoadsBy[k] = Math.round(num(v, 0, 1e7, 0)); }
+  if (typeof d.hornyOn === "boolean") s.hornyOn = d.hornyOn;
+  s.kitsOn = d.kitsOn === true;
+  if (["slow", "steady", "fast", "now"].includes(d.kitSpeed)) s.kitSpeed = d.kitSpeed;
+  if (["clothes", "binds", "both"].includes(d.kitWhat)) s.kitWhat = d.kitWhat;
+  if (d.kits && typeof d.kits === "object") { s.kits = {}; for (const [k, v] of Object.entries(d.kits).slice(0, 8)) if (typeof k === "string" && k.length <= 40 && typeof v === "string" && v.length <= 12000) s.kits[k] = v; }
+  { const K = d.kit, bundle = (a) => (Array.isArray(a) ? a.filter((b) => b && typeof b === "object" && typeof b.Group === "string" && typeof b.Name === "string").slice(0, 120) : []);
+    if (K && typeof K === "object" && typeof K.key === "string" && Array.isArray(K.pieces)) {
+      s.kit = { key: K.key.slice(0, 40), flav: typeof K.flav === "string" ? K.flav.slice(0, 40) : "plain", by: Math.round(num(K.by, 0, 1e9, 0)), old: bundle(K.old), pieces: bundle(K.pieces),
+        queue: Array.isArray(K.queue) ? K.queue.filter((g) => typeof g === "string").slice(0, 120) : [], next: num(K.next, 0, 1e14, 0), at: num(K.at, 0, 1e14, 0), done: K.done === true, back: Math.round(num(K.back, 0, 999, 0)) };
+    } }
+  if (typeof d.holesHeal === "boolean") s.holesHeal = d.holesHeal;
+  if (d.holesPain === false) s.holesPain = false;
+  if (d.holes && typeof d.holes === "object") {
+    const o = d.holes, out = { m: {}, pend: [], goals: {}, id: Math.round(num(o.id, 0, 1e12, 0)), sync: num(o.sync, 0, 1e14, 0), ep: typeof o.ep === "string" && /^[a-z0-9]{4,12}$/.test(o.ep) ? o.ep : "" };
+    const lvl = (v) => Math.round(num(v, 1, 20, 1));
+    for (const h of ["vulva", "butt", "throat"]) {
+      const x = o.m && o.m[h];
+      if (x && typeof x === "object") out.m[h] = { n: lvl(x.n), u: lvl(x.u), cr: num(x.cr, 0, 12, 0), t: num(x.t, 0, 1e14, 0), g: num(x.g, 0, 1e14, 0), hl: num(x.hl, 0, 1, 0),
+        tk: typeof x.tk === "string" ? x.tk.slice(0, 120) : "", ta: num(x.ta, 0, 1e14, 0), gd: typeof x.gd === "string" ? x.gd.slice(0, 120) : "",
+        ub: x.ub && typeof x.ub === "object" ? { at: num(x.ub.at, 0, 1e14, 0), n: num(x.ub.n, 0, 100, 0) } : undefined };
+      const g = o.goals && o.goals[h];
+      if (g && typeof g === "object") out.goals[h] = { to: lvl(g.to), by: Math.round(num(g.by, 0, 1e9, 0)), due: num(g.due, 0, 1e14, 0), at: num(g.at, 0, 1e14, 0) };
+    }
+    if (Array.isArray(o.has)) out.has = o.has.filter((h) => ["vulva", "butt", "throat"].includes(h));
+    const op = (x) => { if (!x || typeof x !== "object" || !["vulva", "butt", "throat"].includes(x.h)) return null; const r = { h: x.h }; for (const k of ["up", "down", "tight", "set", "st"]) if (typeof x[k] === "number") r[k] = Math.round(num(x[k], 0, 20, 0)); return Object.keys(r).length > 1 ? r : null; };
+    if (Array.isArray(o.pend)) out.pend = o.pend.map(op).filter(Boolean).slice(-80);
+    if (o.fly && typeof o.fly === "object" && Array.isArray(o.fly.ops)) out.fly = { id: Math.round(num(o.fly.id, 0, 1e12, 0)), ops: o.fly.ops.map(op).filter(Boolean).slice(0, 60), at: 0 };
+    s.holes = out;
+  }
   s.mouthAuto = d.mouthAuto === true;
   s.iconsShow = d.iconsShow !== false; s.iconsShare = d.iconsShare !== false;   // (dose icons: both on till you switch them off)
   s.wornPause = num(d.wornPause, 0, 1e14, 0);

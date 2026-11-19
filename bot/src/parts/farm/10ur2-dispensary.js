@@ -102,7 +102,7 @@
     const ids = (a) => Array.isArray(a) ? a.filter(x => typeof x === "string" && /^[a-z]{2,20}$/.test(x)).slice(0, 40) : [];
     dispMap().set(mn, { ver: String(m.ver || "?").slice(0, 20), farm: m.farm !== false, lscg: !!m.lscg,
                         off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now(),
-                        on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "" });
+                        on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "", holes: m.holes === 1 });   // (holes: it counts their hole trainin')
     try { craveOffer(mn, dispMap().get(mn)); } catch(e){ warn("crave:", e); }
     if (!had) log("Dispensary hello from "+mn+" (v"+String(m.ver || "?").slice(0, 20)+")");
     const r = rec(mn);
@@ -114,7 +114,8 @@
       else delete r.dispHard;
       if (JSON.stringify(r.dispHard || null) !== was){ saveLedger(); audit(mn, "DISPHARD", m.hard === true ? "on" : "off"); }
     }
-    enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length), species: r ? String(speciesKey(mn) || "").toLowerCase() : "" }, mn));   // (species: their animal, for Moo Juice)
+    enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length), species: r ? String(speciesKey(mn) || "").toLowerCase() : "",
+      holes: m.holes === 1 ? dispHoleSizes(mn) : undefined }, mn));   // (species: their animal, for Moo Juice · holes: my numbers for their holes)
   }
   const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
   // a dose for their Dispensary to give. Returns "sent", null (no Dispensary: do it yourself), or why it can't take
@@ -222,7 +223,58 @@
     p.nipCream = null;
     if (charFor(mn)) emote(pickFresh("creamedmilk", CREAMED_MILK).replace(/%n/g, plainName(mn)).replace(/%s/g, c.by ? plainName(c.by) + "'s" : "somebody's"), mn);
   }
+  /* HOLE TRAININ' ANYWHERE (Nov 18; Laynie: "if we can do the hole training better, i would love to explore that idea",
+     then all seven: it trains anywhere, the toy's size matters, a trainer that grows, use counts, stretched and trained
+     both shown, a heal switch, the room notices). The books are mine: their pussy, ass and throat sizes (p.size is how
+     open now, p.sizeBase their usual). Their Dispensary (shared/holes.js, dispensary/src/holes.js) counts what happens
+     anywhere, their trainers on the farm too (so I leave a stretcher on them to it: 08-production.js), and hands me
+     the changes, all in one go under one number, when they're in my room:
+       them → me   dispHoles { ep, id, ops: [{ h, up | down | tight | set | st }] }
+       me → them   dispHolesOk { id, sizes: { vulva: [now, usual], ... }, has } (or { id, none } off my books)
+     A number I've had already isn't counted twice. My own stretchin' (a cock too big, the traps, ?size, the shots)
+     goes on as ever, and they get my numbers back each time. */
+  const DISP_HOLES = ["vulva", "butt", "throat"];
+  function dispHoleSizes(mn){
+    const r = rec(mn), p = r && r.prod; if (!p) return undefined;
+    const has = DISP_HOLES.filter(h => CFG.SIZES[h] && (h !== "vulva" || hasVulva(mn))), sizes = {};
+    for (const h of has) sizes[h] = [sizeOf(mn, h), sizeBase(mn, h)];
+    return { sizes, has };
+  }
+  // one change: up (usual + k, to natural) · down (usual - k) · tight (usual - k, and closed to it) · set (their own
+  // pick, like ?size) · st (stretched to at least k)
+  function dispHoleOp(mn, o){
+    const h = String((o && o.h) || ""), S = CFG.SIZES[h];
+    if (!DISP_HOLES.includes(h) || !S || (h === "vulva" && !hasVulva(mn))) return false;
+    const p = prodOf(mn), k = (key) => Math.max(0, Math.min(20, Math.round(Number(o[key]) || 0)));
+    if (!p.size) p.size = {}; if (!p.sizeBase) p.sizeBase = {}; if (!p.gapeAt) p.gapeAt = {};
+    let base = sizeBase(mn, h), cur = sizeOf(mn, h);
+    if (typeof o.set === "number"){ const v = Math.max(S.start, Math.min(S.natural, k("set"))); base = v; cur = v; }
+    if (o.up) base = Math.max(base, Math.min(S.natural, base + k("up")));
+    if (o.down) base = Math.max(S.start, base - k("down"));
+    if (typeof o.tight === "number"){ base = Math.max(S.start, base - k("tight")); cur = base; p.gapeAt[h] = Date.now(); }
+    if (o.st){ const v = Math.min(S.max, k("st")); if (v > cur){ cur = v; p.gapeAt[h] = Date.now(); } }
+    if (cur < base) cur = base;
+    p.sizeBase[h] = base; p.size[h] = cur;
+    return true;
+  }
+  function onDispHoles(mn, m){
+    const r = rec(mn), p = r && r.prod, id = Math.max(0, Math.floor(Number(m.id) || 0));
+    if (!p){ enqueue(makeMsg("dispHolesOk", { id, none: true }, mn)); return; }
+    const ep = typeof m.ep === "string" ? m.ep.slice(0, 16) : "";
+    if (ep && ep !== r.dispHoleEp){ r.dispHoleEp = ep; r.dispHoleSeq = 0; }   // (a fresh Dispensary: its numbers start again)
+    if (id > (r.dispHoleSeq || 0) && Array.isArray(m.ops)){
+      let n = 0; for (const o of m.ops.slice(0, 60)){ try { if (dispHoleOp(mn, o)) n++; } catch(e){ warn("holes:", e); } }
+      r.dispHoleSeq = id; saveLedger();
+      if (n){ dbg("HOLES", mn, n + " change(s)"); try { syncCompanions(true); } catch(e){ /* fine */ } }
+    }
+    const hs = dispHoleSizes(mn);
+    enqueue(makeMsg("dispHolesOk", { id, sizes: hs.sizes, has: hs.has }, mn));
+  }
+  // their Dispensary does their trainers (and says so): I don't count a stretcher on them twice
+  function dispHolesOn(mn){ const d = dispFor(mn); return !!(d && d.holes); }
+  if (W.__FARMHAND_TEST__) W.__dispHoleOp = (mn, o) => dispHoleOp(mn, o);
   function onDispensaryMsg(mn, m){
+    if (m.type === "dispHoles"){ onDispHoles(mn, m); return true; }
     if (m.type === "dispNipLoad"){ onNipLoad(mn, m); return true; }
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }
     if (m.type === "doseDone"){ onDoseDone(mn, m); return true; }

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.83.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.84.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.67.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.17.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.18.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.84.0 + Companion 0.68.0 + Dispensary 0.18.0: hole training anywhere** Laynie, Nov 18: "if we can do the hole training better, i would love to explore that idea", then all seven ideas, with "let it in, aching, sometimes even painful. A 'cruel' or 'sadist' tag might be fun".
+  - **It trains anywhere:** your Dispensary counts your trainers and what's done to you in any room, and hands it to the farm girl next time you're in her room. Her books stay the only books.
+  - **The toy's size matters:** every game plug, dildo, egg, bead and gag that goes in you has a size (craft words make it bigger or smaller). It stretches you to its size; one size bigger than you're trained is a good stretch, two aches, three or more hurts. A cruel or sadist one always hurts. "Too-big toys can hurt" is your switch.
+  - **Trainers:** crafted to say stretcher, trainer, gaper or dilator (or cruel, or with a goal), they train you a size every 12 hours, faster the bigger they are. A pump or beads crafted as a trainer grows with you, a notch at a time, up to its goal.
+  - **Goals:** on the trainer ("goal: gaping in 3 days"), or `/dispensary train <who> <ass|pussy|throat> <size>` from anybody who can dose you.
+  - **Use counts:** fingers, a tongue, a fist, a cock or a toy stretch you and train you a little. A load in a loose hole drips back out.
+  - **Both shown:** how open you are tonight and what you're trained to, on the Dispensary's Holes card, `/dispensary holes`, and the Companion's Body rows.
+  - **Healin':** your switch, off to start. **The room notices** a loose hole now and then. **The Tightening Balm** can name a hole ("Ass Tightener", "Virgin Tonic").
+  - **Fixed:** a reload forgot the nipples' trained stretch, the Kits and Horny switches, saved kits, and the old outfit a kit was holdin' for you. A stretched throat now tightens back like the others.
+  - Tests: `tests/dispensary-holes.test.cjs`, `tests/dispensary-holes-farm.test.cjs` (new).
 
 - **Dispensary 0.17.0: horny gear and kits** Laynie, Nov 18: "the devices being horny", "a horny tag on parasites so they are more active with thrusting", and "lscg imports outfits, so maybe ones saved there, to utilize them similar to lscg curses".
   - **Horny gear:** crafted gear that says horny or hungry uses you by itself (insatiable or ravenous: rougher, and every couple of minutes). Plugs and dildos thrust, nipple gear suckles, gags fuck your throat, ropes and belts grind. It pushes your arousal up and makes you cum when you're close and not denied. "Breeding" on it: it fills you when you cum. Its own switch, on to start.

@@ -45,12 +45,12 @@ const ME = 600, OWNER = 700, STRANGER = 999, MIN = 60000;
   const beats1 = local.length + actions().length;
   ok(beats1 >= 1 && beats1 <= 4 && /Hungry Tentacle Plug/.test(said()), "every six to ten minutes it fucks her by itself (" + beats1 + " in a quarter hour: " + said().slice(0, 140) + ")");
   ok(A.Progress > 20 && A.Progress <= 20 + 12 * beats1, "...each time her arousal goes up a step (" + A.Progress + ")");
-  ok(/thrust|fuck|push|deep|stroke|swell/i.test(said()), "...and it's thrustin', the way a plug would");
+  ok(/thrust|fuck|push|deep|stroke|swell|twist|flex|press|in and out|rhythm|grind/i.test(said()), "...and it's thrustin', the way a plug would");   // (every hole line has one of these: Nov 19, the narrower list missed some and failed now and then)
 
   // over the edge
   A.Progress = 90; orgasms = 0;
   D.hornyBeat(Object.assign({}, D.horny()[0]));
-  ok(orgasms === 1 && actions().some((l) => /cum|edge|over/i.test(l)), "close enough: it tips her right over, the game's own orgasm, and the room sees it");
+  ok(orgasms === 1 && actions().some((l) => /cum|edge|over|climax|comes apart/i.test(l)), "close enough: it tips her right over, the game's own orgasm, and the room sees it");
   A.Progress = 90; orgasms = 0; D.give("denial", { by: OWNER, quiet: true });
   D.hornyBeat(Object.assign({}, D.horny()[0]));
   ok(orgasms === 0, "...not while she's denied");

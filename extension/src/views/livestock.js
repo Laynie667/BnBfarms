@@ -15,6 +15,12 @@ import { mePieces } from "./extras.js";
 import { gearLore } from "../gearlore.js";
 import { settingsAvailable, openSettings } from "../settings.js";
 import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
+// the body sizes: the farm's, with your holes from your Dispensary when it's runnin' (Nov 18: it counts what happens
+// off the farm, so it's the fresher of the two): how open tonight, and trained when that's different
+function bodyNow(s) {
+  let dh = null; try { const D = window.FarmhandDispensary; dh = D && typeof D.holes === "function" ? D.holes() : null; } catch (e) { dh = null; }
+  return (s.body || []).map((b) => { const x = dh && dh[b.part]; return x ? Object.assign({}, b, { size: x.nowWord + " (" + x.now + "/20)", trained: x.now !== x.trained ? x.trainedWord : "" }) : b; });
+}
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -119,8 +125,8 @@ function me(ctx) {
           s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - now) / 86400000)) + " day(s)"),
           s.eggs && h("div", null, "🥚 " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
           h("div", null, btn("Pedigree", () => ctx.send("pedigree")), btn("Eggs", () => ctx.send("eggs")), btn("Body tab ›", () => ctx.setUi({ goTab: "body" })))] },
-      (s.body || []).length && { id: "body", label: "📏 Body", sum: s.body.map((b) => b.size).slice(0, 3).join(" · "),
-        body: () => [h("div", { class: "fhc-grid" }, s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))),
+      (s.body || []).length && { id: "body", label: "📏 Body", sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" · "),
+        body: () => [h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null))),
           h("div", null, btn("Measure", () => ctx.send("measure")))] },
       s.today && { id: "marks", label: "✍️ Today's marks", sum: "used " + s.today.tally + " · " + s.today.naughty + " naughty · praised " + s.today.praised,
         body: () => [pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),

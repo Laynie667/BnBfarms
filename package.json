@@ -7,7 +7,7 @@
     "bot": "0.83.0",
     "companion": "0.67.0",
     "watcher": "1.0.4",
-    "dispensary": "0.16.0"
+    "dispensary": "0.17.0"
   },
   "scripts": {
     "build": "node build.mjs",

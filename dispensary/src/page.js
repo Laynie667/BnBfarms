@@ -17,6 +17,7 @@ import { ANIMALS } from "../../shared/noises.js";
 import { hardOn, keyholders, lock, dueAt, hardLog, wards, keyDo, wardState, CHECK_DAYS, addKey, removeKey } from "./hardcore.js";
 import { nipsOpen, trainedLevel, nipsClose, lastPopped, nipLoads } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
+import { kitNow, kitNames, SPEED_NAMES } from "./kits.js";
 
 const W = window, ID = "FarmhandDispensary";
 let box = null, note = "";
@@ -235,6 +236,25 @@ function view() {
     h("div", null, "• roulette or mystery dose: a different one of the doses you allow, each time"),
     h("div", null, "• a drink or a treat somebody feeds you (Sip, Eat), and lip gloss or lipstick with a dose in it, on a kiss"),
     h("div", { style: { marginTop: "4px" } }, "Whoever crafted it has to be on your list. Your safeword clears what's in you and rests your gear " + PAUSE_MINS + " minutes.")));
+  // kits (Nov 18, kits.js): yours to switch on, what they put on you, how fast, and your own saved ones
+  kids.push(h("h3", null, "Kits"));
+  { const k = kitNow(), n = kitNames();
+    kids.push(h("div", { class: "fd-card" },
+      k ? h("div", null, "👗 On you now: " + k.key + (k.left ? " (" + k.left + " pieces still to go on)" : "")) : null,
+      h("label", null, h("input", { type: "checkbox", disabled: locked, checked: S.kitsOn ? true : undefined, onchange: (e) => { st().kitsOn = e.target.checked; save(); draw(); } }), h("b", null, "Kits can dress me")),
+      h("div", { class: "fd-row", style: { marginTop: "6px", gap: "10px" } },
+        h("select", { "aria-label": "What kits put on you", disabled: locked, onchange: (e) => { st().kitWhat = e.target.value; save(); draw(); } },
+          [["both", "Clothes and restraints"], ["clothes", "Only clothes"], ["binds", "Only restraints"]].map(([v, t]) => h("option", { value: v, selected: (S.kitWhat || "both") === v ? true : undefined }, t))),
+        h("select", { "aria-label": "How fast kits go on", onchange: (e) => { st().kitSpeed = e.target.value; save(); draw(); } },
+          Object.keys(SPEED_NAMES).map((v) => h("option", { value: v, selected: (S.kitSpeed || "steady") === v ? true : undefined }, SPEED_NAMES[v])))),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A dose that says \"kit: <name>\" puts its crafter's saved outfit on you (one saved in LSCG, or on their Dispensary), a piece at a time, held on half an hour a dose: anythin' taken off creeps back on. Never your body, nothin' you've blocked, never over somethin' locked. When it's over, your old outfit slips back on. Its pieces keep their crafts, so horny gear in it is horny."),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Your kits: " + (n.own.length ? n.own.join(", ") : "none yet") + (n.lscg.length ? " · in LSCG: " + n.lscg.join(", ") : "") + ". /dispensary kit save <name> keeps what you're wearin'.")));
+  }
+  // horny gear (Nov 18, horny.js): its own switch
+  kids.push(h("div", { class: "fd-card" },
+    h("label", null, h("input", { type: "checkbox", disabled: locked, checked: S.hornyOn !== false ? true : undefined, onchange: (e) => { st().hornyOn = e.target.checked; save(); draw(); } }),
+      h("b", null, "Horny gear can use me")),
+    h("div", { class: "fd-muted" }, "Crafted gear that says horny or hungry has its way with you, all by itself, every few minutes (insatiable or ravenous: every couple): plugs and dildos thrust, nipple gear suckles, gags fuck your throat, ropes and belts grind. It pushes your arousal up, and close enough it makes you cum. \"Breeding\" on it too: it fills you when you cum. A parasite that says horny is twice as busy.")));
   // your nipples (Nov 18, nipples.js): how open, trained, the switch, and closin' them back up
   kids.push(h("h3", null, "Nipples"));
   { const n = nipsOpen(), t = trainedLevel(), loads = nipLoads();

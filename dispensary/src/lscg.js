@@ -56,7 +56,7 @@ function setUp(L) {
   caps = L.capabilities || new Set();
   if (caps.has("drugs")) {
     for (const [id, B] of Object.entries(BOOK)) {
-      if (B.lscg || B.instant || REG[id]) continue;   // LSCG's own are never ours to add (nor the Purge: LSCG has its antidote)
+      if (B.lscg || B.instant || B.noLscg || REG[id]) continue;   // (a kit's no drug: it isn't LSCG's to list)   // LSCG's own are never ours to add (nor the Purge: LSCG has its antidote)
       try {
         api.drugs.register({
           name: id, label: B.label, description: B.desc, keywords: B.keywords, color: B.color, soakKeywords: B.soak || undefined,

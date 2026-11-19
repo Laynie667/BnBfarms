@@ -39,6 +39,7 @@ import { craftText } from "./needle.js";
 import { lscgPresent } from "./lscg.js";
 import { LINES } from "./lines.js";
 import { local, action, fill, pick, nameOf, inRoom, myName } from "./say.js";
+import { hornyOf } from "./horny.js";
 
 const W = window, MIN = 60000, HOUR = 3600000;
 export const KINDS = {
@@ -72,7 +73,8 @@ export function latch(kind, o) {
   if (o.by && o.by !== me() && !allowed(o.by)) return false;
   const P = mine(); if (P[kind]) return false;
   const now = Date.now();
-  P[kind] = { by: o.by || 0, name: String(o.name || "").slice(0, 30), since: now, until: K.worn ? 0 : now + K.hours * HOUR, strain: (o.strain || DEFAULT_STRAIN).filter((id) => BOOK[id]).slice(0, 4), fed: now, stage: 0, n: 0, eggs: 0, next: now + (K.every || 30) * MIN };
+  P[kind] = { by: o.by || 0, name: String(o.name || "").slice(0, 30), since: now, until: K.worn ? 0 : now + K.hours * HOUR, strain: (o.strain || DEFAULT_STRAIN).filter((id) => BOOK[id]).slice(0, 4), fed: now, stage: 0, n: 0, eggs: 0, next: now + (K.every || 30) * MIN,
+    horny: Math.max(0, Math.min(2, Math.round(Number(o.horny) || 0))) };   // (a horny one: twice as busy, and it squirms in between: horny.js)
   save();
   action(line(kind, "latch", { by: P[kind].name || "somebody" }));
   return true;
@@ -103,7 +105,7 @@ export function wornParasites() {
 export function paraTick() {
   const now = Date.now(), P = mine(), worn = wornParasites();
   // gear with a parasite in it: it latches (if that kind's on and the crafter's on your list)
-  if ((st().wornPause || 0) <= now) for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text) });
+  if ((st().wornPause || 0) <= now) for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text), horny: hornyOf(w.text) });
   if (P.moss && active("letdown")) P.moss.fed = now;   // (the moss feeds on your let-down)
   // the worn-only ones go when their gear does
   for (const kind of ["vine", "mouth"]) if (P[kind] && !worn.some((w) => w.kind === kind)) letGo(kind, "off");
@@ -112,7 +114,7 @@ export function paraTick() {
     if (p.until && now > p.until) { letGo(kind, "done"); continue; }
     if (K.starve && now - p.fed > K.starve * HOUR) { letGo(kind, "starved"); continue; }
     if (!K.every || now < p.next) continue;
-    p.next = now + K.every * MIN;
+    p.next = now + K.every * MIN / (p.horny ? 2 : 1);
     if (!inRoom()) continue;
     if (kind === "lips") { const id = p.strain[p.n++ % Math.max(1, p.strain.length)] || "needy"; give(id, { by: p.by, line: fill(line("lips", "feed"), { dose: (BOOK[id] || {}).label || id }) }); local(line("lips", "crave")); }
     if (kind === "moss") give("letdown", { by: p.by, line: line("moss", "feed") });
@@ -159,7 +161,7 @@ export function paraSuckled(from) {
 // a kiss YOU gave: the parasite lips spread, and the brood mother's little ones go across
 export function paraKissGiven(to) {
   const P = mine(); if (!to || to === me()) return;
-  if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me(), name: myName() }, to);
+  if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me(), name: myName(), horny: P.lips.horny || 0 }, to);
   if (P.brood && P.brood.eggs > 0) { P.brood.eggs--; save(); send("dispPara", { kind: "lips", strain: P.brood.strain, by: me(), name: myName(), brood: true }, to); local(line("brood", "pass").replace(/%b/g, nameOf(to))); }
 }
 // a kiss somebody gave you, carryin' one (their Dispensary says so)
@@ -167,7 +169,7 @@ function onPara(from, m) {
   const kind = String(m.kind || ""); if (!KINDS[kind] || KINDS[kind].worn) return;
   if (!on(kind) || !allowed(from)) return;
   const strain = Array.isArray(m.strain) ? m.strain.filter((id) => typeof id === "string" && BOOK[id]) : DEFAULT_STRAIN;
-  latch(kind, { by: from, name: nameOf(from), strain });
+  latch(kind, { by: from, name: nameOf(from), strain, horny: m.horny });
 }
 
 // THE LEASH VINE: no step more than a few tiles from whoever crafted it (only on a map, only while they're on it)

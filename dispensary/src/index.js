@@ -13,8 +13,10 @@ import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, mo
 import { laterTick, craving, craveSoon } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
-import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped } from "./nipples.js";
+import { initNipples, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped, nipsToyUsed } from "./nipples.js";
 import { initToys } from "./toys.js";
+import { initKits, kitTick, kitNow, kitSave, kitDelete, kitNames, kitLookup, kitEnd, SPEEDS, SPEED_NAMES } from "./kits.js";
+import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset } from "./horny.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import "./lines-nips.js";
 import "./lines-worn.js";
@@ -30,7 +32,7 @@ import { initSpeech, dosedSpeech } from "./speech.js";
 import { screenTick } from "./screen.js";
 import { initPage, openPage, pageOpen, redrawPage, timeLeft } from "./page.js";
 import { ladderWho, allowed } from "./ladder.js";
-import { local } from "./say.js";
+import { local, nameOf } from "./say.js";
 
 const W = window;
 const bcModSdk = sdkModule.default || sdkModule;
@@ -57,7 +59,7 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off]]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples",
+      Description: "[safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, horny gear",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
@@ -72,6 +74,12 @@ function commands() {
             (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") +
             (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close · /dispensary nips heal on|off"); return;
         }
+        // kits (Nov 18): yours to switch on, what they put on you, how fast; your own saved ones
+        const km = /^kits?(?:\s+(.*))?$/.exec(String(args || "").trim());
+        if (km) { kitCommand(String(km[1] || "").trim()); return; }
+        // horny gear (Nov 18): its own switch
+        const hm = /^horny\s+(on|off)$/.exec(a);
+        if (hm) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().hornyOn = hm[1] === "on"; save(); local(hm[1] === "on" ? "Horny gear can use you: crafted gear that says horny or hungry has its way with you, now and then." : "Horny gear sits still on you now."); return; }
         if (/^(safe|safeword|red)$/.test(a)) { safeword("command"); return; }
         if (/^(page|settings|open)$/.test(a)) { openPage(); return; }
         // the mouthpiece: say what its crafter asked, or let it pass; or, as the crafter, send some words
@@ -83,6 +91,24 @@ function commands() {
       },
     }]);
   } catch (e) { console.warn("[Dispensary] /dispensary unavailable:", e); }
+}
+
+// /dispensary kit ...
+function kitCommand(rest) {
+  const a = rest.toLowerCase(), S = st();
+  const lockedOut = () => { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return true; } return false; };
+  let m;
+  if (/^(on|off)$/.test(a)) { if (lockedOut()) return; S.kitsOn = a === "on"; save(); local(a === "on" ? "Kits can dress you now: a dose that says \"kit: <name>\" puts its crafter's outfit on you, " + SPEED_NAMES[S.kitSpeed || "steady"] + "." : "Kits can't dress you now."); return; }
+  if ((m = /^speed\s+(slow|steady|fast|now)$/.exec(a))) { S.kitSpeed = m[1]; save(); local("Kits go on you " + SPEED_NAMES[m[1]] + "."); return; }
+  if ((m = /^(?:what|put)\s+(clothes|binds|restraints|both)$/.exec(a))) { if (lockedOut()) return; S.kitWhat = m[1] === "restraints" ? "binds" : m[1]; save(); local("Kits can put " + ({ clothes: "clothes", binds: "restraints", both: "clothes and restraints" })[S.kitWhat] + " on you."); return; }
+  if ((m = /^save\s+(.+)$/.exec(rest))) { const r = kitSave(m[1]); local(r.ok ? "Saved what you're wearin' as the kit \"" + r.key + "\" (" + r.n + " pieces). Craft a dose that says \"Kit: " + r.key + "\" to put it on somebody." : ({ name: "Give it a name: /dispensary kit save <name>.", full: "You've eight kits saved already: /dispensary kit del <name> makes room.", empty: "You've nothin' on to save, sugar.", big: "That outfit's too big to keep as a kit." })[r.why]); return; }
+  if ((m = /^(?:del|delete|remove)\s+(.+)$/.exec(rest))) { local(kitDelete(m[1]) ? "Kit \"" + m[1].toLowerCase().trim() + "\" deleted." : "You've no kit called that."); return; }
+  if (/^(stop|end|off now)$/.test(a)) { if (lockedOut()) return; local(kitNow() ? (end("kit", "quiet"), "The kit lets go of you, and your own outfit's back on.") : "No kit's on you."); return; }
+  const k = kitNow(), n = kitNames();
+  local((k ? "👗 On you: " + k.key + " from " + (nameOf(k.by) || "#" + k.by) + " (" + k.on + " pieces on" + (k.left ? ", " + k.left + " to go" : "") + "). " : "") +
+    "Kits can dress you: " + (S.kitsOn ? "yes" : "no") + " · they put on " + ({ clothes: "clothes", binds: "restraints", both: "clothes and restraints" })[S.kitWhat || "both"] + " · " + SPEED_NAMES[S.kitSpeed || "steady"] + ". " +
+    "Your kits: " + (n.own.length ? n.own.join(", ") : "none") + (n.lscg.length ? " · in LSCG: " + n.lscg.join(", ") : "") + ". " +
+    "/dispensary kit on|off · speed slow|steady|fast|now · what clothes|binds|both · save <name> · del <name>");
 }
 
 // "mouth <who>": a member number, or somebody in the room by name
@@ -108,11 +134,13 @@ function start() {
   initIcons(mod);
   initParasites(mod);
   initNipples(mod); nipsOnSuckle(paraSuckled); nipsOnFarmLoad(tellNipLoad);
+  initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => paraMine() });
+  initKits(mod, { end: (id) => end(id, "quiet"), byOf: (id) => (st().doses[id] && st().doses[id].by) || 0 });
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -129,6 +157,8 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), give: (...a) => give(...a)
   speech: (t) => dosedSpeech(t), screen: () => screenTick(),
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },
   worn: () => wornGear(), wornTick: () => wornTick(), wornReset: () => wornReset(), trigger: (k, f) => trigger(k, f), para: () => paraMine(), paraTick: () => paraTick(), latch: (k, o) => latch(k, o), climax: () => paraClimax(), haze: () => hazeTick(), icons: (mn) => iconsFor(mn), iconsTell: (f) => iconsTell(f),
+  kit: () => kitNow(), kitTick: (now) => kitTick(now), kitSave: (n) => kitSave(n), kitLookup: (k) => kitLookup(k), kitEnd: () => kitEnd(false), kitCmd: (r) => kitCommand(r),
+  horny: () => hornyGear(), hornyTick: (now) => { hornyTick(now); hornyParaTick(now); }, hornyBeat: (g) => hornyBeat(g), hornyClimax: () => hornyClimax(), hornyReset: () => hornyReset(),
   nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only

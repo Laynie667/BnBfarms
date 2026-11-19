@@ -1,6 +1,6 @@
 # What to install (current versions)
 
-Updated 2026-11-18. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-19. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.67.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.16.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.17.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.17.0: horny gear and kits** Laynie, Nov 18: "the devices being horny", "a horny tag on parasites so they are more active with thrusting", and "lscg imports outfits, so maybe ones saved there, to utilize them similar to lscg curses".
+  - **Horny gear:** crafted gear that says horny or hungry uses you by itself (insatiable or ravenous: rougher, and every couple of minutes). Plugs and dildos thrust, nipple gear suckles, gags fuck your throat, ropes and belts grind. It pushes your arousal up and makes you cum when you're close and not denied. "Breeding" on it: it fills you when you cum. Its own switch, on to start.
+  - **Horny parasites:** a crafted parasite that says horny feeds twice as often, and squirms and thrusts in between.
+  - **Kits:** a dose that says "Kit: <name>" puts its crafter's saved outfit on you (saved in LSCG, or with `/dispensary kit save <name>`), creepin' on at the speed you pick. Anythin' taken off creeps back on, and when it's over your old outfit slips back on. "Kits can dress me" is off to start; you pick clothes, restraints or both. Never your body, nothin' you've blocked, never over a lock.
+  - Tests: `tests/dispensary-horny.test.cjs`, `tests/dispensary-kits.test.cjs` (new).
 
 - **Companion 0.67.0 + Dispensary 0.16.0: the Animal Tongue** Laynie, Nov 18, on each animal's noises: "Those suit just fine".
   - A new dose, the Animal Tongue: the bottle names the animal ("Kitty Tongue", "Puppy Tongue", "Pony Tongue", cow, bunny, fox, goat, lamb, piggy, wolf, dragon, rat), or "Animal Tongue" for your own.

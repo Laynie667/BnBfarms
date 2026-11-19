@@ -25,6 +25,7 @@ import { local, action, fill, pick, inRoom, myName } from "./say.js";
 import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
 import { nipsOpen, nipsClose, lastPopped } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
+import { kitPart } from "./kits.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -110,6 +111,14 @@ export const BOOK = {
     words: /\b((?:airhead|bimbo) (?:elixir|potion|serum|tonic|shot|juice|drops?))\b/,
     keywords: ["airhead elixir", "bimbo serum"], soak: ["airhead", "bimbo"],
     desc: "Everything you say comes out, like, totally airheaded: likes and ums, uptalk, giggles, and big words that just sort of float off. The stronger the dose, the emptier your head. Twenty minutes a dose.",
+  },
+  // KITS (Nov 18; kits.js): "kit: <name>" on the bottle puts the crafter's saved outfit on you, creepin' on, held on for
+  // its time, and your old outfit back after. Only with "Kits can dress me" on (off to start)
+  kit: {
+    label: "Kit", icon: "👗", mins: 30, color: "#b48ad8", optIn: "kitsOn", noLscg: true,
+    words: /\bkit\s*:\s*[a-z0-9]/,
+    keywords: [], soak: [],
+    desc: "\"Kit: <name>\" on the bottle: its crafter's saved outfit (in LSCG, or saved on their Dispensary) creeps onto you a piece at a time and stays on half an hour a dose. Anythin' taken off creeps back on. When it's over, your old outfit slips back on. Only with \"Kits can dress me\" on.",
   },
   // THE ANIMAL TONGUE (Nov 18; Laynie: "Those suit just fine"): Moo Juice's big sister. The bottle names the animal
   // ("Kitty Tongue" makes anybody a kitty; "Animal Tongue" is your own), and it gets stronger dose by dose: noises slip
@@ -319,6 +328,7 @@ export function partFor(id, text) {
   if (id === "fillout") return PART_RE.belly.test(t) ? "belly" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "statue") return statueMat(t);
   if (id === "tongue") { for (const [k, re] of TONGUE_RE) if (re.test(t)) return k; return ""; }
+  if (id === "kit") return kitPart(t);
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   return "";
@@ -384,6 +394,7 @@ export function give(id, o) {
   const B = BOOK[id], S = st();
   if (!B) return { ok: false, why: "unknown" };
   if (S.off[id]) return { ok: false, why: "off" };
+  if (B.optIn && !S[B.optIn]) return { ok: false, why: "off" };   // (one you've to switch on first: kits)
   if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : purge(o);
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
@@ -492,7 +503,7 @@ export function setClock(mode) {
 // ── what they do ───────────────────────────────────────────
 const face = (group, expr, secs) => { try { if (typeof W.CharacterSetFacialExpression === "function" && W.Player) W.CharacterSetFacialExpression(W.Player, group, expr, secs); } catch (e) { /* fine */ } };
 const meter = () => { const A = W.Player && W.Player.ArousalSettings; return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null; };
-function setArousal(v) {
+export function setArousal(v) {
   try { const A = meter(); if (!A) return; const n = Math.max(0, Math.min(100, Math.round(v))); if (typeof W.ActivitySetArousal === "function") W.ActivitySetArousal(W.Player, n); else A.Progress = n; } catch (e) { /* fine */ }
 }
 const xOf = (id) => (st().doses[id] && st().doses[id].x) || 1;

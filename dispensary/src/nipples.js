@@ -135,6 +135,12 @@ export function nipsUsed(from, kind) {
   if (now - usedAt > 3 * 60000) { usedAt = now; const L = LINES.nips && LINES.nips[!from || from === me() ? "self" : kind === "cock" ? "fucked" : "fingered"]; if (L && L.length) local(fill(pick(L), { by: from && from !== me() ? nameOf(from) : "you" })); }
 }
 
+// a horny toy (or the leeches) fucked them all by itself (horny.js): they train, and the leeches feed
+export function nipsToyUsed() {
+  const T = trainOf(); T.used = Date.now(); T.lvl = Math.min(3, T.lvl + TRAIN.finger); save();
+  if (mine().nips) nipsFed(0, "toy");
+}
+
 // ── CREAMPIES ──
 const CREAM_WINDOW = 90 * 1000;
 let lastFuck = null;   // { target, at }: the nipple you last fucked

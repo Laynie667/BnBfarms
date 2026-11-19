@@ -114,7 +114,30 @@ and running timers follow you between your phone and your PC, and clearing the b
      wolf, dragon, rat), and "Animal Tongue" is your own. One dose, noises slip in between your words; two, about half
      your words are noises; three, nothin' but. Thirty minutes a dose. Moo Juice stays as it was; the bimbo speak is
      the Airhead Elixir ("Bimbo Serum" works too).
-   Kits are still to come.
+   - **Kits** (built Nov 18, kits.js; Laynie: "lscg imports outfits, so maybe ones saved there, to utilize them similar
+     to lscg curses"): a dose that says **"Kit: <name>"** puts its crafter's saved outfit on you. The outfit is one they
+     saved in LSCG, or with `/dispensary kit save <name>` (eight at most). Their Dispensary sends it when yours asks
+     (`dispKitAsk { key }`, `dispKit { key, code }`), so they need to be in the room; your own kits work anywhere.
+     - **"Kits can dress me"** is off to start (`/dispensary kit on|off`, or the page).
+     - **How fast** is yours to pick: a piece a minute, every half minute, every ten seconds, or all at once
+       (`/dispensary kit speed slow|steady|fast|now`). **What:** clothes, restraints or both (`kit what ...`).
+     - It holds on for half an hour a dose, and a piece taken off creeps back on. Its locks don't come with it.
+     - Never your body, nothin' you've blocked, nothin' the room blocks, and never over somethin' locked on you.
+     - Its pieces keep their crafts, so horny gear in a kit is horny and a dilator drip keeps you open.
+     - **When it's over** (its time, the safeword, the Purge) the kit comes off and your old outfit slips back on. In
+       hardcore the safeword is your keyholders' as ever.
+     - The bottle's words flavour the lines: livin', demonic or brainwashin', or a mix of them.
+     - LSCG's outfit list isn't part of its extension API yet (`window.LSCG.Outfits`), so it's read carefully and a kit
+       saved on the Dispensary keeps workin' if LSCG moves it.
+   - **Horny gear** (built Nov 18, horny.js; Laynie: "the devices being horny"): crafted gear that says **"horny"** or
+     **"hungry"** uses you by itself every six to ten minutes (**"insatiable"** or **"ravenous"**: every two to four, and
+     rougher). Plugs and dildos thrust, nipple gear suckles (a nipple toy fucks an open nipple, and they train), gags fuck
+     your throat, ropes and belts grind.
+     - Each go pushes your arousal up. Close enough, and not denied, it makes you cum (the game's own orgasm).
+     - **"Breeding"** or **"seeding"** on it as well: when you cum it cums too, and fills you.
+     - **A parasite that says horny** feeds twice as often, and squirms and thrusts in between.
+     - The crafter has to be on your list. "Horny gear can use me" is on to start (`/dispensary horny on|off`), and the
+       safeword rests it with the rest of your gear.
 5. **Senses** (built Nov 18, senses.js):
    - **Blinder Drops:** the game's own blindness, up to three levels.
    - **Cotton Ears:** the game's own deafness, up to four.

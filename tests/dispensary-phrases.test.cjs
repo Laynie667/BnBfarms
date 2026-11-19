@@ -17,7 +17,7 @@ const ME = 600;
   const w = dom.window; w.TextEncoder = TextEncoder; w.TextDecoder = TextDecoder; w.console.warn = () => {}; w.console.log = () => {};
   w.__FARMHAND_TEST__ = true; w.CurrentScreen = "ChatRoom";
   w.LZString = { compressToBase64: (t) => Buffer.from(t).toString("base64"), decompressFromBase64: (t) => Buffer.from(t, "base64").toString() };
-  w.Player = { MemberNumber: ME, Name: "Hana", ExtensionSettings: {}, Lovership: [], WhiteList: [], FriendList: [], BlackList: [], ArousalSettings: { Progress: 0 }, IsPlayer: () => true, HasPenis: () => false, Appearance: [] };
+  w.Player = { MemberNumber: ME, Name: "Hana", ExtensionSettings: {}, Lovership: [], WhiteList: [], FriendList: [], BlackList: [], ArousalSettings: { Progress: 0 }, IsPlayer: () => true, HasPenis: () => false, HasVagina: () => true, Appearance: [] };
   w.ChatRoomCharacter = [w.Player]; w.ServerSend = () => {}; w.ChatRoomSendLocal = () => {}; w.CommandCombine = () => {}; w.ServerPlayerExtensionSettingsSync = () => {}; w.PreferenceRegisterExtensionSetting = () => {};
   w.ChatRoomMessage = function () {}; w.ChatRoomSync = function () {}; w.ActivityFemale3DCG = []; w.ActivityFemale3DCGOrdering = []; w.ActivityCheckPrerequisite = () => true;
   w.eval(fs.readFileSync(path.join(__dirname, "../dist/farmhand-dispensary.user.js"), "utf8")); await wait(1300);
@@ -54,6 +54,16 @@ const ME = 600;
   ok(["Puppy-Tongue", "PuppyTongue", "puppy tongue", "PUPPY_TONGUE"].every((t) => part(t, "tongue") === "pup") && part("Kitty-Tongue Tonic", "tongue") === "kitty" && (part("Animal-Tongue", "tongue") || "") === "", "Animal Tongue: the animal, however it's written");
   ok(part("Throat-Tightener", "balm") === "throat" && part("Pussy_Tightener", "balm") === "vulva" && part("Tightening-Balm | for every-hole", "balm") === "holes" && part("Virgin-Tonic", "balm") === "holes" && part("Nipple-Tightener, pussy too", "balm") === "nvulva", "Tightening Balm: which holes, however it's written");
   ok(D.dosesIn("cock-reducer".toLowerCase())[0] && D.dosesIn("cock-reducer")[0].id === "reducing" && part("Reducing-Serum | balls", "reducing") === "balls" && D.dosesIn("denial serum x3")[0].x === 3 && D.dosesIn("denial-serum 3x")[0].x === 3, "Reducing Serum's part, and x2 to x5, however they're written");
+
+  // Ass Growth and Booty Growth (Nov 19, her pick): the hole, and a bigger behind, each its own dose
+  ok(D.dosesIn("ass-growth x2")[0].id === "gape" && D.dosesIn("ass-growth")[0].p === "butt" && D.dosesIn("pussygape")[0].p === "vulva" && D.dosesIn("anal_gape".replace("_", " "))[0].id === "gape",
+    "Ass Growth and Anal Gape open the ass, Pussy Gape the pussy, however they're written");
+  ok(["booty growth", "Hip-Growth", "RearGrowth"].every((t) => D.dosesIn(t.toLowerCase())[0].id === "growass") && !D.dosesIn("ass growth").some((d) => d.id === "growass"), "...and Booty, Hip and Rear Growth are a bigger behind");
+  { const b0 = D.holes().holes.butt.trained; const r = D.give("gape", { by: ME, x: 1, p: "butt" });
+    ok(r.ok && D.holes().holes.butt.trained === b0 + 1, "off the farm, Ass Growth opens your ass a size through your hole trainin' (" + b0 + " → " + D.holes().holes.butt.trained + ")");
+    D.holesSet("butt", 10); const r2 = D.give("gape", { by: ME, x: 1, p: "butt" });
+    ok(!r2.ok && D.holes().holes.butt.trained === 10, "...up to natural: past that is the farm girl's own shots"); }
+  ok(D.farmHas("gape", "butt") && D.farmHas("reducing", "cup") && !D.farmHas("reducing", "ass") && !D.farmHas("growass", "") && !D.farmHas("statue", ""), "with the farm girl here: Ass Growth and Reducing Serum are hers, a Reducing Serum for a booty and Booty Growth stay yours");
 
   // ── the gear words ──
   const wear = (group, asset, name, desc) => { w.Player.Appearance = [{ Asset: { Name: asset, Group: { Name: group } }, Craft: { Name: name, Description: desc || "", MemberNumber: ME }, Property: {} }]; return D.worn()[0] || {}; };

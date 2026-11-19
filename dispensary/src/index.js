@@ -9,7 +9,7 @@ import { registerInk } from "../../shared/ink/ink.js";
 import sdkModule from "bondage-club-mod-sdk";
 import { VERSION } from "./version.js";
 import { load, st, save } from "./store.js";
-import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown, dosesIn } from "./doses.js";
+import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown, dosesIn, farmHas } from "./doses.js";
 import { laterTick, craving, craveSoon, isLater } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset, GLOSS_WORDS } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
@@ -200,6 +200,7 @@ const boot = setInterval(() => {
 // the tests reach in (only when a test page says so)
 const plainWords = (t) => String(t || "").toLowerCase().replace(/_+/g, " ");
 if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), dosesIn: (t) => dosesIn(t),
+  farmHas: (id, p) => farmHas(id, p),
   book: () => Object.fromEntries(Object.entries(BOOK).map(([id, B]) => [id, { farm: !!B.farm, lscg: B.lscg || "", lscgOnly: !!B.lscgOnly, keywords: (B.keywords || []).slice() }])),
   phrases: { gloss: (t) => GLOSS_WORDS.test(plainWords(t)), later: (t) => isLater(plainWords(t)), horny: (t) => hornyOf(plainWords(t)), para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t))) }, give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
   lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),

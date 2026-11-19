@@ -20,7 +20,7 @@
    The safeword, the Purge, or a keyholder lettin' you out clears what's in you and stops your gear for 15 minutes.
 */
 import { st, save } from "./store.js";
-import { BOOK, doseIds, dosesIn, give, active, leftMs, stackOf } from "./doses.js";
+import { BOOK, doseIds, dosesIn, give, active, leftMs, stackOf, farmHas } from "./doses.js";
 import { allowed } from "./ladder.js";
 import { lscgPresent } from "./lscg.js";
 import { craftText, botHere } from "./needle.js";
@@ -64,7 +64,7 @@ const me = () => (W.Player && W.Player.MemberNumber) || 0;
 const okFrom = (by) => !by || by === me() || allowed(by);   // (no maker on it: it's yours)
 const keyOf = (item) => (item.Asset && item.Asset.Group ? item.Asset.Group.Name : "?") + ":" + ((item.Craft && item.Craft.Name) || "");
 // a dose this gear may give here: not the farm girl's, not LSCG's own, not switched off
-function ours(id) { const B = BOOK[id]; return !!B && !(B.farm && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id]; }
+function ours(id, p) { const B = BOOK[id]; return !!B && !(farmHas(id, p) && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id]; }
 
 // the gear you're wearin' that doses, read fresh each time
 export function wornGear() {
@@ -73,7 +73,7 @@ export function wornGear() {
   for (const item of P.Appearance) {
     if (!item || !item.Craft) continue;
     const text = craftText(item); if (!text) continue;
-    const list = dosesOf(text).filter((d) => ours(d.id));
+    const list = dosesOf(text).filter((d) => ours(d.id, d.p));
     // (Nov 18) crafted nipple gear that says dilator or stretcher: the Nipple Dilator stays in you while it's worn
     const onNips = /^ItemNipples/.test(String(item.Asset && item.Asset.Group && item.Asset.Group.Name));
     if (onNips && NIP_DILATE.test(text) && !list.some((d) => d.id === "dilator") && ours("dilator")) list.push({ id: "dilator", x: stackOf(text) });

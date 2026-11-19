@@ -84,7 +84,24 @@ const inject = async (by, to, name, desc) => {
     }
   }
   ok(!grew.length, "Udder, Cock and Balls Growth, every spellin', grow her own sizes (" + (grew.join("; ") || "all of them") + ")");
-  ok(FARM_DOSES.every((id) => DID[id] || ["growcup", "growcock", "growballs", "growass", "reducing", "suggestible"].includes(id)), "...and that's every farm dose in the shared book (" + FARM_DOSES.join(", ") + ")");
+  // Ass Growth (Nov 19, her pick: the farm's own meaning): the hole opens a size, every spellin'; Pussy Gape the pussy
+  const gaped = [];
+  for (const k of KW.gape || []) for (const sp of spellings(k)) {
+    const p = prod(600); p.size = Object.assign(p.size || {}, { vulva: 6, butt: 6 }); p.sizeBase = Object.assign(p.sizeBase || {}, { vulva: 6, butt: 6 });
+    await inject(700, 600, sp);
+    const want = /pussy/i.test(sp) ? "vulva" : "butt", other = want === "vulva" ? "butt" : "vulva";
+    if (!(prod(600).size[want] > 6) || prod(600).size[other] !== 6) gaped.push(JSON.stringify(sp));
+  }
+  ok(KW.gape && KW.gape.length >= 3 && !gaped.length, "Ass Growth, Anal Gape, Pussy Gape, every spellin': the farm girl opens that hole a size (" + (gaped.join("; ") || "all of them") + ")");
+  // a Reducing Serum takes a size off (her pick), and never her hold-less shot
+  { const p = prod(600); p.size = Object.assign(p.size || {}, { udder: 9 }); p.sizeBase = Object.assign(p.sizeBase || {}, { udder: 9 }); const cap = p.capBonus = 400;
+    await inject(700, 600, "Reducing-Serum");
+    ok(prod(600).size.udder === 8 && prod(600).capBonus === cap, "a Reducing Serum takes a cup off, and leaves how much she holds alone (" + prod(600).size.udder + ", " + prod(600).capBonus + ")");
+    await inject(700, 600, "Shrinking Shot");
+    ok(prod(600).capBonus < cap, "...while \"shrinking\" is still the farm's hold-less shot");
+    p.size.udder = 9; p.sizeBase.udder = 9; p.size.butt = 6; p.sizeBase.butt = 6; await inject(700, 600, "Reducing Serum | for her booty");
+    ok(prod(600).size.udder === 9 && prod(600).size.butt === 6, "...and a Reducing Serum for a booty is the Dispensary's: she leaves it be"); }
+  ok(FARM_DOSES.every((id) => DID[id] || ["growcup", "growcock", "growballs", "gape", "reducing", "suggestible"].includes(id)) && !FARM_DOSES.includes("growass"), "...and that's every farm dose in the shared book (" + FARM_DOSES.join(", ") + ")");
 
   // ── the Dispensary's own doses: nothin' from her, for somebody runnin' it ──
   const doubled = [], noisy = [];

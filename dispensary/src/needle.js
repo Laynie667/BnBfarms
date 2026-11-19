@@ -11,7 +11,7 @@
      (later.js), whichever of us caught it.
 */
 import { BOT } from "./config.js";
-import { BOOK, dosesIn, give } from "./doses.js";
+import { BOOK, dosesIn, give, farmHas } from "./doses.js";
 import { allowed } from "./ladder.js";
 import { lscgPresent, lscgHas, lastLscgDose } from "./lscg.js";
 import { local, fill, nameOf } from "./say.js";
@@ -50,7 +50,7 @@ export function onNeedle(by, item) {
   const text = craftText(item), list = dosesOf(text), at = Date.now(), done = [], later = isLater(text);   // (dosesOf: a roulette is a dose of its own)
   for (const { id, x, p } of list) {
     const B = BOOK[id];
-    if (B.farm && botHere()) continue;              // the farm girl's (farm.js)
+    if (farmHas(id, p) && botHere()) continue;     // the farm girl's (farm.js)
     if (B.lscg && lscgPresent()) continue;          // LSCG's own
     if (!allowed(by)) { local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label })); continue; }
     const go = () => {

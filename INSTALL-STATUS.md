@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.85.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.85.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.2** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.20.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.21.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.85.1 + Dispensary 0.21.0: Ass Growth, Booty Growth and the Reducing Serum, one meanin' each** Laynie, Nov 19, of the two words the farm and the Dispensary read differently: "choose the best options for me".
+  - **Ass Growth opens your ass a size, everywhere:** the farm's own meanin', the way her traps, parasites and roulette have always used it ("%t's ass loosens and opens"). Anal Gape too, and Pussy Gape or Pussy Growth opens the pussy. On the farm it's the farm girl's shot, as ever, and hers can go past natural. Off the farm it's the Dispensary's now, through hole trainin', up to natural. A Tightening Balm closes it back up.
+  - **A bigger behind has its own names:** Booty Growth, Hip Growth, Rear Growth. The farm keeps no size for a behind, so these are the Dispensary's on the farm too (before, they did nothin' there with the farm girl in the room). Counted, and drawn once the drawn body learns hips.
+  - **A Reducing Serum takes a size off:** your tits, or the cock, balls or booty it names, undoin' the growth serums, on the farm and off it. The farm's hold-less shot (500 mL less) keeps "shrinking" and a plain "reducing"; the farm's guide says so.
 - **Bot 0.85.0 + Companion 0.68.2 + Dispensary 0.20.0: every spellin', one door per dose, nipple gear, and nipples in the Body rows** Laynie, Nov 19: "the nipple clamps for the nipple dilation doesn't seem to work? I also dont see nipples as part of the body for stages in the companion", then "need to double check that everything gets routed correctly, and that its accurately checking the phrases, even if we need to hyphenate".
   - **Nipple gear that dilates (Dispensary):** clamps crafted as "Dilator Clamps" or "Stretcher Clamps", or with only "dilator" in the description, did nothin': the words wanted "nipple dilator" in full, though the page said "dilator or stretcher". Now anythin' worn on the nipples (clamps, rings, piercings, toys) that says dilator, dilating, stretcher, spreader, opener or widener holds them open while it's on; x2 and x3 hold them wider.
   - **Nipples in the Companion's Body rows:** from your Dispensary: closed, open, wide open or gapin', what they're trained to stay, how far along the trainin' is, the toy in them, and loads taken. Off the farm's books, the Body row is still there, with your Dispensary's holes and nipples.

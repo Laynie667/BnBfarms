@@ -321,9 +321,12 @@ and running timers follow you between your phone and your PC, and clearing the b
        as ever.
      - **Nipple gear:** anythin' worn on the nipples that says dilator, dilating, stretcher, spreader, opener or widener
        is the Nipple Dilator while it's on (it wanted "nipple dilator" in full before).
-     - **Still hers to decide:** "Ass Growth" (on the farm, her "Ass" is the hole: it stretches it; the Dispensary
-       grows a bigger rear) and a "Reducing Serum" that names no part (the farm: 500 mL less capacity; the Dispensary:
-       a cup size off). Both left as they were.
+     - **Her picks** (Laynie: "choose the best options for me"): **Ass Growth** opens the hole a size, everywhere, the
+       farm's own meanin' (dose `gape`: Anal Gape, Pussy Gape; the farm girl's on her farm, past natural; off it, the
+       Dispensary's hole trainin', up to natural). A bigger behind is **Booty, Hip or Rear Growth** (`growass`, the
+       Dispensary's on the farm too). A **Reducing Serum** takes a size off (tits, or the cock, balls or booty it names)
+       on the farm and off; the farm's hold-less shot keeps "shrinking" and a plain "reducing". A Reducing Serum for a
+       booty stays the Dispensary's with the farm girl there (`farmHas`).
      - Tests: `dispensary-phrases` (every keyword nine ways, and the rest), `dispensary-routing` (the farm girl and
        every dose in every spellin'), `nipple-gear-body`.
 8. **Punishments by contract** dose through it.

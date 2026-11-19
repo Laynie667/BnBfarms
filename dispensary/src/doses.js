@@ -27,7 +27,7 @@ import { lscgPresent, lscgShow, lscgDose } from "./lscg.js";
 import { nipsOpen, nipsClose, lastPopped } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { kitPart } from "./kits.js";
-import { holesBalm, holesSafe } from "./holes.js";
+import { holesBalm, holesGape, holesSafe } from "./holes.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -192,11 +192,20 @@ export const BOOK = {
     keywords: ["udder growth", "breast growth"],
     desc: "A cup bigger for every dose, and it stays. Your Companion's drawn breasts show it. A reducing serum takes one back off.",
   },
+  // (Nov 19; Laynie: "choose the best options for me") a bigger behind has its own names now. "Ass Growth" is the
+  // farm's shot that opens the hole (gape, below), the way her traps, parasites and roulette have always used it. The
+  // farm keeps no size for a behind, so this one's your Dispensary's on the farm too.
   growass: {
-    label: "Ass Growth", icon: "🍑", mins: 0, color: "#f0a080", farm: true, instant: true, grow: "ass",
+    label: "Booty Growth", icon: "🍑", mins: 0, color: "#f0a080", instant: true, grow: "ass",
     words: DOSE_WORDS.growass,
-    keywords: ["ass growth"],
-    desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips).",
+    keywords: ["booty growth", "hip growth", "rear growth"],
+    desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips). Ass Growth is a different shot: it opens your ass.",
+  },
+  gape: {
+    label: "Ass Growth", icon: "🕳️", mins: 0, color: "#c86a7a", farm: true, instant: true,
+    words: DOSE_WORDS.gape,
+    keywords: ["ass growth", "anal gape", "pussy gape"],
+    desc: "The farm's own shot: your ass opens up a size for good, and stays trained that way (Pussy Gape or Pussy Growth: your pussy). On the farm it's the farm girl's, and hers can go past natural; anywhere else your Dispensary's hole trainin' keeps it, up to natural. A Tightening Balm closes it back up.",
   },
   growcock: {
     label: "Cock Growth", icon: "🍆", mins: 0, color: "#c07090", farm: true, instant: true, grow: "cock",
@@ -214,7 +223,7 @@ export const BOOK = {
     label: "Reducing Serum", icon: "🔻", mins: 0, color: "#90a0c0", farm: true, instant: true, grow: "less",
     words: DOSE_WORDS.reducing,
     keywords: ["reducing serum"],
-    desc: "Takes a size back off whatever the bottle names (Udder Reducer, Cock Reducer, Reducing Serum (ass)...; tits if it doesn't say).",
+    desc: "A size back off for every dose: your tits, or your cock, balls or booty if the bottle says so. It undoes the growth serums, and stays.",
   },
   // ── Nov 18: poses and senses (senses.js) ──
   weakknees: {
@@ -334,6 +343,7 @@ export function partFor(id, text) {
   if (id === "tongue") { for (const [k, re] of TONGUE_RE) if (re.test(t)) return k; return ""; }
   if (id === "kit") return kitPart(t);
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
+  if (id === "gape") { const m = BOOK.gape.words.exec(t); return m && /^(pussy|vulva|vaginal|cunt)/.test(m[0]) ? "vulva" : "butt"; }   // (the hole the phrase itself names: "PussyGape" too)
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
   if (id === "balm") {   // (Nov 18) which holes: "n" in front when it's for the nipples too
     const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag[\s_-]*reflex)\b/.test(t) && "throat"].filter(Boolean);
@@ -404,7 +414,7 @@ export function give(id, o) {
   if (!B) return { ok: false, why: "unknown" };
   if (S.off[id]) return { ok: false, why: "off" };
   if (B.optIn && !S[B.optIn]) return { ok: false, why: "off" };   // (one you've to switch on first: kits)
-  if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : purge(o);
+  if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : purge(o);
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
   const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
@@ -452,6 +462,14 @@ function purge(o) {
   return { ok: true, n, lscg };
 }
 
+// ASS GROWTH (Nov 19): a hole opened a size for good, trained that way (holes.js); a pussy if the bottle says so
+function gape(o) {
+  const h = o.p === "vulva" ? "vulva" : "butt", done = holesGape(h, o.x, o.quiet);
+  return done.length ? { ok: true, holes: done } : { ok: false, why: "max" };
+}
+// ON THE FARM, WITH THE FARM GIRL HERE, THIS DOSE IS HERS (needle.js, worn.js): the ones she keeps books for. A Reducing
+// Serum for a behind stays yours (she keeps no size for one).
+export const farmHas = (id, p) => !!(BOOK[id] && BOOK[id].farm) && !(id === "reducing" && p === "ass");
 // the Tightening Balm: stretched nipples closed back up (nipples.js), or a hole that's named (holes.js)
 function balm(o) {
   const hm = /^(n?)(vulva|butt|throat|holes)$/.exec(String(o.p || ""));

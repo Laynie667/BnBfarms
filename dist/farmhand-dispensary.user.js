@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.20.0
+// @version      0.21.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8049,7 +8049,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.20.0";
+  var VERSION = "0.21.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -8349,10 +8349,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     musk: loosen(/\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/),
     echo: loosen(/\becho[- ]elixir\b/),
     growcup: loosen(/\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/),
-    growass: loosen(/\b(ass|butt|booty|hips?) (growth|enlarger)\b/),
+    // (Nov 19, Laynie: "choose the best options for me") a bigger behind is Booty, Hip or Rear Growth. "Ass Growth" is
+    // the farm's own shot, the hole opened a size (gape, below): her traps, parasites and roulette all mean it that way.
+    growass: loosen(/\b(booty|hips?|rear|bum) (growth|enlarger)\b/),
+    gape: loosen(/\b((?:ass|anal|anus|asshole|butt|butthole|backdoor) (?:growth|gape|gaper)|(?:pussy|vulva|vaginal|cunt) (?:growth|gape|gaper))\b/),
     growcock: loosen(/\b(cock|penis|dick|shaft) (growth|enlarger)\b/),
     growballs: loosen(/\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/),
-    reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),
+    reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|booty|hips?|rear|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),
     // (not "shrinking": that's LSCG's, and it shrinks all of you)
     weakknees: loosen(/\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/),
     allfours: loosen(/\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/),
@@ -9251,9 +9254,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var me = () => W5.Player && W5.Player.MemberNumber || 0;
   var okFrom = (by) => !by || by === me() || allowed(by);
   var keyOf = (item) => (item.Asset && item.Asset.Group ? item.Asset.Group.Name : "?") + ":" + (item.Craft && item.Craft.Name || "");
-  function ours3(id) {
+  function ours3(id, p) {
     const B = BOOK[id];
-    return !!B && !(B.farm && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id];
+    return !!B && !(farmHas(id, p) && botHere()) && !(B.lscg && lscgPresent()) && !B.lscgOnly && !st().off[id];
   }
   function wornGear() {
     const P = W5.Player, out = [];
@@ -9262,7 +9265,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!item || !item.Craft) continue;
       const text3 = craftText(item);
       if (!text3) continue;
-      const list = dosesOf(text3).filter((d) => ours3(d.id));
+      const list = dosesOf(text3).filter((d) => ours3(d.id, d.p));
       const onNips2 = /^ItemNipples/.test(String(item.Asset && item.Asset.Group && item.Asset.Group.Name));
       if (onNips2 && NIP_DILATE.test(text3) && !list.some((d) => d.id === "dilator") && ours3("dilator")) list.push({ id: "dilator", x: stackOf(text3) });
       const roulette = ROULETTE_WORDS.test(text3);
@@ -10068,7 +10071,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const text3 = craftText(item), list = dosesOf(text3), at = Date.now(), done = [], later = isLater(text3);
     for (const { id, x, p } of list) {
       const B = BOOK[id];
-      if (B.farm && botHere()) continue;
+      if (farmHas(id, p) && botHere()) continue;
       if (B.lscg && lscgPresent()) continue;
       if (!allowed(by)) {
         local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label }));
@@ -12034,6 +12037,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       "%t's %h tightens round the %g in it. The balm's done its work, but the %g's holdin' it open for now.",
       "The balm tingles, and %t's %h squeezes the %g in it. Once it's out, they'll be %s."
     ],
+    // (Nov 19) Ass Growth, Anal Gape, Pussy Gape, off the farm
+    gape: [
+      "The shot burns warm and low, and %t's %h loosens and opens, achin' to be filled: %s now, and it stays.",
+      "%t gasps as it takes. Their %h eases open, wider than it was, and it isn't goin' back: %s.",
+      "Somethin' warm spreads deep, and %t's %h relaxes open round nothin' at all. %s now, for good.",
+      "%t clenches, and finds there's more room than there was. Their %h is %s now, and trained to stay that way."
+    ],
+    gape_max: [
+      "The shot burns warm, but %t's %h is as open as a shot off the farm can make it. Only the farm girl's own needles go further.",
+      "%t's %h aches for more, but this one won't open it any wider. Past here, it's the farm's shots or nothin'."
+    ],
     balm_none: [
       "%t gets a dab of tightenin' balm. They're as tight as they come already, but it tingles nicely.",
       "The tightenin' balm goes on, and finds nothin' to tighten. %t just squirms at the tingle.",
@@ -12486,6 +12500,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       change(h2, { tight: Math.max(0, k) });
       if (!quiet) say3(T ? "balm_plug" : "balm", h2, { g: T && T.name, s: o.u }, true);
+      out.push(h2);
+    }
+    save();
+    return out;
+  }
+  function holesGape(which, x, quiet) {
+    const out = [];
+    for (const h2 of holesHave().filter((k) => k === which)) {
+      const o = hole(h2), S2 = HOLE_SIZES[h2], k = Math.min(S2.natural - o.u, Math.max(1, Math.min(5, Number(x) || 1)));
+      if (k <= 0) {
+        if (!quiet) say3("gape_max", h2, {}, true);
+        continue;
+      }
+      o.u += k;
+      o.n = Math.max(o.n, o.u);
+      o.g = Date.now();
+      o.hl = 0;
+      change(h2, { up: k });
+      if (!quiet) say3("gape", h2, { s: o.u }, true);
       out.push(h2);
     }
     save();
@@ -12969,17 +13002,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keywords: ["udder growth", "breast growth"],
       desc: "A cup bigger for every dose, and it stays. Your Companion's drawn breasts show it. A reducing serum takes one back off."
     },
+    // (Nov 19; Laynie: "choose the best options for me") a bigger behind has its own names now. "Ass Growth" is the
+    // farm's shot that opens the hole (gape, below), the way her traps, parasites and roulette have always used it. The
+    // farm keeps no size for a behind, so this one's your Dispensary's on the farm too.
     growass: {
-      label: "Ass Growth",
+      label: "Booty Growth",
       icon: "\u{1F351}",
       mins: 0,
       color: "#f0a080",
-      farm: true,
       instant: true,
       grow: "ass",
       words: DOSE_WORDS.growass,
-      keywords: ["ass growth"],
-      desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips)."
+      keywords: ["booty growth", "hip growth", "rear growth"],
+      desc: "A size rounder behind for every dose, and it stays (counted now; drawn when the drawn body learns hips). Ass Growth is a different shot: it opens your ass."
+    },
+    gape: {
+      label: "Ass Growth",
+      icon: "\u{1F573}\uFE0F",
+      mins: 0,
+      color: "#c86a7a",
+      farm: true,
+      instant: true,
+      words: DOSE_WORDS.gape,
+      keywords: ["ass growth", "anal gape", "pussy gape"],
+      desc: "The farm's own shot: your ass opens up a size for good, and stays trained that way (Pussy Gape or Pussy Growth: your pussy). On the farm it's the farm girl's, and hers can go past natural; anywhere else your Dispensary's hole trainin' keeps it, up to natural. A Tightening Balm closes it back up."
     },
     growcock: {
       label: "Cock Growth",
@@ -13015,7 +13061,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       grow: "less",
       words: DOSE_WORDS.reducing,
       keywords: ["reducing serum"],
-      desc: "Takes a size back off whatever the bottle names (Udder Reducer, Cock Reducer, Reducing Serum (ass)...; tits if it doesn't say)."
+      desc: "A size back off for every dose: your tits, or your cock, balls or booty if the bottle says so. It undoes the growth serums, and stays."
     },
     // ── Nov 18: poses and senses (senses.js) ──
     weakknees: {
@@ -13197,6 +13243,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (id === "kit") return kitPart(t);
     if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
+    if (id === "gape") {
+      const m = BOOK.gape.words.exec(t);
+      return m && /^(pussy|vulva|vaginal|cunt)/.test(m[0]) ? "vulva" : "butt";
+    }
     if (id === "tender") {
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
       return "";
@@ -13280,7 +13330,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!B) return { ok: false, why: "unknown" };
     if (S2.off[id]) return { ok: false, why: "off" };
     if (B.optIn && !S2[B.optIn]) return { ok: false, why: "off" };
-    if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : purge(o);
+    if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : purge(o);
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
@@ -13337,6 +13387,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!o.quiet) action(o.line || fill("%t shudders as the purge hits, and every dose in them drains away, clean and cold."));
     return { ok: true, n, lscg };
   }
+  function gape(o) {
+    const h2 = o.p === "vulva" ? "vulva" : "butt", done = holesGape(h2, o.x, o.quiet);
+    return done.length ? { ok: true, holes: done } : { ok: false, why: "max" };
+  }
+  var farmHas = (id, p) => !!(BOOK[id] && BOOK[id].farm) && !(id === "reducing" && p === "ass");
   function balm(o) {
     const hm = /^(n?)(vulva|butt|throat|holes)$/.exec(String(o.p || ""));
     if (hm) {
@@ -14907,7 +14962,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Tender: names its spot: nipples, tits, clit, pussy, ass, neck, ears, lips, belly, thighs or feet. With no spot named it goes where you picked under How doses take you.",
         "Statue Serum: stone, unless it says porcelain, gold, latex, marble or bronze. Everybody with the Companion sees you turned.",
         "Animal Tongue: a puppy, kitty, pony, cow, bunny, fox, goat, lamb, piggy, wolf, dragon or rat tongue. Animal tongue on its own makes you your own animal, picked under Touches.",
-        "Growth: Udder, Ass, Cock and Balls Growth grow you a size, and it stays. A Reducing Serum takes a size back off: cock, balls or ass if it says so, tits otherwise.",
+        "Growth: Udder, Booty, Cock and Balls Growth grow you a size, and it stays (Hip or Rear Growth is the booty too). A Reducing Serum takes a size back off: cock, balls or booty if it says so, tits otherwise.",
+        "Ass Growth is the farm's own shot: it opens your ass a size for good, Pussy Gape or Pussy Growth your pussy. A Tightening Balm closes it back up.",
         "Tightening Balm: closes up what it names: nipples, pussy, ass or throat. Virgin balm, or a balm for every hole, does them all.",
         "Purge: lifts every dose in you, there and then.",
         "Kit: puts an outfit on them. See Kits."
@@ -15004,6 +15060,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "A goal goes on the toy, like goal: gaping in 2 days. Anybody who can dose you can also set one by command: /dispensary train <who> <ass|pussy|throat> <size> in 3 days.",
         "A pump or beads crafted as a trainer grows with you, a little at a time.",
         "Fingers, fists, cocks and toys used on you count too, and a load in a loose hole drips back out.",
+        "Ass Growth, Anal Gape or Pussy Gape on a needle opens a hole a size for good, the farm's own shot, up to natural off the farm.",
         "Tighten up with a Tightening Balm that names the hole, or pick your own size under Holes."
       ],
       craft: [
@@ -16208,6 +16265,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   if (W21.__FARMHAND_TEST__) W21.__disp = {
     st: () => st(),
     dosesIn: (t) => dosesIn(t),
+    farmHas: (id, p) => farmHas(id, p),
     book: () => Object.fromEntries(Object.entries(BOOK).map(([id, B]) => [id, { farm: !!B.farm, lscg: B.lscg || "", lscgOnly: !!B.lscgOnly, keywords: (B.keywords || []).slice() }])),
     phrases: { gloss: (t) => GLOSS_WORDS.test(plainWords(t)), later: (t) => isLater(plainWords(t)), horny: (t) => hornyOf(plainWords(t)), para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t))) },
     give: (...a) => give(...a),

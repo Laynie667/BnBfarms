@@ -357,6 +357,21 @@ export function holesBalm(which, x, quiet) {
   save();
   return out;
 }
+// ASS GROWTH, ANAL GAPE, PUSSY GAPE (Nov 19): the farm's own shot, off the farm. The hole opens a size for good, trained
+// that way, up to natural (only the farm girl's own shots go past it). A Tightening Balm closes it back up.
+export function holesGape(which, x, quiet) {
+  const out = [];
+  for (const h of holesHave().filter((k) => k === which)) {
+    const o = hole(h), S = HOLE_SIZES[h], k = Math.min(S.natural - o.u, Math.max(1, Math.min(5, Number(x) || 1)));
+    if (k <= 0) { if (!quiet) say("gape_max", h, {}, true); continue; }
+    o.u += k; o.n = Math.max(o.n, o.u); o.g = Date.now(); o.hl = 0;
+    change(h, { up: k });
+    if (!quiet) say("gape", h, { s: o.u }, true);
+    out.push(h);
+  }
+  save();
+  return out;
+}
 // your own pick (the page, like the farm's ?size): your usual, up to natural
 export function holesSet(h, lvl) {
   if (!holesHave().includes(h)) return false;

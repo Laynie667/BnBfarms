@@ -377,7 +377,7 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
       the farm treats it as that cock, and big ones stretch you.
   Capacity
     stretching / capacity · +250 mL for good (up to 50 L)
-    reducing / shrinking · −500 mL, spills the extra
+    shrinking · −500 mL, spills the extra (a Reducing Serum takes a size off instead)
   Sizes · a part plus a grow or shrink word, either order
     parts: breasts (tits, udder) · balls · cock (penis) · knot ·
       pussy · ass (anal) · throat

@@ -46,10 +46,13 @@ export const DOSE_WORDS = {
   musk: loosen(/\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/),
   echo: loosen(/\becho[- ]elixir\b/),
   growcup: loosen(/\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/),
-  growass: loosen(/\b(ass|butt|booty|hips?) (growth|enlarger)\b/),
+  // (Nov 19, Laynie: "choose the best options for me") a bigger behind is Booty, Hip or Rear Growth. "Ass Growth" is
+  // the farm's own shot, the hole opened a size (gape, below): her traps, parasites and roulette all mean it that way.
+  growass: loosen(/\b(booty|hips?|rear|bum) (growth|enlarger)\b/),
+  gape: loosen(/\b((?:ass|anal|anus|asshole|butt|butthole|backdoor) (?:growth|gape|gaper)|(?:pussy|vulva|vaginal|cunt) (?:growth|gape|gaper))\b/),
   growcock: loosen(/\b(cock|penis|dick|shaft) (growth|enlarger)\b/),
   growballs: loosen(/\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/),
-  reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),   // (not "shrinking": that's LSCG's, and it shrinks all of you)
+  reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|booty|hips?|rear|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),   // (not "shrinking": that's LSCG's, and it shrinks all of you)
   weakknees: loosen(/\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/),
   allfours: loosen(/\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/),
   blinder: loosen(/\b(blind(?:er|ing)? drops?|dim(?:ming)? drops?|darkness drops?)\b/),
@@ -62,6 +65,6 @@ export const DOSE_WORDS = {
   balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
   purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/),
 };
-export const FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "growass", "growcock", "growballs", "reducing", "purge"];
+export const FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge"];
 // which doses a text names (ids), in the book's order
 export const dosesNamed = (text) => { const t = String(text || "").toLowerCase(); return Object.keys(DOSE_WORDS).filter((id) => DOSE_WORDS[id].test(t)); };

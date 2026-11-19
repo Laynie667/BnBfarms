@@ -74,7 +74,7 @@
   // the Dispensary's own needle words (shotUnread stays quiet about them: their Dispensary reads them, not me), straight
   // out of its book (shared/dose-words.js), so every spellin' counts: "Rut Serum", "rut-serum", "RutSerum"
   const DISP_ONLY = Object.keys(DOSE_WORDS).filter(id => !FARM_DOSES.includes(id));
-  const DISP_WORDS = { test: (t) => { const s = String(t || "").toLowerCase(); return DISP_ONLY.some(id => DOSE_WORDS[id].test(s)); } };
+  const DISP_WORDS = { test: (t) => { const s = String(t || "").toLowerCase(); return DISP_ONLY.some(id => DOSE_WORDS[id].test(s)) || (DOSE_WORDS.reducing.test(s) && /\b(booty|hips?|rear|bum)\b/.test(s)); } };   // (a Reducing Serum for a behind is the Dispensary's too)
   // ONE DOOR PER DOSE (Nov 19; Laynie: "need to double check that everything gets routed correctly"). For somebody
   // runnin' the Dispensary, its own doses' words come out of a needle's text before I read it: "Deep Throat Drops" and
   // "Throat Relaxer" read as my throat trainin' too, a "Pussy Tightener" as my tightenin' shot, "Sure-Catch" as my

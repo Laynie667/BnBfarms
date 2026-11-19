@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.85.0
+// @version      0.85.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2957,10 +2957,13 @@
     musk: loosen(/\b(blue[- ]ribbon[- ]musk|ribbon musk)\b/),
     echo: loosen(/\becho[- ]elixir\b/),
     growcup: loosen(/\b(udder|breast|tits?|boobs?|chest|cup) (growth|boost|enlarger)\b/),
-    growass: loosen(/\b(ass|butt|booty|hips?) (growth|enlarger)\b/),
+    // (Nov 19, Laynie: "choose the best options for me") a bigger behind is Booty, Hip or Rear Growth. "Ass Growth" is
+    // the farm's own shot, the hole opened a size (gape, below): her traps, parasites and roulette all mean it that way.
+    growass: loosen(/\b(booty|hips?|rear|bum) (growth|enlarger)\b/),
+    gape: loosen(/\b((?:ass|anal|anus|asshole|butt|butthole|backdoor) (?:growth|gape|gaper)|(?:pussy|vulva|vaginal|cunt) (?:growth|gape|gaper))\b/),
     growcock: loosen(/\b(cock|penis|dick|shaft) (growth|enlarger)\b/),
     growballs: loosen(/\b(balls?|testes|testicles?|nuts) (growth|enlarger)\b/),
-    reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|ass|butt|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),
+    reducing: loosen(/\b(reducing (?:serum|shot|tonic|potion|drops?)|(?:udder|breast|boob|tits?|booty|hips?|rear|balls?|testicle|testes|penis|cock|dick) (?:reducer|reducing))\b/),
     // (not "shrinking": that's LSCG's, and it shrinks all of you)
     weakknees: loosen(/\b(weak[- ]?knees?|jelly[- ]?legs?|kneel(?:ing)? (?:serum|draught|shot|tonic|potion))\b/),
     allfours: loosen(/\b(down[- ](?:girl|boy|pet) (?:serum|draught|shot|tonic|potion|drops?)|all[- ]fours (?:serum|draught|shot|tonic|potion|drops?))\b/),
@@ -2974,7 +2977,7 @@
     balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
     purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/)
   };
-  var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "growass", "growcock", "growballs", "reducing", "purge"];
+  var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge"];
 
   // shared/guides.js
   var PUBLIC_GROUPS = [
@@ -3011,7 +3014,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.85.0";
+  var VERSION = "0.85.1";
   var COMPANION_VERSION = "0.68.2";
 
   // bot-parts:farmhand-bot-parts
@@ -6810,6 +6813,11 @@
       purge: "purge"
     };
     const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
+    const gapePart = (t) => {
+      const m = DOSE_WORDS.gape.exec(t);
+      return m && /^(pussy|vulva|vaginal|cunt)/.test(m[0]) ? "vulva" : "butt";
+    };
+    const reducePart = (t) => /\b(cock|penis|dick|shaft)\b/.test(t) ? "penis" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "testes" : /\b(booty|hips?|rear|bum|ass|butt)\b/.test(t) ? null : "udder";
     function sizeTagsIn(text) {
       const out = [], flat = squash(text);
       for (const [part, d] of Object.entries(CFG.SIZE_TAGS)) {
@@ -6819,9 +6827,18 @@
       for (const pr of partShots(text).pairs) if (!out.some((o) => o[0] === pr[0])) out.push(pr);
       const low = String(text || "").toLowerCase();
       for (const [id, part] of FARM_DOSE_SIZE) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low) && !out.some((o) => o[0] === part)) out.push([part, 1]);
+      if (DOSE_WORDS.gape && DOSE_WORDS.gape.test(low)) {
+        const part = gapePart(low);
+        if (!out.some((o) => o[0] === part)) out.push([part, 1]);
+      }
+      if (DOSE_WORDS.reducing && DOSE_WORDS.reducing.test(low)) {
+        const part = reducePart(low);
+        if (part && !out.some((o) => o[0] === part)) out.push([part, -1]);
+      }
       return out;
     }
     function tagsIn(text) {
+      text = String(text || "").toLowerCase().replace(everyOf(DOSE_WORDS.reducing), " ");
       let flat = squash(partShots(text).rest);
       for (const d of Object.values(CFG.SIZE_TAGS)) for (const w of d.up.concat(d.down)) flat = flat.split(squash(w)).join(" ");
       const out = /* @__PURE__ */ new Set();
@@ -26507,7 +26524,7 @@
     const DISP_ONLY = Object.keys(DOSE_WORDS).filter((id) => !FARM_DOSES.includes(id));
     const DISP_WORDS = { test: (t) => {
       const s = String(t || "").toLowerCase();
-      return DISP_ONLY.some((id) => DOSE_WORDS[id].test(s));
+      return DISP_ONLY.some((id) => DOSE_WORDS[id].test(s)) || DOSE_WORDS.reducing.test(s) && /\b(booty|hips?|rear|bum)\b/.test(s);
     } };
     function dispStrip(mn, text) {
       if (!text || !dispFor(mn)) return text;
@@ -62568,7 +62585,7 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
       the farm treats it as that cock, and big ones stretch you.
   Capacity
     stretching / capacity \xB7 +250 mL for good (up to 50 L)
-    reducing / shrinking \xB7 \u2212500 mL, spills the extra
+    shrinking \xB7 \u2212500 mL, spills the extra (a Reducing Serum takes a size off instead)
   Sizes \xB7 a part plus a grow or shrink word, either order
     parts: breasts (tits, udder) \xB7 balls \xB7 cock (penis) \xB7 knot \xB7
       pussy \xB7 ass (anal) \xB7 throat

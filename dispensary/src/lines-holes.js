@@ -297,6 +297,17 @@ LINES.holes = {
     "%t's %h tightens round the %g in it. The balm's done its work, but the %g's holdin' it open for now.",
     "The balm tingles, and %t's %h squeezes the %g in it. Once it's out, they'll be %s.",
   ],
+  // (Nov 19) Ass Growth, Anal Gape, Pussy Gape, off the farm
+  gape: [
+    "The shot burns warm and low, and %t's %h loosens and opens, achin' to be filled: %s now, and it stays.",
+    "%t gasps as it takes. Their %h eases open, wider than it was, and it isn't goin' back: %s.",
+    "Somethin' warm spreads deep, and %t's %h relaxes open round nothin' at all. %s now, for good.",
+    "%t clenches, and finds there's more room than there was. Their %h is %s now, and trained to stay that way.",
+  ],
+  gape_max: [
+    "The shot burns warm, but %t's %h is as open as a shot off the farm can make it. Only the farm girl's own needles go further.",
+    "%t's %h aches for more, but this one won't open it any wider. Past here, it's the farm's shots or nothin'.",
+  ],
   balm_none: [
     "%t gets a dab of tightenin' balm. They're as tight as they come already, but it tingles nicely.",
     "The tightenin' balm goes on, and finds nothin' to tighten. %t just squirms at the tingle.",

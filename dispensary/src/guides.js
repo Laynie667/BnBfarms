@@ -110,7 +110,8 @@ export const GUIDES = [
       "Tender: names its spot: nipples, tits, clit, pussy, ass, neck, ears, lips, belly, thighs or feet. With no spot named it goes where you picked under How doses take you.",
       "Statue Serum: stone, unless it says porcelain, gold, latex, marble or bronze. Everybody with the Companion sees you turned.",
       "Animal Tongue: a puppy, kitty, pony, cow, bunny, fox, goat, lamb, piggy, wolf, dragon or rat tongue. Animal tongue on its own makes you your own animal, picked under Touches.",
-      "Growth: Udder, Ass, Cock and Balls Growth grow you a size, and it stays. A Reducing Serum takes a size back off: cock, balls or ass if it says so, tits otherwise.",
+      "Growth: Udder, Booty, Cock and Balls Growth grow you a size, and it stays (Hip or Rear Growth is the booty too). A Reducing Serum takes a size back off: cock, balls or booty if it says so, tits otherwise.",
+      "Ass Growth is the farm's own shot: it opens your ass a size for good, Pussy Gape or Pussy Growth your pussy. A Tightening Balm closes it back up.",
       "Tightening Balm: closes up what it names: nipples, pussy, ass or throat. Virgin balm, or a balm for every hole, does them all.",
       "Purge: lifts every dose in you, there and then.",
       "Kit: puts an outfit on them. See Kits.",
@@ -199,6 +200,7 @@ export const GUIDES = [
       "A goal goes on the toy, like goal: gaping in 2 days. Anybody who can dose you can also set one by command: /dispensary train <who> <ass|pussy|throat> <size> in 3 days.",
       "A pump or beads crafted as a trainer grows with you, a little at a time.",
       "Fingers, fists, cocks and toys used on you count too, and a load in a loose hole drips back out.",
+      "Ass Growth, Anal Gape or Pussy Gape on a needle opens a hole a size for good, the farm's own shot, up to natural off the farm.",
       "Tighten up with a Tightening Balm that names the hole, or pick your own size under Holes.",
     ],
     craft: [

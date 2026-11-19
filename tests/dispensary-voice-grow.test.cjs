@@ -124,9 +124,9 @@ function page(opts) {
   ok(evs.some((e) => e.type === "grow" && e.part === "cup" && e.n === 2), "...the Companion's told, so the drawn breasts grow");
   s.needle(OWNER, "Breast Enlarger");
   ok(FD.grow().cup === 3, "...the farm's own words work too (Breast Enlarger)");
-  s.needle(OWNER, "Cock Growth"); s.needle(OWNER, "Ball Enlarger x2"); s.needle(OWNER, "Ass Growth");
+  s.needle(OWNER, "Cock Growth"); s.needle(OWNER, "Ball Enlarger x2"); s.needle(OWNER, "Booty Growth");
   const g = FD.grow();
-  ok(g.cock === 1 && g.balls === 2 && g.ass === 1, "cock, balls and ass growth each counted (" + JSON.stringify(g) + ")");
+  ok(g.cock === 1 && g.balls === 2 && g.ass === 1, "cock, balls and booty growth each counted (" + JSON.stringify(g) + ")");
   s.needle(OWNER, "Cock Reducer");
   ok(FD.grow().cock === 0 && /shrinks|smaller/.test(s.actions().pop()), "a Cock Reducer takes a size back off the cock");
   s.needle(OWNER, "Reducing Serum");

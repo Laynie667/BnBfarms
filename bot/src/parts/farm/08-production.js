@@ -86,6 +86,12 @@
   const FARM_DOSE_TAG = { denial: "denial", sedative: "sedative", needy: "aphro", hairtrigger: "trigger", bitterroot: "bitterroot", moo: "mooserum",
     hiccup: "hiccup", feather: "feather", heat: "heat", suggestible: "obey", purge: "purge" };
   const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
+  // (Nov 19; Laynie: "choose the best options for me") "Ass Growth" is my shot that opens the hole, the way my traps,
+  // parasites and roulette use it, every spellin' of it (a pussy if it says so); a bigger behind is Booty Growth, the
+  // Dispensary's (I keep no size for one). A "Reducing Serum" takes a size off (tits, or the cock or balls it names), the
+  // way the Dispensary's does; "shrinking" and a plain "reducing" are still my hold-less shot.
+  const gapePart = (t) => { const m = DOSE_WORDS.gape.exec(t); return m && /^(pussy|vulva|vaginal|cunt)/.test(m[0]) ? "vulva" : "butt"; };   // (the hole the phrase names: "PussyGape" too)
+  const reducePart = (t) => /\b(cock|penis|dick|shaft)\b/.test(t) ? "penis" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "testes" : /\b(booty|hips?|rear|bum|ass|butt)\b/.test(t) ? null : "udder";
   function sizeTagsIn(text){
     const out = [], flat = squash(text);
     for (const [part, d] of Object.entries(CFG.SIZE_TAGS)){
@@ -95,9 +101,12 @@
     for (const pr of partShots(text).pairs) if (!out.some(o => o[0] === pr[0])) out.push(pr);
     const low = String(text || "").toLowerCase();
     for (const [id, part] of FARM_DOSE_SIZE) if (DOSE_WORDS[id] && DOSE_WORDS[id].test(low) && !out.some(o => o[0] === part)) out.push([part, +1]);
+    if (DOSE_WORDS.gape && DOSE_WORDS.gape.test(low)){ const part = gapePart(low); if (!out.some(o => o[0] === part)) out.push([part, +1]); }
+    if (DOSE_WORDS.reducing && DOSE_WORDS.reducing.test(low)){ const part = reducePart(low); if (part && !out.some(o => o[0] === part)) out.push([part, -1]); }
     return out;
   }
   function tagsIn(text){
+    text = String(text || "").toLowerCase().replace(everyOf(DOSE_WORDS.reducing), " ");   // (a Reducing Serum is a size off, not my hold-less shot)
     // size phrases ("udder reducing", "pussy stretching") come out first so they don't also count as plain "reducing"
     let flat = squash(partShots(text).rest);
     for (const d of Object.values(CFG.SIZE_TAGS)) for (const w of d.up.concat(d.down)) flat = flat.split(squash(w)).join(" ");

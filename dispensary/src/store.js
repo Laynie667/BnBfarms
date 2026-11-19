@@ -92,6 +92,34 @@ export function clean(d) {
     if (o.fly && typeof o.fly === "object" && Array.isArray(o.fly.ops)) out.fly = { id: Math.round(num(o.fly.id, 0, 1e12, 0)), ops: o.fly.ops.map(op).filter(Boolean).slice(0, 60), at: 0 };
     s.holes = out;
   }
+  // (Nov 19) seed: what's in you, whose, every load you've taken, and what's waitin' for the farm girl (seed.js)
+  if (d.seed && typeof d.seed === "object") {
+    const o = d.seed, HS = ["vulva", "butt", "mouth", "nips"], mn = (k) => /^\d{1,9}$/.test(String(k));
+    const by = (m) => { const r = {}; if (m && typeof m === "object") for (const [k, v] of Object.entries(m).slice(0, 8)) if (mn(k)) r[k] = num(v, 0, 40000, 0); return r; };
+    const ld = (x) => (x && typeof x === "object" && HS.includes(x.h) && Number(x.by) > 0 ? { h: x.h, ml: Math.round(num(x.ml, 0, 40000, 0)), by: Math.round(num(x.by, 0, 1e9, 0)), at: num(x.at, 0, 1e14, 0), nc: x.nc ? 1 : 0, here: x.here ? 1 : 0, nm: typeof x.nm === "string" ? x.nm.slice(0, 40) : undefined, up: x.up ? 1 : undefined, via: x.via === "cock" ? "cock" : undefined } : null);
+    // (a draught waitin' in flight with them)
+    const out = { h: {}, from: {}, seals: {}, leak: {}, drip: {}, pend: [], n: Math.round(num(o.n, 0, 1e7, 0)), ml: num(o.ml, 0, 1e10, 0), id: Math.round(num(o.id, 0, 1e12, 0)), cap: num(o.cap, 0, 60000, 0), sync: num(o.sync, 0, 1e14, 0),
+      ep: typeof o.ep === "string" && /^[a-z0-9]{4,12}$/.test(o.ep) ? o.ep : "", no: typeof o.no === "string" ? o.no.slice(0, 20) : "" };
+    for (const h of HS) { const x = o.h && o.h[h]; out.h[h] = { ml: x && typeof x === "object" ? num(x.ml, 0, 40000, 0) : 0, by: x && typeof x === "object" ? by(x.by) : {} }; }
+    if (o.from && typeof o.from === "object") for (const [k, f] of Object.entries(o.from).slice(-40)) if (mn(k) && f && typeof f === "object") out.from[k] = { n: Math.round(num(f.n, 0, 1e7, 0)), ml: num(f.ml, 0, 1e10, 0), at: num(f.at, 0, 1e14, 0), nm: typeof f.nm === "string" ? f.nm.slice(0, 40) : "" };
+    if (o.seals && typeof o.seals === "object") for (const h of HS) { const x = o.seals[h]; if (x && typeof x === "object" && Number(x.by) > 0) out.seals[h] = { by: Math.round(num(x.by, 0, 1e9, 0)), g: String(x.g || "").slice(0, 40), nm: String(x.nm || "").slice(0, 40) }; }
+    if (Array.isArray(o.pend)) out.pend = o.pend.map(ld).filter(Boolean).slice(-60);
+    if (o.fly && typeof o.fly === "object" && Array.isArray(o.fly.loads)) out.fly = { id: Math.round(num(o.fly.id, 0, 1e12, 0)), loads: o.fly.loads.map(ld).filter(Boolean).slice(0, 30), at: 0, quick: o.fly.quick ? Math.round(num(o.fly.quick, 0, 20, 0)) : undefined };
+    s.seed = out;
+  }
+  // (Nov 19) breedin' anywhere (breed.js): your switch, a knot you're tied on, the farm's ripe days and cock for you
+  s.breedAny = d.breedAny === true;
+  // (Nov 19, part two: carry.js) what the farm says you're carryin', and what you did away for her books
+  if (d.carry && typeof d.carry === "object") s.carry = d.carry;   // (carry.js carryWelcome cleans it as it comes in)
+  const stamp = (x, keys) => { if (!x || typeof x !== "object") return undefined; const o = {}; for (const k of keys) if (typeof x[k] === "number" && isFinite(x[k])) o[k] = x[k]; return o.at > 0 || o.start > 0 ? o : undefined; };
+  s.born = stamp(d.born, ["at", "midwife", "helps", "n", "due"]); if (!s.born) delete s.born;
+  s.laid = stamp(d.laid, ["at", "n"]); if (!s.laid) delete s.laid;
+  s.labour = stamp(d.labour, ["start", "until", "next", "due", "helps", "midwife"]); if (!s.labour) delete s.labour;
+  s.laying = stamp(d.laying, ["start", "next", "pushes"]); if (!s.laying) delete s.laying;
+  if (d.quick) s.quick = Math.round(num(d.quick, 0, 20, 0)); if (d.heatAt) s.heatAt = num(d.heatAt, 0, 1e14, 0);
+  if (d.tie && typeof d.tie === "object" && Number(d.tie.by) > 0 && ["vulva", "butt"].includes(d.tie.h)) s.tie = { by: Math.round(num(d.tie.by, 0, 1e9, 0)), h: d.tie.h, until: num(d.tie.until, 0, 1e14, 0) };
+  if (d.ripe && typeof d.ripe === "object" && num(d.ripe.at, 0, 1e14, 0) > 0) s.ripe = { at: num(d.ripe.at, 0, 1e14, 0), every: Math.round(num(d.ripe.every, 2, 30, 7)), from: Math.round(num(d.ripe.from, 0, 29, 3)), days: Math.round(num(d.ripe.days, 1, 10, 2)) };
+  if (d.cock && typeof d.cock === "object") s.cock = { load: Math.round(num(d.cock.load, 0, 5000, 0)), knot: d.cock.knot === true, tie: Array.isArray(d.cock.tie) ? d.cock.tie.slice(0, 2).map((x) => Math.round(num(x, 1, 40, 5))) : null };
   s.mouthAuto = d.mouthAuto === true;
   s.guided = d.guided === true;   // (Nov 19: you've opened a guide, so the guides fold away at the top of the page)
   s.iconsShow = d.iconsShow !== false; s.iconsShare = d.iconsShare !== false;   // (dose icons: both on till you switch them off)

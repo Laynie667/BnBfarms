@@ -46,16 +46,22 @@ function factsOf(data, sender) {
 
 export const LSCG_WAIT_MS = 1500;
 // a needle went into you: what's on it, and what you let through
-export function onNeedle(by, item) {
+// act: the game's activity (Inject, SipItem, EatItem). Seed (seed.js) is its crafter's, whoever's holdin' it: the game
+// keeps the maker's number on every crafted item, and they have to be on your list too
+export function onNeedle(by, item, act) {
   const text = craftText(item), list = dosesOf(text), at = Date.now(), done = [], later = isLater(text);   // (dosesOf: a roulette is a dose of its own)
+  const maker = (item && item.Craft && Number(item.Craft.MemberNumber)) || 0, makerName = item && item.Craft && item.Craft.MemberName ? String(item.Craft.MemberName) : "";
+  const via = /^(SipItem|EatItem)$/.test(act || "") ? "sip" : "needle", mine = (W.Player && W.Player.MemberNumber) || 0;
   for (const { id, x, p } of list) {
     const B = BOOK[id];
     if (farmHas(id, p) && botHere()) continue;     // the farm girl's (farm.js)
     if (B.lscg && lscgPresent()) continue;          // LSCG's own
     if (!allowed(by)) { local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label })); continue; }
+    const sire = maker || by;
+    if (id === "seed" && sire !== mine && !allowed(sire)) { local(fill(NOTES.notListed, { by: makerName || nameOf(sire), dose: B.label })); continue; }
     const go = () => {
       if (later && !B.instant) { if (st0().off[id]) { local(fill(NOTES.switchedOff, { dose: B.label })); return { ok: false, why: "off" }; } return { ok: queue(id, { by, x, p }), later: true }; }
-      const r = give(id, { by, x, p });
+      const r = give(id, { by, x, p, sire, nm: makerName, via });
       if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
       return r;
     };
@@ -73,7 +79,7 @@ export function initNeedle(mod) {
         if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
           const sender = charOf(data.Sender) || (data.Sender === P.MemberNumber ? P : null), f = factsOf(data, sender);
           // a needle, or a drink or a treat fed to you from somebody's hand (Nov 18): the words on it are the dose
-          if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
+          if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender), f.name);
           // anything done to you: gear that answers to a kiss, a touch or a spank, and lip gloss (worn.js)
           if (f.target === P.MemberNumber && data.Sender !== P.MemberNumber) onActivity(f.name, data.Sender);
           // a kiss YOU gave: parasites spread (parasites.js)

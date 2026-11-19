@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.85.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.86.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.68.3** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.21.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.69.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.22.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,9 +25,27 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
-- **Companion 0.68.3: a BC+ button in the Companion**
-- **Bot 0.85.2 + Companion 0.68.3: a BC+ button in the Companion** Laynie, Nov 19: "can we add a button to the companion that opens bc plus? the recent bc plus update made it impossible to use the standard button".
-  - **BC+ in the Companion's top bar:** with BC+ loaded, a BC+ button sits just before ⚙ and opens your own BC+ window, the same as typin' /bcp menu (BC+'s own command, so its rules hold: in its hardcore your hands are bound, and BC+ says so). Without BC+ there's no button. The bot's bump is only the Companion version it carries.
+- **Bot 0.86.0 + Companion 0.69.0 + Dispensary 0.22.0: Seed, the Breeder's Seal, and breedin' anywhere: the best baby factory wherever you go** Laynie, Nov 19: "Definitely the insemination and breeders seal, and I would love if the crafter can specify how much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or gallons".
+  - **Seed:** a crafted syringe, baster, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, Breeding Baster, Cum Cocktail, filled with my seed) puts its crafter's own seed in you, whoever's holdin' it. The crafter writes how much and where: "500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples", "half a gallon in every hole", "both holes, 2 L". A hole with no amount gets a thick load; no hole and a needle puts it in your pussy (your ass without one), a drink or a kiss down your throat. Whoever holds it and whoever crafted it both have to be on your list.
+  - **How much you hold:** your belly holds what the farm says (200 mL to start, more with a capacity shot), your tits a litre; the rest spills down your thighs (the Companion draws it). Off the farm it drains slowly, faster from a looser hole, and drips where the room can see. The Companion's drawn belly rounds out with it, anywhere.
+  - **The Breeder's Seal:** gear that says Breeder's Seal, Breeding Seal, Sire's Seal, Seed Lock or Cum Stopper. In your pussy or ass, or as a belt over both, it keeps every drop in however much goes in, opens only for its maker (their seed, and on the farm their cock), and while it's in only its maker's loads can catch. Out it comes, and most of it gushes out after.
+  - **On the farm's books:** every load goes to the farm girl, at once if she's in the room or next time you're in hers. She books it as that crafter's load and it can catch, with them as sire (?breedable on, Fertile; Sure-Catch makes it take). One load a crafter counts every ten minutes; more still fills you.
+  - **Breeding gear** (horny gear that says breeding) fills you with its crafter's seed now, as much as it says. A dose that's done at once (seed, growth) on drip gear is given every half hour, not every few seconds.
+  - The page has a Seed card (what's in you, whose, the seals, every load you've taken, Let it all out), /dispensary seed, and a guide.
+  - **Breedin' anywhere** (Laynie, Nov 19: "I want to be the best baby factory wherever I go", then "all of them, non clinical language please, make it hot and sexy"):
+    - **Breed me anywhere** (your switch under Seed on the Dispensary page, off to start): off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books and the farm's, where it can catch. Only from somebody on your list; on the farm, her own scenes count it. If they run the Dispensary too, yours is told how big a load the farm says they give.
+    - **Knots anywhere:** a knotted stud ties you for their minutes. You can't step away from them on the map, and the room sees it swell, lock and slip free. It never stops you leavin' a room.
+    - **Hips up:** on all fours, knees spread or hogtied within five minutes of a load in your pussy or ass, and it gets another chance to take, half again as likely, on the farm and off.
+    - **Ripe days:** Fertile, two days in every seven you're ripe and every load takes twice as easy. The farm tells you, ?stats shows it, and your Dispensary lets you and now and then the room feel it.
+    - **Brood Womb** (?broodwomb on, and in the Companion's Breedin' switches): once you're carryin', every load takes and adds to your litter, up to the farm's hyper sizes.
+    - **Carryin' anywhere:** your Dispensary knows what you're carryin', and wherever you are you feel it take hold, show, grow heavy and kick, your tits leak, you crave seed, and the room sees it. Your drawn belly grows with it in any room.
+    - **Heat anywhere:** your natural heat comes on where you are, flushed and achin', and a stud runnin' the Dispensary catches the scent.
+    - **Labour and layin' where you are:** due away from the farm, your waters break right there and the room sees every wave; anybody who touches your belly becomes your midwife and eases it along, and you deliver there. A clutch comes out the same way. The farm books them quietly next time you're in her room (she waits three days for it).
+    - **Back to back:** wide open for the hour after a birth, wherever it happened: a load takes four times as easy.
+    - **Quickening Draught:** a day off your pregnancy a dose, half a day off a clutch. **Breeder's Scan:** somebody on your list scans your belly (a needle, or holdin' it while they touch you) and the room hears what's in there, whose, and how close.
+    - **Baby Factory:** twenty litters, and the farm pins it on you. The Dispensary page has a Breedin' card for all of it, and a guide.
+- **Companion 0.68.3: a BC+ button in the Companion** Laynie, Nov 19: "can we add a button to the companion that opens bc plus? the recent bc plus update made it impossible to use the standard button".
+  - **BC+ in the Companion's top bar:** with BC+ loaded, a BC+ button sits just before ⚙ and opens your own BC+ window, the same as typin' /bcp menu (BC+'s own command, so its rules hold: in its hardcore your hands are bound, and BC+ says so). Without BC+ there's no button.
 - **Bot 0.85.1 + Dispensary 0.21.0: Ass Growth, Booty Growth and the Reducing Serum, one meanin' each** Laynie, Nov 19, of the two words the farm and the Dispensary read differently: "choose the best options for me".
   - **Ass Growth opens your ass a size, everywhere:** the farm's own meanin', the way her traps, parasites and roulette have always used it ("%t's ass loosens and opens"). Anal Gape too, and Pussy Gape or Pussy Growth opens the pussy. On the farm it's the farm girl's shot, as ever, and hers can go past natural. Off the farm it's the Dispensary's now, through hole trainin', up to natural. A Tightening Balm closes it back up.
   - **A bigger behind has its own names:** Booty Growth, Hip Growth, Rear Growth. The farm keeps no size for a behind, so these are the Dispensary's on the farm too (before, they did nothin' there with the farm girl in the room). Counted, and drawn once the drawn body learns hips.

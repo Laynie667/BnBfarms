@@ -84,7 +84,7 @@
   // spellin' of them (Nov 19: "Needy Nectar", "needy-nectar", "Bitterroot", "Hiccup Fizz", "Featherlight", "Heat Mist",
   // "Cup Growth" all used to slip past me, and with me in the room their Dispensary left them to me: nothin' happened)
   const FARM_DOSE_TAG = { denial: "denial", sedative: "sedative", needy: "aphro", hairtrigger: "trigger", bitterroot: "bitterroot", moo: "mooserum",
-    hiccup: "hiccup", feather: "feather", heat: "heat", suggestible: "obey", purge: "purge" };
+    hiccup: "hiccup", feather: "feather", heat: "heat", suggestible: "obey", purge: "purge", quicken: "quicken" };
   const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
   // (Nov 19; Laynie: "choose the best options for me") "Ass Growth" is my shot that opens the hole, the way my traps,
   // parasites and roulette use it, every spellin' of it (a pussy if it says so); a bigger behind is Booty Growth, the
@@ -553,14 +553,16 @@
     hole = hole === "butt" ? "butt" : "vulva";
     try { sireBottles(mother, stud); } catch(e){ warn("sire bottles:", e); }   // Sire's Claim and One Sire (10y9l-tile-care.js)
     if (!r.fertile || boosted(p,"contra")) return null;
+    { const ss = sealsFor(mother); if (ss.length && !ss.some(s => s.by === stud)) return null; }   // a Breeder's Seal in them: only its maker's loads catch (10ur2-dispensary.js)
     { const sc = secondCarry(mother, stud, amount, bonus, hole); if (sc !== undefined) return sc; }   // a second litter in the other hole (10y7-udders.js)
     if (hole === "butt" && !mpregOn(mother)) return null;
     const now = Date.now();
     const sure = dispOn(mother, "surecatch");   // the Sure-Catch Serum, from their Dispensary: every load takes (10ur2-dispensary.js)
+    const brood = sure || (!!r.broodWomb && !!p.preg);   // (Nov 19) their Brood Womb: carryin', every load takes and adds to the litter
     if (p.preg){
-      // a second father can join only in the first day, and never the same stud twice (not on Sure-Catch: every load)
-      if (!sure && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H*3600000) return null;
-      if (!sure && p.preg.sires.includes(stud)) return null;
+      // a second father can join only in the first day, and never the same stud twice (not on Sure-Catch or a Brood Womb: every load)
+      if (!brood && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H*3600000) return null;
+      if (!brood && p.preg.sires.includes(stud)) return null;
       if (p.preg.claimed && p.preg.claimed !== stud) return null;   // claimed by one sire (10y9l-tile-care.js)
     }
     let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert *
@@ -580,11 +582,12 @@
     if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow||[]).includes(stud)) return null;
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
     chance *= dangerX(mother).chance;
-    chance *= openX(mother);            // wide open for an hour after a birth or a layin' (10y7-udders.js)   // a Danger Draught (10z-trap-variants.js)
-    chance = boosted(p, "ripe") || sure ? 1 : Math.min(0.95, chance);   // ripe from a shot: the next load that can take, takes (10ur-shots-more.js)
+    chance *= openX(mother);
+    chance *= ripeX(mother, state.rollAt || now);   // (Nov 19) their ripe days (10ur3-breed-anywhere.js)            // wide open for an hour after a birth or a layin' (10y7-udders.js)   // a Danger Draught (10z-trap-variants.js)
+    chance = boosted(p, "ripe") || brood ? 1 : Math.min(0.95, chance);   // ripe from a shot: the next load that can take, takes (10ur-shots-more.js)
     if (Math.random() >= chance) return null;
     if (!sure && p.boosts && p.boosts.ripe) delete p.boosts.ripe;
-    if (p.preg && sure) return sureMore(mother, stud);   // already carryin': it adds to the litter (10ur2-dispensary.js)
+    if (p.preg && brood) return sureMore(mother, stud);   // already carryin': it adds to the litter (10ur2-dispensary.js)
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
@@ -627,7 +630,11 @@
     const mw = info.midwife && info.midwife !== CFG.BOT_MEMBER ? info.midwife : 0;
     const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+what+", sired by "+siresTxt+(mw ? ", with "+plainName(mw)+" as midwife" : "")+". Milk's comin' in strong now!";
     try { albumAdd(mn, "🍼", g.count === 1 ? "A "+birthWords(mn).one+" delivered" : "A litter delivered", what+", sired by "+siresTxt+(mw ? ". Midwife: "+plainName(mw) : "")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
-    if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);   // the birth, in beats (10y2-brood.js)
+    if (info.away){   // (Nov 19) born away from the farm, in whatever room they were in: their Dispensary told it there
+      tell(mn, "🍼 Your litter's on the books, sugar: "+what+", sired by "+siresTxt+(mw ? ", with "+plainName(mw)+" as midwife" : "")+". Milk's comin' in strong.");
+      if (onMap(mn)) emote("🍼 The farm girl writes "+plainName(mn)+"'s litter into the stud book: "+what+", sired by "+siresTxt+", born away from the farm. Welcome home, mama.", mn);
+    }
+    else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);   // the birth, in beats (10y2-brood.js)
     else if (onMap(mn)) emote("🍼 "+birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
     else beep(mn, msg);
     try { const split = revealSplit(mn, sires, g.count); if (split) L.studbook[L.studbook.length - 1].split = split; } catch(e){ warn("split:", e); }   // whose they were (10y7-udders.js)
@@ -677,10 +684,14 @@
         for (const h of HOLES){
           // a knot keeps every drop in; a plug seals that hole (only while they're here, wearin' it)
           if (tied) continue;
-          if (h !== "mouth" && charFor(mn) && holeBlocked(mn, h)) continue;
+          if (h !== "mouth" && charFor(mn) && (holeBlocked(mn, h) || sealIn(mn, h))) continue;
           p.held[h] = (p.held[h]||0) * Math.pow(0.5, dtH / halfLife(mn, h));
         }
       }
+      // a Breeder's Seal comes out: most of what it held gushes out with it (10ur2-dispensary.js)
+      if (charFor(mn)) { try { sealWatch(mn, p); } catch(e){ warn("seal:", e); } }
+      if (charFor(mn)) { try { legsUpTick(mn, p, now); } catch(e){ warn("legs up:", e); } }   // hips up after a load (10ur3-breed-anywhere.js)
+      try { ripeTick(mn, r, p, now); } catch(e){ warn("ripe:", e); }
       // stretched holes slowly tighten back to their usual (a throat too, Nov 18: one held open never closed back)
       for (const h of ["vulva","butt","throat"]){
         const cur = sizeOf(mn, h), base = sizeBase(mn, h), at = (p.gapeAt && p.gapeAt[h]) || 0;
@@ -764,8 +775,8 @@
       }
       // eggs: laid when they're due (they wait for you to come to the farm, up to half a day)
       if (p.eggs && now >= p.eggs.layAt){
-        const here = onMap(mn);
-        if (here || now - p.eggs.layAt > CFG.LABOUR_WAIT_H*3600000){
+        const here = onMap(mn) && !(r.dispCarry && !dispFor(mn) && now - (p.dueOnMap || (p.dueOnMap = now)) < 120000);   // (their Dispensary first: it may have laid them away)
+        if (here || now - p.eggs.layAt > (r.dispCarry ? CFG.LABOUR_WAIT_DISP_H : CFG.LABOUR_WAIT_H)*3600000){
           const e = p.eggs; p.eggs = null;
           p.offspring.eggs = (p.offspring.eggs||0) + e.n;
           eggsLaid(mn, e.n, false);   // the week's best layer (10x-trap-extras.js)
@@ -785,9 +796,12 @@
         // labour: on the farm when it's time, there's a show first, in their kind's own way (10y2b-birthing.js)
         if (p.labour) labourTick(mn, p, now);
         else if (now >= p.preg.due){
-          if (onMap(mn)) startLabour(mn);
-          else if (now - p.preg.due > CFG.LABOUR_WAIT_H*3600000) giveBirth(mn);
+          // (Nov 19) with a Dispensary that births anywhere, it gets its say first: born away, it's in their hello
+          const wait = r.dispCarry && !dispFor(mn) && now - (p.dueOnMap || (p.dueOnMap = now)) < 120000;
+          if (onMap(mn) && !wait) startLabour(mn);
+          else if (!onMap(mn) && now - p.preg.due > (r.dispCarry ? CFG.LABOUR_WAIT_DISP_H : CFG.LABOUR_WAIT_H)*3600000) giveBirth(mn);
         }
+        else if (p.dueOnMap) p.dueOnMap = 0;
       }
       if (p.tieUntil && now >= p.tieUntil) untie(mn, true);
       if (p.deniedUntil && now >= p.deniedUntil){ p.deniedUntil = 0; p.pentUp = true; tell(mn, "😤 Your denial's up, "+plainName(mn)+", and you're achin' with it. Next load's a big, pent-up one."); }
@@ -798,7 +812,7 @@
       }
       // a loose hole drips its load now and then (not while plugged or tied)
       for (const h of ["vulva","butt"]){
-        if (!charFor(mn) || sizeOf(mn,h) < CFG.LEAKY_GAPE || (p.held[h]||0) < 30 || p.tieUntil > now || holeBlocked(mn,h)) continue;
+        if (!charFor(mn) || sizeOf(mn,h) < CFG.LEAKY_GAPE || (p.held[h]||0) < 30 || p.tieUntil > now || holeBlocked(mn,h) || sealIn(mn,h)) continue;
         p.lastDrip = p.lastDrip || {};
         if (now - (p.lastDrip[h]||0) < CFG.LEAKY_EMOTE_MIN*60000*(0.75+Math.random()*0.5)) continue;
         p.lastDrip[h] = now;
@@ -1033,7 +1047,8 @@
     if (hole === "vulva" && !hasVulva(t)){ R(plainName(t)+" doesn't have a pussy to fill, hon. Try their ass or mouth, like ?cum "+plainName(t)+" ass. (If they're futa, they can say ?futa on.)"); return false; }
     const penBlock = makesSemen(stud) && holeBlocked(stud, "penis");
     if (penBlock){ R("Can't do it, sugar: your cock is locked up in "+penBlock+". Get it off first!"); blockedTease(stud, t, hole, penBlock, true); return false; }
-    const holeBlock = holeBlocked(t, hole);
+    const seal = sealIn(t, hole), sealOpen = !!(seal && seal.by === stud);   // a Breeder's Seal opens for its maker alone (10ur2-dispensary.js)
+    const holeBlock = seal ? (sealOpen ? null : seal.name) : holeBlocked(t, hole);
     if (holeBlock){ R("Whoa there, hon! "+plainName(t)+"'s "+({ vulva:"pussy", butt:"ass" }[hole] || hole)+" is blocked by "+holeBlock+". That'll have to come off before you can fill it."); blockedTease(stud, t, hole, holeBlock, false); return false; }
     // a pent-up stud empties everything, and then some
     if (sp.deniedUntil > Date.now()){ R("🚫 Not yet, sugar. You're denied for "+Math.ceil((sp.deniedUntil-Date.now())/60000)+" more minutes. Ache for it."); return false; }
@@ -1077,7 +1092,7 @@
     const room = Math.max(0, capacity(t) - heldTotal(tp));
     const fullBefore = heldTotal(tp) / capacity(t);
     // a knot plugs 'em up tight: not a drop spills, however full they get
-    const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
+    const kept = knot || sealOpen ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;   // (a knot, or their own seal: not a drop spills)
     tp.held[hole] = (tp.held[hole]||0) + kept; tp.totals.received += kept;
     if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud), kept + spilt);
     if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
@@ -1099,6 +1114,7 @@
                      draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "" }[penisType(stud)] || "";
     let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") "+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+holeText(hole))+"."+(makesSemen(stud) ? flavor : "")+" "+
             plainName(t)+" is "+Math.round(100*heldTotal(tp)/capacity(t))+"% full"+(spilt>0 ? ", and "+ml(spilt)+" spills out" : "")+".";
+    if (sealOpen) o += " "+plainName(t)+"'s "+seal.name+" opens for "+plainName(stud)+" alone, and seals every drop in behind.";
     if (opt.edged) o += " Edged "+opt.edged+" time"+(opt.edged === 1 ? "" : "s")+" first, it just keeps on comin'.";
     if (hole === "mouth" && makesSemen(stud)) o += " "+seedTaste(stud, pent);
     if (gagged >= 1) o += " "+plainName(t)+" gags on that "+pen+"\" cock and drools "+ml(gagged)+" back up"+(trained ? ", but that throat's learnin': it's "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
@@ -1504,6 +1520,7 @@
       case "dump":    return (t.received||0) >= 50000;
       case "brood":   return (o.litters||0) >= 5;
       case "breeder": return (o.litters||0) >= 10;
+      case "factory": return (o.litters||0) >= 20;
       case "bottom":  return ["vulva","butt"].some(h => sizeBase(mn,h) >= CFG.SIZES[h].natural);
       case "throat":  return sizeBase(mn,"throat") >= CFG.SIZES.throat.natural;
       case "stud":    return (t.covers||0) >= 50;

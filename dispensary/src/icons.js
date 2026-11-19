@@ -33,6 +33,8 @@ function onIcons(from, m) {
 }
 // is anythin' in them right now (yours from your own doses; anybody else's from their icons)
 export function iconsDosed(mn) { const e = mn === me() ? mineNow() : others.get(mn); return !!(e && e.ids.length); }
+// (Nov 19) which doses somebody has in them, by what their Dispensary tells the room: a stud smells heat (carry.js)
+export function iconsIds(mn) { const e = mn === me() ? mineNow() : others.get(mn); return e && Array.isArray(e.ids) ? e.ids.slice() : []; }
 export function iconsFor(mn) {
   const e = mn === me() ? mineNow() : others.get(mn);
   if (!e) return "";

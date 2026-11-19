@@ -358,6 +358,7 @@
       if (sizeOf(target, part) !== before){ fx.push(shotLine(part+(d>0?"+":"-"), target, part)); if (tags.has("temp")) tempSizeAdd(target, part, sizeOf(target, part) - before, x); }   // temporary: it snaps back in an hour
     }
     if (tags.has("suppressant") && inHeat(p)){ p.heat = null; done.push("heat broken"); fx0.push("suppressant"); }
+    if (tags.has("quicken")){ const q = quickenBooks(target, x); done.push(q ? q : "nothin' in there to hurry along, yet"); if (q) fx.push(quickenLine(target)); }   // the Quickening Draught (10ur3-breed-anywhere.js)
     if (tags.has("heat")){
       if (limitBlocks(target,"heat")) done.push("no heat, though, 'cause their limits rule it out");
       else {
@@ -446,6 +447,8 @@
     sec("🐂 BREEDING", [
       "Breedable "+(r.breedable?"yes":"no")+" · Fertile "+(r.fertile?"yes":"no")+(r.futa ? " · Futa" : "")+(r.species ? " · "+r.species : ""),
       inHeat(p) && "🔥 In heat · "+hrsLeft(p.heat.until)+" left",
+      isRipe(mn) && "🌸 Ripe today: every load takes twice as easy",   // (Nov 19, 10ur3-breed-anywhere.js)
+      r.broodWomb && "🤰 Brood Womb: carryin', every load takes and adds to your litter",
       p.preg && "🍼 Bred by "+p.preg.sires.map(plainName).join(" & ")+" · due "+new Date(p.preg.due).toLocaleDateString()+" ("+Math.ceil((p.preg.due-now)/86400000)+" day(s))",
       r.rights && r.rights.until > now && "🔏 Breedin' rights: "+plainName(r.rights.stud)+((r.rights.allow||[]).length ? " (also "+r.rights.allow.map(plainName).join(", ")+")" : "")+" till "+new Date(r.rights.until).toLocaleDateString(),
       p.offspring.litters && "👶 Litters: "+p.offspring.litters+" · "+p.offspring.male+" male, "+p.offspring.female+" female, "+p.offspring.futa+" futa",

@@ -28,6 +28,9 @@ import { nipsOpen, nipsClose, lastPopped } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { kitPart } from "./kits.js";
 import { holesBalm, holesGape, holesSafe } from "./holes.js";
+import { seedGive } from "./seed.js";
+import { quicken, scan } from "./carry.js";
+import { seedAmounts, seedEncode } from "../../shared/seed.js";
 
 const W = window, MIN = 60000, CAP = 48 * 60 * MIN;
 
@@ -291,6 +294,27 @@ export const BOOK = {
     keywords: ["tightening balm", "nipple tightener", "pussy tightener", "ass tightener", "virgin tonic"],
     desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone. A bottle that names your pussy, ass or throat (or says virgin, for all of them) tightens that instead: two sizes a dose off what it's trained to, and closed back up to it.",
   },
+  // ── Nov 19 (Laynie: "Definitely the insemination and breeders seal, and I would love if the crafter can specify how
+  // much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or gallons"): seed.js, shared/seed.js ──
+  // ── Nov 19, breedin' anywhere: carry.js ──
+  quicken: {
+    label: "Quickening Draught", icon: "🌱", mins: 0, color: "#a8d08d", farm: true, instant: true,
+    words: DOSE_WORDS.quicken,
+    keywords: ["quickening draught", "quicken tonic"],
+    desc: "Hurries a litter along: a day off your pregnancy a dose (never closer than two hours to due), and a clutch of eggs ripens half a day sooner. Your belly swells with it. On the farm it's the farm girl's; off it your Dispensary hands it to her with your loads.",
+  },
+  scan: {
+    label: "Breeder's Scan", icon: "🔎", mins: 0, color: "#b8c8e0", instant: true,
+    words: DOSE_WORDS.scan,
+    keywords: ["breeder's scan", "womb scanner"],
+    desc: "Somebody on your list runs it over your belly, and the room hears what's in there: how many, whose, how close you are, a clutch of eggs, or just how much seed's waitin' to take, and whether you're ripe. A needle with it, or hold it while you touch their belly.",
+  },
+  seed: {
+    label: "Seed", icon: "💦", mins: 0, color: "#f4efe4", instant: true,
+    words: DOSE_WORDS.seed,
+    keywords: ["insemination", "seed syringe", "cum shot", "filled with my seed"],
+    desc: "A load of its crafter's own seed, as much as it says, where it says: \"500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples\", \"half a gallon in every hole\". A hole with no amount gets a thick load; no hole, and it goes in your pussy (your ass without one), or down your throat from a drink or a kiss. Your belly holds what the farm says and the rest spills; a Breeder's Seal keeps every drop. On the farm it's that crafter's load on the farm's books, and it can catch.",
+  },
   purge: {
     label: "Purge", icon: "🧼", mins: 0, color: "#9fc7c7", farm: true, instant: true,
     words: DOSE_WORDS.purge,
@@ -345,6 +369,7 @@ export function partFor(id, text) {
   if (id === "reducing") return /\b(cock|penis|dick|shaft)\b/.test(t) ? "cock" : /\b(balls?|testes|testicles?|nuts)\b/.test(t) ? "balls" : PART_RE.ass.test(t) ? "ass" : "cup";
   if (id === "gape") { const m = BOOK.gape.words.exec(t); return m && /^(pussy|vulva|vaginal|cunt)/.test(m[0]) ? "vulva" : "butt"; }   // (the hole the phrase itself names: "PussyGape" too)
   if (id === "tender") { for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k; return ""; }
+  if (id === "seed") return seedEncode(seedAmounts(t));   // (how much, where: shared/seed.js)
   if (id === "balm") {   // (Nov 18) which holes: "n" in front when it's for the nipples too
     const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag[\s_-]*reflex)\b/.test(t) && "throat"].filter(Boolean);
     const which = /\b(virgin\w*|holes|every[\s_-]*hole|all[\s_-]*over)\b/.test(t) || hs.length > 1 ? "holes" : hs[0] || "";
@@ -414,7 +439,7 @@ export function give(id, o) {
   if (!B) return { ok: false, why: "unknown" };
   if (S.off[id]) return { ok: false, why: "off" };
   if (B.optIn && !S[B.optIn]) return { ok: false, why: "off" };   // (one you've to switch on first: kits)
-  if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : purge(o);
+  if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : id === "seed" ? seedGive(o) : id === "quicken" ? quicken(o.x, o.quiet) : id === "scan" ? scan(o.by) : purge(o);
   if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };   // LSCG's own: the callers route it there
   if (B.lscgOnly) return { ok: false, why: "nolscg" };               // (and without LSCG, nothing of ours)
   const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));

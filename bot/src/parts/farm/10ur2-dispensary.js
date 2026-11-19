@@ -12,6 +12,8 @@
        them → me   doseDone { id, ok, why }              didn't take (LSCG has it switched off): I take my side back off
        them → me   dispSafeword {}                       their safeword: the farm's side of their doses goes too
        me → them   dispClear {}                          my safeword (?safeword): every dose in them lifted
+       them → me   dispSeed { ep, id, loads, held }      (Nov 19) seed: every load that landed in them, and whose
+       me → them   dispSeedOk { id, seed } | { id, none } my numbers back (what's in them, how much they hold)
      Step 1 (Nov 17): the Denial Serum and the Sedative (10ur-shots-more.js calls dispCall for them).
   */
   const DISP_TTL_MS = 3 * 3600000, DISP_WAIT_MS = 2 * 60000;
@@ -40,7 +42,7 @@
     // (Nov 18) the poses and senses, and my own four voice potions from a crafted bottle (bought at my store, they're mine)
     weakknees: "Weak Knees", allfours: "Down Girl", blinder: "Blinder Drops", cotton: "Cotton Ears", tunnel: "Tunnel Vision", haze: "Haze",
     honey: "Honey Tongue", golden: "Golden Hour", musk: "Blue Ribbon Musk", echo: "Echo Elixir", statue: "Statue Serum",
-    surecatch: "Sure-Catch Serum", dilator: "Nipple Dilator" };
+    surecatch: "Sure-Catch Serum", dilator: "Nipple Dilator", seed: "Seed" };
   // SURE-CATCH: already carryin', another load took. One more in the litter (two for a hyper one), its stud a sire too,
   // and the litter brought on a little (never past two hours from due), so the belly shows it
   const SURE_STEP = 0.06;
@@ -115,8 +117,9 @@
     const ids = (a) => Array.isArray(a) ? a.filter(x => typeof x === "string" && /^[a-z]{2,20}$/.test(x)).slice(0, 40) : [];
     dispMap().set(mn, { ver: String(m.ver || "?").slice(0, 20), farm: m.farm !== false, lscg: !!m.lscg,
                         off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now(),
-                        on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "", holes: m.holes === 1 });   // (holes: it counts their hole trainin')
+                        on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "", holes: m.holes === 1, seed: m.seed === 1, breed: m.breed === 1 });   // (holes: it counts their hole trainin' · seed: their loads and seals, Nov 19)
     try { craveOffer(mn, dispMap().get(mn)); } catch(e){ warn("crave:", e); }
+    if (m.breed === 1){ try { carryHello(mn, m); } catch(e){ warn("carry:", e); } }   // (Nov 19: a birth or a layin' done away, for my books)
     if (!had) log("Dispensary hello from "+mn+" (v"+String(m.ver || "?").slice(0, 20)+")");
     const r = rec(mn);
     // their hardcore, kept on their record: it holds even when their Dispensary isn't here to say so, till it lets go
@@ -128,7 +131,8 @@
       if (JSON.stringify(r.dispHard || null) !== was){ saveLedger(); audit(mn, "DISPHARD", m.hard === true ? "on" : "off"); }
     }
     enqueue(makeMsg("dispWelcome", { farm: dispFarmList(), stock: !!(r && Array.isArray(r.roles) && r.roles.length), species: r ? String(speciesKey(mn) || "").toLowerCase() : "",
-      holes: m.holes === 1 ? dispHoleSizes(mn) : undefined }, mn));   // (species: their animal, for Moo Juice · holes: my numbers for their holes)
+      holes: m.holes === 1 ? dispHoleSizes(mn) : undefined, seed: m.seed === 1 ? seedNumbers(mn) : undefined,
+      ripe: m.breed === 1 ? ripeWire(mn) : undefined, cock: m.breed === 1 ? cockWire(mn) : undefined, carry: m.breed === 1 ? carryWire(mn) : undefined }, mn));   // (Nov 19: their ripe days and their cock, for breedin' anywhere)   // (seed: what's in them, and how much they hold)   // (species: their animal, for Moo Juice · holes: my numbers for their holes)
   }
   const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
   // a dose for their Dispensary to give. Returns "sent", null (no Dispensary: do it yourself), or why it can't take
@@ -286,7 +290,132 @@
   // their Dispensary does their trainers (and says so): I don't count a stretcher on them twice
   function dispHolesOn(mn){ const d = dispFor(mn); return !!(d && d.holes); }
   if (W.__FARMHAND_TEST__) W.__dispHoleOp = (mn, o) => dispHoleOp(mn, o);
+  /* SEED AND THE BREEDER'S SEAL (Nov 19; Laynie: "Definitely the insemination and breeders seal, and I would love if the
+     crafter can specify how much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or gallons").
+     The seed is a crafted item's crafter's own (their Dispensary reads it: dispensary/src/seed.js, shared/seed.js), and
+     the books are mine: every load their Dispensary counted is handed to me (dispSeed), and I book it as that crafter's
+     load, like any stud's. It can catch (my own rules: breedable, Fertile, breedin' rights, Sure-Catch), with them as
+     sire. Loads that landed while they were in my room go in the way a stud's does (what fits, or every drop behind
+     their own seal); loads from elsewhere were counted by their Dispensary, so I take its numbers for what's left.
+     I count one load a crafter every ten minutes (more seed still fills them, it just doesn't count again or roll).
+     A BREEDER'S SEAL (gear that says so, in a hole's slot; a belt seals both below) keeps that hole's load in, opens
+     only for its maker (08-production.js doCum), and while it's in, only its maker's loads can catch (rollConception).
+     It comes out, and most of what it held gushes out with it. */
+  const SEED_HOLES_FARM = ["vulva", "butt", "mouth", "nips"];
+  const sealCache = new Map();
+  // the seals on somebody here: [{ holes, by (its maker), name }]
+  function sealsFor(mn){
+    const now = Date.now(), c = sealCache.get(mn);
+    if (c && now - c.t < 5000) return c.v;
+    const C = charFor(mn), v = C ? sealsOnGear(C.Appearance, craftText) : [];
+    sealCache.set(mn, { t: now, v });
+    return v;
+  }
+  function sealIn(mn, h){ return sealsFor(mn).find(s => s.holes.includes(h)) || null; }
+  const dispSeedOn = (mn) => { const d = dispFor(mn); return !!(d && d.seed); };
+  // a crafter's name, for one I've never seen: what their crafted item called them
+  const seedNames = () => state.seedNames || (state.seedNames = new Map());
+  function sireName(mn){ const n = plainName(mn); return /^#\d+$/.test(n) && seedNames().get(mn) ? seedNames().get(mn) : n; }
+  // what's in them, and how much they hold (for their Dispensary's copy)
+  function seedNumbers(mn){
+    const r = rec(mn), p = r && r.prod; if (!p) return undefined;
+    return { held: { vulva: Math.round(p.held.vulva || 0), butt: Math.round(p.held.butt || 0), mouth: Math.round(p.held.mouth || 0) }, cap: Math.round(capacity(mn)), by: p.lastStud || 0, nm: p.lastStud ? sireName(p.lastStud) : "" };
+  }
+  // one load, booked as its crafter's. Returns what came of it (null, or rollConception's "new"/"extra"/"more")
+  function seedBook(mn, l, now){
+    const p = prodOf(mn), sire = Math.floor(Number(l && l.by) || 0), ml = Math.max(0, Math.min(20000, Number(l && l.ml) || 0));
+    let h = String((l && l.h) || "");
+    if (!(sire > 0) || !SEED_HOLES_FARM.includes(h) || !(ml >= 1)) return null;
+    if (typeof l.nm === "string" && l.nm) seedNames().set(sire, l.nm.slice(0, 40));
+    const gaps = state.seedGap || (state.seedGap = new Map()), key = mn + ":" + sire, fresh = now - (gaps.get(key) || 0) >= SEED_GAP_MS;
+    if (fresh) gaps.set(key, now);
+    if (h === "nips"){   // in their tits: my own count, and it comes back out with their milk (creamedMilk)
+      if (fresh){ p.totals.nipLoads = (p.totals.nipLoads || 0) + 1; const nb = p.totals.nipBy = p.totals.nipBy || {}; nb[sire] = (nb[sire] || 0) + 1; const ks = Object.keys(nb); if (ks.length > 40) delete nb[ks[0]]; }
+      p.totals.nipMl = (p.totals.nipMl || 0) + ml;
+      p.nipCream = { by: sire, n: ((p.nipCream && p.nipCream.n) || 0) + 1, at: now };
+      return null;
+    }
+    if (h === "vulva" && !hasVulva(mn)) h = "butt";
+    const seal = sealIn(mn, h);
+    if (l.here && seal && seal.by !== sire) return null;   // (somebody else's seal: it doesn't open)
+    let kept;
+    if (l.here){
+      const room = Math.max(0, capacity(mn) - heldTotal(p));
+      kept = (seal && seal.by === sire) || p.tieUntil > now ? Math.min(ml, Math.max(0, CFG.PROD.MAX_CAPACITY - heldTotal(p))) : Math.min(ml, room);
+      p.held[h] = (p.held[h] || 0) + kept;
+      if (h === "mouth" && kept > 0) p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
+    } else kept = Math.min(ml, p.held[h] || 0);   // (from elsewhere: what's left of it, by their Dispensary's count)
+    p.lastStud = sire;
+    if (!fresh) return null;
+    const bonus = l.up ? CFG.LEGS_UP_X : 1;   // (hips up after, off the farm: 10ur3-breed-anywhere.js)
+    p.totals.received += Math.min(ml, 5000);
+    p.totals.loads = (p.totals.loads || 0) + 1;
+    const by = p.totals.by || (p.totals.by = {}), e = by[sire] || (by[sire] = { n: 0, at: 0 }); e.n++; e.at = now;
+    const ks = Object.keys(by); if (ks.length > 40) ks.sort((a, b) => by[a].at - by[b].at).slice(0, ks.length - 40).forEach(k => { delete by[k]; });
+    const sp = rec(sire) ? prodOf(sire) : null;
+    if (sp) sp.totals.given += Math.min(ml, 5000);
+    audit(mn, "SEED", h + " " + Math.round(ml) + " from " + sire + (l.here ? "" : " (elsewhere)"));
+    if (l.nc || !canCatchIn(mn, h) || !(kept >= 1)) return null;
+    p.lastFill = { at: now, stud: sire, ml: kept, hole: h };
+    if (sp) sp.totals.covers = (sp.totals.covers || 0) + 1;
+    state.rollAt = l.here ? 0 : Math.min(now, Number(l.at) || now);   // (ripe or not when it landed)
+    let caught = null;
+    try { caught = rollConception(mn, sire, kept, bonus, h); } finally { state.rollAt = 0; }
+    if (caught){
+      if (sp){ sp.totals.conceived = (sp.totals.conceived || 0) + 1; rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[sire] = (Y.s[sire] || 0) + 1; }
+      seedCaught(mn, sire, caught, !l.here);
+    }
+    return caught;
+  }
+  function seedCaught(mn, sire, caught, late){
+    const s = sireName(sire), t = plainName(mn);
+    let line = caught === "new" ? (late ? "🍼 Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days."
+                                        : "🍼 It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days.")
+             : caught === "extra" ? "🍼 " + s + "'s seed got one in too! " + t + " is carryin' for two sires now."
+             : caught === "more" ? sureLine(mn, sire) : "";
+    if (!line) return;
+    line = line.split("#" + sire).join(s);
+    if (onMap(mn)) emote(line, mn); else tell(mn, line);
+    if (caught === "new" && !makesMilk(mn) && !limitBlocks(mn, "milk"))
+      tell(mn, "🍼 You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
+    for (const hd of herdsOf(mn)) beep(hd.leader, "🍼 Guess what, sugar: " + t + " caught from " + s + "!");
+  }
+  function onDispSeed(mn, m){
+    const r = rec(mn), id = Math.max(0, Math.floor(Number(m.id) || 0));
+    const answer = (x) => enqueue(makeMsg("dispSeedOk", Object.assign({ id }, x), mn));
+    if (!r){ answer({ none: "books" }); return; }
+    if (!r.breedable || limitBlocks(mn)){ answer({ none: "breedable" }); return; }
+    const ep = typeof m.ep === "string" ? m.ep.slice(0, 16) : "";
+    if (ep && ep !== r.dispSeedEp){ r.dispSeedEp = ep; r.dispSeedSeq = 0; }   // (a fresh Dispensary: its numbers start again)
+    if (id > (r.dispSeedSeq || 0) && Array.isArray(m.loads)){
+      r.dispSeedSeq = id;
+      const loads = m.loads.slice(0, 30).filter(l => l && typeof l === "object"), p = prodOf(mn), now = Date.now();
+      // none of these landed here: their Dispensary's count of what's in them is the truer one
+      if (!loads.some(l => l.here) && m.held && typeof m.held === "object")
+        for (const h of HOLES){ const v = Math.max(0, Math.min(CFG.PROD.MAX_CAPACITY, Number(m.held[h]) || 0)); if (v > (p.held[h] || 0)) p.held[h] = v; }
+      for (const l of loads){ try { seedBook(mn, l, now); } catch(e){ warn("seed:", e); } }
+      if (Number(m.quick) > 0){ try { quickenBooks(mn, Math.min(20, Math.round(Number(m.quick)))); } catch(e){ warn("quicken:", e); } }   // (a Quickening Draught off the farm)
+      saveLedger(); try { syncCompanions(true); } catch(e){ /* fine */ }
+    }
+    answer({ seed: seedNumbers(mn), carry: dispFor(mn) && dispFor(mn).breed ? carryWire(mn) : undefined });
+  }
+  // a seal they had in has come out: most of what it held gushes out (they're told by their Dispensary, if they run
+  // one; otherwise I say it)
+  function sealWatch(mn, p){
+    const on = p.sealOn || (p.sealOn = {});
+    for (const h of ["vulva", "butt"]){
+      const s = sealIn(mn, h);
+      if (s){ on[h] = s.by; continue; }
+      if (!on[h]) continue;
+      delete on[h];
+      if ((p.held[h] || 0) < 30) continue;
+      const out = p.held[h] * 0.6; p.held[h] -= out;
+      if (!dispSeedOn(mn) && onMap(mn)) emote("💦 Out comes " + plainName(mn) + "'s seal, and " + ml(out) + " of " + (p.lastStud ? sireName(p.lastStud) + "'s" : "somebody's") + " seed gushes out right behind it, down their thighs.", mn);
+    }
+  }
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __sealsFor: (mn) => { sealCache.delete(mn); return sealsFor(mn); }, __seedBook: (mn, l) => seedBook(mn, l, Date.now()), __sealWatch: (mn) => { sealCache.delete(mn); sealWatch(mn, prodOf(mn)); } });
   function onDispensaryMsg(mn, m){
+    if (m.type === "dispSeed"){ onDispSeed(mn, m); return true; }
     if (m.type === "dispHoles"){ onDispHoles(mn, m); return true; }
     if (m.type === "dispNipLoad"){ onNipLoad(mn, m); return true; }
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }

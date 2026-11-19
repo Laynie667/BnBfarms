@@ -121,6 +121,11 @@ function grownAll() {
   return out;
 }
 const grownCup = () => grownAll().cup;
+/* SEED OFF THE FARM (The Farmhand's Dispensary, Nov 19): what's in you, by your Dispensary's count, rounds your belly
+   out (0 flat to 4 huge, the farm's own sum) wherever you are. On the farm her books already have it in your belly. */
+function seedBelly() {
+  try { const D = W.FarmhandDispensary, n = D && typeof D.seedBelly === "function" ? Number(D.seedBelly()) : 0; return Math.max(0, Math.min(4, Math.round(n) || 0)); } catch (e) { return 0; }
+}
 function cupWithFill(cup, f) { const add = Math.min(6, 2 * f.x); return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add / 2) : add)); }
 function bellyWithFill(stage, f) {
   if (f.half) return Math.min(4, Math.max(stage + 1, 1));
@@ -131,7 +136,7 @@ let fillSig = "";
 // somebody's nipples opened or closed (the Dispensary says): them drawn again
 export function drawnBodyRedrawFor(mn) { if (W.Player && Number(mn) === W.Player.MemberNumber) redraw(60); else if (others.has(Number(mn))) redrawMn(Number(mn), 60); }
 export function drawnBodyFillCheck() {
-  const f = fillOut(), g = grownAll(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;   // (and growth off the farm)
+  const f = fillOut(), g = grownAll(), sig = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls + "|" + seedBelly();   // (and growth off the farm, and seed)
   if (sig === fillSig) return false;
   fillSig = sig;
   if (!S.on) return false;
@@ -302,7 +307,7 @@ let toldAt = 0, askedAt = 0;
 // Only somebody who brought their own studio settings sends them whole.
 const bellyStage = () => {
   const m = bellyMode(); if (m === "off") return 0;
-  const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+  const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)), seedBelly());   // (the farm's, or your seed off the farm)
   const f = m === "studio" ? null : fillOut();   // (Fill-Out swells it for now)
   return f && f.p === "belly" ? bellyWithFill(s, f) : s;
 };

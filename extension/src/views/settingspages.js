@@ -22,7 +22,7 @@ import { workCard } from "./staff.js";
 // the farm switches by what they're about (the commands and words are SWITCH_INFO's, livestock.js)
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
 const FARM_GROUPS = [
-  ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
+  ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
   ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
   ["🪤 Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
   ["🪱 Things that latch on", ["parasite", "symbiote", "watersports"]],

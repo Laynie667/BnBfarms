@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.85.1
+// @version      0.86.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2975,9 +2975,41 @@
     surecatch: loosen(/\b(sure[- ]?catch(?: (?:serum|shot|tonic|potion|drops?))?|every[- ]load[- ]takes?|womb[- ]?opener)\b/),
     dilator: loosen(/\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/),
     balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
-    purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/)
+    purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/),
+    // (Nov 19; Laynie: "Definitely the insemination and breeders seal") a load of the crafter's own seed: shared/seed.js
+    // reads how much and where. Only plain seed words: "doubles their load" is a virility shot, not this.
+    // (Nov 19, breedin' anywhere) a day off a pregnancy, and a look at what's in there
+    quicken: loosen(/\b(quicken\w*(?: (?:draught|serum|tonic|potion|drops?|shot))?)\b/),
+    scan: loosen(/\b(breeder['\u2019]?s scan(?:ner)?|breeding scan(?:ner)?|womb scan(?:ner)?|belly scan(?:ner)?|pregnancy scan(?:ner)?)\b/),
+    seed: loosen(/\b(inseminat\w*|(?:seed|cum|creampie|breeding) (?:syringe|shot|injector|vial|bottle|baster|dose|filler|plunger|pump|serum|cocktail)|(?:full|filled) (?:of|with) (?:my |his |her |their |\w+['’]?s )?(?:seed|cum)|my (?:own )?(?:seed|cum))\b/)
   };
-  var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge"];
+  var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge", "quicken"];
+
+  // shared/seed.js
+  var SEED_GAP_MS = 10 * 6e4;
+  var SEAL_WORDS = loosen(/\b(breeder['’]?s seal|breeding seal|sire['’]?s seal|(?:seed|cum) (?:seal|lock|keeper|stopper))\b/);
+  function sealHolesOf(group) {
+    const g = String(group || "");
+    if (g === "ItemVulva" || g === "ItemVulvaPiercings") return ["vulva"];
+    if (g === "ItemButt") return ["butt"];
+    if (/^ItemMouth/.test(g)) return ["mouth"];
+    if (/^ItemNipples/.test(g)) return ["nips"];
+    if (g === "ItemPelvis") return ["vulva", "butt"];
+    return [];
+  }
+  function sealsOn(appearance, textOf) {
+    const out = [];
+    for (const it of Array.isArray(appearance) ? appearance : []) {
+      if (!it || !it.Craft || !it.Asset || !it.Asset.Group) continue;
+      const by = Number(it.Craft.MemberNumber) || 0, holes = sealHolesOf(it.Asset.Group.Name);
+      if (!by || !holes.length || !SEAL_WORDS.test(String(textOf(it) || ""))) continue;
+      out.push({ holes, by, maker: String(it.Craft.MemberName || "").slice(0, 40), name: String(it.Craft.Name || it.Asset.Description || it.Asset.Name || "seal").slice(0, 40), key: it.Asset.Group.Name + ":" + (it.Craft.Name || "") });
+    }
+    return out;
+  }
+  var UNIT = "(ml|mls|millilit(?:er|re)s?|cc|l|ltrs?|lit(?:er|re)s?|gal|gals|gallons?)";
+  var NUM = "(\\d{1,3}(?:,\\d{3})+|\\d+(?:[.,]\\d+)?(?:\\s*\\/\\s*\\d+)?|half\\s+an?|an?\\s+half|(?:a\\s+)?quarter(?:\\s+of)?(?:\\s+an?)?|half|one|two|three|four|five|six|seven|eight|nine|ten|an?)";
+  var AMOUNT = new RegExp("(?<![a-z0-9.,/])" + NUM + "[\\s_-]*(?:full[\\s_-]+)?" + UNIT + "(?![a-z])", "g");
 
   // shared/guides.js
   var PUBLIC_GROUPS = [
@@ -2987,7 +3019,7 @@
     { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "seedmilk", "quota"] },
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
-    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "broodwomb", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
@@ -3014,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.85.1";
-  var COMPANION_VERSION = "0.68.3";
+  var VERSION = "0.86.0";
+  var COMPANION_VERSION = "0.69.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3549,6 +3581,11 @@
       // held semen past 1.5x your capacity pins you (only a knot gets you past full)
       BREEDING_STAND: "breedingstand",
       BREEDING_STAND_X: 1.5,
+      // (Nov 19, breedin' anywhere) hips up within LEGS_UP_MIN minutes of a load: another chance for it to take, this much
+      // likelier · RIPE: for anybody Fertile, two days in seven are ripe, and every load takes RIPE.X times as easy
+      LEGS_UP_X: 1.5,
+      LEGS_UP_MIN: 5,
+      RIPE: { EVERY_D: 7, FROM_D: 3, DAYS: 2, X: 2 },
       // fills on (or next to) that spot catch more
       HEAT_SCENT_TILES: 2,
       // a stud this close to stock in heat gets pent up twice as fast
@@ -3593,6 +3630,8 @@
       // nobody turns it in this long: the farm girl does it herself
       LABOUR_WAIT_H: 12,
       // due but away from the farm this long: the litter comes without the show
+      LABOUR_WAIT_DISP_H: 72,
+      // (Nov 19) with a Dispensary that births anywhere: three days for it to say it did
       EGG_CHANCE: 0.2,
       EGG_TIED_CHANCE: 0.4,
       EGG_COUNT: [2, 6],
@@ -3785,7 +3824,9 @@
         { key: "sire", name: "Prolific Sire", why: "sired 10 litters" },
         { key: "eggs", name: "Egg Layer", why: "10 eggs laid" },
         { key: "triple", name: "Triple-Carried", why: "womb, ass and a clutch, all at once" },
-        { key: "bredback", name: "Bred Back", why: "caught again within the hour of bein' emptied" }
+        { key: "bredback", name: "Bred Back", why: "caught again within the hour of bein' emptied" },
+        { key: "factory", name: "Baby Factory", why: "20 litters" }
+        // (Laynie, Nov 19: "I want to be the best baby factory wherever I go")
       ],
       FAST_SCENE_TYPES: ["canine", "draconic"],
       FAST_SCENE_S: 30,
@@ -4067,7 +4108,7 @@
     addCommand("nomilk", { topic: "milk", staff: true });
     addCommand("inspect", { topic: "milk", staff: true });
     addCommand("shotlog", { topic: "milk", staff: true });
-    addCommand("breedable fertile naturalheat mpreg pinme", { topic: "breeding" });
+    addCommand("breedable fertile naturalheat mpreg pinme broodwomb", { topic: "breeding" });
     addCommand("breed", { topic: "breeding" });
     addCommand("cum", { topic: "breeding" });
     addCommand("yes no", { topic: "breeding" });
@@ -6368,7 +6409,8 @@
       trapsOn: "traps",
       ownOutfit: "ownoutfit",
       teaseMe: "teaseme",
-      pinMe: "pinme"
+      pinMe: "pinme",
+      broodWomb: "broodwomb"
     };
     function shownMl(n) {
       n = Number(n) || 0;
@@ -6810,7 +6852,8 @@
       feather: "feather",
       heat: "heat",
       suggestible: "obey",
-      purge: "purge"
+      purge: "purge",
+      quicken: "quicken"
     };
     const FARM_DOSE_SIZE = [["growcup", "udder"], ["growcock", "penis"], ["growballs", "testes"]];
     const gapePart = (t) => {
@@ -7386,15 +7429,20 @@
       }
       if (!r.fertile || boosted(p, "contra")) return null;
       {
+        const ss = sealsFor(mother);
+        if (ss.length && !ss.some((s) => s.by === stud)) return null;
+      }
+      {
         const sc = secondCarry(mother, stud, amount, bonus, hole);
         if (sc !== void 0) return sc;
       }
       if (hole === "butt" && !mpregOn(mother)) return null;
       const now = Date.now();
       const sure = dispOn(mother, "surecatch");
+      const brood = sure || !!r.broodWomb && !!p.preg;
       if (p.preg) {
-        if (!sure && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return null;
-        if (!sure && p.preg.sires.includes(stud)) return null;
+        if (!brood && now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return null;
+        if (!brood && p.preg.sires.includes(stud)) return null;
         if (p.preg.claimed && p.preg.claimed !== stud) return null;
       }
       let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert * (0.5 + Math.min(1, (p.held[hole] || 0) / capacity(mother)));
@@ -7412,10 +7460,11 @@
       if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
       chance *= dangerX(mother).chance;
       chance *= openX(mother);
-      chance = boosted(p, "ripe") || sure ? 1 : Math.min(0.95, chance);
+      chance *= ripeX(mother, state.rollAt || now);
+      chance = boosted(p, "ripe") || brood ? 1 : Math.min(0.95, chance);
       if (Math.random() >= chance) return null;
       if (!sure && p.boosts && p.boosts.ripe) delete p.boosts.ripe;
-      if (p.preg && sure) return sureMore(mother, stud);
+      if (p.preg && brood) return sureMore(mother, stud);
       if (p.preg) {
         p.preg.sires.push(stud);
         return "extra";
@@ -7482,7 +7531,10 @@
         albumAdd(mn, "\u{1F37C}", g.count === 1 ? "A " + birthWords(mn).one + " delivered" : "A litter delivered", what + ", sired by " + siresTxt + (mw ? ". Midwife: " + plainName(mw) : "") + ".");
       } catch (e) {
       }
-      if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);
+      if (info.away) {
+        tell(mn, "\u{1F37C} Your litter's on the books, sugar: " + what + ", sired by " + siresTxt + (mw ? ", with " + plainName(mw) + " as midwife" : "") + ". Milk's comin' in strong.");
+        if (onMap(mn)) emote("\u{1F37C} The farm girl writes " + plainName(mn) + "'s litter into the stud book: " + what + ", sired by " + siresTxt + ", born away from the farm. Welcome home, mama.", mn);
+      } else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);
       else if (onMap(mn)) emote("\u{1F37C} " + birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
       else beep(mn, msg);
       try {
@@ -7535,9 +7587,28 @@
           const tied = p.tieUntil > now;
           for (const h of HOLES) {
             if (tied) continue;
-            if (h !== "mouth" && charFor(mn) && holeBlocked(mn, h)) continue;
+            if (h !== "mouth" && charFor(mn) && (holeBlocked(mn, h) || sealIn(mn, h))) continue;
             p.held[h] = (p.held[h] || 0) * Math.pow(0.5, dtH / halfLife(mn, h));
           }
+        }
+        if (charFor(mn)) {
+          try {
+            sealWatch(mn, p);
+          } catch (e) {
+            warn("seal:", e);
+          }
+        }
+        if (charFor(mn)) {
+          try {
+            legsUpTick(mn, p, now);
+          } catch (e) {
+            warn("legs up:", e);
+          }
+        }
+        try {
+          ripeTick(mn, r, p, now);
+        } catch (e) {
+          warn("ripe:", e);
         }
         for (const h of ["vulva", "butt", "throat"]) {
           const cur = sizeOf(mn, h), base = sizeBase(mn, h), at = p.gapeAt && p.gapeAt[h] || 0;
@@ -7625,8 +7696,8 @@
           }
         }
         if (p.eggs && now >= p.eggs.layAt) {
-          const here = onMap(mn);
-          if (here || now - p.eggs.layAt > CFG.LABOUR_WAIT_H * 36e5) {
+          const here = onMap(mn) && !(r.dispCarry && !dispFor(mn) && now - (p.dueOnMap || (p.dueOnMap = now)) < 12e4);
+          if (here || now - p.eggs.layAt > (r.dispCarry ? CFG.LABOUR_WAIT_DISP_H : CFG.LABOUR_WAIT_H) * 36e5) {
             const e = p.eggs;
             p.eggs = null;
             p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
@@ -7647,9 +7718,10 @@
           }
           if (p.labour) labourTick(mn, p, now);
           else if (now >= p.preg.due) {
-            if (onMap(mn)) startLabour(mn);
-            else if (now - p.preg.due > CFG.LABOUR_WAIT_H * 36e5) giveBirth(mn);
-          }
+            const wait = r.dispCarry && !dispFor(mn) && now - (p.dueOnMap || (p.dueOnMap = now)) < 12e4;
+            if (onMap(mn) && !wait) startLabour(mn);
+            else if (!onMap(mn) && now - p.preg.due > (r.dispCarry ? CFG.LABOUR_WAIT_DISP_H : CFG.LABOUR_WAIT_H) * 36e5) giveBirth(mn);
+          } else if (p.dueOnMap) p.dueOnMap = 0;
         }
         if (p.tieUntil && now >= p.tieUntil) untie(mn, true);
         if (p.deniedUntil && now >= p.deniedUntil) {
@@ -7662,7 +7734,7 @@
           emote("\u{1F930} " + plainName(mn) + " rests a hand on that swellin' belly. " + plainName(p.preg.sires[0]) + "'s " + ((p.preg.count || 1) === 1 ? birthWords(mn).one + " is" : birthWords(mn).many + " are") + " really showin' now.");
         }
         for (const h of ["vulva", "butt"]) {
-          if (!charFor(mn) || sizeOf(mn, h) < CFG.LEAKY_GAPE || (p.held[h] || 0) < 30 || p.tieUntil > now || holeBlocked(mn, h)) continue;
+          if (!charFor(mn) || sizeOf(mn, h) < CFG.LEAKY_GAPE || (p.held[h] || 0) < 30 || p.tieUntil > now || holeBlocked(mn, h) || sealIn(mn, h)) continue;
           p.lastDrip = p.lastDrip || {};
           if (now - (p.lastDrip[h] || 0) < CFG.LEAKY_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) continue;
           p.lastDrip[h] = now;
@@ -7922,7 +7994,8 @@
         blockedTease(stud, t, hole, penBlock, true);
         return false;
       }
-      const holeBlock = holeBlocked(t, hole);
+      const seal = sealIn(t, hole), sealOpen = !!(seal && seal.by === stud);
+      const holeBlock = seal ? sealOpen ? null : seal.name : holeBlocked(t, hole);
       if (holeBlock) {
         R("Whoa there, hon! " + plainName(t) + "'s " + ({ vulva: "pussy", butt: "ass" }[hole] || hole) + " is blocked by " + holeBlock + ". That'll have to come off before you can fill it.");
         blockedTease(stud, t, hole, holeBlock, false);
@@ -7982,7 +8055,7 @@
       }
       const room = Math.max(0, capacity(t) - heldTotal(tp));
       const fullBefore = heldTotal(tp) / capacity(t);
-      const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
+      const kept = knot || sealOpen ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
       tp.held[hole] = (tp.held[hole] || 0) + kept;
       tp.totals.received += kept;
       if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud), kept + spilt);
@@ -8016,6 +8089,7 @@
         double: opt.load || opt.half ? " Both cocks throb and unload at once." : ""
       }[penisType(stud)] || "";
       let o = "\u{1F4A6} " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") " + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + holeText(hole)) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
+      if (sealOpen) o += " " + plainName(t) + "'s " + seal.name + " opens for " + plainName(stud) + " alone, and seals every drop in behind.";
       if (opt.edged) o += " Edged " + opt.edged + " time" + (opt.edged === 1 ? "" : "s") + " first, it just keeps on comin'.";
       if (hole === "mouth" && makesSemen(stud)) o += " " + seedTaste(stud, pent);
       if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" cock and drools ' + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
@@ -8521,6 +8595,8 @@
           return (o.litters || 0) >= 5;
         case "breeder":
           return (o.litters || 0) >= 10;
+        case "factory":
+          return (o.litters || 0) >= 20;
         case "bottom":
           return ["vulva", "butt"].some((h) => sizeBase(mn, h) >= CFG.SIZES[h].natural);
         case "throat":
@@ -9230,6 +9306,11 @@
         done.push("heat broken");
         fx0.push("suppressant");
       }
+      if (tags.has("quicken")) {
+        const q = quickenBooks(target, x);
+        done.push(q ? q : "nothin' in there to hurry along, yet");
+        if (q) fx.push(quickenLine(target));
+      }
       if (tags.has("heat")) {
         if (limitBlocks(target, "heat")) done.push("no heat, though, 'cause their limits rule it out");
         else {
@@ -9325,6 +9406,9 @@
       sec("\u{1F402} BREEDING", [
         "Breedable " + (r.breedable ? "yes" : "no") + " \xB7 Fertile " + (r.fertile ? "yes" : "no") + (r.futa ? " \xB7 Futa" : "") + (r.species ? " \xB7 " + r.species : ""),
         inHeat(p) && "\u{1F525} In heat \xB7 " + hrsLeft(p.heat.until) + " left",
+        isRipe(mn) && "\u{1F338} Ripe today: every load takes twice as easy",
+        // (Nov 19, 10ur3-breed-anywhere.js)
+        r.broodWomb && "\u{1F930} Brood Womb: carryin', every load takes and adds to your litter",
         p.preg && "\u{1F37C} Bred by " + p.preg.sires.map(plainName).join(" & ") + " \xB7 due " + new Date(p.preg.due).toLocaleDateString() + " (" + Math.ceil((p.preg.due - now) / 864e5) + " day(s))",
         r.rights && r.rights.until > now && "\u{1F50F} Breedin' rights: " + plainName(r.rights.stud) + ((r.rights.allow || []).length ? " (also " + r.rights.allow.map(plainName).join(", ") + ")" : "") + " till " + new Date(r.rights.until).toLocaleDateString(),
         p.offspring.litters && "\u{1F476} Litters: " + p.offspring.litters + " \xB7 " + p.offspring.male + " male, " + p.offspring.female + " female, " + p.offspring.futa + " futa",
@@ -26487,7 +26571,8 @@
       echo: "Echo Elixir",
       statue: "Statue Serum",
       surecatch: "Sure-Catch Serum",
-      dilator: "Nipple Dilator"
+      dilator: "Nipple Dilator",
+      seed: "Seed"
     };
     const SURE_STEP = 0.06;
     function sureMore(mother, stud) {
@@ -26575,12 +26660,21 @@
         at: Date.now(),
         on: ids(m.on),
         crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "",
-        holes: m.holes === 1
+        holes: m.holes === 1,
+        seed: m.seed === 1,
+        breed: m.breed === 1
       });
       try {
         craveOffer(mn, dispMap().get(mn));
       } catch (e) {
         warn("crave:", e);
+      }
+      if (m.breed === 1) {
+        try {
+          carryHello(mn, m);
+        } catch (e) {
+          warn("carry:", e);
+        }
       }
       if (!had) log("Dispensary hello from " + mn + " (v" + String(m.ver || "?").slice(0, 20) + ")");
       const r = rec(mn);
@@ -26602,7 +26696,11 @@
         farm: dispFarmList(),
         stock: !!(r && Array.isArray(r.roles) && r.roles.length),
         species: r ? String(speciesKey(mn) || "").toLowerCase() : "",
-        holes: m.holes === 1 ? dispHoleSizes(mn) : void 0
+        holes: m.holes === 1 ? dispHoleSizes(mn) : void 0,
+        seed: m.seed === 1 ? seedNumbers(mn) : void 0,
+        ripe: m.breed === 1 ? ripeWire(mn) : void 0,
+        cock: m.breed === 1 ? cockWire(mn) : void 0,
+        carry: m.breed === 1 ? carryWire(mn) : void 0
       }, mn));
     }
     const dispWhy = (why) => why === "ladder" ? "their Dispensary doesn't take doses from the farm" : "they've switched it off in their Dispensary";
@@ -26807,7 +26905,183 @@
       return !!(d && d.holes);
     }
     if (W.__FARMHAND_TEST__) W.__dispHoleOp = (mn, o) => dispHoleOp(mn, o);
+    const SEED_HOLES_FARM = ["vulva", "butt", "mouth", "nips"];
+    const sealCache = /* @__PURE__ */ new Map();
+    function sealsFor(mn) {
+      const now = Date.now(), c = sealCache.get(mn);
+      if (c && now - c.t < 5e3) return c.v;
+      const C2 = charFor(mn), v = C2 ? sealsOn(C2.Appearance, craftText) : [];
+      sealCache.set(mn, { t: now, v });
+      return v;
+    }
+    function sealIn(mn, h) {
+      return sealsFor(mn).find((s) => s.holes.includes(h)) || null;
+    }
+    const dispSeedOn = (mn) => {
+      const d = dispFor(mn);
+      return !!(d && d.seed);
+    };
+    const seedNames = () => state.seedNames || (state.seedNames = /* @__PURE__ */ new Map());
+    function sireName(mn) {
+      const n = plainName(mn);
+      return /^#\d+$/.test(n) && seedNames().get(mn) ? seedNames().get(mn) : n;
+    }
+    function seedNumbers(mn) {
+      const r = rec(mn), p = r && r.prod;
+      if (!p) return void 0;
+      return { held: { vulva: Math.round(p.held.vulva || 0), butt: Math.round(p.held.butt || 0), mouth: Math.round(p.held.mouth || 0) }, cap: Math.round(capacity(mn)), by: p.lastStud || 0, nm: p.lastStud ? sireName(p.lastStud) : "" };
+    }
+    function seedBook(mn, l, now) {
+      const p = prodOf(mn), sire = Math.floor(Number(l && l.by) || 0), ml2 = Math.max(0, Math.min(2e4, Number(l && l.ml) || 0));
+      let h = String(l && l.h || "");
+      if (!(sire > 0) || !SEED_HOLES_FARM.includes(h) || !(ml2 >= 1)) return null;
+      if (typeof l.nm === "string" && l.nm) seedNames().set(sire, l.nm.slice(0, 40));
+      const gaps = state.seedGap || (state.seedGap = /* @__PURE__ */ new Map()), key = mn + ":" + sire, fresh = now - (gaps.get(key) || 0) >= SEED_GAP_MS;
+      if (fresh) gaps.set(key, now);
+      if (h === "nips") {
+        if (fresh) {
+          p.totals.nipLoads = (p.totals.nipLoads || 0) + 1;
+          const nb = p.totals.nipBy = p.totals.nipBy || {};
+          nb[sire] = (nb[sire] || 0) + 1;
+          const ks2 = Object.keys(nb);
+          if (ks2.length > 40) delete nb[ks2[0]];
+        }
+        p.totals.nipMl = (p.totals.nipMl || 0) + ml2;
+        p.nipCream = { by: sire, n: (p.nipCream && p.nipCream.n || 0) + 1, at: now };
+        return null;
+      }
+      if (h === "vulva" && !hasVulva(mn)) h = "butt";
+      const seal = sealIn(mn, h);
+      if (l.here && seal && seal.by !== sire) return null;
+      let kept;
+      if (l.here) {
+        const room = Math.max(0, capacity(mn) - heldTotal(p));
+        kept = seal && seal.by === sire || p.tieUntil > now ? Math.min(ml2, Math.max(0, CFG.PROD.MAX_CAPACITY - heldTotal(p))) : Math.min(ml2, room);
+        p.held[h] = (p.held[h] || 0) + kept;
+        if (h === "mouth" && kept > 0) p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
+      } else kept = Math.min(ml2, p.held[h] || 0);
+      p.lastStud = sire;
+      if (!fresh) return null;
+      const bonus = l.up ? CFG.LEGS_UP_X : 1;
+      p.totals.received += Math.min(ml2, 5e3);
+      p.totals.loads = (p.totals.loads || 0) + 1;
+      const by = p.totals.by || (p.totals.by = {}), e = by[sire] || (by[sire] = { n: 0, at: 0 });
+      e.n++;
+      e.at = now;
+      const ks = Object.keys(by);
+      if (ks.length > 40) ks.sort((a, b) => by[a].at - by[b].at).slice(0, ks.length - 40).forEach((k) => {
+        delete by[k];
+      });
+      const sp = rec(sire) ? prodOf(sire) : null;
+      if (sp) sp.totals.given += Math.min(ml2, 5e3);
+      audit(mn, "SEED", h + " " + Math.round(ml2) + " from " + sire + (l.here ? "" : " (elsewhere)"));
+      if (l.nc || !canCatchIn(mn, h) || !(kept >= 1)) return null;
+      p.lastFill = { at: now, stud: sire, ml: kept, hole: h };
+      if (sp) sp.totals.covers = (sp.totals.covers || 0) + 1;
+      state.rollAt = l.here ? 0 : Math.min(now, Number(l.at) || now);
+      let caught = null;
+      try {
+        caught = rollConception(mn, sire, kept, bonus, h);
+      } finally {
+        state.rollAt = 0;
+      }
+      if (caught) {
+        if (sp) {
+          sp.totals.conceived = (sp.totals.conceived || 0) + 1;
+          rollBoard();
+          const Y = L2.yield;
+          Y.s = Y.s || {};
+          Y.s[sire] = (Y.s[sire] || 0) + 1;
+        }
+        seedCaught(mn, sire, caught, !l.here);
+      }
+      return caught;
+    }
+    function seedCaught(mn, sire, caught, late) {
+      const s = sireName(sire), t = plainName(mn);
+      let line = caught === "new" ? late ? "\u{1F37C} Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days." : "\u{1F37C} It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days." : caught === "extra" ? "\u{1F37C} " + s + "'s seed got one in too! " + t + " is carryin' for two sires now." : caught === "more" ? sureLine(mn, sire) : "";
+      if (!line) return;
+      line = line.split("#" + sire).join(s);
+      if (onMap(mn)) emote(line, mn);
+      else tell(mn, line);
+      if (caught === "new" && !makesMilk(mn) && !limitBlocks(mn, "milk"))
+        tell(mn, "\u{1F37C} You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
+      for (const hd of herdsOf(mn)) beep(hd.leader, "\u{1F37C} Guess what, sugar: " + t + " caught from " + s + "!");
+    }
+    function onDispSeed(mn, m) {
+      const r = rec(mn), id = Math.max(0, Math.floor(Number(m.id) || 0));
+      const answer = (x) => enqueue(makeMsg("dispSeedOk", Object.assign({ id }, x), mn));
+      if (!r) {
+        answer({ none: "books" });
+        return;
+      }
+      if (!r.breedable || limitBlocks(mn)) {
+        answer({ none: "breedable" });
+        return;
+      }
+      const ep = typeof m.ep === "string" ? m.ep.slice(0, 16) : "";
+      if (ep && ep !== r.dispSeedEp) {
+        r.dispSeedEp = ep;
+        r.dispSeedSeq = 0;
+      }
+      if (id > (r.dispSeedSeq || 0) && Array.isArray(m.loads)) {
+        r.dispSeedSeq = id;
+        const loads = m.loads.slice(0, 30).filter((l) => l && typeof l === "object"), p = prodOf(mn), now = Date.now();
+        if (!loads.some((l) => l.here) && m.held && typeof m.held === "object")
+          for (const h of HOLES) {
+            const v = Math.max(0, Math.min(CFG.PROD.MAX_CAPACITY, Number(m.held[h]) || 0));
+            if (v > (p.held[h] || 0)) p.held[h] = v;
+          }
+        for (const l of loads) {
+          try {
+            seedBook(mn, l, now);
+          } catch (e) {
+            warn("seed:", e);
+          }
+        }
+        if (Number(m.quick) > 0) {
+          try {
+            quickenBooks(mn, Math.min(20, Math.round(Number(m.quick))));
+          } catch (e) {
+            warn("quicken:", e);
+          }
+        }
+        saveLedger();
+        try {
+          syncCompanions(true);
+        } catch (e) {
+        }
+      }
+      answer({ seed: seedNumbers(mn), carry: dispFor(mn) && dispFor(mn).breed ? carryWire(mn) : void 0 });
+    }
+    function sealWatch(mn, p) {
+      const on = p.sealOn || (p.sealOn = {});
+      for (const h of ["vulva", "butt"]) {
+        const s = sealIn(mn, h);
+        if (s) {
+          on[h] = s.by;
+          continue;
+        }
+        if (!on[h]) continue;
+        delete on[h];
+        if ((p.held[h] || 0) < 30) continue;
+        const out = p.held[h] * 0.6;
+        p.held[h] -= out;
+        if (!dispSeedOn(mn) && onMap(mn)) emote("\u{1F4A6} Out comes " + plainName(mn) + "'s seal, and " + ml(out) + " of " + (p.lastStud ? sireName(p.lastStud) + "'s" : "somebody's") + " seed gushes out right behind it, down their thighs.", mn);
+      }
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __sealsFor: (mn) => {
+      sealCache.delete(mn);
+      return sealsFor(mn);
+    }, __seedBook: (mn, l) => seedBook(mn, l, Date.now()), __sealWatch: (mn) => {
+      sealCache.delete(mn);
+      sealWatch(mn, prodOf(mn));
+    } });
     function onDispensaryMsg(mn, m) {
+      if (m.type === "dispSeed") {
+        onDispSeed(mn, m);
+        return true;
+      }
       if (m.type === "dispHoles") {
         onDispHoles(mn, m);
         return true;
@@ -26830,6 +27104,175 @@
       }
       return false;
     }
+    function cycleOf(mn) {
+      const r = rec(mn);
+      if (!r) return 0;
+      if (!(r.cycleAt > 0)) {
+        r.cycleAt = Date.now() - Math.floor(Math.random() * CFG.RIPE.EVERY_D) * 864e5;
+        saveLedger();
+      }
+      return r.cycleAt;
+    }
+    function cycleDay(mn, at) {
+      const D = 864e5, n = Math.floor(((at || Date.now()) - cycleOf(mn)) / D), e = CFG.RIPE.EVERY_D;
+      return { n, k: (n % e + e) % e };
+    }
+    function isRipe(mn, at) {
+      const r = rec(mn);
+      if (!r || !r.fertile) return false;
+      const { k } = cycleDay(mn, at);
+      return k >= CFG.RIPE.FROM_D && k < CFG.RIPE.FROM_D + CFG.RIPE.DAYS;
+    }
+    function ripeX(mn, at) {
+      return isRipe(mn, at) ? CFG.RIPE.X : 1;
+    }
+    function ripeWire(mn) {
+      const r = rec(mn);
+      if (!r || !r.breedable || !r.fertile || limitBlocks(mn)) return null;
+      return { at: cycleOf(mn), every: CFG.RIPE.EVERY_D, from: CFG.RIPE.FROM_D, days: CFG.RIPE.DAYS };
+    }
+    const RIPE_TELL = [
+      "\u{1F338} You're ripe today, sugar. That warm ache low in your belly's tellin' you so: any load in you the next two days takes twice as easy.",
+      "\u{1F338} Ripe and achin', hon. For two days every load's twice as likely to catch. Go get yourself bred.",
+      "\u{1F338} Mmh, somebody's ripe. Two days of the easiest catchin' you'll get all week, sweetie."
+    ];
+    function ripeTick(mn, r, p, now) {
+      if (!r || !r.fertile || !r.breedable || limitBlocks(mn) || !charFor(mn)) return;
+      if (!isRipe(mn, now)) return;
+      const { n } = cycleDay(mn, now), cyc = Math.floor((n - CFG.RIPE.FROM_D) / CFG.RIPE.EVERY_D);
+      if (p.ripeTold === cyc) return;
+      p.ripeTold = cyc;
+      saveLedger();
+      tell(mn, RIPE_TELL[Math.floor(Math.random() * RIPE_TELL.length)]);
+    }
+    function cockWire(mn) {
+      if (!rec(mn) || !makesSemen(mn)) return null;
+      const p = prodOf(mn), T = typeInfo(mn);
+      const load = Math.round(Math.max(CFG.PROD.MIN_LOAD, (p.semen || 0) * CFG.PROD.LOAD_SHARE) * (T.loadX || 1) * perkLoadX(mn));
+      if (!knotted(mn)) return { load, knot: false };
+      const frac = (sizeOf(mn, "knot") - 1) / (CFG.SIZES.knot.max - 1), span = CFG.TIE_MAX_M - CFG.TIE_MIN_M;
+      return { load, knot: true, tie: [Math.round(CFG.TIE_MIN_M + span * frac * 0.6), Math.round(CFG.TIE_MIN_M + span * (0.4 + 0.6 * frac))] };
+    }
+    const HIPS_UP = ["AllFours", "Hogtied", "KneelingSpread"];
+    function hipsUpOn(mn) {
+      const C2 = charFor(mn), lo = C2 && C2.PoseMapping && C2.PoseMapping.BodyLower;
+      return HIPS_UP.includes(lo);
+    }
+    const LEGS_UP_LINES = [
+      "%t stays down with their hips tipped high, keepin' %s load deep where it can take.",
+      "Rump up and knees spread, %t holds every drop of %s seed inside and lets it work.",
+      "%t doesn't move an inch: hips up, belly warm, %s load settlin' right where it belongs.",
+      "%t arches and keeps their rump in the air, coaxin' %s seed deeper. Good breeder.",
+      "%t stays bent over and still, holdin' %s load in like it's precious. It might be."
+    ];
+    function legsUpTick(mn, p, now) {
+      const f = p.lastFill;
+      if (!f || f.up || p.preg || now - (f.at || 0) > CFG.LEGS_UP_MIN * 6e4 || !(f.hole === "vulva" || f.hole === "butt")) return;
+      if (!hipsUpOn(mn)) return;
+      f.up = true;
+      const left = Math.min(f.ml || 0, p.held[f.hole] || 0), who = f.stud > 0 ? (typeof sireName === "function" ? sireName(f.stud) : plainName(f.stud)) + "'s" : "their";
+      if (onMap(mn)) emote("\u{1F351} " + pickFresh("legsup", LEGS_UP_LINES).replace(/%t/g, plainName(mn)).replace(/%s/g, who), mn);
+      if (!(left >= 1) || !canCatchIn(mn, f.hole)) return;
+      const caught = rollConception(mn, f.stud, left, CFG.LEGS_UP_X, f.hole);
+      if (!caught) return;
+      const sp = f.stud > 0 && rec(f.stud) ? prodOf(f.stud) : null;
+      if (sp) {
+        sp.totals.conceived = (sp.totals.conceived || 0) + 1;
+        rollBoard();
+        const Y = L2.yield;
+        Y.s = Y.s || {};
+        Y.s[f.stud] = (Y.s[f.stud] || 0) + 1;
+      }
+      seedCaught(mn, f.stud, caught, false);
+      saveLedger();
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __isRipe: (mn, at) => isRipe(mn, at), __ripeWire: (mn) => ripeWire(mn), __cockWire: (mn) => cockWire(mn), __legsUp: (mn) => legsUpTick(mn, prodOf(mn), Date.now()) });
+    function carryWire(mn) {
+      const r = rec(mn), p = r && r.prod;
+      if (!p) return void 0;
+      const w = birthWords(mn), g = p.preg, e = p.eggs;
+      return {
+        preg: g ? { since: g.since, due: g.due, count: g.count || 1, sires: (g.sires || []).slice(0, 6).map((s) => sireName(s)) } : null,
+        eggs: e ? { n: e.n, layAt: e.layAt, by: e.by ? sireName(e.by) : "" } : null,
+        heat: { until: inHeat(p) ? p.heat.until : 0, next: r.naturalHeat && !limitBlocks(mn, "heat") ? p.nextHeatAt || 0 : 0 },
+        open: p.openUntil || 0,
+        litters: p.offspring && p.offspring.litters || 0,
+        one: w.one,
+        many: w.many,
+        bornSeen: r.dispBornSeen || 0,
+        laidSeen: r.dispLaidSeen || 0
+      };
+    }
+    function carryHello(mn, m) {
+      const r = rec(mn);
+      if (!r) return;
+      if (!r.dispCarry) {
+        r.dispCarry = true;
+        saveLedger();
+      }
+      const p = prodOf(mn), now = Date.now();
+      const B = m.born && typeof m.born === "object" ? m.born : null;
+      if (B && Number(B.at) > (r.dispBornSeen || 0) && Number(B.at) <= now + 6e4) {
+        r.dispBornSeen = Number(B.at);
+        if (p.preg) {
+          p.labour = null;
+          p.dueOnMap = 0;
+          const mw = Math.max(0, Math.floor(Number(B.midwife) || 0));
+          giveBirth(mn, { midwife: mw, helps: Math.max(0, Math.min(50, Number(B.helps) || 0)), away: true });
+          p.openUntil = Math.max(0, Number(B.at)) + CFG.BREDBACK_MIN * 6e4;
+        }
+        saveLedger();
+      }
+      const Ly = m.laid && typeof m.laid === "object" ? m.laid : null;
+      if (Ly && Number(Ly.at) > (r.dispLaidSeen || 0) && Number(Ly.at) <= now + 6e4) {
+        r.dispLaidSeen = Number(Ly.at);
+        if (p.eggs) {
+          const e = p.eggs;
+          p.eggs = null;
+          p.dueOnMap = 0;
+          p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
+          try {
+            eggsLaid(mn, e.n, false);
+          } catch (err) {
+            warn("eggs laid:", err);
+          }
+          if (!L2.studbook) L2.studbook = [];
+          L2.studbook.push({ t: Number(Ly.at), dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
+          audit(CFG.BOT_MEMBER, "EGGS", mn + " " + e.n + " (away)");
+          tell(mn, "\u{1F95A} Your clutch is on the books, sugar: " + e.n + " eggs from " + sireName(e.by) + "'s, laid away from the farm.");
+        }
+        saveLedger();
+      }
+    }
+    function quickenBooks(mn, x) {
+      const p = prodOf(mn);
+      if (!p) return "";
+      const now = Date.now(), out = [];
+      x = Math.max(1, Math.min(20, Math.round(Number(x) || 1)));
+      if (p.preg && !p.labour) {
+        const step = Math.min(x * 864e5, Math.max(0, p.preg.due - now - 2 * 36e5));
+        if (step > 0) {
+          p.preg.due -= step;
+          p.preg.since -= step;
+          out.push("pregnancy hurried along " + (step >= 864e5 ? Math.round(step / 864e5) + " day" + (step >= 1.5 * 864e5 ? "s" : "") : Math.round(step / 36e5) + " hours"));
+        }
+      }
+      if (p.eggs) {
+        p.eggs.layAt = Math.max(now + 30 * 6e4, p.eggs.layAt - x * 12 * 36e5);
+        out.push("the clutch ripens faster");
+      }
+      if (out.length) saveLedger();
+      return out.join(", ");
+    }
+    const QUICKEN_LINES = [
+      "%t's belly swells rounder right before everybody's eyes, the litter inside hurried along and growin'.",
+      "Warmth floods %t's belly, and it grows, heavier and tighter. They're closer to due now.",
+      "%t gasps and cups their belly as it tightens and swells. Whatever's in there's growin' fast."
+    ];
+    function quickenLine(mn) {
+      return pickFresh("quicken", QUICKEN_LINES).replace(/%t/g, plainName(mn));
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __carryWire: (mn) => carryWire(mn), __carryHello: (mn, m) => carryHello(mn, m), __quicken: (mn, x) => quickenBooks(mn, x) });
     const FEATS = [
       {
         key: "dairy",
@@ -34626,7 +35069,7 @@
     }
     function openX(mn) {
       const p = prodOf(mn);
-      return p && p.openUntil > Date.now() ? CFG.BREDBACK_X : 1;
+      return p && p.openUntil > (state.rollAt || Date.now()) ? CFG.BREDBACK_X : 1;
     }
     function openedUp(mn) {
       const p = prodOf(mn);
@@ -67125,13 +67568,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "fertile":
         case "naturalheat":
         case "mpreg":
-        case "pinme": {
+        case "pinme":
+        case "broodwomb": {
           const r = rec(sender);
           if (!r || !r.roles.length) {
             R("That's just for folks on the books, sugar. Say ?apply first!");
             break;
           }
-          const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd;
+          const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd;
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
             R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. For example: ?" + cmd + " on");
@@ -67155,6 +67599,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             fertile: "Fertile (can catch)",
             mpreg: "Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)",
             naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days",
+            broodWomb: "Brood Womb (every load that lands while you're already carryin' takes too, and adds to your litter, up to the farm's hyper sizes)",
             pinMe: "Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)"
           }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
           if (field === "pinMe" && !on) syncCompanions(true);

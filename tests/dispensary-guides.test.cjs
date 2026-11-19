@@ -36,7 +36,7 @@ async function boot(settings) {
   const H = await import(url("../shared/holes.js"));
 
   // ── the guides themselves ──
-  const want = ["start", "craft", "give", "gear", "timing", "pick", "kits", "horny", "nipples", "holes", "parasites", "safety", "hardcore", "farm", "commands"];
+  const want = ["start", "craft", "give", "gear", "timing", "pick", "kits", "horny", "breeding", "nipples", "holes", "parasites", "safety", "hardcore", "farm", "commands"];
   ok(want.every((id) => GUIDE_BY[id]) && GUIDES.length === want.length, "a guide for every part of the Dispensary (" + GUIDES.map((g) => g.id).join(", ") + ")");
   ok(GUIDES.every((g) => g.title && g.icon && g.intro && Array.isArray(g.steps) && g.steps.length >= 2 && (g.see || []).every((k) => GUIDE_BY[k] && k !== g.id)), "...each with a title, an intro, its steps, and see-alsos that are real guides");
   const all = GUIDES.map((g) => [g.intro, ...g.steps, ...(g.tips || []), ...(g.craft || []).map((c) => c.note)].join(" ")).join(" ");

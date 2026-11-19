@@ -10,7 +10,7 @@ export const PUBLIC_GROUPS = [
   { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
   { name: "Milk", cmds: ["stats", "board", "milkable", "seedmilk", "quota"] },
   { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
-  { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+  { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "broodwomb", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
   { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
   { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
   { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },

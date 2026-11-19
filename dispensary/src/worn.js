@@ -37,7 +37,7 @@ export const DRIP_MINS = 10, INJECT_EVERY = 30, TRIGGER_GAP = 2 * MIN, PAUSE_MIN
 export const DRIP_WORDS = loosen(/\b(drip\w*|iv|i\.v\.|laced|coated|soaked|infused|seeping)\b/);
 export const INJECT_WORDS = loosen(/\b(injector|auto[- ]?inject\w*|dosing|dispenser|pump)\b/);
 const EVERY = loosen(/\bevery\s+(\d{1,3})\s*(?:min|minutes?)\b/);
-const TRIGGERS = { climax: loosen(/\b(on|when|whenever|every)\s+(?:she |he |they |you )?(climax\w*|cum\w*|orgasm\w*)\b/), kissed: loosen(/\bwhen\s+kiss\w*\b/),
+export const TRIGGERS = { climax: loosen(/\b(on|when|whenever|every)\s+(?:she |he |they |you )?(climax\w*|cum\w*|orgasm\w*)\b/), kissed: loosen(/\bwhen\s+kiss\w*\b/),
   touched: loosen(/\bwhen\s+(touch\w*|groped|caressed|fondled)\b/), spanked: loosen(/\bwhen\s+(spank\w*|slapped|paddled)\b/) };
 export const ROULETTE_WORDS = loosen(/\b(roulette|mystery (?:dose|shot|serum|drink)|surprise (?:dose|shot))\b/);
 export const GLOSS_WORDS = loosen(/\b(lip ?gloss|lip ?stick|lip balm|lip stain)\b/);
@@ -59,6 +59,8 @@ export function dosesOf(text) {
   }
   return list;
 }
+// the hole a piece of gear sits in (where its seed goes, when it doesn't say)
+const holeOfGear = (item) => { const g = String((item && item.Asset && item.Asset.Group && item.Asset.Group.Name) || ""); return g === "ItemVulva" ? "vulva" : g === "ItemButt" ? "butt" : /^ItemMouth/.test(g) ? "mouth" : /^ItemNipples/.test(g) || g === "ItemBreast" ? "nips" : ""; };
 const crafterOf = (item) => { const n = item && item.Craft && Number(item.Craft.MemberNumber); return Number.isInteger(n) && n > 0 ? n : 0; };
 const me = () => (W.Player && W.Player.MemberNumber) || 0;
 const okFrom = (by) => !by || by === me() || allowed(by);   // (no maker on it: it's yours)
@@ -81,11 +83,14 @@ export function wornGear() {
     if (!list.length && !roulette) continue;
     const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text));
     const nipGear = onNips && list.some((d) => d.id === "dilator");
-    const drip = nipGear || (DRIP_WORDS.test(text) && !(lscgPresent() && LSCG_SOAKED.test(text) && !/\bdrip|\biv\b/.test(text)));
-    const inject = INJECT_WORDS.test(text);
+    const drip0 = nipGear || (DRIP_WORDS.test(text) && !(lscgPresent() && LSCG_SOAKED.test(text) && !/\bdrip|\biv\b/.test(text)));
+    // (Nov 19) a dose that's done at once (seed, growth, a balm) can't be kept topped up: on drip gear it's given like an
+    // injector's, every half hour, not every few seconds
+    const once = list.length > 0 && list.every((d) => BOOK[d.id] && BOOK[d.id].instant);
+    const drip = drip0 && !once, inject = INJECT_WORDS.test(text) || (drip0 && once);
     if (!drip && !inject && !trig.length) continue;   // (a dose's words on a worn thing that doesn't say how: nothin')
     const every = EVERY.exec(text);
-    out.push({ item, key: keyOf(item), text, list, by: crafterOf(item), drip, inject, trig, roulette,
+    out.push({ item, key: keyOf(item), text, list, by: crafterOf(item), nm: item.Craft && item.Craft.MemberName ? String(item.Craft.MemberName) : "", hole: holeOfGear(item), drip, inject, trig, roulette,
       every: Math.max(5, Math.min(240, every ? Number(every[1]) : INJECT_EVERY)), gloss: GLOSS_WORDS.test(text) });
   }
   return out;
@@ -104,6 +109,7 @@ export function wornTick() {
   for (const g of wornGear()) {
     if (!okFrom(g.by)) { notAllowed(g); continue; }
     if (g.drip) for (const d of g.list) {
+      if (BOOK[d.id] && BOOK[d.id].instant) continue;
       const was = active(d.id);
       if (was && leftMs(d.id) > (DRIP_MINS - 2) * MIN) continue;   // (topped up every couple of minutes, not every tick)
       const r = give(d.id, { by: g.by, x: d.x, p: d.p, mins: DRIP_MINS, upto: true, quiet: was, line: was ? undefined : fill(pick(LINES.worn.drip), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
@@ -117,7 +123,7 @@ export function wornTick() {
       const list = g.roulette ? dosesOf(g.text).filter((d) => ours(d.id)) : g.list;
       for (const d of list) {
         if (isLater(g.text)) queue(d.id, { by: g.by, x: d.x, p: d.p });
-        else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
+        else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)), via: "gear", g: itemName(g.item), nm: g.nm, hole: g.hole });
       }
     }
   }
@@ -138,7 +144,7 @@ export function trigger(kind, from) {
     if (Date.now() - (lastTrig[k] || 0) < TRIGGER_GAP) continue;
     lastTrig[k] = Date.now();
     const list = g.roulette ? dosesOf(g.text).filter((d) => ours(d.id)) : g.list;
-    for (const d of list) { const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)) }); if (r.ok) n++; }
+    for (const d of list) { const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)), via: "gear", g: itemName(g.item), nm: g.nm, hole: g.hole }); if (r.ok) n++; }
   }
   return n;
 }
@@ -155,7 +161,7 @@ export function kissedBy(mn) {
     const by = crafterOf(item) || mn;
     if (!allowed(by) && !allowed(mn)) { local(fill(NOTES.notListed, { by: nameOf(mn), dose: itemName(item) })); continue; }
     const k = mn + ":" + keyOf(item); if (Date.now() - (glossAt[k] || 0) < TRIGGER_GAP) continue; glossAt[k] = Date.now();
-    for (const d of dosesOf(text).filter((x) => ours(x.id))) { const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }) }); if (r.ok) n++; }
+    for (const d of dosesOf(text).filter((x) => ours(x.id))) { const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }), sire: by, nm: item.Craft.MemberName ? String(item.Craft.MemberName) : "", via: "kiss" }); if (r.ok) n++; }
   }
   return n;
 }

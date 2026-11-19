@@ -64,7 +64,13 @@ export const DOSE_WORDS = {
   dilator: loosen(/\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/),
   balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
   purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/),
+  // (Nov 19; Laynie: "Definitely the insemination and breeders seal") a load of the crafter's own seed: shared/seed.js
+  // reads how much and where. Only plain seed words: "doubles their load" is a virility shot, not this.
+  // (Nov 19, breedin' anywhere) a day off a pregnancy, and a look at what's in there
+  quicken: loosen(/\b(quicken\w*(?: (?:draught|serum|tonic|potion|drops?|shot))?)\b/),
+  scan: loosen(/\b(breeder['\u2019]?s scan(?:ner)?|breeding scan(?:ner)?|womb scan(?:ner)?|belly scan(?:ner)?|pregnancy scan(?:ner)?)\b/),
+  seed: loosen(/\b(inseminat\w*|(?:seed|cum|creampie|breeding) (?:syringe|shot|injector|vial|bottle|baster|dose|filler|plunger|pump|serum|cocktail)|(?:full|filled) (?:of|with) (?:my |his |her |their |\w+['’]?s )?(?:seed|cum)|my (?:own )?(?:seed|cum))\b/),
 };
-export const FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge"];
+export const FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge", "quicken"];
 // which doses a text names (ids), in the book's order
 export const dosesNamed = (text) => { const t = String(text || "").toLowerCase(); return Object.keys(DOSE_WORDS).filter((id) => DOSE_WORDS[id].test(t)); };

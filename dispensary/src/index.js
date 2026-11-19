@@ -18,8 +18,15 @@ import { initToys } from "./toys.js";
 import { initKits, kitTick, kitNow, kitSave, kitDelete, kitNames, kitLookup, kitEnd, SPEEDS, SPEED_NAMES } from "./kits.js";
 import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset, hornyOf } from "./horny.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
+import { holesOnLoad } from "./holes.js";
 import { initHoles, holesTick, holesNow, holesUsed, holesClimaxOf, holesBalm, holesSet, holesReset, holesState, holesDrips, sendNow as holesSend, sendGoal, sendClear, setGoal, clearGoal, HOLE_OF_WORD, dueWords, toysNow } from "./holes.js";
 import { HOLE_WORD, sizeWord, HOLE_SIZES } from "../../shared/holes.js";
+import { initSeed, seedTick, seedGive, seedInfo, seedBelly, seedState, seedReset, seedDrain, sealsNow, sendNow as seedSend } from "./seed.js";
+import { seedAmounts, seedPlan, amountSay } from "../../shared/seed.js";
+import { carryTick, carryInfo, carryReset, carryFeelNow, carryWelcome, labourTouch, bellyAll, scan as carryScan } from "./carry.js";
+import { seedOnCarry } from "./seed.js";
+import { iconsIds } from "./icons.js";
+import { initBreed, breedTick, realLoad, tied, ripeNow, hipsUp, breedReset, breedClimax, breedLastIn, breedWelcome } from "./breed.js";
 import "./lines-nips.js";
 import "./lines-worn.js";
 import { initSenses, hazeTick, settle } from "./senses.js";
@@ -62,7 +69,7 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear",
+      Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
@@ -85,6 +92,8 @@ function commands() {
         // kits (Nov 18): yours to switch on, what they put on you, how fast; your own saved ones
         const km = /^kits?(?:\s+(.*))?$/.exec(String(args || "").trim());
         if (km) { kitCommand(String(km[1] || "").trim()); return; }
+        // seed (Nov 19): what's in you, and whose
+        if (/^(seed|cum|loads?|held|holding)$/.test(a)) { seedCommand(); return; }
         // horny gear (Nov 18): its own switch
         const hm = /^horny\s+(on|off)$/.exec(a);
         if (hm) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().hornyOn = hm[1] === "on"; save(); local(hm[1] === "on" ? "Horny gear can use you: crafted gear that says horny or hungry has its way with you, now and then." : "Horny gear sits still on you now."); return; }
@@ -156,6 +165,15 @@ function trainCommand(rest) {
   local(r.self ? "🎯 Your goal: your " + HOLE_WORD[h] + ", " + sizeWord(h, r.to) + ". Your trainers will work you there." : "🎯 Sent: a goal for their " + HOLE_WORD[h] + ", " + sizeWord(h, r.to) + ". Their Dispensary tells you if it took.");
 }
 
+// /dispensary seed: what's in you, whose, and every load you've taken
+function seedCommand() {
+  const I = seedInfo(), rows = [];
+  for (const [h, x] of Object.entries(I.held)) if (x.ml >= 1 || x.seal) rows.push("your " + ({ vulva: "pussy", butt: "ass", mouth: "belly, swallowed", nips: "tits" })[h] + ": " + amountSay(x.ml) + (x.who ? ", mostly " + x.who + "'s" : "") + (x.seal ? " (sealed with " + x.seal.name + "'s " + x.seal.g + ")" : ""));
+  local((rows.length ? "💦 In you now: " + rows.join(" · ") + ". Your belly's " + I.pct + "% full (it holds " + amountSay(I.cap) + " before it spills)." : "💦 Nothin' in you right now.") +
+    (I.loads ? " Loads you've taken: " + I.loads + ", " + amountSay(I.ml) + " all told" + (I.top.length ? "; most from " + I.top.slice(0, 3).map((t) => t.name + " (" + t.n + ")").join(", ") : "") + "." : "") +
+    (I.waiting ? " " + I.waiting + " waitin' to hand the farm girl." : ""));
+}
+
 // "mouth <who>": a member number, or somebody in the room by name
 function mouthTarget(w) {
   if (/^\d+$/.test(w)) return Number(w);
@@ -163,6 +181,32 @@ function mouthTarget(w) {
   return C ? C.MemberNumber : 0;
 }
 
+// (Nov 19, carry.js) your heat comes on anywhere through the Heat dose; a stud smells it through the room's icons
+const CARRY_DEPS = { giveHeat: (mins, line) => give("heat", { by: 260239, mins, line, upto: true }), idsOf: (mn) => iconsIds(mn) };
+// a touch on your belly while you labour helps it along; somebody holdin' a Breeder's Scan who touches your belly scans it
+const SCAN_TOUCH = /^(Caress|Rub|MassageHands|Kiss|Pet|Grope|RubItem|Lick)$/;
+let scanAt = 0;
+function initCarryTouch(mod) {
+  try {
+    mod.hookFunction("ChatRoomMessage", 11, (args, next) => {
+      try {
+        const data = args[0], P = W.Player;
+        if (data && data.Type === "Activity" && P && typeof data.Sender === "number" && data.Sender !== P.MemberNumber) {
+          const D0 = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (k) => { const e = D0.find((x) => x && x[k] != null); return e ? e[k] : null; };
+          const tgt = Number(get("TargetCharacter")) || 0, grp = String(get("FocusGroupName") || ""), name = String(get("ActivityName") || "");
+          if (tgt === P.MemberNumber) {
+            labourTouch(data.Sender, grp);
+            if (SCAN_TOUCH.test(name) && /^Item(Pelvis|Torso)$/.test(grp) && Date.now() - scanAt > 2 * 60000 && allowed(data.Sender)) {
+              const C0 = (W.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === data.Sender), it = C0 && (C0.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "ItemHandheld");
+              if (it && it.Craft && /scan/i.test(String(it.Craft.Name || "") + " " + String(it.Craft.Description || "")) && dosesIn(((it.Craft.Name || "") + " | " + (it.Craft.Description || "")).toLowerCase()).some((d) => d.id === "scan") && !st().off.scan) { scanAt = Date.now(); carryScan(data.Sender); }
+            }
+          }
+        }
+      } catch (e) { console.warn("[Dispensary] carry:", e); }
+      return next(args);
+    });
+  } catch (e) { /* fine */ }
+}
 let started = false;
 function start() {
   if (started) return;
@@ -182,11 +226,14 @@ function start() {
   initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => paraMine() });
   initKits(mod, { end: (id) => end(id, "quiet"), byOf: (id) => (st().doses[id] && st().doses[id].by) || 0 });
   initHoles(mod);
+  initSeed(mod);
+  initBreed(mod); holesOnLoad((from, h) => realLoad(from, h)); seedOnCarry((m) => carryWelcome(m));
+  initCarryTouch(mod);
   onHardChange(() => { if (pageOpen()) redrawPage(true); });
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); holesTick(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); holesTick(); seedTick(); breedTick(); carryTick(Date.now(), CARRY_DEPS); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -210,6 +257,10 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), dosesIn: (t) => dosesIn(t)
   kit: () => kitNow(), kitTick: (now) => kitTick(now), kitSave: (n) => kitSave(n), kitLookup: (k) => kitLookup(k), kitEnd: () => kitEnd(false), kitCmd: (r) => kitCommand(r),
   holes: () => holesNow(), holesTick: (now) => holesTick(now), holesUsed: (...a) => holesUsed(...a), holesClimax: (f) => holesClimaxOf(f), holesBalm: (w, x) => holesBalm(w, x), holesSet: (h, n) => holesSet(h, n),
   holesReset: () => holesReset(), holesState: () => holesState(), holesDrips: () => holesDrips(), holesSend: (a) => holesSend(a), setGoal: (h, to, by, ms) => setGoal(h, to, by, ms), clearGoal: (h) => clearGoal(h), trainCmd: (r) => trainCommand(r), holesCmd: (s, v) => holesCommand(s, v), toys: () => toysNow(),
+  seed: () => seedInfo(), seedGive: (o) => seedGive(o), seedTick: (now) => seedTick(now), seedState: () => seedState(), seedReset: () => seedReset(), seedSend: () => seedSend(), seals: () => sealsNow(), seedDrain: () => seedDrain(),
+  seedAmounts: (t) => seedAmounts(t), seedPlan: (a, o) => seedPlan(a, o),
+  carryTick: (now) => carryTick(now, CARRY_DEPS), carry: (now) => carryInfo(now), carryReset: () => carryReset(), carryFeelNow: () => carryFeelNow(), carryWelcome: (m) => carryWelcome(m), labourTouch: (f, g) => labourTouch(f, g), bellyAll: (now) => bellyAll(now),
+  breedTick: (now) => breedTick(now), realLoad: (f, h) => realLoad(f, h), tied: () => tied(), ripe: (now) => ripeNow(now), hipsUp: () => hipsUp(), breedReset: () => breedReset(), breedClimax: () => breedClimax(), breedLastIn: () => breedLastIn(), breedWelcome: (m) => breedWelcome(m),
   horny: () => hornyGear(), hornyTick: (now) => { hornyTick(now); hornyParaTick(now); }, hornyBeat: (g) => hornyBeat(g), hornyClimax: () => hornyClimax(), hornyReset: () => hornyReset(),
   nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
@@ -237,4 +288,10 @@ W.FarmhandDispensary = Object.freeze({
   // your holes (Nov 18, holes.js): { vulva|butt|throat: { label, now, trained, nowWord, trainedWord, toward, toy, goal } }.
   // The Companion's Body rows read it, so they're right off the farm too.
   holes: () => holesNow().holes,
+  // (Nov 19) seed in you (seed.js): { held: { vulva|butt|mouth|nips: { ml, who, seal } }, belly, cap, pct, stage, loads, top }
+  seed: () => seedInfo(),
+  // how round your belly is with it, 0 flat to 4 huge: the Companion's drawn belly reads it, off the farm too
+  seedBelly: () => bellyAll(),   // (Nov 19: seed, a litter, a clutch: carry.js)
+  // what you're carryin', by the farm's books (carry.js): { carrying: { count, sires, due, stage }, eggs, labour, heat, open, litters }
+  carry: () => carryInfo(),
 });

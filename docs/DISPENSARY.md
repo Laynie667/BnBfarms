@@ -329,6 +329,40 @@ and running timers follow you between your phone and your PC, and clearing the b
        booty stays the Dispensary's with the farm girl there (`farmHas`).
      - Tests: `dispensary-phrases` (every keyword nine ways, and the rest), `dispensary-routing` (the farm girl and
        every dose in every spellin'), `nipple-gear-body`.
+   - **Seed and the Breeder's Seal** (Nov 19; Laynie: "Definitely the insemination and breeders seal, and I would love
+     if the crafter can specify how much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or
+     gallons"). Dose `seed`: a crafted needle, drink, kiss or gear with seed words (Insemination, Seed Syringe, Cum
+     Shot, Breeding Baster, filled with my seed) puts its **crafter's** own seed in them, whoever's holdin' it (the
+     game keeps the maker's number on the item; both have to be on their list). How much and where comes off the item
+     (`shared/seed.js` seedAmounts: mL, cc, litres, gallons, in digits or words; pussy, ass, mouth, nipples, every
+     hole, both holes; a hole with no amount gets 50 mL; no hole, a needle's way or down the throat from a drink or a
+     kiss). A belly holds the farm's capacity (200 mL to start), tits a litre; the rest spills (Companion leaks).
+     Off the farm it drains by the farm's own half-lives, faster from a looser hole, and drips where the room can see.
+     **The Breeder's Seal** (gear: Breeder's Seal, Breeding Seal, Sire's Seal, Seed Lock, Cum Stopper; its slot is its
+     hole, a belt seals both below) keeps every drop (up to 40 L), opens only for its maker's seed (on the farm their
+     cock too), and while it's in only its maker's loads can catch; out it comes and 60% gushes out. Horny breeding
+     gear fills with its crafter's seed now, as much as it says. Every load goes to the farm girl (`dispSeed { ep, id,
+     loads, held }` → `dispSeedOk { id, seed } | { id, none }`): she books it as that crafter's load (one a crafter
+     every ten minutes), it can catch with them as sire, and loads from elsewhere are booked by the Dispensary's count
+     of what's left. The Companion's drawn belly rounds out with it anywhere (`FarmhandDispensary.seedBelly`).
+     Tests: `dispensary-seed`, `dispensary-seed-farm`.
+   - **Breedin' anywhere** (Nov 19; Laynie: "I want to be the best baby factory wherever I go", then "all of them, non
+     clinical language please, make it hot and sexy"). **Part one, catchin'** (`breed.js`, bot `10ur3-breed-anywhere.js`):
+     *Breed me anywhere* (the page, off to start): off the farm a real cock that cums in you (the game's Penetrate
+     actions and orgasm, holes.js) is a load of theirs on your seed books, handed to the farm; their Dispensary sends
+     `dispLoad { h, ml, knot, mins }` from the farm's numbers for their cock (`dispWelcome.cock`), and a knot ties you on
+     the map. *Hips up* (all fours, knees spread, hogtied) within five minutes gives a load another chance, half again as
+     likely (the bot rerolls on the farm; off it the load is marked `up`). *Ripe days*: Fertile, two days in seven, twice
+     as easy (`dispWelcome.ripe`). *Brood Womb*: `?broodwomb on`, carryin', every load takes and adds to the litter.
+     **Part two, carryin'** (`carry.js`): the farm tells your Dispensary what you're carryin' (`carry` in dispWelcome and
+     dispSeedOk); you feel it anywhere (it takes, shows, grows heavy and kicks, your tits leak, you crave seed), your
+     drawn belly grows with it, your natural heat comes on where you are (the Heat dose; a stud with the Dispensary smells
+     it through the room's dose icons), labour and layin' happen where you are with a midwife if anybody touches your
+     belly, and your hello hands them to the farm (`born`, `laid`), which books them quietly (it waits up to 72 h for a
+     Dispensary that births anywhere). *Back to back*: wide open the hour after a birth, by when it happened. The
+     **Quickening Draught** (`quicken`, a farm dose) takes a day off; the **Breeder's Scan** (`scan`) tells the room
+     what's in you. Twenty litters: **Baby Factory**. Tests: `dispensary-breed`, `breed-anywhere-farm`,
+     `dispensary-carry`, `carry-farm`.
 8. **Punishments by contract** dose through it.
 
 After step 1, a lighter drawing engine (for the Dispensary and the Companion alike): the picture step encoded off the
@@ -347,6 +381,8 @@ Dispensary, she doesn't narrate it: she sends their game one hidden message and 
 | player → her | `doseDone { id, ok, why }` | it didn't take (LSCG has it switched off): she takes her side back off |
 | player → her | `dispSafeword {}` | their safeword: she lifts the farm's side of their doses |
 | her → player | `dispClear {}` | her `?safeword`: every dose in them lifted |
+| player → her | `dispSeed { ep, id, loads, held }` | every load of seed that landed in them, whose, and what's in them now |
+| her → player | `dispSeedOk { id, seed }` | she has it; her numbers for what's in them and how much they hold (or `none`: not breedable on her books) |
 
 If the farm isn't on their ladder, or they've switched a dose off, she treats it like a limit and says so. Without a
 Dispensary, she does everything herself, as before. Only messages from the farm girl's own account count (the server

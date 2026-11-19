@@ -611,7 +611,7 @@ function start() {
     const d = e && e.detail; if (!d || typeof d !== "object") return;
     try {
       if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
-      if ((d.type === "dose" && d.id === "fillout") || d.type === "grow") drawnBodyFillCheck();   // (Fill-Out, and growth off the farm)
+      if ((d.type === "dose" && d.id === "fillout") || d.type === "grow" || d.type === "seed") drawnBodyFillCheck();   // (Fill-Out, growth off the farm, and seed in you)
       if (d.type === "dose" && d.id === "statue") statueCheck();   // (the Statue Serum)
       if (d.type === "nips") drawnBodyRedrawFor(d.from);   // (nipples opened or closed: drawn again, Nov 18)
     } catch (err) { console.warn("[Farmhand Companion] the Dispensary's doses:", err); }

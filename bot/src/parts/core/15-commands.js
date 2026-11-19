@@ -2156,10 +2156,10 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      case "breedable": case "fertile": case "naturalheat": case "mpreg": case "pinme": {
+      case "breedable": case "fertile": case "naturalheat": case "mpreg": case "pinme": case "broodwomb": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
-        const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd;
+        const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd;
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. For example: ?"+cmd+" on"); break; }
         if (!v){ R(switchStatus(cmd, !!r[field])); break; }
@@ -2169,6 +2169,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
         saveLedger(); audit(sender, field.toUpperCase(), on?"on":"off");
         R({ breedable:"Breedable", fertile:"Fertile (can catch)", mpreg:"Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days",
+            broodWomb:"Brood Womb (every load that lands while you're already carryin' takes too, and adds to your litter, up to the farm's hyper sizes)",
             pinMe:"Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
         if (field === "pinMe" && !on) syncCompanions(true);   // (anybody pinned right now is let go on the next tick)
         break;

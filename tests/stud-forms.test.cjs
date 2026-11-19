@@ -93,7 +93,7 @@ async function run(kind, id, mn, name, pre){
     ok(!/The pack circles|passed round the pack|Every wolf that's had a turn|alpha takes %n by the scruff/.test(R.said), '...and he doesn\'t borrow the pack\'s middle'); }
   // the ones with a middle of their own don't borrow the usual one's
   { const R=await run("foxden","silver",500,"Moo");
-    ok(!/fox brothers tie|swap places so fast|Every fox that finishes|tied with ribbons/.test(R.said) && /mantel|firelight|Marvellous|wine glass|punctuation|turnin' pages|tail curls/.test(R.said), 'the silver fox has his own middle, not the brothers\''); }
+    ok(!/fox brothers tie|swap places so fast|Every fox that finishes|tied with ribbons/.test(R.said) && /silver|mantel|firelight|Marvellous|wine|punctuation|turnin' pages|tail curls|gramophone|fire|spectacles|velvet|settee|fortune|candles|rose|glass/.test(R.said), 'the silver fox has his own middle, not the brothers\''); }   // (Nov 19: his pool grew: the gramophone, the candles, the rose; any of his own does)
   ok(["silver","lazy","lone","snow","maze","oldbull","show","shy","whitehart"].every(id=>KINDS.some(k=>F[k][id] && F[k][id].scene && F[k][id].scene.length===2 && F[k][id].scene.every(p=>p.length>=4))), 'nine versions bring their own two middle beats');
   ok(W.__studDef("stag","whitehart").bonus > W.__studDef("stag","classic").bonus && W.__studDef("lionpride","blackmane").bonus > W.__studDef("lionpride","classic").bonus, 'the white hart and the black-maned king are likelier to take');
   // the blood moon wolf's bite: a heat, unless heat's in their limits

@@ -21,6 +21,8 @@ The daily farm: milk, breeding, chores and the scenes that go with them.
 | 10ug-wash.js | the wash |
 | 10uo-services.js | farm services: drains and getting rid of parasites without a safeword |
 | 10ur-shots-more.js | more in the needle: kryptonite, the auto-injector, ?myshots |
+| 10ur2-dispensary.js | the farm girl's side of a player's Dispensary: her calls, hardcore, hole trainin', seed and the Breeder's Seal |
+| 10ur3-breed-anywhere.js | breedin' anywhere: ripe days, hips up, the Brood Womb, a cock's numbers, what they're carryin', births and clutches done away, the Quickening Draught |
 | 10y2-brood.js | the brood: layin' at the nest |
 | 10y6-keepers.js | keepers |
 | 10y7-udders.js | udders |

@@ -55,7 +55,7 @@ const inject = async (by, to, name, desc) => {
   const spellings = (k) => [title(k), title(k).replace(/ /g, "-"), title(k).replace(/[- ]/g, "")];
   for (const mn of [600, 700]) await hid(mn, "dispHello", { ver: "0.20.0", farm: true, lscg: false, off: [], on: [], holes: 1 });
   // a clean slate between needles: no shots, no potions (a second bottle of one only stacks)
-  const reset = (mn) => { const p = prod(mn); p.deniedUntil = 0; p.boosts = {}; p.heat = null; const R = W.FarmhandLedger().people[String(mn)]; if (R) R.fx = {}; };
+  const reset = (mn) => { const p = prod(mn); p.deniedUntil = 0; p.boosts = {}; p.heat = null; p.preg = { since: Date.now() - 86400000, due: Date.now() + 4 * 86400000, sires: [700], count: 1, warned: true };   /* (carryin', for the Quickening Draught) */ const R = W.FarmhandLedger().people[String(mn)]; if (R) R.fx = {}; };
 
   // ── farm doses: hers to read, in every spellin' ──
   // what each one does on her side (her books), or the dose she hands their Dispensary
@@ -64,6 +64,7 @@ const inject = async (by, to, name, desc) => {
     heat: (mn, from) => doses(mn, from).includes("heat"), purge: (mn, from) => doses(mn, from).includes("purge"),
     needy: (mn, from) => doses(mn, from).includes("needy"), moo: (mn, from) => doses(mn, from).includes("moo"), bitterroot: (mn, from) => doses(mn, from).includes("bitterroot"),
     hiccup: (mn, from) => doses(mn, from).includes("hiccup"), feather: (mn, from) => doses(mn, from).includes("feather"),
+    quicken: (mn) => !!prod(mn).preg && prod(mn).preg.due < Date.now() + 3.5 * 86400000,   // (Nov 19: a day off her pregnancy)
   };
   const missed = [];
   for (const id of Object.keys(DID)) {
@@ -73,6 +74,7 @@ const inject = async (by, to, name, desc) => {
       if (!DID[id](600, n)) missed.push(id + ": " + JSON.stringify(sp));
     }
   }
+  prod(600).preg = null;
   ok(!missed.length, "every farm dose, every spellin' on the page, takes through the farm girl (" + Object.keys(DID).join(", ") + (missed.length ? ": MISSED " + missed.join("; ") : "") + ")");
   // growth: her own sizes
   const grew = [];

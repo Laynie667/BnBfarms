@@ -9,7 +9,9 @@
        crotch, belt, harness    it grinds and tightens
      Every time, your arousal goes up a step. Close enough, and with nothin' denyin' you, it tips you over: the game's
      own orgasm. Now and then the room sees it; in between, only you do.
-   • "Breeding" or "seeding" on it as well: when you cum, it cums too, and fills you.
+   • "Breeding" or "seeding" on it as well: when you cum, it cums too, and fills you. (Nov 19) It's its crafter's seed,
+     on your books and the farm's like any other (seed.js): as much as it says, where it says ("breeding plug, 500 ml"),
+     or a thick load in the hole it's in (a ravenous one, bigger).
    • A crafted parasite that says "horny" is twice as busy (parasites.js), and squirms and thrusts in between.
    • Whoever crafted it has to be on your list, like any of the Dispensary's gear. Its own switch on the page, on to
      start. The safeword stops it (with the rest of your gear), and it's quiet while you're out of a room.
@@ -22,6 +24,10 @@ import { local, action, fill, pick, inRoom } from "./say.js";
 import { active, setArousal } from "./doses.js";
 import { toyIn } from "./toys-list.js";
 import "./lines-horny.js";
+import { seedGive } from "./seed.js";
+import { seedAmounts, seedEncode, SEED_DEFAULT_ML } from "../../shared/seed.js";
+import { DOSE_WORDS } from "../../shared/dose-words.js";
+import { TRIGGERS } from "./worn.js";
 
 const W = window, MIN = 60000;
 export const HORNY = /\b(horny|hungry|insatiable|ravenous)\b/;
@@ -123,9 +129,20 @@ export function hornyClimax() {
     const t = lineOf("bred_" + g.where, { g: nameOf(g.item) }) || lineOf("bred_hole", { g: nameOf(g.item) });
     if (t) action(t);
     try { W.dispatchEvent(new W.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: LEAK[g.where] || ["thighs"], amount: g.lvl === 2 ? 1.8 : 1.3 } })); } catch (e) { /* fine */ }
+    try { breedSeed(g); } catch (e) { /* fine */ }
     n++;
   }
   return n;
+}
+// its crafter's seed, booked (unless it's seed gear that doses "on climax" by itself: worn.js gives that one)
+const GEAR_HOLE = { ItemVulva: "vulva", ItemButt: "butt" };
+function breedSeed(g) {
+  if (st().off && st().off.seed) return null;
+  if (DOSE_WORDS.seed.test(g.text) && TRIGGERS.climax.test(g.text)) return null;
+  const grp = g.item.Asset.Group.Name, hole = GEAR_HOLE[grp] || (g.where === "mouth" ? "mouth" : g.where === "nips" ? "nips" : "vulva");
+  const a = seedAmounts(g.text);
+  if (Object.keys(a).length === 1 && a.any === SEED_DEFAULT_ML && g.lvl === 2) a.any = 120;   // (nothin' written: a ravenous one gives more)
+  return seedGive({ by: g.by || me(), sire: g.by || me(), nm: g.item.Craft && g.item.Craft.MemberName, p: seedEncode(a), via: "breed", g: nameOf(g.item), hole });
 }
 export function initHorny(mod, d) {
   deps = Object.assign(deps, d || {});

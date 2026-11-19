@@ -161,7 +161,7 @@
     }
     p.preg = first; return null;
   }
-  function openX(mn){ const p = prodOf(mn); return p && p.openUntil > Date.now() ? CFG.BREDBACK_X : 1; }
+  function openX(mn){ const p = prodOf(mn); return p && p.openUntil > (state.rollAt || Date.now()) ? CFG.BREDBACK_X : 1; }   // (a load booked late: open when it landed, Nov 19)
   function openedUp(mn){ const p = prodOf(mn); if (p){ p.openUntil = Date.now() + CFG.BREDBACK_MIN*60000; } }
   function bredBack(mn){
     const p = prodOf(mn), r = rec(mn);

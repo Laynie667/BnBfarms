@@ -320,14 +320,18 @@ function whatWent(from, U) {
 }
 // they came: a load in you, if their cock was just in you
 const drips = [];   // { h, by, at }
+let onLoad = null;   // (Nov 19, breed.js: a real load, on your seed books when you've said "Breed me anywhere")
+export function holesOnLoad(f) { onLoad = f; }
 export function holesClimaxOf(from) {
   const e = inMe.get(from); if (!e) return false;
   inMe.delete(from);
   if (Date.now() - e.at > 90000) return false;
   const h = e.h, x = hole(h), toys = toysNow();
-  if (h === "throat") { say("swallow", h, { by: nameOf(from) }, false); return true; }
+  let booked = false;   // (on your books: breed.js says it in its own words, so not twice)
+  if (onLoad) { try { booked = !!onLoad(from, h); } catch (err) { /* fine */ } }
+  if (h === "throat") { if (!booked) say("swallow", h, { by: nameOf(from) }, false); return true; }
   if (x.n >= 5 && !toys[h]) drips.push({ h, by: from, at: Date.now() + (40 + Math.random() * 80) * 1000 });
-  else say("kept", h, { by: nameOf(from) }, false);
+  else if (!booked) say("kept", h, { by: nameOf(from) }, false);
   return true;
 }
 function dripTick(now) {

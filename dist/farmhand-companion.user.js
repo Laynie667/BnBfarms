@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.68.3
+// @version      0.69.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8064,7 +8064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.68.3";
+  var VERSION = "0.69.0";
 
   // shared/species.js
   var WORDS = {
@@ -8597,7 +8597,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "seedmilk", "quota"] },
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
-    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "broodwomb", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
@@ -12640,6 +12640,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return out;
   }
   var grownCup = () => grownAll().cup;
+  function seedBelly() {
+    try {
+      const D = W4.FarmhandDispensary, n = D && typeof D.seedBelly === "function" ? Number(D.seedBelly()) : 0;
+      return Math.max(0, Math.min(4, Math.round(n) || 0));
+    } catch (e) {
+      return 0;
+    }
+  }
   function cupWithFill(cup, f) {
     const add3 = Math.min(6, 2 * f.x);
     return Math.min(20, (Number(cup) || 12) + (f.half ? Math.ceil(add3 / 2) : add3));
@@ -12654,7 +12662,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     else if (others.has(Number(mn))) redrawMn(Number(mn), 60);
   }
   function drawnBodyFillCheck() {
-    const f = fillOut(), g = grownAll(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls;
+    const f = fillOut(), g = grownAll(), sig2 = (f ? f.p + f.x + (f.half ? "h" : "") : "") + "|" + g.cup + "|" + g.cock + "|" + g.balls + "|" + seedBelly();
     if (sig2 === fillSig) return false;
     fillSig = sig2;
     if (!S.on) return false;
@@ -12928,7 +12936,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var bellyStage = () => {
     const m = bellyMode();
     if (m === "off") return 0;
-    const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+    const s = m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)), seedBelly());
     const f = m === "studio" ? null : fillOut();
     return f && f.p === "belly" ? bellyWithFill(s, f) : s;
   };
@@ -17361,7 +17369,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // extension/src/views/settingspages.js
   var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
   var FARM_GROUPS = [
-    ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
+    ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
     ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
@@ -18223,6 +18231,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["milkable", "Milkable", "Make milk"],
     ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
     ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
+    // Laynie, Nov 19: "I want to be the best baby factory wherever I go" (off till switched on)
+    ["broodwomb", "Brood Womb", "Already carryin'? Every load that lands in you takes too, and adds to your litter, bigger and bigger, up to the farm's hyper sizes"],
     ["praise", "Praise", "Let staff's praise count"],
     // Laynie, Nov 7: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic" (off till switched on)
     ["pinme", "Can be pinned", "Fill up past bursting, or grow too big, and you're stuck right where you stand till you're milked down, drained or given a reducer shot: twenty minutes at most, and your safeword frees you. Off: you just waddle"],
@@ -22584,7 +22594,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!d || typeof d !== "object") return;
       try {
         if (d.type === "leak" && st.panel.prefs.marks) messFromMark({ mess: typeof d.mess === "string" ? d.mess : "milk", splat: Array.isArray(d.areas) ? d.areas : ["chest"], amount: d.amount });
-        if (d.type === "dose" && d.id === "fillout" || d.type === "grow") drawnBodyFillCheck();
+        if (d.type === "dose" && d.id === "fillout" || d.type === "grow" || d.type === "seed") drawnBodyFillCheck();
         if (d.type === "dose" && d.id === "statue") statueCheck();
         if (d.type === "nips") drawnBodyRedrawFor(d.from);
       } catch (err) {

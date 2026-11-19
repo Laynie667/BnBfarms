@@ -250,7 +250,10 @@
     CHATLOG_KEEP: 500,            // the bot's own tab keeps this many chat lines on the page, the oldest go (17-heartbeat.js)
     KNOT_FERT_X: 1.5,             // a tied load is more likely to take
     CUMFLATE_PIN_X: 1.5,          // held semen past 1.5x your capacity pins you (only a knot gets you past full)
-    BREEDING_STAND: "breedingstand", BREEDING_STAND_X: 1.5,   // fills on (or next to) that spot catch more
+    BREEDING_STAND: "breedingstand", BREEDING_STAND_X: 1.5,
+    // (Nov 19, breedin' anywhere) hips up within LEGS_UP_MIN minutes of a load: another chance for it to take, this much
+    // likelier · RIPE: for anybody Fertile, two days in seven are ripe, and every load takes RIPE.X times as easy
+    LEGS_UP_X: 1.5, LEGS_UP_MIN: 5, RIPE: { EVERY_D: 7, FROM_D: 3, DAYS: 2, X: 2 },   // fills on (or next to) that spot catch more
     HEAT_SCENT_TILES: 2,          // a stud this close to stock in heat gets pent up twice as fast
     MILK_LEAK_SHARE: 0.5,         // milkin' someone who's cumflated squeezes out this much semen per mL of milk
     TOP_SIRES: 3,                 // how many sires the weekly post names
@@ -272,6 +275,7 @@
     STUCK_AT: 0.6, STUCK_CHANCE: [0.15, 0.4],   // past this far through labour, one may come turned crossways (a single, a litter)
     STUCK_WAIT_MIN: 10,           // nobody turns it in this long: the farm girl does it herself
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show
+    LABOUR_WAIT_DISP_H: 72,       // (Nov 19) with a Dispensary that births anywhere: three days for it to say it did
     EGG_CHANCE: 0.2, EGG_TIED_CHANCE: 0.4, EGG_COUNT: [2,6], EGG_DAYS: [2,3],
     // traps, the thing in the water, and toys that act on their own (10u-traps.js)
     TRAP_BEAT_S: 18,             // seconds between the beats of a trap's story (slow enough to read and to answer)
@@ -349,7 +353,8 @@
       { key:"sire",   name:"Prolific Sire",    why:"sired 10 litters" },
       { key:"eggs",   name:"Egg Layer",        why:"10 eggs laid" },
       { key:"triple", name:"Triple-Carried",   why:"womb, ass and a clutch, all at once" },
-      { key:"bredback", name:"Bred Back",      why:"caught again within the hour of bein' emptied" }
+      { key:"bredback", name:"Bred Back",      why:"caught again within the hour of bein' emptied" },
+      { key:"factory",  name:"Baby Factory",   why:"20 litters" }   // (Laynie, Nov 19: "I want to be the best baby factory wherever I go")
     ],
     FAST_SCENE_TYPES: ["canine","draconic"], FAST_SCENE_S: 30,   // these can fill every 30 seconds in a scene
     STAMINA_FILLS: 3, STAMINA_X: 0.6,   // past 3 fills in an hour, each load is 60% of the one before (pent up / virility skip it)

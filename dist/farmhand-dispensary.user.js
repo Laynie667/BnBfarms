@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.21.0
+// @version      0.22.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5277,26 +5277,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const i = 14, k = 1, r = 44 + 2.6 * i, sag = 0.06 + 0.22 * k, top = 1.34 + 0.16 * k;
     return { k, r, sag, top, bx: r * (1.03 - 0.13 * k) * (apart || 1), by: r * top };
   }
-  function titPt(S2, s, t) {
+  function titPt(S3, s, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    if (sn >= 0) return [s * S2.bx + S2.r * cs * (1 + S2.sag * 0.3 * sn * sn) + s * S2.r * 0.06 * S2.k * sn * sn, S2.by + S2.r * sn * (1 + S2.sag)];
+    if (sn >= 0) return [s * S3.bx + S3.r * cs * (1 + S3.sag * 0.3 * sn * sn) + s * S3.r * 0.06 * S3.k * sn * sn, S3.by + S3.r * sn * (1 + S3.sag)];
     const up = -sn;
-    return [s * S2.bx + S2.r * cs * (1 - 0.5 * up * up) - s * S2.r * 0.2 * up * up, S2.by - S2.r * S2.top * up];
+    return [s * S3.bx + S3.r * cs * (1 - 0.5 * up * up) - s * S3.r * 0.2 * up * up, S3.by - S3.r * S3.top * up];
   }
-  function titArc(g, S2, s, ox, oy, sc, a0, a1) {
+  function titArc(g, S3, s, ox, oy, sc, a0, a1) {
     g.beginPath();
     for (let j = 0; j <= 120; j++) {
       let t = (a0 + (a1 - a0) * j / 120) * Math.PI;
       if (s < 0) t = Math.PI - t;
-      const p = titPt(S2, s, t), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      const p = titPt(S3, s, t), X = ox + p[0] * sc, Y = oy + p[1] * sc;
       if (j) g.lineTo(X, Y);
       else g.moveTo(X, Y);
     }
   }
-  function titPath(g, S2, s, ox, oy, sc) {
+  function titPath(g, S3, s, ox, oy, sc) {
     g.beginPath();
     for (let j = 0; j <= 160; j++) {
-      const p = titPt(S2, s, j / 160 * Math.PI * 2), X = ox + p[0] * sc, Y = oy + p[1] * sc;
+      const p = titPt(S3, s, j / 160 * Math.PI * 2), X = ox + p[0] * sc, Y = oy + p[1] * sc;
       if (j) g.lineTo(X, Y);
       else g.moveTo(X, Y);
     }
@@ -5748,8 +5748,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W22, H2) {
-    const t = cy - H2 / 2, L = cx - W22 / 2, R = cx + W22 / 2;
+  function shield(g, cx, cy, W25, H2) {
+    const t = cy - H2 / 2, L = cx - W25 / 2, R = cx + W25 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6201,9 +6201,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function corrupted(lines2, size, seed) {
     return (g, w, h2) => {
-      const C = "#3a0d52", r = rng(seed);
-      g.fillStyle = C;
-      g.strokeStyle = C;
+      const C2 = "#3a0d52", r = rng(seed);
+      g.fillStyle = C2;
+      g.strokeStyle = C2;
       const ys = lines2.length === 1 ? [h2 / 2] : [h2 / 2 - size * 0.55, h2 / 2 + size * 0.55];
       let maxW = 0;
       lines2.forEach((t, i) => {
@@ -6591,9 +6591,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W22 = 192, H2 = 226;
+        const x0 = 94, y0 = 12, W25 = 192, H2 = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W22, H2);
+        g.strokeRect(x0, y0, W25, H2);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6601,20 +6601,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W22 - 8, yy);
+            g.fillText(right, x0 + W25 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W22 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W25 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W22 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W25 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W22 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W25 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W22 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W25 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7086,8 +7086,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W22, d, V) {
-    doc = W22.document;
+  function drawCard(W25, d, V) {
+    doc = W25.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7115,7 +7115,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W22, d, m, layer, V) {
+  function picture(W25, d, m, layer, V) {
     const key2 = d.name + "|" + JSON.stringify(V);
     let set2 = cache.get(key2);
     if (set2) {
@@ -7124,30 +7124,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W22, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W25, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key2, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W22, u);
+      for (const u of Object.values(os)) forget(W25, u);
     }
     return set2[layer] || null;
   }
-  function forget(W22, url) {
+  function forget(W25, url) {
     try {
-      const m = W22.GLDrawImageCache;
+      const m = W25.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W22.DrawImageCache;
+      const m = W25.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W22.GLDrawCanvas && W22.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W25.GLDrawCanvas && W25.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7251,19 +7251,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W22, a) {
-    Wd = W22;
+  function openInkPanel(W25, a) {
+    Wd = W25;
     api = a;
     close();
-    if (!W22.document.getElementById("fi-style")) {
-      const s = W22.document.createElement("style");
+    if (!W25.document.getElementById("fi-style")) {
+      const s = W25.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W22.document.head.appendChild(s);
+      W25.document.head.appendChild(s);
     }
-    box = W22.document.createElement("div");
+    box = W25.document.createElement("div");
     box.id = "fi-panel";
-    W22.document.body.appendChild(box);
+    W25.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7289,7 +7289,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var LIVE_SRC = /\/live\/(Farm(?:Ink[1-4]|Brand|Tat[12]))\/(Live[A-Za-z]+)_([A-Za-z0-9]+)\.png$/;
   var STILL_SRC = /\/(Farm(?:Ink|Brand))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
   var MARK_SRC = /\/(Farm(?:Mark[1-3]|Tat[12]))\/([A-Za-z0-9]+)_([A-Za-z0-9]+)\.png$/;
-  var stillItem = (C, kind, name) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
+  var stillItem = (C2, kind, name) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Name === name && it.Asset.Group && kindOf(it.Asset.Group.Name) === kind) : null;
   var PRIORITY = 11;
   var kindOf = (slot) => slot === BRAND_SLOT ? "FarmBrand" : /^FarmInk[1-4]$/.test(String(slot)) ? "FarmInk" : null;
   var isMark = (slot) => MARK_SLOTS.includes(slot);
@@ -7359,9 +7359,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
-  function describe(W22) {
+  function describe(W25) {
     for (const slot of ALL_SLOTS) {
-      const G = W22.AssetGroupMap && W22.AssetGroupMap.get(slot);
+      const G = W25.AssetGroupMap && W25.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7370,32 +7370,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W22) => typeof W22.AssetGroupAdd === "function" && typeof W22.AssetAdd === "function" && W22.AssetGroupMap && W22.AssetGroupMap.size > 30;
-  function addSlots(W22) {
+  var gameReady = (W25) => typeof W25.AssetGroupAdd === "function" && typeof W25.AssetAdd === "function" && W25.AssetGroupMap && W25.AssetGroupMap.size > 30;
+  function addSlots(W25) {
     let added = false;
     for (const slot of ALL_SLOTS) {
-      if (W22.AssetGroupMap.has(slot)) continue;
-      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W22.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W22.AssetAdd(G, a, W22.AssetFemale3DCGExtended || {}, def);
+      if (W25.AssetGroupMap.has(slot)) continue;
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W25.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W25.AssetAdd(G, a, W25.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
-    describe(W22);
+    describe(W25);
     return added;
   }
-  var itemIn = (C, slot) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
-  var whoOf = (C) => ({ num: C && C.MemberNumber, owner: C && C.Ownership && typeof C.Ownership.Name === "string" ? C.Ownership.Name : "" });
-  function liveSrc(W22, C, slot, name, layer) {
-    const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C, slot);
+  var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
+  var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
+  function liveSrc(W25, C2, slot, name, layer) {
+    const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W22, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C)));
+      return picture(W25, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W22) {
-    const P = W22.Player, out = [];
+  function wornLive(W25) {
+    const P = W25.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7403,8 +7403,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W22, slot, values, now) {
-    const it = itemIn(W22.Player, slot);
+  function write(W25, slot, values, now) {
+    const it = itemIn(W25.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7414,17 +7414,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W22), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W25), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next2 });
     try {
-      if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(W22.Player);
+      if (typeof W25.CharacterRefresh === "function") W25.CharacterRefresh(W25.Player);
     } catch (e) {
     }
     try {
-      if (typeof W22.ChatRoomCharacterItemUpdate === "function") W22.ChatRoomCharacterItemUpdate(W22.Player, slot);
+      if (typeof W25.ChatRoomCharacterItemUpdate === "function") W25.ChatRoomCharacterItemUpdate(W25.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7432,17 +7432,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var retry = {};
   var counts = {};
   var DAY = 864e5;
-  var cumKey = (W22) => "farmink-lastcum-" + (W22.Player && W22.Player.MemberNumber);
-  function daysDenied(W22) {
+  var cumKey = (W25) => "farmink-lastcum-" + (W25.Player && W25.Player.MemberNumber);
+  function daysDenied(W25) {
     let t = 0;
     try {
-      t = Number(W22.localStorage.getItem(cumKey(W22))) || 0;
+      t = Number(W25.localStorage.getItem(cumKey(W25))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W22, auto) {
-    if (auto === "denied") return { n: daysDenied(W22) };
+  function autoOf(W25, auto) {
+    if (auto === "denied") return { n: daysDenied(W25) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
@@ -7450,12 +7450,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W22) {
-    for (const { slot, name, item } of wornLive(W22)) {
+  function refreshAuto(W25) {
+    for (const { slot, name, item } of wornLive(W25)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W22, d.auto);
-      if (v) write(W22, slot, v);
+      const v = autoOf(W25, d.auto);
+      if (v) write(W25, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7490,7 +7490,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W22) => "farmink-done-" + (W22.Player && W22.Player.MemberNumber);
+  var doneKey = (W25) => "farmink-done-" + (W25.Player && W25.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
@@ -7503,21 +7503,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W22, list, on2, now, opts) {
+  function farmInkSync(W25, list, on2, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P = W22.Player;
-    if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W22.InventoryWear !== "function") return null;
+    const P = W25.Player;
+    if (!P || !Array.isArray(P.Appearance) || !Array.isArray(list) || typeof W25.InventoryWear !== "function") return null;
     now = now || Date.now();
     const want = on2 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed = [];
     let done = {};
     try {
-      done = JSON.parse(W22.localStorage.getItem(doneKey(W22))) || {};
+      done = JSON.parse(W25.localStorage.getItem(doneKey(W25))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W22.InventoryRemove === "function") W22.InventoryRemove(P, slot, false);
+        if (typeof W25.InventoryRemove === "function") W25.InventoryRemove(P, slot, false);
         else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7564,7 +7564,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (itemIn(P, slot)) remove(slot);
       const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W22.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false);
+        W25.InventoryWear(P, e.design, slot, color, 0, P.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
@@ -7579,69 +7579,69 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W22.localStorage.setItem(doneKey(W22), JSON.stringify(done));
+      W25.localStorage.setItem(doneKey(W25), JSON.stringify(done));
     } catch (e) {
     }
     if (changed.length) {
       try {
-        if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(P);
+        if (typeof W25.CharacterRefresh === "function") W25.CharacterRefresh(P);
       } catch (e) {
       }
       try {
-        if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(P);
+        if (typeof W25.ChatRoomCharacterUpdate === "function") W25.ChatRoomCharacterUpdate(P);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W22) => {
-    const id = farmOf(itemIn(W22.Player, BRAND_SLOT));
+  var farmBrandWorn = (W25) => {
+    const id = farmOf(itemIn(W25.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W22, C) => {
+  var dosed = (W25, C2) => {
     try {
-      const D = W22.FarmhandDispensary;
-      return !!(D && typeof D.dosedOf === "function" && C && D.dosedOf(C.MemberNumber));
+      const D = W25.FarmhandDispensary;
+      return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
     } catch (e) {
       return false;
     }
   };
-  var wearsDosedOnly = (C) => ALL_SLOTS.some((s) => {
-    const it = itemIn(C, s);
+  var wearsDosedOnly = (C2) => ALL_SLOTS.some((s) => {
+    const it = itemIn(C2, s);
     return !!(it && DOSED_ONLY.has(it.Asset.Name));
   });
-  var stillChanging = (C, now) => ALL_SLOTS.some((s) => {
-    const it = itemIn(C, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
+  var stillChanging = (C2, now) => ALL_SLOTS.some((s) => {
+    const it = itemIn(C2, s), f = farmOf(it) && it.Property.FarmInk, a = f && ageOf(f, now);
     return !!(a && a.still);
   });
   var trophyOf = (it) => {
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.trophy === "string" ? f.trophy : null;
   };
-  function trophyWorn(W22) {
+  function trophyWorn(W25) {
     const o = {};
     for (const s of INK_SLOTS) {
-      const id = trophyOf(itemIn(W22.Player, s));
+      const id = trophyOf(itemIn(W25.Player, s));
       if (id) o[id] = s;
     }
     return o;
   }
-  var roomSees = (W22, P) => {
+  var roomSees = (W25, P) => {
     try {
-      if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(P);
+      if (typeof W25.CharacterRefresh === "function") W25.CharacterRefresh(P);
     } catch (e) {
     }
     try {
-      if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(P);
+      if (typeof W25.ChatRoomCharacterUpdate === "function") W25.ChatRoomCharacterUpdate(P);
     } catch (e) {
     }
   };
-  function trophyWear(W22, t, slot) {
-    const P = W22.Player;
-    if (!P || !Array.isArray(P.Appearance) || typeof W22.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  function trophyWear(W25, t, slot) {
+    const P = W25.Player;
+    if (!P || !Array.isArray(P.Appearance) || typeof W25.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
     if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
-    const worn = trophyWorn(W22);
+    const worn = trophyWorn(W25);
     if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
     if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
     slot = slot || INK_SLOTS.find((s) => !itemIn(P, s));
@@ -7651,100 +7651,100 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }) };
     if (itemIn(P, slot)) {
       try {
-        W22.InventoryRemove(P, slot, false);
+        W25.InventoryRemove(P, slot, false);
       } catch (e) {
         return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
       }
     }
     try {
-      W22.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false);
+      W25.InventoryWear(P, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P.MemberNumber, null, false);
     } catch (e) {
       return { ok: false, why: "the game wouldn't take it" };
     }
     const it = itemIn(P, slot);
     if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
-    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W22, d.auto) : null;
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W25, d.auto) : null;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
-    roomSees(W22, P);
+    roomSees(W25, P);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
-  function trophyOff(W22, id) {
-    const P = W22.Player, slot = P && trophyWorn(W22)[id];
+  function trophyOff(W25, id) {
+    const P = W25.Player, slot = P && trophyWorn(W25)[id];
     if (!slot) return { ok: true, already: true };
     try {
-      if (typeof W22.InventoryRemove === "function") W22.InventoryRemove(P, slot, false);
+      if (typeof W25.InventoryRemove === "function") W25.InventoryRemove(P, slot, false);
       else P.Appearance = P.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
     } catch (e) {
       return { ok: false, why: "it wouldn't come off" };
     }
-    roomSees(W22, P);
+    roomSees(W25, P);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W22, t) => {
+  var say = (W25, t) => {
     try {
-      if (typeof W22.ChatRoomSendLocal === "function") {
-        const d = W22.document.createElement("div");
+      if (typeof W25.ChatRoomSendLocal === "function") {
+        const d = W25.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W22.ChatRoomSendLocal(d.outerHTML);
+        W25.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W22) {
+  function wornAll(W25) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W22.Player, slot);
+      const it = itemIn(W25.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W22) => ({ worn: () => wornAll(W22), write: (slot, v) => write(W22, slot, v, true), command: (a) => inkCommand(W22, a) });
-  function inkCommand(W22, args) {
+  var panelApi = (W25) => ({ worn: () => wornAll(W25), write: (slot, v) => write(W25, slot, v, true), command: (a) => inkCommand(W25, a) });
+  function inkCommand(W25, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W22);
-    if (!a && W22.document && W22.document.body) {
-      openInkPanel(W22, panelApi(W22));
+    const worn = wornLive(W25);
+    if (!a && W25.document && W25.document.body) {
+      openInkPanel(W25, panelApi(W25));
       return;
     }
-    if (/^why$/i.test(a)) return say(W22, whyText());
+    if (/^why$/i.test(a)) return say(W25, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W22.Player, slot2)) return say(W22, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W22, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W22, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W25.Player, slot2)) return say(W25, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W25, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W25, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W22, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W22, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W25, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W25, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W22.Player, slot);
-    if (!it) return say(W22, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W22, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W25.Player, slot);
+    if (!it) return say(W25, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W25, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W22, "");
+    if (!rest) return inkCommand(W25, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W22, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W22, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W22);
-    say(W22, "Written on " + d.title + ".");
+    else return say(W25, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W25, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W25);
+    say(W25, "Written on " + d.title + ".");
   }
-  function farmInkEntry(W22) {
-    const PD = W22.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W22.PropertyDataEntry;
+  function farmInkEntry(W25) {
+    const PD = W25.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W25.PropertyDataEntry;
     if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
     const same = (a, b) => {
       try {
@@ -7767,9 +7767,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return true;
   }
-  function registerInk(W22, mod2) {
-    if (W22.__farmInk) return W22.__farmInk;
-    const st2 = W22.__farmInk = {
+  function registerInk(W25, mod2) {
+    if (W25.__farmInk) return W25.__farmInk;
+    const st2 = W25.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7779,26 +7779,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W22);
+            refreshAuto(W25);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W22, slot, v, true),
-      command: (a) => inkCommand(W22, a),
+      write: (slot, v) => write(W25, slot, v, true),
+      command: (a) => inkCommand(W25, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on2, opts) => farmInkSync(W22, list, on2, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W22),
+      farm: (list, on2, opts) => farmInkSync(W25, list, on2, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W25),
       // trophies (the Companion's 🏆 Trophies row)
-      trophyWear: (t2, slot) => trophyWear(W22, t2, slot),
-      trophyOff: (id) => trophyOff(W22, id),
-      trophyWorn: () => trophyWorn(W22),
-      worn: () => wornLive(W22).map(({ slot, name }) => ({ slot, name }))
+      trophyWear: (t2, slot) => trophyWear(W25, t2, slot),
+      trophyOff: (id) => trophyOff(W25, id),
+      trophyWorn: () => trophyWorn(W25),
+      worn: () => wornLive(W25).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook = (name, pri, fn) => {
         try {
-          if (typeof W22[name] === "function") mod2.hookFunction(name, pri, fn);
+          if (typeof W25[name] === "function") mod2.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7819,13 +7819,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetBuildDescription", 0, (args, next2) => {
         const r = next2(args);
         try {
-          describe(W22);
+          describe(W25);
         } catch (e) {
         }
         return r;
       });
       hook("CommonDrawAppearanceBuild", 5, (args, next2) => {
-        const C = args[0], cb = args[1];
+        const C2 = args[0], cb = args[1];
         if (!cb || typeof cb !== "object") return next2(args);
         const sized = (o, it) => {
           const f = it && it.Property && it.Property.FarmInk || {}, sz = (f.sz || 1) * kOf(it), kx = sz * (f.sw || 1) / RES, ky = sz * (f.sh || 1) / RES;
@@ -7837,18 +7837,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen = /* @__PURE__ */ new Set(), notReady = [];
         const ready = (u) => {
           try {
-            const c = W22.GLDrawImageCache;
+            const c = W25.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain, self, u, x, y, o) => {
-          const T = W22.__farmInkTint;
+          const T = W25.__farmInkTint;
           if (typeof T !== "function") return false;
           let t2;
           try {
-            t2 = T(C, u, x, y);
+            t2 = T(C2, u, x, y);
           } catch (e) {
             t2 = void 0;
           }
@@ -7872,7 +7872,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (typeof src === "string") {
             const mm = (src.indexOf("/FarmMark") > 0 || src.indexOf("/FarmTat") > 0) && src.indexOf("/live/") < 0 ? MARK_SRC.exec(src) : null;
             if (mm) {
-              const it = itemIn(C, mm[1]);
+              const it = itemIn(C2, mm[1]);
               if (!it || it.Asset.Name !== mm[2]) return void 0;
               const u = src.replace("/" + mm[1] + "/", "/" + picKind(mm[1]) + "/");
               const o3 = aged(sized(o, it), it, mm[3]);
@@ -7884,22 +7884,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W22, C, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W25, C2, lm[1], lm[2], lm[3]);
               seen.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
                 return void 0;
               }
               if (!ready(u)) notReady.push(lm[2]);
-              const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]);
+              const it = itemIn(C2, lm[1]), o3 = aged(sized(o, it), it, lm[3]);
               if (o3.Alpha === 0) return void 0;
               if (statue(plain, this, u, x, y, o3)) return void 0;
               return f.call(this, u, x, y, o3);
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W22, C)) return void 0;
-              const it = stillItem(C, sm[1], sm[2]);
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W25, C2)) return void 0;
+              const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
               seen.add(sm[2]);
@@ -7911,23 +7911,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next2([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W22, C, seen, notReady);
+          note2(W25, C2, seen, notReady);
         } catch (e) {
         }
         return out;
       });
       const keepInk = (name) => hook(name, 0, (args, next2) => {
-        const C = args[0], keep = C && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)) : [];
+        const C2 = args[0], keep = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)) : [];
         const r = next2(args);
         try {
           let back = 0;
-          if (keep.length && C && Array.isArray(C.Appearance)) {
-            for (const it of keep) if (!C.Appearance.includes(it) && !itemIn(C, it.Asset.Group.Name)) {
-              C.Appearance.push(it);
+          if (keep.length && C2 && Array.isArray(C2.Appearance)) {
+            for (const it of keep) if (!C2.Appearance.includes(it) && !itemIn(C2, it.Asset.Group.Name)) {
+              C2.Appearance.push(it);
               back++;
             }
           }
-          if (back && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C);
+          if (back && typeof W25.CharacterLoadCanvas === "function") W25.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
@@ -7935,17 +7935,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keepInk("CharacterAppearanceNaked");
       keepInk("CharacterAppearanceStripLayer");
       hook("WardrobeFastLoad", 0, (args, next2) => {
-        const C = args[0], keep = C && typeof C.IsPlayer === "function" && C.IsPlayer() && Array.isArray(C.Appearance) ? C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isHid(it.Asset.Group.Name) && farmOf(it)) : [];
+        const C2 = args[0], keep = C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && Array.isArray(C2.Appearance) ? C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && isHid(it.Asset.Group.Name) && farmOf(it)) : [];
         const r = next2(args);
         try {
           let back = 0;
-          for (const it of keep) if (!itemIn(C, it.Asset.Group.Name)) {
-            C.Appearance.push(it);
+          for (const it of keep) if (!itemIn(C2, it.Asset.Group.Name)) {
+            C2.Appearance.push(it);
             back++;
           }
           if (back) {
-            if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(C, false);
-            if (args[2] && typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(C);
+            if (typeof W25.CharacterRefresh === "function") W25.CharacterRefresh(C2, false);
+            if (args[2] && typeof W25.ChatRoomCharacterUpdate === "function") W25.ChatRoomCharacterUpdate(C2);
           }
         } catch (e) {
         }
@@ -7954,13 +7954,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook("AssetLoadAll", 0, (args, next2) => {
         const r = next2(args);
         try {
-          addSlots(W22);
+          addSlots(W25);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      if (typeof W22.ItemPropertiesGetBundleProperties === "function") hook("ItemPropertiesGetBundleProperties", 0, (args, next2) => {
+      if (typeof W25.ItemPropertiesGetBundleProperties === "function") hook("ItemPropertiesGetBundleProperties", 0, (args, next2) => {
         const r = next2(args);
         try {
           const it = args[0];
@@ -7969,13 +7969,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      farmInkEntry(W22);
+      farmInkEntry(W25);
       hook("ActivityOrgasmStart", 0, (args, next2) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W22.ActivityOrgasmRuined) {
-            W22.localStorage.setItem(cumKey(W22), String(Date.now()));
-            setTimeout(() => refreshAuto(W22), 1e3);
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W25.ActivityOrgasmRuined) {
+            W25.localStorage.setItem(cumKey(W25), String(Date.now()));
+            setTimeout(() => refreshAuto(W25), 1e3);
           }
         } catch (e) {
         }
@@ -7983,73 +7983,73 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W22)) return;
+      if (!gameReady(W25)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W22);
+        addSlots(W25);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C of W22.ChatRoomCharacter || []) if (wornByLogo(C) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C);
+          for (const C2 of W25.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W25.CharacterLoadCanvas === "function") W25.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W22.CommandCombine === "function") W22.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W22, a) }]);
+        if (typeof W25.CommandCombine === "function") W25.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W25, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W22.Player && W22.Player.Appearance) refreshAuto(W22);
+        if (W25.Player && W25.Player.Appearance) refreshAuto(W25);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W22.addEventListener("farmhand-dispensary", (e) => {
+      W25.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W22.Player && W22.Player.MemberNumber;
-        const C = (W22.Player && W22.Player.MemberNumber === mn ? W22.Player : (W22.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C && wearsDosedOnly(C) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C);
+        const mn = d.type === "icons" ? d.from : W25.Player && W25.Player.MemberNumber;
+        const C2 = (W25.Player && W25.Player.MemberNumber === mn ? W25.Player : (W25.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W25.CharacterLoadCanvas === "function") W25.CharacterLoadCanvas(C2);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C of W22.ChatRoomCharacter || []) if (stillChanging(C, now) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C);
+        for (const C2 of W25.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W25.CharacterLoadCanvas === "function") W25.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W22, C, seen, notReady) {
-    if (!C || !Array.isArray(C.Appearance)) return;
-    const pose = [].concat(C.ActivePose || [], C.Pose || []).join(",");
+  function note2(W25, C2, seen, notReady) {
+    if (!C2 || !Array.isArray(C2.Appearance)) return;
+    const pose = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
-    const worn = C.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)).map((it) => it.Asset.Name);
+    const worn = C2.Appearance.filter((it) => it && it.Asset && it.Asset.Group && ours(it.Asset.Group.Name)).map((it) => it.Asset.Name);
     const missing = worn.filter((n) => !seen.has(n));
     if (!missing.length && !notReady.length) return;
-    DIAG.push({ t: Date.now(), who: C.MemberNumber, name: String(C.Nickname || C.Name || ""), missing, notReady: [...new Set(notReady)] });
+    DIAG.push({ t: Date.now(), who: C2.MemberNumber, name: String(C2.Nickname || C2.Name || ""), missing, notReady: [...new Set(notReady)] });
     if (DIAG.length > 40) DIAG.shift();
   }
   function whyText() {
     if (!DIAG.length) return "No ink has gone missin' since you logged in.";
     return "Ink that didn't show, newest last:\n" + DIAG.slice(-10).map((d) => new Date(d.t).toLocaleTimeString() + " \xB7 " + d.name + " (" + d.who + ")" + (d.missing.length ? " \xB7 not drawn at all: " + d.missing.join(", ") : "") + (d.notReady.length ? " \xB7 picture not loaded yet: " + d.notReady.join(", ") : "")).join("\n");
   }
-  var wornByLogo = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.some((it) => it && it.Asset && LIVE_BY[it.Asset.Name] && LIVE_BY[it.Asset.Name].logo) : false;
+  var wornByLogo = (C2) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.some((it) => it && it.Asset && LIVE_BY[it.Asset.Name] && LIVE_BY[it.Asset.Name].logo) : false;
 
   // dispensary/src/index.js
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.21.0";
+  var VERSION = "0.22.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -8225,6 +8225,67 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (o.fly && typeof o.fly === "object" && Array.isArray(o.fly.ops)) out.fly = { id: Math.round(num(o.fly.id, 0, 1e12, 0)), ops: o.fly.ops.map(op).filter(Boolean).slice(0, 60), at: 0 };
       s.holes = out;
     }
+    if (d.seed && typeof d.seed === "object") {
+      const o = d.seed, HS = ["vulva", "butt", "mouth", "nips"], mn = (k) => /^\d{1,9}$/.test(String(k));
+      const by = (m) => {
+        const r = {};
+        if (m && typeof m === "object") {
+          for (const [k, v] of Object.entries(m).slice(0, 8)) if (mn(k)) r[k] = num(v, 0, 4e4, 0);
+        }
+        return r;
+      };
+      const ld = (x) => x && typeof x === "object" && HS.includes(x.h) && Number(x.by) > 0 ? { h: x.h, ml: Math.round(num(x.ml, 0, 4e4, 0)), by: Math.round(num(x.by, 0, 1e9, 0)), at: num(x.at, 0, 1e14, 0), nc: x.nc ? 1 : 0, here: x.here ? 1 : 0, nm: typeof x.nm === "string" ? x.nm.slice(0, 40) : void 0, up: x.up ? 1 : void 0, via: x.via === "cock" ? "cock" : void 0 } : null;
+      const out = {
+        h: {},
+        from: {},
+        seals: {},
+        leak: {},
+        drip: {},
+        pend: [],
+        n: Math.round(num(o.n, 0, 1e7, 0)),
+        ml: num(o.ml, 0, 1e10, 0),
+        id: Math.round(num(o.id, 0, 1e12, 0)),
+        cap: num(o.cap, 0, 6e4, 0),
+        sync: num(o.sync, 0, 1e14, 0),
+        ep: typeof o.ep === "string" && /^[a-z0-9]{4,12}$/.test(o.ep) ? o.ep : "",
+        no: typeof o.no === "string" ? o.no.slice(0, 20) : ""
+      };
+      for (const h2 of HS) {
+        const x = o.h && o.h[h2];
+        out.h[h2] = { ml: x && typeof x === "object" ? num(x.ml, 0, 4e4, 0) : 0, by: x && typeof x === "object" ? by(x.by) : {} };
+      }
+      if (o.from && typeof o.from === "object") {
+        for (const [k, f] of Object.entries(o.from).slice(-40)) if (mn(k) && f && typeof f === "object") out.from[k] = { n: Math.round(num(f.n, 0, 1e7, 0)), ml: num(f.ml, 0, 1e10, 0), at: num(f.at, 0, 1e14, 0), nm: typeof f.nm === "string" ? f.nm.slice(0, 40) : "" };
+      }
+      if (o.seals && typeof o.seals === "object") for (const h2 of HS) {
+        const x = o.seals[h2];
+        if (x && typeof x === "object" && Number(x.by) > 0) out.seals[h2] = { by: Math.round(num(x.by, 0, 1e9, 0)), g: String(x.g || "").slice(0, 40), nm: String(x.nm || "").slice(0, 40) };
+      }
+      if (Array.isArray(o.pend)) out.pend = o.pend.map(ld).filter(Boolean).slice(-60);
+      if (o.fly && typeof o.fly === "object" && Array.isArray(o.fly.loads)) out.fly = { id: Math.round(num(o.fly.id, 0, 1e12, 0)), loads: o.fly.loads.map(ld).filter(Boolean).slice(0, 30), at: 0, quick: o.fly.quick ? Math.round(num(o.fly.quick, 0, 20, 0)) : void 0 };
+      s.seed = out;
+    }
+    s.breedAny = d.breedAny === true;
+    if (d.carry && typeof d.carry === "object") s.carry = d.carry;
+    const stamp2 = (x, keys) => {
+      if (!x || typeof x !== "object") return void 0;
+      const o = {};
+      for (const k of keys) if (typeof x[k] === "number" && isFinite(x[k])) o[k] = x[k];
+      return o.at > 0 || o.start > 0 ? o : void 0;
+    };
+    s.born = stamp2(d.born, ["at", "midwife", "helps", "n", "due"]);
+    if (!s.born) delete s.born;
+    s.laid = stamp2(d.laid, ["at", "n"]);
+    if (!s.laid) delete s.laid;
+    s.labour = stamp2(d.labour, ["start", "until", "next", "due", "helps", "midwife"]);
+    if (!s.labour) delete s.labour;
+    s.laying = stamp2(d.laying, ["start", "next", "pushes"]);
+    if (!s.laying) delete s.laying;
+    if (d.quick) s.quick = Math.round(num(d.quick, 0, 20, 0));
+    if (d.heatAt) s.heatAt = num(d.heatAt, 0, 1e14, 0);
+    if (d.tie && typeof d.tie === "object" && Number(d.tie.by) > 0 && ["vulva", "butt"].includes(d.tie.h)) s.tie = { by: Math.round(num(d.tie.by, 0, 1e9, 0)), h: d.tie.h, until: num(d.tie.until, 0, 1e14, 0) };
+    if (d.ripe && typeof d.ripe === "object" && num(d.ripe.at, 0, 1e14, 0) > 0) s.ripe = { at: num(d.ripe.at, 0, 1e14, 0), every: Math.round(num(d.ripe.every, 2, 30, 7)), from: Math.round(num(d.ripe.from, 0, 29, 3)), days: Math.round(num(d.ripe.days, 1, 10, 2)) };
+    if (d.cock && typeof d.cock === "object") s.cock = { load: Math.round(num(d.cock.load, 0, 5e3, 0)), knot: d.cock.knot === true, tie: Array.isArray(d.cock.tie) ? d.cock.tie.slice(0, 2).map((x) => Math.round(num(x, 1, 40, 5))) : null };
     s.mouthAuto = d.mouthAuto === true;
     s.guided = d.guided === true;
     s.iconsShow = d.iconsShow !== false;
@@ -8367,7 +8428,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     surecatch: loosen(/\b(sure[- ]?catch(?: (?:serum|shot|tonic|potion|drops?))?|every[- ]load[- ]takes?|womb[- ]?opener)\b/),
     dilator: loosen(/\b(nipple[- ](?:dilat\w*|stretch\w*|opener|spreader)|teat[- ](?:dilat\w*|opener|stretch\w*))\b/),
     balm: loosen(/\b(tightening (?:balm|cream|gel|serum|salve|tonic)|(?:nipple|pussy|ass|butt|hole|throat) (?:tightener|closer|balm)|virgin(?:ity)? (?:balm|tonic|cream|serum|salve))\b/),
-    purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/)
+    purge: loosen(/\b(purge (?:serum|shot)|antidote|detox|cleanser)\b/),
+    // (Nov 19; Laynie: "Definitely the insemination and breeders seal") a load of the crafter's own seed: shared/seed.js
+    // reads how much and where. Only plain seed words: "doubles their load" is a virility shot, not this.
+    // (Nov 19, breedin' anywhere) a day off a pregnancy, and a look at what's in there
+    quicken: loosen(/\b(quicken\w*(?: (?:draught|serum|tonic|potion|drops?|shot))?)\b/),
+    scan: loosen(/\b(breeder['\u2019]?s scan(?:ner)?|breeding scan(?:ner)?|womb scan(?:ner)?|belly scan(?:ner)?|pregnancy scan(?:ner)?)\b/),
+    seed: loosen(/\b(inseminat\w*|(?:seed|cum|creampie|breeding) (?:syringe|shot|injector|vial|bottle|baster|dose|filler|plunger|pump|serum|cocktail)|(?:full|filled) (?:of|with) (?:my |his |her |their |\w+['’]?s )?(?:seed|cum)|my (?:own )?(?:seed|cum))\b/)
   };
 
   // dispensary/src/lines.js
@@ -8816,7 +8883,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // dispensary/src/senses.js
   var W2 = window;
   var STANDING = () => Array.isArray(W2.PoseAllStanding) ? W2.PoseAllStanding : ["BaseLower", "LegsClosed", "LegsOpen", "Spread"];
-  var isMe = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer());
+  var isMe = (C2) => !!(C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer());
   function poseNow() {
     return active("allfours") ? "AllFours" : active("weakknees") ? "Kneel" : null;
   }
@@ -8853,9 +8920,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mod2.hookFunction("PoseCanChangeUnaidedStatus", 4, (args, next2) => {
         const r = next2(args);
         try {
-          const [C, poseName] = args, PCS = W2.PoseChangeStatus;
-          if (isMe(C) && poseNow() && PCS && STANDING().includes(poseName) && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
-          if (isMe(C) && active("allfours") && PCS && poseName === "Kneel" && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
+          const [C2, poseName] = args, PCS = W2.PoseChangeStatus;
+          if (isMe(C2) && poseNow() && PCS && STANDING().includes(poseName) && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
+          if (isMe(C2) && active("allfours") && PCS && poseName === "Kneel" && r === PCS.ALWAYS) return PCS.NEVER_WITHOUT_AID;
         } catch (e) {
         }
         return r;
@@ -9060,8 +9127,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return String(P.Nickname || P.Name || "Somebody");
   };
   function nameOf(mn) {
-    const C = (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
-    return C ? String(C.Nickname || C.Name || "somebody") : "somebody";
+    const C2 = (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+    return C2 ? String(C2.Nickname || C2.Name || "somebody") : "somebody";
   }
   var pick = (a) => a[Math.floor(Math.random() * a.length)];
   var fill = (t, v) => String(t).replace(/%t/g, myName()).replace(/%b/g, v && v.by || "somebody").replace(/%d/g, v && v.dose || "a dose");
@@ -9143,15 +9210,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var CRAVE_EVERY = [20, 40];
   function queue(id, o) {
     o = o || {};
-    const S2 = st();
-    if (!BOOK[id] || BOOK[id].instant || S2.off[id]) return false;
-    if (S2.later.length >= LATER_MAX) return false;
+    const S3 = st();
+    if (!BOOK[id] || BOOK[id].instant || S3.off[id]) return false;
+    if (S3.later.length >= LATER_MAX) return false;
     const fuse = (FUSE_MINS[0] + Math.random() * (FUSE_MINS[1] - FUSE_MINS[0])) * MIN;
     const c = { id, x: Math.max(1, Math.min(5, Math.round(Number(o.x) || 1))), by: Number(o.by) || 0 };
     if (o.p) c.p = String(o.p);
-    if (S2.clock === "real") c.fire = Date.now() + fuse * (1 + S2.penalty / 100);
+    if (S3.clock === "real") c.fire = Date.now() + fuse * (1 + S3.penalty / 100);
     else c.in = fuse;
-    S2.later.push(c);
+    S3.later.push(c);
     save();
     if (!o.quiet) action(fill(pick(LINES.later.set)));
     return true;
@@ -9159,16 +9226,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var lastAt = 0;
   var craveNext = 0;
   function laterTick() {
-    const S2 = st(), now = Date.now(), gap2 = lastAt ? Math.max(0, Math.min(now - lastAt, 15e3)) : 0;
+    const S3 = st(), now = Date.now(), gap2 = lastAt ? Math.max(0, Math.min(now - lastAt, 15e3)) : 0;
     lastAt = now;
     let changed = false;
-    for (const c of S2.later) if (typeof c.fire !== "number") {
+    for (const c of S3.later) if (typeof c.fire !== "number") {
       c.in = Math.max(0, (c.in || 0) - gap2);
     }
     if (inRoom()) {
-      const due = S2.later.filter((c) => typeof c.fire === "number" ? c.fire <= now : c.in <= 0);
+      const due = S3.later.filter((c) => typeof c.fire === "number" ? c.fire <= now : c.in <= 0);
       for (const c of due) {
-        S2.later.splice(S2.later.indexOf(c), 1);
+        S3.later.splice(S3.later.indexOf(c), 1);
         changed = true;
         action(fill(pick(LINES.later.fire)));
         give(c.id, { by: c.by, x: c.x, p: c.p, later: true });
@@ -9178,8 +9245,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     craveTick(now);
   }
   function since() {
-    const S2 = st(), from = Math.max(S2.cravings || 0, Date.now() - CRAVE_DAYS * DAY2), out = {};
-    for (const [id, list] of Object.entries(S2.taken || {})) {
+    const S3 = st(), from = Math.max(S3.cravings || 0, Date.now() - CRAVE_DAYS * DAY2), out = {};
+    for (const [id, list] of Object.entries(S3.taken || {})) {
       const n = list.filter((t) => t >= from).length;
       if (n) out[id] = n;
     }
@@ -9190,8 +9257,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return !!B && !B.instant && !st().off[id] && !(B.lscg && lscgPresent()) && !B.lscgOnly;
   };
   function craving() {
-    const S2 = st();
-    if (!S2.cravings) return "";
+    const S3 = st();
+    if (!S3.cravings) return "";
     const n = since(), total = Object.values(n).reduce((a, b) => a + b, 0);
     if (total < CRAVE_AFTER || doseIds().some(active)) return "";
     const fav = Object.keys(n).filter(ours2).sort((a, b) => n[b] - n[a])[0];
@@ -9239,14 +9306,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const t = String(text3 || "").toLowerCase();
     const list = dosesIn(t);
     if (ROULETTE_WORDS.test(t)) {
-      const S2 = st(), ok = doseIds().filter((id) => {
+      const S3 = st(), ok = doseIds().filter((id) => {
         const B = BOOK[id];
-        return !B.instant && !S2.off[id] && !B.lscgOnly && !(B.lscg && lscgPresent());
+        return !B.instant && !S3.off[id] && !B.lscgOnly && !(B.lscg && lscgPresent());
       });
       if (ok.length) return [{ id: ok[Math.floor(Math.random() * ok.length)], x: list[0] ? list[0].x : 1, roulette: true }];
     }
     return list;
   }
+  var holeOfGear = (item) => {
+    const g = String(item && item.Asset && item.Asset.Group && item.Asset.Group.Name || "");
+    return g === "ItemVulva" ? "vulva" : g === "ItemButt" ? "butt" : /^ItemMouth/.test(g) ? "mouth" : /^ItemNipples/.test(g) || g === "ItemBreast" ? "nips" : "";
+  };
   var crafterOf = (item) => {
     const n = item && item.Craft && Number(item.Craft.MemberNumber);
     return Number.isInteger(n) && n > 0 ? n : 0;
@@ -9272,8 +9343,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!list.length && !roulette) continue;
       const trig = Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(text3));
       const nipGear = onNips2 && list.some((d) => d.id === "dilator");
-      const drip = nipGear || DRIP_WORDS.test(text3) && !(lscgPresent() && LSCG_SOAKED.test(text3) && !/\bdrip|\biv\b/.test(text3));
-      const inject = INJECT_WORDS.test(text3);
+      const drip0 = nipGear || DRIP_WORDS.test(text3) && !(lscgPresent() && LSCG_SOAKED.test(text3) && !/\bdrip|\biv\b/.test(text3));
+      const once = list.length > 0 && list.every((d) => BOOK[d.id] && BOOK[d.id].instant);
+      const drip = drip0 && !once, inject = INJECT_WORDS.test(text3) || drip0 && once;
       if (!drip && !inject && !trig.length) continue;
       const every = EVERY.exec(text3);
       out.push({
@@ -9282,6 +9354,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         text: text3,
         list,
         by: crafterOf(item),
+        nm: item.Craft && item.Craft.MemberName ? String(item.Craft.MemberName) : "",
+        hole: holeOfGear(item),
         drip,
         inject,
         trig,
@@ -9310,6 +9384,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         continue;
       }
       if (g.drip) for (const d of g.list) {
+        if (BOOK[d.id] && BOOK[d.id].instant) continue;
         const was = active(d.id);
         if (was && leftMs(d.id) > (DRIP_MINS - 2) * MIN2) continue;
         const r = give(d.id, { by: g.by, x: d.x, p: d.p, mins: DRIP_MINS, upto: true, quiet: was, line: was ? void 0 : fill(pick(LINES.worn.drip), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
@@ -9326,7 +9401,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const list = g.roulette ? dosesOf(g.text).filter((d) => ours3(d.id)) : g.list;
         for (const d of list) {
           if (isLater(g.text)) queue(d.id, { by: g.by, x: d.x, p: d.p });
-          else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)) });
+          else give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn.inject), { dose: BOOK[d.id].label }).replace(/%g/g, itemName(g.item)), via: "gear", g: itemName(g.item), nm: g.nm, hole: g.hole });
         }
       }
     }
@@ -9348,7 +9423,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       lastTrig[k] = Date.now();
       const list = g.roulette ? dosesOf(g.text).filter((d) => ours3(d.id)) : g.list;
       for (const d of list) {
-        const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)) });
+        const r = give(d.id, { by: g.by, x: d.x, p: d.p, line: fill(pick(LINES.worn[kind] || LINES.worn.inject), { dose: BOOK[d.id].label, by: from ? nameOf(from) : "somebody" }).replace(/%g/g, itemName(g.item)), via: "gear", g: itemName(g.item), nm: g.nm, hole: g.hole });
         if (r.ok) n++;
       }
     }
@@ -9356,10 +9431,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var glossAt = {};
   function kissedBy(mn) {
-    const C = (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
-    if (!C || !Array.isArray(C.Appearance) || paused()) return 0;
+    const C2 = (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+    if (!C2 || !Array.isArray(C2.Appearance) || paused()) return 0;
     let n = 0;
-    for (const item of C.Appearance) {
+    for (const item of C2.Appearance) {
       if (!item || !item.Craft) continue;
       const text3 = craftText(item);
       if (!GLOSS_WORDS.test(text3)) continue;
@@ -9372,7 +9447,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (Date.now() - (glossAt[k] || 0) < TRIGGER_GAP) continue;
       glossAt[k] = Date.now();
       for (const d of dosesOf(text3).filter((x) => ours3(x.id))) {
-        const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }) });
+        const r = give(d.id, { by: mn, x: d.x, p: d.p, line: fill(pick(LINES.worn.gloss), { dose: BOOK[d.id].label, by: nameOf(mn) }), sire: by, nm: item.Craft.MemberName ? String(item.Craft.MemberName) : "", via: "kiss" });
         if (r.ok) n++;
       }
     }
@@ -9395,8 +9470,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivityOrgasmStart", 4, (args, next2) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => trigger("climax"), 500);
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer()) setTimeout(() => trigger("climax"), 500);
         } catch (e) {
         }
         return next2(args);
@@ -9444,14 +9519,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "FarmNipSound", from: ["ItemVulvaPiercings", "UrethralSound"], label: "Nipple Sound", open: 1 }
   ];
   var TOY_BY = Object.fromEntries(TOYS.map((t) => [t.id, t]));
-  function toyIn(C) {
-    const it = C && Array.isArray(C.Appearance) ? C.Appearance.find((i) => i && i.Asset && i.Asset.Group && i.Asset.Group.Name === "ItemNipples") : null;
+  function toyIn(C2) {
+    const it = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((i) => i && i.Asset && i.Asset.Group && i.Asset.Group.Name === "ItemNipples") : null;
     return it && TOY_BY[it.Asset.Name] ? it : null;
   }
   var toyOf = (it) => it && it.Asset ? TOY_BY[it.Asset.Name] || null : null;
   var toyLocked = (it) => !!(it && it.Property && it.Property.LockedBy);
-  function toyOpen(C) {
-    const it = toyIn(C), T = toyOf(it);
+  function toyOpen(C2) {
+    const it = toyIn(C2), T = toyOf(it);
     if (!T) return 0;
     const f = T.states === "pump" ? Number(it.Property && it.Property.InflateLevel) || 0 : 0;
     return Math.max(1, Math.min(3, T.open + Math.ceil(f / 2)));
@@ -9612,1864 +9687,177 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ]
   };
 
-  // dispensary/src/horny.js
-  var W7 = window;
-  var MIN3 = 6e4;
-  var HORNY = /\b(horny|hungry|insatiable|ravenous)\b/;
-  var RAVENOUS = /\b(insatiable|ravenous)\b/;
-  var BREEDS = /\b(breeding|seeding|breeder)\b/;
-  var hornyOf = (text3) => HORNY.test(String(text3 || "")) ? RAVENOUS.test(String(text3 || "")) ? 2 : 1 : 0;
-  function whereOf(group) {
+  // shared/seed.js
+  var SEED_HOLES = ["vulva", "butt", "mouth", "nips"];
+  var SEED_WORD = { vulva: "pussy", butt: "ass", mouth: "throat", nips: "nipples" };
+  var SEED_DEFAULT_ML = 50;
+  var SEED_HOLE_MAX = 2e4;
+  var SEED_TOTAL_MAX = 4e4;
+  var GALLON_ML = 3785;
+  var SEED_HALF_LIFE_H = { vulva: 12, butt: 6, mouth: 1, nips: 12 };
+  var GAPE_LEAK_X = 0.15;
+  var BASE_CAP = 200;
+  var NIP_CAP = 1e3;
+  var SEED_GAP_MS = 10 * 6e4;
+  var SEAL_WORDS = loosen(/\b(breeder['’]?s seal|breeding seal|sire['’]?s seal|(?:seed|cum) (?:seal|lock|keeper|stopper))\b/);
+  function sealHolesOf(group) {
     const g = String(group || "");
-    if (/^Item(Vulva|Butt)$/.test(g)) return "hole";
-    if (/^ItemNipples/.test(g) || g === "ItemBreast") return "nips";
-    if (/^ItemMouth/.test(g)) return "mouth";
-    if (/^Item(Pelvis|VulvaPiercings|Torso|Torso2)$/.test(g)) return "crotch";
-    return null;
+    if (g === "ItemVulva" || g === "ItemVulvaPiercings") return ["vulva"];
+    if (g === "ItemButt") return ["butt"];
+    if (/^ItemMouth/.test(g)) return ["mouth"];
+    if (/^ItemNipples/.test(g)) return ["nips"];
+    if (g === "ItemPelvis") return ["vulva", "butt"];
+    return [];
   }
-  var me2 = () => W7.Player && W7.Player.MemberNumber || 0;
-  var okFrom2 = (by) => !by || by === me2() || allowed(by);
-  var paused2 = () => (st().wornPause || 0) > Date.now();
-  var hornyOn = () => st().hornyOn !== false;
-  var onePiece = (n) => /[^s]s$/i.test(String(n).trim()) ? "pair of " + n : n;
-  var nameOf2 = (it) => onePiece(it && it.Craft && it.Craft.Name || it && it.Asset && (it.Asset.Description || it.Asset.Name) || "it");
-  var meter = () => {
-    const A = W7.Player && W7.Player.ArousalSettings;
-    return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
-  };
-  function hornyGear() {
-    const P = W7.Player, out = [];
-    if (!P || !Array.isArray(P.Appearance)) return out;
-    for (const item of P.Appearance) {
-      if (!item || !item.Craft || !item.Asset || !item.Asset.Group) continue;
-      const text3 = craftText(item), lvl = hornyOf(text3), where = whereOf(item.Asset.Group.Name);
-      if (!lvl || !where) continue;
-      out.push({ item, key: item.Asset.Group.Name + ":" + (item.Craft.Name || ""), text: text3, by: Number(item.Craft.MemberNumber) || 0, where, lvl, breed: BREEDS.test(text3) });
+  function sealsOn(appearance, textOf) {
+    const out = [];
+    for (const it of Array.isArray(appearance) ? appearance : []) {
+      if (!it || !it.Craft || !it.Asset || !it.Asset.Group) continue;
+      const by = Number(it.Craft.MemberNumber) || 0, holes = sealHolesOf(it.Asset.Group.Name);
+      if (!by || !holes.length || !SEAL_WORDS.test(String(textOf(it) || ""))) continue;
+      out.push({ holes, by, maker: String(it.Craft.MemberName || "").slice(0, 40), name: String(it.Craft.Name || it.Asset.Description || it.Asset.Name || "seal").slice(0, 40), key: it.Asset.Group.Name + ":" + (it.Craft.Name || "") });
     }
     return out;
   }
-  var deps = { nipsToyUsed: () => {
-  } };
-  var next = {};
-  var gap = (lvl) => (lvl === 2 ? 2 + Math.random() * 2 : 6 + Math.random() * 4) * MIN3;
-  var lineOf = (key2, v) => {
-    const L = LINES.horny && LINES.horny[key2];
-    return L && L.length ? fill(pick(L), v).replace(/%g/g, v && v.g || "it") : "";
-  };
-  var cumming = () => {
-    const A = W7.Player && W7.Player.ArousalSettings;
-    return !!(A && Number(A.OrgasmStage) > 0);
-  };
-  function hornyBeat(g) {
-    const v = { g: nameOf2(g.item) };
-    const A = meter();
-    if (A) setArousal((Number(A.Progress) || 0) + (g.lvl === 2 ? 18 : 12));
-    const room = Math.random() < 0.35;
-    const t = room ? lineOf(g.where + "_room", v) : lineOf(g.where + (g.lvl === 2 ? "_rough" : "_mine"), v) || lineOf(g.where + "_mine", v);
-    if (t) room ? action(t) : local(t);
-    if (g.where === "nips" && toyIn(W7.Player) === g.item) {
-      try {
-        deps.nipsToyUsed();
-      } catch (e) {
-      }
-    }
-    if (A && Number(A.Progress) >= 95 && !active("denial") && !cumming() && typeof W7.ActivityOrgasmPrepare === "function") {
-      const l = lineOf("tipped", v);
-      if (l) action(l);
-      try {
-        W7.ActivityOrgasmPrepare(W7.Player);
-      } catch (e) {
-      }
-    }
-    return t;
+  var WORDN = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+  var UNIT = "(ml|mls|millilit(?:er|re)s?|cc|l|ltrs?|lit(?:er|re)s?|gal|gals|gallons?)";
+  var NUM = "(\\d{1,3}(?:,\\d{3})+|\\d+(?:[.,]\\d+)?(?:\\s*\\/\\s*\\d+)?|half\\s+an?|an?\\s+half|(?:a\\s+)?quarter(?:\\s+of)?(?:\\s+an?)?|half|one|two|three|four|five|six|seven|eight|nine|ten|an?)";
+  var AMOUNT = new RegExp("(?<![a-z0-9.,/])" + NUM + "[\\s_-]*(?:full[\\s_-]+)?" + UNIT + "(?![a-z])", "g");
+  function valueOf(s) {
+    s = String(s).trim().replace(/\s+/g, " ");
+    let m = /^(\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return Number(m[1]) / Math.max(1, Number(m[2]));
+    if (/^\d{1,3}(,\d{3})+$/.test(s)) return Number(s.replace(/,/g, ""));
+    if (/^\d/.test(s)) return Number(s.replace(",", "."));
+    if (/half/.test(s)) return 0.5;
+    if (/quarter/.test(s)) return 0.25;
+    return WORDN[s] || 1;
   }
-  function hornyTick(now) {
-    now = now || Date.now();
-    const gear = hornyOn() && !paused2() && inRoom() ? hornyGear().filter((g) => okFrom2(g.by)) : [];
-    const on2 = new Set(gear.map((g) => g.key));
-    for (const k of Object.keys(next)) if (!on2.has(k)) delete next[k];
-    for (const g of gear) {
-      if (!next[g.key]) {
-        next[g.key] = now + gap(g.lvl) / 2;
-        continue;
-      }
-      if (now < next[g.key]) continue;
-      next[g.key] = now + gap(g.lvl);
-      hornyBeat(g);
-    }
-  }
-  var paraNext = {};
-  function hornyParaTick(now) {
-    now = now || Date.now();
-    const P = deps.para ? deps.para() : {};
-    for (const k of Object.keys(paraNext)) if (!P[k] || !P[k].horny) delete paraNext[k];
-    if (!hornyOn() || paused2() || !inRoom()) return;
-    for (const [kind, p] of Object.entries(P)) {
-      if (!p || !p.horny || !(LINES.horny && LINES.horny["para_" + kind])) continue;
-      if (!paraNext[kind]) {
-        paraNext[kind] = now + (2 + Math.random() * 3) * MIN3;
-        continue;
-      }
-      if (now < paraNext[kind]) continue;
-      paraNext[kind] = now + (p.horny === 2 ? 2 + Math.random() * 2 : 4 + Math.random() * 3) * MIN3;
-      const A = meter();
-      if (A) setArousal((Number(A.Progress) || 0) + (p.horny === 2 ? 14 : 9));
-      const t = lineOf("para_" + kind, {});
-      if (t) Math.random() < 0.3 ? action(t) : local(t);
-      if (kind === "nips") {
-        try {
-          deps.nipsToyUsed();
-        } catch (e) {
-        }
-      }
-      if (A && Number(A.Progress) >= 95 && !active("denial") && !cumming() && typeof W7.ActivityOrgasmPrepare === "function") {
-        const l = lineOf("tipped_para", {});
-        if (l) action(l);
-        try {
-          W7.ActivityOrgasmPrepare(W7.Player);
-        } catch (e) {
-        }
-      }
-    }
-  }
-  var LEAK = { hole: ["thighs"], mouth: ["face"], nips: ["chest"], crotch: ["thighs"] };
-  function hornyClimax() {
-    if (!hornyOn() || paused2()) return 0;
-    let n = 0;
-    for (const g of hornyGear()) {
-      if (!g.breed || !okFrom2(g.by)) continue;
-      const t = lineOf("bred_" + g.where, { g: nameOf2(g.item) }) || lineOf("bred_hole", { g: nameOf2(g.item) });
-      if (t) action(t);
-      try {
-        W7.dispatchEvent(new W7.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: LEAK[g.where] || ["thighs"], amount: g.lvl === 2 ? 1.8 : 1.3 } }));
-      } catch (e) {
-      }
-      n++;
-    }
-    return n;
-  }
-  function initHorny(mod2, d) {
-    deps = Object.assign(deps, d || {});
-    try {
-      mod2.hookFunction("ActivityOrgasmStart", 3, (args, next2) => {
-        try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && !W7.ActivityOrgasmRuined) setTimeout(() => hornyClimax(), 900);
-        } catch (e) {
-        }
-        return next2(args);
-      });
-    } catch (e) {
-    }
-  }
-  var hornyReset = () => {
-    for (const k of Object.keys(next)) delete next[k];
-  };
-
-  // dispensary/src/parasites.js
-  var W8 = window;
-  var MIN4 = 6e4;
-  var HOUR = 36e5;
-  var KINDS = {
-    lips: { label: "Parasite lips", icon: "\u{1F444}", words: /\bparasit\w*|\bparasite lips\b/, hours: 12, every: 30 },
-    latex: { label: "Livin' latex", icon: "\u{1F5A4}", words: /\bliv(?:ing|in'?) latex\b|\bliving rubber\b|\blatex symbiote\b/, hours: 24, starve: 6 },
-    moss: { label: "Milk moss", icon: "\u{1F331}", words: /\bmilk moss\b/, hours: 24, every: 40 },
-    nestling: { label: "The nestling", icon: "\u{1F41B}", words: /\bnestling\b/, hours: 24, stages: 3 },
-    brood: { label: "The brood mother", icon: "\u{1F95A}", words: /\bbrood ?mother\b|\bbrood queen\b/, hours: 24, every: 45 },
-    vine: { label: "The leash vine", icon: "\u{1F33F}", words: /\bleash vine\b|\bvine leash\b/, worn: true, tiles: 3 },
-    mouth: { label: "The mouthpiece", icon: "\u{1F5E3}\uFE0F", words: /\bmouth ?piece\b/, worn: true },
-    nips: { label: "Nipple leeches", icon: "\u{1F352}", words: /\b(?:nipple|teat)[- ]?(?:leech|parasit|worm|tick)\w*|\bleech\w* (?:on|for) (?:the |your |her |his |their )?(?:nipples?|teats?)\b/, hours: 24, starve: 8 }
-  };
-  for (const K3 of Object.values(KINDS)) K3.words = loosen(K3.words);
-  var kindIds = () => Object.keys(KINDS);
-  var DEFAULT_STRAIN = ["needy", "heat", "hairtrigger"];
-  var me3 = () => W8.Player && W8.Player.MemberNumber || 0;
-  var charOf = (mn) => (W8.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
-  var send = (type, data, to) => {
-    try {
-      if (typeof W8.ServerSend === "function") W8.ServerSend("ChatRoomChat", makeMsg(type, data, to));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-  var on = (kind) => !!(st().parasites && st().parasites[kind]);
-  var usable = (id) => {
-    const B = BOOK[id];
-    return !!B && !B.instant && !B.lscgOnly && !(B.lscg && lscgPresent()) && !st().off[id];
-  };
-  function strainOf(text3) {
-    const ids = dosesIn(text3).map((d) => d.id).filter((id) => usable(id));
-    return ids.length ? ids.slice(0, 4) : DEFAULT_STRAIN.filter(usable);
-  }
-  var mine = () => st().para || (st().para = {});
-  var line = (kind, which, v) => {
-    const L = LINES.para && LINES.para[kind] && LINES.para[kind][which];
-    return L && L.length ? fill(pick(L), v).replace(/%k/g, KINDS[kind].label.toLowerCase()) : "";
-  };
-  function latch(kind, o) {
-    const K3 = KINDS[kind];
-    if (!K3 || !on(kind)) return false;
-    if (o.by && o.by !== me3() && !allowed(o.by)) return false;
-    const P = mine();
-    if (P[kind]) return false;
-    const now = Date.now();
-    P[kind] = {
-      by: o.by || 0,
-      name: String(o.name || "").slice(0, 30),
-      since: now,
-      until: K3.worn ? 0 : now + K3.hours * HOUR,
-      strain: (o.strain || DEFAULT_STRAIN).filter((id) => BOOK[id]).slice(0, 4),
-      fed: now,
-      stage: 0,
-      n: 0,
-      eggs: 0,
-      next: now + (K3.every || 30) * MIN4,
-      horny: Math.max(0, Math.min(2, Math.round(Number(o.horny) || 0)))
-    };
-    save();
-    action(line(kind, "latch", { by: P[kind].name || "somebody" }));
-    return true;
-  }
-  function letGo(kind, why) {
-    const P = mine();
-    if (!P[kind]) return false;
-    delete P[kind];
-    save();
-    if (why !== "quiet") {
-      const l = line(kind, why === "starved" ? "starved" : "off");
-      if (l) local(l);
-    }
-    return true;
-  }
-  function wornParasites() {
-    const P = W8.Player, out = [];
-    if (!P || !Array.isArray(P.Appearance)) return out;
-    for (const item of P.Appearance) {
-      if (!item || !item.Craft) continue;
-      const text3 = craftText(item);
-      const kinds = kindIds().filter((kind) => KINDS[kind].words.test(text3)), own = kinds.filter((k) => k !== "lips");
-      for (const kind of own.length ? own : kinds) out.push({ kind, item, text: text3, by: Number(item.Craft.MemberNumber) || 0, name: String(item.Craft.MemberName || "") });
+  var mlOf = (n, u) => n * (/^(ml|mls|cc|millilit)/.test(u) ? 1 : /^gal/.test(u) ? GALLON_ML : 1e3);
+  function amountsIn(text3) {
+    const out = [], t = String(text3 || "").toLowerCase();
+    AMOUNT.lastIndex = 0;
+    let m;
+    while (m = AMOUNT.exec(t)) {
+      const ml = mlOf(valueOf(m[1]), m[2]);
+      if (ml > 0) out.push({ ml: Math.min(SEED_HOLE_MAX, Math.round(ml)), at: m.index });
     }
     return out;
   }
-  function paraTick() {
-    const now = Date.now(), P = mine(), worn = wornParasites();
-    if ((st().wornPause || 0) <= now) {
-      for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text), horny: hornyOf(w.text) });
-    }
-    if (P.moss && active("letdown")) P.moss.fed = now;
-    for (const kind of ["vine", "mouth"]) if (P[kind] && !worn.some((w) => w.kind === kind)) letGo(kind, "off");
-    for (const [kind, p] of Object.entries(P)) {
-      const K3 = KINDS[kind];
-      if (!K3) {
-        delete P[kind];
-        continue;
-      }
-      if (p.until && now > p.until) {
-        letGo(kind, "done");
-        continue;
-      }
-      if (K3.starve && now - p.fed > K3.starve * HOUR) {
-        letGo(kind, "starved");
-        continue;
-      }
-      if (!K3.every || now < p.next) continue;
-      p.next = now + K3.every * MIN4 / (p.horny ? 2 : 1);
-      if (!inRoom()) continue;
-      if (kind === "lips") {
-        const id = p.strain[p.n++ % Math.max(1, p.strain.length)] || "needy";
-        give(id, { by: p.by, line: fill(line("lips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
-        local(line("lips", "crave"));
-      }
-      if (kind === "moss") give("letdown", { by: p.by, line: line("moss", "feed") });
-      if (kind === "brood") {
-        p.eggs = Math.min(5, (p.eggs || 0) + 1);
-        local(fill(line("brood", "lay"), {}).replace(/%n/g, String(p.eggs)));
-      }
-      save();
-    }
-  }
-  function paraClimax() {
-    const P = mine(), now = Date.now();
-    if (P.latex) {
-      P.latex.fed = now;
-      P.latex.until = Math.min(P.latex.since + 72 * HOUR, Math.max(P.latex.until, now + KINDS.latex.hours * HOUR));
-      give("hairtrigger", { by: P.latex.by, mins: 30, upto: true, quiet: active("hairtrigger"), line: line("latex", "feed") });
-    }
-    if (P.nestling) {
-      const n = P.nestling;
-      n.fed = now;
-      if (n.stage < KINDS.nestling.stages) {
-        n.stage++;
-        give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, line: line("nestling", "grow").replace(/%n/g, String(n.stage)) });
-      } else give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, upto: true, quiet: true });
-    }
-    save();
-  }
-  function nipsFed(from, kind) {
-    const p = mine().nips;
-    if (!p) return false;
-    const now = Date.now();
-    p.fed = now;
-    p.n = (p.n || 0) + 1;
-    p.until = Math.min(p.since + 72 * HOUR, Math.max(p.until || 0, now + KINDS.nips.hours * HOUR));
-    if (now - (p.gave || 0) > 10 * MIN4 && inRoom()) {
-      p.gave = now;
-      const id = p.strain[(p.n - 1) % Math.max(1, p.strain.length)] || "needy";
-      give(id, { by: p.by, line: fill(line("nips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
-    }
-    if (p.n === 3) local(line("nips", "wider"));
-    save();
-    return true;
-  }
-  var suckledAt = {};
-  function paraSuckled(from) {
-    const p = mine().nips;
-    if (!p || !from || from === me3() || Date.now() - (suckledAt[from] || 0) < 10 * MIN4) return false;
-    suckledAt[from] = Date.now();
-    send("dispPara", { kind: "nips", strain: p.strain, by: p.by || me3(), name: myName() }, from);
-    return true;
-  }
-  function paraKissGiven(to) {
-    const P = mine();
-    if (!to || to === me3()) return;
-    if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me3(), name: myName(), horny: P.lips.horny || 0 }, to);
-    if (P.brood && P.brood.eggs > 0) {
-      P.brood.eggs--;
-      save();
-      send("dispPara", { kind: "lips", strain: P.brood.strain, by: me3(), name: myName(), brood: true }, to);
-      local(line("brood", "pass").replace(/%b/g, nameOf(to)));
-    }
-  }
-  function onPara(from, m) {
-    const kind = String(m.kind || "");
-    if (!KINDS[kind] || KINDS[kind].worn) return;
-    if (!on(kind) || !allowed(from)) return;
-    const strain = Array.isArray(m.strain) ? m.strain.filter((id) => typeof id === "string" && BOOK[id]) : DEFAULT_STRAIN;
-    latch(kind, { by: from, name: nameOf(from), strain, horny: m.horny });
-  }
-  function vineOk(X, Y) {
-    const p = mine().vine;
-    if (!p) return true;
-    const C = charOf(p.by), pos = C && C.MapData && C.MapData.Pos;
-    if (!pos || typeof pos.X !== "number") return true;
-    return Math.max(Math.abs(X - pos.X), Math.abs(Y - pos.Y)) <= KINDS.vine.tiles;
-  }
-  var vineTold = 0;
-  var asked = null;
-  function onSay(from, m) {
-    const p = mine().mouth;
-    if (!p || p.by !== from) return;
-    const text3 = String(m.text || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 300);
-    if (!text3 || /^[\/(\[]/.test(text3)) return;
-    if (st().mouthAuto === true) {
-      say2(text3);
-      send("dispSaid", { ok: true }, from);
-      return;
-    }
-    asked = { from, text: text3 };
-    local("\u{1F5E3}\uFE0F " + nameOf(from) + `'s mouthpiece wants you to say: "` + text3 + '"\nSay it: /dispensary say \xB7 let it pass: /dispensary nope');
-  }
-  function say2(text3) {
-    try {
-      W8.ServerSend("ChatRoomChat", { Content: text3, Type: "Chat" });
-    } catch (e) {
-    }
-  }
-  function sayAsked(yes) {
-    if (!asked) return false;
-    const a = asked;
-    asked = null;
-    if (yes) say2(a.text);
-    send("dispSaid", { ok: !!yes }, a.from);
-    return true;
-  }
-  function mouthSend(to, text3) {
-    return send("dispSay", { text: String(text3).slice(0, 300) }, to);
-  }
-  function initParasites(mod2) {
-    try {
-      mod2.hookFunction("ActivityOrgasmStart", 3, (args, next2) => {
-        try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => paraClimax(), 600);
-        } catch (e) {
-        }
-        return next2(args);
-      });
-    } catch (e) {
-    }
-    try {
-      mod2.hookFunction("ChatRoomMapViewCanEnterTile", 2, (args, next2) => {
-        const t = next2(args);
-        try {
-          if (t > 0 && !vineOk(args[0], args[1])) {
-            if (Date.now() - vineTold > 2e4) {
-              vineTold = Date.now();
-              local(line("vine", "tug"));
-            }
-            return 0;
-          }
-        } catch (e) {
-        }
-        return t;
-      });
-    } catch (e) {
-      console.warn("[Dispensary] the leash vine can't hold you:", e);
-    }
-    try {
-      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
-        try {
-          const data = args[0];
-          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me3()) {
-            const m = readMsg(data);
-            if (m && m.type === "dispPara") onPara(data.Sender, m);
-            else if (m && m.type === "dispSay") onSay(data.Sender, m);
-            else if (m && m.type === "dispSaid") local(nameOf(data.Sender) + (m.ok ? " said it." : " let it pass."));
-          }
-        } catch (e) {
-          console.warn("[Dispensary] parasites:", e);
-        }
-        return next2(args);
-      });
-    } catch (e) {
-      console.warn("[Dispensary] parasites can't hear:", e);
-    }
-  }
-
-  // dispensary/src/needle.js
-  var W9 = window;
-  var botHere = () => (W9.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
-  var charOf2 = (mn) => (W9.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W9.Player && W9.Player.MemberNumber === mn ? W9.Player : null);
-  function craftText(item) {
-    if (!item || !item.Craft) return "";
-    let d = item.Craft.Description || "";
-    try {
-      if (W9.CraftingDescription && typeof W9.CraftingDescription.Decode === "function") d = W9.CraftingDescription.Decode(d);
-    } catch (e) {
-    }
-    return ((item.Craft.Name || "") + " | " + d).toLowerCase().replace(/_+/g, " ");
-  }
-  var handOf = (C) => C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
-  var handTextOf = (mn) => craftText(handOf(charOf2(mn)));
-  function factsOf(data, sender) {
-    try {
-      if (typeof W9.ChatRoomMessageRunExtractors === "function") {
-        const m = W9.ChatRoomMessageRunExtractors(data, sender).metadata;
-        if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
-      }
-    } catch (e) {
-    }
-    const dict = Array.isArray(data.Dictionary) ? data.Dictionary : [];
-    const name = (dict.find((d) => d && d.ActivityName) || {}).ActivityName;
-    const t = dict.find((d) => d && (typeof d.TargetCharacter === "number" || d.Tag === "TargetCharacter"));
-    return { name, target: t ? typeof t.TargetCharacter === "number" ? t.TargetCharacter : t.MemberNumber : void 0 };
-  }
-  var LSCG_WAIT_MS = 1500;
-  function onNeedle(by, item) {
-    const text3 = craftText(item), list = dosesOf(text3), at = Date.now(), done = [], later = isLater(text3);
-    for (const { id, x, p } of list) {
-      const B = BOOK[id];
-      if (farmHas(id, p) && botHere()) continue;
-      if (B.lscg && lscgPresent()) continue;
-      if (!allowed(by)) {
-        local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label }));
-        continue;
-      }
-      const go = () => {
-        if (later && !B.instant) {
-          if (st().off[id]) {
-            local(fill(NOTES.switchedOff, { dose: B.label }));
-            return { ok: false, why: "off" };
-          }
-          return { ok: queue(id, { by, x, p }), later: true };
-        }
-        const r = give(id, { by, x, p });
-        if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
-        return r;
-      };
-      if (lscgHas(id)) setTimeout(() => {
-        if (lastLscgDose(id) < at) go();
-      }, LSCG_WAIT_MS);
-      else {
-        go();
-        done.push(id);
-      }
-    }
-    return done;
-  }
-  function initNeedle(mod2) {
-    try {
-      mod2.hookFunction("ChatRoomMessage", 1, (args, next2) => {
-        try {
-          const data = args[0], P = W9.Player;
-          if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
-            const sender = charOf2(data.Sender) || (data.Sender === P.MemberNumber ? P : null), f = factsOf(data, sender);
-            if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender));
-            if (f.target === P.MemberNumber && data.Sender !== P.MemberNumber) onActivity(f.name, data.Sender);
-            if (data.Sender === P.MemberNumber && typeof f.target === "number" && f.target !== P.MemberNumber && /^(Kiss|FrenchKiss|PoliteKiss|GaggedKiss|SiblingsCheekKiss)$/.test(f.name || "")) paraKissGiven(f.target);
-          }
-        } catch (e) {
-          console.warn("[Dispensary] needle:", e);
-        }
-        return next2(args);
-      });
-    } catch (e) {
-      console.warn("[Dispensary] can't feel needles:", e);
-    }
-  }
-
-  // dispensary/src/hardcore.js
-  var W10 = window;
-  var DAY3 = 864e5;
-  var CHECK_DAYS = 30;
-  var me4 = () => W10.Player && W10.Player.MemberNumber || 0;
-  var here = (mn) => (W10.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
-  var who = (mn) => here(mn) ? nameOf(mn) : "#" + mn;
-  var onChange = () => {
-  };
-  function onHardChange(f) {
-    onChange = f;
-  }
-  var hardOn = () => !!(st().hard && st().hard.on);
-  function keyholders() {
-    const P = W10.Player, out = [];
-    const own = P && P.Ownership && P.Ownership.MemberNumber;
-    if (typeof own === "number" && own > 0 && own !== me4()) out.push(own);
-    if (st().stock) {
-      for (const m of PROPRIETORS) if (m !== me4() && !out.includes(m)) out.push(m);
-    }
-    for (const m of st().keys || []) if (m !== me4() && !out.includes(m)) out.push(m);
-    return out;
-  }
-  var MAX_KEYS = 10;
-  function addKey(mn) {
-    mn = Math.round(Number(mn));
-    if (hardOn()) return { ok: false, why: "locked" };
-    if (!Number.isInteger(mn) || mn <= 0 || mn >= 1e9) return { ok: false, why: "number" };
-    if (mn === me4()) return { ok: false, why: "self" };
-    const S2 = st();
-    S2.keys = S2.keys || [];
-    if (S2.keys.includes(mn) || keyholders().includes(mn)) return { ok: false, why: "already" };
-    if (S2.keys.length >= MAX_KEYS) return { ok: false, why: "full" };
-    S2.keys.push(mn);
-    save();
-    onChange();
-    return { ok: true };
-  }
-  function removeKey(mn) {
-    if (hardOn()) return { ok: false, why: "locked" };
-    const S2 = st(), i = (S2.keys || []).indexOf(Number(mn));
-    if (i < 0) return { ok: false, why: "none" };
-    S2.keys.splice(i, 1);
-    save();
-    onChange();
-    return { ok: true };
-  }
-  var companion = () => {
-    try {
-      const C = W10.FarmhandCompanion;
-      return C && typeof C.hardPrefs === "function" ? C : null;
-    } catch (e) {
-      return null;
-    }
-  };
-  var isKey = (mn) => typeof mn === "number" && keyholders().includes(mn);
-  function dueAt() {
-    const H2 = st().hard || {};
-    return H2.until ? H2.until : (H2.checkAt || H2.since || Date.now()) + CHECK_DAYS * DAY3;
-  }
-  function log(by, what2) {
-    const H2 = st().hard;
-    H2.log = (H2.log || []).concat({ t: Date.now(), by, what: String(what2).slice(0, 200) }).slice(-50);
-  }
-  var hardLog = () => (st().hard && st().hard.log || []).slice();
-  function sendTo(mn, type, data) {
-    try {
-      if (here(mn) && typeof W10.ServerSend === "function") {
-        W10.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
-        return true;
-      }
-    } catch (e) {
-    }
-    return false;
-  }
-  function beepTo(mn, text3) {
-    try {
-      if (typeof W10.ServerSend === "function") {
-        W10.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text3).slice(0, 900) });
-        return true;
-      }
-    } catch (e) {
-    }
-    return false;
-  }
-  function announce() {
-    const H2 = st().hard || {}, keys = keyholders();
-    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H2.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W10.Player && (W10.Player.Nickname || W10.Player.Name) || "" });
-  }
-  function lock(days) {
-    if (hardOn()) return { ok: false, why: "on" };
-    if (!keyholders().length) return { ok: false, why: "nokey" };
-    const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
-    st().hard = { on: true, since: now, until: d ? now + d * DAY3 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
-    log(me4(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
-    save(true);
-    announce();
-    onChange();
-    return { ok: true };
-  }
-  function unlock(by, why) {
-    if (!hardOn()) return false;
-    const H2 = st().hard;
-    H2.on = false;
-    H2.until = 0;
-    log(by, "hardcore off: " + why);
-    save(true);
-    announce();
-    onChange();
-    local("\u{1F513} Hardcore's off (" + why + "). Your settings are yours again, and so is your safeword.");
-    return true;
-  }
-  function checkIn(by) {
-    if (!hardOn() || !isKey(by)) return false;
-    const H2 = st().hard, now = Date.now(), last = H2.checkAt || 0;
-    H2.checkAt = now;
-    if (now - last > DAY3) log(by, "checked in");
-    save();
-    onChange();
-    return true;
-  }
-  function tickHard() {
-    if (!hardOn()) return;
-    const H2 = st().hard, now = Date.now();
-    if (H2.until && now >= H2.until) unlock(me4(), "the end date came");
-    else if (!H2.until && now - (H2.checkAt || H2.since || now) >= CHECK_DAYS * DAY3) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
-  }
-  var askedAt = 0;
-  function askOut() {
-    const now = Date.now(), keys = keyholders(), name = W10.Player && (W10.Player.Nickname || W10.Player.Name) || "Somebody";
-    if (now - askedAt < 5 * 6e4) {
-      local("\u{1F5DD}\uFE0F Your keyholders have already been asked. Your doses stay till one of them lets you out.");
-      return 0;
-    }
-    askedAt = now;
-    let n = 0;
-    for (const k of keys) {
-      if (sendTo(k, "dispAsk", { name })) n++;
-      else if (beepTo(k, "\u{1F5DD}\uFE0F " + name + " (" + me4() + ") is askin' to be let out of hardcore in The Farmhand's Dispensary. If you've the Dispensary, open its page (Keys you hold); with the Companion, /keys letout " + me4() + ".")) n++;
-    }
-    log(me4(), "asked to be let out");
-    save();
-    local("\u{1F5DD}\uFE0F Hardcore: your doses stay. " + (n ? "Your keyholders have been asked to let you out: " + keys.map(who).join(", ") + "." : "None of your keyholders could be reached just now."));
-    return n;
-  }
-  function onKey(by, m) {
-    if (!isKey(by) || !m || typeof m !== "object") return false;
-    const H2 = st().hard, nm = who(by);
-    if (m.do === "check") {
-      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H2.until || 0, due: dueAt(), keys: keyholders(), name: W10.Player && (W10.Player.Nickname || W10.Player.Name) || "" });
-      return true;
-    }
-    if (!hardOn()) return false;
-    if (m.do === "state") {
-      sendTo(by, "dispKeyState", stateFor());
-      checkIn(by);
-      return true;
-    }
-    if (m.do === "letout") {
-      const n = clearAll("keyholder");
-      log(by, "let you out (" + n + " dose" + (n === 1 ? "" : "s") + " lifted)");
-      save();
-      local("\u{1F5DD}\uFE0F " + nm + " let you out: every dose in you is lifted.");
-      checkIn(by);
-      onChange();
-      return true;
-    }
-    if (m.do === "end") {
-      checkIn(by);
-      return unlock(by, "ended by " + nm);
-    }
-    if (m.do === "extend") {
-      const d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(m.days) || 0)));
-      H2.until = d ? Date.now() + d * DAY3 : 0;
-      H2.checkAt = Date.now();
-      log(by, d ? "set the end to " + d + " day" + (d === 1 ? "" : "s") + " from now" : "took the end date away");
-      save();
-      local("\u{1F5DD}\uFE0F " + nm + " " + (d ? "set your hardcore to end in " + d + " day" + (d === 1 ? "" : "s") + "." : "took your end date away. A keyholder checks in every " + CHECK_DAYS + " days instead."));
-      onChange();
-      return true;
-    }
-    if (m.do === "set") {
-      const S2 = st(), said2 = [];
-      if (typeof m.who === "string" && LADDER.some((r) => r.id === m.who) && m.who !== S2.who) {
-        S2.who = m.who;
-        said2.push("who can dose you: " + LADDER.find((r) => r.id === m.who).label);
-      }
-      if ((m.clock === "real" || m.clock === "online") && m.clock !== S2.clock) {
-        setClock(m.clock);
-        said2.push("the clock: " + (m.clock === "real" ? "real time" : "while online"));
-      }
-      if (m.off && typeof m.off === "object") {
-        for (const id of doseIds()) if (typeof m.off[id] === "boolean" && !!S2.off[id] !== m.off[id]) {
-          if (m.off[id]) S2.off[id] = true;
-          else delete S2.off[id];
-          said2.push(id + (m.off[id] ? " switched off" : " switched on"));
-        }
-      }
-      if (m.companion && typeof m.companion === "object" && companion()) {
-        try {
-          said2.push(...companion().setHardPrefs(m.companion));
-        } catch (e) {
-        }
-      }
-      if (!said2.length) return true;
-      log(by, "changed " + said2.join(", "));
-      save();
-      checkIn(by);
-      onChange();
-      local("\u{1F5DD}\uFE0F " + nm + " changed your Dispensary: " + said2.join("; ") + ".");
-      sendTo(by, "dispKeyState", stateFor());
-      return true;
-    }
-    return false;
-  }
-  function stateFor() {
-    const S2 = st();
-    let comp = null;
-    try {
-      comp = companion() ? companion().hardPrefs() : null;
-    } catch (e) {
-      comp = null;
-    }
-    return { who: S2.who, clock: S2.clock, off: Object.assign({}, S2.off), doses: doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })), until: S2.hard && S2.hard.until || 0, due: dueAt(), companion: comp };
-  }
-  var wards = () => st().wards || (st().wards = {});
-  function onWardHard(from, m) {
-    if (!Array.isArray(m.keys) || !m.keys.includes(me4())) return;
-    const w = wards();
-    if (!m.on) {
-      if (w[from]) {
-        delete w[from];
-        save();
-        onChange();
-      }
-      return;
-    }
-    const was = w[from], now = Date.now();
-    w[from] = Object.assign({}, was, { name: String(m.name || "").slice(0, 40), until: Number(m.until) || 0, due: Number(m.due) || 0, seen: now });
-    save();
-    onChange();
-    if (!was || now - (was.checked || 0) > 36e5) {
-      w[from].checked = now;
-      sendTo(from, "dispKey", { do: "check" });
-    }
-  }
-  var wardStates = {};
-  var wardState = (mn) => wardStates[mn] || null;
-  function keyDo(mn, what2, data) {
-    if (sendTo(mn, "dispKey", Object.assign({ do: what2 }, data || {}))) return "room";
-    const words = { check: "checked in on your hardcore", letout: "let you out: every dose lifted", end: "ended your hardcore" };
-    if (!words[what2]) return null;
-    const nm = W10.Player && (W10.Player.Nickname || W10.Player.Name) || "Your keyholder";
-    return beepTo(mn, "\u{1F5DD}\uFE0F " + nm + " " + words[what2] + ". [fd:" + what2 + "]") ? "beep" : null;
-  }
-  function initHardcore(mod2) {
-    try {
-      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
-        try {
-          const data = args[0];
-          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me4()) {
-            const m = readMsg(data);
-            if (m && m.type === "dispKey") onKey(data.Sender, m);
-            else if (m && m.type === "dispHard") onWardHard(data.Sender, m);
-            else if (m && m.type === "dispKeyState") {
-              wardStates[data.Sender] = m;
-              onChange();
-            } else if (m && m.type === "dispAsk" && wards()[data.Sender]) {
-              wards()[data.Sender].asked = Date.now();
-              save();
-              onChange();
-              local("\u{1F5DD}\uFE0F " + who(data.Sender) + " is askin' to be let out of hardcore. Open the Dispensary's page (Keys you hold) to let them out.");
-            }
-          }
-        } catch (e) {
-          console.warn("[Dispensary] hardcore:", e);
-        }
-        return next2(args);
-      });
-    } catch (e) {
-      console.warn("[Dispensary] keyholders can't reach you:", e);
-    }
-    try {
-      mod2.hookFunction("ServerAccountBeep", 11, (args, next2) => {
-        try {
-          const d = args[0], t = d && typeof d.Message === "string" ? /\s*\[fd:(check|letout|end)\]\s*$/.exec(d.Message) : null;
-          if (t) {
-            if (isKey(d.MemberNumber)) onKey(d.MemberNumber, { do: t[1] });
-            d.Message = d.Message.slice(0, t.index);
-          }
-        } catch (e) {
-        }
-        return next2(args);
-      });
-    } catch (e) {
-    }
-    try {
-      mod2.hookFunction("ChatRoomSync", 11, (args, next2) => {
-        const r = next2(args);
-        setTimeout(() => {
-          if (hardOn()) announce();
-        }, 3e3);
-        return r;
-      });
-    } catch (e) {
-    }
-  }
-
-  // dispensary/src/nipples.js
-  var W11 = window;
-  var me5 = () => W11.Player && W11.Player.MemberNumber || 0;
-  var charOf3 = (mn) => (mn === me5() ? W11.Player : (W11.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-  var inRoom2 = () => W11.CurrentScreen === "ChatRoom" && typeof W11.ServerSend === "function";
-  var others = /* @__PURE__ */ new Map();
-  function heldOpen() {
-    let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
-    const p = mine().nips;
-    if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
-    return Math.max(n, toyOpen(W11.Player));
-  }
-  var MIN5 = 6e4;
-  var HOUR2 = 36e5;
-  var DAY4 = 864e5;
-  var TRAIN = { step: 0.1, every: 30 * MIN5, cock: 0.15, finger: 0.05, grace: 12 * HOUR2, perDay: 0.5 };
-  var trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 });
-  var trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
-  function nipsOpen() {
-    return Math.max(heldOpen(), trainedLevel());
-  }
-  var NIP_WORDS = ["closed", "open", "wide open", "gapin'"];
-  function nipsInfo() {
-    const open2 = nipsOpen(), trained = trainedLevel(), lvl = (st().nipTrain || {}).lvl || 0, held = heldOpen();
-    const toy = toyIn(W11.Player), T = toyOf(toy);
-    return {
-      open: open2,
-      trained,
-      held,
-      word: NIP_WORDS[open2],
-      trainedWord: NIP_WORDS[trained],
-      toward: held > trained && trained < 3 ? Math.max(0, Math.min(99, Math.floor((lvl - trained) * 100))) : 0,
-      loads: nipLoads().n || 0,
-      toy: T ? T.label : "",
-      locked: !!(toy && toyLocked(toy)),
-      heal: st().nipsHeal !== false
-    };
-  }
-  function nipsTrainTick(now) {
-    now = now || Date.now();
-    const T = trainOf(), held = heldOpen(), dt = Math.max(0, Math.min(now - (T.at || now), 15 * MIN5));
-    T.at = now;
-    if (held > 0) {
-      T.open = now;
-      if (T.lvl < held) T.lvl = Math.min(held, T.lvl + TRAIN.step * dt / TRAIN.every);
-    } else if (st().nipsHeal !== false && T.lvl > 0 && now - Math.max(T.open || 0, T.used || 0) > TRAIN.grace) T.lvl = Math.max(0, T.lvl - TRAIN.perDay * dt / DAY4);
-  }
-  var popped = "";
-  var lastPopped = () => popped;
-  function nipsClose(quiet) {
-    const toy = toyIn(W11.Player);
-    popped = "";
-    if (toy && toyLocked(toy)) return 0;
-    const was = nipsOpen();
-    if (toy) {
-      popped = toyOf(toy).label;
-      try {
-        W11.InventoryRemove(W11.Player, "ItemNipples", false);
-        if (typeof W11.CharacterRefresh === "function") W11.CharacterRefresh(W11.Player);
-        if (typeof W11.ChatRoomCharacterItemUpdate === "function") W11.ChatRoomCharacterItemUpdate(W11.Player, "ItemNipples");
-      } catch (e) {
-      }
-    }
-    st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 };
-    try {
-      if (active("dilator")) end("dilator", "quiet");
-    } catch (e) {
-    }
-    try {
-      if (mine().nips) letGo("nips", "quiet");
-    } catch (e) {
-    }
-    save();
-    nipsTell(false);
-    if (!quiet && was) local("Your nipples close up again, snug and tender, as if they'd never been stretched.");
-    return was;
-  }
-  function openOf(mn) {
-    mn = Number(mn);
-    if (mn === me5()) return nipsOpen();
-    const e = others.get(mn);
-    return e && Date.now() - e.at < 6 * 36e5 ? e.n : 0;
-  }
-  var told2 = 0;
-  var tellPage = (detail) => {
-    try {
-      W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail }));
-    } catch (e) {
-    }
-  };
-  var shown = -1;
-  function nipsTell(force) {
-    const n = nipsOpen();
-    if (n !== shown) {
-      shown = n;
-      tellPage({ type: "nips", from: me5(), n });
-    }
-    if (!inRoom2() || !force && n === told2 || force && !n) return false;
-    told2 = n;
-    try {
-      W11.ServerSend("ChatRoomChat", makeMsg("dispNips", { n }));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  function onNips(from, m) {
-    const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0))), was = openOf(from);
-    if (n) others.set(from, { n, at: Date.now() });
-    else others.delete(from);
-    if (was !== n) tellPage({ type: "nips", from, n });
-  }
-  var ACTS = {
-    cock: {
-      name: "NippleFuck",
-      label: "Fuck nipple",
-      image: "Icons/Activity/PenetrateSlow.png",
-      max: 90,
-      action: "SourceCharacter pushes into TargetCharacter's stretched-open nipple, slow and deep, and fucks it."
-    },
-    finger: {
-      name: "NippleFinger",
-      label: "Finger nipple",
-      selfLabel: "Finger your nipple",
-      image: "Icons/Activity/MasturbateHand.png",
-      max: 70,
-      action: "SourceCharacter works a finger right inside TargetCharacter's open nipple.",
-      selfAction: "SourceCharacter slips a finger inside one of PronounPossessive own open nipples."
-    }
-  };
-  var hasCock = (C) => {
-    try {
-      return !!(C && typeof C.HasPenis === "function" && C.HasPenis());
-    } catch (e) {
-      return false;
-    }
-  };
-  var mode = "";
-  var lscgApi = null;
-  var gameName = (k) => mode === "lscg" ? "LSCG_" + LSCG_ID + "." + ACTS[k].name.toLowerCase() : "FarmDisp_" + ACTS[k].name;
-  var kindOfName = (n) => Object.keys(ACTS).find((k) => gameName(k) === n) || null;
-  var usedAt = 0;
-  var lastIn = /* @__PURE__ */ new Map();
-  function nipsUsed(from, kind) {
-    if (from && from !== me5()) nipsFed(from, kind);
-    const now = Date.now();
-    {
-      const T = trainOf();
-      T.used = now;
-      T.lvl = Math.min(3, T.lvl + (kind === "cock" ? TRAIN.cock : TRAIN.finger));
-      save();
-    }
-    if (kind === "cock" && from && from !== me5()) lastIn.set(from, now);
-    if (now - usedAt > 3 * 6e4) {
-      usedAt = now;
-      const L = LINES.nips && LINES.nips[!from || from === me5() ? "self" : kind === "cock" ? "fucked" : "fingered"];
-      if (L && L.length) local(fill(pick(L), { by: from && from !== me5() ? nameOf(from) : "you" }));
-    }
-  }
-  function nipsToyUsed() {
-    const T = trainOf();
-    T.used = Date.now();
-    T.lvl = Math.min(3, T.lvl + TRAIN.finger);
-    save();
-    if (mine().nips) nipsFed(0, "toy");
-  }
-  var CREAM_WINDOW = 90 * 1e3;
-  var lastFuck = null;
-  function fucked(target2) {
-    if (target2 && target2 !== me5()) lastFuck = { target: Number(target2), at: Date.now() };
-  }
-  function onMyClimax() {
-    const f = lastFuck;
-    lastFuck = null;
-    if (!f || Date.now() - f.at > CREAM_WINDOW || W11.ActivityOrgasmRuined) return;
-    if (!hasCock(W11.Player) || !charOf3(f.target)) return;
-    try {
-      W11.ServerSend("ChatRoomChat", makeMsg("dispCream", {}, f.target));
-    } catch (e) {
-      return;
-    }
-    local(fill(pick(LINES.nips.came), { by: nameOf(f.target) }));
-  }
-  var onFarmLoad = null;
-  function nipsOnFarmLoad(f) {
-    onFarmLoad = f;
-  }
-  function onCream(from) {
-    const at = lastIn.get(from);
-    if (!at || Date.now() - at > 3 * 6e4) return;
-    lastIn.delete(from);
-    const S2 = st();
-    S2.nipLoads = (S2.nipLoads || 0) + 1;
-    const by = S2.nipLoadsBy || (S2.nipLoadsBy = {});
-    by[from] = (by[from] || 0) + 1;
-    const keys = Object.keys(by);
-    if (keys.length > 40) delete by[keys[0]];
-    save();
-    action(fill(pick(LINES.nips.creamed), { by: nameOf(from) }));
-    try {
-      W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["chest"], amount: 1 } }));
-    } catch (e) {
-    }
-    if (onFarmLoad) {
-      try {
-        onFarmLoad(from);
-      } catch (e) {
-      }
-    }
-  }
-  var nipLoads = () => ({ n: st().nipLoads || 0, by: Object.assign({}, st().nipLoadsBy || {}) });
-  function nipsLscg(api3, caps2) {
-    if (!api3 || !caps2 || !caps2.has("activities") || mode) return false;
-    try {
-      api3.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 && !toyIn(acted) });
-      api3.activities.registerPrerequisite({ name: "hascock", check: ({ acting }) => hasCock(charOf3(acting && acting.MemberNumber)) });
-      for (const k of Object.keys(ACTS)) {
-        const A = ACTS[k];
-        api3.activities.register({
-          name: A.name.toLowerCase(),
-          maxProgress: A.max,
-          maxProgressSelf: A.max,
-          image: A.image,
-          prerequisites: k === "cock" ? ["ZoneAccessible", "ZoneNaked", "CanUsePenis", "hascock", "nipsopen"] : ["ZoneAccessible", "ZoneNaked", "UseHands", "nipsopen"],
-          targets: [Object.assign({ group: "ItemNipples", label: A.label, action: A.action }, A.selfAction ? { selfAllowed: true, selfLabel: A.selfLabel, selfAction: A.selfAction } : {})],
-          onSend: ({ target: target2 }) => {
-            try {
-              if (k === "cock") fucked(target2);
-            } catch (e) {
-            }
-          },
-          onReceive: ({ sender }) => {
-            try {
-              nipsUsed(Number(sender) || 0, k);
-            } catch (e) {
-            }
-          }
-        });
-      }
-      mode = "lscg";
-      lscgApi = api3;
-      return true;
-    } catch (e) {
-      console.warn("[Dispensary] LSCG wouldn't take the nipple actions:", e);
-      return false;
-    }
-  }
-  var TEXT = {};
-  function addOwn(mod2) {
-    if (mode) return false;
-    const list = W11.ActivityFemale3DCG || (typeof ActivityFemale3DCG !== "undefined" ? ActivityFemale3DCG : null);
-    const order = W11.ActivityFemale3DCGOrdering || (typeof ActivityFemale3DCGOrdering !== "undefined" ? ActivityFemale3DCGOrdering : null);
-    if (!Array.isArray(list) || !Array.isArray(order) || typeof W11.ActivityCheckPrerequisite !== "function") return false;
-    mode = "own";
-    for (const k of Object.keys(ACTS)) {
-      const A = ACTS[k], n = gameName(k);
-      if (list.some((a) => a && a.Name === n)) continue;
-      list.push({
-        Name: n,
-        MaxProgress: A.max,
-        MaxProgressSelf: A.max,
-        Target: ["ItemNipples"],
-        TargetSelf: A.selfAction ? ["ItemNipples"] : void 0,
-        Prerequisite: k === "cock" ? ["ZoneAccessible", "ZoneNaked", "CanUsePenis", "FarmDispHasCock", "FarmDispNipsOpen"] : ["ZoneAccessible", "ZoneNaked", "UseHands", "FarmDispNipsOpen"]
-      });
-      order.push(n);
-      TEXT["Activity" + n] = A.label;
-      TEXT["Label-ChatOther-ItemNipples-" + n] = A.label;
-      TEXT["ChatOther-ItemNipples-" + n] = A.action;
-      if (A.selfAction) {
-        TEXT["Label-ChatSelf-ItemNipples-" + n] = A.selfLabel;
-        TEXT["ChatSelf-ItemNipples-" + n] = A.selfAction;
-      }
-    }
-    const hook = (fn, pri, f) => {
-      try {
-        mod2.hookFunction(fn, pri, f);
-      } catch (e) {
-        console.warn("[Dispensary] nipples can't hook " + fn + ":", e);
-      }
-    };
-    hook("ActivityCheckPrerequisite", 5, (args, next2) => {
-      if (args[0] === "FarmDispNipsOpen") {
-        try {
-          return openOf(args[2] && args[2].MemberNumber) > 0 && !toyIn(args[2]);
-        } catch (e) {
-          return false;
-        }
-      }
-      if (args[0] === "FarmDispHasCock") return hasCock(args[1]);
-      return next2(args);
-    });
-    hook("PreferenceGetActivityFactor", 5, (args, next2) => /^FarmDisp_Nipple/.test(String(args[1])) ? 2 : next2(args));
-    hook("ActivityDictionaryText", 5, (args, next2) => Object.prototype.hasOwnProperty.call(TEXT, args[0]) ? TEXT[args[0]] : next2(args));
-    hook("ElementButton.CreateForActivity", 5, (args, next2) => {
-      try {
-        const a = args[1], k = a && a.Activity && kindOfName(a.Activity.Name);
-        if (k && !a.Item) {
-          args[4] = Object.assign({}, args[4] || {});
-          args[4].image = ACTS[k].image;
-        }
-      } catch (e) {
-      }
-      return next2(args);
-    });
-    hook("ServerSend", 5, (args, next2) => {
-      try {
-        const d = args[1];
-        if (args[0] === "ChatRoomChat" && d && d.Type === "Activity" && Array.isArray(d.Dictionary) && /FarmDisp_Nipple/.test(String(d.Content))) {
-          const get = (key2) => {
-            const e = d.Dictionary.find((x) => x && x[key2] != null);
-            return e ? e[key2] : null;
-          };
-          const src = Number(get("SourceCharacter")), tgt = Number(get("TargetCharacter"));
-          const nm = (mn) => {
-            const C = charOf3(mn);
-            return C ? String(C.Nickname || C.Name || mn) : String(mn);
-          };
-          const text3 = String(TEXT[d.Content] || "").replace(/SourceCharacter/g, nm(src)).replace(/TargetCharacter/g, nm(tgt)).replace(/PronounPossessive/g, "their");
-          if (text3) d.Dictionary.push({ Tag: 'MISSING TEXT IN "ActivityDictionary.csv": ' + d.Content, Text: text3 });
-          if (/FarmDisp_NippleFuck$/.test(String(d.Content)) && src === me5()) fucked(tgt);
-        }
-      } catch (e) {
-      }
-      return next2(args);
-    });
-    return true;
-  }
-  var onSuckled = null;
-  function nipsOnSuckle(f) {
-    onSuckled = f;
-  }
-  function onActivity2(data) {
-    const D = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (key2) => {
-      const e = D.find((x) => x && x[key2] != null);
-      return e ? e[key2] : null;
-    };
-    const name = String(get("ActivityName") || ""), src = Number(get("SourceCharacter")) || 0, tgt = Number(get("TargetCharacter")) || 0, grp = String(get("FocusGroupName") || "");
-    if (tgt !== me5() || !/^ItemNipples/.test(grp)) return;
-    const k = mode === "own" ? kindOfName(name) : null;
-    if (k) {
-      nipsUsed(src, k);
-      return;
-    }
-    if (src && src !== me5() && /^(Suck|Nibble|Lick|Kiss)/.test(name) && onSuckled) onSuckled(src);
-  }
-  function initNipples(mod2) {
-    setTimeout(() => {
-      try {
-        if (!mode) addOwn(mod2);
-      } catch (e) {
-        console.warn("[Dispensary] the nipple actions:", e);
-      }
-    }, 8e3);
-    try {
-      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
-        try {
-          const data = args[0];
-          if (data && data.Type === "Activity") onActivity2(data);
-          else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me5()) {
-            const m = readMsg(data);
-            if (m && m.type === "dispNips") onNips(data.Sender, m);
-            else if (m && m.type === "dispCream") onCream(data.Sender);
-            else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
-          }
-        } catch (e) {
-          console.warn("[Dispensary] nipples:", e);
-        }
-        return next2(args);
-      });
-    } catch (e) {
-      console.warn("[Dispensary] nipples can't hear:", e);
-    }
-    try {
-      mod2.hookFunction("ActivityOrgasmStart", 2, (args, next2) => {
-        try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) setTimeout(() => onMyClimax(), 300);
-        } catch (e) {
-        }
-        return next2(args);
-      });
-    } catch (e) {
-    }
-  }
-  var nipsState = () => ({ mode, others: [...others.entries()], told: told2, names: Object.keys(ACTS).map(gameName), text: Object.assign({}, TEXT), lscg: !!lscgApi, train: Object.assign({}, st().nipTrain || {}), lastFuck });
-  var nipsCream = (from) => onCream(from);
-  var nipsClimax = () => onMyClimax();
-  var nipsAddOwn = (mod2) => addOwn(mod2);
-
-  // dispensary/src/lscg.js
-  var W12 = window;
-  var api2 = null;
-  var caps = null;
-  var syncing = null;
-  var REG = {};
-  var lastLscg = {};
-  var ours4 = (id) => LSCG_ID + "." + id;
-  var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
-  var BREATH_MINS = 10;
-  function lscgPresent() {
-    if (W12.LSCG) return true;
-    try {
-      const sdk = W12.bcModSdk;
-      if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
-    } catch (e) {
-    }
-    return false;
-  }
-  var lscgApi2 = () => !!(api2 && caps && caps.has("drugs"));
-  var lscgHas = (id) => lscgApi2() && !!REG[id];
-  var lastLscgDose = (id) => lastLscg[id] || 0;
-  function lscgDose(type, o) {
-    if (!lscgApi2()) return false;
-    o = o || {};
-    try {
-      return !!api2.drugs.dose(type, { multiplier: Math.max(0.2, Math.min(3, Number(o.x) || 1)), method: o.method || "inject", sender: o.by, minigame: false });
-    } catch (e) {
-      return false;
-    }
-  }
-  function lscgShow(id, by) {
-    if (!lscgHas(id) || syncing) return;
-    syncing = id;
-    try {
-      api2.drugs.dose(ours4(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
-    } catch (e) {
-    } finally {
-      syncing = null;
-    }
-  }
-  function setUp(L) {
-    try {
-      api2 = L.getModApi({ id: LSCG_ID, name: "The Farmhand's Dispensary", version: VERSION });
-    } catch (e) {
-      api2 = null;
-      return;
-    }
-    caps = L.capabilities || /* @__PURE__ */ new Set();
-    if (caps.has("drugs")) {
-      for (const [id, B] of Object.entries(BOOK)) {
-        if (B.lscg || B.instant || B.noLscg || REG[id]) continue;
-        try {
-          api2.drugs.register({
-            name: id,
-            label: B.label,
-            description: B.desc,
-            keywords: B.keywords,
-            color: B.color,
-            soakKeywords: B.soak || void 0,
-            max: 600,
-            decayPerMinute: 0,
-            tickSeconds: 20,
-            onDose(ctx) {
-              if (syncing === id) {
-                ctx.setLevel(minsLeft(id));
-                return;
-              }
-              lastLscg[id] = Date.now();
-              if (ctx.method === "breath") {
-                const r0 = give(id, { by: ctx.sender, mins: BREATH_MINS, upto: true, quiet: active(id) });
-                ctx.setLevel(r0.ok ? minsLeft(id) : 0);
-                return;
-              }
-              const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
-              const text3 = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text3) || void 0;
-              if (text3 && isLater(text3)) {
-                queue(id, { by: ctx.sender, x: 1, p });
-                ctx.setLevel(active(id) ? minsLeft(id) : 0);
-                return;
-              }
-              const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult), p });
-              ctx.setLevel(r.ok ? minsLeft(id) : 0);
-            },
-            onTick(ctx) {
-              const m = active(id) ? minsLeft(id) : 0;
-              if (ctx.level !== m) ctx.setLevel(m);
-            },
-            onWearOff() {
-              if (active(id)) end(id, "lscg");
-            }
-            // LSCG's antidote, or LSCG's safeword
-          });
-          REG[id] = true;
-        } catch (e) {
-          console.warn("[Dispensary] LSCG wouldn't take " + id + ":", e);
-        }
-      }
-    }
-    try {
-      nipsLscg(api2, caps);
-    } catch (e) {
-      console.warn("[Dispensary] LSCG nipple actions:", e);
-    }
-    if (caps.has("events")) {
-      try {
-        api2.events.on("safeword", () => {
-          if (hardOn()) askOut();
-          else clearAll("safeword");
-        });
-      } catch (e) {
-      }
-      try {
-        api2.events.before("drug.beforeApply", (c) => {
-          const p = c && c.payload;
-          if (!p || !Array.isArray(p.types) || syncing) return;
-          for (let i = p.types.length - 1; i >= 0; i--) {
-            const m = /^farmhand-dispensary\.([a-z]+)$/.exec(String(p.types[i]));
-            if (m && (st().off[m[1]] || typeof p.sender === "number" && !allowed(p.sender))) p.types.splice(i, 1);
-          }
-        });
-      } catch (e) {
-      }
-    }
-  }
-  function initLscg() {
-    const q = W12.LSCG_OnLoad = W12.LSCG_OnLoad || [];
-    q.push((L) => {
-      try {
-        setUp(L);
-      } catch (e) {
-        console.warn("[Dispensary] LSCG hookup:", e);
-      }
-    });
-  }
-
-  // dispensary/src/lines-kits.js
-  LINES.kits = {
-    start_plain: [
-      "%b's %k kit starts puttin' itself on %t, one piece at a time.",
-      "%t feels the first tug: %b's %k is on its way onto them, whether they like it or not.",
-      "Somethin' clicks into place on %t. %b's %k kit has started dressin' them."
-    ],
-    piece_plain: [
-      "The %g slides into place on %t, snug and certain.",
-      "%t's %g settles on them, neat as if somebody'd put it there by hand.",
-      "Another piece: the %g, fittin' itself onto %t.",
-      "The %g buckles itself on %t without anybody touchin' it."
-    ],
-    back_plain: [
-      "The %g's back on %t again, quick as it came off.",
-      "%t takes it off, and the %g just puts itself right back.",
-      "The %g creeps back onto %t. The kit isn't done with them."
-    ],
-    done_plain: [
-      "%t's all done up in %k now, every piece in place. It'll stay that way a while.",
-      "The last piece settles. %t's wearin' the whole of %k, and it isn't comin' off till it's done."
-    ],
-    off_plain: [
-      "The %k kit lets go of %t, and their own clothes slip back on where it was.",
-      "%k comes away from %t piece by piece, and their old outfit's back on them, as if it never left."
-    ],
-    start_living: [
-      "Somethin' slick and warm starts to move on %t's skin. %b's %k is alive, and it's crawlin' on.",
-      "%t shivers: %b's %k kit wakes up and starts to creep over them, wet and eager.",
-      "It's breathin'. %b's %k slithers onto %t one piece at a time, like it's been waitin' for them."
-    ],
-    piece_living: [
-      "The %g oozes up %t's body and sets, glossy and tight, then gives a little squeeze.",
-      "The %g wraps itself round %t, slick and throbbin', and shrinks to fit.",
-      "A wet sound, and the %g's on %t: it crawled there by itself, and now it's pulsin' gently.",
-      "The %g slides over %t like warm syrup and hardens snug, still twitchin'.",
-      "The %g squirms into place on %t and settles with a satisfied little shiver."
-    ],
-    back_living: [
-      "The %g crawls right back onto %t, slick and stubborn. It likes it there.",
-      "%t peels the %g off, and it oozes straight back on, tighter than before.",
-      "The %g slithers back up %t's skin. It's not lettin' go of them."
-    ],
-    done_living: [
-      "%t's covered now: the whole of %k is on them, warm and breathin', squeezin' now and then like it's alive. It is.",
-      "The last of %k seals over %t with a wet kiss. All of it's alive, and all of it's holdin' on."
-    ],
-    off_living: [
-      "%k goes still, then slides off %t in slow, wet sheets, and their own clothes are back on underneath.",
-      "The livin' %k lets go of %t with a reluctant shiver and crawls away, leavin' their old outfit on them."
-    ],
-    start_demon: [
-      "A red glow sparks on %t's skin, and %b's %k answers it: the curse is takin' hold, a piece at a time.",
-      "%t hears somethin' laugh, low and cruel. %b's %k has been called, and it's comin' for them.",
-      "Sigils flare along %t's arms. %b's cursed %k starts bindin' itself to them."
-    ],
-    piece_demon: [
-      `The %g burns into place on %t, sigils glowin' along its edges, and somethin' whispers "mine".`,
-      "Red light snaps tight round %t, and when it fades the %g's on them, warm as a brand.",
-      "The %g locks onto %t with a hiss of brimstone. A voice in their ear purrs how good it looks on them.",
-      "The %g appears on %t in a curl of black smoke, already too tight, already theirs.",
-      "A sigil sears onto %t's skin, and the %g settles over it, humming with somethin' that isn't kind."
-    ],
-    back_demon: [
-      "The %g flares back onto %t in a flash of red. The curse laughs at them for tryin'.",
-      "%t takes the %g off, and the sigils pull it straight back, burnin' hotter for the cheek.",
-      'The %g reappears on %t with a cruel little chuckle in their ear: "no."'
-    ],
-    done_demon: [
-      "%t's bound in the whole of %k now, every sigil glowin'. The curse settles in to enjoy itself.",
-      "The last piece of %k burns into place. Somethin' sighs, pleased, inside %t's head. They're its, for now."
-    ],
-    off_demon: [
-      "The sigils on %t gutter and go out, and %k crumbles away to ash. Their own clothes are back on, a little scorched round the edges.",
-      "The curse lets go of %t with a disappointed hiss, and %k is gone, their old outfit on them again."
-    ],
-    start_brain: [
-      "A soft hum fills %t's head. %b's %k kit is goin' on them, and part of them is already noddin' along.",
-      "%t's thoughts go slow and syrupy. %b's %k is dressin' them, and it feels so right to let it.",
-      `"Good. Hold still," whispers somethin' only %t can hear, and %b's %k begins.`
-    ],
-    piece_brain: [
-      "The %g goes on %t, and their eyes go a little glassier with it.",
-      "%t helps the %g on without meanin' to. It feels like the right thing to do.",
-      "The %g settles on %t, and a soft voice tells them how much better they look already.",
-      "The %g clicks into place on %t, and another thought of their own floats away.",
-      "%t holds still for the %g. Stillness feels nice. Obedience feels nicer."
-    ],
-    back_brain: [
-      "%t blinks. The %g's back on them, and they don't remember puttin' it there.",
-      "%t takes the %g off, then puts it right back on, smilin' vaguely. That's where it goes.",
-      `"Ah ah," murmurs the voice, and %t's own hands put the %g back on.`
-    ],
-    done_brain: [
-      "%t's wearin' the whole of %k now, eyes soft and empty. The hum in their head says they look perfect.",
-      "The last piece settles, and so does %t: dressed in %k, calm and blank and very, very obedient."
-    ],
-    off_brain: [
-      "The hum fades, and %k comes off %t. They blink at their own clothes, back on them, and can't quite remember the last little while.",
-      "%t wakes up out of it, dressed as they were before %k. Bits of it are still hummin' at the back of their head."
-    ],
-    missing: [
-      "The kit called %k can't be found: %b's Dispensary didn't send it (they might be gone, or not have it any more)."
-    ],
-    missing_own: [
-      "You've no kit called %k saved: /dispensary kit save <name> keeps what you're wearin', or save it in LSCG."
-    ],
-    nothing: [
-      "The %k kit has nothin' in it that's allowed to go on you (your Kits settin' picks clothes, restraints or both)."
-    ]
-  };
-
-  // dispensary/src/kits.js
-  var W13 = window;
-  var SPEEDS = { slow: 60, steady: 30, fast: 10, now: 0 };
-  var SPEED_NAMES = { slow: "a piece a minute", steady: "a piece every half minute", fast: "a piece every ten seconds", now: "all at once" };
-  var KIT_RE = /\bkit\s*:\s*([a-z0-9][^|,.;!?\n]{0,39})/;
-  var kitKeyOf = (text3) => {
-    const m = KIT_RE.exec(String(text3 || "").toLowerCase());
-    return m ? m[1].trim().replace(/\s+/g, " ") : "";
-  };
-  var FLAVOURS = [
-    ["living", /\b(living|livin'?|alive|symbiot\w*|tentacle\w*|slime\w*|latex)\b/],
-    ["demon", /\b(demon\w*|cursed|enchanted|infernal|hell\w*|sigil\w*|succubus)\b/],
-    ["brain", /\b(brainwash\w*|hypno\w*|mind\w*|conditioning|trance)\b/]
+  var HOLE_FIND = [
+    ["every", /\b(?:every|all|each)(?:[\s_-]+(?:of[\s_-]+)?(?:her|his|their|your|my|the|its|three|four))?[\s_-]+holes?\b/g],
+    ["both", /\bboth(?:[\s_-]+(?:of[\s_-]+)?(?:her|his|their|your|my|the))?[\s_-]+holes\b/g],
+    ["vulva", /\b(?:pussy|pussies|cunt|vulva|vagina\w*|womb|slit|cooch|twat|front[\s_-]?hole)\b/g],
+    ["butt", /\b(?:ass|arse|asshole|butt|butthole|anus|anal|rear|bum|backdoor|bowels?|back[\s_-]?hole)\b/g],
+    ["mouth", /\b(?:mouth|throat|oral|gullet|stomach)\b/g],
+    ["nips", /\b(?:nipples?|nips|teats?|tits?|titties|breasts?|boobs?|udders?)\b/g]
   ];
-  var flavourOf = (text3) => {
-    const t = String(text3 || "").toLowerCase(), f = FLAVOURS.filter(([, re]) => re.test(t)).map(([k]) => k);
-    return f.length ? f.join("+") : "plain";
-  };
-  var kitPart = (text3) => {
-    const k = kitKeyOf(text3);
-    return k ? k + "#" + flavourOf(text3) : "";
-  };
-  var splitPart = (p) => {
-    const i = String(p || "").lastIndexOf("#");
-    return i > 0 ? { key: p.slice(0, i), flav: p.slice(i + 1) } : { key: String(p || ""), flav: "plain" };
-  };
-  var what = () => ["clothes", "binds", "both"].includes(st().kitWhat) ? st().kitWhat : "both";
-  var speedOf = () => SPEEDS[st().kitSpeed] != null ? SPEEDS[st().kitSpeed] : SPEEDS.steady;
-  var me6 = () => W13.Player && W13.Player.MemberNumber || 0;
-  var send2 = (type, data, to) => {
-    try {
-      if (typeof W13.ServerSend === "function") W13.ServerSend("ChatRoomChat", makeMsg(type, data, to));
-      return true;
-    } catch (e) {
-      return false;
+  function holesIn(text3) {
+    const out = [], t = String(text3 || "").toLowerCase();
+    for (const [k, re] of HOLE_FIND) {
+      re.lastIndex = 0;
+      let m;
+      while (m = re.exec(t)) out.push({ k, at: m.index });
     }
-  };
-  var LZ = () => W13.LZString;
-  var pack = (bundle) => {
-    try {
-      return LZ().compressToBase64(JSON.stringify(bundle));
-    } catch (e) {
-      return "";
-    }
-  };
-  var unpack = (code) => {
-    try {
-      const b = JSON.parse(LZ().decompressFromBase64(String(code || "")));
-      return Array.isArray(b) ? b.filter((i) => i && typeof i.Group === "string" && typeof i.Name === "string") : null;
-    } catch (e) {
-      return null;
-    }
-  };
-  var groupOf = (name) => {
-    try {
-      return typeof W13.AssetGroupGet === "function" && W13.AssetGroupGet("Female3DCG", name) || W13.AssetGroupMap && W13.AssetGroupMap.get(name) || null;
-    } catch (e) {
-      return null;
-    }
-  };
-  function kindOfGroup(g) {
-    if (!g || g.BodyCosplay || g.AllowCustomize === false) return null;
-    if (g.Category === "Item") return "binds";
-    if (g.Category === "Appearance" && g.Clothing) return "clothes";
-    return null;
+    return out.sort((a, b) => a.at - b.at);
   }
-  var wanted = (gname) => {
-    const k = kindOfGroup(groupOf(gname));
-    return !!k && (what() === "both" || what() === k);
-  };
-  var itemIn2 = (group) => W13.Player && Array.isArray(W13.Player.Appearance) ? W13.Player.Appearance.find((i) => i && i.Asset && i.Asset.Group && i.Asset.Group.Name === group) : null;
-  var lockedOn = (it) => !!(it && it.Property && it.Property.LockedBy);
-  function wornBundle() {
-    const P = W13.Player;
-    if (!P || !Array.isArray(P.Appearance)) return [];
-    return P.Appearance.filter((i) => i && i.Asset && i.Asset.Group && kindOfGroup(i.Asset.Group)).map((i) => {
-      const b = { Group: i.Asset.Group.Name, Name: i.Asset.Name };
-      if (i.Color != null) b.Color = i.Color;
-      if (i.Difficulty != null) b.Difficulty = i.Difficulty;
-      if (i.Craft) b.Craft = i.Craft;
-      if (i.Property) {
-        try {
-          b.Property = typeof W13.ItemPropertiesCompress === "function" ? W13.ItemPropertiesCompress(i) : JSON.parse(JSON.stringify(i.Property));
-        } catch (e) {
-          b.Property = JSON.parse(JSON.stringify(i.Property));
-        }
+  var CLAUSE = /(?<!\d),|,(?!\d)|[;|\n]+|\.(?!\d)|\s(?:then|plus)\s/;
+  function seedAmounts(text3) {
+    const t = String(text3 || "").toLowerCase().replace(/_+/g, " "), out = {};
+    const add2 = (k, v) => {
+      out[k] = Math.min(SEED_HOLE_MAX, (out[k] || 0) + Math.max(0, Math.round(v)));
+    };
+    const orphanH = [], orphanA = [];
+    for (const c of t.split(CLAUSE)) {
+      if (!c || !c.trim()) continue;
+      const A = amountsIn(c), H2 = holesIn(c);
+      if (!H2.length) {
+        for (const a of A) orphanA.push(a.ml);
+        continue;
       }
-      return b;
-    });
-  }
-  var lscgOutfits = () => {
-    try {
-      const L = W13.LSCG;
-      return L && typeof L.Outfits === "function" ? L.Outfits() : null;
-    } catch (e) {
-      return null;
-    }
-  };
-  function kitNames() {
-    const own = Object.keys(st().kits || {}), C = lscgOutfits();
-    let lscg = [];
-    try {
-      lscg = C && typeof C.GetOutfitNames === "function" ? C.GetOutfitNames() : C && typeof C.GetOutfitKeys === "function" ? C.GetOutfitKeys() : [];
-    } catch (e) {
-      lscg = [];
-    }
-    return { own, lscg };
-  }
-  function kitLookup(key2) {
-    key2 = String(key2 || "").toLowerCase().trim();
-    if (!key2) return null;
-    const own = (st().kits || {})[key2];
-    if (own) return unpack(own);
-    const C = lscgOutfits();
-    try {
-      if (C && C.GetOutfit(key2)) {
-        const b = C.GetOutfitBundle(key2);
-        return Array.isArray(b) ? b : null;
+      if (!A.length) {
+        for (const x of H2) orphanH.push(x.k);
+        continue;
       }
-    } catch (e) {
-    }
-    return null;
-  }
-  function kitSave(name) {
-    const key2 = String(name || "").toLowerCase().trim().replace(/\s+/g, " ").slice(0, 40);
-    if (!key2) return { ok: false, why: "name" };
-    const S2 = st();
-    S2.kits = S2.kits || {};
-    if (!S2.kits[key2] && Object.keys(S2.kits).length >= 8) return { ok: false, why: "full" };
-    const b = wornBundle();
-    if (!b.length) return { ok: false, why: "empty" };
-    const code = pack(b);
-    if (!code || code.length > 12e3) return { ok: false, why: "big" };
-    S2.kits[key2] = code;
-    save();
-    return { ok: true, key: key2, n: b.length };
-  }
-  function kitDelete(name) {
-    const S2 = st(), key2 = String(name || "").toLowerCase().trim();
-    if (!S2.kits || !S2.kits[key2]) return false;
-    delete S2.kits[key2];
-    save();
-    return true;
-  }
-  function onAsk(from, m) {
-    const key2 = String(m.key || "").slice(0, 40), b = kitLookup(key2);
-    const clean2 = b ? b.filter((i) => kindOfGroup(groupOf(i.Group))) : null;
-    send2("dispKit", clean2 && clean2.length ? { key: key2, code: pack(clean2) } : { key: key2, none: true }, from);
-  }
-  var K2 = () => st().kit || null;
-  var waiting = null;
-  var lineOf2 = (key2, flav, v) => {
-    const L = LINES.kits || {}, pools = String(flav || "plain").split("+").map((f) => L[key2 + "_" + f]).filter((p) => p && p.length);
-    const pool = pools.length ? pools[Math.floor(Math.random() * pools.length)] : L[key2 + "_plain"] || [];
-    return pool.length ? fill(pick(pool), { by: v && v.by || "somebody" }).replace(/%g/g, v && v.g || "it").replace(/%k/g, v && v.k || "the kit") : "";
-  };
-  var onePiece2 = (n) => /[^s]s$/i.test(String(n).trim()) ? "pair of " + n : n;
-  var pieceName = (b) => {
-    try {
-      const A = W13.AssetGet("Female3DCG", b.Group, b.Name);
-      return onePiece2(String(b.Craft && b.Craft.Name || A && (A.Description || A.Name) || b.Name).toLowerCase());
-    } catch (e) {
-      return String(b.Name).toLowerCase();
-    }
-  };
-  function update(group) {
-    try {
-      if (group && typeof W13.ChatRoomCharacterItemUpdate === "function") W13.ChatRoomCharacterItemUpdate(W13.Player, group);
-      else if (typeof W13.ChatRoomCharacterUpdate === "function") W13.ChatRoomCharacterUpdate(W13.Player);
-    } catch (e) {
-    }
-  }
-  function refresh() {
-    try {
-      if (typeof W13.CharacterRefresh === "function") W13.CharacterRefresh(W13.Player, false);
-    } catch (e) {
-    }
-  }
-  function putOn(b, by) {
-    const P = W13.Player;
-    if (!P || typeof W13.InventoryWear !== "function" || typeof W13.AssetGet !== "function") return false;
-    const A = W13.AssetGet("Female3DCG", b.Group, b.Name);
-    if (!A || !wanted(b.Group)) return false;
-    const cur = itemIn2(b.Group);
-    if (cur && cur.Asset.Name === b.Name) return true;
-    if (cur && lockedOn(cur)) return false;
-    try {
-      if (typeof W13.InventoryBlockedOrLimited === "function" && W13.InventoryBlockedOrLimited(P, { Asset: A })) return false;
-    } catch (e) {
-    }
-    try {
-      if (typeof W13.InventoryChatRoomAllow === "function" && !W13.InventoryChatRoomAllow(A.Category || [])) return false;
-    } catch (e) {
-    }
-    let it = null;
-    try {
-      it = W13.InventoryWear(P, b.Name, b.Group, b.Color, b.Difficulty, by || me6(), b.Craft, false);
-    } catch (e) {
-      return false;
-    }
-    it = it || itemIn2(b.Group);
-    if (!it || it.Asset.Name !== b.Name) return false;
-    if (b.Property) {
-      try {
-        it.Property = typeof W13.ItemPropertiesDecompress === "function" ? W13.ItemPropertiesDecompress(Object.assign(it, { Property: {} }), b.Property) : JSON.parse(JSON.stringify(b.Property));
-      } catch (e) {
-        it.Property = JSON.parse(JSON.stringify(b.Property));
+      if (A.length === 1) {
+        for (const x of H2) add2(x.k, A[0].ml);
+        continue;
       }
-    }
-    if (lockedOn(it)) {
-      try {
-        if (typeof W13.InventoryUnlock === "function") W13.InventoryUnlock(P, it, false);
-        else {
-          for (const k of ["LockedBy", "LockMemberNumber", "RemoveTimer", "Password", "CombinationNumber", "MemberNumberList"]) delete it.Property[k];
-        }
-      } catch (e) {
+      if (A.length === H2.length) {
+        H2.forEach((x, i) => add2(x.k, A[i].ml));
+        continue;
       }
-    }
-    if (it.Property && it.Property.Effect) it.Property.Effect = it.Property.Effect.filter((e) => e !== "Lock");
-    return true;
-  }
-  function kitBegin(part, by) {
-    const { key: key2, flav } = splitPart(part);
-    if (!key2) return false;
-    const k = K2();
-    if (k && k.key === key2 && k.by === by) {
-      k.flav = flav;
-      save();
-      return true;
-    }
-    if (!by || by === me6()) {
-      const b = kitLookup(key2);
-      if (!b) {
-        local(fill(pick(LINES.kits.missing_own)).replace(/%k/g, key2));
-        return false;
-      }
-      return dress(key2, flav, by || me6(), b);
-    }
-    waiting = { key: key2, flav, by, at: Date.now() };
-    send2("dispKitAsk", { key: key2 }, by);
-    return true;
-  }
-  function onKit(from, m) {
-    if (!waiting || waiting.by !== from || String(m.key) !== waiting.key) return;
-    const w = waiting;
-    waiting = null;
-    const b = m.none ? null : unpack(m.code);
-    if (!b || !b.length) {
-      local(fill(pick(LINES.kits.missing), { by: nameOf(from) }).replace(/%k/g, w.key));
-      try {
-        endDose("kit");
-      } catch (e) {
-      }
-      return;
-    }
-    dress(w.key, w.flav, from, b);
-  }
-  var endDose = () => {
-  };
-  function dress(key2, flav, by, bundle) {
-    const S2 = st(), was = K2();
-    const pieces = bundle.filter((b) => wanted(b.Group)).slice(0, 60);
-    if (!pieces.length) {
-      local(fill(pick(LINES.kits.nothing)).replace(/%k/g, key2));
-      return false;
-    }
-    S2.kit = { key: key2, flav, by, old: was ? was.old : wornBundle(), pieces, queue: pieces.map((b) => b.Group), next: Date.now(), at: Date.now(), done: false };
-    save();
-    action(lineOf2("start", flav, { by: nameOf(by) || "somebody", k: key2 }));
-    kitTick(Date.now());
-    return true;
-  }
-  function kitTick(now) {
-    now = now || Date.now();
-    if (waiting && now - waiting.at > 2e4) {
-      const w = waiting;
-      waiting = null;
-      local(fill(pick(LINES.kits.missing), { by: nameOf(w.by) || "whoever made it" }).replace(/%k/g, w.key));
-      try {
-        endDose("kit");
-      } catch (e) {
-      }
-      return;
-    }
-    const k = K2();
-    if (!k) return;
-    if (!inRoom()) return;
-    if (k.done) for (const b of k.pieces) {
-      const cur = itemIn2(b.Group);
-      if (!cur && !k.queue.includes(b.Group) && wanted(b.Group)) {
-        k.queue.push(b.Group);
-        k.back = (k.back || 0) + 1;
-      }
-    }
-    if (!k.queue.length || now < k.next) return;
-    const gap2 = speedOf(), n = gap2 ? 1 : k.queue.length;
-    const put = [];
-    for (let i = 0; i < n && k.queue.length; i++) {
-      const g = k.queue.shift(), b = k.pieces.find((p) => p.Group === g);
-      if (!b) continue;
-      if (putOn(b, k.by)) put.push(b);
-    }
-    k.next = now + gap2 * 1e3;
-    if (put.length) {
-      refresh();
-      put.forEach((b) => update(b.Group));
-      const v = { g: pieceName(put[0]), k: k.key, by: nameOf(k.by) || "somebody" };
-      const back = k.done && k.back > 0;
-      const t = put.length > 1 ? "" : lineOf2(back ? "back" : "piece", k.flav, v);
-      if (t) back || Math.random() < 0.4 ? action(t) : local(t);
-      if (back) k.back = Math.max(0, k.back - put.length);
-    }
-    if (!k.queue.length && !k.done) {
-      k.done = true;
-      action(lineOf2("done", k.flav, { k: k.key, by: nameOf(k.by) || "somebody" }));
-    }
-    save();
-  }
-  function kitEnd(quiet) {
-    const k = K2();
-    waiting = null;
-    if (!k) return false;
-    const P = W13.Player, S2 = st();
-    for (const b of k.pieces) {
-      const cur = itemIn2(b.Group);
-      if (cur && cur.Asset.Name === b.Name && !lockedOn(cur)) {
-        try {
-          W13.InventoryRemove(P, b.Group, false);
-        } catch (e) {
-        }
-      }
-    }
-    for (const b of k.old || []) {
-      if (!itemIn2(b.Group)) {
-        try {
-          putBack(b);
-        } catch (e) {
-        }
-      }
-    }
-    S2.kit = null;
-    save();
-    refresh();
-    update(null);
-    if (!quiet) action(lineOf2("off", k.flav, { k: k.key }));
-    return true;
-  }
-  function putBack(b) {
-    const A = W13.AssetGet("Female3DCG", b.Group, b.Name);
-    if (!A) return;
-    const it = W13.InventoryWear(W13.Player, b.Name, b.Group, b.Color, b.Difficulty, me6(), b.Craft, false) || itemIn2(b.Group);
-    if (it && b.Property) {
-      try {
-        it.Property = typeof W13.ItemPropertiesDecompress === "function" ? W13.ItemPropertiesDecompress(Object.assign(it, { Property: {} }), b.Property) : JSON.parse(JSON.stringify(b.Property));
-      } catch (e) {
-        it.Property = JSON.parse(JSON.stringify(b.Property));
-      }
-    }
-  }
-  var kitNow = () => {
-    const k = K2();
-    return k ? { key: k.key, flav: k.flav, by: k.by, left: k.queue.length, on: k.pieces.length - k.queue.length, done: k.done } : null;
-  };
-  function initKits(mod2, o) {
-    endDose = o && typeof o.end === "function" ? o.end : endDose;
-    try {
-      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
-        try {
-          const data = args[0];
-          if (data && data.Type === "Hidden" && typeof data.Sender === "number") {
-            const m = readMsg(data);
-            if (m) kitMessage(data.Sender, m);
+      for (const x of H2) {
+        let best = A[0], bd = Infinity;
+        for (const a of A) {
+          const d = Math.abs(a.at - x.at);
+          if (d < bd) {
+            bd = d;
+            best = a;
           }
-        } catch (e) {
         }
-        return next2(args);
-      });
-    } catch (e) {
+        add2(x.k, best.ml);
+      }
     }
-    try {
-      W13.addEventListener("farmhand-dispensary", (e) => {
-        const d = e && e.detail;
-        if (!d || d.type !== "dose" || d.id !== "kit") return;
-        try {
-          if (d.on) kitBegin(d.p, o && o.byOf ? o.byOf("kit") : 0);
-          else kitEnd(false);
-        } catch (err) {
-          console.warn("[Dispensary] kit:", err);
-        }
-      });
-    } catch (e) {
-    }
+    if (orphanH.length) orphanH.forEach((k, i) => add2(k, orphanA.length ? orphanA[Math.min(i, orphanA.length - 1)] : SEED_DEFAULT_ML));
+    else if (orphanA.length && !Object.keys(out).length) add2("any", orphanA.reduce((a, b) => a + b, 0));
+    if (!Object.keys(out).length) add2("any", SEED_DEFAULT_ML);
+    return out;
   }
-  function kitMessage(from, m) {
-    if (!m || from === me6()) return false;
-    if (m.type === "dispKitAsk") {
-      onAsk(from, m);
-      return true;
+  var KEYS = ["vulva", "butt", "mouth", "nips", "every", "both", "any"];
+  var seedEncode = (a) => KEYS.filter((k) => a && a[k] > 0).map((k) => k + "=" + Math.round(a[k])).join(",");
+  function seedDecode(p) {
+    const out = {};
+    for (const bit of String(p || "").split(",")) {
+      const m = /^([a-z]+)=(\d{1,6})$/.exec(bit.trim());
+      if (m && KEYS.includes(m[1])) out[m[1]] = Math.min(SEED_HOLE_MAX, Number(m[2]));
     }
-    if (m.type === "dispKit") {
-      onKit(from, m);
-      return true;
+    return out;
+  }
+  function seedPlan(a, o) {
+    o = o || {};
+    const pussy = !o.have || o.have.includes("vulva"), out = {}, x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
+    const drunk = o.via === "sip" || o.via === "kiss";
+    const put = (h2, v) => {
+      if (drunk) h2 = "mouth";
+      if (h2 === "vulva" && !pussy) h2 = "butt";
+      out[h2] = (out[h2] || 0) + v;
+    };
+    for (const [k, v] of Object.entries(a || {})) {
+      if (!(v > 0)) continue;
+      if ((k === "every" || k === "both") && drunk) put("mouth", v);
+      else if (k === "every") {
+        for (const h2 of ["vulva", "butt", "mouth"]) if (h2 !== "vulva" || pussy) put(h2, v);
+        if (o.nipsOpen) put("nips", v);
+      } else if (k === "both") {
+        if (pussy) put("vulva", v);
+        put("butt", v);
+      } else if (k === "any") put(o.via === "sip" || o.via === "kiss" ? "mouth" : o.hole && SEED_HOLES.includes(o.hole) ? o.hole : "vulva", v);
+      else if (SEED_HOLES.includes(k)) put(k, v);
     }
-    return false;
+    let total = 0;
+    for (const h2 of Object.keys(out)) {
+      out[h2] = Math.min(SEED_HOLE_MAX, Math.round(out[h2] * x));
+      total += out[h2];
+    }
+    if (total > SEED_TOTAL_MAX) for (const h2 of Object.keys(out)) out[h2] = Math.round(out[h2] * SEED_TOTAL_MAX / total);
+    return out;
+  }
+  function amountSay(ml) {
+    ml = Math.max(0, Number(ml) || 0);
+    if (ml >= GALLON_ML * 0.95) {
+      const g = Math.round(ml / GALLON_ML * 10) / 10;
+      return (g === Math.round(g) ? String(Math.round(g)) : g.toFixed(1)) + (g === 1 ? " gallon" : " gallons");
+    }
+    if (ml >= 1e3) return (Math.round(ml / 100) / 10).toFixed(1).replace(/\.0$/, "") + " L";
+    return Math.round(ml) + " mL";
+  }
+  function loadSay(ml) {
+    return ml < 5 ? "a little dribble" : ml < 15 ? "a load" : ml < 40 ? "a thick load" : ml < 100 ? "a huge load" : ml < 300 ? "a gushin' flood" : ml < 1e3 ? "a floodin' torrent" : ml < GALLON_ML ? "a bellyful" : "a flood fit to burst a body";
+  }
+  function bellyFrom(held, cap) {
+    const full = Math.max(0, Number(held) || 0) / Math.max(1, Number(cap) || BASE_CAP), w = full > 0.8 ? (full - 0.8) * 3 : 0;
+    return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
   }
 
   // shared/holes.js
@@ -11530,8 +9918,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var HEAL_PER_DAY = 0.5;
   var USE_BUDGET_H = 6;
   var clampSize = (h2, n) => {
-    const S2 = HOLE_SIZES[h2];
-    return Math.max(1, Math.min(S2 ? S2.max : 20, Math.round(Number(n) || 1)));
+    const S3 = HOLE_SIZES[h2];
+    return Math.max(1, Math.min(S3 ? S3.max : 20, Math.round(Number(n) || 1)));
   };
   var sizeWord = (h2, n) => (HOLE_SIZES[h2] || HOLE_SIZES.butt).names[clampSize(h2, n) - 1];
   var THROAT_SAY = { "no gag reflex": "past gaggin'", "trained": "well trained", "swallow-anything": "ready to swallow anything", "cock sleeve": "a cock sleeve", "living funnel": "a livin' funnel" };
@@ -11707,13 +10095,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var NUM_WORDS = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, ten: 10, fourteen: 14 };
   var DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   function goalSize(hole2, words) {
-    const w = String(words || "").toLowerCase().trim(), S2 = HOLE_SIZES[hole2];
-    if (!S2) return 0;
+    const w = String(words || "").toLowerCase().trim(), S3 = HOLE_SIZES[hole2];
+    if (!S3) return 0;
     const m = /\b(?:size|level)\s*(\d{1,2})\b/.exec(w);
-    if (m) return Math.max(S2.start, Math.min(S2.natural, Number(m[1])));
-    const names = S2.names.slice(0, S2.natural).map((n, i) => [n, i + 1]).concat(Object.entries(SAY_TO)).sort((a, b) => b[0].length - a[0].length);
+    if (m) return Math.max(S3.start, Math.min(S3.natural, Number(m[1])));
+    const names = S3.names.slice(0, S3.natural).map((n, i) => [n, i + 1]).concat(Object.entries(SAY_TO)).sort((a, b) => b[0].length - a[0].length);
     for (const [n, lvl] of names) {
-      if (new RegExp("(^|[^a-z])" + phrase(n) + "(?![a-z])").test(w)) return Math.max(S2.start, Math.min(S2.natural, lvl));
+      if (new RegExp("(^|[^a-z])" + phrase(n) + "(?![a-z])").test(w)) return Math.max(S3.start, Math.min(S3.natural, lvl));
     }
     return 0;
   }
@@ -12056,21 +10444,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
 
   // dispensary/src/holes.js
-  var W14 = window;
-  var MIN6 = 6e4;
-  var HOUR3 = 36e5;
-  var DAY5 = 864e5;
-  var me7 = () => W14.Player && W14.Player.MemberNumber || 0;
-  var botIn = () => (W14.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
-  var charOf4 = (mn) => (mn === me7() ? W14.Player : (W14.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-  var okBy = (by) => !by || by === me7() || allowed(by);
-  var paused3 = (now) => (st().wornPause || 0) > (now || Date.now());
+  var W7 = window;
+  var MIN3 = 6e4;
+  var HOUR = 36e5;
+  var DAY3 = 864e5;
+  var me2 = () => W7.Player && W7.Player.MemberNumber || 0;
+  var botIn = () => (W7.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf = (mn) => (mn === me2() ? W7.Player : (W7.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+  var okBy = (by) => !by || by === me2() || allowed(by);
+  var paused2 = (now) => (st().wornPause || 0) > (now || Date.now());
   var painOn = () => st().holesPain !== false;
   var healOn = () => st().holesHeal === true;
   function H() {
-    const S2 = st();
-    if (!S2.holes || typeof S2.holes !== "object") S2.holes = {};
-    const o = S2.holes;
+    const S3 = st();
+    if (!S3.holes || typeof S3.holes !== "object") S3.holes = {};
+    const o = S3.holes;
     if (!o.m || typeof o.m !== "object") o.m = {};
     if (!Array.isArray(o.pend)) o.pend = [];
     if (!o.goals || typeof o.goals !== "object") o.goals = {};
@@ -12079,15 +10467,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return o;
   }
   function hole(h2) {
-    const o = H(), S2 = HOLE_SIZES[h2];
+    const o = H(), S3 = HOLE_SIZES[h2];
     let x = o.m[h2];
-    if (!x || typeof x !== "object") x = o.m[h2] = { n: S2.start, u: S2.start, cr: 0, t: 0, g: 0, hl: 0 };
+    if (!x || typeof x !== "object") x = o.m[h2] = { n: S3.start, u: S3.start, cr: 0, t: 0, g: 0, hl: 0 };
     return x;
   }
   function holesHave() {
     const o = H();
     if (Array.isArray(o.has) && o.has.length) return HOLES.filter((h2) => o.has.includes(h2));
-    const P = W14.Player;
+    const P = W7.Player;
     let v = true;
     try {
       if (P && typeof P.HasVagina === "function") v = !!P.HasVagina();
@@ -12110,7 +10498,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     sendSoon();
   }
   var sendT = null;
-  var askedAt2 = 0;
+  var askedAt = 0;
   function sendSoon() {
     clearTimeout(sendT);
     sendT = setTimeout(() => {
@@ -12122,7 +10510,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function sendNow(ask) {
     const o = H();
-    if (!botIn() || typeof W14.ServerSend !== "function") return false;
+    if (!botIn() || typeof W7.ServerSend !== "function") return false;
     if (o.fly && Date.now() - (o.fly.at || 0) < 6e4) return false;
     if (!o.fly && o.pend.length) {
       o.id += 1;
@@ -12132,12 +10520,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = o.fly;
     if (!f && !ask) return false;
     try {
-      W14.ServerSend("ChatRoomChat", makeMsg("dispHoles", f ? { ep: o.ep, id: f.id, ops: f.ops } : { ep: o.ep, id: 0, ops: [] }, BOT));
+      W7.ServerSend("ChatRoomChat", makeMsg("dispHoles", f ? { ep: o.ep, id: f.id, ops: f.ops } : { ep: o.ep, id: 0, ops: [] }, BOT));
     } catch (e) {
       return false;
     }
     if (f) f.at = Date.now();
-    askedAt2 = Date.now();
+    askedAt = Date.now();
     save();
     return true;
   }
@@ -12171,7 +10559,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var keyOf2 = (it) => it.Asset.Group.Name + ":" + it.Asset.Name + ":" + (it.Craft && it.Craft.Name || "");
   function toysNow() {
-    const P = W14.Player, out = {};
+    const P = W7.Player, out = {};
     if (!P || !Array.isArray(P.Appearance)) return out;
     for (const item of P.Appearance) {
       if (!item || !item.Asset || !item.Asset.Group || !holeOfGroup(item.Asset.Group.Name)) continue;
@@ -12193,11 +10581,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function setGoal(h2, to, by, inMs) {
     if (!HOLES.includes(h2) || !holesHave().includes(h2)) return { ok: false, why: "hole" };
-    const S2 = HOLE_SIZES[h2];
-    to = Math.max(S2.start, Math.min(S2.natural, Math.round(Number(to) || 0)));
+    const S3 = HOLE_SIZES[h2];
+    to = Math.max(S3.start, Math.min(S3.natural, Math.round(Number(to) || 0)));
     if (!to) return { ok: false, why: "size" };
     if (to <= hole(h2).u) return { ok: false, why: "already", to };
-    H().goals[h2] = { to, by: Number(by) || me7(), due: inMs > 0 ? Date.now() + Math.min(30 * DAY5, inMs) : 0, at: Date.now() };
+    H().goals[h2] = { to, by: Number(by) || me2(), due: inMs > 0 ? Date.now() + Math.min(30 * DAY3, inMs) : 0, at: Date.now() };
     save();
     return { ok: true, to };
   }
@@ -12214,7 +10602,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return true;
   }
   var lines = (key2) => LINES.holes && LINES.holes[key2] || [];
-  function line2(key2, h2, v) {
+  function line(key2, h2, v) {
     const L = lines(key2);
     if (!L.length) return "";
     const x = hole(h2);
@@ -12222,8 +10610,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var tk = (h2, key2) => h2 === "throat" ? key2 + "_t" : key2;
   var said = {};
-  function say3(key2, h2, v, room) {
-    const t = line2(tk(h2, key2), h2, v) || line2(key2, h2, v);
+  function say2(key2, h2, v, room) {
+    const t = line(tk(h2, key2), h2, v) || line(key2, h2, v);
     if (!t) return "";
     said[h2] = Date.now();
     if (room) action(t);
@@ -12235,13 +10623,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var nextPump = {};
   function holesTick(now) {
     now = now || Date.now();
-    const dt = lastTick ? Math.max(0, Math.min(now - lastTick, 15 * MIN6)) : 0;
+    const dt = lastTick ? Math.max(0, Math.min(now - lastTick, 15 * MIN3)) : 0;
     lastTick = now;
-    const have = holesHave(), toys = toysNow(), rest = paused3(now);
+    const have = holesHave(), toys = toysNow(), rest = paused2(now);
     let dirty = false;
     for (const h2 of have) {
-      const x = hole(h2), T = toys[h2], S2 = HOLE_SIZES[h2];
-      if (!T && x.n > x.u && now - (x.g || 0) > TIGHTEN_H * HOUR3) {
+      const x = hole(h2), T = toys[h2], S3 = HOLE_SIZES[h2];
+      if (!T && x.n > x.u && now - (x.g || 0) > TIGHTEN_H * HOUR) {
         x.n -= 1;
         x.g = now;
         dirty = true;
@@ -12253,11 +10641,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           x.tk = T.key;
           x.ta = now;
           x.gd = T.goal && T.goal.to <= x.u ? T.key : "";
-          if (inRoom() && !rest) say3("in_" + feel(T, was), h2, { g: T.name }, true);
-          nextBeat[h2] = now + (4 + Math.random() * 4) * MIN6;
+          if (inRoom() && !rest) say2("in_" + feel(T, was), h2, { g: T.name }, true);
+          nextBeat[h2] = now + (4 + Math.random() * 4) * MIN3;
           dirty = true;
         }
-        if (!nextBeat[h2]) nextBeat[h2] = now + (3 + Math.random() * 4) * MIN6;
+        if (!nextBeat[h2]) nextBeat[h2] = now + (3 + Math.random() * 4) * MIN3;
         if (T.size > x.n) {
           x.n = T.size;
           change(h2, { st: x.n });
@@ -12266,7 +10654,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!rest && train(h2, x, T, dt, now)) dirty = true;
         if (!rest && T.pump && inRoom()) pumpTick(h2, x, T, now);
         if (!rest && inRoom() && now >= (nextBeat[h2] || 0)) {
-          nextBeat[h2] = now + (6 + Math.random() * 4) * MIN6;
+          nextBeat[h2] = now + (6 + Math.random() * 4) * MIN3;
           beat(h2, x, T);
         }
       } else if (x.tk) {
@@ -12275,14 +10663,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         delete nextBeat[h2];
         dirty = true;
       }
-      if (healOn() && !T && x.u > S2.start && now - Math.max(x.t || 0, x.g || 0) > HEAL_GRACE_H * HOUR3 && dt > 0) {
-        x.hl = (x.hl || 0) + HEAL_PER_DAY * dt / DAY5;
+      if (healOn() && !T && x.u > S3.start && now - Math.max(x.t || 0, x.g || 0) > HEAL_GRACE_H * HOUR && dt > 0) {
+        x.hl = (x.hl || 0) + HEAL_PER_DAY * dt / DAY3;
         if (x.hl >= 1) {
           x.hl = 0;
           x.u -= 1;
-          if (x.n > x.u && now - (x.g || 0) > TIGHTEN_H * HOUR3) x.n = x.u;
+          if (x.n > x.u && now - (x.g || 0) > TIGHTEN_H * HOUR) x.n = x.u;
           change(h2, { down: 1 });
-          say3("heal", h2, {}, false);
+          say2("heal", h2, {}, false);
         }
         dirty = true;
       }
@@ -12290,7 +10678,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!rest) notice(now, toys);
     dripTick(now);
     const o = H();
-    if (botIn() && (o.pend.length || o.fly && now - (o.fly.at || 0) > 6e4 || now - askedAt2 > 10 * MIN6)) sendNow(true);
+    if (botIn() && (o.pend.length || o.fly && now - (o.fly.at || 0) > 6e4 || now - askedAt > 10 * MIN3)) sendNow(true);
     if (dirty && Math.random() < 0.1) save();
     return toys;
   }
@@ -12300,17 +10688,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function train(h2, x, T, dt, now) {
     if (!T.trainer || !okBy(T.by) || !(dt > 0) || x.gd === T.key) return false;
-    const S2 = HOLE_SIZES[h2], G = goalFor(h2, T, x), cap = Math.min(S2.natural, T.size, G ? G.to : 99);
+    const S3 = HOLE_SIZES[h2], G = goalFor(h2, T, x), cap = Math.min(S3.natural, T.size, G ? G.to : 99);
     if (x.u >= cap) {
       if (G && x.u >= G.to) goalMet(h2, x, T, G);
       return false;
     }
     let r = rateOf(T.size - x.u, T.cruel);
     if (G && G.due) {
-      const need = (G.to - x.u) * TRAIN_H * HOUR3 / Math.max(HOUR3, G.due - now);
+      const need = (G.to - x.u) * TRAIN_H * HOUR / Math.max(HOUR, G.due - now);
       r = Math.max(r, Math.min(4, need));
     }
-    x.cr = (x.cr || 0) + r * dt / HOUR3;
+    x.cr = (x.cr || 0) + r * dt / HOUR;
     x.t = now;
     let up = 0;
     while (x.cr >= TRAIN_H && x.u < cap) {
@@ -12322,7 +10710,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (x.u >= cap) x.cr = Math.min(x.cr, TRAIN_H * 0.99);
     if (up) {
       change(h2, { up });
-      if (inRoom()) say3("trained", h2, { g: T.name, s: x.u }, true);
+      if (inRoom()) say2("trained", h2, { g: T.name, s: x.u }, true);
     }
     if (G && x.u >= G.to) goalMet(h2, x, T, G);
     return true;
@@ -12330,7 +10718,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function goalMet(h2, x, T, G) {
     if (G.sent) clearGoal(h2);
     else x.gd = T ? T.key : "";
-    if (inRoom()) say3("goal_done", h2, { g: T ? T.name : "trainin'", s: x.u }, true);
+    if (inRoom()) say2("goal_done", h2, { g: T ? T.name : "trainin'", s: x.u }, true);
     save();
   }
   function pumpTick(h2, x, T, now) {
@@ -12341,14 +10729,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (T.size >= aim && x.u >= aim) return false;
     let want = x.u >= T.size || T.cruel && x.u >= T.size - 1;
     if (!want && G && G.due) {
-      const need = (G.to - x.u) * TRAIN_H * HOUR3 / Math.max(HOUR3, G.due - now);
+      const need = (G.to - x.u) * TRAIN_H * HOUR / Math.max(HOUR, G.due - now);
       want = need > rateOf(T.size - x.u, T.cruel) && T.size - x.u < 3;
     }
     if (!want || T.size >= aim + (T.cruel ? 1 : 0)) return false;
-    nextPump[h2] = now + 20 * MIN6;
+    nextPump[h2] = now + 20 * MIN3;
     try {
-      if (typeof W14.ExtendedItemSetOptionByRecord !== "function") return false;
-      W14.ExtendedItemSetOptionByRecord(W14.Player, T.item, pumpRecord(T, n + 1), { push: true, C_Source: W14.Player, refresh: true });
+      if (typeof W7.ExtendedItemSetOptionByRecord !== "function") return false;
+      W7.ExtendedItemSetOptionByRecord(W7.Player, T.item, pumpRecord(T, n + 1), { push: true, C_Source: W7.Player, refresh: true });
     } catch (e) {
       console.warn("[Dispensary] the trainer couldn't pump:", e);
       return false;
@@ -12358,22 +10746,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       x.n = bigger;
       change(h2, { st: x.n });
     }
-    if (inRoom()) say3(h2 === "throat" ? "pump" : T.pump.kind === "beads" ? "pump_beads" : T.cruel ? "pump_cruel" : "pump", h2, { g: T.name }, true);
+    if (inRoom()) say2(h2 === "throat" ? "pump" : T.pump.kind === "beads" ? "pump_beads" : T.cruel ? "pump_cruel" : "pump", h2, { g: T.name }, true);
     return true;
   }
   function beat(h2, x, T) {
     const f = feel(T, x.u);
     if (f === "0") return "";
     if (T.horny && Math.random() < 0.5) return "";
-    const A = W14.Player && W14.Player.ArousalSettings, p = A && Number(A.Progress) || 0;
+    const A = W7.Player && W7.Player.ArousalSettings, p = A && Number(A.Progress) || 0;
     if (A) setArousal(f === "1" ? p + 4 : f === "2" ? p + 2 : f === "3" ? p - 10 : p - 6);
     const room = f !== "1" && Math.random() < 0.3;
-    return say3((room ? "room_" : "mine_") + f, h2, { g: T.name }, room) || say3("mine_" + f, h2, { g: T.name }, false);
+    return say2((room ? "room_" : "mine_") + f, h2, { g: T.name }, room) || say2("mine_" + f, h2, { g: T.name }, false);
   }
   var nextNotice = 0;
   function bare(h2) {
     try {
-      const P = W14.Player, I = W14.InventoryPrerequisiteMessage;
+      const P = W7.Player, I = W7.InventoryPrerequisiteMessage;
       if (typeof I !== "function") return false;
       if (h2 === "butt") return I(P, "AccessButt") === "" && !(P.IsButtChaste && P.IsButtChaste());
       return I(P, "AccessCrotch") === "" && I(P, "AccessVulva") === "" && !(P.IsVulvaChaste && P.IsVulvaChaste());
@@ -12387,26 +10775,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return;
     }
     if (!nextNotice) {
-      nextNotice = now + (10 + Math.random() * 15) * MIN6;
+      nextNotice = now + (10 + Math.random() * 15) * MIN3;
       return;
     }
     if (now < nextNotice) return;
-    nextNotice = now + (25 + Math.random() * 20) * MIN6;
-    const have = holesHave().filter((h2) => now - (said[h2] || 0) > 10 * MIN6);
+    nextNotice = now + (25 + Math.random() * 20) * MIN3;
+    const have = holesHave().filter((h2) => now - (said[h2] || 0) > 10 * MIN3);
     const loose = have.filter((h2) => h2 !== "throat" && hole(h2).n >= 5);
     if (loose.length) {
       const h2 = loose[Math.floor(Math.random() * loose.length)], x = hole(h2), T = toys[h2];
-      if (T) return say3("notice_plug", h2, { g: T.name }, false);
-      if (bare(h2)) return say3(x.n >= 10 ? "notice_10" : x.n >= 7 ? "notice_7" : "notice_5", h2, { s: x.n }, true);
-      return Math.random() < 0.5 ? say3("notice_cover", h2, {}, false) : "";
+      if (T) return say2("notice_plug", h2, { g: T.name }, false);
+      if (bare(h2)) return say2(x.n >= 10 ? "notice_10" : x.n >= 7 ? "notice_7" : "notice_5", h2, { s: x.n }, true);
+      return Math.random() < 0.5 ? say2("notice_cover", h2, {}, false) : "";
     }
-    if (have.includes("throat") && hole("throat").u >= 6 && Math.random() < 0.4) return say3("notice", "throat", {}, false);
+    if (have.includes("throat") && hole("throat").u >= 6 && Math.random() < 0.4) return say2("notice", "throat", {}, false);
     return "";
   }
-  var usedAt2 = {};
+  var usedAt = {};
   var inMe = /* @__PURE__ */ new Map();
   function budgetLeft(x, now) {
-    if (!x.ub || now - x.ub.at > HOUR3) x.ub = { at: now, n: 0 };
+    if (!x.ub || now - x.ub.at > HOUR) x.ub = { at: now, n: 0 };
     return Math.max(0, USE_BUDGET_H - x.ub.n);
   }
   function holesUsed(from, act, group, asset, text3, toyName) {
@@ -12417,19 +10805,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!U) return null;
     if (toyName) U.toyName = toyName;
     const now = Date.now(), k = from + ":" + h2;
-    if (U.cock && from && from !== me7()) inMe.set(from, { h: h2, at: now });
-    if (now - (usedAt2[k] || 0) < 45e3) return null;
-    usedAt2[k] = now;
-    const x = hole(h2), was = x.u, S2 = HOLE_SIZES[h2];
+    if (U.cock && from && from !== me2()) inMe.set(from, { h: h2, at: now });
+    if (now - (usedAt[k] || 0) < 45e3) return null;
+    usedAt[k] = now;
+    const x = hole(h2), was = x.u, S3 = HOLE_SIZES[h2];
     x.t = now;
     if (U.size > x.n) {
       x.n = U.size;
       x.g = now;
       change(h2, { st: x.n });
     }
-    const d = U.size - x.u, cap = Math.min(S2.natural, U.size);
-    if (d >= 1 && x.u < cap && !paused3(now)) {
-      const add2 = Math.min(U.cr * rateOf(d, false) * (from === me7() ? 0.5 : 1), budgetLeft(x, now));
+    const d = U.size - x.u, cap = Math.min(S3.natural, U.size);
+    if (d >= 1 && x.u < cap && !paused2(now)) {
+      const add2 = Math.min(U.cr * rateOf(d, false) * (from === me2() ? 0.5 : 1), budgetLeft(x, now));
       x.ub.n += add2;
       x.cr = (x.cr || 0) + add2;
       let up = 0;
@@ -12440,32 +10828,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       if (up) {
         change(h2, { up });
-        if (inRoom()) say3("trained", h2, { g: U.toy ? "toy" : U.kind, s: x.u }, true);
+        if (inRoom()) say2("trained", h2, { g: U.toy ? "toy" : U.kind, s: x.u }, true);
       }
     }
     save();
     const f = hurtOf(U.size - was, false, painOn());
-    if (f && now - (said[h2] || 0) > 3 * MIN6) say3("use_" + f, h2, { u: whatWent(from, U) }, false);
+    if (f && now - (said[h2] || 0) > 3 * MIN3) say2("use_" + f, h2, { u: whatWent(from, U) }, false);
     return { h: h2, size: U.size, felt: f };
   }
   function whatWent(from, U) {
-    const who2 = !from || from === me7() ? "your own" : nameOf(from) + "'s";
+    const who2 = !from || from === me2() ? "your own" : nameOf(from) + "'s";
     if (U.toy) return U.toyName ? "the " + U.toyName : "the " + String(U.toy).replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
     return who2 + " " + { fingers: "fingers", tongue: "tongue", fist: "fist", cock: "cock" }[U.kind];
   }
   var drips2 = [];
+  var onLoad = null;
+  function holesOnLoad(f) {
+    onLoad = f;
+  }
   function holesClimaxOf(from) {
     const e = inMe.get(from);
     if (!e) return false;
     inMe.delete(from);
     if (Date.now() - e.at > 9e4) return false;
     const h2 = e.h, x = hole(h2), toys = toysNow();
+    let booked = false;
+    if (onLoad) {
+      try {
+        booked = !!onLoad(from, h2);
+      } catch (err) {
+      }
+    }
     if (h2 === "throat") {
-      say3("swallow", h2, { by: nameOf(from) }, false);
+      if (!booked) say2("swallow", h2, { by: nameOf(from) }, false);
       return true;
     }
     if (x.n >= 5 && !toys[h2]) drips2.push({ h: h2, by: from, at: Date.now() + (40 + Math.random() * 80) * 1e3 });
-    else say3("kept", h2, { by: nameOf(from) }, false);
+    else if (!booked) say2("kept", h2, { by: nameOf(from) }, false);
     return true;
   }
   function dripTick(now) {
@@ -12474,9 +10873,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (now < d.at) continue;
       drips2.splice(i, 1);
       if (!inRoom()) continue;
-      say3("drip", d.h, { by: nameOf(d.by) }, true);
+      say2("drip", d.h, { by: nameOf(d.by) }, true);
       try {
-        W14.dispatchEvent(new W14.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["thighs"], amount: 1 } }));
+        W7.dispatchEvent(new W7.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["thighs"], amount: 1 } }));
       } catch (e) {
       }
     }
@@ -12485,10 +10884,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const list = which === "holes" ? holesHave() : holesHave().filter((h2) => h2 === which);
     const toys = toysNow(), out = [];
     for (const h2 of list) {
-      const o = hole(h2), S2 = HOLE_SIZES[h2], k = Math.min(o.u - S2.start, 2 * Math.max(1, Math.min(5, Number(x) || 1)));
+      const o = hole(h2), S3 = HOLE_SIZES[h2], k = Math.min(o.u - S3.start, 2 * Math.max(1, Math.min(5, Number(x) || 1)));
       const T = toys[h2];
       if (k <= 0 && o.n <= o.u) {
-        if (!quiet) say3("balm_none", h2, {}, true);
+        if (!quiet) say2("balm_none", h2, {}, true);
         continue;
       }
       o.u -= Math.max(0, k);
@@ -12499,7 +10898,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         o.g = Date.now();
       }
       change(h2, { tight: Math.max(0, k) });
-      if (!quiet) say3(T ? "balm_plug" : "balm", h2, { g: T && T.name, s: o.u }, true);
+      if (!quiet) say2(T ? "balm_plug" : "balm", h2, { g: T && T.name, s: o.u }, true);
       out.push(h2);
     }
     save();
@@ -12508,9 +10907,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function holesGape(which, x, quiet) {
     const out = [];
     for (const h2 of holesHave().filter((k) => k === which)) {
-      const o = hole(h2), S2 = HOLE_SIZES[h2], k = Math.min(S2.natural - o.u, Math.max(1, Math.min(5, Number(x) || 1)));
+      const o = hole(h2), S3 = HOLE_SIZES[h2], k = Math.min(S3.natural - o.u, Math.max(1, Math.min(5, Number(x) || 1)));
       if (k <= 0) {
-        if (!quiet) say3("gape_max", h2, {}, true);
+        if (!quiet) say2("gape_max", h2, {}, true);
         continue;
       }
       o.u += k;
@@ -12518,7 +10917,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       o.g = Date.now();
       o.hl = 0;
       change(h2, { up: k });
-      if (!quiet) say3("gape", h2, { s: o.u }, true);
+      if (!quiet) say2("gape", h2, { s: o.u }, true);
       out.push(h2);
     }
     save();
@@ -12526,7 +10925,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function holesSet(h2, lvl) {
     if (!holesHave().includes(h2)) return false;
-    const S2 = HOLE_SIZES[h2], n = Math.max(S2.start, Math.min(S2.natural, Math.round(Number(lvl) || 0)));
+    const S3 = HOLE_SIZES[h2], n = Math.max(S3.start, Math.min(S3.natural, Math.round(Number(lvl) || 0)));
     const x = hole(h2);
     x.u = n;
     x.n = Math.max(n, toysNow()[h2] ? x.n : n);
@@ -12555,17 +10954,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return { holes: out, waiting: o.pend.length + (o.fly ? o.fly.ops.length : 0), sync: o.sync || 0, heal: healOn(), pain: painOn() };
   }
-  function onActivity3(data) {
+  function onActivity2(data) {
     const D = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (key2) => {
       const e = D.find((x) => x && x[key2] != null);
       return e ? e[key2] : null;
     };
     const name = String(get("ActivityName") || ""), src = Number(get("SourceCharacter")) || Number(data.Sender) || 0, tgt = Number(get("TargetCharacter")) || 0;
-    if (tgt !== me7()) return;
+    if (tgt !== me2()) return;
     const grp = String(get("FocusGroupName") || ""), A = D.find((x) => x && x.Tag === "ActivityAsset");
     let text3 = "";
     if (A) {
-      const C = charOf4(src), it = C && Array.isArray(C.Appearance) ? C.Appearance.find((i) => i && i.Asset && i.Asset.Name === A.AssetName && i.Asset.Group && i.Asset.Group.Name === A.GroupName) : null;
+      const C2 = charOf(src), it = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((i) => i && i.Asset && i.Asset.Name === A.AssetName && i.Asset.Group && i.Asset.Group.Name === A.GroupName) : null;
       text3 = craftText(it) || String(A.CraftName || "").toLowerCase();
     }
     holesUsed(src, name, grp, A ? A.AssetName : "", text3, A && A.CraftName ? String(A.CraftName) : "");
@@ -12576,9 +10975,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         try {
           const data = args[0];
           if (data && data.Type === "Activity") {
-            if (/^Orgasm\d$/.test(String(data.Content || "")) && typeof data.Sender === "number" && data.Sender !== me7()) holesClimaxOf(data.Sender);
-            else onActivity3(data);
-          } else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me7()) {
+            if (/^Orgasm\d$/.test(String(data.Content || "")) && typeof data.Sender === "number" && data.Sender !== me2()) holesClimaxOf(data.Sender);
+            else onActivity2(data);
+          } else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me2()) {
             const m = readMsg(data);
             if (m && m.type === "dispHolesOk" && data.Sender === BOT) onOk(m);
             else if (m && m.type === "dispTrain") onTrain(data.Sender, m);
@@ -12613,21 +11012,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function sendGoal(to, h2, words) {
     const size = goalSize(h2, words), due = goalDue(words);
     if (!size) return { ok: false, why: "size" };
-    if (to === me7()) {
-      const r = setGoal(h2, size, me7(), due);
+    if (to === me2()) {
+      const r = setGoal(h2, size, me2(), due);
       return r.ok ? { ok: true, self: true, to: size } : r;
     }
     try {
-      W14.ServerSend("ChatRoomChat", makeMsg("dispTrain", { h: h2, to: size, due }, to));
+      W7.ServerSend("ChatRoomChat", makeMsg("dispTrain", { h: h2, to: size, due }, to));
       return { ok: true, to: size };
     } catch (e) {
       return { ok: false, why: "send" };
     }
   }
   function sendClear(to, h2) {
-    if (to === me7()) return { ok: clearGoal(h2 || ""), self: true };
+    if (to === me2()) return { ok: clearGoal(h2 || ""), self: true };
     try {
-      W14.ServerSend("ChatRoomChat", makeMsg("dispTrain", { h: h2 || "", clear: true }, to));
+      W7.ServerSend("ChatRoomChat", makeMsg("dispTrain", { h: h2 || "", clear: true }, to));
       return { ok: true };
     } catch (e) {
       return { ok: false, why: "send" };
@@ -12637,7 +11036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const h2 = String(m.h || "");
     const reply = (ok, why) => {
       try {
-        W14.ServerSend("ChatRoomChat", makeMsg("dispTrainOk", { h: h2, ok, why: why || "", to: Number(m.to) || 0, clear: !!m.clear }, from));
+        W7.ServerSend("ChatRoomChat", makeMsg("dispTrainOk", { h: h2, ok, why: why || "", to: Number(m.to) || 0, clear: !!m.clear }, from));
       } catch (e) {
       }
     };
@@ -12673,23 +11072,3282 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function dueWords(t) {
     const ms = t - Date.now();
     if (ms <= 0) return "overdue";
-    return ms < 36 * HOUR3 ? "in " + Math.max(1, Math.round(ms / HOUR3)) + " hours" : "in " + Math.round(ms / DAY5) + " days";
+    return ms < 36 * HOUR ? "in " + Math.max(1, Math.round(ms / HOUR)) + " hours" : "in " + Math.round(ms / DAY3) + " days";
   }
   var holesState = () => JSON.parse(JSON.stringify(H()));
   var holesReset = () => {
     st().holes = {};
     lastTick = 0;
-    for (const o of [nextBeat, nextPump, said, usedAt2]) for (const k of Object.keys(o)) delete o[k];
+    for (const o of [nextBeat, nextPump, said, usedAt]) for (const k of Object.keys(o)) delete o[k];
     inMe.clear();
     drips2.length = 0;
     nextNotice = 0;
   };
   var holesDrips = () => drips2.slice();
 
-  // dispensary/src/doses.js
-  var W15 = window;
+  // dispensary/src/nipples.js
+  var W8 = window;
+  var me3 = () => W8.Player && W8.Player.MemberNumber || 0;
+  var charOf2 = (mn) => (mn === me3() ? W8.Player : (W8.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+  var inRoom2 = () => W8.CurrentScreen === "ChatRoom" && typeof W8.ServerSend === "function";
+  var others = /* @__PURE__ */ new Map();
+  function heldOpen() {
+    let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
+    const p = mine().nips;
+    if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
+    return Math.max(n, toyOpen(W8.Player));
+  }
+  var MIN4 = 6e4;
+  var HOUR2 = 36e5;
+  var DAY4 = 864e5;
+  var TRAIN = { step: 0.1, every: 30 * MIN4, cock: 0.15, finger: 0.05, grace: 12 * HOUR2, perDay: 0.5 };
+  var trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 });
+  var trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
+  function nipsOpen() {
+    return Math.max(heldOpen(), trainedLevel());
+  }
+  var NIP_WORDS = ["closed", "open", "wide open", "gapin'"];
+  function nipsInfo() {
+    const open2 = nipsOpen(), trained = trainedLevel(), lvl = (st().nipTrain || {}).lvl || 0, held = heldOpen();
+    const toy = toyIn(W8.Player), T = toyOf(toy);
+    return {
+      open: open2,
+      trained,
+      held,
+      word: NIP_WORDS[open2],
+      trainedWord: NIP_WORDS[trained],
+      toward: held > trained && trained < 3 ? Math.max(0, Math.min(99, Math.floor((lvl - trained) * 100))) : 0,
+      loads: nipLoads().n || 0,
+      toy: T ? T.label : "",
+      locked: !!(toy && toyLocked(toy)),
+      heal: st().nipsHeal !== false
+    };
+  }
+  function nipsTrainTick(now) {
+    now = now || Date.now();
+    const T = trainOf(), held = heldOpen(), dt = Math.max(0, Math.min(now - (T.at || now), 15 * MIN4));
+    T.at = now;
+    if (held > 0) {
+      T.open = now;
+      if (T.lvl < held) T.lvl = Math.min(held, T.lvl + TRAIN.step * dt / TRAIN.every);
+    } else if (st().nipsHeal !== false && T.lvl > 0 && now - Math.max(T.open || 0, T.used || 0) > TRAIN.grace) T.lvl = Math.max(0, T.lvl - TRAIN.perDay * dt / DAY4);
+  }
+  var popped = "";
+  var lastPopped = () => popped;
+  function nipsClose(quiet) {
+    const toy = toyIn(W8.Player);
+    popped = "";
+    if (toy && toyLocked(toy)) return 0;
+    const was = nipsOpen();
+    if (toy) {
+      popped = toyOf(toy).label;
+      try {
+        W8.InventoryRemove(W8.Player, "ItemNipples", false);
+        if (typeof W8.CharacterRefresh === "function") W8.CharacterRefresh(W8.Player);
+        if (typeof W8.ChatRoomCharacterItemUpdate === "function") W8.ChatRoomCharacterItemUpdate(W8.Player, "ItemNipples");
+      } catch (e) {
+      }
+    }
+    st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 };
+    try {
+      if (active("dilator")) end("dilator", "quiet");
+    } catch (e) {
+    }
+    try {
+      if (mine().nips) letGo("nips", "quiet");
+    } catch (e) {
+    }
+    save();
+    nipsTell(false);
+    if (!quiet && was) local("Your nipples close up again, snug and tender, as if they'd never been stretched.");
+    return was;
+  }
+  function openOf(mn) {
+    mn = Number(mn);
+    if (mn === me3()) return nipsOpen();
+    const e = others.get(mn);
+    return e && Date.now() - e.at < 6 * 36e5 ? e.n : 0;
+  }
+  var told2 = 0;
+  var tellPage = (detail) => {
+    try {
+      W8.dispatchEvent(new W8.CustomEvent("farmhand-dispensary", { detail }));
+    } catch (e) {
+    }
+  };
+  var shown = -1;
+  function nipsTell(force) {
+    const n = nipsOpen();
+    if (n !== shown) {
+      shown = n;
+      tellPage({ type: "nips", from: me3(), n });
+    }
+    if (!inRoom2() || !force && n === told2 || force && !n) return false;
+    told2 = n;
+    try {
+      W8.ServerSend("ChatRoomChat", makeMsg("dispNips", { n }));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function onNips(from, m) {
+    const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0))), was = openOf(from);
+    if (n) others.set(from, { n, at: Date.now() });
+    else others.delete(from);
+    if (was !== n) tellPage({ type: "nips", from, n });
+  }
+  var ACTS = {
+    cock: {
+      name: "NippleFuck",
+      label: "Fuck nipple",
+      image: "Icons/Activity/PenetrateSlow.png",
+      max: 90,
+      action: "SourceCharacter pushes into TargetCharacter's stretched-open nipple, slow and deep, and fucks it."
+    },
+    finger: {
+      name: "NippleFinger",
+      label: "Finger nipple",
+      selfLabel: "Finger your nipple",
+      image: "Icons/Activity/MasturbateHand.png",
+      max: 70,
+      action: "SourceCharacter works a finger right inside TargetCharacter's open nipple.",
+      selfAction: "SourceCharacter slips a finger inside one of PronounPossessive own open nipples."
+    }
+  };
+  var hasCock = (C2) => {
+    try {
+      return !!(C2 && typeof C2.HasPenis === "function" && C2.HasPenis());
+    } catch (e) {
+      return false;
+    }
+  };
+  var mode = "";
+  var lscgApi = null;
+  var gameName = (k) => mode === "lscg" ? "LSCG_" + LSCG_ID + "." + ACTS[k].name.toLowerCase() : "FarmDisp_" + ACTS[k].name;
+  var kindOfName = (n) => Object.keys(ACTS).find((k) => gameName(k) === n) || null;
+  var usedAt2 = 0;
+  var lastIn = /* @__PURE__ */ new Map();
+  function nipsUsed(from, kind) {
+    if (from && from !== me3()) nipsFed(from, kind);
+    const now = Date.now();
+    {
+      const T = trainOf();
+      T.used = now;
+      T.lvl = Math.min(3, T.lvl + (kind === "cock" ? TRAIN.cock : TRAIN.finger));
+      save();
+    }
+    if (kind === "cock" && from && from !== me3()) lastIn.set(from, now);
+    if (now - usedAt2 > 3 * 6e4) {
+      usedAt2 = now;
+      const L = LINES.nips && LINES.nips[!from || from === me3() ? "self" : kind === "cock" ? "fucked" : "fingered"];
+      if (L && L.length) local(fill(pick(L), { by: from && from !== me3() ? nameOf(from) : "you" }));
+    }
+  }
+  function nipsToyUsed() {
+    const T = trainOf();
+    T.used = Date.now();
+    T.lvl = Math.min(3, T.lvl + TRAIN.finger);
+    save();
+    if (mine().nips) nipsFed(0, "toy");
+  }
+  var CREAM_WINDOW = 90 * 1e3;
+  var lastFuck = null;
+  function fucked(target2) {
+    if (target2 && target2 !== me3()) lastFuck = { target: Number(target2), at: Date.now() };
+  }
+  function onMyClimax() {
+    const f = lastFuck;
+    lastFuck = null;
+    if (!f || Date.now() - f.at > CREAM_WINDOW || W8.ActivityOrgasmRuined) return;
+    if (!hasCock(W8.Player) || !charOf2(f.target)) return;
+    try {
+      W8.ServerSend("ChatRoomChat", makeMsg("dispCream", {}, f.target));
+    } catch (e) {
+      return;
+    }
+    local(fill(pick(LINES.nips.came), { by: nameOf(f.target) }));
+  }
+  var onFarmLoad = null;
+  function nipsOnFarmLoad(f) {
+    onFarmLoad = f;
+  }
+  function onCream(from) {
+    const at = lastIn.get(from);
+    if (!at || Date.now() - at > 3 * 6e4) return;
+    lastIn.delete(from);
+    const S3 = st();
+    S3.nipLoads = (S3.nipLoads || 0) + 1;
+    const by = S3.nipLoadsBy || (S3.nipLoadsBy = {});
+    by[from] = (by[from] || 0) + 1;
+    const keys = Object.keys(by);
+    if (keys.length > 40) delete by[keys[0]];
+    save();
+    action(fill(pick(LINES.nips.creamed), { by: nameOf(from) }));
+    try {
+      W8.dispatchEvent(new W8.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: ["chest"], amount: 1 } }));
+    } catch (e) {
+    }
+    if (onFarmLoad) {
+      try {
+        onFarmLoad(from);
+      } catch (e) {
+      }
+    }
+  }
+  var nipLoads = () => ({ n: st().nipLoads || 0, by: Object.assign({}, st().nipLoadsBy || {}) });
+  function nipsLscg(api3, caps2) {
+    if (!api3 || !caps2 || !caps2.has("activities") || mode) return false;
+    try {
+      api3.activities.registerPrerequisite({ name: "nipsopen", check: ({ acted }) => openOf(acted && acted.MemberNumber) > 0 && !toyIn(acted) });
+      api3.activities.registerPrerequisite({ name: "hascock", check: ({ acting }) => hasCock(charOf2(acting && acting.MemberNumber)) });
+      for (const k of Object.keys(ACTS)) {
+        const A = ACTS[k];
+        api3.activities.register({
+          name: A.name.toLowerCase(),
+          maxProgress: A.max,
+          maxProgressSelf: A.max,
+          image: A.image,
+          prerequisites: k === "cock" ? ["ZoneAccessible", "ZoneNaked", "CanUsePenis", "hascock", "nipsopen"] : ["ZoneAccessible", "ZoneNaked", "UseHands", "nipsopen"],
+          targets: [Object.assign({ group: "ItemNipples", label: A.label, action: A.action }, A.selfAction ? { selfAllowed: true, selfLabel: A.selfLabel, selfAction: A.selfAction } : {})],
+          onSend: ({ target: target2 }) => {
+            try {
+              if (k === "cock") fucked(target2);
+            } catch (e) {
+            }
+          },
+          onReceive: ({ sender }) => {
+            try {
+              nipsUsed(Number(sender) || 0, k);
+            } catch (e) {
+            }
+          }
+        });
+      }
+      mode = "lscg";
+      lscgApi = api3;
+      return true;
+    } catch (e) {
+      console.warn("[Dispensary] LSCG wouldn't take the nipple actions:", e);
+      return false;
+    }
+  }
+  var TEXT = {};
+  function addOwn(mod2) {
+    if (mode) return false;
+    const list = W8.ActivityFemale3DCG || (typeof ActivityFemale3DCG !== "undefined" ? ActivityFemale3DCG : null);
+    const order = W8.ActivityFemale3DCGOrdering || (typeof ActivityFemale3DCGOrdering !== "undefined" ? ActivityFemale3DCGOrdering : null);
+    if (!Array.isArray(list) || !Array.isArray(order) || typeof W8.ActivityCheckPrerequisite !== "function") return false;
+    mode = "own";
+    for (const k of Object.keys(ACTS)) {
+      const A = ACTS[k], n = gameName(k);
+      if (list.some((a) => a && a.Name === n)) continue;
+      list.push({
+        Name: n,
+        MaxProgress: A.max,
+        MaxProgressSelf: A.max,
+        Target: ["ItemNipples"],
+        TargetSelf: A.selfAction ? ["ItemNipples"] : void 0,
+        Prerequisite: k === "cock" ? ["ZoneAccessible", "ZoneNaked", "CanUsePenis", "FarmDispHasCock", "FarmDispNipsOpen"] : ["ZoneAccessible", "ZoneNaked", "UseHands", "FarmDispNipsOpen"]
+      });
+      order.push(n);
+      TEXT["Activity" + n] = A.label;
+      TEXT["Label-ChatOther-ItemNipples-" + n] = A.label;
+      TEXT["ChatOther-ItemNipples-" + n] = A.action;
+      if (A.selfAction) {
+        TEXT["Label-ChatSelf-ItemNipples-" + n] = A.selfLabel;
+        TEXT["ChatSelf-ItemNipples-" + n] = A.selfAction;
+      }
+    }
+    const hook = (fn, pri, f) => {
+      try {
+        mod2.hookFunction(fn, pri, f);
+      } catch (e) {
+        console.warn("[Dispensary] nipples can't hook " + fn + ":", e);
+      }
+    };
+    hook("ActivityCheckPrerequisite", 5, (args, next2) => {
+      if (args[0] === "FarmDispNipsOpen") {
+        try {
+          return openOf(args[2] && args[2].MemberNumber) > 0 && !toyIn(args[2]);
+        } catch (e) {
+          return false;
+        }
+      }
+      if (args[0] === "FarmDispHasCock") return hasCock(args[1]);
+      return next2(args);
+    });
+    hook("PreferenceGetActivityFactor", 5, (args, next2) => /^FarmDisp_Nipple/.test(String(args[1])) ? 2 : next2(args));
+    hook("ActivityDictionaryText", 5, (args, next2) => Object.prototype.hasOwnProperty.call(TEXT, args[0]) ? TEXT[args[0]] : next2(args));
+    hook("ElementButton.CreateForActivity", 5, (args, next2) => {
+      try {
+        const a = args[1], k = a && a.Activity && kindOfName(a.Activity.Name);
+        if (k && !a.Item) {
+          args[4] = Object.assign({}, args[4] || {});
+          args[4].image = ACTS[k].image;
+        }
+      } catch (e) {
+      }
+      return next2(args);
+    });
+    hook("ServerSend", 5, (args, next2) => {
+      try {
+        const d = args[1];
+        if (args[0] === "ChatRoomChat" && d && d.Type === "Activity" && Array.isArray(d.Dictionary) && /FarmDisp_Nipple/.test(String(d.Content))) {
+          const get = (key2) => {
+            const e = d.Dictionary.find((x) => x && x[key2] != null);
+            return e ? e[key2] : null;
+          };
+          const src = Number(get("SourceCharacter")), tgt = Number(get("TargetCharacter"));
+          const nm = (mn) => {
+            const C2 = charOf2(mn);
+            return C2 ? String(C2.Nickname || C2.Name || mn) : String(mn);
+          };
+          const text3 = String(TEXT[d.Content] || "").replace(/SourceCharacter/g, nm(src)).replace(/TargetCharacter/g, nm(tgt)).replace(/PronounPossessive/g, "their");
+          if (text3) d.Dictionary.push({ Tag: 'MISSING TEXT IN "ActivityDictionary.csv": ' + d.Content, Text: text3 });
+          if (/FarmDisp_NippleFuck$/.test(String(d.Content)) && src === me3()) fucked(tgt);
+        }
+      } catch (e) {
+      }
+      return next2(args);
+    });
+    return true;
+  }
+  var onSuckled = null;
+  function nipsOnSuckle(f) {
+    onSuckled = f;
+  }
+  function onActivity3(data) {
+    const D = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (key2) => {
+      const e = D.find((x) => x && x[key2] != null);
+      return e ? e[key2] : null;
+    };
+    const name = String(get("ActivityName") || ""), src = Number(get("SourceCharacter")) || 0, tgt = Number(get("TargetCharacter")) || 0, grp = String(get("FocusGroupName") || "");
+    if (tgt !== me3() || !/^ItemNipples/.test(grp)) return;
+    const k = mode === "own" ? kindOfName(name) : null;
+    if (k) {
+      nipsUsed(src, k);
+      return;
+    }
+    if (src && src !== me3() && /^(Suck|Nibble|Lick|Kiss)/.test(name) && onSuckled) onSuckled(src);
+  }
+  function initNipples(mod2) {
+    setTimeout(() => {
+      try {
+        if (!mode) addOwn(mod2);
+      } catch (e) {
+        console.warn("[Dispensary] the nipple actions:", e);
+      }
+    }, 8e3);
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Activity") onActivity3(data);
+          else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me3()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispNips") onNips(data.Sender, m);
+            else if (m && m.type === "dispCream") onCream(data.Sender);
+            else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
+          }
+        } catch (e) {
+          console.warn("[Dispensary] nipples:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] nipples can't hear:", e);
+    }
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 2, (args, next2) => {
+        try {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer()) setTimeout(() => onMyClimax(), 300);
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+  }
+  var nipsState = () => ({ mode, others: [...others.entries()], told: told2, names: Object.keys(ACTS).map(gameName), text: Object.assign({}, TEXT), lscg: !!lscgApi, train: Object.assign({}, st().nipTrain || {}), lastFuck });
+  var nipsCream = (from) => onCream(from);
+  var nipsClimax = () => onMyClimax();
+  var nipsAddOwn = (mod2) => addOwn(mod2);
+
+  // dispensary/src/lines-seed.js
+  LINES.seed = {
+    // ── how it goes in ──
+    open_needle: [
+      "%b fits the syringe's nozzle in and pushes the plunger home, slow and steady.",
+      "%b lines up the syringe, slides it in, and empties it with one long squeeze.",
+      "%b works the nozzle in deep and leans on the plunger till it bottoms out.",
+      "%b holds %t still with one hand and pushes the plunger down with the other.",
+      "%b eases the baster in and squeezes, and keeps squeezin'."
+    ],
+    open_self: [
+      "%t fits the syringe in themselves and pushes the plunger down, slow, bitin' their lip.",
+      "%t slides the nozzle in with a shaky hand and empties it into themselves.",
+      "%t leans back, works the syringe in, and squeezes every drop in."
+    ],
+    open_sip: [
+      "%b tips the bottle to %t's lips and doesn't take it away till it's empty.",
+      "%b holds the glass for %t and makes them drink it all down, thick and warm.",
+      "%b feeds it to %t a slow mouthful at a time, thumb under their chin."
+    ],
+    open_kiss: [
+      "%b's kiss leaves somethin' thick and warm on %t's tongue, and %t swallows it down.",
+      "%b kisses %t deep and pushes it into their mouth with their tongue."
+    ],
+    open_gear: [
+      "%t's %g gives a warm, wet pulse.",
+      "Somethin' in %t's %g throbs, and then it lets go.",
+      "%t's %g clenches and pumps, all by itself.",
+      "With a soft, wet click, %t's %g empties itself."
+    ],
+    // ── where it lands: small (a load or two), big (up to a litre and a half), huge (past that) ──
+    vulva_s: [
+      "%l of %s seed spills warm into %t's pussy, %a of it.",
+      "%t's pussy takes %a of %s seed, and holds it, warm and deep.",
+      "%a of %s seed settles deep in %t's pussy, right where it can take.",
+      "%t feels it land, %a of %s seed, hot inside their pussy."
+    ],
+    vulva_m: [
+      "%a of %s seed floods %t's pussy, so much it presses deep and fills them right up.",
+      "%t's pussy is flooded with %s seed, %a of it, poured in till they're aching full.",
+      "%a of %s seed pumps into %t's pussy, wave after warm wave, and their womb soaks it all up.",
+      "%t gasps as %a of %s seed rushes into their pussy and keeps on comin'."
+    ],
+    vulva_l: [
+      "%a of %s seed. It pours into %t's pussy and doesn't stop, packin' their womb tight and swellin' their belly out with it.",
+      "%t's pussy is pumped full of %s seed, %a of it, till their womb is stretched round and heavy.",
+      "%a. That's how much of %s seed goes into %t's pussy, and every drop of it pushes their belly out a little further.",
+      "%t can only moan as %a of %s seed floods their pussy, fillin' them till their belly sloshes with it."
+    ],
+    butt_s: [
+      "%l of %s seed slides warm into %t's ass, %a of it.",
+      "%t's ass takes %a of %s seed and clenches round it.",
+      "%a of %s seed goes deep in %t's ass, and stays there, warm.",
+      "%t feels %a of %s seed spread hot inside their ass."
+    ],
+    butt_m: [
+      "%a of %s seed floods %t's ass, so much they can feel it fillin' them up from the inside.",
+      "%t's ass is pumped full of %s seed, %a of it, deep and heavy.",
+      "%a of %s seed rushes up into %t's ass, wave after warm wave.",
+      "%t squirms as %a of %s seed pours into their ass and keeps on comin'."
+    ],
+    butt_l: [
+      "%a of %s seed. It floods up into %t's ass and keeps on goin', till their belly is round and sloshin' with it.",
+      "%t's ass is pumped so full of %s seed, %a of it, that their belly swells out tight.",
+      "%a of %s seed fills %t from behind, deeper and deeper, till their whole belly's heavy with it.",
+      "%t can only whimper as %a of %s seed packs their ass full and swells their belly with it."
+    ],
+    mouth_s: [
+      "%a of %s seed lands on %t's tongue, and they swallow it down.",
+      "%t swallows %l of %s seed, %a of it, thick and salty.",
+      "%t gulps down %a of %s seed and licks their lips after.",
+      "%a of %s seed coats %t's tongue before it slides down their throat."
+    ],
+    mouth_m: [
+      "%a of %s seed pours down %t's throat, and they gulp and gulp to keep up.",
+      "%t swallows and swallows, %a of %s seed, till their belly's warm with it.",
+      "%t's throat works hard round %a of %s seed, every thick mouthful of it.",
+      "%a of %s seed fills %t's mouth faster than they can swallow, and they drink it all down anyway."
+    ],
+    mouth_l: [
+      "%a of %s seed pours down %t's throat, more than any mouth should hold, and their belly swells round with it.",
+      "%t drinks %a of %s seed, gulp after gulp, till their belly's tight and sloshin'.",
+      "%t chokes it down, %a of %s seed, till they're stuffed full and their belly's round with it.",
+      "There's no end to it: %a of %s seed floods down %t's throat and swells their belly out."
+    ],
+    nips_s: [
+      "%a of %s seed pushes into %t's nipples, and their tits go warm and heavy.",
+      "%t's nipples take %a of %s seed, a little in each, and tingle with it.",
+      "%a of %s seed fills %t's tits from the nipples in, a slow, warm swell.",
+      "%t shivers as %a of %s seed slides into their nipples and settles in their tits."
+    ],
+    nips_m: [
+      "%a of %s seed pumps into %t's nipples, and their tits swell tight and heavy with it.",
+      "%t's tits are filled from the nipples in, %a of %s seed, till they're round and achin'.",
+      "%a of %s seed floods %t's nipples, and their tits sit fuller and heavier for it."
+    ],
+    nips_l: [
+      "%a of %s seed is forced into %t's nipples, till their tits are swollen tight and shiny with it.",
+      "%t's tits fill and fill with %s seed, %a of it, till they're heavy as udders.",
+      "%a of %s seed packs %t's tits so full their nipples drip white."
+    ],
+    many_s: [
+      "%a of %s seed, shared out between %t's %w.",
+      "%s seed goes everywhere it can: %t's %w, %a of it all told.",
+      "%t takes %a of %s seed, in their %w."
+    ],
+    many_m: [
+      "%a of %s seed floods %t's %w, every hole filled at once.",
+      "%t is filled everywhere: their %w, %a of %s seed in all.",
+      "%s seed pumps into %t's %w all at once, %a of it."
+    ],
+    many_l: [
+      "%a of %s seed floods %t's %w, every one of them packed full till their belly swells round.",
+      "%t is stuffed in every hole, their %w, with %a of %s seed, and their belly sloshes with it.",
+      "Every hole %t has is pumped full: their %w, %a of %s seed, till they're round and heavy."
+    ],
+    // ── what spills (more than a body holds) ──
+    spill_hole: [
+      "Most of it won't stay: %x wells back out of %t's %h and runs down their thighs.",
+      "%t can't hold it all, and %x gushes back out of their %h.",
+      "%x of it pours straight back out of %t's %h and puddles under them.",
+      "It's too much: %x spills back out of %t's %h, down their legs."
+    ],
+    spill_mouth: [
+      "%x of it spills from the corners of %t's mouth and drips off their chin.",
+      "%t can't swallow it all, and %x runs down their chin and chest.",
+      "%x of it bubbles back up and dribbles down %t's chin."
+    ],
+    spill_nips: [
+      "%x of it wells back out of %t's nipples and runs down their tits.",
+      "Their tits can't hold it all, and %x drips white from %t's nipples."
+    ],
+    // ── the seal ──
+    seal_hold: [
+      "%t's %g holds every last drop in.",
+      "Not a drop gets out past %t's %g.",
+      "%t's %g keeps it all in, right where it belongs.",
+      "The %g holds it in, every drop, however full %t gets."
+    ],
+    seal_refuse: [
+      "But %t's %g won't open for it: it's sealed for %S. %s seed runs off the outside of it and down %t's thighs.",
+      "%t's %g stays shut. It's %S's, and it keeps %s seed out.",
+      "None of it gets past %t's %g, sealed for %S as it is. It all runs back down their thighs."
+    ],
+    // ── the belly, fillin' up ──
+    full_1: [
+      "%t's belly starts to round out, warm and heavy.",
+      "%t's belly is soft and round with it now.",
+      "There's a warm swell low in %t's belly now."
+    ],
+    full_2: [
+      "%t's belly is swollen and sloshin', round as can be.",
+      "%t's belly is stretched round and heavy, and it sloshes when they move.",
+      "%t looks well bred now, belly swollen tight and round."
+    ],
+    full_3: [
+      "%t's belly is drum-tight, stretched so round with seed it shines.",
+      "%t's belly is swollen huge and tight, like they're carryin' a litter already.",
+      "%t can hardly move for the weight of it: their belly's drum-tight and sloshin'."
+    ],
+    // ── after: it drips back out (the room sees it when they're bare) ──
+    drip_room: [
+      "%t's %h can't hold it: a slow trickle of %s seed runs down their thighs.",
+      "A little of %s seed seeps out of %t's %h and leaves a shiny trail down their leg.",
+      "%t shifts, and a warm dribble of %s seed slips out of their %h.",
+      "%t's %h leaks a little more of %s seed. It's been doin' that all day."
+    ],
+    drip_mine: [
+      "You feel a little of %s seed seep out of your %h, warm and slow.",
+      "A warm trickle of %s seed slips out of your %h, under your clothes.",
+      "Your %h leaks a little more of %s seed. Everybody'd know, if they could see."
+    ],
+    // ── the seal goes in, and comes out ──
+    seal_in: [
+      "%t's %g settles into their %h and seals it shut: %S's, and nobody else's.",
+      "%t's %g locks into place in their %h. Whatever %S puts in there now stays in.",
+      "%t's %h is sealed now with %S's %g, and only %S's seed can take."
+    ],
+    seal_out: [
+      "Out comes %t's %g, and %a of %s seed gushes out right behind it.",
+      "The moment %t's %g comes out, %a of %s seed pours out of their %h and down their thighs.",
+      "%t's %g pops free, and %a of %s seed floods out after it with a wet rush.",
+      "%t's %g slides out, and their %h lets go of %a of %s seed all at once."
+    ]
+  };
+
+  // dispensary/src/lines-breed.js
+  LINES.breed = {
+    // ── a real load lands in you (only you see these: the scene's yours to tell) ──
+    load_vulva: [
+      "You feel %S throb and let go deep inside you: %l, %a of it, hot in your pussy where it can take.",
+      "%S empties into your pussy, pulse after pulse, and you can feel every warm drop of it settle deep.",
+      "%a of %s seed floods your pussy. Your womb soaks it up like it's been waitin' for it all day.",
+      "%S cums, buried to the hilt, and leaves you full and drippin' with %l.",
+      "You clench round %S as they unload, %a of it, and keep every drop you can."
+    ],
+    load_butt: [
+      "%S throbs deep in your ass and unloads, %l, %a of it, hot and heavy.",
+      "%S cums in your ass, and you feel it spread warm all through you.",
+      "%a of %s seed pumps into your ass, pulse after pulse, deep as it'll go.",
+      "%S fills your ass full, and you squeeze down to keep it in."
+    ],
+    load_mouth: [
+      "%S cums down your throat, %l, and you swallow and swallow to keep up.",
+      "%a of %s seed fills your mouth, thick and salty, and slides down warm.",
+      "%S holds your head and empties into your throat. You drink down every drop.",
+      "You gulp down %S's load, %a of it, and lick your lips after."
+    ],
+    load_full: [
+      "There's no room left for it: most of %s load runs straight back out of your %h.",
+      "You're too full to keep it: it wells back out of your %h and down your thighs."
+    ],
+    // ── a knot: it swells, it locks, you're theirs till it goes down (the room sees it) ──
+    knot_tie: [
+      "%S's knot swells fat and locks inside %t's %h. They're tied together now, and %t isn't goin' anywhere till it goes down.",
+      "With one last deep push, %S's knot pops past %t's rim and swells tight. %t's stuck on it, full and tied.",
+      "%S's knot locks %t's %h shut round every drop. They're tied, and the seed's got nowhere to go but deep.",
+      "%t gasps as %S's knot swells inside them, stretchin' them wide and lockin' them on. Tied fast."
+    ],
+    knot_tug: [
+      "You try to pull away, and %S's knot tugs you right back. Not yet.",
+      "You squirm on %S's knot. It won't budge, and every wiggle pushes their seed deeper.",
+      "You're stuck fast on %S's knot. You'll go where they go for a while.",
+      "The knot holds. Your %h's stretched round it, and it isn't lettin' go."
+    ],
+    knot_free: [
+      "With a slow, wet pop, %S's knot finally slips free of %t, and a warm trickle follows it out.",
+      "%S's knot goes down at last and slides out of %t's %h, leavin' them open, drippin' and well bred.",
+      "%t is untied: %S's knot slips loose, and their %h stays gapin' and wet behind it."
+    ],
+    // ── keepin' it in: hips up after a load (only you see it) ──
+    legs_up: [
+      "You tip your hips up and keep %s load right where it can take.",
+      "Rump up, knees spread: you hold %s seed deep and let it work.",
+      "You stay down with your hips high, keepin' every drop of %s load inside, warm and deep.",
+      "You lie still, hips tipped up, and feel %s seed settle deep where it belongs."
+    ],
+    // ── your ripe days: your womb's achin' for it (only you, then now and then the room) ──
+    ripe_start: [
+      "\u{1F338} You're ripe. There's a warm, hungry ache low in your belly, and it wants filled.",
+      "\u{1F338} Your ripe days are here. Everything down low feels heavy and wet and ready to take.",
+      "\u{1F338} You wake ripe and achin'. Any load today's likelier to catch."
+    ],
+    ripe_mine: [
+      "That ripe ache throbs low in your belly again. You'd take a load right now, from anybody.",
+      "You're slick and achin' and ripe, and you can't stop thinkin' about bein' bred.",
+      "Your womb's achin' for it. Ripe as you are, the next load in you could take.",
+      "You squeeze your thighs together. Ripe days make everything throb."
+    ],
+    ripe_room: [
+      "%t smells ripe and ready, and keeps shiftin' their hips like they're hopin' somebody notices.",
+      "There's a flush on %t and a want in how they move. Ripe, and everybody can tell.",
+      "%t presses their thighs together and lets out a needy little breath. Somebody's ripe for breedin'."
+    ],
+    ripe_end: [
+      "The ripe ache eases off. Whatever's in you now has had its best chance.",
+      "Your ripe days pass, and the hungry ache low down settles again."
+    ]
+  };
+
+  // dispensary/src/breed.js
+  var W9 = window;
+  var MIN5 = 6e4;
+  var DAY5 = 864e5;
+  var me4 = () => W9.Player && W9.Player.MemberNumber || 0;
+  var botIn2 = () => (W9.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf3 = (mn) => (mn === me4() ? W9.Player : (W9.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+  var breedAnyOn = () => st().breedAny === true;
+  var HOLE_OF = { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" };
+  var DEFAULT_LOAD = [30, 60];
+  var said2 = {};
+  function lineOf(key2, v) {
+    const L = LINES.breed && LINES.breed[key2];
+    if (!L || !L.length) return "";
+    let t = pick(L);
+    if (L.length > 1 && t === said2[key2]) t = L[(L.indexOf(t) + 1) % L.length];
+    said2[key2] = t;
+    v = v || {};
+    return String(t).replace(/%t/g, myName()).replace(/%S/g, v.S || "somebody").replace(/%s/g, v.s || "somebody's").replace(/%a/g, v.a || "").replace(/%l/g, v.l || "a load").replace(/%h/g, v.h || "pussy").replace(/^\s*(\S)/, (m, c) => m.slice(0, -1) + c.toUpperCase());
+  }
+  var lastIn2 = null;
+  function myLoad() {
+    const F = st().cock;
+    let ml = F && F.load > 0 ? F.load : DEFAULT_LOAD[0] + Math.random() * (DEFAULT_LOAD[1] - DEFAULT_LOAD[0]);
+    try {
+      const D = W9.FarmhandDispensary;
+      if (D && D.active && D.active("rut")) ml *= 1.5;
+    } catch (e) {
+    }
+    const tie2 = F && F.knot ? F.tie && F.tie.length === 2 ? F.tie : [5, 15] : null;
+    return { ml: Math.round(ml), knot: !!tie2, mins: tie2 ? Math.round(tie2[0] + Math.random() * (tie2[1] - tie2[0])) : 0 };
+  }
+  function onMyClimax2() {
+    const f = lastIn2;
+    lastIn2 = null;
+    if (!f || Date.now() - f.at > 9e4 || W9.ActivityOrgasmRuined || !charOf3(f.target)) return false;
+    const L0 = myLoad();
+    try {
+      W9.ServerSend("ChatRoomChat", makeMsg("dispLoad", { h: f.h, ml: L0.ml, knot: L0.knot ? 1 : 0, mins: L0.mins }, f.target));
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+  var waiting = /* @__PURE__ */ new Map();
+  var told3 = /* @__PURE__ */ new Map();
+  function realLoad(from, h2) {
+    if (!breedAnyOn() || botIn2() || !from || from === me4() || !allowed(from)) return false;
+    if (!["vulva", "butt", "throat", "mouth"].includes(h2)) return false;
+    h2 = h2 === "throat" ? "mouth" : h2;
+    const pre = told3.get(from);
+    if (pre && Date.now() - pre.at < 8e3) {
+      told3.delete(from);
+      book(from, h2, pre);
+      return true;
+    }
+    const w = waiting.get(from);
+    if (w) clearTimeout(w.t);
+    waiting.set(from, { h: h2, at: Date.now(), t: setTimeout(() => {
+      waiting.delete(from);
+      book(from, h2, null);
+    }, 2500) });
+    return true;
+  }
+  function onLoadMsg(from, m) {
+    const o = { ml: Math.max(1, Math.min(5e3, Number(m.ml) || 0)), knot: m.knot ? 1 : 0, mins: Math.max(0, Math.min(40, Number(m.mins) || 0)), at: Date.now() };
+    const w = waiting.get(from);
+    if (w) {
+      clearTimeout(w.t);
+      waiting.delete(from);
+      book(from, w.h, o);
+      return;
+    }
+    told3.set(from, o);
+  }
+  function book(from, h2, o) {
+    const ml = o && o.ml ? o.ml : Math.round(DEFAULT_LOAD[0] + Math.random() * (DEFAULT_LOAD[1] - DEFAULT_LOAD[0]));
+    const r = seedGive({ by: from, sire: from, nm: nameOf(from) !== "somebody" ? nameOf(from) : "", p: h2 + "=" + ml, via: "cock", quiet: true });
+    if (!r || !r.ok) return null;
+    const v = { S: nameOf(from), s: nameOf(from) + "'s", a: amountSay(ml), l: loadSay(ml), h: SEED_WORD[h2] };
+    local(lineOf("load_" + h2, v) + (r.spilt && r.spilt[h2] >= 5 ? " " + lineOf("load_full", v) : ""));
+    if (o && o.knot && h2 !== "mouth" && charOf3(from)) tieTo(from, h2, o.mins || 10);
+    return r;
+  }
+  function tieTo(by, h2, mins) {
+    const S3 = st(), now = Date.now();
+    S3.tie = { by, h: h2, until: Math.max(S3.tie && S3.tie.by === by && S3.tie.until || 0, now + Math.max(3, mins) * MIN5) };
+    save();
+    if (inRoom()) action(lineOf("knot_tie", { S: nameOf(by), h: SEED_WORD[h2] }));
+  }
+  var tied = () => {
+    const t = st().tie;
+    return t && t.until > Date.now() ? t : null;
+  };
+  var tugAt = 0;
+  function tieOk(X, Y) {
+    const t = tied();
+    if (!t) return true;
+    const C2 = charOf3(t.by), pos = C2 && C2.MapData && C2.MapData.Pos;
+    if (!pos || typeof pos.X !== "number") return true;
+    if (Math.max(Math.abs(X - pos.X), Math.abs(Y - pos.Y)) <= 1) return true;
+    if (Date.now() - tugAt > 2e4) {
+      tugAt = Date.now();
+      local(lineOf("knot_tug", { S: nameOf(t.by), h: SEED_WORD[t.h] }));
+    }
+    return false;
+  }
+  function tieTick(now) {
+    const t = st().tie;
+    if (!t) return;
+    if (t.until <= now || !charOf3(t.by)) {
+      delete st().tie;
+      save();
+      if (inRoom() && charOf3(t.by)) action(lineOf("knot_free", { S: nameOf(t.by), h: SEED_WORD[t.h] }));
+    }
+  }
+  var UP_POSES = ["AllFours", "Hogtied", "KneelingSpread"];
+  function hipsUp() {
+    try {
+      const P = W9.Player, lower = P && P.PoseMapping && P.PoseMapping.BodyLower;
+      return UP_POSES.includes(lower);
+    } catch (e) {
+      return false;
+    }
+  }
+  function upTick(now) {
+    if (!hipsUp()) return;
+    const n = seedMarkUp(now - 5 * MIN5);
+    if (n && n.who) local(lineOf("legs_up", { s: n.who === me4() ? "your own" : (nameOf(n.who) !== "somebody" ? nameOf(n.who) : n.nm || "their") + "'s" }));
+  }
+  function ripeNow(now) {
+    const R = st().ripe;
+    if (!R || !(R.at > 0)) return false;
+    now = now || Date.now();
+    const d = Math.floor((now - R.at) / DAY5), every = R.every || 7, k = (d % every + every) % every;
+    return k >= (R.from || 3) && k < (R.from || 3) + (R.days || 2);
+  }
+  var ripeWas = null;
+  var ripeNext = 0;
+  var ripeRoomNext = 0;
+  function ripeTick(now) {
+    const r = ripeNow(now);
+    if (ripeWas === null) {
+      ripeWas = r;
+      ripeNext = now + (20 + Math.random() * 20) * MIN5;
+      ripeRoomNext = now + (60 + Math.random() * 60) * MIN5;
+      return;
+    }
+    if (r !== ripeWas) {
+      ripeWas = r;
+      local(lineOf(r ? "ripe_start" : "ripe_end"));
+      ripeNext = now + (30 + Math.random() * 20) * MIN5;
+      return;
+    }
+    if (!r || !inRoom()) return;
+    if (now >= ripeNext) {
+      ripeNext = now + (35 + Math.random() * 25) * MIN5;
+      local(lineOf("ripe_mine"));
+    }
+    if (now >= ripeRoomNext) {
+      ripeRoomNext = now + (90 + Math.random() * 60) * MIN5;
+      action(lineOf("ripe_room"));
+    }
+  }
+  function breedWelcome(m) {
+    const S3 = st();
+    if (m && m.ripe && typeof m.ripe === "object" && Number(m.ripe.at) > 0) S3.ripe = { at: Number(m.ripe.at), every: Math.max(2, Math.min(30, Number(m.ripe.every) || 7)), from: Math.max(0, Math.min(29, Number(m.ripe.from) || 3)), days: Math.max(1, Math.min(10, Number(m.ripe.days) || 2)) };
+    else if (m && m.ripe === null) delete S3.ripe;
+    if (m && m.cock && typeof m.cock === "object") S3.cock = { load: Math.max(0, Math.min(5e3, Math.round(Number(m.cock.load) || 0))), knot: !!m.cock.knot, tie: Array.isArray(m.cock.tie) ? m.cock.tie.slice(0, 2).map((x) => Math.max(1, Math.min(40, Number(x) || 5))) : null };
+    else if (m && m.cock === null) delete S3.cock;
+    save();
+  }
+  function breedTick(now) {
+    now = now || Date.now();
+    tieTick(now);
+    upTick(now);
+    ripeTick(now);
+  }
+  function initBreed(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Activity" && data.Sender === me4()) {
+            const D = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (k) => {
+              const e = D.find((x) => x && x[k] != null);
+              return e ? e[k] : null;
+            };
+            const name = String(get("ActivityName") || ""), tgt = Number(get("TargetCharacter")) || 0, grp = String(get("FocusGroupName") || ""), A = D.find((x) => x && x.Tag === "ActivityAsset");
+            const U = useOf(name, A ? A.AssetName : "", ""), h2 = HOLE_OF[grp];
+            if (U && U.cock && h2 && tgt && tgt !== me4()) lastIn2 = { target: tgt, h: h2 === "mouth" ? "throat" : h2, at: Date.now() };
+          } else if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me4()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispLoad") onLoadMsg(data.Sender, m);
+          }
+        } catch (e) {
+          console.warn("[Dispensary] breed:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] breedin' can't hear the room:", e);
+    }
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 2, (args, next2) => {
+        try {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer()) setTimeout(() => onMyClimax2(), 300);
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomMapViewCanEnterTile", 2, (args, next2) => {
+        const t = next2(args);
+        try {
+          return t > 0 && !tieOk(args[0], args[1]) ? 0 : t;
+        } catch (e) {
+          return t;
+        }
+      });
+    } catch (e) {
+    }
+  }
+  var breedReset = () => {
+    lastIn2 = null;
+    waiting.forEach((w) => clearTimeout(w.t));
+    waiting.clear();
+    told3.clear();
+    delete st().tie;
+    ripeWas = null;
+  };
+  var breedClimax = () => onMyClimax2();
+  var breedLastIn = () => lastIn2;
+
+  // dispensary/src/lines-carry.js
+  LINES.carry = {
+    // ── carryin' (mostly only you; now and then the room) ──
+    early_mine: [
+      "There's a warm, secret fullness low in your belly. %S young are in there, takin' hold.",
+      "Your tits feel heavy and tender today, achin' for no reason at all. You know the reason.",
+      "You catch yourself restin' a hand on your belly. Bred. Really, properly bred.",
+      "Every time you move you feel it: that soft, full weight that says you took."
+    ],
+    show_mine: [
+      "Your belly's round now, firm and warm under your hand. Everybody can see what you are.",
+      "You're showin', and you can't stop touchin' it. %c in there, all %S.",
+      "Your clothes sit tight over your swellin' belly. You're a breeder, and it shows.",
+      "Your tits are swollen and achin', fillin' up for what's comin'."
+    ],
+    heavy_mine: [
+      "Your belly's heavy and huge, stretched tight with %S %many. Every step's a slow, swayin' waddle.",
+      "Somethin' shifts and kicks deep inside you, then again. They're gettin' big in there.",
+      "You're so full of them you can hardly bend. Your belly sits heavy and round in front of you, proud.",
+      "Milk beads at your nipples all by itself now. Your body's ready for them."
+    ],
+    room_show: [
+      "%t rests both hands on their round, swellin' belly. Bred, and showin' it off.",
+      "%t's belly's grown round and firm. Somebody's been well and truly bred.",
+      "%t shifts their weight with a little sigh, one hand cupped under their full belly."
+    ],
+    room_heavy: [
+      "%t waddles a few slow steps, belly huge and heavy in front of them, and has to stop and catch their breath.",
+      "%t's belly gives a visible kick. They gasp, then smile and rub the spot.",
+      "%t is heavy with young, belly stretched tight and round, tits swollen and leakin'.",
+      "%t lowers themselves down slow and careful, cradlin' a belly that's almost ready to burst."
+    ],
+    crave: [
+      "You're achin' for seed. Not just a little: you'd drink a load right now, from anybody who'd give it.",
+      "Carryin's made you hungry, and not for food. You want a thick load down your throat or deep in you.",
+      "Your belly's full and your mouth's empty, and all you can think about is cock."
+    ],
+    // ── heat, anywhere ──
+    heat_start: [
+      "\u{1F525} Heat hits %t like a wave: flushed, slick and achin', and they can't keep still.",
+      "\u{1F525} %t comes into heat right where they are, cheeks burnin', thighs pressed tight, needy all over.",
+      "\u{1F525} %t's in heat. You can see it on them, and anybody close enough can smell it."
+    ],
+    heat_scent: [
+      "You catch the scent of %b's heat, sweet and heavy, and your cock throbs with it.",
+      "%b's in heat, and you can smell it from here. Your balls ache to empty into them.",
+      "There's heat in the air: %b's. It goes straight to your cock."
+    ],
+    // ── labour, wherever you are (the room sees it) ──
+    water: [
+      "%t gasps and grabs for somethin' to hold: their waters have broken, right here. %S %many are on their way.",
+      "A warm gush runs down %t's thighs, and their belly tightens hard. It's time.",
+      "%t doubles over with a low moan as the first real wave rolls through their swollen belly. Their %many are comin'."
+    ],
+    early: [
+      "Another wave rolls through %t's belly. They rock their hips and breathe through it, slow.",
+      "%t's belly tightens and holds, then eases. It's only startin'.",
+      "%t pants, both hands on their belly, as it squeezes hard and lets go."
+    ],
+    strong: [
+      "The waves come close and strong now. %t's on their knees, moanin' with every one.",
+      "%t bears down with a long, deep groan, belly drawn hard and tight. They're pushin' now.",
+      "%t can't hold back the noises: every push is a deep, needy groan."
+    ],
+    close: [
+      "%t's almost there, red-faced and shakin', pushin' with everything they've got.",
+      "One more, %t. They grit their teeth and push, and push.",
+      "%t cries out: the first one's crownin'."
+    ],
+    midwife: [
+      "%b kneels beside %t and rubs their belly through the next wave, slow and firm.",
+      "%b holds %t's hand and talks them through it, steady and sweet.",
+      "%b's hands work low on %t's belly, easin' the next one along."
+    ],
+    birth: [
+      "With one last long push, %t delivers %kids, %S. Spent, glowin' and well bred, they gather them close.",
+      "%t's labour ends in a rush: %kids, slick and squirmin', %S every one. They're a mother again.",
+      "There they are: %kids. %t sinks back, belly soft and empty, tits heavy with milk, and laughs breathless."
+    ],
+    birth_midwife: [
+      "With %b's hands to help, %t delivers %kids, %S. %b gathers them up and lays them on %t's chest.",
+      "%t pushes the last one out into %b's waitin' hands: %kids, %S. What a good breeder."
+    ],
+    // ── layin' eggs ──
+    lay_start: [
+      "%t's belly rolls and shifts. The eggs in them want out, and they want out now.",
+      "%t squirms, belly heavy and lumpy with eggs, and squats down low."
+    ],
+    lay_push: [
+      "%t strains and moans, and a slick, warm egg slides out of them.",
+      "Another egg crowns and pops free with a wet sound. %t shudders all over.",
+      "%t bears down, gasps, and pushes out another egg, round and glistenin'."
+    ],
+    lay_done: [
+      "%t pushes the last of them out: %e eggs, warm and slick, in a little pile. Their belly's soft and empty again.",
+      "With a long shiver %t lays the last one. %e eggs, every one of them perfect."
+    ],
+    // ── back to back: open again after a birth ──
+    open_mine: [
+      "You're still open and achin' from the birth, and already you want filled again.",
+      "Your womb's wide open and hungry. The next load in you could take, easy."
+    ],
+    // ── the Quickening Draught ──
+    quicken: [
+      "The draught goes down warm, and %t's belly swells a little rounder right away. Their %many are growin' faster.",
+      "%t gasps as their belly tightens and grows, hurried along. They're closer to due now.",
+      "Warmth floods %t's belly, and it swells, heavier and rounder by the minute."
+    ],
+    quicken_none: [
+      "The draught goes down warm and settles low, achin'. There's nothin' in %t to hurry along. Yet."
+    ],
+    // ── the Breeder's Scan ──
+    scan_preg: [
+      "%b runs the scanner slow over %t's belly, and it lights up: %c in there, %S, %d.",
+      "The scan shows it plain: %t's carryin' %c, all %S, and %d.",
+      "%b's scan glides across %t's swollen belly. %c heartbeats, %S, %d."
+    ],
+    scan_eggs: [
+      "...and a clutch of %e eggs packed in there too, nearly ready."
+    ],
+    scan_seed: [
+      "%b runs the scanner over %t's belly: nothin' caught yet, but %a of seed sloshin' in there, waitin' to take.",
+      "Empty for now, the scan says. Just %a of seed in %t, and a womb hungry for it."
+    ],
+    scan_empty: [
+      "%b runs the scanner over %t's belly. Nothin' in there. Somebody should fix that.",
+      "The scan comes up empty: %t's not carryin'. Not yet."
+    ],
+    scan_ripe: [
+      "...and they're ripe right now: a load today would take twice as easy."
+    ]
+  };
+
+  // dispensary/src/carry.js
+  var W10 = window;
+  var MIN6 = 6e4;
+  var HOUR3 = 36e5;
+  var DAY6 = 864e5;
+  var me5 = () => W10.Player && W10.Player.MemberNumber || 0;
+  var botIn3 = () => (W10.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf4 = (mn) => (mn === me5() ? W10.Player : (W10.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+  var tellPage2 = (detail) => {
+    try {
+      W10.dispatchEvent(new W10.CustomEvent("farmhand-dispensary", { detail }));
+    } catch (e) {
+    }
+  };
+  var BREDBACK_MIN = 60;
+  var C = () => st().carry || null;
+  function carryWelcome(m) {
+    const c = m && m.carry;
+    if (!c || typeof c !== "object") return;
+    const S3 = st(), num2 = (v, lo, hi) => Math.max(lo, Math.min(hi, Number(v) || 0));
+    const P = c.preg && typeof c.preg === "object" ? c.preg : null, E = c.eggs && typeof c.eggs === "object" ? c.eggs : null;
+    S3.carry = {
+      preg: P ? { since: num2(P.since, 0, 1e14), due: num2(P.due, 0, 1e14), count: Math.round(num2(P.count, 1, 60)), sires: Array.isArray(P.sires) ? P.sires.filter((x) => typeof x === "string").slice(0, 6).map((x) => x.slice(0, 40)) : [] } : null,
+      eggs: E ? { n: Math.round(num2(E.n, 1, 200)), layAt: num2(E.layAt, 0, 1e14), by: typeof E.by === "string" ? E.by.slice(0, 40) : "" } : null,
+      heat: { until: num2(c.heat && c.heat.until, 0, 1e14), next: num2(c.heat && c.heat.next, 0, 1e14) },
+      open: num2(c.open, 0, 1e14),
+      litters: Math.round(num2(c.litters, 0, 1e6)),
+      one: typeof c.one === "string" ? c.one.slice(0, 20) : "little one",
+      many: typeof c.many === "string" ? c.many.slice(0, 20) : "little ones",
+      at: Date.now()
+    };
+    if (S3.born && Number(c.bornSeen) >= S3.born.at) delete S3.born;
+    if (S3.laid && Number(c.laidSeen) >= S3.laid.at) delete S3.laid;
+    if (S3.carry.preg && S3.labour && S3.labour.due !== S3.carry.preg.due && !S3.born) delete S3.labour;
+    save();
+    tellPage2({ type: "seed" });
+  }
+  var carryHello = () => ({ born: st().born || void 0, laid: st().laid || void 0 });
+  function bellyAll(now) {
+    now = now || Date.now();
+    const c = C(), I = seedInfo();
+    let w = 0;
+    const full = I.belly / Math.max(1, seedCap());
+    if (full > 0.8) w += (full - 0.8) * 3;
+    if (c && c.eggs && !st().laid) w += c.eggs.n / 10;
+    const g = c && c.preg && !st().born ? c.preg : null;
+    if (g) {
+      const f = Math.max(0, Math.min(1, (now - g.since) / Math.max(1, g.due - g.since)));
+      w += f * (1 + g.count * 0.5);
+    }
+    return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+  }
+  var said3 = {};
+  function lineOf2(key2, v) {
+    const L = LINES.carry && LINES.carry[key2];
+    if (!L || !L.length) return "";
+    let t = pick(L);
+    if (L.length > 1 && t === said3[key2]) t = L[(L.indexOf(t) + 1) % L.length];
+    said3[key2] = t;
+    v = v || {};
+    const c = C() || {}, g = c.preg || {}, n = v.c || g.count || 1;
+    const kids = n === 1 ? "a " + (c.one || "little one") : n + " " + (c.many || "little ones");
+    return String(t).replace(/%t/g, myName()).replace(/%b/g, v.b || "somebody").replace(/%S/g, v.S || sireWords(g.sires)).replace(/%kids/g, kids).replace(/%many/g, c.many || "little ones").replace(/%one/g, c.one || "little one").replace(/%c/g, String(n)).replace(/%e/g, String(v.e || c.eggs && c.eggs.n || "")).replace(/%a/g, v.a || "").replace(/%d/g, v.d || "").replace(/^\s*(\S)/, (m, ch) => m.slice(0, -1) + ch.toUpperCase());
+  }
+  var sireWords = (s) => !s || !s.length ? "their sire's" : s.length === 1 ? s[0] + "'s" : s.slice(0, -1).join(", ") + " and " + s[s.length - 1] + "'s";
+  var dueWords2 = (due) => {
+    const ms = due - Date.now();
+    return ms <= 0 ? "due right now" : ms < 36 * HOUR3 ? "due in " + Math.max(1, Math.round(ms / HOUR3)) + " hours" : "due in " + Math.round(ms / DAY6) + " days";
+  };
+  function stageOf(now) {
+    const g = C() && C().preg;
+    if (!g || st().born) return "";
+    const f = (now - g.since) / Math.max(1, g.due - g.since);
+    return f >= 1 ? "due" : f >= 0.7 ? "heavy" : f >= 0.3 ? "show" : "early";
+  }
+  var feelNext = 0;
+  var roomNext = 0;
+  var craveNext2 = 0;
+  function feelTick(now) {
+    const s = stageOf(now);
+    if (!s || !inRoom()) return;
+    if (!feelNext) {
+      feelNext = now + (8 + Math.random() * 10) * MIN6;
+      roomNext = now + (40 + Math.random() * 30) * MIN6;
+      craveNext2 = now + (50 + Math.random() * 40) * MIN6;
+      return;
+    }
+    if (now >= feelNext) {
+      feelNext = now + (25 + Math.random() * 20) * MIN6;
+      local(lineOf2((s === "due" ? "heavy" : s) + "_mine"));
+      if (s === "heavy" || s === "due") tellPage2({ type: "leak", mess: "milk", areas: ["chest"], amount: 0.8 });
+    }
+    if (now >= roomNext && s !== "early") {
+      roomNext = now + (60 + Math.random() * 40) * MIN6;
+      action(lineOf2(s === "show" ? "room_show" : "room_heavy"));
+    }
+    if (now >= craveNext2) {
+      craveNext2 = now + (70 + Math.random() * 50) * MIN6;
+      local(lineOf2("crave"));
+    }
+  }
+  var heatDone = 0;
+  function heatTick(now, giveHeat) {
+    const c = C();
+    if (!c || botIn3()) return;
+    const next2 = c.heat && c.heat.next;
+    if (!(next2 > 0) || now < next2 || heatDone === next2 || st().heatAt === next2 || now - next2 > 12 * HOUR3) return;
+    heatDone = next2;
+    st().heatAt = next2;
+    save();
+    const mins = Math.max(10, Math.round((next2 + 12 * HOUR3 - now) / MIN6));
+    try {
+      giveHeat(mins, lineOf2("heat_start"));
+    } catch (e) {
+    }
+  }
+  var scentAt = /* @__PURE__ */ new Map();
+  function scentTick(now, idsOf) {
+    const P = W10.Player;
+    if (!P || typeof P.HasPenis !== "function" || !P.HasPenis() || !inRoom()) return;
+    for (const c of W10.ChatRoomCharacter || []) {
+      if (!c || c.MemberNumber === me5()) continue;
+      const ids = idsOf(c.MemberNumber);
+      if (!ids.includes("heat")) continue;
+      if (now - (scentAt.get(c.MemberNumber) || 0) < HOUR3) continue;
+      scentAt.set(c.MemberNumber, now);
+      local(lineOf2("heat_scent", { b: nameOf(c.MemberNumber) }));
+      try {
+        const A = P.ArousalSettings;
+        if (A && typeof W10.ActivitySetArousal === "function") W10.ActivitySetArousal(P, Math.min(100, (Number(A.Progress) || 0) + 10));
+      } catch (e) {
+      }
+    }
+  }
+  var helped = /* @__PURE__ */ new Map();
+  function labourTick(now) {
+    const S3 = st(), c = C(), g = c && c.preg;
+    if (!g || S3.born || botIn3()) {
+      if (S3.labour && (!g || S3.born)) {
+        delete S3.labour;
+        save();
+      }
+      return;
+    }
+    if (!S3.labour) {
+      if (now < g.due || !inRoom()) return;
+      const mins = Math.min(90, 45 + Math.max(0, g.count - 1) * 3);
+      S3.labour = { start: now, until: now + mins * MIN6, next: now + (6 + Math.random() * 4) * MIN6, due: g.due, helps: 0, midwife: 0 };
+      save();
+      action(lineOf2("water"));
+      return;
+    }
+    const L = S3.labour;
+    if (now >= L.until) {
+      S3.born = { at: now, midwife: L.midwife || 0, helps: L.helps || 0, n: g.count, due: g.due };
+      delete S3.labour;
+      save();
+      action(L.midwife && charOf4(L.midwife) ? lineOf2("birth_midwife", { b: nameOf(L.midwife) }) : lineOf2("birth"));
+      tellPage2({ type: "leak", mess: "milk", areas: ["chest"], amount: 1.5 });
+      tellPage2({ type: "seed" });
+      return;
+    }
+    if (now >= L.next && inRoom()) {
+      L.next = now + (6 + Math.random() * 4) * MIN6;
+      save();
+      const f = (now - L.start) / Math.max(1, L.until - L.start);
+      action(lineOf2(f < 0.4 ? "early" : f < 0.8 ? "strong" : "close"));
+    }
+  }
+  function labourTouch(from, group) {
+    const L = st().labour;
+    if (!L || !from || from === me5() || !/^Item(Pelvis|Torso|Vulva|Breast)$/.test(String(group || ""))) return false;
+    if (Date.now() - (helped.get(from) || 0) < 3 * MIN6) return false;
+    helped.set(from, Date.now());
+    if (!L.midwife) L.midwife = from;
+    L.helps = (L.helps || 0) + 1;
+    L.until = Math.max(Date.now() + MIN6, L.until - 3 * MIN6);
+    save();
+    action(lineOf2("midwife", { b: nameOf(from) }));
+    return true;
+  }
+  function layTick(now) {
+    const S3 = st(), c = C(), e = c && c.eggs;
+    if (!e || S3.laid || botIn3() || now < e.layAt || !inRoom()) {
+      if (S3.laying && (!e || S3.laid)) {
+        delete S3.laying;
+        save();
+      }
+      return;
+    }
+    if (!S3.laying) {
+      S3.laying = { start: now, next: now + 2 * MIN6, pushes: 0 };
+      save();
+      action(lineOf2("lay_start"));
+      return;
+    }
+    const Y = S3.laying;
+    if (now < Y.next) return;
+    Y.pushes += 1;
+    Y.next = now + (2 + Math.random() * 2) * MIN6;
+    if (Y.pushes >= Math.min(4, 1 + Math.ceil(e.n / 3))) {
+      S3.laid = { at: now, n: e.n };
+      delete S3.laying;
+      save();
+      action(lineOf2("lay_done", { e: e.n }));
+      tellPage2({ type: "seed" });
+      return;
+    }
+    save();
+    action(lineOf2("lay_push"));
+  }
+  function openUntil() {
+    const c = C(), S3 = st();
+    return Math.max(c && c.open || 0, S3.born ? S3.born.at + BREDBACK_MIN * MIN6 : 0);
+  }
+  var openSaid = 0;
+  function openTick(now) {
+    const u = openUntil();
+    if (!(u > now) || openSaid === u || !inRoom()) return;
+    openSaid = u;
+    local(lineOf2("open_mine"));
+  }
+  function quicken(x, quiet) {
+    const c = C(), g = c && c.preg, S3 = st();
+    x = Math.max(1, Math.min(5, Math.round(Number(x) || 1)));
+    if ((!g || S3.born) && !(c && c.eggs && !S3.laid)) {
+      if (!quiet) action(lineOf2("quicken_none"));
+      return { ok: false, why: "none" };
+    }
+    const now = Date.now();
+    if (g && !S3.born) {
+      const step = Math.min(x * DAY6, Math.max(0, g.due - now - 2 * HOUR3));
+      g.due -= step;
+      g.since -= step;
+    }
+    if (c.eggs && !S3.laid) c.eggs.layAt = Math.max(now + 30 * MIN6, c.eggs.layAt - x * 12 * HOUR3);
+    if (!botIn3()) S3.quick = Math.min(20, (S3.quick || 0) + x);
+    save();
+    tellPage2({ type: "seed" });
+    if (!quiet) action(lineOf2("quicken"));
+    return { ok: true };
+  }
+  function takeQuick() {
+    const n = st().quick || 0;
+    if (n) {
+      delete st().quick;
+      save();
+    }
+    return n;
+  }
+  function scan(by) {
+    const c = C(), g = c && c.preg, S3 = st(), I = seedInfo(), v = { b: by && by !== me5() ? nameOf(by) : myName() };
+    let t;
+    if (g && !S3.born) t = lineOf2("scan_preg", Object.assign({}, v, { d: dueWords2(g.due) })) + (c.eggs && !S3.laid ? " " + lineOf2("scan_eggs") : "");
+    else if (c && c.eggs && !S3.laid) t = lineOf2("scan_preg", Object.assign({}, v, { c: c.eggs.n, S: c.eggs.by ? c.eggs.by + "'s" : "somebody's", d: "eggs, " + dueWords2(c.eggs.layAt).replace("due", "ready") }));
+    else if (I.belly >= 5) t = lineOf2("scan_seed", Object.assign({}, v, { a: amountSay(I.belly) }));
+    else t = lineOf2("scan_empty", v);
+    if (ripeNow()) t += " " + lineOf2("scan_ripe");
+    action(t);
+    return { ok: true };
+  }
+  var lastTick2 = 0;
+  function carryTick(now, deps2) {
+    now = now || Date.now();
+    lastTick2 = now;
+    try {
+      labourTick(now);
+    } catch (e) {
+      console.warn("[Dispensary] labour:", e);
+    }
+    try {
+      layTick(now);
+    } catch (e) {
+      console.warn("[Dispensary] eggs:", e);
+    }
+    try {
+      feelTick(now);
+    } catch (e) {
+    }
+    try {
+      heatTick(now, deps2.giveHeat);
+    } catch (e) {
+    }
+    try {
+      scentTick(now, deps2.idsOf);
+    } catch (e) {
+    }
+    try {
+      openTick(now);
+    } catch (e) {
+    }
+  }
+  function carryInfo(now) {
+    now = now || Date.now();
+    const c = C(), S3 = st(), g = c && c.preg && !S3.born ? c.preg : null;
+    return {
+      carrying: g ? { count: g.count, sires: g.sires, due: g.due, dueWords: dueWords2(g.due), stage: stageOf(now) } : null,
+      eggs: c && c.eggs && !S3.laid ? { n: c.eggs.n, by: c.eggs.by, layAt: c.eggs.layAt } : null,
+      labour: S3.labour ? { left: Math.max(0, S3.labour.until - now), midwife: S3.labour.midwife ? nameOf(S3.labour.midwife) : "" } : null,
+      born: S3.born || null,
+      laid: S3.laid || null,
+      heat: c && c.heat && c.heat.until > now ? c.heat.until : 0,
+      nextHeat: c && c.heat ? c.heat.next : 0,
+      open: openUntil() > now ? openUntil() : 0,
+      litters: c && c.litters || 0,
+      belly: bellyAll(now),
+      known: !!c,
+      one: c && c.one || "",
+      many: c && c.many || ""
+    };
+  }
+  var carryReset = () => {
+    delete st().carry;
+    delete st().labour;
+    delete st().born;
+    delete st().laid;
+    delete st().laying;
+    delete st().quick;
+    delete st().heatAt;
+    feelNext = 0;
+    heatDone = 0;
+    openSaid = 0;
+    scentAt.clear();
+    helped.clear();
+  };
+  var carryFeelNow = () => {
+    feelNext = 1;
+    roomNext = 1;
+    craveNext2 = 1;
+  };
+
+  // dispensary/src/seed.js
+  var W11 = window;
   var MIN7 = 6e4;
-  var CAP = 48 * 60 * MIN7;
+  var HOUR4 = 36e5;
+  var me6 = () => W11.Player && W11.Player.MemberNumber || 0;
+  var botIn4 = () => (W11.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var BELLY = ["vulva", "butt", "mouth"];
+  var tellPage3 = (detail) => {
+    try {
+      W11.dispatchEvent(new W11.CustomEvent("farmhand-dispensary", { detail }));
+    } catch (e) {
+    }
+  };
+  function S2() {
+    const s = st();
+    if (!s.seed || typeof s.seed !== "object") s.seed = {};
+    const o = s.seed;
+    if (!o.h || typeof o.h !== "object") o.h = {};
+    for (const h2 of SEED_HOLES) if (!o.h[h2] || typeof o.h[h2] !== "object") o.h[h2] = { ml: 0, by: {} };
+    for (const k of ["from", "seals", "leak", "drip"]) if (!o[k] || typeof o[k] !== "object") o[k] = {};
+    if (!Array.isArray(o.pend)) o.pend = [];
+    if (typeof o.n !== "number") o.n = 0;
+    if (typeof o.ml !== "number") o.ml = 0;
+    if (typeof o.id !== "number") o.id = 0;
+    if (typeof o.ep !== "string" || !o.ep) o.ep = Math.random().toString(36).slice(2, 10);
+    return o;
+  }
+  var seedCap = () => Math.max(BASE_CAP, Number(S2().cap) || BASE_CAP);
+  var bellyHeld = () => BELLY.reduce((a, h2) => a + (S2().h[h2].ml || 0), 0);
+  var seedBelly = () => bellyFrom(bellyHeld(), seedCap());
+  function addTo(h2, sire, ml) {
+    if (!(ml > 0)) return;
+    const x = S2().h[h2];
+    x.ml += ml;
+    x.by[sire] = (x.by[sire] || 0) + ml;
+    const ks = Object.keys(x.by);
+    if (ks.length > 8) {
+      ks.sort((a, b) => x.by[a] - x.by[b]);
+      for (const k of ks.slice(0, ks.length - 8)) delete x.by[k];
+    }
+  }
+  function scaleTo(x, ml) {
+    ml = Math.max(0, ml);
+    if (ml < 0.5) {
+      x.ml = 0;
+      x.by = {};
+      return;
+    }
+    const f = x.ml > 0 ? ml / x.ml : 0;
+    for (const k of Object.keys(x.by)) x.by[k] *= f;
+    x.ml = ml;
+  }
+  var topSire = (h2) => {
+    const by = S2().h[h2].by;
+    let best = 0, n = 0;
+    for (const [k, v] of Object.entries(by)) if (v > n) {
+      n = v;
+      best = Number(k);
+    }
+    return best;
+  };
+  function nameFor(mn, nm) {
+    if (!mn) return nm || "somebody";
+    if (mn === me6()) return myName();
+    const n = nameOf(mn);
+    if (n && n !== "somebody") return n;
+    const f = S2().from[mn];
+    return f && f.nm || nm || "somebody";
+  }
+  var poss = (sire, nm) => !sire ? "somebody's" : sire === me6() ? "their own" : nameFor(sire, nm) + "'s";
+  var holeList = (hs) => {
+    const w = hs.map((h2) => SEED_WORD[h2]);
+    return w.length < 2 ? w.join("") : w.slice(0, -1).join(", ") + " and " + w[w.length - 1];
+  };
+  var cap1 = (t) => String(t).replace(/^\s*(\S)/, (m, c) => m.slice(0, -1) + c.toUpperCase());
+  function fillSeed(t, v) {
+    v = v || {};
+    return String(t).replace(/%t/g, myName()).replace(/%b/g, v.b || "somebody").replace(/%S/g, v.S || "somebody").replace(/%s/g, v.s || "somebody's").replace(/%a/g, v.a || "").replace(/%l/g, v.l || "a load").replace(/%h/g, v.h || "").replace(/%w/g, v.w || "").replace(/%g/g, v.g || "it").replace(/%x/g, v.x || "");
+  }
+  var said4 = {};
+  function lineOf3(key2, v) {
+    const L = LINES.seed && LINES.seed[key2];
+    if (!L || !L.length) return "";
+    let t = pick(L);
+    if (L.length > 1 && t === said4[key2]) t = L[(L.indexOf(t) + 1) % L.length];
+    said4[key2] = t;
+    return cap1(fillSeed(t, v));
+  }
+  var AREAS = { vulva: ["thighs"], butt: ["thighs"], mouth: ["face"], nips: ["chest"] };
+  function leak(h2, ml) {
+    tellPage3({ type: "leak", mess: "cum", areas: AREAS[h2] || ["thighs"], amount: Math.max(0.6, Math.min(3, 0.6 + Math.log10(Math.max(1, ml) / 20))) });
+  }
+  function sealsNow() {
+    const P = W11.Player, out = {};
+    if (!P) return out;
+    for (const s of sealsOn(P.Appearance, craftText)) {
+      if (s.by !== me6() && !allowed(s.by)) continue;
+      for (const h2 of s.holes) if (!out[h2]) out[h2] = { by: s.by, g: s.name, nm: s.maker };
+    }
+    return out;
+  }
+  function seedGive(o) {
+    o = o || {};
+    const sire = Number(o.sire) || Number(o.by) || me6(), by = Number(o.by) || sire, now = Date.now();
+    if (sire !== me6() && !allowed(sire)) return { ok: false, why: "ladder" };
+    const plan = seedPlan(seedDecode(o.p), { have: holesHave(), nipsOpen: nipsOpen() > 0, via: o.via, x: o.x, hole: o.hole });
+    const holes = SEED_HOLES.filter((h2) => plan[h2] > 0);
+    if (!holes.length) return { ok: false, why: "none" };
+    const D = S2(), seals = sealsNow(), cap = seedCap(), here2 = botIn4();
+    const f = D.from[sire] || (D.from[sire] = { n: 0, ml: 0, at: 0, nm: "" });
+    if (o.nm) f.nm = String(o.nm).slice(0, 40);
+    else if (!f.nm && sire !== me6() && nameOf(sire) !== "somebody") f.nm = nameOf(sire);
+    const nc = Object.values(seals).some((s) => s.by !== sire);
+    const kept = {}, spilt = {}, refused = [], held = [];
+    const stage0 = bellyFrom(bellyHeld(), cap);
+    for (const h2 of holes) {
+      const ml = plan[h2], seal = seals[h2];
+      if (seal && seal.by !== sire) {
+        refused.push(h2);
+        spilt[h2] = ml;
+        continue;
+      }
+      const room = h2 === "nips" ? Math.max(0, NIP_CAP * (seal || toyIn(W11.Player) ? 2 : 1) - D.h.nips.ml) : seal ? Math.max(0, SEED_TOTAL_MAX - bellyHeld()) : Math.max(0, cap - bellyHeld());
+      kept[h2] = Math.min(ml, room);
+      spilt[h2] = ml - kept[h2];
+      if (seal) held.push(h2);
+      addTo(h2, sire, kept[h2]);
+    }
+    const went = holes.filter((h2) => !refused.includes(h2)), total = went.reduce((a, h2) => a + plan[h2], 0);
+    if (went.length) {
+      D.n += 1;
+      D.ml += total;
+      f.n += 1;
+      f.ml += total;
+      f.at = now;
+      const ks = Object.keys(D.from);
+      if (ks.length > 40) {
+        ks.sort((a, b) => D.from[a].at - D.from[b].at);
+        for (const k of ks.slice(0, ks.length - 40)) delete D.from[k];
+      }
+      for (const h2 of went) D.pend.push({ h: h2, ml: Math.round(plan[h2]), by: sire, at: now, nc: nc ? 1 : 0, here: here2 ? 1 : 0, nm: f.nm || void 0, via: o.via === "cock" ? "cock" : void 0 });
+      if (D.pend.length > 60) D.pend = D.pend.slice(-60);
+    }
+    save();
+    tellPage3({ type: "seed" });
+    if (here2) sendSoon2();
+    for (const h2 of holes) if (spilt[h2] >= 5) leak(h2, spilt[h2]);
+    if (o.via === "breed") {
+      if (went.length && !o.silent) local("\u{1F4A6} It left " + amountSay(total) + " of " + poss(sire, o.nm).replace(/^their own$/, "your own") + " seed in your " + holeList(went) + ".");
+    } else if (!o.quiet) {
+      const v = { b: nameFor(by), s: poss(sire, o.nm), g: o.g || "gear" }, parts2 = [];
+      const open2 = o.via === "sip" ? "open_sip" : o.via === "kiss" ? "open_kiss" : o.via === "gear" ? "open_gear" : by === me6() ? "open_self" : "open_needle";
+      parts2.push(lineOf3(open2, v));
+      if (went.length) {
+        const tier = total < 150 ? "s" : total < 1500 ? "m" : "l";
+        parts2.push(went.length === 1 ? lineOf3(went[0] + "_" + tier, Object.assign({}, v, { a: amountSay(total), l: loadSay(total), h: SEED_WORD[went[0]] })) : lineOf3("many_" + tier, Object.assign({}, v, { a: amountSay(total), l: loadSay(total), w: holeList(went) })));
+        const sp = went.filter((h2) => spilt[h2] >= 5);
+        if (sp.length) {
+          const h0 = sp.find((h2) => h2 === "vulva" || h2 === "butt") || sp[0], x = sp.reduce((a, h2) => a + spilt[h2], 0);
+          parts2.push(lineOf3(h0 === "mouth" ? "spill_mouth" : h0 === "nips" ? "spill_nips" : "spill_hole", Object.assign({}, v, { x: amountSay(x), h: SEED_WORD[h0] })));
+        }
+        if (held.length) parts2.push(lineOf3("seal_hold", Object.assign({}, v, { g: seals[held[0]].g })));
+      }
+      if (refused.length) {
+        const s0 = seals[refused[0]];
+        parts2.push(lineOf3("seal_refuse", Object.assign({}, v, { g: s0.g, S: nameFor(s0.by, s0.nm) })));
+      }
+      const stage = bellyFrom(bellyHeld(), cap);
+      if (stage > stage0 && stage >= 1) parts2.push(lineOf3(stage >= 4 ? "full_3" : stage >= 2 ? "full_2" : "full_1", v));
+      const text3 = parts2.filter(Boolean).join(" ");
+      if (text3) action(text3);
+    }
+    return { ok: went.length > 0, why: went.length ? "" : "sealed", kept, spilt, refused, holes: went, total };
+  }
+  var lastTick3 = 0;
+  var lastStage = -1;
+  function bare2(h2) {
+    try {
+      const P = W11.Player, I = W11.InventoryPrerequisiteMessage;
+      if (typeof I !== "function") return false;
+      if (h2 === "butt") return I(P, "AccessButt") === "" && !(P.IsButtChaste && P.IsButtChaste());
+      return I(P, "AccessCrotch") === "" && I(P, "AccessVulva") === "" && !(P.IsVulvaChaste && P.IsVulvaChaste());
+    } catch (e) {
+      return false;
+    }
+  }
+  function seedTick(now) {
+    now = now || Date.now();
+    const dt = lastTick3 ? Math.max(0, Math.min(now - lastTick3, 15 * MIN7)) : 0;
+    lastTick3 = now;
+    const D = S2(), seals = sealsNow(), here2 = botIn4(), room = inRoom();
+    let dirty = false, sealSaid = false;
+    for (const h2 of SEED_HOLES) {
+      const was = D.seals[h2], is = seals[h2];
+      if (is && (!was || was.by !== is.by || was.g !== is.g)) {
+        D.seals[h2] = { by: is.by, g: is.g, nm: is.nm || "" };
+        dirty = true;
+        if (room && !sealSaid && h2 !== "nips") {
+          sealSaid = true;
+          action(lineOf3("seal_in", { g: is.g, S: nameFor(is.by, is.nm), h: SEED_WORD[h2] }));
+        }
+      } else if (!is && was) {
+        delete D.seals[h2];
+        dirty = true;
+        const x = D.h[h2];
+        if (x.ml >= 30 && h2 !== "mouth") {
+          const out = Math.round(x.ml * 0.6), who2 = topSire(h2);
+          scaleTo(x, x.ml - out);
+          if (room) {
+            action(lineOf3("seal_out", { g: was.g, a: amountSay(out), s: poss(who2, (D.from[who2] || {}).nm), h: SEED_WORD[h2] }));
+            leak(h2, out);
+          }
+        }
+      }
+    }
+    if (dt > 0) {
+      const toys = toysNow(), N = holesNow().holes;
+      for (const h2 of SEED_HOLES) {
+        const x = D.h[h2];
+        if (!(x.ml > 0)) continue;
+        if (seals[h2] || (h2 === "vulva" || h2 === "butt") && toys[h2] || h2 === "nips" && toyIn(W11.Player)) continue;
+        const n = (h2 === "vulva" || h2 === "butt") && N[h2] ? N[h2].now || 1 : 1;
+        const hl = SEED_HALF_LIFE_H[h2] / (1 + GAPE_LEAK_X * (n - 1));
+        const left = x.ml * Math.pow(0.5, dt / (hl * HOUR4)), out = x.ml - left;
+        scaleTo(x, left);
+        if ((h2 === "vulva" || h2 === "butt") && !here2) D.leak[h2] = (D.leak[h2] || 0) + out;
+      }
+    }
+    if (!here2 && room) for (const h2 of ["vulva", "butt"]) {
+      if ((D.leak[h2] || 0) < 25 || now - (D.drip[h2] || 0) < 9 * MIN7) continue;
+      D.drip[h2] = now;
+      const x = D.leak[h2];
+      D.leak[h2] = 0;
+      dirty = true;
+      const who2 = topSire(h2), v = { s: poss(who2, (D.from[who2] || {}).nm), h: SEED_WORD[h2] };
+      if (bare2(h2)) {
+        action(lineOf3("drip_room", v));
+        leak(h2, x);
+      } else local(lineOf3("drip_mine", Object.assign({}, v, { s: v.s.replace(/^their own$/, "your own") })));
+    }
+    if (here2) {
+      D.leak = {};
+    }
+    if (here2 && (D.pend.length || st().quick || D.fly && now - (D.fly.at || 0) > 6e4)) sendNow2();
+    const stage = seedBelly();
+    if (stage !== lastStage) {
+      lastStage = stage;
+      tellPage3({ type: "seed" });
+    }
+    if (dirty || dt > 0 && Math.random() < 0.05) save();
+  }
+  var sendT2 = null;
+  function sendSoon2() {
+    clearTimeout(sendT2);
+    sendT2 = setTimeout(() => {
+      try {
+        sendNow2();
+      } catch (e) {
+      }
+    }, 1500);
+  }
+  function sendNow2() {
+    const D = S2();
+    if (!botIn4() || typeof W11.ServerSend !== "function") return false;
+    if (D.fly && Date.now() - (D.fly.at || 0) < 6e4) return false;
+    if (!D.fly && (D.pend.length || st().quick)) {
+      D.id += 1;
+      D.fly = { id: D.id, loads: D.pend.slice(0, 30), at: 0, quick: takeQuick() || void 0 };
+      D.pend = D.pend.slice(30);
+    }
+    const f = D.fly;
+    if (!f) return false;
+    const held = {};
+    for (const h2 of SEED_HOLES) held[h2] = Math.round(D.h[h2].ml);
+    try {
+      W11.ServerSend("ChatRoomChat", makeMsg("dispSeed", { ep: D.ep, id: f.id, loads: f.loads, held, quick: f.quick || void 0 }, BOT));
+    } catch (e) {
+      return false;
+    }
+    f.at = Date.now();
+    save();
+    return true;
+  }
+  function fromFarm2(m) {
+    const D = S2();
+    if (Number(m.cap) > 0) D.cap = Math.min(6e4, Math.round(Number(m.cap)));
+    const held = m.held;
+    if (!D.fly && !D.pend.length && held && typeof held === "object") {
+      for (const h2 of BELLY) {
+        const v = Number(held[h2]);
+        if (!(v >= 0) || !isFinite(v)) continue;
+        const x = D.h[h2], was = x.ml;
+        scaleTo(x, Math.min(SEED_TOTAL_MAX, v));
+        if (v >= 1 && (!was || !Object.keys(x.by).length) && Number(m.by) > 0) {
+          x.by = {};
+          x.by[Number(m.by)] = x.ml;
+        }
+      }
+      if (Number(m.by) > 0 && typeof m.nm === "string" && m.nm) {
+        const f = D.from[Number(m.by)] || (D.from[Number(m.by)] = { n: 0, ml: 0, at: 0, nm: "" });
+        if (!f.nm) f.nm = m.nm.slice(0, 40);
+      }
+      D.sync = Date.now();
+    }
+    save();
+    tellPage3({ type: "seed" });
+  }
+  var carryWelcomeFn = null;
+  function seedOnCarry(f) {
+    carryWelcomeFn = f;
+  }
+  function seedWelcome(m) {
+    if (m && m.seed && typeof m.seed === "object") fromFarm2(m.seed);
+  }
+  function onOk2(m) {
+    const D = S2(), id = Number(m.id) || 0;
+    if (D.fly && id >= D.fly.id) D.fly = null;
+    if (m.none) {
+      if (m.none !== D.no) {
+        D.no = String(m.none).slice(0, 20);
+        if (m.none === "breedable") local("\u{1F402} The farm girl didn't book that load: you're not breedable on her books. Say ?breedable on in her room if you want your loads to count there, and catch.");
+      }
+      save();
+      return;
+    }
+    D.no = "";
+    if (m.seed) fromFarm2(m.seed);
+    if (m.carry) {
+      try {
+        carryWelcomeFn && carryWelcomeFn(m);
+      } catch (e) {
+      }
+    }
+    if (D.pend.length) sendSoon2();
+  }
+  function initSeed(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && data.Sender === BOT) {
+            const m = readMsg(data);
+            if (m && m.type === "dispSeedOk") onOk2(m);
+          }
+        } catch (e) {
+          console.warn("[Dispensary] seed:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] seed can't hear the farm girl:", e);
+    }
+    try {
+      mod2.hookFunction("ChatRoomSync", 2, (args, next2) => {
+        const r = next2(args);
+        setTimeout(() => {
+          try {
+            sendNow2();
+          } catch (e) {
+          }
+        }, 4500);
+        return r;
+      });
+    } catch (e) {
+    }
+  }
+  function seedInfo() {
+    const D = S2(), cap = seedCap(), belly = bellyHeld(), held = {};
+    for (const h2 of SEED_HOLES) {
+      const x = D.h[h2], who2 = topSire(h2), s = D.seals[h2];
+      held[h2] = { ml: Math.round(x.ml), who: who2 ? nameFor(who2, (D.from[who2] || {}).nm) : "", seal: s ? { by: s.by, g: s.g, name: nameFor(s.by, s.nm) } : null };
+    }
+    const top = Object.entries(D.from).sort((a, b) => b[1].n - a[1].n).slice(0, 5).map(([k, f]) => ({ by: Number(k), name: nameFor(Number(k), f.nm), n: f.n, ml: Math.round(f.ml) }));
+    return {
+      held,
+      belly: Math.round(belly),
+      cap,
+      pct: Math.round(100 * belly / cap),
+      stage: bellyFrom(belly, cap),
+      loads: D.n,
+      ml: Math.round(D.ml),
+      top,
+      waiting: D.pend.length + (D.fly ? D.fly.loads.length : 0),
+      sync: D.sync || 0,
+      no: D.no || ""
+    };
+  }
+  function seedDrain() {
+    const D = S2(), seals = sealsNow();
+    let n = 0;
+    for (const h2 of SEED_HOLES) {
+      if (seals[h2]) continue;
+      n += D.h[h2].ml;
+      scaleTo(D.h[h2], 0);
+    }
+    save();
+    tellPage3({ type: "seed" });
+    return Math.round(n);
+  }
+  function seedMarkUp(since2) {
+    const D = S2();
+    let first = null;
+    for (const l of D.pend.concat(D.fly ? D.fly.loads : [])) {
+      if (l.up || !(l.at >= since2) || !(l.h === "vulva" || l.h === "butt")) continue;
+      l.up = 1;
+      if (!first) first = { who: l.by, nm: l.nm || "" };
+    }
+    if (first) save();
+    return first;
+  }
+  var seedState = () => JSON.parse(JSON.stringify(S2()));
+  var seedReset = () => {
+    st().seed = {};
+    lastTick3 = 0;
+    lastStage = -1;
+    for (const k of Object.keys(said4)) delete said4[k];
+  };
+
+  // dispensary/src/horny.js
+  var W12 = window;
+  var MIN8 = 6e4;
+  var HORNY = /\b(horny|hungry|insatiable|ravenous)\b/;
+  var RAVENOUS = /\b(insatiable|ravenous)\b/;
+  var BREEDS = /\b(breeding|seeding|breeder)\b/;
+  var hornyOf = (text3) => HORNY.test(String(text3 || "")) ? RAVENOUS.test(String(text3 || "")) ? 2 : 1 : 0;
+  function whereOf(group) {
+    const g = String(group || "");
+    if (/^Item(Vulva|Butt)$/.test(g)) return "hole";
+    if (/^ItemNipples/.test(g) || g === "ItemBreast") return "nips";
+    if (/^ItemMouth/.test(g)) return "mouth";
+    if (/^Item(Pelvis|VulvaPiercings|Torso|Torso2)$/.test(g)) return "crotch";
+    return null;
+  }
+  var me7 = () => W12.Player && W12.Player.MemberNumber || 0;
+  var okFrom2 = (by) => !by || by === me7() || allowed(by);
+  var paused3 = () => (st().wornPause || 0) > Date.now();
+  var hornyOn = () => st().hornyOn !== false;
+  var onePiece = (n) => /[^s]s$/i.test(String(n).trim()) ? "pair of " + n : n;
+  var nameOf2 = (it) => onePiece(it && it.Craft && it.Craft.Name || it && it.Asset && (it.Asset.Description || it.Asset.Name) || "it");
+  var meter = () => {
+    const A = W12.Player && W12.Player.ArousalSettings;
+    return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
+  };
+  function hornyGear() {
+    const P = W12.Player, out = [];
+    if (!P || !Array.isArray(P.Appearance)) return out;
+    for (const item of P.Appearance) {
+      if (!item || !item.Craft || !item.Asset || !item.Asset.Group) continue;
+      const text3 = craftText(item), lvl = hornyOf(text3), where = whereOf(item.Asset.Group.Name);
+      if (!lvl || !where) continue;
+      out.push({ item, key: item.Asset.Group.Name + ":" + (item.Craft.Name || ""), text: text3, by: Number(item.Craft.MemberNumber) || 0, where, lvl, breed: BREEDS.test(text3) });
+    }
+    return out;
+  }
+  var deps = { nipsToyUsed: () => {
+  } };
+  var next = {};
+  var gap = (lvl) => (lvl === 2 ? 2 + Math.random() * 2 : 6 + Math.random() * 4) * MIN8;
+  var lineOf4 = (key2, v) => {
+    const L = LINES.horny && LINES.horny[key2];
+    return L && L.length ? fill(pick(L), v).replace(/%g/g, v && v.g || "it") : "";
+  };
+  var cumming = () => {
+    const A = W12.Player && W12.Player.ArousalSettings;
+    return !!(A && Number(A.OrgasmStage) > 0);
+  };
+  function hornyBeat(g) {
+    const v = { g: nameOf2(g.item) };
+    const A = meter();
+    if (A) setArousal((Number(A.Progress) || 0) + (g.lvl === 2 ? 18 : 12));
+    const room = Math.random() < 0.35;
+    const t = room ? lineOf4(g.where + "_room", v) : lineOf4(g.where + (g.lvl === 2 ? "_rough" : "_mine"), v) || lineOf4(g.where + "_mine", v);
+    if (t) room ? action(t) : local(t);
+    if (g.where === "nips" && toyIn(W12.Player) === g.item) {
+      try {
+        deps.nipsToyUsed();
+      } catch (e) {
+      }
+    }
+    if (A && Number(A.Progress) >= 95 && !active("denial") && !cumming() && typeof W12.ActivityOrgasmPrepare === "function") {
+      const l = lineOf4("tipped", v);
+      if (l) action(l);
+      try {
+        W12.ActivityOrgasmPrepare(W12.Player);
+      } catch (e) {
+      }
+    }
+    return t;
+  }
+  function hornyTick(now) {
+    now = now || Date.now();
+    const gear = hornyOn() && !paused3() && inRoom() ? hornyGear().filter((g) => okFrom2(g.by)) : [];
+    const on2 = new Set(gear.map((g) => g.key));
+    for (const k of Object.keys(next)) if (!on2.has(k)) delete next[k];
+    for (const g of gear) {
+      if (!next[g.key]) {
+        next[g.key] = now + gap(g.lvl) / 2;
+        continue;
+      }
+      if (now < next[g.key]) continue;
+      next[g.key] = now + gap(g.lvl);
+      hornyBeat(g);
+    }
+  }
+  var paraNext = {};
+  function hornyParaTick(now) {
+    now = now || Date.now();
+    const P = deps.para ? deps.para() : {};
+    for (const k of Object.keys(paraNext)) if (!P[k] || !P[k].horny) delete paraNext[k];
+    if (!hornyOn() || paused3() || !inRoom()) return;
+    for (const [kind, p] of Object.entries(P)) {
+      if (!p || !p.horny || !(LINES.horny && LINES.horny["para_" + kind])) continue;
+      if (!paraNext[kind]) {
+        paraNext[kind] = now + (2 + Math.random() * 3) * MIN8;
+        continue;
+      }
+      if (now < paraNext[kind]) continue;
+      paraNext[kind] = now + (p.horny === 2 ? 2 + Math.random() * 2 : 4 + Math.random() * 3) * MIN8;
+      const A = meter();
+      if (A) setArousal((Number(A.Progress) || 0) + (p.horny === 2 ? 14 : 9));
+      const t = lineOf4("para_" + kind, {});
+      if (t) Math.random() < 0.3 ? action(t) : local(t);
+      if (kind === "nips") {
+        try {
+          deps.nipsToyUsed();
+        } catch (e) {
+        }
+      }
+      if (A && Number(A.Progress) >= 95 && !active("denial") && !cumming() && typeof W12.ActivityOrgasmPrepare === "function") {
+        const l = lineOf4("tipped_para", {});
+        if (l) action(l);
+        try {
+          W12.ActivityOrgasmPrepare(W12.Player);
+        } catch (e) {
+        }
+      }
+    }
+  }
+  var LEAK = { hole: ["thighs"], mouth: ["face"], nips: ["chest"], crotch: ["thighs"] };
+  function hornyClimax() {
+    if (!hornyOn() || paused3()) return 0;
+    let n = 0;
+    for (const g of hornyGear()) {
+      if (!g.breed || !okFrom2(g.by)) continue;
+      const t = lineOf4("bred_" + g.where, { g: nameOf2(g.item) }) || lineOf4("bred_hole", { g: nameOf2(g.item) });
+      if (t) action(t);
+      try {
+        W12.dispatchEvent(new W12.CustomEvent("farmhand-dispensary", { detail: { type: "leak", mess: "cum", areas: LEAK[g.where] || ["thighs"], amount: g.lvl === 2 ? 1.8 : 1.3 } }));
+      } catch (e) {
+      }
+      try {
+        breedSeed(g);
+      } catch (e) {
+      }
+      n++;
+    }
+    return n;
+  }
+  var GEAR_HOLE = { ItemVulva: "vulva", ItemButt: "butt" };
+  function breedSeed(g) {
+    if (st().off && st().off.seed) return null;
+    if (DOSE_WORDS.seed.test(g.text) && TRIGGERS.climax.test(g.text)) return null;
+    const grp = g.item.Asset.Group.Name, hole2 = GEAR_HOLE[grp] || (g.where === "mouth" ? "mouth" : g.where === "nips" ? "nips" : "vulva");
+    const a = seedAmounts(g.text);
+    if (Object.keys(a).length === 1 && a.any === SEED_DEFAULT_ML && g.lvl === 2) a.any = 120;
+    return seedGive({ by: g.by || me7(), sire: g.by || me7(), nm: g.item.Craft && g.item.Craft.MemberName, p: seedEncode(a), via: "breed", g: nameOf2(g.item), hole: hole2 });
+  }
+  function initHorny(mod2, d) {
+    deps = Object.assign(deps, d || {});
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 3, (args, next2) => {
+        try {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W12.ActivityOrgasmRuined) setTimeout(() => hornyClimax(), 900);
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+  }
+  var hornyReset = () => {
+    for (const k of Object.keys(next)) delete next[k];
+  };
+
+  // dispensary/src/parasites.js
+  var W13 = window;
+  var MIN9 = 6e4;
+  var HOUR5 = 36e5;
+  var KINDS = {
+    lips: { label: "Parasite lips", icon: "\u{1F444}", words: /\bparasit\w*|\bparasite lips\b/, hours: 12, every: 30 },
+    latex: { label: "Livin' latex", icon: "\u{1F5A4}", words: /\bliv(?:ing|in'?) latex\b|\bliving rubber\b|\blatex symbiote\b/, hours: 24, starve: 6 },
+    moss: { label: "Milk moss", icon: "\u{1F331}", words: /\bmilk moss\b/, hours: 24, every: 40 },
+    nestling: { label: "The nestling", icon: "\u{1F41B}", words: /\bnestling\b/, hours: 24, stages: 3 },
+    brood: { label: "The brood mother", icon: "\u{1F95A}", words: /\bbrood ?mother\b|\bbrood queen\b/, hours: 24, every: 45 },
+    vine: { label: "The leash vine", icon: "\u{1F33F}", words: /\bleash vine\b|\bvine leash\b/, worn: true, tiles: 3 },
+    mouth: { label: "The mouthpiece", icon: "\u{1F5E3}\uFE0F", words: /\bmouth ?piece\b/, worn: true },
+    nips: { label: "Nipple leeches", icon: "\u{1F352}", words: /\b(?:nipple|teat)[- ]?(?:leech|parasit|worm|tick)\w*|\bleech\w* (?:on|for) (?:the |your |her |his |their )?(?:nipples?|teats?)\b/, hours: 24, starve: 8 }
+  };
+  for (const K3 of Object.values(KINDS)) K3.words = loosen(K3.words);
+  var kindIds = () => Object.keys(KINDS);
+  var DEFAULT_STRAIN = ["needy", "heat", "hairtrigger"];
+  var me8 = () => W13.Player && W13.Player.MemberNumber || 0;
+  var charOf5 = (mn) => (W13.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn);
+  var send = (type, data, to) => {
+    try {
+      if (typeof W13.ServerSend === "function") W13.ServerSend("ChatRoomChat", makeMsg(type, data, to));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  var on = (kind) => !!(st().parasites && st().parasites[kind]);
+  var usable = (id) => {
+    const B = BOOK[id];
+    return !!B && !B.instant && !B.lscgOnly && !(B.lscg && lscgPresent()) && !st().off[id];
+  };
+  function strainOf(text3) {
+    const ids = dosesIn(text3).map((d) => d.id).filter((id) => usable(id));
+    return ids.length ? ids.slice(0, 4) : DEFAULT_STRAIN.filter(usable);
+  }
+  var mine = () => st().para || (st().para = {});
+  var line2 = (kind, which, v) => {
+    const L = LINES.para && LINES.para[kind] && LINES.para[kind][which];
+    return L && L.length ? fill(pick(L), v).replace(/%k/g, KINDS[kind].label.toLowerCase()) : "";
+  };
+  function latch(kind, o) {
+    const K3 = KINDS[kind];
+    if (!K3 || !on(kind)) return false;
+    if (o.by && o.by !== me8() && !allowed(o.by)) return false;
+    const P = mine();
+    if (P[kind]) return false;
+    const now = Date.now();
+    P[kind] = {
+      by: o.by || 0,
+      name: String(o.name || "").slice(0, 30),
+      since: now,
+      until: K3.worn ? 0 : now + K3.hours * HOUR5,
+      strain: (o.strain || DEFAULT_STRAIN).filter((id) => BOOK[id]).slice(0, 4),
+      fed: now,
+      stage: 0,
+      n: 0,
+      eggs: 0,
+      next: now + (K3.every || 30) * MIN9,
+      horny: Math.max(0, Math.min(2, Math.round(Number(o.horny) || 0)))
+    };
+    save();
+    action(line2(kind, "latch", { by: P[kind].name || "somebody" }));
+    return true;
+  }
+  function letGo(kind, why) {
+    const P = mine();
+    if (!P[kind]) return false;
+    delete P[kind];
+    save();
+    if (why !== "quiet") {
+      const l = line2(kind, why === "starved" ? "starved" : "off");
+      if (l) local(l);
+    }
+    return true;
+  }
+  function wornParasites() {
+    const P = W13.Player, out = [];
+    if (!P || !Array.isArray(P.Appearance)) return out;
+    for (const item of P.Appearance) {
+      if (!item || !item.Craft) continue;
+      const text3 = craftText(item);
+      const kinds = kindIds().filter((kind) => KINDS[kind].words.test(text3)), own = kinds.filter((k) => k !== "lips");
+      for (const kind of own.length ? own : kinds) out.push({ kind, item, text: text3, by: Number(item.Craft.MemberNumber) || 0, name: String(item.Craft.MemberName || "") });
+    }
+    return out;
+  }
+  function paraTick() {
+    const now = Date.now(), P = mine(), worn = wornParasites();
+    if ((st().wornPause || 0) <= now) {
+      for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text), horny: hornyOf(w.text) });
+    }
+    if (P.moss && active("letdown")) P.moss.fed = now;
+    for (const kind of ["vine", "mouth"]) if (P[kind] && !worn.some((w) => w.kind === kind)) letGo(kind, "off");
+    for (const [kind, p] of Object.entries(P)) {
+      const K3 = KINDS[kind];
+      if (!K3) {
+        delete P[kind];
+        continue;
+      }
+      if (p.until && now > p.until) {
+        letGo(kind, "done");
+        continue;
+      }
+      if (K3.starve && now - p.fed > K3.starve * HOUR5) {
+        letGo(kind, "starved");
+        continue;
+      }
+      if (!K3.every || now < p.next) continue;
+      p.next = now + K3.every * MIN9 / (p.horny ? 2 : 1);
+      if (!inRoom()) continue;
+      if (kind === "lips") {
+        const id = p.strain[p.n++ % Math.max(1, p.strain.length)] || "needy";
+        give(id, { by: p.by, line: fill(line2("lips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
+        local(line2("lips", "crave"));
+      }
+      if (kind === "moss") give("letdown", { by: p.by, line: line2("moss", "feed") });
+      if (kind === "brood") {
+        p.eggs = Math.min(5, (p.eggs || 0) + 1);
+        local(fill(line2("brood", "lay"), {}).replace(/%n/g, String(p.eggs)));
+      }
+      save();
+    }
+  }
+  function paraClimax() {
+    const P = mine(), now = Date.now();
+    if (P.latex) {
+      P.latex.fed = now;
+      P.latex.until = Math.min(P.latex.since + 72 * HOUR5, Math.max(P.latex.until, now + KINDS.latex.hours * HOUR5));
+      give("hairtrigger", { by: P.latex.by, mins: 30, upto: true, quiet: active("hairtrigger"), line: line2("latex", "feed") });
+    }
+    if (P.nestling) {
+      const n = P.nestling;
+      n.fed = now;
+      if (n.stage < KINDS.nestling.stages) {
+        n.stage++;
+        give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, line: line2("nestling", "grow").replace(/%n/g, String(n.stage)) });
+      } else give("fillout", { by: n.by, p: "belly", x: n.stage, mins: 60, upto: true, quiet: true });
+    }
+    save();
+  }
+  function nipsFed(from, kind) {
+    const p = mine().nips;
+    if (!p) return false;
+    const now = Date.now();
+    p.fed = now;
+    p.n = (p.n || 0) + 1;
+    p.until = Math.min(p.since + 72 * HOUR5, Math.max(p.until || 0, now + KINDS.nips.hours * HOUR5));
+    if (now - (p.gave || 0) > 10 * MIN9 && inRoom()) {
+      p.gave = now;
+      const id = p.strain[(p.n - 1) % Math.max(1, p.strain.length)] || "needy";
+      give(id, { by: p.by, line: fill(line2("nips", "feed"), { dose: (BOOK[id] || {}).label || id }) });
+    }
+    if (p.n === 3) local(line2("nips", "wider"));
+    save();
+    return true;
+  }
+  var suckledAt = {};
+  function paraSuckled(from) {
+    const p = mine().nips;
+    if (!p || !from || from === me8() || Date.now() - (suckledAt[from] || 0) < 10 * MIN9) return false;
+    suckledAt[from] = Date.now();
+    send("dispPara", { kind: "nips", strain: p.strain, by: p.by || me8(), name: myName() }, from);
+    return true;
+  }
+  function paraKissGiven(to) {
+    const P = mine();
+    if (!to || to === me8()) return;
+    if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me8(), name: myName(), horny: P.lips.horny || 0 }, to);
+    if (P.brood && P.brood.eggs > 0) {
+      P.brood.eggs--;
+      save();
+      send("dispPara", { kind: "lips", strain: P.brood.strain, by: me8(), name: myName(), brood: true }, to);
+      local(line2("brood", "pass").replace(/%b/g, nameOf(to)));
+    }
+  }
+  function onPara(from, m) {
+    const kind = String(m.kind || "");
+    if (!KINDS[kind] || KINDS[kind].worn) return;
+    if (!on(kind) || !allowed(from)) return;
+    const strain = Array.isArray(m.strain) ? m.strain.filter((id) => typeof id === "string" && BOOK[id]) : DEFAULT_STRAIN;
+    latch(kind, { by: from, name: nameOf(from), strain, horny: m.horny });
+  }
+  function vineOk(X, Y) {
+    const p = mine().vine;
+    if (!p) return true;
+    const C2 = charOf5(p.by), pos = C2 && C2.MapData && C2.MapData.Pos;
+    if (!pos || typeof pos.X !== "number") return true;
+    return Math.max(Math.abs(X - pos.X), Math.abs(Y - pos.Y)) <= KINDS.vine.tiles;
+  }
+  var vineTold = 0;
+  var asked = null;
+  function onSay(from, m) {
+    const p = mine().mouth;
+    if (!p || p.by !== from) return;
+    const text3 = String(m.text || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 300);
+    if (!text3 || /^[\/(\[]/.test(text3)) return;
+    if (st().mouthAuto === true) {
+      say3(text3);
+      send("dispSaid", { ok: true }, from);
+      return;
+    }
+    asked = { from, text: text3 };
+    local("\u{1F5E3}\uFE0F " + nameOf(from) + `'s mouthpiece wants you to say: "` + text3 + '"\nSay it: /dispensary say \xB7 let it pass: /dispensary nope');
+  }
+  function say3(text3) {
+    try {
+      W13.ServerSend("ChatRoomChat", { Content: text3, Type: "Chat" });
+    } catch (e) {
+    }
+  }
+  function sayAsked(yes) {
+    if (!asked) return false;
+    const a = asked;
+    asked = null;
+    if (yes) say3(a.text);
+    send("dispSaid", { ok: !!yes }, a.from);
+    return true;
+  }
+  function mouthSend(to, text3) {
+    return send("dispSay", { text: String(text3).slice(0, 300) }, to);
+  }
+  function initParasites(mod2) {
+    try {
+      mod2.hookFunction("ActivityOrgasmStart", 3, (args, next2) => {
+        try {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer()) setTimeout(() => paraClimax(), 600);
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomMapViewCanEnterTile", 2, (args, next2) => {
+        const t = next2(args);
+        try {
+          if (t > 0 && !vineOk(args[0], args[1])) {
+            if (Date.now() - vineTold > 2e4) {
+              vineTold = Date.now();
+              local(line2("vine", "tug"));
+            }
+            return 0;
+          }
+        } catch (e) {
+        }
+        return t;
+      });
+    } catch (e) {
+      console.warn("[Dispensary] the leash vine can't hold you:", e);
+    }
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me8()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispPara") onPara(data.Sender, m);
+            else if (m && m.type === "dispSay") onSay(data.Sender, m);
+            else if (m && m.type === "dispSaid") local(nameOf(data.Sender) + (m.ok ? " said it." : " let it pass."));
+          }
+        } catch (e) {
+          console.warn("[Dispensary] parasites:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] parasites can't hear:", e);
+    }
+  }
+
+  // dispensary/src/needle.js
+  var W14 = window;
+  var botHere = () => (W14.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+  var charOf6 = (mn) => (W14.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || (W14.Player && W14.Player.MemberNumber === mn ? W14.Player : null);
+  function craftText(item) {
+    if (!item || !item.Craft) return "";
+    let d = item.Craft.Description || "";
+    try {
+      if (W14.CraftingDescription && typeof W14.CraftingDescription.Decode === "function") d = W14.CraftingDescription.Decode(d);
+    } catch (e) {
+    }
+    return ((item.Craft.Name || "") + " | " + d).toLowerCase().replace(/_+/g, " ");
+  }
+  var handOf = (C2) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld") : null;
+  var handTextOf = (mn) => craftText(handOf(charOf6(mn)));
+  function factsOf(data, sender) {
+    try {
+      if (typeof W14.ChatRoomMessageRunExtractors === "function") {
+        const m = W14.ChatRoomMessageRunExtractors(data, sender).metadata;
+        if (m) return { name: m.ActivityName, target: m.TargetMemberNumber };
+      }
+    } catch (e) {
+    }
+    const dict = Array.isArray(data.Dictionary) ? data.Dictionary : [];
+    const name = (dict.find((d) => d && d.ActivityName) || {}).ActivityName;
+    const t = dict.find((d) => d && (typeof d.TargetCharacter === "number" || d.Tag === "TargetCharacter"));
+    return { name, target: t ? typeof t.TargetCharacter === "number" ? t.TargetCharacter : t.MemberNumber : void 0 };
+  }
+  var LSCG_WAIT_MS = 1500;
+  function onNeedle(by, item, act) {
+    const text3 = craftText(item), list = dosesOf(text3), at = Date.now(), done = [], later = isLater(text3);
+    const maker = item && item.Craft && Number(item.Craft.MemberNumber) || 0, makerName = item && item.Craft && item.Craft.MemberName ? String(item.Craft.MemberName) : "";
+    const via = /^(SipItem|EatItem)$/.test(act || "") ? "sip" : "needle", mine2 = W14.Player && W14.Player.MemberNumber || 0;
+    for (const { id, x, p } of list) {
+      const B = BOOK[id];
+      if (farmHas(id, p) && botHere()) continue;
+      if (B.lscg && lscgPresent()) continue;
+      if (!allowed(by)) {
+        local(fill(NOTES.notListed, { by: nameOf(by), dose: B.label }));
+        continue;
+      }
+      const sire = maker || by;
+      if (id === "seed" && sire !== mine2 && !allowed(sire)) {
+        local(fill(NOTES.notListed, { by: makerName || nameOf(sire), dose: B.label }));
+        continue;
+      }
+      const go = () => {
+        if (later && !B.instant) {
+          if (st().off[id]) {
+            local(fill(NOTES.switchedOff, { dose: B.label }));
+            return { ok: false, why: "off" };
+          }
+          return { ok: queue(id, { by, x, p }), later: true };
+        }
+        const r = give(id, { by, x, p, sire, nm: makerName, via });
+        if (!r.ok && r.why === "off") local(fill(NOTES.switchedOff, { dose: B.label }));
+        return r;
+      };
+      if (lscgHas(id)) setTimeout(() => {
+        if (lastLscgDose(id) < at) go();
+      }, LSCG_WAIT_MS);
+      else {
+        go();
+        done.push(id);
+      }
+    }
+    return done;
+  }
+  function initNeedle(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 1, (args, next2) => {
+        try {
+          const data = args[0], P = W14.Player;
+          if (data && data.Type === "Activity" && P && typeof data.Sender === "number") {
+            const sender = charOf6(data.Sender) || (data.Sender === P.MemberNumber ? P : null), f = factsOf(data, sender);
+            if (/^(Inject|SipItem|EatItem)$/.test(f.name || "") && f.target === P.MemberNumber && sender) onNeedle(data.Sender, handOf(sender), f.name);
+            if (f.target === P.MemberNumber && data.Sender !== P.MemberNumber) onActivity(f.name, data.Sender);
+            if (data.Sender === P.MemberNumber && typeof f.target === "number" && f.target !== P.MemberNumber && /^(Kiss|FrenchKiss|PoliteKiss|GaggedKiss|SiblingsCheekKiss)$/.test(f.name || "")) paraKissGiven(f.target);
+          }
+        } catch (e) {
+          console.warn("[Dispensary] needle:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] can't feel needles:", e);
+    }
+  }
+
+  // dispensary/src/hardcore.js
+  var W15 = window;
+  var DAY7 = 864e5;
+  var CHECK_DAYS = 30;
+  var me9 = () => W15.Player && W15.Player.MemberNumber || 0;
+  var here = (mn) => (W15.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var who = (mn) => here(mn) ? nameOf(mn) : "#" + mn;
+  var onChange = () => {
+  };
+  function onHardChange(f) {
+    onChange = f;
+  }
+  var hardOn = () => !!(st().hard && st().hard.on);
+  function keyholders() {
+    const P = W15.Player, out = [];
+    const own = P && P.Ownership && P.Ownership.MemberNumber;
+    if (typeof own === "number" && own > 0 && own !== me9()) out.push(own);
+    if (st().stock) {
+      for (const m of PROPRIETORS) if (m !== me9() && !out.includes(m)) out.push(m);
+    }
+    for (const m of st().keys || []) if (m !== me9() && !out.includes(m)) out.push(m);
+    return out;
+  }
+  var MAX_KEYS = 10;
+  function addKey(mn) {
+    mn = Math.round(Number(mn));
+    if (hardOn()) return { ok: false, why: "locked" };
+    if (!Number.isInteger(mn) || mn <= 0 || mn >= 1e9) return { ok: false, why: "number" };
+    if (mn === me9()) return { ok: false, why: "self" };
+    const S3 = st();
+    S3.keys = S3.keys || [];
+    if (S3.keys.includes(mn) || keyholders().includes(mn)) return { ok: false, why: "already" };
+    if (S3.keys.length >= MAX_KEYS) return { ok: false, why: "full" };
+    S3.keys.push(mn);
+    save();
+    onChange();
+    return { ok: true };
+  }
+  function removeKey(mn) {
+    if (hardOn()) return { ok: false, why: "locked" };
+    const S3 = st(), i = (S3.keys || []).indexOf(Number(mn));
+    if (i < 0) return { ok: false, why: "none" };
+    S3.keys.splice(i, 1);
+    save();
+    onChange();
+    return { ok: true };
+  }
+  var companion = () => {
+    try {
+      const C2 = W15.FarmhandCompanion;
+      return C2 && typeof C2.hardPrefs === "function" ? C2 : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var isKey = (mn) => typeof mn === "number" && keyholders().includes(mn);
+  function dueAt() {
+    const H2 = st().hard || {};
+    return H2.until ? H2.until : (H2.checkAt || H2.since || Date.now()) + CHECK_DAYS * DAY7;
+  }
+  function log(by, what2) {
+    const H2 = st().hard;
+    H2.log = (H2.log || []).concat({ t: Date.now(), by, what: String(what2).slice(0, 200) }).slice(-50);
+  }
+  var hardLog = () => (st().hard && st().hard.log || []).slice();
+  function sendTo(mn, type, data) {
+    try {
+      if (here(mn) && typeof W15.ServerSend === "function") {
+        W15.ServerSend("ChatRoomChat", makeMsg(type, data, mn));
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+  function beepTo(mn, text3) {
+    try {
+      if (typeof W15.ServerSend === "function") {
+        W15.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(text3).slice(0, 900) });
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+  function announce() {
+    const H2 = st().hard || {}, keys = keyholders();
+    for (const k of keys) sendTo(k, "dispHard", { on: hardOn(), until: H2.until || 0, due: hardOn() ? dueAt() : 0, keys, name: W15.Player && (W15.Player.Nickname || W15.Player.Name) || "" });
+  }
+  function lock(days) {
+    if (hardOn()) return { ok: false, why: "on" };
+    if (!keyholders().length) return { ok: false, why: "nokey" };
+    const now = Date.now(), d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(days) || 0)));
+    st().hard = { on: true, since: now, until: d ? now + d * DAY7 : 0, checkAt: now, log: st().hard && st().hard.log || [] };
+    log(me9(), d ? "locked in for " + d + " day" + (d === 1 ? "" : "s") : "locked in, no end date");
+    save(true);
+    announce();
+    onChange();
+    return { ok: true };
+  }
+  function unlock(by, why) {
+    if (!hardOn()) return false;
+    const H2 = st().hard;
+    H2.on = false;
+    H2.until = 0;
+    log(by, "hardcore off: " + why);
+    save(true);
+    announce();
+    onChange();
+    local("\u{1F513} Hardcore's off (" + why + "). Your settings are yours again, and so is your safeword.");
+    return true;
+  }
+  function checkIn(by) {
+    if (!hardOn() || !isKey(by)) return false;
+    const H2 = st().hard, now = Date.now(), last = H2.checkAt || 0;
+    H2.checkAt = now;
+    if (now - last > DAY7) log(by, "checked in");
+    save();
+    onChange();
+    return true;
+  }
+  function tickHard() {
+    if (!hardOn()) return;
+    const H2 = st().hard, now = Date.now();
+    if (H2.until && now >= H2.until) unlock(me9(), "the end date came");
+    else if (!H2.until && now - (H2.checkAt || H2.since || now) >= CHECK_DAYS * DAY7) unlock(0, CHECK_DAYS + " days without a keyholder checkin' in");
+  }
+  var askedAt2 = 0;
+  function askOut() {
+    const now = Date.now(), keys = keyholders(), name = W15.Player && (W15.Player.Nickname || W15.Player.Name) || "Somebody";
+    if (now - askedAt2 < 5 * 6e4) {
+      local("\u{1F5DD}\uFE0F Your keyholders have already been asked. Your doses stay till one of them lets you out.");
+      return 0;
+    }
+    askedAt2 = now;
+    let n = 0;
+    for (const k of keys) {
+      if (sendTo(k, "dispAsk", { name })) n++;
+      else if (beepTo(k, "\u{1F5DD}\uFE0F " + name + " (" + me9() + ") is askin' to be let out of hardcore in The Farmhand's Dispensary. If you've the Dispensary, open its page (Keys you hold); with the Companion, /keys letout " + me9() + ".")) n++;
+    }
+    log(me9(), "asked to be let out");
+    save();
+    local("\u{1F5DD}\uFE0F Hardcore: your doses stay. " + (n ? "Your keyholders have been asked to let you out: " + keys.map(who).join(", ") + "." : "None of your keyholders could be reached just now."));
+    return n;
+  }
+  function onKey(by, m) {
+    if (!isKey(by) || !m || typeof m !== "object") return false;
+    const H2 = st().hard, nm = who(by);
+    if (m.do === "check") {
+      if (checkIn(by)) sendTo(by, "dispHard", { on: true, until: H2.until || 0, due: dueAt(), keys: keyholders(), name: W15.Player && (W15.Player.Nickname || W15.Player.Name) || "" });
+      return true;
+    }
+    if (!hardOn()) return false;
+    if (m.do === "state") {
+      sendTo(by, "dispKeyState", stateFor());
+      checkIn(by);
+      return true;
+    }
+    if (m.do === "letout") {
+      const n = clearAll("keyholder");
+      log(by, "let you out (" + n + " dose" + (n === 1 ? "" : "s") + " lifted)");
+      save();
+      local("\u{1F5DD}\uFE0F " + nm + " let you out: every dose in you is lifted.");
+      checkIn(by);
+      onChange();
+      return true;
+    }
+    if (m.do === "end") {
+      checkIn(by);
+      return unlock(by, "ended by " + nm);
+    }
+    if (m.do === "extend") {
+      const d = Math.max(0, Math.min(CHECK_DAYS, Math.round(Number(m.days) || 0)));
+      H2.until = d ? Date.now() + d * DAY7 : 0;
+      H2.checkAt = Date.now();
+      log(by, d ? "set the end to " + d + " day" + (d === 1 ? "" : "s") + " from now" : "took the end date away");
+      save();
+      local("\u{1F5DD}\uFE0F " + nm + " " + (d ? "set your hardcore to end in " + d + " day" + (d === 1 ? "" : "s") + "." : "took your end date away. A keyholder checks in every " + CHECK_DAYS + " days instead."));
+      onChange();
+      return true;
+    }
+    if (m.do === "set") {
+      const S3 = st(), said5 = [];
+      if (typeof m.who === "string" && LADDER.some((r) => r.id === m.who) && m.who !== S3.who) {
+        S3.who = m.who;
+        said5.push("who can dose you: " + LADDER.find((r) => r.id === m.who).label);
+      }
+      if ((m.clock === "real" || m.clock === "online") && m.clock !== S3.clock) {
+        setClock(m.clock);
+        said5.push("the clock: " + (m.clock === "real" ? "real time" : "while online"));
+      }
+      if (m.off && typeof m.off === "object") {
+        for (const id of doseIds()) if (typeof m.off[id] === "boolean" && !!S3.off[id] !== m.off[id]) {
+          if (m.off[id]) S3.off[id] = true;
+          else delete S3.off[id];
+          said5.push(id + (m.off[id] ? " switched off" : " switched on"));
+        }
+      }
+      if (m.companion && typeof m.companion === "object" && companion()) {
+        try {
+          said5.push(...companion().setHardPrefs(m.companion));
+        } catch (e) {
+        }
+      }
+      if (!said5.length) return true;
+      log(by, "changed " + said5.join(", "));
+      save();
+      checkIn(by);
+      onChange();
+      local("\u{1F5DD}\uFE0F " + nm + " changed your Dispensary: " + said5.join("; ") + ".");
+      sendTo(by, "dispKeyState", stateFor());
+      return true;
+    }
+    return false;
+  }
+  function stateFor() {
+    const S3 = st();
+    let comp = null;
+    try {
+      comp = companion() ? companion().hardPrefs() : null;
+    } catch (e) {
+      comp = null;
+    }
+    return { who: S3.who, clock: S3.clock, off: Object.assign({}, S3.off), doses: doseIds().filter(active).map((id) => ({ id, left: leftMs(id) })), until: S3.hard && S3.hard.until || 0, due: dueAt(), companion: comp };
+  }
+  var wards = () => st().wards || (st().wards = {});
+  function onWardHard(from, m) {
+    if (!Array.isArray(m.keys) || !m.keys.includes(me9())) return;
+    const w = wards();
+    if (!m.on) {
+      if (w[from]) {
+        delete w[from];
+        save();
+        onChange();
+      }
+      return;
+    }
+    const was = w[from], now = Date.now();
+    w[from] = Object.assign({}, was, { name: String(m.name || "").slice(0, 40), until: Number(m.until) || 0, due: Number(m.due) || 0, seen: now });
+    save();
+    onChange();
+    if (!was || now - (was.checked || 0) > 36e5) {
+      w[from].checked = now;
+      sendTo(from, "dispKey", { do: "check" });
+    }
+  }
+  var wardStates = {};
+  var wardState = (mn) => wardStates[mn] || null;
+  function keyDo(mn, what2, data) {
+    if (sendTo(mn, "dispKey", Object.assign({ do: what2 }, data || {}))) return "room";
+    const words = { check: "checked in on your hardcore", letout: "let you out: every dose lifted", end: "ended your hardcore" };
+    if (!words[what2]) return null;
+    const nm = W15.Player && (W15.Player.Nickname || W15.Player.Name) || "Your keyholder";
+    return beepTo(mn, "\u{1F5DD}\uFE0F " + nm + " " + words[what2] + ". [fd:" + what2 + "]") ? "beep" : null;
+  }
+  function initHardcore(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me9()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispKey") onKey(data.Sender, m);
+            else if (m && m.type === "dispHard") onWardHard(data.Sender, m);
+            else if (m && m.type === "dispKeyState") {
+              wardStates[data.Sender] = m;
+              onChange();
+            } else if (m && m.type === "dispAsk" && wards()[data.Sender]) {
+              wards()[data.Sender].asked = Date.now();
+              save();
+              onChange();
+              local("\u{1F5DD}\uFE0F " + who(data.Sender) + " is askin' to be let out of hardcore. Open the Dispensary's page (Keys you hold) to let them out.");
+            }
+          }
+        } catch (e) {
+          console.warn("[Dispensary] hardcore:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+      console.warn("[Dispensary] keyholders can't reach you:", e);
+    }
+    try {
+      mod2.hookFunction("ServerAccountBeep", 11, (args, next2) => {
+        try {
+          const d = args[0], t = d && typeof d.Message === "string" ? /\s*\[fd:(check|letout|end)\]\s*$/.exec(d.Message) : null;
+          if (t) {
+            if (isKey(d.MemberNumber)) onKey(d.MemberNumber, { do: t[1] });
+            d.Message = d.Message.slice(0, t.index);
+          }
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomSync", 11, (args, next2) => {
+        const r = next2(args);
+        setTimeout(() => {
+          if (hardOn()) announce();
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
+    }
+  }
+
+  // dispensary/src/lscg.js
+  var W16 = window;
+  var api2 = null;
+  var caps = null;
+  var syncing = null;
+  var REG = {};
+  var lastLscg = {};
+  var ours4 = (id) => LSCG_ID + "." + id;
+  var minsLeft = (id) => Math.ceil(leftMs(id) / 6e4);
+  var BREATH_MINS = 10;
+  function lscgPresent() {
+    if (W16.LSCG) return true;
+    try {
+      const sdk = W16.bcModSdk;
+      if (sdk && typeof sdk.getModsInfo === "function") return sdk.getModsInfo().some((m) => m && m.name === "LSCG");
+    } catch (e) {
+    }
+    return false;
+  }
+  var lscgApi2 = () => !!(api2 && caps && caps.has("drugs"));
+  var lscgHas = (id) => lscgApi2() && !!REG[id];
+  var lastLscgDose = (id) => lastLscg[id] || 0;
+  function lscgDose(type, o) {
+    if (!lscgApi2()) return false;
+    o = o || {};
+    try {
+      return !!api2.drugs.dose(type, { multiplier: Math.max(0.2, Math.min(3, Number(o.x) || 1)), method: o.method || "inject", sender: o.by, minigame: false });
+    } catch (e) {
+      return false;
+    }
+  }
+  function lscgShow(id, by) {
+    if (!lscgHas(id) || syncing) return;
+    syncing = id;
+    try {
+      api2.drugs.dose(ours4(id), { multiplier: 1, method: "inject", sender: by || void 0, minigame: false });
+    } catch (e) {
+    } finally {
+      syncing = null;
+    }
+  }
+  function setUp(L) {
+    try {
+      api2 = L.getModApi({ id: LSCG_ID, name: "The Farmhand's Dispensary", version: VERSION });
+    } catch (e) {
+      api2 = null;
+      return;
+    }
+    caps = L.capabilities || /* @__PURE__ */ new Set();
+    if (caps.has("drugs")) {
+      for (const [id, B] of Object.entries(BOOK)) {
+        if (B.lscg || B.instant || B.noLscg || REG[id]) continue;
+        try {
+          api2.drugs.register({
+            name: id,
+            label: B.label,
+            description: B.desc,
+            keywords: B.keywords,
+            color: B.color,
+            soakKeywords: B.soak || void 0,
+            max: 600,
+            decayPerMinute: 0,
+            tickSeconds: 20,
+            onDose(ctx) {
+              if (syncing === id) {
+                ctx.setLevel(minsLeft(id));
+                return;
+              }
+              lastLscg[id] = Date.now();
+              if (ctx.method === "breath") {
+                const r0 = give(id, { by: ctx.sender, mins: BREATH_MINS, upto: true, quiet: active(id) });
+                ctx.setLevel(r0.ok ? minsLeft(id) : 0);
+                return;
+              }
+              const mult = Math.max(0.5, Math.min(2, Number(ctx.multiplier) || 1));
+              const text3 = typeof ctx.sender === "number" ? handTextOf(ctx.sender) : "", p = partFor(id, text3) || void 0;
+              if (text3 && isLater(text3)) {
+                queue(id, { by: ctx.sender, x: 1, p });
+                ctx.setLevel(active(id) ? minsLeft(id) : 0);
+                return;
+              }
+              const r = give(id, { by: ctx.sender, mins: Math.round(B.mins * mult), p });
+              ctx.setLevel(r.ok ? minsLeft(id) : 0);
+            },
+            onTick(ctx) {
+              const m = active(id) ? minsLeft(id) : 0;
+              if (ctx.level !== m) ctx.setLevel(m);
+            },
+            onWearOff() {
+              if (active(id)) end(id, "lscg");
+            }
+            // LSCG's antidote, or LSCG's safeword
+          });
+          REG[id] = true;
+        } catch (e) {
+          console.warn("[Dispensary] LSCG wouldn't take " + id + ":", e);
+        }
+      }
+    }
+    try {
+      nipsLscg(api2, caps);
+    } catch (e) {
+      console.warn("[Dispensary] LSCG nipple actions:", e);
+    }
+    if (caps.has("events")) {
+      try {
+        api2.events.on("safeword", () => {
+          if (hardOn()) askOut();
+          else clearAll("safeword");
+        });
+      } catch (e) {
+      }
+      try {
+        api2.events.before("drug.beforeApply", (c) => {
+          const p = c && c.payload;
+          if (!p || !Array.isArray(p.types) || syncing) return;
+          for (let i = p.types.length - 1; i >= 0; i--) {
+            const m = /^farmhand-dispensary\.([a-z]+)$/.exec(String(p.types[i]));
+            if (m && (st().off[m[1]] || typeof p.sender === "number" && !allowed(p.sender))) p.types.splice(i, 1);
+          }
+        });
+      } catch (e) {
+      }
+    }
+  }
+  function initLscg() {
+    const q = W16.LSCG_OnLoad = W16.LSCG_OnLoad || [];
+    q.push((L) => {
+      try {
+        setUp(L);
+      } catch (e) {
+        console.warn("[Dispensary] LSCG hookup:", e);
+      }
+    });
+  }
+
+  // dispensary/src/lines-kits.js
+  LINES.kits = {
+    start_plain: [
+      "%b's %k kit starts puttin' itself on %t, one piece at a time.",
+      "%t feels the first tug: %b's %k is on its way onto them, whether they like it or not.",
+      "Somethin' clicks into place on %t. %b's %k kit has started dressin' them."
+    ],
+    piece_plain: [
+      "The %g slides into place on %t, snug and certain.",
+      "%t's %g settles on them, neat as if somebody'd put it there by hand.",
+      "Another piece: the %g, fittin' itself onto %t.",
+      "The %g buckles itself on %t without anybody touchin' it."
+    ],
+    back_plain: [
+      "The %g's back on %t again, quick as it came off.",
+      "%t takes it off, and the %g just puts itself right back.",
+      "The %g creeps back onto %t. The kit isn't done with them."
+    ],
+    done_plain: [
+      "%t's all done up in %k now, every piece in place. It'll stay that way a while.",
+      "The last piece settles. %t's wearin' the whole of %k, and it isn't comin' off till it's done."
+    ],
+    off_plain: [
+      "The %k kit lets go of %t, and their own clothes slip back on where it was.",
+      "%k comes away from %t piece by piece, and their old outfit's back on them, as if it never left."
+    ],
+    start_living: [
+      "Somethin' slick and warm starts to move on %t's skin. %b's %k is alive, and it's crawlin' on.",
+      "%t shivers: %b's %k kit wakes up and starts to creep over them, wet and eager.",
+      "It's breathin'. %b's %k slithers onto %t one piece at a time, like it's been waitin' for them."
+    ],
+    piece_living: [
+      "The %g oozes up %t's body and sets, glossy and tight, then gives a little squeeze.",
+      "The %g wraps itself round %t, slick and throbbin', and shrinks to fit.",
+      "A wet sound, and the %g's on %t: it crawled there by itself, and now it's pulsin' gently.",
+      "The %g slides over %t like warm syrup and hardens snug, still twitchin'.",
+      "The %g squirms into place on %t and settles with a satisfied little shiver."
+    ],
+    back_living: [
+      "The %g crawls right back onto %t, slick and stubborn. It likes it there.",
+      "%t peels the %g off, and it oozes straight back on, tighter than before.",
+      "The %g slithers back up %t's skin. It's not lettin' go of them."
+    ],
+    done_living: [
+      "%t's covered now: the whole of %k is on them, warm and breathin', squeezin' now and then like it's alive. It is.",
+      "The last of %k seals over %t with a wet kiss. All of it's alive, and all of it's holdin' on."
+    ],
+    off_living: [
+      "%k goes still, then slides off %t in slow, wet sheets, and their own clothes are back on underneath.",
+      "The livin' %k lets go of %t with a reluctant shiver and crawls away, leavin' their old outfit on them."
+    ],
+    start_demon: [
+      "A red glow sparks on %t's skin, and %b's %k answers it: the curse is takin' hold, a piece at a time.",
+      "%t hears somethin' laugh, low and cruel. %b's %k has been called, and it's comin' for them.",
+      "Sigils flare along %t's arms. %b's cursed %k starts bindin' itself to them."
+    ],
+    piece_demon: [
+      `The %g burns into place on %t, sigils glowin' along its edges, and somethin' whispers "mine".`,
+      "Red light snaps tight round %t, and when it fades the %g's on them, warm as a brand.",
+      "The %g locks onto %t with a hiss of brimstone. A voice in their ear purrs how good it looks on them.",
+      "The %g appears on %t in a curl of black smoke, already too tight, already theirs.",
+      "A sigil sears onto %t's skin, and the %g settles over it, humming with somethin' that isn't kind."
+    ],
+    back_demon: [
+      "The %g flares back onto %t in a flash of red. The curse laughs at them for tryin'.",
+      "%t takes the %g off, and the sigils pull it straight back, burnin' hotter for the cheek.",
+      'The %g reappears on %t with a cruel little chuckle in their ear: "no."'
+    ],
+    done_demon: [
+      "%t's bound in the whole of %k now, every sigil glowin'. The curse settles in to enjoy itself.",
+      "The last piece of %k burns into place. Somethin' sighs, pleased, inside %t's head. They're its, for now."
+    ],
+    off_demon: [
+      "The sigils on %t gutter and go out, and %k crumbles away to ash. Their own clothes are back on, a little scorched round the edges.",
+      "The curse lets go of %t with a disappointed hiss, and %k is gone, their old outfit on them again."
+    ],
+    start_brain: [
+      "A soft hum fills %t's head. %b's %k kit is goin' on them, and part of them is already noddin' along.",
+      "%t's thoughts go slow and syrupy. %b's %k is dressin' them, and it feels so right to let it.",
+      `"Good. Hold still," whispers somethin' only %t can hear, and %b's %k begins.`
+    ],
+    piece_brain: [
+      "The %g goes on %t, and their eyes go a little glassier with it.",
+      "%t helps the %g on without meanin' to. It feels like the right thing to do.",
+      "The %g settles on %t, and a soft voice tells them how much better they look already.",
+      "The %g clicks into place on %t, and another thought of their own floats away.",
+      "%t holds still for the %g. Stillness feels nice. Obedience feels nicer."
+    ],
+    back_brain: [
+      "%t blinks. The %g's back on them, and they don't remember puttin' it there.",
+      "%t takes the %g off, then puts it right back on, smilin' vaguely. That's where it goes.",
+      `"Ah ah," murmurs the voice, and %t's own hands put the %g back on.`
+    ],
+    done_brain: [
+      "%t's wearin' the whole of %k now, eyes soft and empty. The hum in their head says they look perfect.",
+      "The last piece settles, and so does %t: dressed in %k, calm and blank and very, very obedient."
+    ],
+    off_brain: [
+      "The hum fades, and %k comes off %t. They blink at their own clothes, back on them, and can't quite remember the last little while.",
+      "%t wakes up out of it, dressed as they were before %k. Bits of it are still hummin' at the back of their head."
+    ],
+    missing: [
+      "The kit called %k can't be found: %b's Dispensary didn't send it (they might be gone, or not have it any more)."
+    ],
+    missing_own: [
+      "You've no kit called %k saved: /dispensary kit save <name> keeps what you're wearin', or save it in LSCG."
+    ],
+    nothing: [
+      "The %k kit has nothin' in it that's allowed to go on you (your Kits settin' picks clothes, restraints or both)."
+    ]
+  };
+
+  // dispensary/src/kits.js
+  var W17 = window;
+  var SPEEDS = { slow: 60, steady: 30, fast: 10, now: 0 };
+  var SPEED_NAMES = { slow: "a piece a minute", steady: "a piece every half minute", fast: "a piece every ten seconds", now: "all at once" };
+  var KIT_RE = /\bkit\s*:\s*([a-z0-9][^|,.;!?\n]{0,39})/;
+  var kitKeyOf = (text3) => {
+    const m = KIT_RE.exec(String(text3 || "").toLowerCase());
+    return m ? m[1].trim().replace(/\s+/g, " ") : "";
+  };
+  var FLAVOURS = [
+    ["living", /\b(living|livin'?|alive|symbiot\w*|tentacle\w*|slime\w*|latex)\b/],
+    ["demon", /\b(demon\w*|cursed|enchanted|infernal|hell\w*|sigil\w*|succubus)\b/],
+    ["brain", /\b(brainwash\w*|hypno\w*|mind\w*|conditioning|trance)\b/]
+  ];
+  var flavourOf = (text3) => {
+    const t = String(text3 || "").toLowerCase(), f = FLAVOURS.filter(([, re]) => re.test(t)).map(([k]) => k);
+    return f.length ? f.join("+") : "plain";
+  };
+  var kitPart = (text3) => {
+    const k = kitKeyOf(text3);
+    return k ? k + "#" + flavourOf(text3) : "";
+  };
+  var splitPart = (p) => {
+    const i = String(p || "").lastIndexOf("#");
+    return i > 0 ? { key: p.slice(0, i), flav: p.slice(i + 1) } : { key: String(p || ""), flav: "plain" };
+  };
+  var what = () => ["clothes", "binds", "both"].includes(st().kitWhat) ? st().kitWhat : "both";
+  var speedOf = () => SPEEDS[st().kitSpeed] != null ? SPEEDS[st().kitSpeed] : SPEEDS.steady;
+  var me10 = () => W17.Player && W17.Player.MemberNumber || 0;
+  var send2 = (type, data, to) => {
+    try {
+      if (typeof W17.ServerSend === "function") W17.ServerSend("ChatRoomChat", makeMsg(type, data, to));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  var LZ = () => W17.LZString;
+  var pack = (bundle) => {
+    try {
+      return LZ().compressToBase64(JSON.stringify(bundle));
+    } catch (e) {
+      return "";
+    }
+  };
+  var unpack = (code) => {
+    try {
+      const b = JSON.parse(LZ().decompressFromBase64(String(code || "")));
+      return Array.isArray(b) ? b.filter((i) => i && typeof i.Group === "string" && typeof i.Name === "string") : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var groupOf = (name) => {
+    try {
+      return typeof W17.AssetGroupGet === "function" && W17.AssetGroupGet("Female3DCG", name) || W17.AssetGroupMap && W17.AssetGroupMap.get(name) || null;
+    } catch (e) {
+      return null;
+    }
+  };
+  function kindOfGroup(g) {
+    if (!g || g.BodyCosplay || g.AllowCustomize === false) return null;
+    if (g.Category === "Item") return "binds";
+    if (g.Category === "Appearance" && g.Clothing) return "clothes";
+    return null;
+  }
+  var wanted = (gname) => {
+    const k = kindOfGroup(groupOf(gname));
+    return !!k && (what() === "both" || what() === k);
+  };
+  var itemIn2 = (group) => W17.Player && Array.isArray(W17.Player.Appearance) ? W17.Player.Appearance.find((i) => i && i.Asset && i.Asset.Group && i.Asset.Group.Name === group) : null;
+  var lockedOn = (it) => !!(it && it.Property && it.Property.LockedBy);
+  function wornBundle() {
+    const P = W17.Player;
+    if (!P || !Array.isArray(P.Appearance)) return [];
+    return P.Appearance.filter((i) => i && i.Asset && i.Asset.Group && kindOfGroup(i.Asset.Group)).map((i) => {
+      const b = { Group: i.Asset.Group.Name, Name: i.Asset.Name };
+      if (i.Color != null) b.Color = i.Color;
+      if (i.Difficulty != null) b.Difficulty = i.Difficulty;
+      if (i.Craft) b.Craft = i.Craft;
+      if (i.Property) {
+        try {
+          b.Property = typeof W17.ItemPropertiesCompress === "function" ? W17.ItemPropertiesCompress(i) : JSON.parse(JSON.stringify(i.Property));
+        } catch (e) {
+          b.Property = JSON.parse(JSON.stringify(i.Property));
+        }
+      }
+      return b;
+    });
+  }
+  var lscgOutfits = () => {
+    try {
+      const L = W17.LSCG;
+      return L && typeof L.Outfits === "function" ? L.Outfits() : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  function kitNames() {
+    const own = Object.keys(st().kits || {}), C2 = lscgOutfits();
+    let lscg = [];
+    try {
+      lscg = C2 && typeof C2.GetOutfitNames === "function" ? C2.GetOutfitNames() : C2 && typeof C2.GetOutfitKeys === "function" ? C2.GetOutfitKeys() : [];
+    } catch (e) {
+      lscg = [];
+    }
+    return { own, lscg };
+  }
+  function kitLookup(key2) {
+    key2 = String(key2 || "").toLowerCase().trim();
+    if (!key2) return null;
+    const own = (st().kits || {})[key2];
+    if (own) return unpack(own);
+    const C2 = lscgOutfits();
+    try {
+      if (C2 && C2.GetOutfit(key2)) {
+        const b = C2.GetOutfitBundle(key2);
+        return Array.isArray(b) ? b : null;
+      }
+    } catch (e) {
+    }
+    return null;
+  }
+  function kitSave(name) {
+    const key2 = String(name || "").toLowerCase().trim().replace(/\s+/g, " ").slice(0, 40);
+    if (!key2) return { ok: false, why: "name" };
+    const S3 = st();
+    S3.kits = S3.kits || {};
+    if (!S3.kits[key2] && Object.keys(S3.kits).length >= 8) return { ok: false, why: "full" };
+    const b = wornBundle();
+    if (!b.length) return { ok: false, why: "empty" };
+    const code = pack(b);
+    if (!code || code.length > 12e3) return { ok: false, why: "big" };
+    S3.kits[key2] = code;
+    save();
+    return { ok: true, key: key2, n: b.length };
+  }
+  function kitDelete(name) {
+    const S3 = st(), key2 = String(name || "").toLowerCase().trim();
+    if (!S3.kits || !S3.kits[key2]) return false;
+    delete S3.kits[key2];
+    save();
+    return true;
+  }
+  function onAsk(from, m) {
+    const key2 = String(m.key || "").slice(0, 40), b = kitLookup(key2);
+    const clean2 = b ? b.filter((i) => kindOfGroup(groupOf(i.Group))) : null;
+    send2("dispKit", clean2 && clean2.length ? { key: key2, code: pack(clean2) } : { key: key2, none: true }, from);
+  }
+  var K2 = () => st().kit || null;
+  var waiting2 = null;
+  var lineOf5 = (key2, flav, v) => {
+    const L = LINES.kits || {}, pools = String(flav || "plain").split("+").map((f) => L[key2 + "_" + f]).filter((p) => p && p.length);
+    const pool = pools.length ? pools[Math.floor(Math.random() * pools.length)] : L[key2 + "_plain"] || [];
+    return pool.length ? fill(pick(pool), { by: v && v.by || "somebody" }).replace(/%g/g, v && v.g || "it").replace(/%k/g, v && v.k || "the kit") : "";
+  };
+  var onePiece2 = (n) => /[^s]s$/i.test(String(n).trim()) ? "pair of " + n : n;
+  var pieceName = (b) => {
+    try {
+      const A = W17.AssetGet("Female3DCG", b.Group, b.Name);
+      return onePiece2(String(b.Craft && b.Craft.Name || A && (A.Description || A.Name) || b.Name).toLowerCase());
+    } catch (e) {
+      return String(b.Name).toLowerCase();
+    }
+  };
+  function update(group) {
+    try {
+      if (group && typeof W17.ChatRoomCharacterItemUpdate === "function") W17.ChatRoomCharacterItemUpdate(W17.Player, group);
+      else if (typeof W17.ChatRoomCharacterUpdate === "function") W17.ChatRoomCharacterUpdate(W17.Player);
+    } catch (e) {
+    }
+  }
+  function refresh() {
+    try {
+      if (typeof W17.CharacterRefresh === "function") W17.CharacterRefresh(W17.Player, false);
+    } catch (e) {
+    }
+  }
+  function putOn(b, by) {
+    const P = W17.Player;
+    if (!P || typeof W17.InventoryWear !== "function" || typeof W17.AssetGet !== "function") return false;
+    const A = W17.AssetGet("Female3DCG", b.Group, b.Name);
+    if (!A || !wanted(b.Group)) return false;
+    const cur = itemIn2(b.Group);
+    if (cur && cur.Asset.Name === b.Name) return true;
+    if (cur && lockedOn(cur)) return false;
+    try {
+      if (typeof W17.InventoryBlockedOrLimited === "function" && W17.InventoryBlockedOrLimited(P, { Asset: A })) return false;
+    } catch (e) {
+    }
+    try {
+      if (typeof W17.InventoryChatRoomAllow === "function" && !W17.InventoryChatRoomAllow(A.Category || [])) return false;
+    } catch (e) {
+    }
+    let it = null;
+    try {
+      it = W17.InventoryWear(P, b.Name, b.Group, b.Color, b.Difficulty, by || me10(), b.Craft, false);
+    } catch (e) {
+      return false;
+    }
+    it = it || itemIn2(b.Group);
+    if (!it || it.Asset.Name !== b.Name) return false;
+    if (b.Property) {
+      try {
+        it.Property = typeof W17.ItemPropertiesDecompress === "function" ? W17.ItemPropertiesDecompress(Object.assign(it, { Property: {} }), b.Property) : JSON.parse(JSON.stringify(b.Property));
+      } catch (e) {
+        it.Property = JSON.parse(JSON.stringify(b.Property));
+      }
+    }
+    if (lockedOn(it)) {
+      try {
+        if (typeof W17.InventoryUnlock === "function") W17.InventoryUnlock(P, it, false);
+        else {
+          for (const k of ["LockedBy", "LockMemberNumber", "RemoveTimer", "Password", "CombinationNumber", "MemberNumberList"]) delete it.Property[k];
+        }
+      } catch (e) {
+      }
+    }
+    if (it.Property && it.Property.Effect) it.Property.Effect = it.Property.Effect.filter((e) => e !== "Lock");
+    return true;
+  }
+  function kitBegin(part, by) {
+    const { key: key2, flav } = splitPart(part);
+    if (!key2) return false;
+    const k = K2();
+    if (k && k.key === key2 && k.by === by) {
+      k.flav = flav;
+      save();
+      return true;
+    }
+    if (!by || by === me10()) {
+      const b = kitLookup(key2);
+      if (!b) {
+        local(fill(pick(LINES.kits.missing_own)).replace(/%k/g, key2));
+        return false;
+      }
+      return dress(key2, flav, by || me10(), b);
+    }
+    waiting2 = { key: key2, flav, by, at: Date.now() };
+    send2("dispKitAsk", { key: key2 }, by);
+    return true;
+  }
+  function onKit(from, m) {
+    if (!waiting2 || waiting2.by !== from || String(m.key) !== waiting2.key) return;
+    const w = waiting2;
+    waiting2 = null;
+    const b = m.none ? null : unpack(m.code);
+    if (!b || !b.length) {
+      local(fill(pick(LINES.kits.missing), { by: nameOf(from) }).replace(/%k/g, w.key));
+      try {
+        endDose("kit");
+      } catch (e) {
+      }
+      return;
+    }
+    dress(w.key, w.flav, from, b);
+  }
+  var endDose = () => {
+  };
+  function dress(key2, flav, by, bundle) {
+    const S3 = st(), was = K2();
+    const pieces = bundle.filter((b) => wanted(b.Group)).slice(0, 60);
+    if (!pieces.length) {
+      local(fill(pick(LINES.kits.nothing)).replace(/%k/g, key2));
+      return false;
+    }
+    S3.kit = { key: key2, flav, by, old: was ? was.old : wornBundle(), pieces, queue: pieces.map((b) => b.Group), next: Date.now(), at: Date.now(), done: false };
+    save();
+    action(lineOf5("start", flav, { by: nameOf(by) || "somebody", k: key2 }));
+    kitTick(Date.now());
+    return true;
+  }
+  function kitTick(now) {
+    now = now || Date.now();
+    if (waiting2 && now - waiting2.at > 2e4) {
+      const w = waiting2;
+      waiting2 = null;
+      local(fill(pick(LINES.kits.missing), { by: nameOf(w.by) || "whoever made it" }).replace(/%k/g, w.key));
+      try {
+        endDose("kit");
+      } catch (e) {
+      }
+      return;
+    }
+    const k = K2();
+    if (!k) return;
+    if (!inRoom()) return;
+    if (k.done) for (const b of k.pieces) {
+      const cur = itemIn2(b.Group);
+      if (!cur && !k.queue.includes(b.Group) && wanted(b.Group)) {
+        k.queue.push(b.Group);
+        k.back = (k.back || 0) + 1;
+      }
+    }
+    if (!k.queue.length || now < k.next) return;
+    const gap2 = speedOf(), n = gap2 ? 1 : k.queue.length;
+    const put = [];
+    for (let i = 0; i < n && k.queue.length; i++) {
+      const g = k.queue.shift(), b = k.pieces.find((p) => p.Group === g);
+      if (!b) continue;
+      if (putOn(b, k.by)) put.push(b);
+    }
+    k.next = now + gap2 * 1e3;
+    if (put.length) {
+      refresh();
+      put.forEach((b) => update(b.Group));
+      const v = { g: pieceName(put[0]), k: k.key, by: nameOf(k.by) || "somebody" };
+      const back = k.done && k.back > 0;
+      const t = put.length > 1 ? "" : lineOf5(back ? "back" : "piece", k.flav, v);
+      if (t) back || Math.random() < 0.4 ? action(t) : local(t);
+      if (back) k.back = Math.max(0, k.back - put.length);
+    }
+    if (!k.queue.length && !k.done) {
+      k.done = true;
+      action(lineOf5("done", k.flav, { k: k.key, by: nameOf(k.by) || "somebody" }));
+    }
+    save();
+  }
+  function kitEnd(quiet) {
+    const k = K2();
+    waiting2 = null;
+    if (!k) return false;
+    const P = W17.Player, S3 = st();
+    for (const b of k.pieces) {
+      const cur = itemIn2(b.Group);
+      if (cur && cur.Asset.Name === b.Name && !lockedOn(cur)) {
+        try {
+          W17.InventoryRemove(P, b.Group, false);
+        } catch (e) {
+        }
+      }
+    }
+    for (const b of k.old || []) {
+      if (!itemIn2(b.Group)) {
+        try {
+          putBack(b);
+        } catch (e) {
+        }
+      }
+    }
+    S3.kit = null;
+    save();
+    refresh();
+    update(null);
+    if (!quiet) action(lineOf5("off", k.flav, { k: k.key }));
+    return true;
+  }
+  function putBack(b) {
+    const A = W17.AssetGet("Female3DCG", b.Group, b.Name);
+    if (!A) return;
+    const it = W17.InventoryWear(W17.Player, b.Name, b.Group, b.Color, b.Difficulty, me10(), b.Craft, false) || itemIn2(b.Group);
+    if (it && b.Property) {
+      try {
+        it.Property = typeof W17.ItemPropertiesDecompress === "function" ? W17.ItemPropertiesDecompress(Object.assign(it, { Property: {} }), b.Property) : JSON.parse(JSON.stringify(b.Property));
+      } catch (e) {
+        it.Property = JSON.parse(JSON.stringify(b.Property));
+      }
+    }
+  }
+  var kitNow = () => {
+    const k = K2();
+    return k ? { key: k.key, flav: k.flav, by: k.by, left: k.queue.length, on: k.pieces.length - k.queue.length, done: k.done } : null;
+  };
+  function initKits(mod2, o) {
+    endDose = o && typeof o.end === "function" ? o.end : endDose;
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number") {
+            const m = readMsg(data);
+            if (m) kitMessage(data.Sender, m);
+          }
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+    try {
+      W17.addEventListener("farmhand-dispensary", (e) => {
+        const d = e && e.detail;
+        if (!d || d.type !== "dose" || d.id !== "kit") return;
+        try {
+          if (d.on) kitBegin(d.p, o && o.byOf ? o.byOf("kit") : 0);
+          else kitEnd(false);
+        } catch (err) {
+          console.warn("[Dispensary] kit:", err);
+        }
+      });
+    } catch (e) {
+    }
+  }
+  function kitMessage(from, m) {
+    if (!m || from === me10()) return false;
+    if (m.type === "dispKitAsk") {
+      onAsk(from, m);
+      return true;
+    }
+    if (m.type === "dispKit") {
+      onKit(from, m);
+      return true;
+    }
+    return false;
+  }
+
+  // dispensary/src/doses.js
+  var W18 = window;
+  var MIN10 = 6e4;
+  var CAP = 48 * 60 * MIN10;
   var BOOK = {
     denial: {
       label: "Denial Serum",
@@ -13178,6 +14836,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keywords: ["tightening balm", "nipple tightener", "pussy tightener", "ass tightener", "virgin tonic"],
       desc: "Rubbed in, it closes stretched nipples right back up as they were: the Nipple Dilator gone, the leeches off, the stretch undone. A bottle that names your pussy, ass or throat (or says virgin, for all of them) tightens that instead: two sizes a dose off what it's trained to, and closed back up to it."
     },
+    // ── Nov 19 (Laynie: "Definitely the insemination and breeders seal, and I would love if the crafter can specify how
+    // much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or gallons"): seed.js, shared/seed.js ──
+    // ── Nov 19, breedin' anywhere: carry.js ──
+    quicken: {
+      label: "Quickening Draught",
+      icon: "\u{1F331}",
+      mins: 0,
+      color: "#a8d08d",
+      farm: true,
+      instant: true,
+      words: DOSE_WORDS.quicken,
+      keywords: ["quickening draught", "quicken tonic"],
+      desc: "Hurries a litter along: a day off your pregnancy a dose (never closer than two hours to due), and a clutch of eggs ripens half a day sooner. Your belly swells with it. On the farm it's the farm girl's; off it your Dispensary hands it to her with your loads."
+    },
+    scan: {
+      label: "Breeder's Scan",
+      icon: "\u{1F50E}",
+      mins: 0,
+      color: "#b8c8e0",
+      instant: true,
+      words: DOSE_WORDS.scan,
+      keywords: ["breeder's scan", "womb scanner"],
+      desc: "Somebody on your list runs it over your belly, and the room hears what's in there: how many, whose, how close you are, a clutch of eggs, or just how much seed's waitin' to take, and whether you're ripe. A needle with it, or hold it while you touch their belly."
+    },
+    seed: {
+      label: "Seed",
+      icon: "\u{1F4A6}",
+      mins: 0,
+      color: "#f4efe4",
+      instant: true,
+      words: DOSE_WORDS.seed,
+      keywords: ["insemination", "seed syringe", "cum shot", "filled with my seed"],
+      desc: `A load of its crafter's own seed, as much as it says, where it says: "500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples", "half a gallon in every hole". A hole with no amount gets a thick load; no hole, and it goes in your pussy (your ass without one), or down your throat from a drink or a kiss. Your belly holds what the farm says and the rest spills; a Breeder's Seal keeps every drop. On the farm it's that crafter's load on the farm's books, and it can catch.`
+    },
     purge: {
       label: "Purge",
       icon: "\u{1F9FC}",
@@ -13251,6 +14943,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       for (const [k, s] of Object.entries(TENDER_SPOTS)) if (s.re.test(t.replace(BOOK.tender.words, " "))) return k;
       return "";
     }
+    if (id === "seed") return seedEncode(seedAmounts(t));
     if (id === "balm") {
       const hs = [/\b(pussy|cunt|vulva|slit|cooch)\b/.test(t) && "vulva", /\b(ass|butt|bum|asshole|backdoor)\b/.test(t) && "butt", /\b(throat|gag[\s_-]*reflex)\b/.test(t) && "throat"].filter(Boolean);
       const which = /\b(virgin\w*|holes|every[\s_-]*hole|all[\s_-]*over)\b/.test(t) || hs.length > 1 ? "holes" : hs[0] || "";
@@ -13299,9 +14992,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const v = voiceOf(id);
     return v && v.off.length ? nameIn(pick(v.off)) : ours5(id, "off", p);
   }
-  function tellPage2(detail) {
+  function tellPage4(detail) {
     try {
-      W15.dispatchEvent(new W15.CustomEvent("farmhand-dispensary", { detail }));
+      W18.dispatchEvent(new W18.CustomEvent("farmhand-dispensary", { detail }));
     } catch (e) {
     }
   }
@@ -13319,40 +15012,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var TOLERANCE_STEP = 0.2;
   var TOLERANCE_FLOOR = 0.4;
   function toleranceOf(id, now) {
-    const S2 = st();
-    if (!S2.tolerance) return 1;
-    const recent = (S2.taken[id] || []).filter((t) => (now || Date.now()) - t < TOLERANCE_HOURS * 36e5).length;
+    const S3 = st();
+    if (!S3.tolerance) return 1;
+    const recent = (S3.taken[id] || []).filter((t) => (now || Date.now()) - t < TOLERANCE_HOURS * 36e5).length;
     return Math.max(TOLERANCE_FLOOR, 1 - TOLERANCE_STEP * recent);
   }
   function give(id, o) {
     o = o || {};
-    const B = BOOK[id], S2 = st();
+    const B = BOOK[id], S3 = st();
     if (!B) return { ok: false, why: "unknown" };
-    if (S2.off[id]) return { ok: false, why: "off" };
-    if (B.optIn && !S2[B.optIn]) return { ok: false, why: "off" };
-    if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : purge(o);
+    if (S3.off[id]) return { ok: false, why: "off" };
+    if (B.optIn && !S3[B.optIn]) return { ok: false, why: "off" };
+    if (B.instant) return B.grow ? grow(id, o) : id === "balm" ? balm(o) : id === "gape" ? gape(o) : id === "seed" ? seedGive(o) : id === "quicken" ? quicken(o.x, o.quiet) : id === "scan" ? scan(o.by) : purge(o);
     if (B.lscg && lscgPresent()) return { ok: false, why: "lscg" };
     if (B.lscgOnly) return { ok: false, why: "nolscg" };
     const now = Date.now(), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
     const tol = o.upto ? 1 : toleranceOf(id, now);
-    const dur = Math.max(MIN7, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN7 * tol));
-    const was = active(id), d = S2.doses[id], by = Number(o.by) || 0;
+    const dur = Math.max(MIN10, Math.min(CAP, (Number(o.mins) > 0 ? Number(o.mins) : B.mins * x) * MIN10 * tol));
+    const was = active(id), d = S3.doses[id], by = Number(o.by) || 0;
     const xNow = Math.max(x, was && d ? d.x || 1 : 1);
     const p = typeof o.p === "string" && o.p ? o.p : was && d && d.p ? d.p : "";
-    if (S2.clock === "real") {
+    if (S3.clock === "real") {
       const add2 = dur * penaltyF(), base = was && typeof d.until === "number" ? d.until : now;
-      S2.doses[id] = { x: xNow, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add2) : base + add2) };
+      S3.doses[id] = { x: xNow, by, at: now, until: Math.min(now + CAP * penaltyF(), o.upto ? Math.max(base, now + add2) : base + add2) };
     } else {
       const base = was && typeof d.left === "number" ? d.left : 0;
-      S2.doses[id] = { x: xNow, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
+      S3.doses[id] = { x: xNow, by, at: now, left: Math.min(CAP, o.upto ? Math.max(base, dur) : base + dur) };
     }
-    if (p) S2.doses[id].p = p;
-    if (!o.upto) S2.taken[id] = (S2.taken[id] || []).concat(now).filter((t) => now - t < 3 * 864e5).slice(-20);
+    if (p) S3.doses[id].p = p;
+    if (!o.upto) S3.taken[id] = (S3.taken[id] || []).concat(now).filter((t) => now - t < 3 * 864e5).slice(-20);
     save();
     if (!was) start(id);
     if (!o.quiet) action(o.line || takeLine(id));
     if (tol < 1) local(fill(TOLERANCE_NOTE, { dose: B.label }).replace("%p", String(Math.round(tol * 100))));
-    if (!was || p && d && d.p !== p || xNow !== (d && d.x)) tellPage2({ type: "dose", id, on: true, x: xNow, p });
+    if (!was || p && d && d.p !== p || xNow !== (d && d.x)) tellPage4({ type: "dose", id, on: true, x: xNow, p });
     try {
       lscgShow(id, by);
     } catch (e) {
@@ -13361,7 +15054,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var GROW_LIMITS = { cup: [-6, 10], ass: [-3, 6], cock: [-3, 6], balls: [-3, 6] };
   function grow(id, o) {
-    const B = BOOK[id], S2 = st(), g = S2.grow || (S2.grow = {}), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
+    const B = BOOK[id], S3 = st(), g = S3.grow || (S3.grow = {}), x = Math.max(1, Math.min(5, Math.round(Number(o.x) || 1)));
     const part = B.grow === "less" ? o.p && GROW_LIMITS[o.p] ? o.p : "cup" : B.grow, sign = B.grow === "less" ? -1 : 1;
     const [lo, hi] = GROW_LIMITS[part], was = g[part] || 0, now = Math.max(lo, Math.min(hi, was + sign * x));
     if (now === was) {
@@ -13371,7 +15064,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g[part] = now;
     save();
     if (!o.quiet) action(o.line || fill(pick(LINES.grow[sign > 0 ? part : "less"])).replace(/%p/g, { cup: "tits", ass: "ass", cock: "cock", balls: "balls" }[part]));
-    tellPage2({ type: "grow", part, n: now });
+    tellPage4({ type: "grow", part, n: now });
     return { ok: true, part, n: now };
   }
   var grown = () => Object.assign({ cup: 0, ass: 0, cock: 0, balls: 0 }, st().grow || {});
@@ -13409,13 +15102,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, was };
   }
   function end(id, why) {
-    const S2 = st();
-    if (!S2.doses[id]) return false;
-    const p = S2.doses[id].p || (id === "tender" ? partOf(id) : "");
-    delete S2.doses[id];
+    const S3 = st();
+    if (!S3.doses[id]) return false;
+    const p = S3.doses[id].p || (id === "tender" ? partOf(id) : "");
+    delete S3.doses[id];
     save();
     stop(id);
-    tellPage2({ type: "dose", id, on: false });
+    tellPage4({ type: "dose", id, on: false });
     if (why === "done" || why === "lscg") {
       const l = offLine(id, p);
       if (l) local(l);
@@ -13434,7 +15127,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       n += Object.keys(st().para).length;
       st().para = {};
     }
-    st().wornPause = Date.now() + 15 * MIN7;
+    st().wornPause = Date.now() + 15 * MIN10;
     save();
     if (why !== "purge") {
       try {
@@ -13444,30 +15137,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return n;
   }
-  var lastTick2 = 0;
+  var lastTick4 = 0;
   var lastSave = 0;
   function tick() {
-    const S2 = st(), now = Date.now(), gap2 = lastTick2 ? Math.max(0, Math.min(now - lastTick2, 15e3)) : 0;
-    lastTick2 = now;
-    for (const [id, d] of Object.entries(S2.doses)) {
+    const S3 = st(), now = Date.now(), gap2 = lastTick4 ? Math.max(0, Math.min(now - lastTick4, 15e3)) : 0;
+    lastTick4 = now;
+    for (const [id, d] of Object.entries(S3.doses)) {
       if (!BOOK[id]) {
-        delete S2.doses[id];
+        delete S3.doses[id];
         continue;
       }
       if (typeof d.until !== "number") d.left = Math.max(0, (d.left || 0) - gap2);
       if (!active(id)) end(id, "done");
       else feel2(id, now);
     }
-    if (now - lastSave > MIN7) {
+    if (now - lastSave > MIN10) {
       lastSave = now;
-      if (Object.keys(S2.doses).length) save();
+      if (Object.keys(S3.doses).length) save();
     }
   }
   function setClock(mode2) {
-    const S2 = st(), want = mode2 === "real" ? "real" : "online";
-    if (S2.clock === want) return;
+    const S3 = st(), want = mode2 === "real" ? "real" : "online";
+    if (S3.clock === want) return;
     const now = Date.now(), f = penaltyF();
-    for (const d of Object.values(S2.doses)) {
+    for (const d of Object.values(S3.doses)) {
       if (want === "real" && typeof d.until !== "number") {
         d.until = now + (d.left || 0) * f;
         delete d.left;
@@ -13476,17 +15169,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         delete d.until;
       }
     }
-    S2.clock = want;
+    S3.clock = want;
     save();
   }
   var face = (group, expr, secs) => {
     try {
-      if (typeof W15.CharacterSetFacialExpression === "function" && W15.Player) W15.CharacterSetFacialExpression(W15.Player, group, expr, secs);
+      if (typeof W18.CharacterSetFacialExpression === "function" && W18.Player) W18.CharacterSetFacialExpression(W18.Player, group, expr, secs);
     } catch (e) {
     }
   };
   var meter2 = () => {
-    const A = W15.Player && W15.Player.ArousalSettings;
+    const A = W18.Player && W18.Player.ArousalSettings;
     return A && A.Active !== "Inactive" && A.Active !== "NoMeter" ? A : null;
   };
   function setArousal(v) {
@@ -13494,7 +15187,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const A = meter2();
       if (!A) return;
       const n = Math.max(0, Math.min(100, Math.round(v)));
-      if (typeof W15.ActivitySetArousal === "function") W15.ActivitySetArousal(W15.Player, n);
+      if (typeof W18.ActivitySetArousal === "function") W18.ActivitySetArousal(W18.Player, n);
       else A.Progress = n;
     } catch (e) {
     }
@@ -13503,12 +15196,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var felt = {};
   var FLUSHED = ["needy", "heat", "rut", "letdown"];
   var xOfDose = (id) => st().doses[id] && st().doses[id].x || 1;
-  var leak = () => tellPage2({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
+  var leak2 = () => tellPage4({ type: "leak", mess: "milk", areas: ["chest"], amount: Math.min(2, 0.5 + 0.25 * xOf("letdown")) });
   function start(id) {
     if (id === "sedative") face("Eyes", "Dazed", 180);
     if (FLUSHED.includes(id)) face("Blush", id === "letdown" ? "Low" : "Medium", 120);
     if (id === "airhead") face("Eyes", "Dazed", 120);
-    if (id === "letdown") leak();
+    if (id === "letdown") leak2();
     if (id === "weakknees" || id === "allfours") setTimeout(settle, 300);
   }
   function stop(id) {
@@ -13523,15 +15216,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function feel2(id, now) {
     const B = BOOK[id];
-    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN7 });
-    if (id === "sedative" && now - f.face > 2 * MIN7) {
+    const f = felt[id] || (felt[id] = { face: now, next: now + ((B.every ? B.every[0] : 3) + Math.random() * 2) * MIN10 });
+    if (id === "sedative" && now - f.face > 2 * MIN10) {
       f.face = now;
       face("Eyes", "Dazed", 180);
     }
     if (id === "needy") {
       const A = meter2(), cap = Math.min(92, 60 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < cap) setArousal((Number(A.Progress) || 0) + 2);
-      if (now - f.face > 2 * MIN7) {
+      if (now - f.face > 2 * MIN10) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -13539,7 +15232,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "heat") {
       const A = meter2(), floor = Math.min(70, 25 + 15 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN7) {
+      if (now - f.face > 2 * MIN10) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
@@ -13547,25 +15240,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (id === "rut") {
       const A = meter2(), floor = Math.min(60, 20 + 10 * xOf(id));
       if (A && (Number(A.Progress) || 0) < floor) setArousal(floor);
-      if (now - f.face > 2 * MIN7) {
+      if (now - f.face > 2 * MIN10) {
         f.face = now;
         face("Blush", "Medium", 120);
       }
     }
-    if (id === "airhead" && now - f.face > 2 * MIN7) {
+    if (id === "airhead" && now - f.face > 2 * MIN10) {
       f.face = now;
       face("Eyes", "Dazed", 120);
     }
     if (B.every && now >= f.next && inRoom()) {
-      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN7;
+      f.next = now + (B.every[0] + Math.random() * (B.every[1] - B.every[0])) * MIN10;
       const l = nowLine(id);
       if (l) {
         if (B.room) action(l);
         else local(id === "honey" ? "\u{1F36F} The farm girl leans in close to your ear: " + l : id === "golden" ? "\u2728 " + l : l);
       }
-      if (id === "letdown") leak();
+      if (id === "letdown") leak2();
     } else if (!B.every && id === "sedative" && now >= f.next && inRoom()) {
-      f.next = now + (8 + Math.random() * 6) * MIN7;
+      f.next = now + (8 + Math.random() * 6) * MIN10;
       local(pick(LINES.sedative.drift));
     }
   }
@@ -13579,10 +15272,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (l) local(l);
   }
   function initDoses(mod2) {
-    const stone = (C) => !!(C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("statue"));
+    const stone = (C2) => !!(C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && active("statue"));
     for (const fn of ["ActivitySetArousal", "ActivitySetArousalTimer", "ActivityTimerProgress", "ActivityOrgasmPrepare"]) {
       try {
-        if (typeof W15[fn] === "function") mod2.hookFunction(fn, 7, (args, next2) => stone(args[0]) ? void 0 : next2(args));
+        if (typeof W18[fn] === "function") mod2.hookFunction(fn, 7, (args, next2) => stone(args[0]) ? void 0 : next2(args));
       } catch (e) {
         console.warn("[Dispensary] the Statue Serum can't hold " + fn + ":", e);
       }
@@ -13590,11 +15283,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivityOrgasmPrepare", 6, (args, next2) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("denial")) {
-            if (C.ArousalSettings) C.ArousalSettings.Progress = 94;
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && active("denial")) {
+            if (C2.ArousalSettings) C2.ArousalSettings.Progress = 94;
             face("Blush", "High", 20);
-            if (Date.now() - heldTold > MIN7) {
+            if (Date.now() - heldTold > MIN10) {
               heldTold = Date.now();
               local(pick(LINES.denial.held));
             }
@@ -13610,13 +15303,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivityOrgasmStart", 6, (args, next2) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("bitterroot")) W15.ActivityOrgasmRuined = true;
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && active("bitterroot")) W18.ActivityOrgasmRuined = true;
         } catch (e) {
         }
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("golden") && !W15.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500);
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && active("golden") && !W18.ActivityOrgasmRuined) setTimeout(() => local(pick(LINES.goldenDote)), 2500);
         } catch (e) {
         }
         return next2(args);
@@ -13627,8 +15320,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivitySetArousalTimer", 6, (args, next2) => {
         try {
-          const C = args[0], zone = String(args[2] || "");
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && Number(args[3]) > 0) {
+          const C2 = args[0], zone = String(args[2] || "");
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && Number(args[3]) > 0) {
             let f = 1;
             if (active("hairtrigger")) f *= 2;
             if (active("deepthroat") && /^ItemMouth/.test(zone)) {
@@ -13652,12 +15345,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       mod2.hookFunction("ActivityOrgasmStop", 6, (args, next2) => {
         try {
-          const C = args[0];
-          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && active("rut")) {
+          const C2 = args[0];
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && active("rut")) {
             const back = Math.min(80, 40 + 8 * xOf("rut"));
             if ((Number(args[1]) || 0) < back) {
               args = [args[0], back].concat(args.slice(2));
-              feltOnce("rut", "again", MIN7);
+              feltOnce("rut", "again", MIN10);
             }
           }
         } catch (e) {
@@ -13682,12 +15375,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/toys.js
-  var W16 = window;
+  var W19 = window;
   var TOY_HOST = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/toys/v1/";
-  var host = () => typeof W16.__farmToyHost === "string" ? W16.__farmToyHost : TOY_HOST;
+  var host = () => typeof W19.__farmToyHost === "string" ? W19.__farmToyHost : TOY_HOST;
   var ours6 = (group, name) => group === "ItemNipples" && !!TOY_BY[name];
-  var defsAll = () => W16.AssetFemale3DCG || (typeof AssetFemale3DCG !== "undefined" ? AssetFemale3DCG : null);
-  var extAll = () => W16.AssetFemale3DCGExtended || (typeof AssetFemale3DCGExtended !== "undefined" ? AssetFemale3DCGExtended : null);
+  var defsAll = () => W19.AssetFemale3DCG || (typeof AssetFemale3DCG !== "undefined" ? AssetFemale3DCG : null);
+  var extAll = () => W19.AssetFemale3DCGExtended || (typeof AssetFemale3DCGExtended !== "undefined" ? AssetFemale3DCGExtended : null);
   function extOf(T) {
     if (T.states === "typed") return {
       Archetype: "typed",
@@ -13721,7 +15414,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return d;
   }
   function describe2() {
-    const G = W16.AssetGroupMap && W16.AssetGroupMap.get("ItemNipples");
+    const G = W19.AssetGroupMap && W19.AssetGroupMap.get("ItemNipples");
     if (!G) return;
     for (const A of G.Asset || []) {
       const T = TOY_BY[A.Name];
@@ -13729,8 +15422,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function addToys() {
-    const G = W16.AssetGroupMap && W16.AssetGroupMap.get("ItemNipples"), defs = defsAll();
-    if (!G || typeof W16.AssetAdd !== "function" || !Array.isArray(defs)) return false;
+    const G = W19.AssetGroupMap && W19.AssetGroupMap.get("ItemNipples"), defs = defsAll();
+    if (!G || typeof W19.AssetAdd !== "function" || !Array.isArray(defs)) return false;
     const gdef = defs.find((g) => g && g.Group === "ItemNipples");
     if (!gdef) return false;
     const EXT = extAll() || {};
@@ -13744,7 +15437,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         EXT.ItemNipples[T.id] = x;
       }
       try {
-        W16.AssetAdd(G, defOf(T, orig), EXT, gdef);
+        W19.AssetAdd(G, defOf(T, orig), EXT, gdef);
         added++;
       } catch (e) {
         console.warn("[Dispensary] couldn't add the " + T.label, e);
@@ -13758,7 +15451,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function initToys(mod2, deps2) {
     const hook = (fn, pri, f) => {
       try {
-        if (typeof W16[fn] === "function") mod2.hookFunction(fn, pri, f);
+        if (typeof W19[fn] === "function") mod2.hookFunction(fn, pri, f);
       } catch (e) {
         console.warn("[Dispensary] nipple toys can't hook " + fn + ":", e);
       }
@@ -13794,9 +15487,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hook("InventoryPrerequisiteMessage", 0, (args, next2) => {
       if (args[1] !== "FarmNipsOpen") return next2(args);
       try {
-        const C = args[0];
-        if (!C || toyIn(C)) return "";
-        const n = typeof C.IsPlayer === "function" && C.IsPlayer() ? deps2.nipsOpen() : deps2.openOf(C.MemberNumber);
+        const C2 = args[0];
+        if (!C2 || toyIn(C2)) return "";
+        const n = typeof C2.IsPlayer === "function" && C2.IsPlayer() ? deps2.nipsOpen() : deps2.openOf(C2.MemberNumber);
         return n > 0 ? "" : "FarmNipsShut";
       } catch (e) {
         return "FarmNipsShut";
@@ -13819,6 +15512,149 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const t = setInterval(() => {
         if (addToys() || ++n > 120) clearInterval(t);
       }, 500);
+    }
+  }
+
+  // dispensary/src/icons.js
+  var W20 = window;
+  var others2 = /* @__PURE__ */ new Map();
+  var me11 = () => W20.Player && W20.Player.MemberNumber || 0;
+  var inRoom3 = () => W20.CurrentScreen === "ChatRoom" && typeof W20.ServerSend === "function";
+  var mineNow = () => ({ ids: doseIds().filter(active).slice(0, 8), para: Object.keys(st().para || {}).length > 0 });
+  var lastSig = "";
+  var lastAt2 = 0;
+  function iconsTell(force) {
+    if (!inRoom3()) return false;
+    const S3 = st(), m = S3.iconsShare === false ? { ids: [], para: false } : mineNow(), sig = JSON.stringify(m);
+    if (!force && (sig === lastSig || Date.now() - lastAt2 < 4e3)) return false;
+    lastSig = sig;
+    lastAt2 = Date.now();
+    try {
+      W20.ServerSend("ChatRoomChat", makeMsg("dispIcons", m));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function onIcons(from, m) {
+    const ids = Array.isArray(m.ids) ? m.ids.filter((id) => typeof id === "string" && BOOK[id]).slice(0, 8) : [];
+    const was = iconsDosed(from);
+    if (!ids.length && !m.para) others2.delete(from);
+    else others2.set(from, { ids, para: !!m.para, at: Date.now() });
+    if (was !== iconsDosed(from)) {
+      try {
+        W20.dispatchEvent(new W20.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } }));
+      } catch (e) {
+      }
+    }
+  }
+  function iconsDosed(mn) {
+    const e = mn === me11() ? mineNow() : others2.get(mn);
+    return !!(e && e.ids.length);
+  }
+  function iconsIds(mn) {
+    const e = mn === me11() ? mineNow() : others2.get(mn);
+    return e && Array.isArray(e.ids) ? e.ids.slice() : [];
+  }
+  function iconsFor(mn) {
+    const e = mn === me11() ? mineNow() : others2.get(mn);
+    if (!e) return "";
+    return e.ids.slice(0, 5).map((id) => BOOK[id].icon).join("") + (e.para ? "\u{1FAB1}" : "");
+  }
+  var canvas = () => typeof MainCanvas !== "undefined" && MainCanvas || W20.MainCanvas || null;
+  var fontOf2 = (px) => {
+    try {
+      if (typeof CommonGetFont === "function") return CommonGetFont(px);
+    } catch (e) {
+    }
+    return px + "px Arial";
+  };
+  function iconsItems(mn) {
+    const e = mn === me11() ? mineNow() : others2.get(mn);
+    if (!e) return [];
+    return e.ids.filter((id) => BOOK[id]).map((id) => ({ icon: BOOK[id].icon, label: BOOK[id].label })).concat(e.para ? [{ icon: "\u{1FAB1}", label: "A parasite" }] : []);
+  }
+  function drawIcons(C2, X, Y, Z) {
+    const items = iconsItems(C2.MemberNumber), M = canvas();
+    if (!items.length || !M) return 0;
+    const shown2 = items.length > 3 ? items.slice(0, 2).concat({ icon: "+" + (items.length - 2) }) : items;
+    const s = 40 * Z, x0 = X + 190 * Z;
+    M.save();
+    try {
+      M.textAlign = "center";
+      M.textBaseline = "middle";
+      M.font = fontOf2(Math.max(8, Math.round(30 * Z)));
+      M.lineWidth = Math.max(1, 3 * Z);
+      M.strokeStyle = "black";
+      M.fillStyle = "white";
+      shown2.forEach((it, i) => {
+        const x = x0 + s * i + s / 2, y = Y + s / 2;
+        if (it.icon[0] === "+") M.strokeText(it.icon, x, y);
+        M.fillText(it.icon, x, y);
+      });
+      if (typeof W20.MouseIn === "function" && W20.MouseIn(x0, Y, s * shown2.length, s)) {
+        const px = 22, lh = px + 8;
+        M.font = fontOf2(px);
+        M.textAlign = "left";
+        const lines2 = items.map((it) => it.icon + " " + it.label), w = Math.max(...lines2.map((l) => M.measureText(l).width)) + 20, h2 = lines2.length * lh + 10;
+        const bx = Math.max(4, Math.min(x0, 2e3 - w - 4)), by = Y + s + 4;
+        M.fillStyle = "rgba(20,14,24,0.88)";
+        M.fillRect(bx, by, w, h2);
+        M.strokeStyle = "rgba(255,255,255,0.35)";
+        M.lineWidth = 1;
+        M.strokeRect(bx, by, w, h2);
+        M.fillStyle = "white";
+        lines2.forEach((l, i) => M.fillText(l, bx + 10, by + 5 + lh * i + lh / 2));
+      }
+    } finally {
+      M.restore();
+    }
+    return shown2.length;
+  }
+  function initIcons(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomDrawCharacterStatusIcons", 0, (args, next2) => {
+        const r = next2(args);
+        try {
+          const [C2, X, Y, Z] = args;
+          if (st().iconsShow === false || !C2) return r;
+          drawIcons(C2, X, Y, Z || 1);
+        } catch (e) {
+        }
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Dispensary] dose icons can't be drawn:", e);
+    }
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0];
+          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me11()) {
+            const m = readMsg(data);
+            if (m && m.type === "dispIcons") onIcons(data.Sender, m);
+            else if (m && m.type === "dispIconsAsk") iconsTell(true);
+          }
+        } catch (e) {
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
+    try {
+      mod2.hookFunction("ChatRoomSync", 3, (args, next2) => {
+        const r = next2(args);
+        others2.clear();
+        setTimeout(() => {
+          iconsTell(true);
+          try {
+            W20.ServerSend("ChatRoomChat", makeMsg("dispIconsAsk", {}));
+          } catch (e) {
+          }
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
     }
   }
 
@@ -13938,145 +15774,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ]
     }
   });
-
-  // dispensary/src/icons.js
-  var W17 = window;
-  var others2 = /* @__PURE__ */ new Map();
-  var me8 = () => W17.Player && W17.Player.MemberNumber || 0;
-  var inRoom3 = () => W17.CurrentScreen === "ChatRoom" && typeof W17.ServerSend === "function";
-  var mineNow = () => ({ ids: doseIds().filter(active).slice(0, 8), para: Object.keys(st().para || {}).length > 0 });
-  var lastSig = "";
-  var lastAt2 = 0;
-  function iconsTell(force) {
-    if (!inRoom3()) return false;
-    const S2 = st(), m = S2.iconsShare === false ? { ids: [], para: false } : mineNow(), sig = JSON.stringify(m);
-    if (!force && (sig === lastSig || Date.now() - lastAt2 < 4e3)) return false;
-    lastSig = sig;
-    lastAt2 = Date.now();
-    try {
-      W17.ServerSend("ChatRoomChat", makeMsg("dispIcons", m));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  function onIcons(from, m) {
-    const ids = Array.isArray(m.ids) ? m.ids.filter((id) => typeof id === "string" && BOOK[id]).slice(0, 8) : [];
-    const was = iconsDosed(from);
-    if (!ids.length && !m.para) others2.delete(from);
-    else others2.set(from, { ids, para: !!m.para, at: Date.now() });
-    if (was !== iconsDosed(from)) {
-      try {
-        W17.dispatchEvent(new W17.CustomEvent("farmhand-dispensary", { detail: { type: "icons", from } }));
-      } catch (e) {
-      }
-    }
-  }
-  function iconsDosed(mn) {
-    const e = mn === me8() ? mineNow() : others2.get(mn);
-    return !!(e && e.ids.length);
-  }
-  function iconsFor(mn) {
-    const e = mn === me8() ? mineNow() : others2.get(mn);
-    if (!e) return "";
-    return e.ids.slice(0, 5).map((id) => BOOK[id].icon).join("") + (e.para ? "\u{1FAB1}" : "");
-  }
-  var canvas = () => typeof MainCanvas !== "undefined" && MainCanvas || W17.MainCanvas || null;
-  var fontOf2 = (px) => {
-    try {
-      if (typeof CommonGetFont === "function") return CommonGetFont(px);
-    } catch (e) {
-    }
-    return px + "px Arial";
-  };
-  function iconsItems(mn) {
-    const e = mn === me8() ? mineNow() : others2.get(mn);
-    if (!e) return [];
-    return e.ids.filter((id) => BOOK[id]).map((id) => ({ icon: BOOK[id].icon, label: BOOK[id].label })).concat(e.para ? [{ icon: "\u{1FAB1}", label: "A parasite" }] : []);
-  }
-  function drawIcons(C, X, Y, Z) {
-    const items = iconsItems(C.MemberNumber), M = canvas();
-    if (!items.length || !M) return 0;
-    const shown2 = items.length > 3 ? items.slice(0, 2).concat({ icon: "+" + (items.length - 2) }) : items;
-    const s = 40 * Z, x0 = X + 190 * Z;
-    M.save();
-    try {
-      M.textAlign = "center";
-      M.textBaseline = "middle";
-      M.font = fontOf2(Math.max(8, Math.round(30 * Z)));
-      M.lineWidth = Math.max(1, 3 * Z);
-      M.strokeStyle = "black";
-      M.fillStyle = "white";
-      shown2.forEach((it, i) => {
-        const x = x0 + s * i + s / 2, y = Y + s / 2;
-        if (it.icon[0] === "+") M.strokeText(it.icon, x, y);
-        M.fillText(it.icon, x, y);
-      });
-      if (typeof W17.MouseIn === "function" && W17.MouseIn(x0, Y, s * shown2.length, s)) {
-        const px = 22, lh = px + 8;
-        M.font = fontOf2(px);
-        M.textAlign = "left";
-        const lines2 = items.map((it) => it.icon + " " + it.label), w = Math.max(...lines2.map((l) => M.measureText(l).width)) + 20, h2 = lines2.length * lh + 10;
-        const bx = Math.max(4, Math.min(x0, 2e3 - w - 4)), by = Y + s + 4;
-        M.fillStyle = "rgba(20,14,24,0.88)";
-        M.fillRect(bx, by, w, h2);
-        M.strokeStyle = "rgba(255,255,255,0.35)";
-        M.lineWidth = 1;
-        M.strokeRect(bx, by, w, h2);
-        M.fillStyle = "white";
-        lines2.forEach((l, i) => M.fillText(l, bx + 10, by + 5 + lh * i + lh / 2));
-      }
-    } finally {
-      M.restore();
-    }
-    return shown2.length;
-  }
-  function initIcons(mod2) {
-    try {
-      mod2.hookFunction("ChatRoomDrawCharacterStatusIcons", 0, (args, next2) => {
-        const r = next2(args);
-        try {
-          const [C, X, Y, Z] = args;
-          if (st().iconsShow === false || !C) return r;
-          drawIcons(C, X, Y, Z || 1);
-        } catch (e) {
-        }
-        return r;
-      });
-    } catch (e) {
-      console.warn("[Dispensary] dose icons can't be drawn:", e);
-    }
-    try {
-      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
-        try {
-          const data = args[0];
-          if (data && data.Type === "Hidden" && typeof data.Sender === "number" && data.Sender !== me8()) {
-            const m = readMsg(data);
-            if (m && m.type === "dispIcons") onIcons(data.Sender, m);
-            else if (m && m.type === "dispIconsAsk") iconsTell(true);
-          }
-        } catch (e) {
-        }
-        return next2(args);
-      });
-    } catch (e) {
-    }
-    try {
-      mod2.hookFunction("ChatRoomSync", 3, (args, next2) => {
-        const r = next2(args);
-        others2.clear();
-        setTimeout(() => {
-          iconsTell(true);
-          try {
-            W17.ServerSend("ChatRoomChat", makeMsg("dispIconsAsk", {}));
-          } catch (e) {
-          }
-        }, 3e3);
-        return r;
-      });
-    } catch (e) {
-    }
-  }
 
   // dispensary/src/lines-para.js
   Object.assign(LINES, {
@@ -14199,11 +15896,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
 
   // dispensary/src/farm.js
-  var W18 = window;
+  var W21 = window;
   function send3(type, data) {
     try {
-      if (botHere() && typeof W18.ServerSend === "function") {
-        W18.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
+      if (botHere() && typeof W21.ServerSend === "function") {
+        W21.ServerSend("ChatRoomChat", makeMsg(type, data, BOT));
         return true;
       }
     } catch (e) {
@@ -14213,7 +15910,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var helloAt = 0;
   var helloSig = "";
   var onNow = () => doseIds().filter(active).sort();
-  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0, onNow(), craving()]);
+  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0, onNow(), craving(), carryHello()]);
   function hello(force) {
     const now = Date.now(), sig = sigNow();
     if (!force && sig === helloSig && now - helloAt < 30 * 6e4) return false;
@@ -14227,7 +15924,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keys: hardOn() ? keyholders() : [],
       on: onNow(),
       crave: craving(),
-      holes: 1
+      holes: 1,
+      seed: 1,
+      breed: 1,
+      ...carryHello()
     })) return false;
     helloAt = now;
     helloSig = sig;
@@ -14266,14 +15966,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return;
     }
     if (m.type === "dispWelcome") {
-      const S2 = st();
-      S2.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S2.farm;
-      if (typeof m.stock === "boolean") S2.stock = m.stock;
-      if (typeof m.species === "string" && /^[a-z]{2,20}$/.test(m.species)) S2.speciesFarm = m.species;
-      S2.farmAt = Date.now();
+      const S3 = st();
+      S3.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S3.farm;
+      if (typeof m.stock === "boolean") S3.stock = m.stock;
+      if (typeof m.species === "string" && /^[a-z]{2,20}$/.test(m.species)) S3.speciesFarm = m.species;
+      S3.farmAt = Date.now();
       save();
       try {
         holesWelcome(m);
+      } catch (e) {
+      }
+      try {
+        seedWelcome(m);
+      } catch (e) {
+      }
+      try {
+        breedWelcome(m);
+      } catch (e) {
+      }
+      try {
+        carryWelcome(m);
       } catch (e) {
       }
       return;
@@ -14760,7 +16472,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/screen.js
-  var W19 = window;
+  var W22 = window;
   var el2 = null;
   var styled = false;
   var CSS2 = `
@@ -14773,26 +16485,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
 `;
   function ensure() {
     if (!styled) {
-      const s = W19.document.createElement("style");
+      const s = W22.document.createElement("style");
       s.textContent = CSS2;
-      W19.document.head.appendChild(s);
+      W22.document.head.appendChild(s);
       styled = true;
     }
     if (!el2) {
-      el2 = W19.document.createElement("div");
+      el2 = W22.document.createElement("div");
       el2.id = "fd-screen";
       el2.setAttribute("aria-hidden", "true");
-      W19.document.body.appendChild(el2);
+      W22.document.body.appendChild(el2);
     }
     return el2;
   }
   var arousal = () => {
-    const A = W19.Player && W19.Player.ArousalSettings;
+    const A = W22.Player && W22.Player.ArousalSettings;
     return A ? Number(A.Progress) || 0 : 0;
   };
   function screenNow() {
-    if (active("tunnel") && W19.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
-    if (st().screen === false || W19.CurrentScreen !== "ChatRoom") return null;
+    if (active("tunnel") && W22.CurrentScreen === "ChatRoom") return { bg: "radial-gradient(circle at 50% 45%, transparent 16%, rgba(0,0,0,.93) 30%, #000 60%)", cls: "", id: "tunnel" };
+    if (st().screen === false || W22.CurrentScreen !== "ChatRoom") return null;
     if (active("denial") && arousal() >= 85) return { bg: "radial-gradient(ellipse at center, transparent 55%, rgba(220,60,130,.55) 100%)", cls: "pulse", id: "denial" };
     if (active("sedative")) return { bg: "radial-gradient(ellipse at center, transparent 35%, rgba(10,10,20,.75) 100%)", cls: "breathe", id: "sedative" };
     if (active("rut")) return { bg: "radial-gradient(ellipse at center, transparent 45%, rgba(170,40,20,.42) 100%)", cls: "breathe", id: "rut" };
@@ -15011,7 +16723,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Put it on somebody, or wear it yourself. Every six to ten minutes it has its way with them. Insatiable gear goes every two to four.",
         "Where it's worn says what it does: in a pussy or ass it thrusts, on nipples it suckles and tugs, in a mouth it fucks their throat, at the crotch or waist it grinds.",
         "Each time, their arousal goes up a step. Close enough, with nothin' denyin' them, it makes them cum.",
-        "Add breeding or seeding to it: when they cum, it cums too, and fills them."
+        "Add breeding or seeding to it: when they cum, it cums too, and fills them with your seed. Write how much on it, like 300 ml, or it leaves a thick load in whatever hole it's in."
       ],
       craft: [
         { name: "Hungry Tentacle Plug", note: "thrusts every few minutes", expect: [] },
@@ -15023,7 +16735,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "A parasite crafted horny is twice as busy, and squirms between feeds.",
         "It rests while they're out of a room, and after a safeword."
       ],
-      see: ["holes", "nipples", "parasites"]
+      see: ["holes", "nipples", "breeding"]
+    },
+    {
+      id: "breeding",
+      icon: "\u{1F4A6}",
+      title: "Seed, breedin' and carryin'",
+      intro: "Your own seed, in whoever you dose, as much as you like and wherever you say. Theirs to hold, drip, and on the farm, to catch.",
+      steps: [
+        "Craft a syringe, a baster, a drink or a bit of gear that says it carries seed: Insemination, Seed Syringe, Cum Shot, Breeding Baster, Cum Cocktail, or just filled with my seed. It's always the crafter's own seed, whoever's holdin' it.",
+        "Say how much and where, in mL, litres or gallons: 500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples. Every hole fills them all, nipples too while they're open; both holes means pussy and ass.",
+        "No hole written, and a needle puts it in their pussy, or their ass if they've no pussy. A drink or a kiss sends all of it down their throat. A hole with no amount gets a thick load.",
+        "A belly only holds so much: 200 mL to start, more with a capacity shot on the farm. The rest spills back out, down their thighs. Their tits hold a litre.",
+        "A Breeder's Seal is gear that says so: Breeder's Seal, Breeding Seal, Sire's Seal, Seed Lock or Cum Stopper. Worn in their pussy or ass, or as a belt over both, it keeps every drop in, however much, opens only for its maker's seed, and while it's in, only its maker's loads can catch.",
+        "Take the seal out and most of what it held gushes out with it.",
+        "Off the farm, what's in them drains slowly, faster from a looser hole, and drips down their thighs where the room can see. A plug or a seal holds it in.",
+        "Every load goes to the farm girl's books, straight away if she's in the room, or the next time they're in hers. There it can catch, with the crafter as sire: they need ?breedable on, and Fertile. A Sure-Catch Serum makes it take.",
+        "Breed me anywhere, your switch under Seed, off to start: off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books, and on the farm's, where it can catch. Only from somebody on your list.",
+        "A knotted cock ties you: for its minutes you can't step away from them on a map, and the room sees it swell and lock. It never stops you leavin' a room. Theirs knows it's knotted when they run the Dispensary too and the farm's measured their cock.",
+        "Keep it in: on all fours, knees spread, or hogtied within five minutes of a load in your pussy or ass, and it gets another chance to take, half again as likely.",
+        "Ripe days: Fertile on the farm, two days in every seven you're ripe, achin' for it, and every load takes twice as easy. You feel them anywhere, and now and then the room can tell.",
+        "Brood Womb, a farm switch, ?broodwomb on: once you're carryin', every load that lands in you takes too, and makes your litter bigger, up to the farm's hyper sizes.",
+        "Carryin' goes with you: the farm tells your Dispensary, and wherever you are you feel it take hold, show and grow heavy, your tits leak, you crave seed, and your drawn belly grows with it.",
+        "Your natural heat comes on wherever you are, and studs runnin' the Dispensary catch the scent.",
+        "Due away from the farm? Your labour happens right where you are, and anybody who touches your belly is your midwife. A clutch of eggs comes out the same way. The farm girl books them next time you're in her room, and for the hour after a birth you're wide open.",
+        "A Quickening Draught takes a day off. A Breeder's Scan, by needle or held while they touch your belly, tells the room what's in you. Twenty litters makes you a Baby Factory."
+      ],
+      craft: [
+        { name: "Seed Syringe", desc: "500 ml pussy, 1 L ass", note: "a needle: half a litre in their pussy and a litre in their ass, most of it spillin' back out", expect: ["seed"] },
+        { name: "Breeding Baster", desc: "2 gallons in every hole", note: "two gallons in every hole they've got", expect: ["seed"] },
+        { name: "Cum Cocktail", desc: "my seed, 300 ml", note: "a glass to Sip to them: 300 mL down their throat", expect: ["seed"] },
+        { name: "Breeder's Seal", note: "a plug: worn in their pussy or ass, it keeps your seed in and everybody else's out", expect: [] },
+        { name: "Hungry Breeding Plug", desc: "150 ml", note: "horny gear that cums with them and leaves 150 mL of yours in them", expect: [] },
+        { name: "Quickening Draught x2", note: "two days closer to due, and their belly swells with it", expect: ["quicken"] },
+        { name: "Breeder's Scan", note: "a needle, or hold it and touch their belly: the room hears what's in there", expect: ["scan"] }
+      ],
+      tips: [
+        "Add x2 to x5 for that many times as much.",
+        "Seed is a dose like any other: whoever holds it and whoever crafted it both have to be on their list, and it has its own switch under Doses.",
+        "The farm counts one load from the same crafter every ten minutes. More still fills them, it just isn't another load on the books.",
+        "Under Seed on this page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in."
+      ],
+      see: ["horny", "holes", "farm"]
     },
     {
       id: "nipples",
@@ -15150,6 +16903,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       steps: [
         "On B&B Farm the farm girl reads farm shots and keeps the books: milk, heat, denial, sentences. Your Dispensary does the feelin', the seein' and the sayin'. Leave the farm on your ladder for her shots to take.",
         "On the farm's books, she keeps your holes too, and gets what happened off the farm next time you're in her room.",
+        "Seed is hers to book too: every load, whose it was, and whether it catches.",
         "With LSCG loaded, its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's own, and LSCG's settings decide those.",
         "Our doses are in LSCG's Drug Enhancements list too: switch them on there as well, and LSCG shows a bar with the time left."
       ],
@@ -15173,6 +16927,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "/dispensary train <who> <ass|pussy|throat> <size> in 3 days, or by friday. /dispensary train <who> clear lifts a goal. Use me for yourself.",
         "/dispensary kit, then on or off, speed slow, steady, fast or now, what clothes, binds or both, save <name>, del <name>, or stop.",
         "/dispensary horny on or off.",
+        "/dispensary seed: what's in you, whose it is, and every load you've taken.",
         "/dispensary mouth <who> <words>: words for your mouthpiece's wearer. /dispensary say or /dispensary nope answers one."
       ],
       see: ["start"]
@@ -15207,6 +16962,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
       kit: "kits",
       outfit: "kits",
       hungry: "horny",
+      seed: "breeding",
+      cum: "breeding",
+      labour: "breeding",
+      labor: "breeding",
+      birth: "breeding",
+      heat: "breeding",
+      ripe: "breeding",
+      knot: "breeding",
+      scan: "breeding",
+      quicken: "breeding",
+      pregnant: "breeding",
+      eggs: "breeding",
+      insemination: "breeding",
+      inseminate: "breeding",
+      seal: "breeding",
+      breed: "breeding",
+      breeder: "breeding",
+      load: "breeding",
+      loads: "breeding",
       nips: "nipples",
       nipple: "nipples",
       hole: "holes",
@@ -15234,7 +17008,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/page.js
-  var W20 = window;
+  var W23 = window;
   var ID = "FarmhandDispensary";
   var box2 = null;
   var note3 = "";
@@ -15271,11 +17045,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
-    if (W20.document.getElementById("fd-style")) return;
-    const s = W20.document.createElement("style");
+    if (W23.document.getElementById("fd-style")) return;
+    const s = W23.document.createElement("style");
     s.id = "fd-style";
     s.textContent = CSS3;
-    W20.document.head.appendChild(s);
+    W23.document.head.appendChild(s);
   }
   var clockTip = (mode2) => {
     const p = st().penalty;
@@ -15299,9 +17073,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return d <= 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days (" + dateOf(t) + ")";
   };
   var keyName = (mn) => {
-    const P = W20.Player || {};
+    const P = W23.Player || {};
     const own = P.Ownership && P.Ownership.MemberNumber === mn;
-    const c = (W20.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
+    const c = (W23.ChatRoomCharacter || []).find((x) => x && x.MemberNumber === mn);
     return (c ? c.Nickname || c.Name : "#" + mn) + (own ? " (your owner)" : PROPRIETORS.includes(mn) ? " (proprietor)" : "");
   };
   var endPick = "7";
@@ -15311,10 +17085,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var keyInput = "";
   var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
   function keyholdersCard() {
-    const S2 = st(), locked = hardOn(), P = W20.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
+    const S3 = st(), locked = hardOn(), P = W23.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
     if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
-    if (S2.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
-    for (const mn of S2.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
+    if (S3.stock) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + PROPRIETORS.map(keyName).join(" and ") + ": you're on the farm's books"));
+    for (const mn of S3.keys || []) rows.push(h("div", { class: "fd-row" }, "\u{1F5DD}\uFE0F " + keyName(mn), locked ? null : h("button", { onclick: () => {
       removeKey(mn);
       note3 = "";
       draw2();
@@ -15371,7 +17145,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           endSel,
           h("button", { disabled: keys.length ? void 0 : true, onclick: () => {
             const days = Number(endPick) || 0;
-            if (typeof W20.confirm === "function" && !W20.confirm(hardWarning(days, keys))) return;
+            if (typeof W23.confirm === "function" && !W23.confirm(hardWarning(days, keys))) return;
             const r = lock(days);
             note3 = r.ok ? "\u{1F512} Locked in." : "Couldn't lock in: " + (r.why === "nokey" ? "you've no keyholder." : r.why);
             draw2();
@@ -15386,7 +17160,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       { class: "fd-card" },
       h("div", null, "\u{1F512} Locked in since " + dateOf(H2.since) + ". " + (H2.until ? "It ends " + inDays(H2.until) + "." : "No end date: it lets go " + inDays(dueAt()) + " unless a keyholder checks in before then.")),
       h("div", { class: "fd-muted" }, "Your keyholders: " + keys.map(keyName).join(", ") + ". They can change your settings, let you out, or end it."),
-      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W20.Player && W20.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
+      hardLog().slice(-5).reverse().map((l) => h("div", { class: "fd-muted" }, dateOf(l.t) + " \xB7 " + (l.by === (W23.Player && W23.Player.MemberNumber) ? "you" : l.by ? keyName(l.by) : "the clock") + ": " + l.what))
     ));
     return out;
   }
@@ -15396,7 +17170,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!list.length) return [];
     const out = [...head("Keys you hold", "hardcore")];
     for (const [k, x] of list) {
-      const mn = Number(k), inRoom4 = (W20.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
+      const mn = Number(k), inRoom4 = (W23.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn), name = (x.name || "#" + mn) + " (" + mn + ")";
       const go = (what2, data) => {
         const how = keyDo(mn, what2, data);
         note3 = how ? "\u{1F5DD}\uFE0F Sent " + (how === "room" ? "in the room" : "by beep") + "." : "Couldn't reach " + name + " just now.";
@@ -15410,7 +17184,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { onclick: () => go("check") }, "Check in"),
           h("button", { onclick: () => go("letout") }, "Let out (lift every dose)"),
           h("button", { onclick: () => {
-            if (typeof W20.confirm !== "function" || W20.confirm("End " + name + "'s hardcore?")) go("end");
+            if (typeof W23.confirm !== "function" || W23.confirm("End " + name + "'s hardcore?")) go("end");
           } }, "End hardcore"),
           inRoom4 ? h("button", { onclick: () => {
             editing = { mn };
@@ -15474,10 +17248,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var guideWhere = "top";
   var pendingGuide = "";
-  var copyBtn = (text3) => W20.navigator && W20.navigator.clipboard && typeof W20.navigator.clipboard.writeText === "function" ? h("button", { title: "Copy it, to paste in the game's crafting", onclick: (e) => {
+  var copyBtn = (text3) => W23.navigator && W23.navigator.clipboard && typeof W23.navigator.clipboard.writeText === "function" ? h("button", { title: "Copy it, to paste in the game's crafting", onclick: (e) => {
     const b = e.currentTarget;
     try {
-      W20.navigator.clipboard.writeText(text3).then(() => {
+      W23.navigator.clipboard.writeText(text3).then(() => {
         b.textContent = "Copied";
       }, () => {
       });
@@ -15554,14 +17328,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     pendingGuide = GUIDE_BY[id] ? id : "";
   }
   function view2() {
-    const S2 = st(), now = doseIds().filter(active), locked = hardOn() ? true : void 0;
+    const S3 = st(), now = doseIds().filter(active), locked = hardOn() ? true : void 0;
     const kids = [];
     kids.push(h(
       "div",
       { class: "fd-row", style: { marginBottom: "6px" } },
       h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
       h("button", { onclick: () => {
-        if (typeof W20.PreferenceSubscreenExtensionsClear === "function") W20.PreferenceSubscreenExtensionsClear();
+        if (typeof W23.PreferenceSubscreenExtensionsClear === "function") W23.PreferenceSubscreenExtensionsClear();
         else close2();
       } }, "Back")
     ));
@@ -15572,9 +17346,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kids.push(h(
       "div",
       { class: "fd-card" },
-      now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S2.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
-      Object.values(S2.grow || {}).some((v) => v) ? h("div", null, "\u{1F4CF} Grown (it stays): " + Object.entries(S2.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
-      S2.later.length ? h("div", null, "\u{1F48A} " + (S2.later.length === 1 ? "A time-release capsule's" : S2.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
+      now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S3.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
+      Object.values(S3.grow || {}).some((v) => v) ? h("div", null, "\u{1F4CF} Grown (it stays): " + Object.entries(S3.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
+      S3.later.length ? h("div", null, "\u{1F48A} " + (S3.later.length === 1 ? "A time-release capsule's" : S3.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
       h(
         "div",
         { class: "fd-row", style: { marginTop: "8px" } },
@@ -15599,14 +17373,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         note3 = "";
         draw2();
       } },
-      LADDER.map((r) => h("option", { value: r.id, selected: r.id === S2.who ? true : void 0 }, r.label))
+      LADDER.map((r) => h("option", { value: r.id, selected: r.id === S3.who ? true : void 0 }, r.label))
     );
     kids.push(h("div", { class: "fd-card" }, sel, h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Right now: " + ladderWho() + ". You can always dose yourself.")));
     kids.push(...head("The clock", "safety"));
     const radio = (mode2, label) => h(
       "label",
       { title: clockTip(mode2) },
-      h("input", { type: "radio", name: "fd-clock", disabled: locked, checked: S2.clock === mode2 ? true : void 0, onchange: () => {
+      h("input", { type: "radio", name: "fd-clock", disabled: locked, checked: S3.clock === mode2 ? true : void 0, onchange: () => {
         setClock(mode2);
         draw2();
       } }),
@@ -15615,25 +17389,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     kids.push(h(
       "div",
       { class: "fd-card" },
-      h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S2.penalty + "%)")),
-      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S2.clock))
+      h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S3.penalty + "%)")),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S3.clock))
     ));
     kids.push(...head("Touches", "pick"));
     kids.push(h(
       "div",
       { class: "fd-card" },
-      h("label", null, h("input", { type: "checkbox", checked: S2.screen !== false ? true : void 0, onchange: (e) => {
+      h("label", null, h("input", { type: "checkbox", checked: S3.screen !== false ? true : void 0, onchange: (e) => {
         st().screen = e.target.checked;
         save();
         draw2();
       } }), h("b", null, "Screen touches")),
       h("div", { class: "fd-muted" }, "A dose you can see at the edges of your own screen: the Sedative dims it, Denial Serum pulses pink near the top, Heat hazes it warm, Needy Nectar flushes it, Rut reddens it, the Airhead Elixir goes soft and pink. Only you see them. With reduce motion set on your computer, they hold still."),
-      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", checked: S2.iconsShow !== false ? true : void 0, onchange: (e) => {
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", checked: S3.iconsShow !== false ? true : void 0, onchange: (e) => {
         st().iconsShow = e.target.checked;
         save();
         draw2();
       } }), h("b", null, "Dose icons by people")),
-      h("label", null, h("input", { type: "checkbox", checked: S2.iconsShare !== false ? true : void 0, onchange: (e) => {
+      h("label", null, h("input", { type: "checkbox", checked: S3.iconsShare !== false ? true : void 0, onchange: (e) => {
         st().iconsShare = e.target.checked;
         save();
         draw2();
@@ -15650,7 +17424,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             save();
             draw2();
           } },
-          [h("option", { value: "", selected: !S2.species ? true : void 0 }, S2.speciesFarm ? "The farm's word (" + S2.speciesFarm + ")" : "Cow, till the farm says")].concat(ANIMALS.map((a) => h("option", { value: a, selected: S2.species === a ? true : void 0 }, a)))
+          [h("option", { value: "", selected: !S3.species ? true : void 0 }, S3.speciesFarm ? "The farm's word (" + S3.speciesFarm + ")" : "Cow, till the farm says")].concat(ANIMALS.map((a) => h("option", { value: a, selected: S3.species === a ? true : void 0 }, a)))
         )
       )
     ));
@@ -15666,7 +17440,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           null,
           h("input", {
             type: "checkbox",
-            checked: !S2.off[id] ? true : void 0,
+            checked: !S3.off[id] ? true : void 0,
             disabled: theirs || locked ? true : void 0,
             onchange: (e) => {
               if (e.target.checked) delete st().off[id];
@@ -15698,17 +17472,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
             save();
             draw2();
           } },
-          Object.entries(TENDER_SPOTS).map(([k, s2]) => h("option", { value: k, selected: (S2.tenderSpot || TENDER_DEFAULT) === k ? true : void 0 }, s2.word))
+          Object.entries(TENDER_SPOTS).map(([k, s2]) => h("option", { value: k, selected: (S3.tenderSpot || TENDER_DEFAULT) === k ? true : void 0 }, s2.word))
         )
       ),
       h("div", { class: "fd-muted", style: { marginTop: "8px" } }, "\u{1F48A} A needle that also says time-release, slow-release, delayed or capsule doesn't hit at once: it goes off somewhere between " + FUSE_MINS[0] + " and " + FUSE_MINS[1] + " minutes later, at a moment nobody knows. Up to " + LATER_MAX + " can wait in you; your safeword clears them."),
-      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.tolerance ? true : void 0, onchange: (e) => {
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S3.tolerance ? true : void 0, onchange: (e) => {
         st().tolerance = e.target.checked;
         save();
         draw2();
       } }), h("b", null, "Tolerance")),
       h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
-      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S2.cravings ? true : void 0, onchange: (e) => {
+      h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S3.cravings ? true : void 0, onchange: (e) => {
         st().cravings = e.target.checked ? Date.now() : 0;
         save();
         draw2();
@@ -15734,7 +17508,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "div",
         { class: "fd-card" },
         k ? h("div", null, "\u{1F457} On you now: " + k.key + (k.left ? " (" + k.left + " pieces still to go on)" : "")) : null,
-        h("label", null, h("input", { type: "checkbox", disabled: locked, checked: S2.kitsOn ? true : void 0, onchange: (e) => {
+        h("label", null, h("input", { type: "checkbox", disabled: locked, checked: S3.kitsOn ? true : void 0, onchange: (e) => {
           st().kitsOn = e.target.checked;
           save();
           draw2();
@@ -15749,7 +17523,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               save();
               draw2();
             } },
-            [["both", "Clothes and restraints"], ["clothes", "Only clothes"], ["binds", "Only restraints"]].map(([v, t]) => h("option", { value: v, selected: (S2.kitWhat || "both") === v ? true : void 0 }, t))
+            [["both", "Clothes and restraints"], ["clothes", "Only clothes"], ["binds", "Only restraints"]].map(([v, t]) => h("option", { value: v, selected: (S3.kitWhat || "both") === v ? true : void 0 }, t))
           ),
           h(
             "select",
@@ -15758,7 +17532,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               save();
               draw2();
             } },
-            Object.keys(SPEED_NAMES).map((v) => h("option", { value: v, selected: (S2.kitSpeed || "steady") === v ? true : void 0 }, SPEED_NAMES[v]))
+            Object.keys(SPEED_NAMES).map((v) => h("option", { value: v, selected: (S3.kitSpeed || "steady") === v ? true : void 0 }, SPEED_NAMES[v]))
           )
         ),
         h("div", { class: "fd-muted", style: { marginTop: "4px" } }, `A dose that says "kit: <name>" puts its crafter's saved outfit on you (one saved in LSCG, or on their Dispensary), a piece at a time, held on half an hour a dose: anythin' taken off creeps back on. Never your body, nothin' you've blocked, never over somethin' locked. When it's over, your old outfit slips back on. Its pieces keep their crafts, so horny gear in it is horny.`),
@@ -15772,7 +17546,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "label",
         null,
-        h("input", { type: "checkbox", disabled: locked, checked: S2.hornyOn !== false ? true : void 0, onchange: (e) => {
+        h("input", { type: "checkbox", disabled: locked, checked: S3.hornyOn !== false ? true : void 0, onchange: (e) => {
           st().hornyOn = e.target.checked;
           save();
           draw2();
@@ -15791,7 +17565,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "label",
           { style: { marginTop: "6px" } },
-          h("input", { type: "checkbox", disabled: locked, checked: S2.nipsHeal !== false ? true : void 0, onchange: (e) => {
+          h("input", { type: "checkbox", disabled: locked, checked: S3.nipsHeal !== false ? true : void 0, onchange: (e) => {
             st().nipsHeal = e.target.checked;
             save();
             draw2();
@@ -15820,7 +17594,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { style: { margin: "4px 0 8px" } },
         h("div", null, h("b", null, x.label + ": "), x.nowWord + (x.now !== x.trained ? " tonight \xB7 trained " + x.trainedWord : "") + (x.toward ? " \xB7 " + x.toward + "% to the next size" : "")),
         x.toy ? h("div", { class: "fd-muted" }, "In it: the " + x.toy.name + ", holdin' you " + sizeWord(hk, x.toy.size) + ": " + FEEL[x.toy.feel] + (x.toy.trainer ? ", trainin' you" : "") + (x.toy.pump ? ", growin' with you" : "")) : null,
-        x.goal ? h("div", { class: "fd-muted" }, "\u{1F3AF} Goal: " + x.goal.word + (x.goal.due ? ", " + dueWords(x.goal.due) : "") + (x.goal.by && x.goal.by !== (W20.Player && W20.Player.MemberNumber) ? ", set by " + keyName(x.goal.by) : "")) : null,
+        x.goal ? h("div", { class: "fd-muted" }, "\u{1F3AF} Goal: " + x.goal.word + (x.goal.due ? ", " + dueWords(x.goal.due) : "") + (x.goal.by && x.goal.by !== (W23.Player && W23.Player.MemberNumber) ? ", set by " + keyName(x.goal.by) : "")) : null,
         h(
           "div",
           { class: "fd-row", style: { marginTop: "4px" } },
@@ -15856,6 +17630,56 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fd-muted", style: { marginTop: "4px" } }, N.sync ? "On the farm's books: the farm girl keeps them, and gets what happens off the farm next time you're in her room" + (N.waiting ? " (" + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin')." : ".") : "These are your Dispensary's own numbers. On the farm, the farm girl keeps the books.")
       ));
     }
+    kids.push(...head("Breedin'", "breeding"));
+    {
+      const K3 = carryInfo(), STAGE = { early: "just took", show: "showin'", heavy: "heavy and close", due: "due right now" }, rows = [];
+      if (K3.labour) rows.push(h("div", null, "\u{1F37C} In labour: about " + Math.max(1, Math.ceil(K3.labour.left / 6e4)) + " minutes to go" + (K3.labour.midwife ? ", " + K3.labour.midwife + " helpin'" : "") + "."));
+      if (K3.carrying) rows.push(h("div", null, "\u{1F930} Carryin' " + (K3.carrying.count === 1 ? "a " + (K3.one || "little one") : K3.carrying.count + " " + (K3.many || "little ones")) + (K3.carrying.sires.length ? ", " + K3.carrying.sires.join(" & ") + "'s" : "") + " \xB7 " + STAGE[K3.carrying.stage] + " \xB7 " + K3.carrying.dueWords));
+      if (K3.born) rows.push(h("div", null, "\u{1F37C} Delivered away from the farm: the farm girl books your litter next time you're in her room."));
+      if (K3.eggs) rows.push(h("div", null, "\u{1F95A} A clutch of " + K3.eggs.n + (K3.eggs.by ? ", " + K3.eggs.by + "'s" : "") + (K3.eggs.layAt > Date.now() ? ", ready " + (K3.eggs.layAt - Date.now() < 36 * 36e5 ? "in " + Math.max(1, Math.round((K3.eggs.layAt - Date.now()) / 36e5)) + " hours" : "in " + Math.round((K3.eggs.layAt - Date.now()) / 864e5) + " days") : ", ready to lay")));
+      if (K3.laid) rows.push(h("div", null, "\u{1F95A} Laid away from the farm: she books them next time you're in her room."));
+      if (K3.heat) rows.push(h("div", null, "\u{1F525} In heat."));
+      if (ripeNow()) rows.push(h("div", null, "\u{1F338} Ripe: a load takes twice as easy."));
+      if (K3.open) rows.push(h("div", null, "\u{1F49E} Wide open from the birth: a load takes four times as easy, for " + Math.max(1, Math.ceil((K3.open - Date.now()) / 6e4)) + " more minutes."));
+      kids.push(h(
+        "div",
+        { class: "fd-card" },
+        rows.length ? rows : h("div", { class: "fd-muted" }, K3.known ? "Not carryin' right now. Somebody should fix that." : "The farm girl tells your Dispensary what you're carryin', next time you're in her room."),
+        K3.litters ? h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Litters you've delivered: " + K3.litters + (K3.litters >= 20 ? " \xB7 \u{1F396}\uFE0F Baby Factory" : " \xB7 twenty and the farm makes you a Baby Factory")) : null,
+        h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Wherever you are, you feel what you're carryin': it takes hold, shows, grows heavy and kicks, your tits fill, and you crave seed. Your natural heat comes on where you are. Due away from the farm, your labour happens right there, and anybody in the room can be your midwife (a touch on your belly helps); a clutch comes out the same way. For an hour after a birth you're wide open. A Quickening Draught takes a day off; a Breeder's Scan shows the room what's in there.")
+      ));
+    }
+    kids.push(...head("Seed", "breeding"));
+    {
+      const I = seedInfo(), HW = { vulva: "Pussy", butt: "Ass", mouth: "Swallowed", nips: "Tits" }, farmHere = (W23.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+      const rows = Object.entries(I.held).filter(([, x]) => x.ml >= 1 || x.seal).map(([hk, x]) => h("div", null, h("b", null, HW[hk] + ": "), amountSay(x.ml) + (x.who ? ", mostly " + x.who + "'s" : "") + (x.seal ? " \xB7 \u{1F512} sealed with " + x.seal.name + "'s " + x.seal.g : "")));
+      kids.push(h(
+        "div",
+        { class: "fd-card" },
+        rows.length ? rows : h("div", { class: "fd-muted" }, "Nothin' in you right now."),
+        h("label", { style: { marginTop: "6px" } }, h("input", { type: "checkbox", disabled: locked, checked: S3.breedAny ? true : void 0, onchange: (e) => {
+          st().breedAny = e.target.checked;
+          save();
+          draw2();
+        } }), h("b", null, "Breed me anywhere")),
+        h("div", { class: "fd-muted" }, "Off the farm, a cock in you that cums (the game's own actions) leaves a real load: theirs, on your books and the farm girl's, where it can catch. A knotted one ties you on the map for its minutes. Only from somebody on your list; on her farm, her own scenes count it. Off to start."),
+        ripeNow() ? h("div", { style: { marginTop: "4px" } }, "\u{1F338} You're ripe: any load in you takes twice as easy, these two days.") : null,
+        tied() ? h("div", { style: { marginTop: "4px" } }, "\u{1F512} Knotted: tied fast for " + Math.max(1, Math.ceil((tied().until - Date.now()) / 6e4)) + " more minutes.") : null,
+        h("div", { style: { marginTop: "4px" } }, "\u{1F930} Your belly: " + I.pct + "% full \xB7 it holds " + amountSay(I.cap) + " before it spills" + (I.stage ? ", and it shows" : "")),
+        I.loads ? h("div", { class: "fd-muted" }, "Loads you've taken: " + I.loads + ", " + amountSay(I.ml) + " all told" + (I.top.length ? " \xB7 most from " + I.top.slice(0, 3).map((t) => t.name + " (" + t.n + ")").join(", ") : "")) : null,
+        h(
+          "div",
+          { class: "fd-row", style: { marginTop: "6px" } },
+          h("button", { disabled: locked || farmHere || !I.belly && !(I.held.nips.ml >= 1) ? true : void 0, onclick: () => {
+            const n = seedDrain();
+            note3 = n ? "You let it all run out: " + amountSay(n) + ". A seal still holds what's behind it." : "Nothin' to let out but what's sealed in.";
+            draw2();
+          } }, "Let it all out"),
+          h("span", { class: "fd-muted" }, locked ? "Hardcore: it drains on its own, or your keyholders take the seal out." : farmHere ? "On the farm, the farm girl's books say what's in you." : "Anythin' not sealed in drains away at once.")
+        ),
+        h("div", { class: "fd-muted", style: { marginTop: "4px" } }, `A crafted needle, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, filled with my seed) puts its crafter's own seed in you, as much as it says, where it says: "500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples", or "in every hole". A Breeder's Seal (gear that says so) keeps every drop in the hole it's in, opens only for its maker's seed, and while it's in only its maker's loads can catch. Off the farm it drains slowly and drips; your Dispensary hands every load to the farm girl, where it can catch with its crafter as sire` + (I.no === "breedable" ? ". She isn't bookin' yours right now: ?breedable on, in her room." : I.waiting ? " (" + I.waiting + " waitin' for her)." : "."))
+      ));
+    }
     kids.push(...head("Parasites", "parasites"));
     const inMe2 = mine();
     kids.push(h(
@@ -15867,7 +17691,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return h(
           "label",
           { style: { marginTop: "4px" } },
-          h("input", { type: "checkbox", disabled: locked, checked: S2.parasites && S2.parasites[k] ? true : void 0, onchange: (e) => {
+          h("input", { type: "checkbox", disabled: locked, checked: S3.parasites && S3.parasites[k] ? true : void 0, onchange: (e) => {
             const P = st().parasites || (st().parasites = {});
             if (e.target.checked) P[k] = true;
             else {
@@ -15883,7 +17707,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "label",
         { style: { marginTop: "8px" } },
-        h("input", { type: "checkbox", disabled: locked, checked: S2.mouthAuto ? true : void 0, onchange: (e) => {
+        h("input", { type: "checkbox", disabled: locked, checked: S3.mouthAuto ? true : void 0, onchange: (e) => {
           st().mouthAuto = e.target.checked;
           save();
           draw2();
@@ -15916,9 +17740,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         save();
       }
     }
-    box2 = W20.document.createElement("div");
+    box2 = W23.document.createElement("div");
     box2.id = "fd-page";
-    W20.document.body.appendChild(box2);
+    W23.document.body.appendChild(box2);
     draw2();
   }
   function close2() {
@@ -15932,14 +17756,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var pageOpen = () => !!box2;
   function redrawPage(force) {
-    const a = W20.document.activeElement;
+    const a = W23.document.activeElement;
     if (!force && box2 && a && box2.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return;
     draw2();
   }
   function initPage() {
-    if (typeof W20.PreferenceRegisterExtensionSetting !== "function") return false;
+    if (typeof W23.PreferenceRegisterExtensionSetting !== "function") return false;
     try {
-      W20.PreferenceRegisterExtensionSetting({
+      W23.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "The Farmhand's Dispensary",
         load: () => open(),
@@ -15961,8 +17785,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function openPage() {
     try {
-      if (typeof W20.PreferenceSubscreenExtensionsOpen === "function") {
-        W20.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W23.PreferenceSubscreenExtensionsOpen === "function") {
+        W23.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -15972,15 +17796,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // dispensary/src/index.js
-  var W21 = window;
+  var W24 = window;
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  if (W21.__farmDispensary) {
+  if (W24.__farmDispensary) {
     console.warn("[Dispensary] Two copies of the Farmhand's Dispensary are installed. Delete the older one in Tampermonkey, then reload.");
     throw new Error("The Farmhand's Dispensary: another copy is already running");
   }
   var mod = bcModSdk.registerMod({ name: "FarmhandDispensary", fullName: "The Farmhand's Dispensary", version: VERSION });
-  W21.__farmDispensary = VERSION;
-  registerInk(W21, mod);
+  W24.__farmDispensary = VERSION;
+  registerInk(W24, mod);
   initToys(mod, { nipsOpen: () => nipsOpen(), openOf: (mn) => openOf(mn) });
   initLscg();
   function status() {
@@ -15988,11 +17812,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     local((on2.length ? "In you now: " + on2.map((id) => BOOK[id].label + " (" + timeLeft(leftMs(id)) + ")").join(", ") + "." : "No doses in you.") + " Who can dose you: " + ladderWho() + ". /dispensary safeword lifts every dose; /dispensary page opens the settings.");
   }
   function commands() {
-    if (typeof W21.CommandCombine !== "function") return;
+    if (typeof W24.CommandCombine !== "function") return;
     try {
-      W21.CommandCombine([{
+      W24.CommandCombine([{
         Tag: "dispensary",
-        Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear",
+        Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
         Action: (args) => {
           const a = String(args || "").trim().toLowerCase();
           const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
@@ -16038,6 +17862,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const km = /^kits?(?:\s+(.*))?$/.exec(String(args || "").trim());
           if (km) {
             kitCommand(String(km[1] || "").trim());
+            return;
+          }
+          if (/^(seed|cum|loads?|held|holding)$/.test(a)) {
+            seedCommand();
             return;
           }
           const hm = /^horny\s+(on|off)$/.exec(a);
@@ -16096,7 +17924,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function kitCommand(rest) {
-    const a = rest.toLowerCase(), S2 = st();
+    const a = rest.toLowerCase(), S3 = st();
     const lockedOut = () => {
       if (hardOn()) {
         local("\u{1F512} Hardcore: your keyholders hold that switch.");
@@ -16107,22 +17935,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let m;
     if (/^(on|off)$/.test(a)) {
       if (lockedOut()) return;
-      S2.kitsOn = a === "on";
+      S3.kitsOn = a === "on";
       save();
-      local(a === "on" ? `Kits can dress you now: a dose that says "kit: <name>" puts its crafter's outfit on you, ` + SPEED_NAMES[S2.kitSpeed || "steady"] + "." : "Kits can't dress you now.");
+      local(a === "on" ? `Kits can dress you now: a dose that says "kit: <name>" puts its crafter's outfit on you, ` + SPEED_NAMES[S3.kitSpeed || "steady"] + "." : "Kits can't dress you now.");
       return;
     }
     if (m = /^speed\s+(slow|steady|fast|now)$/.exec(a)) {
-      S2.kitSpeed = m[1];
+      S3.kitSpeed = m[1];
       save();
       local("Kits go on you " + SPEED_NAMES[m[1]] + ".");
       return;
     }
     if (m = /^(?:what|put)\s+(clothes|binds|restraints|both)$/.exec(a)) {
       if (lockedOut()) return;
-      S2.kitWhat = m[1] === "restraints" ? "binds" : m[1];
+      S3.kitWhat = m[1] === "restraints" ? "binds" : m[1];
       save();
-      local("Kits can put " + { clothes: "clothes", binds: "restraints", both: "clothes and restraints" }[S2.kitWhat] + " on you.");
+      local("Kits can put " + { clothes: "clothes", binds: "restraints", both: "clothes and restraints" }[S3.kitWhat] + " on you.");
       return;
     }
     if (m = /^save\s+(.+)$/.exec(rest)) {
@@ -16140,7 +17968,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return;
     }
     const k = kitNow(), n = kitNames();
-    local((k ? "\u{1F457} On you: " + k.key + " from " + (nameOf(k.by) || "#" + k.by) + " (" + k.on + " pieces on" + (k.left ? ", " + k.left + " to go" : "") + "). " : "") + "Kits can dress you: " + (S2.kitsOn ? "yes" : "no") + " \xB7 they put on " + { clothes: "clothes", binds: "restraints", both: "clothes and restraints" }[S2.kitWhat || "both"] + " \xB7 " + SPEED_NAMES[S2.kitSpeed || "steady"] + ". Your kits: " + (n.own.length ? n.own.join(", ") : "none") + (n.lscg.length ? " \xB7 in LSCG: " + n.lscg.join(", ") : "") + ". /dispensary kit on|off \xB7 speed slow|steady|fast|now \xB7 what clothes|binds|both \xB7 save <name> \xB7 del <name>");
+    local((k ? "\u{1F457} On you: " + k.key + " from " + (nameOf(k.by) || "#" + k.by) + " (" + k.on + " pieces on" + (k.left ? ", " + k.left + " to go" : "") + "). " : "") + "Kits can dress you: " + (S3.kitsOn ? "yes" : "no") + " \xB7 they put on " + { clothes: "clothes", binds: "restraints", both: "clothes and restraints" }[S3.kitWhat || "both"] + " \xB7 " + SPEED_NAMES[S3.kitSpeed || "steady"] + ". Your kits: " + (n.own.length ? n.own.join(", ") : "none") + (n.lscg.length ? " \xB7 in LSCG: " + n.lscg.join(", ") : "") + ". /dispensary kit on|off \xB7 speed slow|steady|fast|now \xB7 what clothes|binds|both \xB7 save <name> \xB7 del <name>");
   }
   function holesCommand(sw, v) {
     if (sw) {
@@ -16168,12 +17996,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       local("/dispensary train <who> <ass|pussy|throat> <size> [in 3 days | by friday], or /dispensary train <who> clear. The size is one of the farm's words: snug, loose, gaping, ruined, or size 1 to 10.");
       return;
     }
-    const who2 = /^(me|myself|self)$/i.test(m[1]) ? W21.Player && W21.Player.MemberNumber : mouthTarget(m[1]);
+    const who2 = /^(me|myself|self)$/i.test(m[1]) ? W24.Player && W24.Player.MemberNumber : mouthTarget(m[1]);
     if (!who2) {
       local("Who? Their name or member number, in this room (or me).");
       return;
     }
-    const self = who2 === (W21.Player && W21.Player.MemberNumber);
+    const self = who2 === (W24.Player && W24.Player.MemberNumber);
     if (/^(clear|stop|off|lift)$/i.test(m[2])) {
       if (self && hardOn()) {
         local("\u{1F512} Hardcore: your keyholders lift your goals.");
@@ -16196,10 +18024,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     local(r.self ? "\u{1F3AF} Your goal: your " + HOLE_WORD[h2] + ", " + sizeWord(h2, r.to) + ". Your trainers will work you there." : "\u{1F3AF} Sent: a goal for their " + HOLE_WORD[h2] + ", " + sizeWord(h2, r.to) + ". Their Dispensary tells you if it took.");
   }
+  function seedCommand() {
+    const I = seedInfo(), rows = [];
+    for (const [h2, x] of Object.entries(I.held)) if (x.ml >= 1 || x.seal) rows.push("your " + { vulva: "pussy", butt: "ass", mouth: "belly, swallowed", nips: "tits" }[h2] + ": " + amountSay(x.ml) + (x.who ? ", mostly " + x.who + "'s" : "") + (x.seal ? " (sealed with " + x.seal.name + "'s " + x.seal.g + ")" : ""));
+    local((rows.length ? "\u{1F4A6} In you now: " + rows.join(" \xB7 ") + ". Your belly's " + I.pct + "% full (it holds " + amountSay(I.cap) + " before it spills)." : "\u{1F4A6} Nothin' in you right now.") + (I.loads ? " Loads you've taken: " + I.loads + ", " + amountSay(I.ml) + " all told" + (I.top.length ? "; most from " + I.top.slice(0, 3).map((t) => t.name + " (" + t.n + ")").join(", ") : "") + "." : "") + (I.waiting ? " " + I.waiting + " waitin' to hand the farm girl." : ""));
+  }
   function mouthTarget(w) {
     if (/^\d+$/.test(w)) return Number(w);
-    const low = String(w).toLowerCase(), C = (W21.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W21.Player && W21.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
-    return C ? C.MemberNumber : 0;
+    const low = String(w).toLowerCase(), C2 = (W24.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W24.Player && W24.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
+    return C2 ? C2.MemberNumber : 0;
+  }
+  var CARRY_DEPS = { giveHeat: (mins, line3) => give("heat", { by: 260239, mins, line: line3, upto: true }), idsOf: (mn) => iconsIds(mn) };
+  var SCAN_TOUCH = /^(Caress|Rub|MassageHands|Kiss|Pet|Grope|RubItem|Lick)$/;
+  var scanAt = 0;
+  function initCarryTouch(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMessage", 11, (args, next2) => {
+        try {
+          const data = args[0], P = W24.Player;
+          if (data && data.Type === "Activity" && P && typeof data.Sender === "number" && data.Sender !== P.MemberNumber) {
+            const D0 = Array.isArray(data.Dictionary) ? data.Dictionary : [], get = (k) => {
+              const e = D0.find((x) => x && x[k] != null);
+              return e ? e[k] : null;
+            };
+            const tgt = Number(get("TargetCharacter")) || 0, grp = String(get("FocusGroupName") || ""), name = String(get("ActivityName") || "");
+            if (tgt === P.MemberNumber) {
+              labourTouch(data.Sender, grp);
+              if (SCAN_TOUCH.test(name) && /^Item(Pelvis|Torso)$/.test(grp) && Date.now() - scanAt > 2 * 6e4 && allowed(data.Sender)) {
+                const C0 = (W24.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === data.Sender), it = C0 && (C0.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "ItemHandheld");
+                if (it && it.Craft && /scan/i.test(String(it.Craft.Name || "") + " " + String(it.Craft.Description || "")) && dosesIn(((it.Craft.Name || "") + " | " + (it.Craft.Description || "")).toLowerCase()).some((d) => d.id === "scan") && !st().off.scan) {
+                  scanAt = Date.now();
+                  scan(data.Sender);
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("[Dispensary] carry:", e);
+        }
+        return next2(args);
+      });
+    } catch (e) {
+    }
   }
   var started = false;
   function start2() {
@@ -16222,6 +18088,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => mine() });
     initKits(mod, { end: (id) => end(id, "quiet"), byOf: (id) => st().doses[id] && st().doses[id].by || 0 });
     initHoles(mod);
+    initSeed(mod);
+    initBreed(mod);
+    holesOnLoad((from, h2) => realLoad(from, h2));
+    seedOnCarry((m) => carryWelcome(m));
+    initCarryTouch(mod);
     onHardChange(() => {
       if (pageOpen()) redrawPage(true);
     });
@@ -16239,6 +18110,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         hornyParaTick();
         kitTick();
         holesTick();
+        seedTick();
+        breedTick();
+        carryTick(Date.now(), CARRY_DEPS);
         nipsTell(false);
         tickHard();
         screenTick();
@@ -16252,7 +18126,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => hello(true), 3e3);
   }
   var boot = setInterval(() => {
-    const P = W21.Player;
+    const P = W24.Player;
     if (!P || typeof P.MemberNumber !== "number" || !P.ExtensionSettings) return;
     clearInterval(boot);
     try {
@@ -16262,7 +18136,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }, 1e3);
   var plainWords = (t) => String(t || "").toLowerCase().replace(/_+/g, " ");
-  if (W21.__FARMHAND_TEST__) W21.__disp = {
+  if (W24.__FARMHAND_TEST__) W24.__disp = {
     st: () => st(),
     dosesIn: (t) => dosesIn(t),
     farmHas: (id, p) => farmHas(id, p),
@@ -16324,6 +18198,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
     trainCmd: (r) => trainCommand(r),
     holesCmd: (s, v) => holesCommand(s, v),
     toys: () => toysNow(),
+    seed: () => seedInfo(),
+    seedGive: (o) => seedGive(o),
+    seedTick: (now) => seedTick(now),
+    seedState: () => seedState(),
+    seedReset: () => seedReset(),
+    seedSend: () => sendNow2(),
+    seals: () => sealsNow(),
+    seedDrain: () => seedDrain(),
+    seedAmounts: (t) => seedAmounts(t),
+    seedPlan: (a, o) => seedPlan(a, o),
+    carryTick: (now) => carryTick(now, CARRY_DEPS),
+    carry: (now) => carryInfo(now),
+    carryReset: () => carryReset(),
+    carryFeelNow: () => carryFeelNow(),
+    carryWelcome: (m) => carryWelcome(m),
+    labourTouch: (f, g) => labourTouch(f, g),
+    bellyAll: (now) => bellyAll(now),
+    breedTick: (now) => breedTick(now),
+    realLoad: (f, h2) => realLoad(f, h2),
+    tied: () => tied(),
+    ripe: (now) => ripeNow(now),
+    hipsUp: () => hipsUp(),
+    breedReset: () => breedReset(),
+    breedClimax: () => breedClimax(),
+    breedLastIn: () => breedLastIn(),
+    breedWelcome: (m) => breedWelcome(m),
     horny: () => hornyGear(),
     hornyTick: (now) => {
       hornyTick(now);
@@ -16346,7 +18246,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     nipsTell: (f) => nipsTell(f),
     suckled: (from) => paraSuckled(from)
   };
-  W21.FarmhandDispensary = Object.freeze({
+  W24.FarmhandDispensary = Object.freeze({
     version: VERSION,
     active: (id) => active(String(id)),
     dosedOf: (mn) => iconsDosed(Number(mn)),
@@ -16367,11 +18267,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null,
     // open nipples (Nov 18, nipples.js): 0 shut, 1 to 3 open, yours or what somebody's Dispensary told the room. The
     // Companion's drawn breasts can read it.
-    nipples: (mn) => openOf(mn == null ? W21.Player && W21.Player.MemberNumber : Number(mn)),
+    nipples: (mn) => openOf(mn == null ? W24.Player && W24.Player.MemberNumber : Number(mn)),
     // (Nov 19) yours in full, for the Companion's Body rows: { open, trained, word, trainedWord, toward, loads, toy, locked }
     nipsInfo: () => nipsInfo(),
     // your holes (Nov 18, holes.js): { vulva|butt|throat: { label, now, trained, nowWord, trainedWord, toward, toy, goal } }.
     // The Companion's Body rows read it, so they're right off the farm too.
-    holes: () => holesNow().holes
+    holes: () => holesNow().holes,
+    // (Nov 19) seed in you (seed.js): { held: { vulva|butt|mouth|nips: { ml, who, seal } }, belly, cap, pct, stage, loads, top }
+    seed: () => seedInfo(),
+    // how round your belly is with it, 0 flat to 4 huge: the Companion's drawn belly reads it, off the farm too
+    seedBelly: () => bellyAll(),
+    // (Nov 19: seed, a litter, a clutch: carry.js)
+    // what you're carryin', by the farm's books (carry.js): { carrying: { count, sires, due, stage }, eggs, labour, heat, open, litters }
+    carry: () => carryInfo()
   });
 })();

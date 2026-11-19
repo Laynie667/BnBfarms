@@ -21,6 +21,11 @@ import { kitNow, kitNames, SPEED_NAMES } from "./kits.js";
 import { holesNow, holesSet, dueWords } from "./holes.js";
 import { sizeWord, HOLE_SIZES } from "../../shared/holes.js";
 import { GUIDES, GUIDE_BY } from "./guides.js";
+import { seedInfo, seedDrain } from "./seed.js";
+import { ripeNow, tied } from "./breed.js";
+import { carryInfo } from "./carry.js";
+import { amountSay } from "../../shared/seed.js";
+import { BOT } from "./config.js";
 
 const W = window, ID = "FarmhandDispensary";
 let box = null, note = "";
@@ -344,6 +349,38 @@ function view() {
       h("label", null, h("input", { type: "checkbox", disabled: locked, checked: N.pain ? true : undefined, onchange: (e) => { st().holesPain = e.target.checked; save(); draw(); } }), h("b", null, "Too-big toys can hurt")),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A toy in you stretches you to its size. One size bigger than you're trained is a good stretch, two aches, three or more hurts (or only aches, with that switch off); a cruel or sadist one always means it. A trainer (crafted to say stretcher, trainer, gaper or dilator, or cruel, or with a goal like \"goal: gaping\" or \"train her to loose in 3 days\") trains you up while it's in, faster the bigger it is: a size every 12 hours at one size bigger, 6 hours at three. A pump or beads crafted as a trainer grows with you. Fingers, fists, cocks and toys count too, and a load in a loose hole drips back out. Healin' on: left be a day, they close half a size a day. Anybody who can dose you can set a goal: /dispensary train <who> <ass|pussy|throat> <size> [in 3 days]. A Tightening Balm that names a hole closes it up."),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, N.sync ? "On the farm's books: the farm girl keeps them, and gets what happens off the farm next time you're in her room" + (N.waiting ? " (" + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin')." : ".") : "These are your Dispensary's own numbers. On the farm, the farm girl keeps the books.")));
+  }
+  // breedin' (Nov 19, carry.js): what you're carryin' by the farm's books, wherever you are
+  kids.push(...head("Breedin'", "breeding"));
+  { const K = carryInfo(), STAGE = { early: "just took", show: "showin'", heavy: "heavy and close", due: "due right now" }, rows = [];
+    if (K.labour) rows.push(h("div", null, "🍼 In labour: about " + Math.max(1, Math.ceil(K.labour.left / 60000)) + " minutes to go" + (K.labour.midwife ? ", " + K.labour.midwife + " helpin'" : "") + "."));
+    if (K.carrying) rows.push(h("div", null, "🤰 Carryin' " + (K.carrying.count === 1 ? "a " + (K.one || "little one") : K.carrying.count + " " + (K.many || "little ones")) + (K.carrying.sires.length ? ", " + K.carrying.sires.join(" & ") + "'s" : "") + " · " + STAGE[K.carrying.stage] + " · " + K.carrying.dueWords));
+    if (K.born) rows.push(h("div", null, "🍼 Delivered away from the farm: the farm girl books your litter next time you're in her room."));
+    if (K.eggs) rows.push(h("div", null, "🥚 A clutch of " + K.eggs.n + (K.eggs.by ? ", " + K.eggs.by + "'s" : "") + (K.eggs.layAt > Date.now() ? ", ready " + (K.eggs.layAt - Date.now() < 36 * 3600000 ? "in " + Math.max(1, Math.round((K.eggs.layAt - Date.now()) / 3600000)) + " hours" : "in " + Math.round((K.eggs.layAt - Date.now()) / 86400000) + " days") : ", ready to lay")));
+    if (K.laid) rows.push(h("div", null, "🥚 Laid away from the farm: she books them next time you're in her room."));
+    if (K.heat) rows.push(h("div", null, "🔥 In heat."));
+    if (ripeNow()) rows.push(h("div", null, "🌸 Ripe: a load takes twice as easy."));
+    if (K.open) rows.push(h("div", null, "💞 Wide open from the birth: a load takes four times as easy, for " + Math.max(1, Math.ceil((K.open - Date.now()) / 60000)) + " more minutes."));
+    kids.push(h("div", { class: "fd-card" }, rows.length ? rows : h("div", { class: "fd-muted" }, K.known ? "Not carryin' right now. Somebody should fix that." : "The farm girl tells your Dispensary what you're carryin', next time you're in her room."),
+      K.litters ? h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Litters you've delivered: " + K.litters + (K.litters >= 20 ? " · 🎖️ Baby Factory" : " · twenty and the farm makes you a Baby Factory")) : null,
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Wherever you are, you feel what you're carryin': it takes hold, shows, grows heavy and kicks, your tits fill, and you crave seed. Your natural heat comes on where you are. Due away from the farm, your labour happens right there, and anybody in the room can be your midwife (a touch on your belly helps); a clutch comes out the same way. For an hour after a birth you're wide open. A Quickening Draught takes a day off; a Breeder's Scan shows the room what's in there.")));
+  }
+  // seed in you (Nov 19, seed.js): what's in each hole and whose, the seals, how full, every load you've taken
+  kids.push(...head("Seed", "breeding"));
+  { const I = seedInfo(), HW = { vulva: "Pussy", butt: "Ass", mouth: "Swallowed", nips: "Tits" }, farmHere = (W.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === BOT);
+    const rows = Object.entries(I.held).filter(([, x]) => x.ml >= 1 || x.seal).map(([hk, x]) => h("div", null, h("b", null, HW[hk] + ": "), amountSay(x.ml) + (x.who ? ", mostly " + x.who + "'s" : "") + (x.seal ? " · 🔒 sealed with " + x.seal.name + "'s " + x.seal.g : "")));
+    kids.push(h("div", { class: "fd-card" },
+      rows.length ? rows : h("div", { class: "fd-muted" }, "Nothin' in you right now."),
+      h("label", { style: { marginTop: "6px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.breedAny ? true : undefined, onchange: (e) => { st().breedAny = e.target.checked; save(); draw(); } }), h("b", null, "Breed me anywhere")),
+      h("div", { class: "fd-muted" }, "Off the farm, a cock in you that cums (the game's own actions) leaves a real load: theirs, on your books and the farm girl's, where it can catch. A knotted one ties you on the map for its minutes. Only from somebody on your list; on her farm, her own scenes count it. Off to start."),
+      ripeNow() ? h("div", { style: { marginTop: "4px" } }, "🌸 You're ripe: any load in you takes twice as easy, these two days.") : null,
+      tied() ? h("div", { style: { marginTop: "4px" } }, "🔒 Knotted: tied fast for " + Math.max(1, Math.ceil((tied().until - Date.now()) / 60000)) + " more minutes.") : null,
+      h("div", { style: { marginTop: "4px" } }, "🤰 Your belly: " + I.pct + "% full · it holds " + amountSay(I.cap) + " before it spills" + (I.stage ? ", and it shows" : "")),
+      I.loads ? h("div", { class: "fd-muted" }, "Loads you've taken: " + I.loads + ", " + amountSay(I.ml) + " all told" + (I.top.length ? " · most from " + I.top.slice(0, 3).map((t) => t.name + " (" + t.n + ")").join(", ") : "")) : null,
+      h("div", { class: "fd-row", style: { marginTop: "6px" } },
+        h("button", { disabled: locked || farmHere || !I.belly && !(I.held.nips.ml >= 1) ? true : undefined, onclick: () => { const n = seedDrain(); note = n ? "You let it all run out: " + amountSay(n) + ". A seal still holds what's behind it." : "Nothin' to let out but what's sealed in."; draw(); } }, "Let it all out"),
+        h("span", { class: "fd-muted" }, locked ? "Hardcore: it drains on its own, or your keyholders take the seal out." : farmHere ? "On the farm, the farm girl's books say what's in you." : "Anythin' not sealed in drains away at once.")),
+      h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A crafted needle, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, filled with my seed) puts its crafter's own seed in you, as much as it says, where it says: \"500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples\", or \"in every hole\". A Breeder's Seal (gear that says so) keeps every drop in the hole it's in, opens only for its maker's seed, and while it's in only its maker's loads can catch. Off the farm it drains slowly and drips; your Dispensary hands every load to the farm girl, where it can catch with its crafter as sire" + (I.no === "breedable" ? ". She isn't bookin' yours right now: ?breedable on, in her room." : I.waiting ? " (" + I.waiting + " waitin' for her)." : "."))));
   }
   // crafted parasites (Nov 18, parasites.js): each kind yours to switch on
   kids.push(...head("Parasites", "parasites"));

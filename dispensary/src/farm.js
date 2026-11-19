@@ -28,6 +28,9 @@ import { local, action } from "./say.js";
 import { NOTES } from "./lines.js";
 import { hardOn, keyholders, dueAt } from "./hardcore.js";
 import { holesWelcome } from "./holes.js";
+import { seedWelcome } from "./seed.js";
+import { breedWelcome } from "./breed.js";
+import { carryWelcome, carryHello } from "./carry.js";
 
 const W = window;
 function send(type, data) {
@@ -38,12 +41,12 @@ let helloAt = 0, helloSig = "";
 // (Nov 17, more) on: what's in you now, so a dosed throat doesn't gag on the farm and a stud in rut loads bigger ·
 // crave: the dose you're cravin', if you've switched cravings on, so the farm girl can offer (?fix)
 const onNow = () => doseIds().filter(active).sort();
-const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0, onNow(), craving()]);
+const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0, onNow(), craving(), carryHello()]);
 export function hello(force) {
   const now = Date.now(), sig = sigNow();
   if (!force && sig === helloSig && now - helloAt < 30 * 60000) return false;
   if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off), hard: hardOn(),
-    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving(), holes: 1 })) return false;   // (holes: we count your hole trainin', Nov 18)
+    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving(), holes: 1, seed: 1, breed: 1, ...carryHello() })) return false;   // (born, laid: what you did away, for her books)   // (holes: we count your hole trainin', Nov 18 · seed: your loads and seals, Nov 19)
   helloAt = now; helloSig = sig;
   return true;
 }
@@ -82,6 +85,9 @@ function onFarmMsg(m) {
     S.farmAt = Date.now();
     save();
     try { holesWelcome(m); } catch (e) { /* fine */ }   // (Nov 18) her numbers for your holes
+    try { seedWelcome(m); } catch (e) { /* fine */ }    // (Nov 19) and for what's in them
+    try { breedWelcome(m); } catch (e) { /* fine */ }   // (Nov 19) your ripe days and your cock
+    try { carryWelcome(m); } catch (e) { /* fine */ }   // (Nov 19) what's in you, by her books
     return;
   }
   if (m.type === "dispClear") {

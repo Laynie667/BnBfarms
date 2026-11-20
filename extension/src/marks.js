@@ -249,10 +249,20 @@ const GEAR_KEY = "fhc-gear";
 const gearMem = () => { try { return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {}; } catch (e) { return {}; } };
 const gearMemSave = (m) => { try { window.localStorage.setItem(GEAR_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
 const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null));
+// WHAT A WILD TRAP LEFT (Nov 20, Laynie: "Id even let the gear remain til removed by someone else"): a piece the farm
+// keeps (keep) is put back if they pull it off themselves, like all the farm's gear; when somebody ELSE takes it off,
+// index.js tells the farm girl (gearFreed), and till her word comes back it's not put back on (freedHere).
+const freedHere = new Map();   // name → till when it's left off
+export function gearFreedHere(name) { freedHere.set(String(name), Date.now() + 120000); }
+// the farm piece in one of their spots, if there is one (its name)
+export function farmPieceIn(group) {
+  try { const b = (P() && P().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group); if (!b) return null;
+    const mem = gearMem(); return gearNameOf({ Group: group, Name: b.Asset.Name, Craft: b.Craft }, mem); } catch (e) { return null; }
+}
 // list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()))
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()) && !((freedHere.get(g.name) || 0) > Date.now()))
     .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();

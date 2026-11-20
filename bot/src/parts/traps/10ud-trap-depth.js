@@ -182,7 +182,7 @@
       if (cast && !cast.people) kinds = kinds.filter(k => k !== "watched").concat(kinds.includes("watched") && kinds.length === 1 ? ["tease"] : []);   // (nobody about: nobody watchin')
       if (!kinds.length) kinds = ["tease"];
       if (!Array.isArray(beats) || beats.length < 2) return beats;
-      const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";   // ?intensity tender | rough | filthy (10y7-udders.js)
+      const it = wildFilthy(mn) ? "filthy" : intensityOf(mn), gentle = it === "tender", hard = it === "filthy";   // ?intensity tender | rough | filthy (10y7-udders.js); a wild trap tells it filthy (10z8)
       const n = gentle ? 1 : hard ? 3 : 2;
       const out = beats.slice(), used = new Set();
       for (let i = 0; i < n; i++){

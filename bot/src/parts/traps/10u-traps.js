@@ -156,7 +156,7 @@
       state.trapRuns.delete(mn);
       { const re = rec(mn); if (re){ re.trapAt = Date.now(); saveLedger(); } }   // the breather starts when it lets go
       if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
-      try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
+      try { trapGearDone(mn, charFor(mn) ? (gearPlan || []) : null); } catch(e){ warn("trap gear:", e); }   // (still here, with no gear of its own: [], so a wild trap can leave its cuffs)
       try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }
       try { if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]); } catch(e){}   // ...and when it lets go   // the album card; toys go still or back how they were (10y6-keepers.js)
       try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }
@@ -165,6 +165,7 @@
       try { if (charFor(mn)) trapEnded(mn, kind, before); } catch(e){ warn("trap ended:", e); }   // how was it, the trap of the day, how they're left (10y9o, 10y9p)   // the mess its equipment leaves (10u7-traps-3.js)   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn);
       try { if (charFor(mn)) nipTrapAfter(mn, kind); } catch(e){ warn("nipple trap:", e); }   // what it did to their nipples, after it frees them: a knot holds on (10z7-nipple-traps.js)
+      wildDone(mn);   // (a wild trap's done hittin' harder: 10z8-wild-traps.js)
       saveLedger(); syncCompanions(true);
     };
     step();
@@ -178,7 +179,8 @@
     if (quietMin == null) uddersSafe(mn);   // up out of the farrowin' stall (10y7-udders.js)
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
     sceneStop(mn);              // a layin' or a birth scene (10y2-brood.js)
-    gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");
+    gearOff(mn, null, "hold"); if (quietMin == null){ gearOff(mn, null, "trap"); gearOff(mn, null, "wild"); }   // (a safeword takes off what a wild trap left too)
+    wildDone(mn);
     if (quietMin == null){ const r1 = rec(mn); if (r1){ r1.run = null; } if (state.lend && state.lend.mn === mn) state.lend = null; cursedOff(mn, "safe"); }   // a safeword ends a gauntlet run, a loan, a curse and the suit   // what it had on them comes off (all of it, on a safeword)
     { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
     trapFree(mn);
@@ -202,7 +204,7 @@
   const TRAP_HOLE = { vulva: "pussy", butt: "ass", mouth: "throat" };
   // pour somethin' into a hole: what fits stays, the rest runs out. Returns what stayed.
   function trapFill(mn, hole, amount, over){
-    amount *= holeX(mn, hole);   // a trained hole is given more (10y6-keepers.js)
+    amount *= holeX(mn, hole) * (wildOn(mn) ? CFG.WILD.FILL_X : 1);   // a trained hole is given more (10y6-keepers.js); a wild trap gives half again (10z8)
     // the body steers it (Oct 24): a roomy one is given more, a tight one less but stretched by it, and one already
     // past full is flooded out first, then filled again
     try {
@@ -456,10 +458,12 @@
     state.trapAt = state.trapAt || new Map();
     const r = rec(mn);
     const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));   // (water and troughs too: on the tile, not beside it, Oct 24)
-    const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
+    const wild = !on && !wet ? wildHere(mn) : null;   // one of the farm girl's own, that moves about (10z8-wild-traps.js)
+    const here = on ? on[0] : wet ? wet[0] : wild ? "wild:"+wild.id : null, was = state.trapAt.get(mn);
     if (!here){ state.trapAt.delete(mn); return; }
     const fresh = !was || was.spot !== here;
     if (fresh) state.trapAt.set(mn, { spot: here, at: now });
+    if (wild){ if (fresh) wildSpring(mn, wild, now); return; }   // (no breather for a wild one: it has its own minute's grace)
     if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;    // one trap at a time, with a breather between (not durin' a hunt)
     if (on){
       if (!fresh) return;                                                               // step off and back on to spring it again
@@ -493,6 +497,7 @@
     const L1 = [];
     const dg = dangerX(mn);
     L1.push("• Traps: on"+(r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "")+(dg.on ? ". A Danger Draught's in "+(you ? "them" : "you")+": every chancy trap's half again as likely, and the traps come round sooner" : "")+".");
+    L1.push(r.wildOff ? "• 🕳️ Wild traps: off for "+(you ? "them" : "you")+" (?traps wild on)." : "• 🕳️ Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is.");
     if (r.trapsOff) L1.push("• ⏸️ Paused: "+(you ? "they've" : "you've")+" paused the traps.");
     if ((r.trapQuiet || 0) > now) L1.push("• 🛑 A safeword not long ago: nothin' springs for "+mmss(r.trapQuiet - now)+" yet.");
     if (quietNow(mn)) L1.push("• 🤫 "+own("They've asked for quiet")+": nothin' springs till that's over.");
@@ -522,6 +527,7 @@
   }
   function trapTick(){
     const now = Date.now();
+    try { wildTick(now); } catch(e){ warn("wild traps:", e); }   // the farm girl's own, placed and moved (10z8-wild-traps.js)
     for (const C of (W.ChatRoomCharacter || [])){ try { trapCheck(C.MemberNumber, now); } catch(e){ warn("trap check:", e); } }
     toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
   }
@@ -687,6 +693,8 @@
         R(trapRatingsText()); return true;   // (10y9o-trap-ratings.js)
       }
       if (a0 === "today" || a0 === "day"){ R(trapDayLine() || "🎯 No trap of the day yet: the farm hasn't any traps out."); return true; }
+      if (a0 === "wild"){ wildCommand(sender, args, R); return true; }   // the farm girl's own traps, that move (10z8-wild-traps.js)
+      if (a0 === "where"){ R(isStaff(sender) ? wildWhereText() : "That's for staff, sugar. The traps are hidden, and the wild ones move."); return true; }
       if (a0 === "why"){   // what's holdin' the traps back (staff can ask about somebody else)
         const t = args[1] ? resolveTarget(args[1]) : sender;
         if (args[1] && !t){ R("Who, sugar? ?trap why, or (staff) ?trap why <who>."); return true; }
@@ -767,7 +775,7 @@
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
           "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+
           " · ?traps theme <kind> off rules out a whole kind (furry, monsters, messy…)"+((r.trapThemesOff || []).length ? " (off: "+r.trapThemesOff.join(", ")+")" : "")+
-          " · ?rate says how one was · ?trap why says what's holdin' them back · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
+          " · ?rate says how one was · ?trap why says what's holdin' them back · ?traps wild off keeps the farm's movin' ones away · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
       else R("🧪 Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n"+trapsList());
       return true;
     }

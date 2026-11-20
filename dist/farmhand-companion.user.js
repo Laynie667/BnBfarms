@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.71.1
+// @version      0.72.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.71.1";
+  var VERSION = "0.72.0";
 
   // shared/species.js
   var WORDS = {
@@ -18581,7 +18581,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           label: "\u26D3 On you right now",
           sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
           body: () => [
-            gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
+            gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, g.keep ? "till somebody else takes it off" : minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
             !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
           ]
         },
@@ -20705,9 +20705,23 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   };
   var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
+  var freedHere = /* @__PURE__ */ new Map();
+  function gearFreedHere(name) {
+    freedHere.set(String(name), Date.now() + 12e4);
+  }
+  function farmPieceIn(group) {
+    try {
+      const b = (P3() && P3().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group);
+      if (!b) return null;
+      const mem = gearMem();
+      return gearNameOf({ Group: group, Name: b.Asset.Name, Craft: b.Craft }, mem);
+    } catch (e) {
+      return null;
+    }
+  }
   function syncFarmGear(list, allow) {
     if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now())).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()) && !((freedHere.get(g.name) || 0) > Date.now())).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
@@ -22965,6 +22979,36 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       return next(args);
     });
+    try {
+      mod.hookFunction("ChatRoomSyncItem", 0, (args, next) => {
+        const d = args[0];
+        let was = null;
+        const same = (a, b) => !!a && !!b && String(a).slice(0, 30) === String(b).slice(0, 30);
+        try {
+          const me4 = window.Player && window.Player.MemberNumber, kept2 = (st.panel && st.panel.s && st.panel.s.farmGear || []).filter((g) => g && g.keep).map((g) => String(g.name));
+          if (kept2.length && d && d.Item && d.Item.Target === me4 && typeof d.Source === "number" && d.Source !== me4 && typeof d.Item.Group === "string") {
+            const n = farmPieceIn(d.Item.Group);
+            was = n && kept2.find((k) => same(k, n)) || null;
+          }
+        } catch (e) {
+          was = null;
+        }
+        const r = next(args);
+        if (was) {
+          try {
+            if (!same(farmPieceIn(d.Item.Group), was)) {
+              gearFreedHere(was);
+              toBot("gearFreed", { name: was, by: d.Source });
+            }
+          } catch (e) {
+            console.warn("[Farmhand Companion] gear freed:", e);
+          }
+        }
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] can't see who takes the farm's gear off:", e);
+    }
     try {
       mod.hookFunction("ServerSend", 3, (args, next) => {
         try {

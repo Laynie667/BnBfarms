@@ -62,6 +62,7 @@
     if (x && x.items) r.gear[slot].items = x.items.slice(0, 4); if (x && x.color) r.gear[slot].color = x.color;
     if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);   // how it's set: "Hogtied", "Wide"… (the Companion's GEAR_OPT has the usual)
     if (x && x.only) r.gear[slot].only = true;   // only the items it names, or nothin' (a costume piece the game might not have: Oct 27)
+    if (x && x.keep) r.gear[slot].keep = true;   // stays till somebody else takes it off: what a wild trap leaves (10z8-wild-traps.js)
     saveLedger(); syncCompanions(true);
     return true;
   }
@@ -83,6 +84,7 @@
   }
   function trapGearDone(mn, plan){
     gearOff(mn, null, "hold");
+    if (plan && wildOn(mn)){ wildGear(mn, plan); return; }   // a wild trap: what it leaves stays till somebody else takes it off (10z8-wild-traps.js)
     for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
   }
   function farmGearTick(now){
@@ -97,7 +99,7 @@
   // what their Companion should have on them right now
   function farmGearFor(mn){
     const r = rec(mn), now = Date.now(), out = [];
-    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}));
+    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}));
     if (mn === CFG.BOT_MEMBER) for (const g of seasonCostume()) out.push(g);   // the farm girl dressed for the season (10y9m-seasons.js)
     if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
     if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);

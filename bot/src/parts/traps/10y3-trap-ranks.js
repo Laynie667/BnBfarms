@@ -46,9 +46,11 @@
     r.chainN = (now - (r.chainAt || 0) < 10*60000) ? (r.chainN || 0) : 0;
     // (Oct 24, Laynie: "a new player kept getting traps back to back to back": a hand-on is a trap with no breather, so it's
     // only for somebody with eager on, the ones who asked for no breather)
-    if (!r.trapEager && !huntOn() && !onGauntlet(mn)) return;
+    // (a wild trap hands them on too, half the time: it's the one that doesn't wait, Nov 20, 10z8-wild-traps.js)
+    const wild = wildOn(mn);
+    if (!r.trapEager && !huntOn() && !onGauntlet(mn) && !wild) return;
     if (r.chainN >= CFG.CHAIN_MAX - 1 || kind === "tentacle" || kind === "well" || r.trapWait || (r.benched && r.benched.trap) || quietNow(mn)) return;
-    if (Math.random() >= Math.min(0.9, CFG.CHAIN_CHANCE * rankX(mn).chain * dangerX(mn).chance)) return;
+    if (Math.random() >= Math.min(0.9, (wild ? CFG.WILD.CHAIN : CFG.CHAIN_CHANCE) * rankX(mn).chain * dangerX(mn).chance)) return;
     const want = (CHAIN_NEXT[kind] || []).filter(x => !trapWhyNotFree(mn, x));
     const any = Object.keys(TRAP_KINDS).filter(x => x !== kind && x !== "tentacle" && x !== "well" && !trapWhyNotFree(mn, x));
     const next = want.length ? want[Math.floor(Math.random()*want.length)] : any[Math.floor(Math.random()*any.length)];

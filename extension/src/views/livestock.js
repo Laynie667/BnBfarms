@@ -258,7 +258,7 @@ function play(ctx) {
     traps,
     rows(ctx, "play", [
       { id: "gear", label: "⛓ On you right now", sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
-        body: () => [gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, minsLeft(g.until) + " min")), muted(gearLore(g.name) || g.desc || "")))
+        body: () => [gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, g.keep ? "till somebody else takes it off" : minsLeft(g.until) + " min")), muted(gearLore(g.name) || g.desc || "")))
           : muted("No farm gear on you."),
           !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (⚙ Settings › Gear and marks).")] },
       themes.length && tc && { id: "kinds", label: "🧬 Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx) },

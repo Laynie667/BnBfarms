@@ -18,7 +18,7 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
@@ -527,6 +527,27 @@ function start() {
     if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } return; }
     return next(args);
   });
+  // WHAT A WILD TRAP LEFT ON YOU (Nov 20, Laynie: "Id even let the gear remain til removed by someone else"): it's put back
+  // if you pull it off yourself; when somebody ELSE takes it off you, the farm girl's told, and it stays off (marks.js)
+  try {
+    mod.hookFunction("ChatRoomSyncItem", 0, (args, next) => {
+      const d = args[0]; let was = null;
+      const same = (a, b) => !!a && !!b && String(a).slice(0, 30) === String(b).slice(0, 30);   // (the game keeps 30 letters of a piece's name)
+      try {
+        const me = window.Player && window.Player.MemberNumber, kept = ((st.panel && st.panel.s && st.panel.s.farmGear) || []).filter((g) => g && g.keep).map((g) => String(g.name));
+        if (kept.length && d && d.Item && d.Item.Target === me && typeof d.Source === "number" && d.Source !== me && typeof d.Item.Group === "string") {
+          const n = farmPieceIn(d.Item.Group); was = (n && kept.find((k) => same(k, n))) || null;
+        }
+      } catch (e) { was = null; }
+      const r = next(args);
+      if (was) {
+        try {
+          if (!same(farmPieceIn(d.Item.Group), was)) { gearFreedHere(was); toBot("gearFreed", { name: was, by: d.Source }); }
+        } catch (e) { console.warn("[Farmhand Companion] gear freed:", e); }
+      }
+      return r;
+    });
+  } catch (e) { console.warn("[Farmhand Companion] can't see who takes the farm's gear off:", e); }
 
   // GONE UNDER (the haze, the lantern, the mirror box): from depth 2 your words come out simpler on screen: long words
   // shorten or trail off, the deeper the more. And once the farm has put a word in your mouth (corruption 80), it

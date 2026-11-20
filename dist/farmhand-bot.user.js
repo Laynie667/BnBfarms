@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.89.0
+// @version      0.90.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.89.0";
-  var COMPANION_VERSION = "0.71.1";
+  var VERSION = "0.90.0";
+  var COMPANION_VERSION = "0.72.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6095,6 +6095,14 @@
       }
       if (m.type === "say") {
         companionSaid(mn, m);
+        return;
+      }
+      if (m.type === "gearFreed") {
+        try {
+          wildGearFreed(mn, m);
+        } catch (e) {
+          warn("gear freed:", e);
+        }
         return;
       }
       if (m.type === "nurseryStats") {
@@ -14760,7 +14768,7 @@
           }
         }
         try {
-          trapGearDone(mn, charFor(mn) ? gearPlan : null);
+          trapGearDone(mn, charFor(mn) ? gearPlan || [] : null);
         } catch (e) {
           warn("trap gear:", e);
         }
@@ -14800,6 +14808,7 @@
         } catch (e) {
           warn("nipple trap:", e);
         }
+        wildDone(mn);
         saveLedger();
         syncCompanions(true);
       };
@@ -14818,7 +14827,11 @@
       trapWaitEnd(mn, "quiet");
       sceneStop(mn);
       gearOff(mn, null, "hold");
-      if (quietMin == null) gearOff(mn, null, "trap");
+      if (quietMin == null) {
+        gearOff(mn, null, "trap");
+        gearOff(mn, null, "wild");
+      }
+      wildDone(mn);
       if (quietMin == null) {
         const r1 = rec(mn);
         if (r1) {
@@ -14853,7 +14866,7 @@
     }
     const TRAP_HOLE = { vulva: "pussy", butt: "ass", mouth: "throat" };
     function trapFill(mn, hole, amount, over) {
-      amount *= holeX(mn, hole);
+      amount *= holeX(mn, hole) * (wildOn(mn) ? CFG.WILD.FILL_X : 1);
       try {
         const p0 = prodOf(mn), cap = capacity(mn), base = CFG.PROD.BASE_CAPACITY || cap;
         amount *= Math.max(0.75, Math.min(1.5, cap / base));
@@ -15177,13 +15190,18 @@
       state.trapAt = state.trapAt || /* @__PURE__ */ new Map();
       const r = rec(mn);
       const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));
-      const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
+      const wild = !on && !wet ? wildHere(mn) : null;
+      const here = on ? on[0] : wet ? wet[0] : wild ? "wild:" + wild.id : null, was = state.trapAt.get(mn);
       if (!here) {
         state.trapAt.delete(mn);
         return;
       }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
+      if (wild) {
+        if (fresh) wildSpring(mn, wild, now);
+        return;
+      }
       if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;
       if (on) {
         if (!fresh) return;
@@ -15227,6 +15245,7 @@
       const L1 = [];
       const dg = dangerX(mn);
       L1.push("\u2022 Traps: on" + (r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "") + (dg.on ? ". A Danger Draught's in " + (you ? "them" : "you") + ": every chancy trap's half again as likely, and the traps come round sooner" : "") + ".");
+      L1.push(r.wildOff ? "\u2022 \u{1F573}\uFE0F Wild traps: off for " + (you ? "them" : "you") + " (?traps wild on)." : "\u2022 \u{1F573}\uFE0F Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is.");
       if (r.trapsOff) L1.push("\u2022 \u23F8\uFE0F Paused: " + (you ? "they've" : "you've") + " paused the traps.");
       if ((r.trapQuiet || 0) > now) L1.push("\u2022 \u{1F6D1} A safeword not long ago: nothin' springs for " + mmss(r.trapQuiet - now) + " yet.");
       if (quietNow(mn)) L1.push("\u2022 \u{1F92B} " + own("They've asked for quiet") + ": nothin' springs till that's over.");
@@ -15270,6 +15289,11 @@
     }
     function trapTick() {
       const now = Date.now();
+      try {
+        wildTick(now);
+      } catch (e) {
+        warn("wild traps:", e);
+      }
       for (const C2 of W.ChatRoomCharacter || []) {
         try {
           trapCheck(C2.MemberNumber, now);
@@ -15496,6 +15520,14 @@
           R(trapDayLine() || "\u{1F3AF} No trap of the day yet: the farm hasn't any traps out.");
           return true;
         }
+        if (a0 === "wild") {
+          wildCommand(sender, args, R);
+          return true;
+        }
+        if (a0 === "where") {
+          R(isStaff(sender) ? wildWhereText() : "That's for staff, sugar. The traps are hidden, and the wild ones move.");
+          return true;
+        }
         if (a0 === "why") {
           const t = args[1] ? resolveTarget(args[1]) : sender;
           if (args[1] && !t) {
@@ -15657,7 +15689,7 @@
         if (isStaff(sender))
           R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L2.trapLoads && L2.trapLoads[n] ? " [" + L2.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?trap why <who> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate) \xB7 ?traps ratings" + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else if (isSubject(sender))
-          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 ?trap why says what's holdin' them back \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
+          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 ?trap why says what's holdin' them back \xB7 ?traps wild off keeps the farm's movin' ones away \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else R("\u{1F9EA} Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n" + trapsList());
         return true;
       }
@@ -20595,7 +20627,7 @@
         if (cast && !cast.people) kinds = kinds.filter((k) => k !== "watched").concat(kinds.includes("watched") && kinds.length === 1 ? ["tease"] : []);
         if (!kinds.length) kinds = ["tease"];
         if (!Array.isArray(beats) || beats.length < 2) return beats;
-        const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";
+        const it = wildFilthy(mn) ? "filthy" : intensityOf(mn), gentle = it === "tender", hard = it === "filthy";
         const n = gentle ? 1 : hard ? 3 : 2;
         const out = beats.slice(), used = /* @__PURE__ */ new Set();
         for (let i = 0; i < n; i++) {
@@ -31312,7 +31344,7 @@
       if (kind === "brand" && r.branded) d.brand = r.branded;
       if (ANTHRO[kind] && ANTHRO[kind].sire <= -10) bump1(subjWeek().fur, mn, ANTHRO[kind].loads);
       const words = TRAP_WRITES[kind];
-      if (words && Math.random() < CFG.TRAP_WRITE_CHANCE) {
+      if (words && Math.random() < (wildOn(mn) ? 1 : CFG.TRAP_WRITE_CHANCE)) {
         const w = words[Math.floor(Math.random() * words.length)];
         later(() => {
           if (trapWords(mn, w, "marker", ["hips", "waist", "chest", "ribs"][Math.floor(Math.random() * 4)])) {
@@ -32052,6 +32084,7 @@
       if (x && x.color) r.gear[slot].color = x.color;
       if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);
       if (x && x.only) r.gear[slot].only = true;
+      if (x && x.keep) r.gear[slot].keep = true;
       saveLedger();
       syncCompanions(true);
       return true;
@@ -32080,6 +32113,10 @@
     }
     function trapGearDone(mn, plan) {
       gearOff(mn, null, "hold");
+      if (plan && wildOn(mn)) {
+        wildGear(mn, plan);
+        return;
+      }
       for (const x of plan || []) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
     }
     function farmGearTick(now) {
@@ -32102,7 +32139,7 @@
     }
     function farmGearFor(mn) {
       const r = rec(mn), now = Date.now(), out = [];
-      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}));
+      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}));
       if (mn === CFG.BOT_MEMBER) for (const g of seasonCostume()) out.push(g);
       if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
       if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
@@ -33171,9 +33208,10 @@
         else if (bet.what === "wait") state.betsWait = (state.betsWait || /* @__PURE__ */ new Map()).set(mn, bet);
       }
       r.chainN = now - (r.chainAt || 0) < 10 * 6e4 ? r.chainN || 0 : 0;
-      if (!r.trapEager && !huntOn() && !onGauntlet(mn)) return;
+      const wild = wildOn(mn);
+      if (!r.trapEager && !huntOn() && !onGauntlet(mn) && !wild) return;
       if (r.chainN >= CFG.CHAIN_MAX - 1 || kind === "tentacle" || kind === "well" || r.trapWait || r.benched && r.benched.trap || quietNow(mn)) return;
-      if (Math.random() >= Math.min(0.9, CFG.CHAIN_CHANCE * rankX(mn).chain * dangerX(mn).chance)) return;
+      if (Math.random() >= Math.min(0.9, (wild ? CFG.WILD.CHAIN : CFG.CHAIN_CHANCE) * rankX(mn).chain * dangerX(mn).chance)) return;
       const want = (CHAIN_NEXT[kind] || []).filter((x) => !trapWhyNotFree(mn, x));
       const any = Object.keys(TRAP_KINDS).filter((x) => x !== kind && x !== "tentacle" && x !== "well" && !trapWhyNotFree(mn, x));
       const next = want.length ? want[Math.floor(Math.random() * want.length)] : any[Math.floor(Math.random() * any.length)];
@@ -35475,7 +35513,7 @@
       return r && (r.intensity === "tender" || r.intensity === "filthy") ? r.intensity : "rough";
     }
     function intensityTail(mn, i, n, kind) {
-      const k = intensityOf(mn);
+      const k = wildFilthy(mn) ? "filthy" : intensityOf(mn);
       if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
       return " " + (intensityTrapLine(mn, kind) || tFill(pickFor(mn, "udd:int:" + k, UDDER_LINES["int_" + k]), mn));
     }
@@ -47566,9 +47604,10 @@
       const n = potionX(mn, "danger");
       return { chance: n ? CFG.DANGER_CHANCE_X : 1, time: n >= 2 ? 3 : n === 1 ? 2 : 1, on: n > 0 };
     }
-    const tmin = (mn, mins) => mins * dangerX(mn).time;
+    const tmin = (mn, mins) => mins * dangerX(mn).time * (wildOn(mn) ? CFG.WILD.HOLD_X : 1);
     function pickSeverity(mn, fixed) {
       if (fixed) return fixed;
+      if (wildOn(mn)) return intensityOf(mn) === "tender" ? 2 : 3;
       const w = ruined(mn) ? [0.1, 0.3, 0.6] : dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();
       return intensitySev(mn, roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3);
     }
@@ -48689,7 +48728,7 @@
     function stateBeats(mn, kind, beats, cast, fams0) {
       try {
         if (!Array.isArray(beats) || beats.length < 3) return beats;
-        const n = CFG.STATE_BEATS[intensityOf(mn)];
+        const n = CFG.STATE_BEATS[wildFilthy(mn) ? "filthy" : intensityOf(mn)];
         if (!n) return beats;
         const s = stateOf(mn), fams = (fams0 && fams0.length ? fams0 : DEPTH_KIND[kind]) || ["tease"], out = beats.slice(), used = /* @__PURE__ */ new Set(), where = whereOf(mn);
         const fit = (pool) => fitFor(mn, pool).filter((t) => castFits(t, cast));
@@ -63114,6 +63153,204 @@
       __titCups: (mn) => titCups(mn),
       __titTick: (mn) => titTick(mn, prodOf(mn), Date.now())
     });
+    if (!CFG.WILD) CFG.WILD = {
+      BASE: 3,
+      MAX: 8,
+      PER: 2,
+      MOVE_MIN: [10, 15],
+      HUNT_MOVE_MIN: [2, 3],
+      GRACE_S: 60,
+      HOLD_X: 2,
+      FILL_X: 1.5,
+      CHAIN: 0.5,
+      KEEP_DAYS: 30,
+      ZONES: { barn: { w: 4, theme: "stalls", label: "the barn" }, pasture: { w: 4, theme: "pasture", label: "the pasture" }, receiving: { w: 2, theme: "office", label: "receiving" } }
+    };
+    function wildOn(mn) {
+      return !!(state.wildRun && (state.wildRun.get(mn) || 0) > Date.now());
+    }
+    function wildFilthy(mn) {
+      return wildOn(mn) && intensityOf(mn) !== "tender";
+    }
+    function wildZones() {
+      zonesLedger();
+      return Object.entries(L2.zones || {}).filter(([, z]) => z && z.a && z.b && CFG.WILD.ZONES[z.group]).map(([n, z]) => ({ n, z, g: z.group }));
+    }
+    function wildCount() {
+      if (huntOn()) return CFG.WILD.MAX;
+      const on = (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== BOTMN() && isSubject(c.MemberNumber) && !(rec(c.MemberNumber) || {}).wildOff).length;
+      return Math.max(CFG.WILD.BASE, Math.min(CFG.WILD.MAX, CFG.WILD.BASE + Math.floor(on / CFG.WILD.PER)));
+    }
+    function wildTileOk(X, Y, self) {
+      try {
+        if (typeof W.ChatRoomMapViewPositionIsBlocked === "function" && W.ChatRoomMapViewPositionIsBlocked(X, Y)) return false;
+      } catch (e) {
+      }
+      for (const s of Object.values(L2.spots || {})) if (s && Math.max(Math.abs(s.X - X), Math.abs(s.Y - Y)) <= 1) return false;
+      for (const z of Object.values(L2.zones || {})) if (z && z.a && z.b && /safe/i.test(String(z.group || "")) && inZone(z, { X, Y })) return false;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const p = C2 && C2.MapData && C2.MapData.Pos;
+        if (p && p.X === X && p.Y === Y) return false;
+      }
+      for (const w of L2.wild || []) if (w !== self && w.X != null && Math.max(Math.abs(w.X - X), Math.abs(w.Y - Y)) <= 1) return false;
+      return true;
+    }
+    const wildMoveMs = () => {
+      const [a, b] = huntOn() ? CFG.WILD.HUNT_MOVE_MIN : CFG.WILD.MOVE_MIN;
+      return (a + Math.random() * (b - a)) * 6e4;
+    };
+    function wildPlace(w, now) {
+      const zs = wildZones();
+      if (!zs.length) return false;
+      const groups = Array.from(new Set(zs.map((z) => z.g)));
+      const area = (z) => (Math.abs(z.a.X - z.b.X) + 1) * (Math.abs(z.a.Y - z.b.Y) + 1);
+      for (let t = 0; t < 6; t++) {
+        let x = Math.random() * groups.reduce((s, g2) => s + CFG.WILD.ZONES[g2].w, 0), g = groups[0];
+        for (const gg of groups) {
+          x -= CFG.WILD.ZONES[gg].w;
+          if (x <= 0) {
+            g = gg;
+            break;
+          }
+        }
+        const inG = zs.filter((z) => z.g === g);
+        for (let u = 0; u < 25; u++) {
+          let y = Math.random() * inG.reduce((s, z2) => s + area(z2.z), 0), z = inG[0];
+          for (const zz of inG) {
+            y -= area(zz.z);
+            if (y <= 0) {
+              z = zz;
+              break;
+            }
+          }
+          const x0 = Math.min(z.z.a.X, z.z.b.X), x1 = Math.max(z.z.a.X, z.z.b.X), y0 = Math.min(z.z.a.Y, z.z.b.Y), y1 = Math.max(z.z.a.Y, z.z.b.Y);
+          const X = x0 + Math.floor(Math.random() * (x1 - x0 + 1)), Y = y0 + Math.floor(Math.random() * (y1 - y0 + 1));
+          if (wildTileOk(X, Y, w)) {
+            w.X = X;
+            w.Y = Y;
+            w.g = g;
+            w.zone = z.n;
+            w.at = now;
+            w.moveAt = now + wildMoveMs();
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    function wildTick(now) {
+      L2.wild = Array.isArray(L2.wild) ? L2.wild : [];
+      if (!wildZones().length) {
+        if (L2.wild.length) {
+          L2.wild = [];
+          saveLedger();
+        }
+        return;
+      }
+      let changed = false;
+      const want = wildCount();
+      while (L2.wild.length > want) {
+        L2.wild.pop();
+        changed = true;
+      }
+      while (L2.wild.length < want) {
+        const w = { id: Math.random().toString(36).slice(2, 7) };
+        if (!wildPlace(w, now)) break;
+        L2.wild.push(w);
+        changed = true;
+      }
+      const huntMax = CFG.WILD.HUNT_MOVE_MIN[1] * 6e4;
+      for (const w of L2.wild) if (now >= (w.moveAt || 0) || huntOn() && (w.moveAt || 0) - now > huntMax) {
+        if (wildPlace(w, now)) changed = true;
+      }
+      if (changed) saveLedger();
+    }
+    function wildHere(mn) {
+      const p = posOf(mn);
+      if (!p || !Array.isArray(L2.wild)) return null;
+      return L2.wild.find((w) => w.X === p.X && w.Y === p.Y) || null;
+    }
+    const WILD_OPEN = [
+      "The ground that was solid a minute ago isn't. %n goes down into it before they can so much as yelp.",
+      "Somethin' that wasn't there when %n walked this way this mornin' snaps shut round their ankle, and pulls.",
+      "%n never sees it. One step they're walkin', the next they're caught, and there's nobody near to say sorry.",
+      "A board that was only a board gives under %n like a trapdoor, and somethin' underneath has been waitin' all day.",
+      "The straw shifts under %n's feet like it's breathin', and then it isn't straw, and it has them.",
+      "There was nothin' on that tile. There's somethin' on it now, and it's got %n by the ankles before they've finished the step.",
+      "%n puts their foot down, and the farm takes it, and the rest of them with it. Nobody set this one. It set itself."
+    ];
+    function wildSpring(mn, w, now) {
+      const r = rec(mn);
+      if (!r || r.wildOff) return false;
+      if (now - (r.trapAt || 0) < CFG.WILD.GRACE_S * 1e3 || heldByTrap(mn) || state.trapRuns && state.trapRuns.has(mn)) return false;
+      const Z = CFG.WILD.ZONES[w.g], spot = Z ? "trap-theme-" + Z.theme : "";
+      const can = spot && themePool(mn, spot).length || Object.keys(TRAP_KINDS).some((k) => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
+      if (!can) return false;
+      state.wildRun = state.wildRun || /* @__PURE__ */ new Map();
+      state.wildRun.set(mn, now + 30 * 6e4);
+      emote("\u{1F573}\uFE0F " + tFill(pickFor(mn, "wild:open", WILD_OPEN), mn), mn);
+      const why = springTrap(mn, "random", spot);
+      if (why) {
+        state.wildRun.delete(mn);
+        return false;
+      }
+      r.trapAt = now;
+      r.wildN = (r.wildN || 0) + 1;
+      audit(BOTMN(), "WILDTRAP", mn + " in " + (w.zone || w.g || "?"));
+      wildPlace(w, now);
+      saveLedger();
+      return true;
+    }
+    function wildDone(mn) {
+      if (state.wildRun) state.wildRun.delete(mn);
+    }
+    const WILD_CUFFS = {
+      when: "after",
+      slot: "arms",
+      label: "Wild Trap Cuffs",
+      items: ["LeatherCuffs", "SteelCuffs"],
+      opt: "Wrist",
+      desc: "Cuffs a wild trap snapped on and locked behind their back. They don't come off for the one wearin' them: somebody else has to."
+    };
+    function wildGear(mn, plan) {
+      const after = (plan || []).filter((x) => x.when === "after" && x.slot);
+      const keep = CFG.WILD.KEEP_DAYS * 1440;
+      for (const x of after.length ? after : [WILD_CUFFS]) gearOn(mn, x.slot, x.label, (x.desc || "") + " It stays till somebody else takes it off.", keep, "wild", Object.assign({}, x, { keep: true }));
+    }
+    function wildGearFreed(mn, m) {
+      const r = rec(mn);
+      if (!r || !r.gear) return;
+      const by = Number(m.by), name = String(m.name || "").slice(0, 30);
+      if (!Number.isFinite(by) || by === mn || !name) return;
+      const slot = Object.keys(r.gear).find((s) => r.gear[s].keep && String(r.gear[s].label).slice(0, 30) === name);
+      if (!slot) return;
+      const label = r.gear[slot].label;
+      delete r.gear[slot];
+      saveLedger();
+      syncCompanions(true);
+      audit(by, "WILDGEAR", mn + " " + label);
+      emote("\u{1F513} " + plainName(by) + " takes the " + String(label).toLowerCase() + " off " + plainName(mn) + ". It took somebody else to do it.", mn);
+    }
+    function wildCommand(sender, args, R) {
+      const r = rec(sender), v = String(args[1] || "").toLowerCase();
+      if (v === "on" || v === "off") {
+        if (!r) {
+          R("You'll need to be on the farm's books first, sugar.");
+          return;
+        }
+        r.wildOff = v === "off";
+        saveLedger();
+        R(r.wildOff ? "\u{1F573}\uFE0F Wild traps: off for you. The ones the farm set itself leave you be; the set tiles still have you." : "\u{1F573}\uFE0F Wild traps: ON. The farm hides its own traps in the barn, the pasture and receiving, and moves them. No warnin', and they hit hard: what they leave on you stays till somebody else takes it off. Your safeword still stops one cold and takes it all off.");
+        return;
+      }
+      R("\u{1F573}\uFE0F Wild traps are " + (r && r.wildOff ? "OFF" : "ON") + " for you, sugar: the farm hides " + wildCount() + " traps of its own in the barn, the pasture and receiving and moves them about. No warnin', no breather, and they hit harder; what they leave on you stays till somebody else takes it off. ?traps wild off|on");
+    }
+    function wildWhereText() {
+      const ws = Array.isArray(L2.wild) ? L2.wild : [], now = Date.now();
+      if (!ws.length) return "\u{1F573}\uFE0F No wild traps out: " + (wildZones().length ? "they'll be out at the next heartbeat." : "there are no barn, pasture or receiving zones on the map for them.");
+      return "\u{1F573}\uFE0F WILD TRAPS (staff only: nobody else is told)\n" + ws.map((w) => "\u2022 " + (w.zone || w.g) + " at " + w.X + "," + w.Y + ", movin' in " + Math.max(0, Math.round(((w.moveAt || now) - now) / 6e4)) + " min").join("\n");
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __wildTick: (t) => wildTick(t || Date.now()), __wild: () => L2.wild, __wildOn: (m) => wildOn(m) });
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);

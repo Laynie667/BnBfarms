@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.89.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.90.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.71.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.72.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.90.0 + Companion 0.72.0: wild traps: the farm's own hidden traps in the barn, pasture and receiving, movin' about, no warnin', hittin' harder, and what they leave stays till somebody else takes it off**
+- **Bot 0.90.0 / Companion 0.72.0: wild traps, the farm's own, hidden and movin' about** Laynie, Nov 20: "What if trap spots place and move themselves at random? more when a hunt is active?", then "id like for the spots I have set to stay as is, but 3-8 roaming spots would be great. the barn and pasture mostly, and receiving." and "they hit harder, more ruthlessly, and by suprise with much much heavier consequences. Id even let the gear remain til removed by someone else."
+  - **The set tiles stay just as they are.** On top of them the farm girl hides traps of her own: three, one more for every two people in the room with traps on, eight at most, and all eight in a hunt. They sit on open tiles in the barn, the pasture and receiving (the barn and pasture most), never on a wall, a set trap or the tile beside one, the safe barn, or under somebody's feet. Each creeps to a new tile every 10 to 15 minutes, every 2 to 3 in a hunt, and one that's just had somebody moves on at once.
+  - **No warnin'.** Step on one and it has them then and there, breather or no: a minute after the last trap let go is all the grace it gives. It springs the place's own traps: the stalls' in the barn, the pasture's in the pasture, the office's in receiving. "Nobody set this one. It set itself."
+  - **It hits harder:** the brutal strength every time, held twice as long, filled half again as full, the filthiest tellin', always written on (for those the farm can mark), and half the time it hands them straight on to another trap.
+  - **What it leaves on them stays till somebody else takes it off.** Every piece the trap would leave, and if it'd leave nothin', cuffs locked behind their back. Pull it off themselves and their Companion puts it right back; when somebody else takes it off, the room hears who freed them. Their Livestock panel says "till somebody else takes it off".
+  - **What still holds:** it's for those with traps on, and the gear only goes on those who've switched "Farm can put real gear on me" on, as all trap gear does. Their safeword stops it cold and takes every bit of it off. ?intensity tender keeps theirs gentle and strong rather than brutal. `?traps wild off` keeps the wild ones away (the set tiles still have them), `?traps wild on` brings them back. Staff can ask `?trap where` for where they are right now; nobody else is ever told.
 
 - **Bot 0.89.0: every trap's story told in order, with nobody appearin' out of nowhere** Laynie, Nov 20: "Need a beats pass too, to make sure each beat makes sense like a story. some beats seem unconnected.. Additional slutty stuff always welcome." Read through: a sample story of every one of the 180 traps, on a cow and a bull, several times over.
   - **The trap's own extra beats go where they belong:** the first was always put just before the end, so the breedin' frame strapped and greased them after it had been ruttin' them a while. Now a gettin'-ready beat goes in early, and one that's already in the thick of it goes in before the end.

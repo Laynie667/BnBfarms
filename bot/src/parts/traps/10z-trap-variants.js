@@ -20,9 +20,10 @@
   const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
   // the Danger Draught: chance is how much likelier, time is how much longer
   function dangerX(mn){ const n = potionX(mn, "danger"); return { chance: n ? CFG.DANGER_CHANCE_X : 1, time: n >= 2 ? 3 : n === 1 ? 2 : 1, on: n > 0 }; }
-  const tmin = (mn, mins) => mins * dangerX(mn).time;
+  const tmin = (mn, mins) => mins * dangerX(mn).time * (wildOn(mn) ? CFG.WILD.HOLD_X : 1);   // (a wild trap holds twice as long: 10z8-wild-traps.js)
   function pickSeverity(mn, fixed){
     if (fixed) return fixed;
+    if (wildOn(mn)) return intensityOf(mn) === "tender" ? 2 : 3;   // a wild trap: brutal (strong for somebody on ?intensity tender: 10z8-wild-traps.js)
     const w = ruined(mn) ? [0.1, 0.3, 0.6] : dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();   // (Ruined: 10y4-corruption.js)
     return intensitySev(mn, roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3);   // tender leans mild, filthy leans brutal (10y7-udders.js)
   }

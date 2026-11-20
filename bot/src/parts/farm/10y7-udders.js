@@ -274,7 +274,7 @@
   // ── intensity ──────────────────────────────────────────────
   function intensityOf(mn){ const r = rec(mn); return r && (r.intensity === "tender" || r.intensity === "filthy") ? r.intensity : "rough"; }
   function intensityTail(mn, i, n, kind){
-    const k = intensityOf(mn);
+    const k = wildFilthy(mn) ? "filthy" : intensityOf(mn);   // (a wild trap tells it filthy: 10z8-wild-traps.js)
     if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
     return " "+(intensityTrapLine(mn, kind) || tFill(pickFor(mn, "udd:int:"+k, UDDER_LINES["int_"+k]), mn));   // the trap's own, two times in three (10y9b-intensity-lines.js)
   }

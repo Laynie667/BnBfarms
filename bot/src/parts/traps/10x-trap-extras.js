@@ -44,7 +44,7 @@
     if (ANTHRO[kind] && ANTHRO[kind].sire <= -10) bump1(subjWeek().fur, mn, ANTHRO[kind].loads);
     // ...and what it writes on them, so everybody can read what had them
     const words = TRAP_WRITES[kind];
-    if (words && Math.random() < CFG.TRAP_WRITE_CHANCE){
+    if (words && Math.random() < (wildOn(mn) ? 1 : CFG.TRAP_WRITE_CHANCE)){   // (a wild trap always writes on them: 10z8-wild-traps.js)
       const w = words[Math.floor(Math.random()*words.length)];
       later(() => { if (trapWords(mn, w, "marker", ["hips", "waist", "chest", "ribs"][Math.floor(Math.random()*4)])){ const r2 = rec(mn); r2.dirt = r2.dirt || {}; r2.dirt.brand = w; saveLedger(); } }, 4000);
     }

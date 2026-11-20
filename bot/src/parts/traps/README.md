@@ -37,5 +37,6 @@ Bigger line pools are in [lines](lines/), each trap's own lines grown in [more](
 | 10z4-trap-state.js | what's true of them right now, woven into the story |
 | 10z6f-trap-branches.js | the last few beats a trap only tells one kind of body |
 | 10z7-nipple-traps.js | open nipples: knotted, laid in, pumped and fucked by the traps; eggs in the tits; the kraken |
+| 10z8-wild-traps.js | the farm girl's own hidden traps in the barn, pasture and receiving, movin' about; they hit harder and what they leave stays till somebody else takes it off |
 
 The build joins every part by file name, not folder: see [the parts README](../README.md).

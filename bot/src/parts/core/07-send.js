@@ -540,6 +540,7 @@
     if (m.type === "outfitSave"){ saveOutfit(mn, m); return; }
     if (m.type === "outfitAnswer"){ outfitAnswer(mn, m); return; }
     if (m.type === "say"){ companionSaid(mn, m); return; }
+    if (m.type === "gearFreed"){ try { wildGearFreed(mn, m); } catch(e){ warn("gear freed:", e); } return; }   // somebody else took off what a wild trap left (10z8-wild-traps.js)
     if (m.type === "nurseryStats"){ try { nurseryStats(mn, m); } catch(e){ warn("nursery stats:", e); } return; }   // a little's padding (ABCL) and Littlish Club grown-ups (10up2-nursery.js)   // the Say it box (10ui-say.js)
     if (m.type === "cmd"){
       const text = String(m.text||"").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2000);   // "/record Alexia" works too   // contract terms can run to 1,000

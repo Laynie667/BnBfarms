@@ -72,7 +72,7 @@
   function stateBeats(mn, kind, beats, cast, fams0){   // (cast: who's there, so nobody appears out of nowhere: trapCast, 10ud-trap-depth.js)
     try {
       if (!Array.isArray(beats) || beats.length < 3) return beats;
-      const n = CFG.STATE_BEATS[intensityOf(mn)]; if (!n) return beats;
+      const n = CFG.STATE_BEATS[wildFilthy(mn) ? "filthy" : intensityOf(mn)]; if (!n) return beats;   // (a wild trap: filthy, 10z8)
       const s = stateOf(mn), fams = (fams0 && fams0.length ? fams0 : DEPTH_KIND[kind]) || ["tease"], out = beats.slice(), used = new Set(), where = whereOf(mn);
       const fit = (pool) => fitFor(mn, pool).filter(t => castFits(t, cast));
       for (let i = 0; i < n; i++){

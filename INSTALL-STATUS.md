@@ -25,8 +25,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
-- **Bot 0.87.1 + Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits**
-- **Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits** Laynie, Nov 20: "the toys are on layer 22, the breast are layer 49, the toys dont match or follow where the nipple is".
+- **Bot 0.87.1 + Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits** (the bot only notes the new Companion) Laynie, Nov 20: "the toys are on layer 22, the breast are layer 49, the toys dont match or follow where the nipple is".
   - **What was wrong:** the toys' pictures come from the repo, and the drawn body only knew what slot a picture was in from the game's own folders. So a toy wasn't seen as nipple gear (never moved onto your drawn nipples: it sat where the game's biggest chest has its nipples), and wasn't seen as worn (the drawn breasts waited for the next worn piece and went on over it; bare but for the toy, it was hidden altogether). And a picture from another site was fetched without leave to read it, so its nipples couldn't be found to move it.
   - **Now:** the toys are read as nipple gear and as worn, like the game's own clamps: moved onto your drawn nipples, grown with your cup, and drawn in front. The brand and messes go under them too.
 

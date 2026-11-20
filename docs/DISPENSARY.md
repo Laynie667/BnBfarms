@@ -248,6 +248,15 @@ and running timers follow you between your phone and your PC, and clearing the b
      somebody else (`dispNipsOpen { n }`, answered `dispNipsOpenOk { ok, why, n }`): their Dispensary takes it from
      anybody who can dose them, not if they've switched the Nipple Dilator off. Hardcore doesn't stop it: it only ever
      opens them. The room sees it happen.
+   - **The farm's traps use them** (Nov 19, Laynie: "since tits are fuckable via nipple, some traps should use it. like
+     knotting in them, eggs in them, etc.", then "all of them, and more, like the kraken"). The farm girl knows whose are
+     open from `dispNips` and the hello's `nips`. A canine stud's knot ties in a nipple, egg layers lay in the tits
+     (a cup or two bigger till they come out, when milked or on their own), tendrils and goblins fill them, passers-by use
+     them in the stocks, the pump fills them, other breedin' traps leave a load in one now and then, and the kraken does
+     all of it. The milkers and the kraken open shut ones: `dispNipsOpen { n, quiet: true }` from her, only taken from
+     the farm on your list with the Nipple Dilator on; quiet means her trap tells it, not us. Every trap fuckin' trains
+     them (`dispNipsUsed { n }`, only from her). Leeches in the milkin' cups: `dispLatch { kind: "nips", name }`, only
+     with your nipple leeches switched on. Nipples in your farm ?limits keeps all of it off.
    - **Creampies:** whoever cums within a minute and a half of fuckin' your nipple, their Dispensary tells yours
      (`dispCream`). It wells back out (a line for the room, cum on your chest for the Companion) and is counted, its own
      count (Laynie: "its own count"). On the farm the farm girl's told (`dispNipLoad`): her own count on `?stats`, and it

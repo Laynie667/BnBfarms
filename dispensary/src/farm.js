@@ -31,6 +31,8 @@ import { holesWelcome } from "./holes.js";
 import { seedWelcome } from "./seed.js";
 import { breedWelcome } from "./breed.js";
 import { carryWelcome, carryHello } from "./carry.js";
+import { nipsOpen } from "./nipples.js";
+import { latch } from "./parasites.js";
 
 const W = window;
 function send(type, data) {
@@ -41,12 +43,12 @@ let helloAt = 0, helloSig = "";
 // (Nov 17, more) on: what's in you now, so a dosed throat doesn't gag on the farm and a stud in rut loads bigger ·
 // crave: the dose you're cravin', if you've switched cravings on, so the farm girl can offer (?fix)
 const onNow = () => doseIds().filter(active).sort();
-const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0, onNow(), craving(), carryHello()]);
+const sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 3600000) : 0, onNow(), craving(), carryHello(), nipsOpen()]);
 export function hello(force) {
   const now = Date.now(), sig = sigNow();
   if (!force && sig === helloSig && now - helloAt < 30 * 60000) return false;
   if (!send("dispHello", { ver: VERSION, farm: allowed(BOT), lscg: lscgPresent(), off: Object.keys(st().off), hard: hardOn(),
-    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving(), holes: 1, seed: 1, breed: 1, ...carryHello() })) return false;   // (born, laid: what you did away, for her books)   // (holes: we count your hole trainin', Nov 18 · seed: your loads and seals, Nov 19)
+    due: hardOn() ? dueAt() : 0, keys: hardOn() ? keyholders() : [], on: onNow(), crave: craving(), holes: 1, seed: 1, breed: 1, nips: nipsOpen(), ...carryHello() })) return false;   // (born, laid: what you did away, for her books)   // (holes: we count your hole trainin', Nov 18 · seed: your loads and seals, Nov 19)
   helloAt = now; helloSig = sig;
   return true;
 }
@@ -77,6 +79,8 @@ export function onDoseCall(m) {
 function onFarmMsg(m) {
   if (m.type === "ping") { hello(true); return; }
   if (m.type === "dose") { onDoseCall(m); return; }
+  // (Nov 19) leeches waitin' in a farm trap's milkin' cups: your parasite switch and your list decide (parasites.js)
+  if (m.type === "dispLatch") { if (/^nips$/.test(String(m.kind))) latch("nips", { by: BOT, name: typeof m.name === "string" ? m.name.slice(0, 30) : "The barn" }); return; }
   if (m.type === "dispWelcome") {
     const S = st();
     S.farm = Array.isArray(m.farm) ? m.farm.filter((x) => Number.isInteger(x) && x > 0).slice(0, 300) : S.farm;

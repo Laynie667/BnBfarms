@@ -119,7 +119,8 @@
                         off: Array.isArray(m.off) ? m.off.filter(x => typeof x === "string").slice(0, 40) : [], hard: m.hard === true, at: Date.now(),
                         on: ids(m.on), crave: typeof m.crave === "string" && DISP_LABEL[m.crave] ? m.crave : "", holes: m.holes === 1, seed: m.seed === 1, breed: m.breed === 1 });   // (holes: it counts their hole trainin' · seed: their loads and seals, Nov 19)
     try { craveOffer(mn, dispMap().get(mn)); } catch(e){ warn("crave:", e); }
-    if (m.breed === 1){ try { carryHello(mn, m); } catch(e){ warn("carry:", e); } }   // (Nov 19: a birth or a layin' done away, for my books)
+    if (m.breed === 1){ try { carryHello(mn, m); } catch(e){ warn("carry:", e); } }
+    if (m.nips != null) nipsHeard(mn, m.nips);   // (Nov 19: their nipples, open or not, for the traps)   // (Nov 19: a birth or a layin' done away, for my books)
     if (!had) log("Dispensary hello from "+mn+" (v"+String(m.ver || "?").slice(0, 20)+")");
     const r = rec(mn);
     // their hardcore, kept on their record: it holds even when their Dispensary isn't here to say so, till it lets go
@@ -418,6 +419,8 @@
     if (m.type === "dispSeed"){ onDispSeed(mn, m); return true; }
     if (m.type === "dispHoles"){ onDispHoles(mn, m); return true; }
     if (m.type === "dispNipLoad"){ onNipLoad(mn, m); return true; }
+    if (m.type === "dispNips"){ nipsHeard(mn, m.n); return true; }   // whose nipples are open, for the traps (10z7-nipple-traps.js)
+    if (m.type === "dispNipsOpenOk") return true;
     if (m.type === "dispHello"){ onDispHello(mn, m); return true; }
     if (m.type === "doseDone"){ onDoseDone(mn, m); return true; }
     if (m.type === "dispSafeword"){ onDispSafeword(mn); return true; }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.23.0
+// @version      0.24.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.23.0";
+  var VERSION = "0.24.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -11308,7 +11308,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return was;
   }
   var FORCED_WIDE = ["", "open enough to take a finger", "wide open", "gapin' wide"];
-  function nipsForce(n, by) {
+  function nipsForce(n, by, quiet) {
     n = Math.max(1, Math.min(3, Math.round(Number(n) || 3)));
     const was = nipsOpen();
     if (trainedLevel() >= n) return { ok: false, why: "already", was, n: trainedLevel() };
@@ -11320,7 +11320,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     save();
     nipsTell();
     const L = LINES.nips && LINES.nips[other ? "forced_by" : "forced_self"];
-    if (L && L.length) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));
+    if (L && L.length && !quiet) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));
     return { ok: true, was, n };
   }
   function nipsForceSend(to, n) {
@@ -11347,9 +11347,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       local(nameOf(from) + " tried to force your nipples open, but you've the Nipple Dilator switched off.");
       return reply(false, "off");
     }
-    const r = nipsForce(m.n, from);
+    const quiet = !!m.quiet && from === BOT, r = nipsForce(m.n, from, quiet);
     if (!r.ok) return reply(false, r.why, r.n);
-    local("\u2B55 " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
+    if (!quiet) local("\u2B55 " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
     reply(true, "", r.n);
   }
   function forceOk(from, m) {
@@ -11437,6 +11437,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const L = LINES.nips && LINES.nips[!from || from === me3() ? "self" : kind === "cock" ? "fucked" : "fingered"];
       if (L && L.length) local(fill(pick(L), { by: from && from !== me3() ? nameOf(from) : "you" }));
     }
+  }
+  function nipsTrapUsed(n) {
+    n = Math.max(1, Math.min(8, Math.round(Number(n) || 1)));
+    const T = trainOf();
+    T.used = Date.now();
+    T.lvl = Math.min(3, T.lvl + n * TRAIN.cock);
+    save();
+    if (mine2().nips) for (let i = 0; i < n; i++) nipsFed(0, "toy");
   }
   function nipsToyUsed() {
     const T = trainOf();
@@ -11644,6 +11652,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             else if (m && m.type === "dispCream") onCream(data.Sender);
             else if (m && m.type === "dispNipsOpen") forceOf(data.Sender, m);
             else if (m && m.type === "dispNipsOpenOk") forceOk(data.Sender, m);
+            else if (m && m.type === "dispNipsUsed" && data.Sender === BOT) nipsTrapUsed(m.n);
             else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
           }
         } catch (e) {
@@ -16122,7 +16131,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var helloAt = 0;
   var helloSig = "";
   var onNow = () => doseIds().filter(active).sort();
-  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0, onNow(), craving(), carryHello()]);
+  var sigNow = () => JSON.stringify([allowed(BOT), lscgPresent(), Object.keys(st().off).sort(), hardOn(), hardOn() ? keyholders() : [], hardOn() ? Math.floor(dueAt() / 36e5) : 0, onNow(), craving(), carryHello(), nipsOpen()]);
   function hello(force) {
     const now = Date.now(), sig = sigNow();
     if (!force && sig === helloSig && now - helloAt < 30 * 6e4) return false;
@@ -16139,6 +16148,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       holes: 1,
       seed: 1,
       breed: 1,
+      nips: nipsOpen(),
       ...carryHello()
     })) return false;
     helloAt = now;
@@ -16175,6 +16185,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (m.type === "dose") {
       onDoseCall(m);
+      return;
+    }
+    if (m.type === "dispLatch") {
+      if (/^nips$/.test(String(m.kind))) latch("nips", { by: BOT, name: typeof m.name === "string" ? m.name.slice(0, 30) : "The barn" });
       return;
     }
     if (m.type === "dispWelcome") {
@@ -17003,6 +17017,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Or force them: /dispensary nips open leaves yours gapin' right now (1, 2 or 3 after it for how wide), and the Open them up button under Nipples opens them a step wider. /dispensary nips open <who> does it to somebody who lets you dose them.",
         "Held open and used, they train, a step an hour: three hours held wide and they're gapin'. The stretch stays after the dose wears off or the leeches drop.",
         "A load in them wells back out, and it's counted.",
+        "On the farm, the traps use them too: a knot tied in a nipple, eggs laid in your tits, tendrils, goblins, the pump, the milkers, the kraken. The milkers open shut ones if the farm's on your list. Put nipples in your farm limits to keep the traps off them.",
         "Close them up with the button under Nipples, /dispensary nips close, or a Tightening Balm."
       ],
       craft: [

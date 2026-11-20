@@ -43,6 +43,9 @@
       }
       if (arousalOf(mn) >= 75) s.edge = true;
       if (parasiteOn(mn)) s.parasite = true;
+      if (nipsUsable(mn)) s.nipsOpen = true;   // (Nov 19, 10z7-nipple-traps.js)
+      if (p && p.titEggs) s.titEggs = true;
+      if (p && p.titPump && p.titPump.until > now) s.titPump = true;
       const sk = symKind(mn); if (sk) s["sym_"+sk] = true;
       if (suitOnNow(mn)) s.suit = true;
       const sp = SP_GROUP[speciesKey(mn)]; if (sp) s["sp_"+sp] = true;

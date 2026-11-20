@@ -6,13 +6,14 @@
        tag on the front, and the tag never shows:
          {v} has a pussy · {nv} hasn't · {c} has a cock · {nc} hasn't · {t} has tits · {nt} flat
          {f} female · {m} male · {fu} futa · {fb} femboy            (several tags: all must fit)
+         {np} their nipples are open (and nipples aren't in their limits) · {nn} they aren't   (Nov 19)
        A line with no tag is checked by its words: one that talks about a pussy, a womb or a clit is left out for
        somebody without one, the same for tits and udders on a flat chest. If nothin' in the pool fits, the words
        are swapped instead (bodyWords), so nobody is ever told about parts they haven't got.
      • bodyTail(mn, kind): now and then a trap beat gets one more sentence about the parts they DO have: cock and
        balls, pussy, both, or a femboy's. Each named trap has its own, and there are shared ones.
   */
-  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\})+/;   // {nb}: nonbinary (Oct 19)   // {ok}: already fitted (an add-on did it), leave it be
+  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|nb|ok|np|nn|v|c|t|f|m)\})+/;   // {np}: nipples open, {nn}: shut (Nov 19, 10z7-nipple-traps.js)   // {nb}: nonbinary (Oct 19)   // {ok}: already fitted (an add-on did it), leave it be
   const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
@@ -24,7 +25,7 @@
     const g = set || (r.futa || (vulva && cock) ? "futa" : vulva ? "female" : "male");
     // tits: their ?chest says first; then a nonbinary body goes by what's there (a pussy, tits too), the rest by gender
     const tits = r.chest ? r.chest === "tits" : g === "nonbinary" ? vulva : (g === "female" || g === "futa");
-    return { g, vulva, cock, tits };
+    return { g, vulva, cock, tits, nips: nipsUsable(mn) };   // (open nipples: 10z7-nipple-traps.js)
   }
   function tagsFit(line, b){
     const m = String(line).match(BODY_TAG); if (!m) return true;
@@ -35,6 +36,7 @@
       if (t === "f" && b.g !== "female") return false; if (t === "m" && b.g !== "male") return false;
       if (t === "fu" && b.g !== "futa") return false;  if (t === "fb" && b.g !== "femboy") return false;
       if (t === "nb" && b.g !== "nonbinary") return false;
+      if (t === "np" && !b.nips) return false;   if (t === "nn" && b.nips) return false;
     }
     return true;
   }

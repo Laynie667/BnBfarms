@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.86.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.23.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.87.0 + Dispensary 0.24.0: the traps use open nipples, and the kraken** Laynie, Nov 19: "since tits are fuckable via nipple, some traps should use it. like knotting in them, eggs in them, etc.", then "all of them, and more, like the kraken".
+  - **The farm girl knows whose nipples are open:** your Dispensary tells the room, and its hello says so. Traps on and nipples open, and the traps use them. Put nipples in your ?limits and they never do.
+  - **Knotted by the tit:** the canine studs (the wolves, the werewolf, the fox den, the kennel, the whelpin' box) tie their knot in a nipple. You're held a few minutes past the end, and his load's in your breast.
+  - **Eggs in your tits:** the egg post, the clutch, the hive, the drake and the naga lay part of the clutch in your breasts, and the thing in the water does half the time. Your tits are drawn a cup or two bigger while they're in there. They come out your nipples when you're milked, or on their own in a day or so, and they count as eggs laid.
+  - **Tendrils, goblins and the stocks:** a tendril in each nipple in the water, the vines and the slime; the goblins fight over your tits; held in the stocks, the pillory, the wall, the kiss gate, the booth or the leash post, passers-by use them too.
+  - **The pump** fills your tits through the nipples: two cups bigger for a couple of hours. Other breedin' traps leave a load in a nipple now and then.
+  - **The milkers open you:** the milker, the cups, the teat check and the milkin' hole open shut nipples, through your Dispensary's Nipple Dilator (its switch and your list decide). Open ones get fucked by the cups. Now and then there are leeches in the cups, if your nipple leeches are switched on.
+  - **Every load in your tits** goes on the farm's books and comes back out creamy with your milk, and every trap fuckin' trains your nipples wider.
+  - **THE KRAKEN:** a new thing in the pond, rare. Every hole at once and both nipples, opened for it if they're shut, eggs in your belly and your tits, and KRAKEN BAIT written on you after.
+  - Any trap's story now and then notices open nipples, eggs in your tits, or tits pumped full. ?stats shows eggs in your tits and a pump.
 - **Bot 0.86.1 + Companion 0.70.0 + Dispensary 0.23.0: the Womb Mark, and nipples forced open** Laynie, Nov 19: "I love it, could I also get a command to force dilate nipples? shorten the time down to 4 hours or less".
   - **The Womb Mark:** a new live tattoo in every Farm Ink slot in the wardrobe, over the womb. The womb crest, with twenty little hearts in a smile under it, one inked in for every litter. While you're carryin', the womb fills hot pink with a white dot for each one in there, and the whole mark glows. At twenty litters it reads BABY FACTORY underneath. It follows the farm's books (the farm girl hands the Companion `womb { n, c }`); away from the farm your Dispensary fills in a birth or a layin' she hasn't booked yet. Three colours to pick: the dots, the pink, the ink.
   - **Nipples forced open:** `/dispensary nips open` leaves yours gapin' right now, trained to stay that way (1, 2 or 3 after it for how wide; dilate, stretch, gape and spread work too). The page's **Open them up** opens them a step wider. `/dispensary nips open <who> [1-3]` does it to somebody who lets you dose them, unless they've switched the Nipple Dilator off. The room sees it happen.

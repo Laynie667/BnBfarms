@@ -108,7 +108,7 @@ const spring=async(mn,kind)=>{ free(mn); const n=sent.length; await say(221397,'
 
   // ── the things in the water ──
   { const F=W.__waterForms(), ids=Object.keys(F);
-    ok(ids.length===10, 'ten things live in the water ('+ids.join(', ')+')');
+    ok(ids.length===11, 'eleven things live in the water, the kraken too (Nov 19) ('+ids.join(', ')+')');
     const quiet=[], leaks=[], told=[];
     for (const id of ids) for (const mn of [500,600,700,800]){
       W.__waterForce=id; P(mn).limits=""; const p=W.__prodOf(mn); p.eggs=null; p.held={}; p.milk=Math.max(p.milk||0,800);
@@ -123,7 +123,7 @@ const spring=async(mn,kind)=>{ free(mn); const n=sent.length; await say(221397,'
     ok(!quiet.length, 'every one of them tells its whole story on every body ('+quiet.join(', ')+')');
     ok(!leaks.length, '...and every line fills in ('+leaks.slice(0,2).join(' || ')+')');
     ok(!told.length, 'the whisper after says which it was ('+told.slice(0,4).join(', ')+')');
-    ok(Object.keys(P(500).waterForms||{}).length===10, 'the farm remembers which ones have had them');
+    ok(Object.keys(P(500).waterForms||{}).length===11, 'the farm remembers which ones have had them');
     let n=sent.length; await say(500,'?traps tentacle',900); ok(/the jelly bloom \(had you 1×\)/.test(all(n)) && /the twins/.test(all(n)), '?traps tentacle lists them, and which have had you');
     // what each one leaves
     W.__waterForce='bloom'; P(500).limits=""; W.__prodOf(500).heat=null; await spring(500,'tentacle');
@@ -141,7 +141,7 @@ const spring=async(mn,kind)=>{ free(mn); const n=sent.length; await say(221397,'
     W.__waterForce=null;
     // left to itself, mostly the old one
     const c={}; for (let i=0;i<2000;i++){ const f=W.__waterForm(500).id; c[f]=(c[f]||0)+1; }
-    ok(c.classic>500 && c.classic<900 && c.mother>20 && c.mother<180 && Object.keys(c).length===10, 'left to itself: the old one most often, the mother rarely ('+JSON.stringify(c)+')'); }
+    ok(c.classic>500 && c.classic<900 && c.mother>20 && c.mother<180 && Object.keys(c).length===11, 'left to itself: the old one most often, the mother rarely ('+JSON.stringify(c)+')'); }
 
   // ── the herd's ratings ──
   { let n=sent.length; await say(221397,'?traps ratings',900); ok(/HOW THE HERD RATES THE TRAPS/.test(all(n)) && /Most \\?"not for me\\?": 🐖 mud \(1\)/.test(all(n)), '?traps ratings for staff');

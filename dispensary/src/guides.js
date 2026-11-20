@@ -219,6 +219,7 @@ export const GUIDES = [
       "Or force them: /dispensary nips open leaves yours gapin' right now (1, 2 or 3 after it for how wide), and the Open them up button under Nipples opens them a step wider. /dispensary nips open <who> does it to somebody who lets you dose them.",
       "Held open and used, they train, a step an hour: three hours held wide and they're gapin'. The stretch stays after the dose wears off or the leeches drop.",
       "A load in them wells back out, and it's counted.",
+      "On the farm, the traps use them too: a knot tied in a nipple, eggs laid in your tits, tendrils, goblins, the pump, the milkers, the kraken. The milkers open shut ones if the farm's on your list. Put nipples in your farm limits to keep the traps off them.",
       "Close them up with the button under Nipples, /dispensary nips close, or a Tightening Balm.",
     ],
     craft: [

@@ -442,6 +442,8 @@
       holding,
       "Total "+ml(held)+" of "+ml(cap),
       p.totals && p.totals.nipLoads && "Loads taken in the tits: "+p.totals.nipLoads+(p.nipCream ? " (one's still in there, for the milk)" : ""),
+      p.titEggs && "🥚 Eggs in your tits: "+p.titEggs.n+" (they come out when you're milked)",
+      p.titPump && p.titPump.until > Date.now() && "🎈 Tits pumped full",
       p.pin && "🎈 "+(sizePinned(mn) ? "Too big to move" : "Too full to move")
     ]);
     sec("🐂 BREEDING", [

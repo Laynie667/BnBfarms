@@ -516,7 +516,8 @@
         p.leakAcc = 0;
       }
     }
-    if (!nursing && take >= 20 && p.nipCream){ try { creamedMilk(mn); } catch(e){ warn("creamed milk:", e); } }   // a load in their nipples comes back out with the milk (10ur2-dispensary.js)
+    if (!nursing && take >= 20 && p.nipCream){ try { creamedMilk(mn); } catch(e){ warn("creamed milk:", e); } }
+    if (!nursing && take >= 20 && p.titEggs){ try { titEggsOut(mn, "milked"); } catch(e){ warn("tit eggs:", e); } }   // eggs in their tits come out with it (10z7-nipple-traps.js)   // a load in their nipples comes back out with the milk (10ur2-dispensary.js)
     return take;
   }
   function drainSemen(mn, amount){
@@ -690,7 +691,8 @@
       }
       // a Breeder's Seal comes out: most of what it held gushes out with it (10ur2-dispensary.js)
       if (charFor(mn)) { try { sealWatch(mn, p); } catch(e){ warn("seal:", e); } }
-      if (charFor(mn)) { try { legsUpTick(mn, p, now); } catch(e){ warn("legs up:", e); } }   // hips up after a load (10ur3-breed-anywhere.js)
+      if (charFor(mn)) { try { legsUpTick(mn, p, now); } catch(e){ warn("legs up:", e); } }
+      if (p.titEggs || p.titPump){ try { titTick(mn, p, now); } catch(e){ warn("tit eggs:", e); } }   // eggs in their tits, tits pumped full (10z7-nipple-traps.js)   // hips up after a load (10ur3-breed-anywhere.js)
       try { ripeTick(mn, r, p, now); } catch(e){ warn("ripe:", e); }
       // stretched holes slowly tighten back to their usual (a throat too, Nov 18: one held open never closed back)
       for (const h of ["vulva","butt","throat"]){

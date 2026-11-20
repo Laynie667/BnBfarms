@@ -31,9 +31,13 @@
      now, gapin' if you don't say how wide, and trained to stay that way, no waitin'. /dispensary nips open <who> [1-3]
      does somebody else's (dispNipsOpen): their Dispensary takes it from anybody who can dose them, unless they've
      switched the Nipple Dilator off. The room sees it happen. The page's Open them up button opens yours a step wider.
+   • THE FARM'S TRAPS (Nov 19, Laynie: "since tits are fuckable via nipple, some traps should use it"): the farm girl
+     opens them in a milkin' trap or for the kraken (dispNipsOpen with quiet: her trap tells it, not us), and tells us
+     how many times a trap used them (dispNipsUsed { n }, only from her): they train like a cock in them, and the
+     leeches feed. She hears whose are open from what we tell the room, and from our hello (farm.js: nips).
 */
 import { makeMsg, readMsg } from "../../shared/protocol.js";
-import { LSCG_ID } from "./config.js";
+import { LSCG_ID, BOT } from "./config.js";
 import { active, xOfDose, end } from "./doses.js";
 import { mine, nipsFed, letGo } from "./parasites.js";
 import { st, save } from "./store.js";
@@ -103,7 +107,7 @@ export function nipsClose(quiet) {
 // FORCED OPEN: right open, n wide (1 to 3, gapin' if not said), and trained to stay that way. by: who did it (you, or
 // somebody on your list). The room sees it.
 const FORCED_WIDE = ["", "open enough to take a finger", "wide open", "gapin' wide"];   // (the room lines' %w)
-export function nipsForce(n, by) {
+export function nipsForce(n, by, quiet) {
   n = Math.max(1, Math.min(3, Math.round(Number(n) || 3)));
   const was = nipsOpen();
   if (trainedLevel() >= n) return { ok: false, why: "already", was, n: trainedLevel() };
@@ -111,7 +115,7 @@ export function nipsForce(n, by) {
   T.lvl = Math.max(T.lvl, n); T.at = now; T.open = now; T.used = now;
   save(); nipsTell();
   const L = LINES.nips && LINES.nips[other ? "forced_by" : "forced_self"];
-  if (L && L.length) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));
+  if (L && L.length && !quiet) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));   // (quiet: the farm's trap tells it)
   return { ok: true, was, n };
 }
 // somebody else's: their Dispensary decides (forceOf below)
@@ -123,9 +127,9 @@ function forceOf(from, m) {
   const reply = (ok, why, n) => { try { W.ServerSend("ChatRoomChat", makeMsg("dispNipsOpenOk", { ok, why: why || "", n: n || 0 }, from)); } catch (e) { /* fine */ } };
   if (!allowed(from)) { local(nameOf(from) + " tried to force your nipples open, but they aren't on your list."); return reply(false, "ladder"); }
   if (st().off && st().off.dilator) { local(nameOf(from) + " tried to force your nipples open, but you've the Nipple Dilator switched off."); return reply(false, "off"); }
-  const r = nipsForce(m.n, from);
+  const quiet = !!m.quiet && from === BOT, r = nipsForce(m.n, from, quiet);
   if (!r.ok) return reply(false, r.why, r.n);
-  local("⭕ " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
+  if (!quiet) local("⭕ " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
   reply(true, "", r.n);
 }
 function forceOk(from, m) {
@@ -184,6 +188,12 @@ export function nipsUsed(from, kind) {
   if (now - usedAt > 3 * 60000) { usedAt = now; const L = LINES.nips && LINES.nips[!from || from === me() ? "self" : kind === "cock" ? "fucked" : "fingered"]; if (L && L.length) local(fill(pick(L), { by: from && from !== me() ? nameOf(from) : "you" })); }
 }
 
+// a farm trap used them (dispNipsUsed, from the farm girl): n times, each like a cock in them, and the leeches feed
+export function nipsTrapUsed(n) {
+  n = Math.max(1, Math.min(8, Math.round(Number(n) || 1)));
+  const T = trainOf(); T.used = Date.now(); T.lvl = Math.min(3, T.lvl + n * TRAIN.cock); save();
+  if (mine().nips) for (let i = 0; i < n; i++) nipsFed(0, "toy");
+}
 // a horny toy (or the leeches) fucked them all by itself (horny.js): they train, and the leeches feed
 export function nipsToyUsed() {
   const T = trainOf(); T.used = Date.now(); T.lvl = Math.min(3, T.lvl + TRAIN.finger); save();
@@ -318,6 +328,7 @@ export function initNipples(mod) {
           else if (m && m.type === "dispCream") onCream(data.Sender);
           else if (m && m.type === "dispNipsOpen") forceOf(data.Sender, m);
           else if (m && m.type === "dispNipsOpenOk") forceOk(data.Sender, m);
+          else if (m && m.type === "dispNipsUsed" && data.Sender === BOT) nipsTrapUsed(m.n);
           else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
         }
       } catch (e) { console.warn("[Dispensary] nipples:", e); }

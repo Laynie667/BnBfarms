@@ -113,6 +113,7 @@
     beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
     beats = stateBeats(mn, kind, beats);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)
+    beats = nipBeats(mn, kind, beats, v);   // open nipples: knotted, laid in, pumped, fucked (10z7-nipple-traps.js)
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
     try { offerBets(mn, kind); } catch(e){ warn("bets:", e); }   // watchers get a flutter (10y3-trap-ranks.js)
@@ -139,7 +140,9 @@
       try { if (charFor(mn)) symbioteAfterTrap(mn, kind); } catch(e){ warn("trap symbiote:", e); }
       try { if (charFor(mn)) trapMess(mn, kind); } catch(e){ warn("trap mess:", e); }
       try { if (charFor(mn)) trapEnded(mn, kind, before); } catch(e){ warn("trap ended:", e); }   // how was it, the trap of the day, how they're left (10y9o, 10y9p)   // the mess its equipment leaves (10u7-traps-3.js)   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
-      trapFree(mn); saveLedger(); syncCompanions(true);
+      trapFree(mn);
+      try { if (charFor(mn)) nipTrapAfter(mn, kind); } catch(e){ warn("nipple trap:", e); }   // what it did to their nipples, after it frees them: a knot holds on (10z7-nipple-traps.js)
+      saveLedger(); syncCompanions(true);
     };
     step();
   }
@@ -147,6 +150,7 @@
   function trapStop(mn, quietMin){
     const run = state.trapRuns && state.trapRuns.get(mn);
     if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); toysFollow(mn, null); }
+    if (state.nipPlan) state.nipPlan.delete(mn);   // (a safeword: nothin' more happens to their nipples)
     sitStop(mn, "safe");        // up off the nest (10y6-keepers.js)
     if (quietMin == null) uddersSafe(mn);   // up out of the farrowin' stall (10y7-udders.js)
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)

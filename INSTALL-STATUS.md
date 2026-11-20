@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.71.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.87.2 + Companion 0.71.0: drawin' people lighter, one at a time, and timed** (the bot only notes the new Companion) Laynie, Nov 20: "Is there any way to improve the drawing engine per browser? so its faster and not laggy?", then yes to the first three ideas.
+  - **Smaller drawings:** every fitted piece is drawn on a big sheet with room to grow into, and it was kept and sent to the graphics card like that: in the studio, 85 MB of kept drawings had 3.4 MB of picture on them. Now each is cut to what's on it in the page's idle moments just after it's made (never in the drawing itself, so the first drawing of a new look is no slower), and the cut copy is what's kept and sent from then on. A dressed J cup with a belly, a harness and nipple beads: 50.5 MB kept became 9.7 MB, and the picture is the same to the pixel.
+  - **One at a time:** when a lot of people need drawing at once (walking into a room, several changing), once a frame has spent 40 ms on people, anybody else with a drawn body waits a frame, showing their last picture meanwhile. You never wait, nor does anybody with no picture yet, nor anybody without a drawn body.
+  - **Timed:** /farmmem now says what drawin' people took in that browser: the last few, the slowest, the slowest pieces (which clothes took longest to fit), how often somebody waited a frame, and how much each body keeps. Run it on the phone and the PC and paste it to Claude: that says what to speed up next.
 
 - **Bot 0.87.1 + Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits** (the bot only notes the new Companion) Laynie, Nov 20: "the toys are on layer 22, the breast are layer 49, the toys dont match or follow where the nipple is".
   - **What was wrong:** the toys' pictures come from the repo, and the drawn body only knew what slot a picture was in from the game's own folders. So a toy wasn't seen as nipple gear (never moved onto your drawn nipples: it sat where the game's biggest chest has its nipples), and wasn't seen as worn (the drawn breasts waited for the next worn piece and went on over it; bare but for the toy, it was hidden altogether). And a picture from another site was fetched without leave to read it, so its nipples couldn't be found to move it.

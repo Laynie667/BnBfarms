@@ -3,7 +3,7 @@
 // game's pictures and what's on the graphics card, the drawn body's and the messes' keepings, and who's in the room.
 // It keeps the last hour of it (in this browser only). After a crash, reload and type /farmmem: it shows how things
 // grew, and copies the whole log so it can be pasted to whoever's looking into it.
-import { drawnBodyMemory } from "./drawnbody.js";
+import { drawnBodyMemory, drawnBodyPerfText, drawnBodyPerfTick } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
 import { trimStats, cacheSize, leftLoaded } from "./trimpics.js";
 import { VERSION } from "./version.js";
@@ -48,6 +48,7 @@ function snap() {
     if (tc) { let px = 0; for (const v of tc.values()) px += (v.width || 0) * (v.height || 0); s.textures = tc.size; s.textureMB = Math.round(px * 4 / 1e6); }
   } catch (e) { /* fine */ }
   try { s.body = drawnBodyMemory(); } catch (e) { /* fine */ }
+  try { const d = drawnBodyPerfTick(); if (d.n) { s.drawN = d.n; s.drawMax = d.max; } s.drawOff = d.off; } catch (e) { /* fine */ }   // (Nov 20: drawin' people, timed)
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
   try { const ts = trimStats(); s.let = ts.trimmed; s.letPeople = ts.people; } catch (e) { /* fine */ }
   try { s.room = (W.ChatRoomCharacter || []).length; s.screen = W.CurrentScreen; } catch (e) { /* fine */ }
@@ -67,7 +68,8 @@ const line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after
   (s.scrPics != null ? " · screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") +
   (s.chars != null ? " · " + s.chars + " characters loaded" + (s.left != null ? " (" + s.left + " who left the room)" : "") + ", " + s.charMB + " MB drawn" : "") +
   (s.letPeople ? " · " + s.letPeople + " who left let go" : "") +
-  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "") +
+  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") +
+  (s.drawN ? " · drew people " + s.drawN + " times, the slowest " + s.drawMax + " ms" : "") + (s.drawOff ? " (" + s.drawOff + " waited a frame so far)" : "") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "") +
   (s.chat != null ? " · chat log " + s.chat + " lines" : "") + (s.els != null ? " · " + s.els + " page elements" : "");
 
 // and every three seconds, a quick look (the last two minutes): a page that fills up all at once, between two half-minute
@@ -95,8 +97,9 @@ export function initMemlog() {
   if (typeof W.CommandCombine === "function") {
     W.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
       tick();
-      const text = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
-      try { W.navigator.clipboard.writeText(JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
+      let drawing = ""; try { drawing = drawnBodyPerfText(); } catch (e) { /* fine */ }   // (Nov 20: what drawin' people takes on this browser)
+      const text = "Companion v" + VERSION + "\n" + sentLine() + (drawing ? "\n" + drawing : "") + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+      try { W.navigator.clipboard.writeText((drawing ? drawing + "\n" : "") + JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
       if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 120000);
       else console.log(text);
     } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {

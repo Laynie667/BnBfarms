@@ -32,6 +32,10 @@ const warnSome = (what, e) => {
 // moved onto drawn nipples, and the drawn breasts went on over them (Laynie: "the toys dont match or follow where the
 // nipple is"). The same as SLOT_SRC in extension/src/belly.js.
 const SLOT_SRC = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
+// (Nov 20) for timing the drawing: a clock, and a short name for a game picture ("Cloth StudentOutfit1")
+const nowMs = () => (window.performance && typeof window.performance.now === "function" ? window.performance.now() : Date.now());
+const SLOT_RE = new RegExp(SLOT_SRC);
+const labelOf = (src) => { if (typeof src !== "string") return "a drawing"; const m = SLOT_RE.exec(src), f = src.slice(src.lastIndexOf("/") + 1).replace(/\.png.*$/i, ""); return (m ? m[1] + " " : "") + f.split("_")[0]; };
 window.FarmBodyEngine = function (host) {
   "use strict";
   const S = host.S;
@@ -257,7 +261,7 @@ window.FarmBodyEngine = function (host) {
       // belly's outline showed through every top as a ring across her breasts: the catalogue at N with the belly, Oct 14.)
       let bm = null; const Bb = ctx.breast; if (Bb && Bb.mask) { const mc = document.createElement("canvas"); mc.width = x1 - x0; mc.height = y1 - y0; const mg = mc.getContext("2d", { willReadFrequently: true }); mg.filter = "blur(2px)"; mg.drawImage(Bb.mask, Bb.mx - sx - x0, Bb.my - sy - y0); bm = mg.getImageData(0, 0, mc.width, mc.height).data; }
       for (let yy = y0; yy < y1; yy++) for (let xx = x0; xx < x1; xx++) { const i = ((yy - y0) * (x1 - x0) + (xx - x0)) * 4; if (d[i + 3] < 8) continue; let k = fm.F[(yy - oy) * fm.w + (xx - ox)]; if (bm) k = 1 + (k - 1) * (1 - bm[i + 3] / 255); if (Math.abs(k - 1) < 0.01) continue; any = true; d[i] = Math.min(255, d[i] * k); d[i + 1] = Math.min(255, d[i + 1] * k); d[i + 2] = Math.min(255, d[i + 2] * k); }
-      if (any) { g.putImageData(part, x0, y0); out = c; }
+      if (any) { g.putImageData(part, x0, y0); out = c; trimSoon(c, null, null); }   // (kept here, so cut just after, like the rest)
     }
     shadeSeen.set(img, { key, out }); return out;
   }
@@ -372,7 +376,77 @@ window.FarmBodyEngine = function (host) {
      Laynie: "the draw order changed on the studio between breast, belly and clothes/restraints". It's keepIn now.) */
   const BUDGET = (host && host.budget) || 256e6;
   const bytesOf = (v) => { if (!v || typeof v !== "object") return 0; if (v.width && v.height && typeof v.getContext === "function") return v.width * v.height * 4; let n = 0; for (const k in v) { const x = v[k]; if (x && typeof x === "object" && x.width && x.height && typeof x.getContext === "function") n += x.width * x.height * 4; } return n; };
-  function keepIn(map, key, v) { map.delete(key); map.set(key, v); return v; }   // (not "put": draw() has its own put, the brush, and inside it that one wins)
+  // THE DRAWINGS, TRIMMED (Nov 20, Laynie: "Is there any way to improve the drawing engine per browser? so its faster
+  // and not laggy?"). A fitted piece is drawn on a sheet with room all round it to grow into, and it was kept and handed
+  // over like that: in the studio, 85 MB of kept drawings had 3.4 MB of picture on them, and every one went to the
+  // graphics card whole each time the character was drawn. Now each kept drawing is cut to what's on it, once. The cut
+  // copy carries TX and TY (how much came off the top left: put() adds them back) and the same MX and MY, so everything
+  // that places a drawing places it just as before.
+  // What's in BREAST.out is only ever handed over, so the cut copy is what's kept there. What's in MOULD.out is read again
+  // (the belly's shade, the hands), so it's kept whole and its cut copy is what's handed over.
+  // The cutting reads every pixel back, and done in the drawing it made the first drawing of a new look slower (the very
+  // moment that freezes): about 780 ms became 890 in the studio. So it's done just after, in the page's idle moments
+  // (trimSoon): the first drawing hands over the whole sheet as it always did, and every drawing after that, the cut one.
+  const TRIMMED = new WeakMap(), toTrim = [];
+  let trimAsked = false;
+  // (a page that's never idle, a busy room on a phone, still gets it done: past a second it's a short turn anyway)
+  const idle = (f) => { try { if (typeof window.requestIdleCallback === "function") { window.requestIdleCallback(f, { timeout: 1000 }); return; } } catch (e) { /* not this browser */ } setTimeout(() => f(null), 60); };
+  function trimSoon(c, map, key) { toTrim.push([c, map, key]); if (!trimAsked) { trimAsked = true; idle(trimSome); } }
+  function trimSome(deadline) {
+    const t0 = nowMs(), more = () => (deadline && typeof deadline.timeRemaining === "function" ? deadline.timeRemaining() > 3 || (deadline.didTimeout && nowMs() - t0 < 20) : nowMs() - t0 < 20);
+    let first = true;
+    try {
+      while (toTrim.length && (first || more())) {
+        first = false;
+        const [c, map, key] = toTrim.shift();
+        if (map && map.get(key) !== c) continue;   // (gone from the keepings already: nothing to cut)
+        try { const t = shrink(c); if (map === BREAST.out && t !== c) map.set(key, t); }   // (only handed over: the cut copy is what's kept)
+        catch (e) { TRIMMED.set(c, c); warnSome("[body] trimming a drawing:", e); }   // (that one stays whole; the rest carry on)
+      }
+    } finally { trimAsked = false; if (toTrim.length) { trimAsked = true; idle(trimSome); } }
+  }
+  const ALPHA = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1 ? 0xff000000 : 0xff;   // (where a pixel's see-through-ness sits)
+  function shrink(c) {
+    if (!c || typeof c.getContext !== "function" || c.TRIM) return c;
+    const had = TRIMMED.get(c); if (had) return had;
+    const w = c.width, h = c.height; if (!w || !h) return c;
+    let px; try { px = new Uint32Array(c.getContext("2d").getImageData(0, 0, w, h).data.buffer); } catch (e) { TRIMMED.set(c, c); return c; }
+    let y0 = -1, y1 = -1, x0 = w, x1 = -1;
+    for (let y = 0; y < h && y0 < 0; y++) { const o = y * w; for (let x = 0; x < w; x++) if (px[o + x] & ALPHA) { y0 = y; break; } }
+    let t;
+    if (y0 < 0) { t = document.createElement("canvas"); t.width = 1; t.height = 1; t.TX = 0; t.TY = 0; }   // (nothing on it at all)
+    else {
+      for (let y = h - 1; y >= y0 && y1 < 0; y--) { const o = y * w; for (let x = 0; x < w; x++) if (px[o + x] & ALPHA) { y1 = y; break; } }
+      for (let y = y0; y <= y1; y++) { const o = y * w; let x = 0; while (x < x0 && !(px[o + x] & ALPHA)) x++; if (x < x0) x0 = x; x = w - 1; while (x > x1 && !(px[o + x] & ALPHA)) x--; if (x > x1) x1 = x; }
+      // (two clear pixels left round it: the graphics card blends an edge with what's just past it, and cut right to the
+      // edge, what's past it would be the edge again)
+      x0 = Math.max(0, x0 - 2); y0 = Math.max(0, y0 - 2); x1 = Math.min(w - 1, x1 + 2); y1 = Math.min(h - 1, y1 + 2);
+      const tw = x1 - x0 + 1, th = y1 - y0 + 1;
+      if (tw * th > w * h * 0.8) { TRIMMED.set(c, c); return c; }   // (hardly any room round it: kept as it is)
+      t = document.createElement("canvas"); t.width = tw; t.height = th; t.getContext("2d").drawImage(c, -x0, -y0); t.TX = x0; t.TY = y0;
+    }
+    if (c.MX != null) { t.MX = c.MX; t.MY = c.MY; }
+    t.TRIM = true; TRIMMED.set(c, t); return t;
+  }
+  // THE DRAWING'S OWN CLOCK (Nov 20): how long each drawing took, how many drawings it had to make fresh, and the slowest
+  // pieces of the last quarter hour. The Companion's /farmmem shows them, so a slow phone can say what's slow on it.
+  const PERF = { made: 0, last: null, slow: new Map() };
+  function noteSlow(label, ms, made) {
+    const e = PERF.slow.get(label), t = Date.now();
+    if (!e || ms > e.ms || t - e.at > 600000) { PERF.slow.delete(label); PERF.slow.set(label, { ms, at: t, made }); }
+    while (PERF.slow.size > 60) PERF.slow.delete(PERF.slow.keys().next().value);
+  }
+  function perf() {
+    const cut = Date.now() - 900000, slow = [];
+    for (const [label, e] of PERF.slow) if (e.at > cut) slow.push({ label, ms: Math.round(e.ms), made: e.made });
+    slow.sort((a, b) => b.ms - a.ms);
+    return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6) };
+  }
+  function keepIn(map, key, v) {   // (not "put": draw() has its own put, the brush, and inside it that one wins)
+    map.delete(key); map.set(key, v);
+    if (v && typeof v.getContext === "function") { PERF.made++; trimSoon(v, map, key); }   // (cut to what's on it, just after)
+    return v;
+  }
   function trim() {
     const maps = [BREAST.out, MOULD.out]; let total = 0;
     for (const m of maps) for (const x of m.values()) total += bytesOf(x);
@@ -478,9 +552,10 @@ window.FarmBodyEngine = function (host) {
   // redraw any moulded piece to the new outline
   // game(cb): the game's own drawing, with whatever set of brushes it's handed
   function draw(C, cb, game) {
+    const t0 = nowMs(), m0 = PERF.made;   // (the drawing's own clock)
     trim();   // (the kept drawings, back under the budget: only here, between drawings)
     {
-      let finish = null, seenNow = null, handFNow = null;
+      let finish = null, seenNow = null, handFNow = null, painted = 0;
       try {
         const fit = C === S.C ? fitNow() : null, br = C === S.C ? breastNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         // put: hand the game something to draw. A drawing of ours goes through host.picture when there is one (the live game
@@ -490,7 +565,9 @@ window.FarmBodyEngine = function (host) {
         // in each. Echo's newer dresses all carry one. Found in the Echo catalogue, Oct 14. Her hands are drawn on their own.)
         // (from: what the drawing is, for whoever's watchin' the build: "skin" for the drawn belly, breasts, nipples and cock,
         // or the game picture of the worn piece it stands in for. The Companion's messes lay the brand under worn pieces.)
-        const put = (name, img, x, y, o, from) => { if (from && img && typeof img === "object") { try { img.__farmFrom = from; } catch (e) { /* fine */ } }
+        const put = (name, img, x, y, o, from) => {
+          if (img && typeof img === "object") { const t = img.TRIM ? img : TRIMMED.get(img); if (t) { img = t; x += t.TX || 0; y += t.TY || 0; } }   // (a kept drawing that's been cut: the cut copy, put back where it was)
+          if (from && img && typeof img === "object") { try { img.__farmFrom = from; } catch (e) { /* fine */ } }
           if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: undefined });
           if (typeof img === "string" || !host.picture || takesDrawings()) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
         if (fit && cb && typeof cb.drawImage === "function") {
@@ -505,7 +582,9 @@ window.FarmBodyEngine = function (host) {
           const isMoulded = (src) => { if (!mouldList.length) return null; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.find((q) => q.folders.includes(g) && file.startsWith(q.name)) || null; };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
-          const paint = () => {
+          // (timed: the drawn belly and breasts are one line on the clock, and don't count against the piece that set them off)
+          const paint = () => { if (done || !upper) return; const p0 = nowMs(), pm = PERF.made; try { paintIn(); } finally { const dt = nowMs() - p0; painted += dt; noteSlow("the drawn belly and breasts", dt, PERF.made - pm); } };
+          const paintIn = () => {
             if (done || !upper) return; done = true;   /* (runs once, after the last of the skin: belly, then a standing cock, then breasts) */
             if (fit.on) {
             const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
@@ -523,7 +602,7 @@ window.FarmBodyEngine = function (host) {
               // over the belly: they hang in front of it
               const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S3 = isHeld ? FarmBreasts.held(freeS) : freeS;
               const key = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
-              if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(S3, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2]))); BREAST.cvKey = key; }
+              if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(S3, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2]))); BREAST.cvKey = key; PERF.made++; }
               // Hogtied, the chest is where it is standing. On all fours the game shows her from the front, chest under the
               // head and between the arms: they hang straight down from it, and whatever reaches the ground rests on it,
               // flat underneath. The hands are in front of them there, not behind.
@@ -1200,7 +1279,10 @@ window.FarmBodyEngine = function (host) {
           const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.on && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (gate ? gate(src) : (lower && prio(src) > 12)) paint(); };
           let upperSkin = null;
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { try { upperSkin = bellySkin(src, o && o.HexColor, FarmBelly.bellyPose(src)); } catch (e) { /* the usual colour */ } upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
-          const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
+          // each piece the game draws, timed: anything that took a while is noted by its name (the clock, above)
+          const wrap = (name) => { const f = wrapIn(name); if (f === real[name]) return f;
+            return (src, x, y, o) => { const p0 = nowMs(), pp = painted, pm = PERF.made; try { return f(src, x, y, o); } finally { const dt = nowMs() - p0 - (painted - pp); if (dt >= 8) noteSlow(labelOf(src), dt, PERF.made - pm); } }; };
+          const wrapIn = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
             const blink = /Blink$/.test(name);
             if (!done && typeof src === "string" && INK_SRC.test(src)) { inkHeld.push([name, src, x, y, o]); return; }   // (farm ink: after the belly)
             if (!blink) { try { before(src, x, y, o); } catch (e) { warnSome("[studio] belly:", e); } }
@@ -1264,11 +1346,12 @@ window.FarmBodyEngine = function (host) {
       if (finish) { try { finish(); } catch (e) { warnSome("[studio] belly:", e); } }
       if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.45;   /* (Laynie, Oct 13: "hands should be hidden once breasts exceed a certain size". Hidden means all of them, with what's on them: never part.) */ if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; againFromSeen(); } }
       if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; againFromSeen(); } }
+      PERF.last = { ms: Math.round(nowMs() - t0), made: PERF.made - m0, at: Date.now() };
       return out;
     }
   }
 
   return { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
-    BREAST, BREAST_SLIDERS, keptBytes, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
+    BREAST, BREAST_SLIDERS, keptBytes, perf, shrink, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
 };
 })();

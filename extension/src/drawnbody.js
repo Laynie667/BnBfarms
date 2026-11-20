@@ -17,10 +17,12 @@
    belly shows. Somebody with a studio of their own can fetch theirs from it, or paste its code, and theirs wins until
    they go back to the farm's.
 
-   How it hands its drawings to the game: the live game only takes a picture by its name (an address), and a drawing
-   handed over as itself broke every character refresh once (Companion 0.16.2, see belly.js). So every drawing of ours
-   is trimmed to what's on it, turned into a picture address, and handed over by that. The game keeps every picture it
-   was ever given, so the ones we no longer use are taken back out of its lists after a while.
+   How it hands its drawings to the game: since R133 the game takes a drawing as itself, and every drawing kept is cut
+   to what's on it first (body-engine.js, Nov 20). An older game only took a picture by its name (an address), and a
+   drawing handed over as itself broke every character refresh once (Companion 0.16.2, see belly.js): there, every
+   drawing is turned into a picture address and handed over by that, and the ones no longer used are taken back out of
+   the game's lists after a while.
+   Drawing people is timed and spread out, one at a time when a lot comes at once (Nov 20, below hook()): /farmmem shows it.
 
    THE DRAWN COCK (Nov 18, Laynie: "the balls should scale too, and it should blend better at the base", then "looked
    great"). Where the game would draw its own cock, soft or hard, the studio's is drawn instead (studio/web/cock-drawing.js,
@@ -345,7 +347,72 @@ export function onBodyMsg(m) {
   hook(); redrawMn(mn, 120); setTimeout(() => redrawMn(mn, 0), 1500);
 }
 
+// ── one at a time (Nov 20, Laynie: "Is there any way to improve the drawing engine per browser? so its faster and not
+// laggy?") ──
+// The game draws somebody again the moment anything about them changes, right then. A room full of changes at once
+// (walking in, several people changing) was all drawn in one go, and a fitted body takes a good part of a second the
+// first time it's drawn at a new size or in new clothes, so the page froze till every one of them was done. Now once a
+// frame has spent SPREAD_MS drawing people, anybody else with a drawn body waits for the next frame, showing their last
+// picture meanwhile: they're marked "must draw" (the game's own mark), and the game draws them itself the next time it
+// shows them. Somebody with no picture yet is drawn at once, and so are you: your own drawing never waits.
+const SPREAD_MS = 40;
+let frame = 0, frameAt = -1, spent = 0, putOff = 0, framesOk = false;
+const builds = [];                                 // the last drawings of people: { who, ms, made, drawn, at }
+const nowMs = () => (W.performance && typeof W.performance.now === "function" ? W.performance.now() : Date.now());
+function frameTick() { frame++; try { W.requestAnimationFrame(frameTick); } catch (e) { framesOk = false; } }
+function drawNow(C) {
+  if (!framesOk) return true;
+  if (frameAt !== frame) { frameAt = frame; spent = 0; }
+  return spent < SPREAD_MS || C === W.Player || !C.Canvas || !seeOthers || typeof C.MemberNumber !== "number" || !others.has(C.MemberNumber);
+}
+function later(C) { putOff++; try { W.requestAnimationFrame(() => { C.MustDraw = true; }); } catch (e) { C.MustDraw = true; } }
+const nameOf = (C) => (C === W.Player ? "you" : String((C && (C.Nickname || C.Name)) || "somebody") + (C && C.MemberNumber ? " (" + C.MemberNumber + ")" : ""));
+function engineOf(C) { if (C === W.Player) return mine.E; const o = C && typeof C.MemberNumber === "number" ? others.get(C.MemberNumber) : null; return o ? o.E : null; }
+function noteBuild(C, ms, since) {
+  const E = engineOf(C); let made = 0, drawn = false;
+  try { const p = E && E.perf ? E.perf().last : null; if (p && p.at >= since) { drawn = true; made = p.made; } } catch (e) { /* fine */ }
+  builds.push({ who: nameOf(C), ms: Math.round(ms), made, drawn, at: Date.now() }); if (builds.length > 40) builds.shift();
+}
+// what /farmmem shows (memlog.js): the last drawings, the slowest pieces, how often somebody waited a frame
+export function drawnBodyPerf() {
+  const slow = [], kept = [];
+  const each = [["you", mine.E], ...Array.from(others.entries()).map(([mn, o]) => [nameOf(charOf(mn) || { MemberNumber: mn }), o.E])];
+  for (const [who, E] of each) if (E && E.perf) { try { const p = E.perf(); for (const s of p.slow) slow.push(Object.assign({ who }, s)); kept.push([who, p.keptMB]); } catch (e) { /* fine */ } }
+  slow.sort((a, b) => b.ms - a.ms);
+  const recent = builds.filter((b) => Date.now() - b.at < 900000);
+  return { recent: recent.slice(-8), worst: recent.slice().sort((a, b) => b.ms - a.ms).slice(0, 3), slow: slow.slice(0, 6), putOff, kept };
+}
+export function drawnBodyPerfText() {
+  const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made ? " (" + x.made + " drawn fresh)" : "");
+  const lines = ["Drawin' people (the last quarter hour):"];
+  lines.push("  the last few: " + (p.recent.length ? p.recent.map(b).join(" · ") : "none yet"));
+  if (p.worst.length) lines.push("  the slowest: " + p.worst.map(b).join(" · "));
+  if (p.slow.length) lines.push("  the slowest pieces: " + p.slow.map((s) => s.label + " on " + s.who + " " + s.ms + " ms" + (s.made ? ", drawn fresh" : "")).join(" · "));
+  lines.push("  waited a frame: " + p.putOff + " times" + (p.kept.length ? " · keepin': " + p.kept.map(([who, mb]) => who + " " + mb + " MB").join(", ") : ""));
+  return lines.join("\n");
+}
+// for the memory log's half-minute line: the slowest drawing since the last one, and how many
+let perfSeen = 0;
+export function drawnBodyPerfTick() { const n = builds.filter((x) => x.at > perfSeen), max = n.reduce((m, x) => Math.max(m, x.ms), 0); perfSeen = Date.now(); return { n: n.length, max, off: putOff }; }
+
+// every drawing of a person, timed, and spread out (above). Its own guard: hook() below tries again if any of its hooks
+// fails, and this one must only ever go in once.
+let spreadHooked = false;
+function hookSpread() {
+  if (spreadHooked || !sdk) return;
+  try {
+    sdk.hookFunction("CharacterAppearanceBuildCanvas", 1, (args, next) => {
+      const C = args[0]; if (!C || onBot()) return next(args);
+      if (!drawNow(C)) { later(C); return undefined; }
+      const t0 = nowMs(), since = Date.now();
+      try { return next(args); } finally { const ms = nowMs() - t0; spent += ms; try { noteBuild(C, ms, since); } catch (e) { /* only the clock */ } }
+    });
+    spreadHooked = true;
+  } catch (e) { console.warn("[Farmhand Companion] drawin' people one at a time unavailable:", e); spreadHooked = true; }   // (not there in this game: no tryin' again)
+}
+
 function hook() {
+  hookSpread();
   if (hooked || !sdk) return; hooked = true;
   try {
     sdk.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
@@ -369,6 +436,7 @@ function hook() {
 export function initDrawnBody(mod) {
   sdk = mod; load();
   setInterval(prune, 20000);
+  if (typeof W.requestAnimationFrame === "function") { framesOk = true; frameTick(); }   // (the frames, counted: one at a time, above)
   setTimeout(() => {
     if (S.on && engine()) { W.__farmDrawnBody = true; redraw(500); }   // (switched on last time: back on once the game is up)
     hook(); if (S.on) tell(true); if (seeOthers) ask();

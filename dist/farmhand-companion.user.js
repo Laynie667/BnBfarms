@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.70.1
+// @version      0.71.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.70.1";
+  var VERSION = "0.71.0";
 
   // shared/species.js
   var WORDS = {
@@ -9297,6 +9297,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
     };
     const SLOT_SRC2 = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
+    const nowMs2 = () => window.performance && typeof window.performance.now === "function" ? window.performance.now() : Date.now();
+    const SLOT_RE = new RegExp(SLOT_SRC2);
+    const labelOf = (src) => {
+      if (typeof src !== "string") return "a drawing";
+      const m = SLOT_RE.exec(src), f = src.slice(src.lastIndexOf("/") + 1).replace(/\.png.*$/i, "");
+      return (m ? m[1] + " " : "") + f.split("_")[0];
+    };
     window.FarmBodyEngine = function(host) {
       "use strict";
       const S3 = host.S;
@@ -9701,6 +9708,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (any) {
             g.putImageData(part, x0, y0);
             out = c;
+            trimSoon(c, null, null);
           }
         }
         shadeSeen.set(img2, { key: key3, out });
@@ -9896,9 +9904,141 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return n;
       };
+      const TRIMMED = /* @__PURE__ */ new WeakMap(), toTrim = [];
+      let trimAsked = false;
+      const idle = (f) => {
+        try {
+          if (typeof window.requestIdleCallback === "function") {
+            window.requestIdleCallback(f, { timeout: 1e3 });
+            return;
+          }
+        } catch (e) {
+        }
+        setTimeout(() => f(null), 60);
+      };
+      function trimSoon(c, map, key3) {
+        toTrim.push([c, map, key3]);
+        if (!trimAsked) {
+          trimAsked = true;
+          idle(trimSome);
+        }
+      }
+      function trimSome(deadline) {
+        const t0 = nowMs2(), more = () => deadline && typeof deadline.timeRemaining === "function" ? deadline.timeRemaining() > 3 || deadline.didTimeout && nowMs2() - t0 < 20 : nowMs2() - t0 < 20;
+        let first = true;
+        try {
+          while (toTrim.length && (first || more())) {
+            first = false;
+            const [c, map, key3] = toTrim.shift();
+            if (map && map.get(key3) !== c) continue;
+            try {
+              const t = shrink2(c);
+              if (map === BREAST.out && t !== c) map.set(key3, t);
+            } catch (e) {
+              TRIMMED.set(c, c);
+              warnSome2("[body] trimming a drawing:", e);
+            }
+          }
+        } finally {
+          trimAsked = false;
+          if (toTrim.length) {
+            trimAsked = true;
+            idle(trimSome);
+          }
+        }
+      }
+      const ALPHA = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1 ? 4278190080 : 255;
+      function shrink2(c) {
+        if (!c || typeof c.getContext !== "function" || c.TRIM) return c;
+        const had = TRIMMED.get(c);
+        if (had) return had;
+        const w = c.width, h2 = c.height;
+        if (!w || !h2) return c;
+        let px;
+        try {
+          px = new Uint32Array(c.getContext("2d").getImageData(0, 0, w, h2).data.buffer);
+        } catch (e) {
+          TRIMMED.set(c, c);
+          return c;
+        }
+        let y0 = -1, y1 = -1, x0 = w, x1 = -1;
+        for (let y = 0; y < h2 && y0 < 0; y++) {
+          const o = y * w;
+          for (let x = 0; x < w; x++) if (px[o + x] & ALPHA) {
+            y0 = y;
+            break;
+          }
+        }
+        let t;
+        if (y0 < 0) {
+          t = document.createElement("canvas");
+          t.width = 1;
+          t.height = 1;
+          t.TX = 0;
+          t.TY = 0;
+        } else {
+          for (let y = h2 - 1; y >= y0 && y1 < 0; y--) {
+            const o = y * w;
+            for (let x = 0; x < w; x++) if (px[o + x] & ALPHA) {
+              y1 = y;
+              break;
+            }
+          }
+          for (let y = y0; y <= y1; y++) {
+            const o = y * w;
+            let x = 0;
+            while (x < x0 && !(px[o + x] & ALPHA)) x++;
+            if (x < x0) x0 = x;
+            x = w - 1;
+            while (x > x1 && !(px[o + x] & ALPHA)) x--;
+            if (x > x1) x1 = x;
+          }
+          x0 = Math.max(0, x0 - 2);
+          y0 = Math.max(0, y0 - 2);
+          x1 = Math.min(w - 1, x1 + 2);
+          y1 = Math.min(h2 - 1, y1 + 2);
+          const tw = x1 - x0 + 1, th = y1 - y0 + 1;
+          if (tw * th > w * h2 * 0.8) {
+            TRIMMED.set(c, c);
+            return c;
+          }
+          t = document.createElement("canvas");
+          t.width = tw;
+          t.height = th;
+          t.getContext("2d").drawImage(c, -x0, -y0);
+          t.TX = x0;
+          t.TY = y0;
+        }
+        if (c.MX != null) {
+          t.MX = c.MX;
+          t.MY = c.MY;
+        }
+        t.TRIM = true;
+        TRIMMED.set(c, t);
+        return t;
+      }
+      const PERF = { made: 0, last: null, slow: /* @__PURE__ */ new Map() };
+      function noteSlow(label, ms, made3) {
+        const e = PERF.slow.get(label), t = Date.now();
+        if (!e || ms > e.ms || t - e.at > 6e5) {
+          PERF.slow.delete(label);
+          PERF.slow.set(label, { ms, at: t, made: made3 });
+        }
+        while (PERF.slow.size > 60) PERF.slow.delete(PERF.slow.keys().next().value);
+      }
+      function perf() {
+        const cut2 = Date.now() - 9e5, slow = [];
+        for (const [label, e] of PERF.slow) if (e.at > cut2) slow.push({ label, ms: Math.round(e.ms), made: e.made });
+        slow.sort((a, b) => b.ms - a.ms);
+        return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6) };
+      }
       function keepIn(map, key3, v) {
         map.delete(key3);
         map.set(key3, v);
+        if (v && typeof v.getContext === "function") {
+          PERF.made++;
+          trimSoon(v, map, key3);
+        }
         return v;
       }
       function trim() {
@@ -10045,12 +10185,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return c;
       }
       function draw3(C2, cb, game) {
+        const t0 = nowMs2(), m0 = PERF.made;
         trim();
         {
-          let finish = null, seenNow = null, handFNow = null;
+          let finish = null, seenNow = null, handFNow = null, painted = 0;
           try {
             const fit = C2 === S3.C ? fitNow() : null, br = C2 === S3.C ? breastNow() : null, real = cb;
             const put2 = (name, img2, x, y, o, from) => {
+              if (img2 && typeof img2 === "object") {
+                const t = img2.TRIM ? img2 : TRIMMED.get(img2);
+                if (t) {
+                  img2 = t;
+                  x += t.TX || 0;
+                  y += t.TY || 0;
+                }
+              }
               if (from && img2 && typeof img2 === "object") {
                 try {
                   img2.__farmFrom = from;
@@ -10094,6 +10243,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const paint = () => {
                 if (done || !upper) return;
+                const p0 = nowMs2(), pm = PERF.made;
+                try {
+                  paintIn();
+                } finally {
+                  const dt = nowMs2() - p0;
+                  painted += dt;
+                  noteSlow("the drawn belly and breasts", dt, PERF.made - pm);
+                }
+              };
+              const paintIn = () => {
+                if (done || !upper) return;
                 done = true;
                 if (fit.on) {
                   const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
@@ -10117,6 +10277,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   if (BREAST.cvKey !== key3) {
                     BREAST.cv = FarmBreasts.canvas(S32, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
                     BREAST.cvKey = key3;
+                    PERF.made++;
                   }
                   const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
                   let bc = BREAST.cv;
@@ -10678,12 +10839,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) {
                   const e0 = edgesOf(src);
                   if (e0) {
-                    let t0 = -1;
+                    let t02 = -1;
                     for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) {
-                      t0 = j;
+                      t02 = j;
                       break;
                     }
-                    if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o);
+                    if (t02 >= 0 && y + t02 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o);
                   }
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
@@ -11493,7 +11654,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   ctx3.bodies.push({ src, x, y });
                 }
               };
-              const wrap = (name) => typeof real[name] === "function" ? (src, x, y, o) => {
+              const wrap = (name) => {
+                const f = wrapIn(name);
+                if (f === real[name]) return f;
+                return (src, x, y, o) => {
+                  const p0 = nowMs2(), pp = painted, pm = PERF.made;
+                  try {
+                    return f(src, x, y, o);
+                  } finally {
+                    const dt = nowMs2() - p0 - (painted - pp);
+                    if (dt >= 8) noteSlow(labelOf(src), dt, PERF.made - pm);
+                  }
+                };
+              };
+              const wrapIn = (name) => typeof real[name] === "function" ? (src, x, y, o) => {
                 const blink = /Blink$/.test(name);
                 if (!done && typeof src === "string" && INK_SRC.test(src)) {
                   inkHeld.push([name, src, x, y, o]);
@@ -11524,13 +11698,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     try {
                       const p0 = edgesOf(src);
                       if (p0) {
-                        let t0 = -1, t1 = -1;
+                        let t02 = -1, t1 = -1;
                         for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) {
-                          if (t0 < 0) t0 = j;
+                          if (t02 < 0) t02 = j;
                           t1 = j;
                         }
-                        if (t0 >= 0) {
-                          const cyL = y + (t0 + t1) / 2 - ctx3.breast.uy;
+                        if (t02 >= 0) {
+                          const cyL = y + (t02 + t1) / 2 - ctx3.breast.uy;
                           put2(name, src, x, y + (ctx3.breast.fit.mapY(cyL) - cyL), o);
                           return;
                         }
@@ -11653,6 +11827,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               againFromSeen();
             }
           }
+          PERF.last = { ms: Math.round(nowMs2() - t0), made: PERF.made - m0, at: Date.now() };
           return out;
         }
       }
@@ -11676,6 +11851,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         BREAST,
         BREAST_SLIDERS,
         keptBytes,
+        perf,
+        shrink: shrink2,
         NIP_GROUPS,
         HAND_GROUPS,
         NIP_PIECES,
@@ -13150,7 +13327,121 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     redrawMn(mn, 120);
     setTimeout(() => redrawMn(mn, 0), 1500);
   }
+  var SPREAD_MS = 40;
+  var frame = 0;
+  var frameAt = -1;
+  var spent = 0;
+  var putOff = 0;
+  var framesOk = false;
+  var builds = [];
+  var nowMs = () => W4.performance && typeof W4.performance.now === "function" ? W4.performance.now() : Date.now();
+  function frameTick() {
+    frame++;
+    try {
+      W4.requestAnimationFrame(frameTick);
+    } catch (e) {
+      framesOk = false;
+    }
+  }
+  function drawNow(C2) {
+    if (!framesOk) return true;
+    if (frameAt !== frame) {
+      frameAt = frame;
+      spent = 0;
+    }
+    return spent < SPREAD_MS || C2 === W4.Player || !C2.Canvas || !seeOthers || typeof C2.MemberNumber !== "number" || !others.has(C2.MemberNumber);
+  }
+  function later(C2) {
+    putOff++;
+    try {
+      W4.requestAnimationFrame(() => {
+        C2.MustDraw = true;
+      });
+    } catch (e) {
+      C2.MustDraw = true;
+    }
+  }
+  var nameOf = (C2) => C2 === W4.Player ? "you" : String(C2 && (C2.Nickname || C2.Name) || "somebody") + (C2 && C2.MemberNumber ? " (" + C2.MemberNumber + ")" : "");
+  function engineOf(C2) {
+    if (C2 === W4.Player) return mine2.E;
+    const o = C2 && typeof C2.MemberNumber === "number" ? others.get(C2.MemberNumber) : null;
+    return o ? o.E : null;
+  }
+  function noteBuild(C2, ms, since2) {
+    const E = engineOf(C2);
+    let made3 = 0, drawn = false;
+    try {
+      const p = E && E.perf ? E.perf().last : null;
+      if (p && p.at >= since2) {
+        drawn = true;
+        made3 = p.made;
+      }
+    } catch (e) {
+    }
+    builds.push({ who: nameOf(C2), ms: Math.round(ms), made: made3, drawn, at: Date.now() });
+    if (builds.length > 40) builds.shift();
+  }
+  function drawnBodyPerf() {
+    const slow = [], kept2 = [];
+    const each = [["you", mine2.E], ...Array.from(others.entries()).map(([mn, o]) => [nameOf(charOf(mn) || { MemberNumber: mn }), o.E])];
+    for (const [who2, E] of each) if (E && E.perf) {
+      try {
+        const p = E.perf();
+        for (const s of p.slow) slow.push(Object.assign({ who: who2 }, s));
+        kept2.push([who2, p.keptMB]);
+      } catch (e) {
+      }
+    }
+    slow.sort((a, b) => b.ms - a.ms);
+    const recent2 = builds.filter((b) => Date.now() - b.at < 9e5);
+    return { recent: recent2.slice(-8), worst: recent2.slice().sort((a, b) => b.ms - a.ms).slice(0, 3), slow: slow.slice(0, 6), putOff, kept: kept2 };
+  }
+  function drawnBodyPerfText() {
+    const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made ? " (" + x.made + " drawn fresh)" : "");
+    const lines = ["Drawin' people (the last quarter hour):"];
+    lines.push("  the last few: " + (p.recent.length ? p.recent.map(b).join(" \xB7 ") : "none yet"));
+    if (p.worst.length) lines.push("  the slowest: " + p.worst.map(b).join(" \xB7 "));
+    if (p.slow.length) lines.push("  the slowest pieces: " + p.slow.map((s) => s.label + " on " + s.who + " " + s.ms + " ms" + (s.made ? ", drawn fresh" : "")).join(" \xB7 "));
+    lines.push("  waited a frame: " + p.putOff + " times" + (p.kept.length ? " \xB7 keepin': " + p.kept.map(([who2, mb]) => who2 + " " + mb + " MB").join(", ") : ""));
+    return lines.join("\n");
+  }
+  var perfSeen = 0;
+  function drawnBodyPerfTick() {
+    const n = builds.filter((x) => x.at > perfSeen), max = n.reduce((m, x) => Math.max(m, x.ms), 0);
+    perfSeen = Date.now();
+    return { n: n.length, max, off: putOff };
+  }
+  var spreadHooked = false;
+  function hookSpread() {
+    if (spreadHooked || !sdk2) return;
+    try {
+      sdk2.hookFunction("CharacterAppearanceBuildCanvas", 1, (args, next) => {
+        const C2 = args[0];
+        if (!C2 || onBot()) return next(args);
+        if (!drawNow(C2)) {
+          later(C2);
+          return void 0;
+        }
+        const t0 = nowMs(), since2 = Date.now();
+        try {
+          return next(args);
+        } finally {
+          const ms = nowMs() - t0;
+          spent += ms;
+          try {
+            noteBuild(C2, ms, since2);
+          } catch (e) {
+          }
+        }
+      });
+      spreadHooked = true;
+    } catch (e) {
+      console.warn("[Farmhand Companion] drawin' people one at a time unavailable:", e);
+      spreadHooked = true;
+    }
+  }
   function hook() {
+    hookSpread();
     if (hooked2 || !sdk2) return;
     hooked2 = true;
     try {
@@ -13207,6 +13498,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     sdk2 = mod2;
     load();
     setInterval(prune, 2e4);
+    if (typeof W4.requestAnimationFrame === "function") {
+      framesOk = true;
+      frameTick();
+    }
     setTimeout(() => {
       if (S.on && engine()) {
         W4.__farmDrawnBody = true;
@@ -15253,6 +15548,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
     try {
+      const d = drawnBodyPerfTick();
+      if (d.n) {
+        s.drawN = d.n;
+        s.drawMax = d.max;
+      }
+      s.drawOff = d.off;
+    } catch (e) {
+    }
+    try {
       s.mess = messMemory();
     } catch (e) {
     }
@@ -15289,7 +15593,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (log.length > MAX2) log = log.slice(-MAX2);
     save3();
   }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + (s.scrPics != null ? " \xB7 screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") + (s.chars != null ? " \xB7 " + s.chars + " characters loaded" + (s.left != null ? " (" + s.left + " who left the room)" : "") + ", " + s.charMB + " MB drawn" : "") + (s.letPeople ? " \xB7 " + s.letPeople + " who left let go" : "") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + (s.scrPics != null ? " \xB7 screen pictures " + s.scrPics + ", " + s.scrMB + " MB" + (s.scrMade ? " (" + s.scrMade + " made on the page)" : "") : "") + (s.chars != null ? " \xB7 " + s.chars + " characters loaded" + (s.left != null ? " (" + s.left + " who left the room)" : "") + ", " + s.charMB + " MB drawn" : "") + (s.letPeople ? " \xB7 " + s.letPeople + " who left let go" : "") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + (s.drawN ? " \xB7 drew people " + s.drawN + " times, the slowest " + s.drawMax + " ms" : "") + (s.drawOff ? " (" + s.drawOff + " waited a frame so far)" : "") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "") + (s.chat != null ? " \xB7 chat log " + s.chat + " lines" : "") + (s.els != null ? " \xB7 " + s.els + " page elements" : "");
   var FAST = "farmhand-memfast";
   var born = Date.now();
   var fast = [];
@@ -15340,9 +15644,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (typeof W11.CommandCombine === "function") {
       W11.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
-        const text3 = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+        let drawing = "";
         try {
-          W11.navigator.clipboard.writeText(JSON.stringify(log));
+          drawing = drawnBodyPerfText();
+        } catch (e) {
+        }
+        const text3 = "Companion v" + VERSION + "\n" + sentLine() + (drawing ? "\n" + drawing : "") + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+        try {
+          W11.navigator.clipboard.writeText((drawing ? drawing + "\n" : "") + JSON.stringify(log));
         } catch (e) {
         }
         if (typeof W11.ChatRoomSendLocal === "function") W11.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text3, 12e4);

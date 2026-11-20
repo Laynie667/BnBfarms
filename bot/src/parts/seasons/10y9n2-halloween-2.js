@@ -455,7 +455,7 @@
         return;
       }
       // a trick: one of Halloween's own traps, if theirs are on (half the time), or a tricky candy
-      if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5){
+      if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5*dangerX(sender).chance)){   // (a Danger Draught: half again as likely, Nov 20)
         const ks = on.reduce((a, id) => a.concat(SEASONS[id].kinds), []).filter(k => !trapWhyNot(sender, k));
         if (ks.length){
           emote("🎃 "+tFill(pickFor(sender, "tot:trap", TOT_LINES.trap), sender), sender);

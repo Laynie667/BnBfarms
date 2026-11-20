@@ -126,7 +126,7 @@
       if (now - (r.groomedAt || 0) < CFG.GROOM_EVERY_MIN*60000) continue;
       r.groomedAt = now; state.groomAt = now; saveLedger();
       // now and then, for somebody with their traps on, it turns into somethin' else
-      if (isSubject(mn) && !r.trapsOff && !trapBreathing(mn) && Math.random() < CFG.GROOM_TRAP_CHANCE){
+      if (isSubject(mn) && !r.trapsOff && !trapBreathing(mn) && Math.random() < CFG.GROOM_TRAP_CHANCE*dangerX(mn).chance){   // (a Danger Draught: half again as likely, Nov 20)
         const can = GROOM_TRAPS.filter(k => { state.groomSpring = mn; try { return !trapWhyNot(mn, k); } finally { state.groomSpring = 0; } });
         if (can.length){
           const k = can[Math.floor(Math.random()*can.length)];

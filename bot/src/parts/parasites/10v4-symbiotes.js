@@ -103,7 +103,7 @@
   // after a trap: now and then, somethin' was waitin' in it
   function symbioteAfterTrap(mn, kind){
     const latexy = SYM_TRAP[kind] === "latex" && LATEX_TRAPS.includes(kind);
-    const r = rec(mn); if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= (latexy ? CFG.SYM.LATEX_TRAP_CHANCE : CFG.SYM.TRAP_CHANCE)) return;
+    const r = rec(mn); if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= Math.min(1, (latexy ? CFG.SYM.LATEX_TRAP_CHANCE : CFG.SYM.TRAP_CHANCE)*dangerX(mn).chance)) return;   // (a Danger Draught: half again as likely, Nov 20)
     const want = SYM_TRAP[kind], order = (want ? [want] : []).concat(Object.keys(SYMBIOTES).sort(() => Math.random() - 0.5));
     const k = order.find(x => !symWhyNot(mn, x)); if (!k) return;
     later(() => { if (charFor(mn) && !symOn(mn)) symBond(mn, k, "after the "+kind+" trap"); }, 6000);

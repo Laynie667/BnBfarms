@@ -41,7 +41,7 @@
   const lastRate = (r, kind) => { const h = r && r.trapRate && r.trapRate[kind]; return h && h.length ? h[h.length - 1] : null; };
   function trapRatesLedger(){ L.trapRates = L.trapRates || {}; return L.trapRates; }
   // a fixed trap-<kind> tile they've said isn't for them: now and then it lets them by (quietly: the tiles stay hidden)
-  function rateLetsBy(mn, kind){ const x = trapRateX(mn, kind); return x < 1 && Math.random() >= x; }
+  function rateLetsBy(mn, kind){ const x = trapRateX(mn, kind) * dangerX(mn).chance; return x < 1 && Math.random() >= x; }   // (a Danger Draught: it lets them by less, Nov 20)
   // the water: what they said about what lives in it, and twice as hungry on its day
   function waterDayX(mn, wk){ return trapRateX(mn, wk) * (wk === trapOfDay() ? CFG.TRAP_DAY_X : 1); }
 

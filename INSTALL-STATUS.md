@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.3** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.88.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.88.0: traps spring the moment you step on them, the Danger Draught on every chancy trap, and ?trap why** Laynie, Nov 20: "I noticed that traps are not triggering like they should, and danger drought doesn't seem to work on the trigger chances the way it should", then "Sounds perfect".
+  - **The moment you step on one:** the farm girl only looked at who was stood where every 20 seconds, so a trap only had you if you were on its tile at that moment: walk across one, or step on and off, and it never knew. Now the game tells her every time somebody moves and she looks right then. Step on a trap and it springs within a second; seen crossin' one on a walk, it has you too. The water, the crate and the roamin' pack are looked at on a move as well.
+  - **The Danger Draught does what its bottle says:** it already made the water, the crate and the parasite half again as likely. Now the scents, the night raid, the groomin' that turns into a trap, the symbiotes and the traps that jump a botched rescuer or come out of a season's trick are half again as likely too. The breather between traps is two minutes, not three; a trap tile resets for them in ten minutes, not fifteen; the traps they said aren't for them let them by less; and slippin' a trap, or bein' got out of one, is harder. Its description says all of that now.
+  - **?trap why:** a trap that holds back says nothin', so a breather, a reset or a limit looked like a broken trap. ?trap why says what's holdin' them back: the breather and how long it has left, traps that had them lately and when they're ready again, a safeword's quiet, the kinds their limits and switches rule out, the ones they rated "not for me", the water's odds, and a Danger Draught. The tiles stay hidden: it never says where a trap is, or that you're stood on one. Staff can ask ?trap why <who>, and are told the trap tile that person is stood on.
 
 - **Bot 0.87.3 + Companion 0.71.1: clothes fitted once, not over and over** (the bot only notes the new Companion) Laynie, Nov 20, with her phone's /farmmem: "users are saying the is significantly less lag", and yes to fixing what the log showed.
   - **What the log showed:** nearly everybody drew in 10 to 80 ms, but one girl in a paw petsuit, a latex corset, a collar and a leash froze the room for 1 to 2 seconds, two to four times over, every few minutes (26 pieces fitted fresh at once).

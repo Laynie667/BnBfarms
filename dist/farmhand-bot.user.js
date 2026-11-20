@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.87.3
+// @version      0.88.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,7 +3046,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.87.3";
+  var VERSION = "0.88.0";
   var COMPANION_VERSION = "0.71.1";
 
   // bot-parts:farmhand-bot-parts
@@ -5211,7 +5211,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L2;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __commands: COMMANDS, __commandClash: COMMAND_CLASH, __lines: () => ({ SEASON_LINES, TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __rateLetsBy: (m, k) => rateLetsBy(m, k), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __commands: COMMANDS, __commandClash: COMMAND_CLASH, __lines: () => ({ SEASON_LINES, TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -12692,7 +12692,7 @@
         mins: 120,
         price: 8,
         stack: 4,
-        desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long (three times with a second bottle). Every bottle adds a quarter to the parasite's chance at the glory stalls: four bottles deep, it is certain.",
+        desc: "For two hours your luck runs bad: you catch half again as easy, and the water, the scents, the night raids, the crate and every chancy trap on the farm are half again as likely to get you. The traps come round for you again in two thirds the time, the ones you said aren't for you let you by less, slippin' one is harder, and whatever a trap does to you lasts twice as long (three times with a second bottle). Every bottle adds a quarter to the parasite's chance at the glory stalls: four bottles deep, it is certain.",
         limit: /\b(danger|risk)/i,
         drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
         seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm."
@@ -14635,7 +14635,10 @@
     function trapBreathing(mn) {
       const r = rec(mn);
       if (!r || r.trapEager || huntOn() || onGauntlet(mn)) return false;
-      return Date.now() - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4;
+      return Date.now() - (r.trapAt || 0) < breatherMs(mn);
+    }
+    function breatherMs(mn) {
+      return CFG.TRAP_COOLDOWN_MIN * 6e4 / perkTrapX(mn) / dangerX(mn).chance;
     }
     function trapWhyNot(mn, kind) {
       const r = rec(mn), K = TRAP_KINDS[kind];
@@ -15140,46 +15143,112 @@
         }
       }, v);
     }
+    function trapResetMs(mn) {
+      return CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance / rankX(mn).reset / perkTrapX(mn);
+    }
+    function trapCheck(mn, now) {
+      if (mn === BOTMN() || !isSubject(mn)) return;
+      state.trapAt = state.trapAt || /* @__PURE__ */ new Map();
+      const r = rec(mn);
+      const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));
+      const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
+      if (!here) {
+        state.trapAt.delete(mn);
+        return;
+      }
+      const fresh = !was || was.spot !== here;
+      if (fresh) state.trapAt.set(mn, { spot: here, at: now });
+      if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;
+      if (on) {
+        if (!fresh) return;
+        r.spotTrapAt = r.spotTrapAt || {};
+        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < trapResetMs(mn)) return;
+        const kind = trapKindOf(here);
+        if (kind !== "random" && rateLetsBy(mn, kind)) {
+          r.spotTrapAt[here] = now;
+          saveLedger();
+          return;
+        }
+        if (!springTrap(mn, kind, here)) {
+          r.trapAt = now;
+          r.spotTrapAt[here] = now;
+          saveLedger();
+        }
+      } else {
+        const st = state.trapAt.get(mn);
+        if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) return;
+        st.rolled = now;
+        const wk = waterKindOf(here);
+        if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < waterOdds(mn, wk)) && !springTrap(mn, wk, here)) {
+          r.trapAt = now;
+          saveLedger();
+        }
+      }
+    }
+    function waterOdds(mn, wk) {
+      return Math.min(1, CFG.TENTACLE_CHANCE * perkTrapX(mn) * nightX().water * dangerX(mn).chance * rankX(mn).water * (corrHas(mn, 10) ? 1.25 : 1) * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1) * waterDayX(mn, wk));
+    }
+    function trapWhyText(mn, asker) {
+      const r = rec(mn), now = Date.now(), you = mn !== asker, nm = plainName(mn);
+      const own = (t) => you ? String(t) : String(t).replace(/\bthey've\b/g, "you've").replace(/\btheir\b/g, "your").replace(/\bthey\b/g, "you").replace(/\bthem\b/g, "you");
+      const mmss = (ms) => {
+        const s = Math.max(0, Math.ceil(ms / 1e3));
+        return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+      };
+      const head = "\u{1F9EA} What's holdin' the traps back for " + (you ? nm : "you, sugar") + ":";
+      if (!r) return head + "\n\u2022 Not on the farm's books.";
+      if (!isSubject(mn)) return head + "\n\u2022 Traps are off" + (you ? " for them." : ": ?traps on and they spring for you.");
+      const L1 = [];
+      const dg = dangerX(mn);
+      L1.push("\u2022 Traps: on" + (r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "") + (dg.on ? ". A Danger Draught's in " + (you ? "them" : "you") + ": every chancy trap's half again as likely, and the traps come round sooner" : "") + ".");
+      if (r.trapsOff) L1.push("\u2022 \u23F8\uFE0F Paused: " + (you ? "they've" : "you've") + " paused the traps.");
+      if ((r.trapQuiet || 0) > now) L1.push("\u2022 \u{1F6D1} A safeword not long ago: nothin' springs for " + mmss(r.trapQuiet - now) + " yet.");
+      if (quietNow(mn)) L1.push("\u2022 \u{1F92B} " + own("They've asked for quiet") + ": nothin' springs till that's over.");
+      if (heldByTrap(mn) || r.trapWait || state.trapRuns && state.trapRuns.has(mn)) L1.push("\u2022 \u{1FAA4} A trap has " + (you ? "them" : "you") + " right now.");
+      else if (benchedNow(mn) || stockedNow(mn) || r.penned || prodOf(mn) && prodOf(mn).stall) L1.push("\u2022 \u{1F512} " + (you ? "They're" : "You're") + " held somewhere already: traps wait till " + (you ? "they're" : "you're") + " loose.");
+      const brLeft = huntOn() || r.trapEager || onGauntlet(mn) ? 0 : breatherMs(mn) - (now - (r.trapAt || 0));
+      L1.push(brLeft > 0 ? "\u2022 \u23F3 Breather: " + mmss(brLeft) + " left before any trap can have " + (you ? "them" : "you") + " again." : "\u2022 \u23F3 No breather: a trap can have " + (you ? "them" : "you") + " right now.");
+      if (!r.trapEager && !onGauntlet(mn)) {
+        const left = trapSpots().map(([n]) => trapResetMs(mn) - (now - ((r.spotTrapAt || {})[n] || 0))).filter((x) => x > 0).sort((a, b) => a - b);
+        if (left.length) L1.push("\u2022 \u{1F501} " + left.length + " trap" + (left.length === 1 ? "" : "s") + " that had " + (you ? "them" : "you") + " lately won't take " + (you ? "them" : "you") + " again yet: " + (left.length === 1 ? "it's ready in " : "the soonest in ") + mmss(left[0]) + (left.length > 1 ? ", the last in " + mmss(left[left.length - 1]) : "") + ".");
+      }
+      L1.push("\u2022 \u{1F463} A trap " + (you ? "they're" : "you're") + " already stood on waits for " + (you ? "them" : "you") + " to step off and back on.");
+      const groups = /* @__PURE__ */ new Map();
+      for (const k of Object.keys(TRAP_KINDS)) {
+        let why;
+        try {
+          why = trapWhyNot(mn, k);
+        } catch (e) {
+          why = null;
+        }
+        if (!why || /season|already has them|held somewhere|safeword|asked for quiet|paused|switched traps on/.test(why)) continue;
+        const g = own(why);
+        if (!groups.has(g)) groups.set(g, []);
+        groups.get(g).push(k);
+      }
+      if (groups.size) L1.push("\u2022 \u{1F645} Ruled out for " + (you ? "them" : "you") + ": " + Array.from(groups.entries()).map(([g, ks]) => g.replace(/ rule it out$| rules it out$/, "") + ": " + ks.slice(0, 8).join(", ") + (ks.length > 8 ? " and " + (ks.length - 8) + " more" : "")).join(" \xB7 ") + ".");
+      const notFor = Object.keys(TRAP_KINDS).filter((k) => trapRateX(mn, k) < 1);
+      if (notFor.length) L1.push("\u2022 \u{1F3B2} Ones " + (you ? "they" : "you") + " said aren't for " + (you ? "them" : "you") + " let " + (you ? "them" : "you") + " by now and then: " + notFor.map((k) => k + " (" + rateOdds(Math.min(1, trapRateX(mn, k) * dg.chance)) + ")").join(", ") + ".");
+      if (waterSpots().length) {
+        const w = waterOdds(mn, "tentacle");
+        L1.push("\u2022 \u{1F30A} The water: " + (w >= 0.995 ? "certain" : Math.max(1, Math.round(w * 100)) + "%") + " each time " + (you ? "they wade" : "you wade") + " in, and again every " + Math.round(CFG.TENTACLE_LINGER_MIN / (potionOn(mn, "tentaclemusk") ? 5 : 1)) + " min " + (you ? "they" : "you") + " stay.");
+      }
+      if (you) {
+        const on = trapSpots().find(([n]) => onSpot(mn, n, 0));
+        if (on) {
+          const left = trapResetMs(mn) - (now - ((r.spotTrapAt || {})[on[0]] || 0));
+          L1.push("\u2022 \u{1F4CD} Stood on " + on[0] + " now" + (left > 0 && !r.trapEager ? ": it resets for them in " + mmss(left) : ": ready for them") + ".");
+        }
+      }
+      return head + "\n" + L1.join("\n");
+    }
     function trapTick() {
       const now = Date.now();
-      state.trapAt = state.trapAt || /* @__PURE__ */ new Map();
       for (const C2 of W.ChatRoomCharacter || []) {
-        const mn = C2.MemberNumber;
-        if (mn === BOTMN() || !isSubject(mn)) continue;
-        const r = rec(mn);
-        const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));
-        const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
-        if (!here) {
-          state.trapAt.delete(mn);
-          continue;
-        }
-        const fresh = !was || was.spot !== here;
-        if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-        if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4 / perkTrapX(mn)) continue;
-        if (on) {
-          if (!fresh) continue;
-          r.spotTrapAt = r.spotTrapAt || {};
-          if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance / rankX(mn).reset / perkTrapX(mn)) continue;
-          const kind = trapKindOf(here);
-          if (kind !== "random" && rateLetsBy(mn, kind)) {
-            r.spotTrapAt[here] = now;
-            saveLedger();
-            continue;
-          }
-          if (!springTrap(mn, kind, here)) {
-            r.trapAt = now;
-            r.spotTrapAt[here] = now;
-            saveLedger();
-          }
-        } else {
-          const st = state.trapAt.get(mn);
-          if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
-          st.rolled = now;
-          const wk = waterKindOf(here);
-          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * perkTrapX(mn) * nightX().water * dangerX(mn).chance * rankX(mn).water * (corrHas(mn, 10) ? 1.25 : 1) * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1) * waterDayX(mn, wk))) && !springTrap(mn, wk, here)) {
-            r.trapAt = now;
-            saveLedger();
-          }
+        try {
+          trapCheck(C2.MemberNumber, now);
+        } catch (e) {
+          warn("trap check:", e);
         }
       }
       toyTick();
@@ -15193,6 +15262,21 @@
       cursedTick();
       keepersTick();
       uddersTick();
+    }
+    function trapMoved(mn) {
+      if (!mn || mn === BOTMN() || state.dormant || !isSubject(mn) || !charFor(mn)) return;
+      const now = Date.now();
+      try {
+        trapCheck(mn, now);
+      } catch (e) {
+        warn("trap on move:", e);
+      }
+      try {
+        packTick(now);
+        crateTick(now);
+      } catch (e) {
+        warn("trap extras on move:", e);
+      }
     }
     const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
     const OVI_WORDS = ["ovipositor"];
@@ -15386,6 +15470,19 @@
           R(trapDayLine() || "\u{1F3AF} No trap of the day yet: the farm hasn't any traps out.");
           return true;
         }
+        if (a0 === "why") {
+          const t = args[1] ? resolveTarget(args[1]) : sender;
+          if (args[1] && !t) {
+            R("Who, sugar? ?trap why, or (staff) ?trap why <who>.");
+            return true;
+          }
+          if (t !== sender && !isStaff(sender)) {
+            R("You can ask about your own traps, sugar: ?trap why.");
+            return true;
+          }
+          R(trapWhyText(t, sender));
+          return true;
+        }
         if (a0 && TRAP_KINDS[a0]) {
           R(trapAbout(a0) + (a0 === "tentacle" ? " " + waterFormsText(sender) : STUD_FORMS[a0] ? " " + studFormsText(sender, a0) : ""));
           return true;
@@ -15532,9 +15629,9 @@
         }
         const spots = trapSpots(), water = waterSpots();
         if (isStaff(sender))
-          R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L2.trapLoads && L2.trapLoads[n] ? " [" + L2.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate) \xB7 ?traps ratings" + (trapDayLine() ? "\n" + trapDayLine() : ""));
+          R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L2.trapLoads && L2.trapLoads[n] ? " [" + L2.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?trap why <who> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate) \xB7 ?traps ratings" + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else if (isSubject(sender))
-          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
+          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 ?trap why says what's holdin' them back \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else R("\u{1F9EA} Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n" + trapsList());
         return true;
       }
@@ -28736,7 +28833,7 @@
     function symbioteAfterTrap(mn, kind) {
       const latexy = SYM_TRAP[kind] === "latex" && LATEX_TRAPS.includes(kind);
       const r = rec(mn);
-      if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= (latexy ? CFG.SYM.LATEX_TRAP_CHANCE : CFG.SYM.TRAP_CHANCE)) return;
+      if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= Math.min(1, (latexy ? CFG.SYM.LATEX_TRAP_CHANCE : CFG.SYM.TRAP_CHANCE) * dangerX(mn).chance)) return;
       const want = SYM_TRAP[kind], order = (want ? [want] : []).concat(Object.keys(SYMBIOTES).sort(() => Math.random() - 0.5));
       const k = order.find((x) => !symWhyNot(mn, x));
       if (!k) return;
@@ -31202,7 +31299,7 @@
         if (heldTotal(p) > 0.8 * capacity(mn) || bellyStage(mn) >= 3 || makesMilk(mn) && p.milk > 0.9 * milkCap(mn)) heavy = 0.6;
       } catch (e) {
       }
-      if (Math.random() < CFG.STRUGGLE_CHANCE * heavy) {
+      if (Math.random() < CFG.STRUGGLE_CHANCE * heavy / dangerX(mn).chance) {
         if (held === "pillory") unbench(mn, "safe");
         trapStop(mn, 0);
         emote("\u{1F4AA} " + xLine("free", mn), mn);
@@ -31253,7 +31350,7 @@
       }
       state.freeTried.set(sender + ":" + t, Date.now());
       audit(sender, "FREE", String(t));
-      if (Math.random() < CFG.FREE_CHANCE) {
+      if (Math.random() < CFG.FREE_CHANCE / dangerX(t).chance) {
         const r = rec(t);
         if (r.benched && r.benched.trap) unbench(t, "safe");
         trapStop(t, 0);
@@ -31262,7 +31359,7 @@
       } else {
         emote("\u{1F91D} " + xLine("rescueFail", t, v), t);
         R("It wouldn't give, sugar." + (isSubject(sender) ? " And now it's noticed you." : ""));
-        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) later(() => {
+        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5 * dangerX(sender).chance)) later(() => {
           const why = springTrap(sender, "random", "", true);
           if (!why) {
             rec(sender).trapAt = Date.now();
@@ -32075,7 +32172,7 @@
           if (!f || f.until <= now || f.came) continue;
           const kind = Array.isArray(k0) ? k0.filter((k) => TRAP_KINDS[k] && !trapWhyNot(mn, k)).sort(() => Math.random() - 0.5)[0] : k0;
           if (!kind) continue;
-          if (now - f.at < CFG.SCENT_WAIT_MIN * 6e4 || trapBreathing(mn) || heldByTrap(mn) || state.sceneRuns && state.sceneRuns.has(mn) || Math.random() >= CFG.SCENT_CHANCE) continue;
+          if (now - f.at < CFG.SCENT_WAIT_MIN * 6e4 || trapBreathing(mn) || heldByTrap(mn) || state.sceneRuns && state.sceneRuns.has(mn) || Math.random() >= Math.min(1, CFG.SCENT_CHANCE * dangerX(mn).chance)) continue;
           f.came = true;
           saveLedger();
           emote(TRAP_KINDS[kind].icon + " " + bLine("scent_" + kind, mn), mn);
@@ -33356,10 +33453,10 @@
     function raidTick(now) {
       if (!inCurfew() || now - (state.raidAt || 0) < CFG.RAID_EVERY_MIN * 6e4) return;
       state.raidAt = now;
-      if (Math.random() >= CFG.RAID_CHANCE) return;
       const barn = Object.keys(L2.spots || {}).filter((n) => /^barn/.test(n));
       const there = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => isSubject(m) && barn.some((b) => onSpot(m, b, 1)) && !trapBreathing(m) && !trapWhyNot(m, "wolves"));
       if (!there.length) return;
+      if (Math.random() >= Math.min(1, CFG.RAID_CHANCE * Math.max(...there.map((m) => dangerX(m).chance)))) return;
       emote("\u{1F43A} " + cLine("raid", there[0]), there[0]);
       there.slice(0, 3).forEach((m, i) => later(() => {
         if (!springTrap(m, "wolves", "", true)) {
@@ -38360,7 +38457,7 @@
         r.groomedAt = now;
         state.groomAt = now;
         saveLedger();
-        if (isSubject(mn) && !r.trapsOff && !trapBreathing(mn) && Math.random() < CFG.GROOM_TRAP_CHANCE) {
+        if (isSubject(mn) && !r.trapsOff && !trapBreathing(mn) && Math.random() < CFG.GROOM_TRAP_CHANCE * dangerX(mn).chance) {
           const can = GROOM_TRAPS.filter((k) => {
             state.groomSpring = mn;
             try {
@@ -40671,7 +40768,7 @@
           emote("\u{1F383} " + tFill(pickFor(sender, "tot:plain", TOT_LINES.plain), sender), sender);
           return;
         }
-        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) {
+        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5 * dangerX(sender).chance)) {
           const ks = on.reduce((a, id) => a.concat(SEASONS[id].kinds), []).filter((k) => !trapWhyNot(sender, k));
           if (ks.length) {
             emote("\u{1F383} " + tFill(pickFor(sender, "tot:trap", TOT_LINES.trap), sender), sender);
@@ -40782,7 +40879,7 @@
       return L2.trapRates;
     }
     function rateLetsBy(mn, kind) {
-      const x = trapRateX(mn, kind);
+      const x = trapRateX(mn, kind) * dangerX(mn).chance;
       return x < 1 && Math.random() >= x;
     }
     function waterDayX(mn, wk) {
@@ -46217,7 +46314,7 @@
           return;
         }
         if (roll < 0.35) {
-          if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) {
+          if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5 * dangerX(sender).chance)) {
             const ks = SEASONS.easter.kinds.filter((k) => !trapWhyNot(sender, k));
             if (ks.length) {
               H.n++;
@@ -68995,6 +69092,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
         } catch (e) {
           warn("leave:", e);
+        }
+      });
+      on("ChatRoomSyncMapData", (data) => {
+        try {
+          if (data && typeof data.MemberNumber === "number" && data.MemberNumber !== CFG.BOT_MEMBER) trapMoved(data.MemberNumber);
+        } catch (e) {
+          warn("move:", e);
         }
       });
       on("AccountQueryResult", (d) => {

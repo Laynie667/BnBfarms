@@ -10,6 +10,11 @@
      • THE DANGER DRAUGHT (10m-potions.js has the bottle): while it's in somebody, everything that works on a chance
        is half again as likely for them (catchin', the thing in the water, the parasite, a crate that bites), and
        every trap timer runs double. A second bottle on top: triple.
+       (Nov 20, Laynie: "danger draught doesn't seem to work on the trigger chances the way it should". Now it's every
+       chancy trap: the scents, the night raid, the groomin' that turns, the symbiotes, the rank hand-ons, the traps that
+       jump a botched rescuer, the season's tricks. The breather between traps and a tile's reset are two thirds as long
+       (breatherMs, trapResetMs in 10u-traps.js), "not for me" lets them by less, and slippin' a trap or bein' got out of
+       one is two thirds as likely.)
      • ?traps eager on|off: a subject's own switch to skip the breather between traps and the reset on each spot.
   */
   const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];

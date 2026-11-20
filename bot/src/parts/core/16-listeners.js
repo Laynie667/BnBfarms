@@ -135,6 +135,8 @@
     });
 
     on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber){ markLeft(data.SourceMemberNumber); addonsEmit("leave", data.SourceMemberNumber); } } catch(e){ warn("leave:",e); } });
+    // somebody moved on the map: their traps are looked at right then, not at the next heartbeat (trapMoved, 10u-traps.js)
+    on("ChatRoomSyncMapData",(data)=>{ try { if (data && typeof data.MemberNumber === "number" && data.MemberNumber !== CFG.BOT_MEMBER) trapMoved(data.MemberNumber); } catch(e){ warn("move:",e); } });
     // who's friends with the bot both ways (and online): the only people a beep can reach
     on("AccountQueryResult",(d)=>{
       try {

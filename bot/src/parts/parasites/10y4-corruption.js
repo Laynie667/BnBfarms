@@ -152,10 +152,11 @@
   function raidTick(now){
     if (!inCurfew() || now - (state.raidAt || 0) < CFG.RAID_EVERY_MIN*60000) return;
     state.raidAt = now;
-    if (Math.random() >= CFG.RAID_CHANCE) return;
     const barn = Object.keys(L.spots || {}).filter(n => /^barn/.test(n));
     const there = (W.ChatRoomCharacter || []).map(c => c.MemberNumber).filter(m => isSubject(m) && barn.some(b => onSpot(m, b, 1)) && !trapBreathing(m) && !trapWhyNot(m, "wolves"));
     if (!there.length) return;
+    // (somebody in the barn with a Danger Draught in them: the raid's half again as likely to come, Nov 20)
+    if (Math.random() >= Math.min(1, CFG.RAID_CHANCE*Math.max(...there.map(m => dangerX(m).chance)))) return;
     emote("🐺 "+cLine("raid", there[0]), there[0]);
     there.slice(0, 3).forEach((m, i) => later(() => { if (!springTrap(m, "wolves", "", true)){ rec(m).trapAt = Date.now(); saveLedger(); } }, 6000 + i*4000));
   }

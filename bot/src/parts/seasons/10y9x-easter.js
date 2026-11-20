@@ -452,7 +452,7 @@
       }
       // a trick: an egg that was bait for one of Easter's traps (theirs on), or a strange jelly bean
       if (roll < 0.35){
-        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5){
+        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5*dangerX(sender).chance)){   // (a Danger Draught: half again as likely, Nov 20)
           const ks = SEASONS.easter.kinds.filter(k => !trapWhyNot(sender, k));
           if (ks.length){
             H.n++; saveLedger();

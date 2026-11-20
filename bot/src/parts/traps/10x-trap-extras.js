@@ -92,7 +92,7 @@
     if (key.struggled){ R("You've had your one try at this one, sugar. It's got you."); return; }
     key.struggled = true;
     let heavy = 1; try { const p = prodOf(mn); if (heldTotal(p) > 0.8*capacity(mn) || bellyStage(mn) >= 3 || (makesMilk(mn) && p.milk > 0.9*milkCap(mn))) heavy = 0.6; } catch(e){}   // full and heavy: harder to get loose (Oct 24)
-    if (Math.random() < CFG.STRUGGLE_CHANCE*heavy){
+    if (Math.random() < CFG.STRUGGLE_CHANCE*heavy/dangerX(mn).chance){   // (a Danger Draught: luck's against you, it's harder to slip, Nov 20)
       if (held === "pillory") unbench(mn, "safe");
       trapStop(mn, 0);
       emote("💪 "+xLine("free", mn), mn);
@@ -124,7 +124,7 @@
     if (Date.now() - (state.freeTried.get(sender+":"+t) || 0) < 5*60000){ R("You've tried, sugar. Give it a few minutes."); return; }
     state.freeTried.set(sender+":"+t, Date.now());
     audit(sender, "FREE", String(t));
-    if (Math.random() < CFG.FREE_CHANCE){
+    if (Math.random() < CFG.FREE_CHANCE/dangerX(t).chance){   // (a Danger Draught in them: harder to get them out, Nov 20)
       const r = rec(t); if (r.benched && r.benched.trap) unbench(t, "safe");
       trapStop(t, 0);
       emote("🤝 "+xLine("rescued", t, v), t);
@@ -132,7 +132,7 @@
     } else {
       emote("🤝 "+xLine("rescueFail", t, v), t);
       R("It wouldn't give, sugar."+(isSubject(sender) ? " And now it's noticed you." : ""));
-      if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) later(() => { const why = springTrap(sender, "random", "", true); if (!why){ rec(sender).trapAt = Date.now(); saveLedger(); } }, 4000);
+      if (isSubject(sender) && !trapBreathing(sender) && Math.random() < Math.min(1, 0.5*dangerX(sender).chance)) later(() => { const why = springTrap(sender, "random", "", true); if (!why){ rec(sender).trapAt = Date.now(); saveLedger(); } }, 4000);
     }
   }
 

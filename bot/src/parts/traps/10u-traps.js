@@ -60,8 +60,12 @@
   // from when the last trap let go of them. Eager, a hunt and the gauntlet skip it, as before.
   function trapBreathing(mn){
     const r = rec(mn); if (!r || r.trapEager || huntOn() || onGauntlet(mn)) return false;
-    return Date.now() - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000;
+    return Date.now() - (r.trapAt || 0) < breatherMs(mn);
   }
+  // how long the breather is for them: a Trap Magnet shortens it, and so does a Danger Draught (Nov 20, Laynie: "danger
+  // draught doesn't seem to work on the trigger chances the way it should": its bottle says every chancy thing is half
+  // again as likely to get you, so the traps come round again in two thirds the time)
+  function breatherMs(mn){ return CFG.TRAP_COOLDOWN_MIN*60000/perkTrapX(mn)/dangerX(mn).chance; }
   // can this trap spring on them right now? null = yes
   function trapWhyNot(mn, kind){
     const r = rec(mn), K = TRAP_KINDS[kind];
@@ -415,37 +419,95 @@
     }, v);
   }
 
-  // ── every heartbeat: who's standin' on what ────────────────
+  // ── who's standin' on what: every heartbeat, and the moment they move ────────────────
+  // how long a trap tile takes to reset for them (half as long after dark; a Danger Draught, a rank, a Trap Magnet: sooner)
+  function trapResetMs(mn){ return CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset/perkTrapX(mn); }
+  // one subject, right now: on a trap tile or in the water? (one visit is one roll: state.trapAt holds the spot they're on)
+  function trapCheck(mn, now){
+    if (mn === BOTMN() || !isSubject(mn)) return;
+    state.trapAt = state.trapAt || new Map();
+    const r = rec(mn);
+    const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));   // (water and troughs too: on the tile, not beside it, Oct 24)
+    const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
+    if (!here){ state.trapAt.delete(mn); return; }
+    const fresh = !was || was.spot !== here;
+    if (fresh) state.trapAt.set(mn, { spot: here, at: now });
+    if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;    // one trap at a time, with a breather between (not durin' a hunt)
+    if (on){
+      if (!fresh) return;                                                               // step off and back on to spring it again
+      r.spotTrapAt = r.spotTrapAt || {};
+      if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < trapResetMs(mn)) return;   // each trap takes a while to reset
+      const kind = trapKindOf(here);
+      if (kind !== "random" && rateLetsBy(mn, kind)){ r.spotTrapAt[here] = now; saveLedger(); return; }   // one they said isn't for them lets them by now and then (10y9o-trap-ratings.js)
+      if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
+    } else {
+      // water: a slim chance when they wade in, and again every few minutes they linger
+      const st = state.trapAt.get(mn);
+      if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) return;   // (with Tentacle Musk on, it looks again every minute)
+      st.rolled = now;
+      const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
+      if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < waterOdds(mn, wk)) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+    }
+  }
+  // the water's odds for them, each time it looks
+  function waterOdds(mn, wk){ return Math.min(1, CFG.TENTACLE_CHANCE*perkTrapX(mn)*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1)*waterDayX(mn, wk)); }
+  // ?trap why (Nov 20, Laynie: traps "not triggering like they should"): what's holdin' the traps back for somebody. A trap
+  // that doesn't spring says nothin', so a breather, a reset or a limit looked like a broken trap. The tiles stay hidden:
+  // a player hears about traps in general, and only about tiles that have already had them. Staff, askin' about somebody,
+  // are told the tile they're stood on too.
+  function trapWhyText(mn, asker){   // (you: somebody else is askin' about them, so it's "them" and "they")
+    const r = rec(mn), now = Date.now(), you = mn !== asker, nm = plainName(mn);
+    const own = (t) => you ? String(t) : String(t).replace(/\bthey've\b/g, "you've").replace(/\btheir\b/g, "your").replace(/\bthey\b/g, "you").replace(/\bthem\b/g, "you");
+    const mmss = (ms) => { const s = Math.max(0, Math.ceil(ms/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2, "0"); };
+    const head = "🧪 What's holdin' the traps back for "+(you ? nm : "you, sugar")+":";
+    if (!r) return head+"\n• Not on the farm's books.";
+    if (!isSubject(mn)) return head+"\n• Traps are off"+(you ? " for them." : ": ?traps on and they spring for you.");
+    const L1 = [];
+    const dg = dangerX(mn);
+    L1.push("• Traps: on"+(r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "")+(dg.on ? ". A Danger Draught's in "+(you ? "them" : "you")+": every chancy trap's half again as likely, and the traps come round sooner" : "")+".");
+    if (r.trapsOff) L1.push("• ⏸️ Paused: "+(you ? "they've" : "you've")+" paused the traps.");
+    if ((r.trapQuiet || 0) > now) L1.push("• 🛑 A safeword not long ago: nothin' springs for "+mmss(r.trapQuiet - now)+" yet.");
+    if (quietNow(mn)) L1.push("• 🤫 "+own("They've asked for quiet")+": nothin' springs till that's over.");
+    if (heldByTrap(mn) || r.trapWait || (state.trapRuns && state.trapRuns.has(mn))) L1.push("• 🪤 A trap has "+(you ? "them" : "you")+" right now.");
+    else if (benchedNow(mn) || stockedNow(mn) || r.penned || (prodOf(mn) && prodOf(mn).stall)) L1.push("• 🔒 "+(you ? "They're" : "You're")+" held somewhere already: traps wait till "+(you ? "they're" : "you're")+" loose.");
+    const brLeft = (huntOn() || r.trapEager || onGauntlet(mn)) ? 0 : breatherMs(mn) - (now - (r.trapAt || 0));
+    L1.push(brLeft > 0 ? "• ⏳ Breather: "+mmss(brLeft)+" left before any trap can have "+(you ? "them" : "you")+" again." : "• ⏳ No breather: a trap can have "+(you ? "them" : "you")+" right now.");
+    // tiles that have had them, still resettin' (no names: the tiles are hidden)
+    if (!r.trapEager && !onGauntlet(mn)){
+      const left = trapSpots().map(([n]) => trapResetMs(mn) - (now - ((r.spotTrapAt || {})[n] || 0))).filter(x => x > 0).sort((a, b) => a - b);
+      if (left.length) L1.push("• 🔁 "+left.length+" trap"+(left.length === 1 ? "" : "s")+" that had "+(you ? "them" : "you")+" lately won't take "+(you ? "them" : "you")+" again yet: "+(left.length === 1 ? "it's ready in " : "the soonest in ")+mmss(left[0])+(left.length > 1 ? ", the last in "+mmss(left[left.length - 1]) : "")+".");
+    }
+    L1.push("• 👣 A trap "+(you ? "they're" : "you're")+" already stood on waits for "+(you ? "them" : "you")+" to step off and back on.");
+    // kinds ruled out, and why (the lasting reasons only: the season, and bein' held, are said above or don't matter here)
+    const groups = new Map();
+    for (const k of Object.keys(TRAP_KINDS)){
+      let why; try { why = trapWhyNot(mn, k); } catch(e){ why = null; }
+      if (!why || /season|already has them|held somewhere|safeword|asked for quiet|paused|switched traps on/.test(why)) continue;
+      const g = own(why); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(k);
+    }
+    if (groups.size) L1.push("• 🙅 Ruled out for "+(you ? "them" : "you")+": "+Array.from(groups.entries()).map(([g, ks]) => g.replace(/ rule it out$| rules it out$/, "")+": "+ks.slice(0, 8).join(", ")+(ks.length > 8 ? " and "+(ks.length - 8)+" more" : "")).join(" · ")+".");
+    const notFor = Object.keys(TRAP_KINDS).filter(k => trapRateX(mn, k) < 1);
+    if (notFor.length) L1.push("• 🎲 Ones "+(you ? "they" : "you")+" said aren't for "+(you ? "them" : "you")+" let "+(you ? "them" : "you")+" by now and then: "+notFor.map(k => k+" ("+rateOdds(Math.min(1, trapRateX(mn, k)*dg.chance))+")").join(", ")+".");
+    if (waterSpots().length){ const w = waterOdds(mn, "tentacle"); L1.push("• 🌊 The water: "+(w >= 0.995 ? "certain" : Math.max(1, Math.round(w*100))+"%")+" each time "+(you ? "they wade" : "you wade")+" in, and again every "+Math.round(CFG.TENTACLE_LINGER_MIN/(potionOn(mn, "tentaclemusk") ? 5 : 1))+" min "+(you ? "they" : "you")+" stay."); }
+    if (you){ const on = trapSpots().find(([n]) => onSpot(mn, n, 0)); if (on){ const left = trapResetMs(mn) - (now - ((r.spotTrapAt || {})[on[0]] || 0)); L1.push("• 📍 Stood on "+on[0]+" now"+(left > 0 && !r.trapEager ? ": it resets for them in "+mmss(left) : ": ready for them")+"."); } }
+    return head+"\n"+L1.join("\n");
+  }
   function trapTick(){
     const now = Date.now();
-    state.trapAt = state.trapAt || new Map();      // subject → the spot they're stood on (so one visit is one roll)
-    for (const C of (W.ChatRoomCharacter || [])){
-      const mn = C.MemberNumber;
-      if (mn === BOTMN() || !isSubject(mn)) continue;
-      const r = rec(mn);
-      const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));   // (water and troughs too: on the tile, not beside it, Oct 24)
-      const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
-      if (!here){ state.trapAt.delete(mn); continue; }
-      const fresh = !was || was.spot !== here;
-      if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000/perkTrapX(mn)) continue;    // one trap at a time, with a breather between (not durin' a hunt)
-      if (on){
-        if (!fresh) continue;                                                             // step off and back on to spring it again
-        r.spotTrapAt = r.spotTrapAt || {};
-        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset/perkTrapX(mn)) continue;   // each trap takes a while to reset (half as long after dark)
-        const kind = trapKindOf(here);
-        if (kind !== "random" && rateLetsBy(mn, kind)){ r.spotTrapAt[here] = now; saveLedger(); continue; }   // one they said isn't for them lets them by now and then (10y9o-trap-ratings.js)
-        if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
-      } else {
-        // water: a slim chance when they wade in, and again every few minutes they linger
-        const st = state.trapAt.get(mn);
-        if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
-        st.rolled = now;
-        const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
-        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*perkTrapX(mn)*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1)*waterDayX(mn, wk))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
-      }
-    }
+    for (const C of (W.ChatRoomCharacter || [])){ try { trapCheck(C.MemberNumber, now); } catch(e){ warn("trap check:", e); } }
     toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
+  }
+  // THE MOMENT THEY MOVE (Nov 20, Laynie: "traps are not triggering like they should"). The heartbeat only looks every 20
+  // seconds, so a trap only had you if you were stood on it at that moment: walk across one, or step on and off, and it
+  // never knew. The game tells me every time somebody moves (16-listeners.js), and their trap tile, the water, the crate
+  // and the roamin' pack are looked at then and there. (The game sends a walker's place about every half second, and
+  // that's all I know of where they are: so every one is looked at, at once, and a trap on a tile they're seen crossin'
+  // has them too.)
+  function trapMoved(mn){
+    if (!mn || mn === BOTMN() || state.dormant || !isSubject(mn) || !charFor(mn)) return;
+    const now = Date.now();
+    try { trapCheck(mn, now); } catch(e){ warn("trap on move:", e); }
+    try { packTick(now); crateTick(now); } catch(e){ warn("trap extras on move:", e); }
   }
 
   // ── toys that do things on their own ───────────────────────
@@ -597,6 +659,12 @@
         R(trapRatingsText()); return true;   // (10y9o-trap-ratings.js)
       }
       if (a0 === "today" || a0 === "day"){ R(trapDayLine() || "🎯 No trap of the day yet: the farm hasn't any traps out."); return true; }
+      if (a0 === "why"){   // what's holdin' the traps back (staff can ask about somebody else)
+        const t = args[1] ? resolveTarget(args[1]) : sender;
+        if (args[1] && !t){ R("Who, sugar? ?trap why, or (staff) ?trap why <who>."); return true; }
+        if (t !== sender && !isStaff(sender)){ R("You can ask about your own traps, sugar: ?trap why."); return true; }
+        R(trapWhyText(t, sender)); return true;
+      }
       if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)+(a0 === "tentacle" ? " "+waterFormsText(sender) : STUD_FORMS[a0] ? " "+studFormsText(sender, a0) : "")); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         const was = isSubject(sender);
@@ -663,7 +731,7 @@
           "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck)."+
           "\nOut there now: "+(spots.length ? spots.map(([n]) => n+(L.trapLoads && L.trapLoads[n] ? " ["+L.trapLoads[n]+"]" : "")).join(", ") : "none yet")+
           "\nWater the thing lives in: "+(water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath…)")+
-          "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for who has them on"+
+          "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?trap why <who> · ?subject for who has them on"+
           "\n?trap make <name> <what it does>… builds one of your own (?trap made) · ?whistle <which> <who> calls one of the farm's own to them"+
           "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate) · ?traps ratings"+
           (trapDayLine() ? "\n"+trapDayLine() : ""));
@@ -671,7 +739,7 @@
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
           "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+
           " · ?traps theme <kind> off rules out a whole kind (furry, monsters, messy…)"+((r.trapThemesOff || []).length ? " (off: "+r.trapThemesOff.join(", ")+")" : "")+
-          " · ?rate says how one was · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
+          " · ?rate says how one was · ?trap why says what's holdin' them back · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
       else R("🧪 Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n"+trapsList());
       return true;
     }

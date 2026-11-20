@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.70.0
+// @version      0.70.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.70.0";
+  var VERSION = "0.70.1";
 
   // shared/species.js
   var WORDS = {
@@ -9296,6 +9296,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (WARNED2.size > 200) WARNED2.clear();
       console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
     };
+    const SLOT_SRC2 = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
     window.FarmBodyEngine = function(host) {
       "use strict";
       const S3 = host.S;
@@ -9391,6 +9392,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             clearTimeout(MOULD.t);
             MOULD.t = setTimeout(bellyDraw, 60);
           };
+          if (/^https?:\/\//i.test(src)) {
+            try {
+              if (new URL(src).origin !== location.origin) e.img.crossOrigin = "anonymous";
+            } catch (er) {
+            }
+          }
           e.img.onerror = () => {
             if (!e.retried) {
               e.retried = true;
@@ -9496,7 +9503,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       function bellyAuto(src, x, y, ctx3, behind, pieceKey) {
         if (!ctx3.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
-        const m0 = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
+        const m0 = new RegExp(SLOT_SRC2).exec(src);
         if (!m0) return false;
         if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
         if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx3, "under|" + (pieceKey || src), "under");
@@ -10064,7 +10071,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   return ctx3.handF;
                 } };
               }
-              const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+              const slot = new RegExp(SLOT_SRC2);
               const groupOf4 = (src) => {
                 const m = slot.exec(src);
                 return m ? m[1] : "";
@@ -12352,6 +12359,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388];
   }
   var SKIN_UNDER = { BodyUpper: 1, BodyLower: 1, Pussy: 1 };
+  var SLOT_SRC = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
   function skinGate(C2) {
     const layers = C2 && C2.AppearanceLayers;
     if (!Array.isArray(layers) || !layers.length) return null;
@@ -12359,7 +12367,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     let last2 = -1, at = 0;
     for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf4(layers[i])]) last2 = i;
     if (last2 < 0) return null;
-    const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+    const slot = new RegExp(SLOT_SRC);
     return (src) => {
       const m = slot.exec(String(src));
       if (!m) return false;
@@ -12370,7 +12378,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return i > last2;
     };
   }
-  var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
+  var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK, SLOT_SRC };
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin, pressed) {
     const key3 = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
@@ -12466,7 +12474,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             let upper = null, lower = false, done = false;
             const gate = skinGate(C2);
             const prio = (src) => {
-              const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
+              const m = new RegExp(SLOT_SRC).exec(src);
               if (!m) return 99;
               try {
                 const g = W2.AssetGroupGet && W2.AssetGroupGet(C2.AssetFamily, m[1]);
@@ -14473,7 +14481,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return p;
   }
   var SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
-  var groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
+  var groupRe = /(?:^|\/)(?:Assets\/[^/]+\/(?:Override\/[^/]+\/)?|toys\/v[0-9]+\/)([^/]+)\//;
   var groupOfSrc = (src) => {
     const m = groupRe.exec(String(src || ""));
     return m ? m[1] : "";

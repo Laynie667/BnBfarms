@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.87.1 + Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits**
+- **Companion 0.70.1: the nipple toys sit on your drawn nipples, in front of your tits** Laynie, Nov 20: "the toys are on layer 22, the breast are layer 49, the toys dont match or follow where the nipple is".
+  - **What was wrong:** the toys' pictures come from the repo, and the drawn body only knew what slot a picture was in from the game's own folders. So a toy wasn't seen as nipple gear (never moved onto your drawn nipples: it sat where the game's biggest chest has its nipples), and wasn't seen as worn (the drawn breasts waited for the next worn piece and went on over it; bare but for the toy, it was hidden altogether). And a picture from another site was fetched without leave to read it, so its nipples couldn't be found to move it.
+  - **Now:** the toys are read as nipple gear and as worn, like the game's own clamps: moved onto your drawn nipples, grown with your cup, and drawn in front. The brand and messes go under them too.
 
 - **Dispensary 0.24.1: the nipple toys go in open nipples now** Laynie, Nov 19: "I used the button to open my nipple and I can't seem to use the toys on them? it doesn't recognize my open nipples".
   - **What was wrong:** the game's item menu doesn't check you, it checks a stand-in copy of you with the nipple slot left off, and that copy has no member number. So the toys always thought the nipples were shut, however they'd been opened: the button, /dispensary nips open, a dose, the leeches.

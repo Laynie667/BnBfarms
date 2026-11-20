@@ -125,6 +125,9 @@ function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : pose === "H
 // skinGate(C) gives back a function to call once for every picture drawn, in order, with that picture's address;
 // it answers true when that picture comes after all the skin. null if this game has no such list.
 const SKIN_UNDER = { BodyUpper: 1, BodyLower: 1, Pussy: 1 };
+// a picture's slot, from its address: the game's (Assets/Female3DCG/<slot>/, a body style's Override/<style>/<slot>/) or
+// the Dispensary's nipple toys (toys/v1/<slot>/)
+const SLOT_SRC = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
 function skinGate(C) {
   const layers = C && C.AppearanceLayers;
   if (!Array.isArray(layers) || !layers.length) return null;
@@ -137,7 +140,10 @@ function skinGate(C) {
   // (and a body STYLE's pictures live a folder deeper, "Assets/Female3DCG/Override/EchoV2/Pussy/…": read as they stood, every
   // one of them was in a slot called "Override", so on a character with a body style nothing was recognised. Found on
   // Laynie's own outfit, Oct 13.)
-  const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+  // (and the Dispensary's nipple toys are drawn from the repo, "…/toys/v1/ItemNipples/…": not seen as worn, the drawn
+  // breasts waited for the next worn piece and went on over them. Laynie, Nov 19: "the toys are on layer 22, the breast
+  // are layer 49".)
+  const slot = new RegExp(SLOT_SRC);
   return (src) => {
     const m = slot.exec(String(src)); if (!m) return false;
     // (an item's pictures can live in ANOTHER slot's folder: a corset locked on as a restraint draws from "Corset", not
@@ -150,7 +156,7 @@ function skinGate(C) {
 }
 // <<< belly drawing
 // the drawing block, for the drawn body (drawnbody.js), which draws the belly with the very same code
-export const bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
+export const bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK, SLOT_SRC };
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
 // character refresh crashed in the game's own clean-up (AnimationPurge: "key.startsWith is not a function"): no dressing,
@@ -228,7 +234,7 @@ function hookBelly(mod) {
           // first thing that isn't skin, or at the very end on a bare body.
           let upper = null, lower = false, done = false;
           const gate = skinGate(C);   // the game's own layer list, when it has one (belly drawing block)
-          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
+          const prio = (src) => { const m = new RegExp(SLOT_SRC).exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
             const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");   // { url, width, height }: a picture the game can cache by name

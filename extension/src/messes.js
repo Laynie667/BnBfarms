@@ -155,7 +155,7 @@ function messPicture(C, list, body, brand) {
 // waited for every skin picture the last drawing had, so arms drawn in front, after the clothes, held it back till after
 // them; now it's the torso and lower body (arms drawn later still cover it, as they should).
 const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
-const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
+const groupRe = /(?:^|\/)(?:Assets\/[^/]+\/(?:Override\/[^/]+\/)?|toys\/v[0-9]+\/)([^/]+)\//;   // (and the Dispensary's nipple toys, from the repo: worn, so the brand goes under them)
 const groupOfSrc = (src) => { const m = groupRe.exec(String(src || "")); return m ? m[1] : ""; };
 const fromOf = (src) => (typeof src === "string" ? src : src && typeof src.__farmFrom === "string" ? src.__farmFrom : "");
 // is this (a picture name, or one of the engine's drawings) a worn piece goin' on over the skin, now that `body` is drawn?

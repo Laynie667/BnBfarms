@@ -27,6 +27,11 @@ const warnSome = (what, e) => {
   WARNED.set(what, { at: now, n: 0 }); if (WARNED.size > 200) WARNED.clear();
   console.warn(what + (w && w.n ? " (" + w.n + " more like it in the last minute)" : ""), e);
 };
+// A picture's slot, from its address: the game's (Assets/Female3DCG/<slot>/, a body style's Override/<style>/<slot>/), or
+// the Dispensary's nipple toys from the repo (toys/v1/<slot>/). Before Nov 19 the toys weren't seen as nipple gear: never
+// moved onto drawn nipples, and the drawn breasts went on over them (Laynie: "the toys dont match or follow where the
+// nipple is"). The same as SLOT_SRC in extension/src/belly.js.
+const SLOT_SRC = "(?:^|/)(?:Assets/[^/]+/(?:Override/[^/]+/)?|toys/v[0-9]+/)([^/]+)/";
 window.FarmBodyEngine = function (host) {
   "use strict";
   const S = host.S;
@@ -114,7 +119,10 @@ window.FarmBodyEngine = function (host) {
     let e = MOULD.img.get(src);
     // (a picture an add-on supplies, the Echo clothing mod's, isn't on the game's own server: the add-on hands the game its own
     // address for it. host.mapSrc, when there is one, gives that address, so the very picture the game draws is the one fitted.)
+    // (A picture from another site, the Dispensary's nipple toys from the repo, is asked for with leave to read it: without
+    // that the browser lets it be drawn but not looked at, so its nipples couldn't be found and it never moved. Nov 19.)
     if (!e) { e = { img: new Image(), ok: false }; e.img.onload = () => { e.ok = true; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); };
+      if (/^https?:\/\//i.test(src)) { try { if (new URL(src).origin !== location.origin) e.img.crossOrigin = "anonymous"; } catch (er) { /* as it is */ } }
       // (tried at the game's own address first: only a picture that isn't there is looked up again)
       e.img.onerror = () => { if (!e.retried) { e.retried = true; let url = src; try { url = mapSrc(src) || src; } catch (er) { url = src; } if (url !== src) { e.img.crossOrigin = "anonymous"; e.img.src = url; return; } } e.bad = true; };
       e.img.src = src; MOULD.img.set(src, e); }
@@ -155,7 +163,7 @@ window.FarmBodyEngine = function (host) {
   // the piece grown to the belly, if it covers it and nothing else has been chosen for it: the canvas, false (nothing to grow) or null (not ready)
   function bellyAuto(src, x, y, ctx, behind, pieceKey) { if (!ctx.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
     // worn things only: not her hands, her skin or her hair
-    const m0 = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m0) return false; if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
+    const m0 = new RegExp(SLOT_SRC).exec(src); if (!m0) return false; if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
     // Panties go UNDER: her belly hangs in front of them and hides them, only their sides at her hips showing (Laynie, Oct 14:
     // "panties can be hidden by the large belly").
     if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx, "under|" + (pieceKey || src), "under");
@@ -488,7 +496,7 @@ window.FarmBodyEngine = function (host) {
         if (fit && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }
-          const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+          const slot = new RegExp(SLOT_SRC);
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
           const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));

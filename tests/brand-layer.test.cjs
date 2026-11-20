@@ -27,4 +27,7 @@ ok(at([A("TailStraps"), A("Wings"), U, Lo, A("Socks")], [U, Lo]) === 4, "a tail 
 ok(at([U, A("Necklace"), Lo, A("Panties")], [U, Lo]) === 3, "it waits for the lower body too: under the panties, not before the hips are drawn");
 ok(at([U, A("Bra")], []) === 1, "the very first drawing: under the first thing worn after the torso");
 ok(at([U, Lo, A("HairFront"), A("Eyes"), A("Mouth")], [U, Lo]) === 5, "naked: nothing worn, so it's the last thing drawn");
+// (Nov 20) the Dispensary's nipple toys are drawn from the repo, not the game's folders: worn all the same
+const TOY = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/toys/v1/ItemNipples/FarmNipDildo_XLarge_Toy.png";
+ok(at([U, Lo, TOY, A("HairFront")], [U, Lo]) === 2, "a nipple toy from the repo is worn: the brand goes under it");
 out(fails ? fails + " FAILED" : "ALL PASSED"); process.exit(fails ? 1 : 0);

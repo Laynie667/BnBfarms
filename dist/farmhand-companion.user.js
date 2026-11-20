@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.71.0
+// @version      0.71.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.71.0";
+  var VERSION = "0.71.1";
 
   // shared/species.js
   var WORDS = {
@@ -9548,6 +9548,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return span;
       }
+      let mouldN = 0;
+      const mouldId = (v) => v && typeof v === "object" ? v.__mid || (v.__mid = ++mouldN) : v === false ? "f" : "n";
       function bellyForm(cv) {
         if (cv.formF !== void 0) return cv.formF;
         const w = cv.width, h2 = cv.height;
@@ -10429,7 +10431,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
+                const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
                 let c = BREAST.out.get(key3);
                 if (!c) {
                   c = document.createElement("canvas");
@@ -10849,7 +10851,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-                const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + MOULD.ver;
+                const pk = (pieceOf(src) || {}).key || src;
+                const overBelly = bellyAuto(src, x, y, ctx3, fit.behind, pk);
+                const span = pieceSpan(pk, src, x, y);
+                const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");
                 let c = BREAST.out.get(key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
@@ -10859,8 +10864,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   c.MX = MX;
                   c.MY = MY;
                   const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
-                  const pk = (pieceOf(src) || {}).key || src, CW3 = c.width, CH3 = c.height;
-                  const overBelly = bellyAuto(src, x, y, ctx3, fit.behind, pk);
+                  const CW3 = c.width, CH3 = c.height;
                   if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY);
                   else g.drawImage(im, MX, MY);
                   let sleeves = null, spA = null;
@@ -11006,7 +11010,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     return alpha;
                   };
                   const gUnderY = (G.cy || 330) + (G.rv || 42) + 4, y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + Math.min(G.y3, gUnderY), flapEnd = uyc + mapYp(Math.min(G.y3, gUnderY));
-                  const span = pieceSpan(pk, src, x, y), pb = span.bottom > 0 ? MY + span.bottom - y : 0;
+                  const pb = span.bottom > 0 ? MY + span.bottom - y : 0;
                   const drape = pb > flapEnd + 24;
                   const sm = (t) => {
                     t = Math.max(0, Math.min(1, t));

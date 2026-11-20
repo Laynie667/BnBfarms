@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.87.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.71.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.71.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.87.3 + Companion 0.71.1: clothes fitted once, not over and over** (the bot only notes the new Companion) Laynie, Nov 20, with her phone's /farmmem: "users are saying the is significantly less lag", and yes to fixing what the log showed.
+  - **What the log showed:** nearly everybody drew in 10 to 80 ms, but one girl in a paw petsuit, a latex corset, a collar and a leash froze the room for 1 to 2 seconds, two to four times over, every few minutes (26 pieces fitted fresh at once).
+  - **Why:** every fitted piece was kept under one count for the whole body, and that count went up whenever any piece turned out to reach further, which every new layer of a new piece does. So one cuff put on, or the next layer of a sleeve loading, threw away every fitted piece on her and fitted them all again.
+  - **Now:** each fitted piece is kept under what it's actually made from: the piece as grown to the belly, how far down that piece itself reaches, and whether it's solid over the breasts. In the studio, a bra put on a girl already in the petsuit outfit fitted 2 drawings (the bra) where it fitted 12, and her settled picture is the same as before to the pixel.
 
 - **Bot 0.87.2 + Companion 0.71.0: drawin' people lighter, one at a time, and timed** (the bot only notes the new Companion) Laynie, Nov 20: "Is there any way to improve the drawing engine per browser? so its faster and not laggy?", then yes to the first three ideas.
   - **Smaller drawings:** every fitted piece is drawn on a big sheet with room to grow into, and it was kept and sent to the graphics card like that: in the studio, 85 MB of kept drawings had 3.4 MB of picture on them. Now each is cut to what's on it in the page's idle moments just after it's made (never in the drawing itself, so the first drawing of a new look is no slower), and the cut copy is what's kept and sent from then on. A dressed J cup with a belly, a harness and nipple beads: 50.5 MB kept became 9.7 MB, and the picture is the same to the pixel.

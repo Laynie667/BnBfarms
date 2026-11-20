@@ -183,6 +183,10 @@ window.FarmBodyEngine = function (host) {
     if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
     return span;
   }
+  // a grown drawing's own number (Nov 20): a fitted piece made from it is kept under this, not under the whole body's
+  // MOULD.ver (see dressDraw). false: nothing of it grown; null: not ready yet.
+  let mouldN = 0;
+  const mouldId = (v) => (v && typeof v === "object" ? (v.__mid || (v.__mid = ++mouldN)) : v === false ? "f" : "n");
   // THE BUMP UNDER CLOTHES. A piece that covers the belly and is as wide as it already (a long dress, a catsuit's legs,
   // jeans) isn't grown, and lay over her flat, as if there were no belly under it (catalogue with the belly, Oct 14). Two
   // tries at shading it on were taken back: her belly's own light laid on cloth made a pale window, and shading only the
@@ -672,7 +676,7 @@ window.FarmBodyEngine = function (host) {
             // Laynie's marks, Oct 14. Only panties: given the belly's version here, bands under the breasts were stretched out sideways.)
             let bv = null; try { bv = ctx.belly && !fit.behind && LOWER_GROUPS.test(groupOf(src)) ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
             const base = bv || im, ox = bv ? MOULD.M : 0;
-            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx.belly ? "|s" + ctx.sig : "");
+            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx.belly ? "|s" + ctx.sig : "");   // (its own grown drawing, not the whole body's count: see dressDraw, Nov 20)
             let c = BREAST.out.get(key);
             if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
               /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
@@ -871,14 +875,22 @@ window.FarmBodyEngine = function (host) {
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) { const e0 = edgesOf(src); if (e0) { let t0 = -1; for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) { t0 = j; break; } if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o); } }   /* (every layer of a banded piece goes the same way: its clasp in the middle too) */
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
             const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc))), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-            const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind ? ctx.sig : "") + "|" + MOULD.ver;   // (the belly's shade goes on with auto off too, so its shape is in the name either way: a new belly no longer empties every kept drawing, Nov 16)
+            // FITTED ONCE (Nov 20, Laynie's phone log: one girl in a paw petsuit and a latex corset froze the room for 1 to 2
+            // seconds at a time, two to four times over). A fitted piece was kept under the whole body's MOULD.ver, which goes
+            // up whenever ANY piece is seen reaching further (every new layer of a new piece does): so a cuff put on, or the next
+            // layer of a sleeve loading, threw away every fitted piece on her and fitted them all again. Now it's kept under
+            // what it's actually made from: the piece as grown to the belly (its own drawing), how far down the piece itself
+            // reaches (its span's bottom: does it drape), and whether it's solid over the breasts.
+            const pk = (pieceOf(src) || {}).key || src;
+            const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
+            const span = pieceSpan(pk, src, x, y);
+            const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind ? ctx.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");   // (the belly's shade goes on with auto off too, so its shape is in the name either way: a new belly no longer empties every kept drawing, Nov 16)
             let c = BREAST.out.get(key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
-              const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
-              const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
+              const CW = c.width, CH = c.height;
               if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
               // A PIECE MADE FOR A FLAT CHEST (the Button Shirt, the male vests and catsuit). Its sleeves start where a flat chest
               // ends, close in to the body, so growing the chest grew them too: long flaps down her sides ending in a straight
@@ -961,7 +973,7 @@ window.FarmBodyEngine = function (host) {
               // dragged sleeves and cuffs about with it, because a sleeve crossing the body can't be told from the body
               // of the dress. The rest of the piece is right as it is.) Whether a piece is long is seen from where it
               // ends, over all its layers: a short one, a bra, keeps its band under the breasts.
-              const span = pieceSpan(pk, src, x, y), pb = span.bottom > 0 ? MY + span.bottom - y : 0;
+              const pb = span.bottom > 0 ? MY + span.bottom - y : 0;   // (span: its own reach, worked out above)
               const drape = pb > flapEnd + 24;   // a long piece: it goes on well below the breasts
               const sm = (t) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
               // how much things have grown on a row of the game's picture: nothing above y1, fully by y2, and (draping) easing off again below y3

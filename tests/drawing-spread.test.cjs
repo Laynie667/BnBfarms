@@ -65,5 +65,12 @@ const FL = JSON.parse(fs.readFileSync(path.join(__dirname, "../shared/farm-look.
   if (process.env.SHOW) out("----\n" + text.split("\n").slice(0, 7).join("\n") + "\n----");
   ok(/Alexia \(777\) \d+ ms/.test(text) && /you \d+ ms/.test(text), "...by name, and yours as \"you\"");
   ok(/the slowest: /.test(text) && /waited a frame: [1-9]\d* times/.test(text), "...the slowest, and how often somebody waited a frame");
+  // FITTED ONCE (Nov 20, Laynie's phone log: a girl in a paw petsuit and a latex corset froze the room 1 to 2 seconds at a
+  // time). A fitted piece was kept under the whole body's MOULD.ver, so any piece reaching further threw every fitted piece
+  // away. Now each is kept under what it's made from. In the studio: a bra put on her refit 2 drawings, not 12.
+  const eng = fs.readFileSync(path.join(__dirname, "../studio/web/body-engine.js"), "utf8");
+  const keys = eng.split("\n").filter((l) => /const key = "(dress|hand)\|/.test(l));
+  ok(keys.length === 2 && keys.every((l) => !/MOULD\.ver/.test(l) && /mouldId\(/.test(l)), "fitted pieces are kept under their own grown drawing, not the whole body's count");
+  ok(/span\.bottom/.test(keys.find((l) => /"dress\|/.test(l)) || "") && /BREAST\.solid\[pk\]/.test(keys.find((l) => /"dress\|/.test(l)) || ""), "...and under how far the piece itself reaches, and whether it's solid over the breasts");
   out(fails ? "\n❌ " + fails + " failed" : "\n✅ all good"); process.exit(fails ? 1 : 0);
 })();

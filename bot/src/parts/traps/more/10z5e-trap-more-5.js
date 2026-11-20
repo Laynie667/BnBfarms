@@ -67,7 +67,7 @@
       "She lays her spawn in %n slow, pearl after pearl, a cold full weight, and kisses each one in through their skin.",
       "When she's laid the last pearl she carries %n to the bank and lays them in the moss, round-bellied, and slides back into the brook with a laugh.",
       "{t}She kisses %n's tits once more, cold, and leaves a little frost of river water on them, and sinks back into the pool.",
-      "%n crawls out of the brook shiverin' and full, their belly heavy with cold pearls, and the nixie waves from the steppin' stones.",
+      "%n's belly swells heavy with cold pearls, one after another, and the nixie holds them still in the current and kisses their shiverin' mouth between each.",
       "The brook carries her song away downstream, and %n's left on the bank, full of her pearls, the cold of her still in them."]);
 
   // ── leapin' the midsummer bonfire (Litha) ──

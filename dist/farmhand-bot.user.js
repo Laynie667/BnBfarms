@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.88.0
+// @version      0.89.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,7 +3046,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.88.0";
+  var VERSION = "0.89.0";
   var COMPANION_VERSION = "0.71.1";
 
   // bot-parts:farmhand-bot-parts
@@ -14691,19 +14691,33 @@
       return v && v.ml !== void 0 && v.ml !== "" && Number.isFinite(n) && n < 15;
     };
     const mlWords = (t, v) => !tinyMl(v) ? t : t.replace(/(drained|milked)( down)? (of|by) %ml/g, "$1$2 of every last drop").replace(/%ml (fuller|heavier)/g, "a whole lot $1").replace(/%ml of /g, "a flood of ").replace(/with %ml\b/g, "with a flood").replace(/%ml/g, "more than they could hold");
-    const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, v && v.ml || "").replace(/%c/g, v && v.c || "").replace(/%h/g, v && v.h || "").replace(/%x/g, v && v.x || "");
+    const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, v && v.ml || "").replace(/%c/g, v && v.c || "").replace(/%h/g, v && v.h || "").replace(/%x/g, v && v.x || "").replace(/^(\s*["“]?)([a-z])/, (m, a, b) => a + b.toUpperCase());
+    const INTRO_END = "~the hold goes on~";
     function trapRun(mn, kind, beats, done, v, opts) {
       state.trapRuns = state.trapRuns || /* @__PURE__ */ new Map();
+      if (opts && opts.intro) beats = beats.concat([[INTRO_END]]);
       beats = moreBeats(kind, beats);
       if (W.__FARMHAND_TEST__ && W.__onTrapBeats) try {
-        W.__onTrapBeats(mn, kind, beats, opts);
+        W.__onTrapBeats(mn, kind, beats.filter((b) => !(Array.isArray(b) && b[0] === INTRO_END)), opts);
       } catch (e) {
       }
       beats = sceneBeats(kind, beats, opts && opts.scene);
-      beats = deepenBeats(mn, kind, beats);
-      beats = stateBeats(mn, kind, beats);
+      beats = beats.map((b, i) => {
+        const pool = Array.isArray(b) ? b : [b];
+        let t = null;
+        try {
+          t = pickFor(mn, "trap:" + kind + ":" + (i + 1), pool);
+        } catch (e) {
+        }
+        return t ? [t] : pool;
+      });
+      const cast = trapCast(beats);
+      beats = deepenBeats(mn, kind, beats, cast, opts && opts.depth);
+      beats = stateBeats(mn, kind, beats, cast, opts && opts.depth);
+      const stateKeys = beats && beats.stateKeys || /* @__PURE__ */ new Set();
       beats = nipBeats(mn, kind, beats, v);
-      const run = { kind, i: 0, timer: null, beats: beats = beats.slice() };
+      if (opts && opts.intro) beats = beats.filter((b) => !(Array.isArray(b) && b[0] === INTRO_END));
+      const run = { kind, i: 0, timer: null, beats: beats = beats.slice(), tails: /* @__PURE__ */ new Set() };
       const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
       try {
         offerBets(mn, kind);
@@ -14720,7 +14734,11 @@
         if (state.trapRuns.get(mn) !== run) return;
         if (run.i < beats.length && charFor(mn)) {
           const b = beats[run.i++];
-          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFor(mn, "trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + (intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i)), mn);
+          const late = run.i > Math.max(2, Math.floor(beats.length * 0.4));
+          let tail = !late ? "" : intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i, stateKeys);
+          if (tail && run.tails.has(tail.trim())) tail = "";
+          else if (tail) run.tails.add(tail.trim());
+          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFor(mn, "trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + tail, mn);
           toysBeat(mn, run.i, beats.length);
           run.timer = setTimeout(step, CFG.TRAP_BEAT_S * 1e3);
           return;
@@ -14821,6 +14839,13 @@
       }
       return !!run;
     }
+    const MILKER_DRY = [
+      "The can's barely wet. %n was milked out already, and the cups suck on empty teats to the end of the cycle anyway, just to be sure, till %n's sobbin' at every pull.",
+      "A few thin drops rattle into the can and that's all there is. The machine sulks, gives each sore nipple one last long tug for luck, and lets %n go.",
+      "Nothin' left in %n to give, and the cups keep pullin' at what isn't there till their nipples are swollen fat and stingin', then pop off with a wet smack.",
+      "{t}%n's tits are milked soft and empty, nipples drawn out long and tender, and the gauge never moved. The trap drops them in the straw, achin' for nothin'.",
+      "{c}It drags at %n's cock long after they've nothin' left, sleeve slurpin', till they're cryin' and drippin' thin and clear, and only then does it let them go."
+    ];
     const INJECTOR_LOADS = ["lactation", "virility", "fertility", "heat inducer", "egg laying", "hyper pregnancy", "udder growth", "ass growth", "lactation x2", "fertility x2"];
     function openHole(mn, want) {
       const order = (want ? [want] : []).concat(["vulva", "butt", "mouth"]);
@@ -14957,7 +14982,8 @@
           const m0 = makesMilk(mn) ? p.milk : 0, s0 = seedMilkable(mn) ? p.semen : 0;
           trapRun(mn, kind, (m0 >= s0 ? T.milk : T.seed).concat(T.both), () => {
             const gotM = m0 > 0 ? drainMilk(mn, p.milk) : 0, gotS = s0 > 0 ? drainSemen(mn, p.semen) : 0;
-            emote("\u{1F95B} " + tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
+            if (gotM + gotS < 15) emote("\u{1F95B} " + tFill(pickFor(mn, "trap:milker:dry", MILKER_DRY), mn), mn);
+            else emote("\u{1F95B} " + tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
             face(mn, "milked", 60);
             arouse(mn, 25);
           });
@@ -16794,7 +16820,7 @@
           r.trapWait = { kind: "tickle", until: Date.now() + CFG.TRAP_WAIT_MIN * 6e4, next: Date.now() + 25e3 };
           if (pos) r.penned = { until: r.trapWait.until + 3e4, X: pos.X, Y: pos.Y, name: "the tickle rack", by: BOTMN(), trap: true, wait: true };
           tell(mn, "\u{1FAB6} It won't stop till you beg, sugar: ?beg and the words. Or hold out the whole " + CFG.TRAP_WAIT_MIN + " minutes, if you can.");
-        });
+        }, {}, { intro: true });
       },
       mirror(mn) {
         const line = MIRROR_LINES[Math.floor(Math.random() * MIRROR_LINES.length)];
@@ -16809,7 +16835,7 @@
             syncCompanions();
           } catch (e) {
           }
-        });
+        }, {}, { intro: true });
       },
       paddle(mn) {
         trapHold(mn, 3, "the paddle wheel");
@@ -20435,7 +20461,7 @@
         "Every wriggle pulls something tighter. %n stops wriggling. Then starts again, because it feels so good to be stopped.",
         "%n can't reach anything, can't cover anything, can't close anything. They're exactly as open as the farm wants them.",
         "The straps creak when %n breathes. That's the most they can move now: breathing.",
-        "{t}Whatever's round %n's chest squeezes their tits out round and tight, and they throb with their own heartbeat.",
+        "{t}Held the way they are, %n's tits are pushed out round and tight, and they throb with their own heartbeat.",
         "{c}%n's cock strains against nothing at all, bobbing, the one part of them that's still free to move.",
         "%n's arms have gone heavy and floaty in the ties. Their head drops. It's easier to just hang there.",
         "Somebody checks the buckles, snugs one a notch tighter, and pats %n's flank like a well-tied calf.",
@@ -20495,17 +20521,89 @@
         "A farmer leans on the fence with his arms folded, like he's watching the weather, and doesn't look away once."
       ]
     };
-    function deepenBeats(mn, kind, beats) {
+    const NEEDS_PARTNER = /whoever's in|breath on %n's neck|weight on (?:their|%n's) back|slap of skin|big hand/i;
+    const NEEDS_PEOPLE = /\b(somebody|someone|farmhands?|farm ?hands?|farmer|onlookers?|crowd|passers-by|watchers?|bets|fingertip|a nail|a hand\b|hands find|everybody|folk|whoever)\b/i;
+    const HAS_PARTNER = /\b(he|his|him|stud|stallion|colt|wolf|wolves|bull|boar|ram|stag|buck|drake|goblins?|minotaur|werewolf|fox|foxes|lion|lions|hound|hounds|dog|dogs|tom|toms|naga|ogre|orc|satyr|centaur|whoever|farmhand's cock)\b/i;
+    const HAS_PEOPLE = /\b(somebody|someone|farmhands?|farm ?hands?|farmer|crowd|onlookers?|folk|passers-by|customers?|baker|auctioneer|plow hand|everybody|queue|watchin'|watching|the yard|the square)\b/i;
+    function trapCast(beats) {
+      const told = (beats || []).map((b) => [].concat(b).join(" ")).join(" ").replace(/\b(like|as if|as though|the way)\b[^,.;:!?]*/gi, " ");
+      return { partner: HAS_PARTNER.test(told), people: HAS_PEOPLE.test(told) };
+    }
+    function castFits(t, cast) {
+      return !cast || (cast.partner || !NEEDS_PARTNER.test(t)) && (cast.people || !NEEDS_PEOPLE.test(t));
+    }
+    DEPTH_LINES.giggle = [
+      "Every brush of air on %n's ribs sets them off again, and they squirm and wheeze and can't get away from their own skin.",
+      "%n laughs till it hurts, and somewhere in the laughin' it turns into a moan, and they can't tell which one's comin' out of them.",
+      "Their own hair tickles. Their own breath tickles. %n curls up gigglin', and that only makes it worse.",
+      "{v}%n's laughin' so hard their thighs clench, and every clench rubs their swollen clit, and the giggles go breathy and wet.",
+      "{c}%n's cock bobs and twitches every time they shake with it, hard from nothin' but not bein' able to stop.",
+      "{t}%n's tits jiggle with every helpless giggle, and the jiggle tickles, and round it goes again.",
+      "Tears run down %n's face and they're gaspin' between squeals, flushed pink from forehead to belly.",
+      "%n tries to hold still. Holdin' still tickles worse. They break, squealin', and thrash in the straw with their legs kickin'."
+    ];
+    const DEPTH_ALONE = {
+      breed: [
+        "It doesn't tire and it doesn't hurry. Every stroke goes all the way in, and every one pulls back out slow enough for %n to feel the drag of it.",
+        "{v}%n's pussy has stopped fightin' it. It just takes, wet and loose and sloppy, and squelches every time it's filled.",
+        "{nv}%n's ass has given up clenchin'. It's open and slick and takes every inch like it was made to.",
+        "There's no face to look at and nobody to beg. Just the thing in them, and the rhythm, and %n's own noises comin' back off the walls.",
+        "%n's belly bulges a little with every push, and they watch it happen, glassy-eyed, the way you'd watch a pot come to the boil.",
+        "{c}%n's cock bounces and drools with every stroke, untouched, leavin' a shiny string on whatever's under them.",
+        "{t}%n's tits swing under them, heavy and loose, slappin' together in time with it.",
+        "It finds the spot and stays on it, grindin', and %n's toes curl so hard they cramp.",
+        "%n cums without meanin' to, clenchin' and sobbin', and it doesn't even slow down. It fucks them right through it and out the other side.",
+        "{v}Every time it bottoms out it nudges the very end of %n, and their whole cunt flutters round it.",
+        "Slick runs out of %n round the shaft and down their thighs, and the sound of it is filthy."
+      ],
+      held: [
+        "%n tests the hold again. It doesn't give a hair. They go limp, and somethin' low in them throbs at how little say they've got.",
+        "Every bit of %n is out and on show and there's not a thing they can cover. Their skin prickles all over with it.",
+        "{v}Held open like this, %n can feel the air on their pussy, cool on all that wet, and it makes them clench on nothin'.",
+        "{c}%n's cock bobs out in front of them, hard and drippin', and there's no hidin' it and no touchin' it.",
+        "%n's arms burn and their legs shake, and the ache of bein' held turns warm and sticky the longer it goes on.",
+        "They squirm, and it's no use, and squirmin' rubs their thighs together, and that's worse."
+      ],
+      mess: [
+        "It's in %n's hair, behind their ears, between their toes, and pooled hot in the crease of their thighs.",
+        "Every time %n moves it squelches, and every squelch makes them blush harder.",
+        "{t}It runs off %n's nipples in fat slow drops, and they can feel every one let go.",
+        "%n licks their lips without thinkin' and gets a mouthful, and then, after a second, licks them again.",
+        "{v}It's found its way between %n's lips, warm in there, and they can't tell any more what's the mess and what's them.",
+        "%n is slick from chin to knees, and the shine on them catches the light every time they breathe."
+      ],
+      milk: [
+        "The pull doesn't stop. Draw, squeeze, let go, draw, and %n's whole body has learned to rock with it.",
+        "{t}Their nipples are drawn long and dark in the cups, swollen fat, and every pull sends a hot thread straight down between %n's legs.",
+        "{c}Every pull on their chest makes %n's cock jump, and it's drippin' as steady as the cups are.",
+        "The milk comes in spurts now, hard enough to rattle the glass, and %n moans with every one like it's bein' pulled out of their cunt.",
+        "%n's leakin' somewhere else too, and the mat under them is soaked through."
+      ],
+      tease: [
+        "It comes and goes. Every time %n gets close it eases off, and every time they slump it starts again.",
+        "{v}%n's clit's swollen fat and stickin' out, and the air movin' over it is nearly enough, and nowhere near.",
+        "{c}%n's cock throbs against nothin', leakin' a steady string, so close the tip's gone dark.",
+        "%n rocks their hips at the empty air like somethin' might be there to meet them. Nothin' is.",
+        "Every inch of %n's skin is listenin' now. A draught across their nipples nearly finishes them.",
+        "%n's thighs are soaked and their breath's all whimpers, and nothin's so much as touched them where they want it.",
+        "They beg out loud, to nobody, real words, and hearin' their own voice beggin' makes them wetter."
+      ]
+    };
+    function deepenBeats(mn, kind, beats, cast, fams) {
       try {
-        const kinds = DEPTH_KIND[kind] || ["tease"];
+        let kinds = (fams && fams.length ? fams : DEPTH_KIND[kind]) || ["tease"];
+        if (cast && !cast.people) kinds = kinds.filter((k) => k !== "watched").concat(kinds.includes("watched") && kinds.length === 1 ? ["tease"] : []);
+        if (!kinds.length) kinds = ["tease"];
         if (!Array.isArray(beats) || beats.length < 2) return beats;
         const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";
         const n = gentle ? 1 : hard ? 3 : 2;
         const out = beats.slice(), used = /* @__PURE__ */ new Set();
         for (let i = 0; i < n; i++) {
           const k = kinds[Math.floor(Math.random() * kinds.length)];
-          const all = DEPTH_LINES[k];
-          if (!all) continue;
+          const own = (DEPTH_LINES[k] || []).filter((t) => castFits(t, cast));
+          const alone = cast && (k === "breed" ? !cast.partner : !cast.people);
+          const all = !DEPTH_ALONE[k] || own.length >= 6 && !alone ? own : own.concat(DEPTH_ALONE[k]);
+          if (!all.length) continue;
           const left = all.filter((t) => !used.has(t)).sort(() => Math.random() - 0.5), size = Math.max(4, Math.ceil(left.length / n));
           const plain = left.filter((t) => !/^\{/.test(t)).slice(0, 2);
           const pool = plain.concat(left.filter((t) => !plain.includes(t)).slice(0, size - plain.length));
@@ -20523,10 +20621,15 @@
     const trapScene = (kind, ...pools) => {
       TRAP_SCENE[kind] = (TRAP_SCENE[kind] || []).concat(pools);
     };
+    const SCENE_ACT = /\b(thrusts?|strokes?|fucks?|fuckin'|fucking|ruts?|ruttin'|pounds?|poundin'|breeds?|breedin'|bred|cums?|cummin'|knot|knots|takes %n's|in %n's (pussy|ass|cunt|mouth|%h))\b/i;
     function sceneBeats(kind, beats, own) {
       const add = own || TRAP_SCENE[kind];
-      if (!add || !Array.isArray(beats) || beats.length < 2) return beats;
-      return beats.slice(0, -1).concat(add.map((p) => p.slice()), [beats[beats.length - 1]]);
+      if (!add || !add.length || !Array.isArray(beats) || beats.length < 2) return beats;
+      const out = beats.slice(0, -1), last = beats[beats.length - 1];
+      const first = add[0] || [], inIt = first.filter((t) => SCENE_ACT.test(String(t))).length > first.length / 2;
+      if (inIt) return out.concat(add.map((p) => p.slice()), [last]);
+      out.splice(Math.min(2, out.length), 0, first.slice());
+      return out.concat(add.slice(1).map((p) => p.slice()), [last]);
     }
     trapScene(
       "injector",
@@ -40558,8 +40661,12 @@
       limit: null,
       hold: 4,
       where: "the treat door",
+      // (the hole the trick's in, known from the start: the scene's own lines say it, and it was only picked at the end, so they
+      // read "every thrust into Moo's ," Nov 20)
       before(mn, v) {
         v.trick = Math.random() < 0.5;
+        const hh = openHole(mn);
+        v.h = hh ? TRAP_HOLE[hh] : "ass";
       },
       lines: {
         beats: (mn, v) => {
@@ -47616,14 +47723,17 @@
         const words = k2 === "cocktail" ? kinds.sort(() => Math.random() - 0.5).slice(0, 2).map((x) => NEEDLE_WORDS[x]) : [NEEDLE_WORDS[k2]];
         const style = Object.keys(T.styles)[Math.floor(Math.random() * Object.keys(T.styles).length)];
         trapHold(mn, 2 + S.x, "the injector");
-        trapRun(mn, kind, T.styles[style].concat([T.fill[S.x - 1]]), () => {
+        const NOT_HERE = /\b(collar|post|arm|gauge)\b/i;
+        const sc = (TRAP_SCENE.injector || []).map((p) => p.filter((t) => !NOT_HERE.test(String(t))));
+        const ready = sc[0] && sc[0].length ? [sc[0]] : [], spread = sc[1] && sc[1].length ? [sc[1]] : [];
+        trapRun(mn, kind, T.styles[style].concat([T.fill[S.x - 1]], spread), () => {
           let ok = false;
           words.forEach((w, i) => {
             ok = applyShot(mn, BOTMN(), w + (S.x > 1 ? " x" + S.x : ""), { open: i ? vLine(T.second, "inj:second", mn, v) : vLine(T.open[S.x - 1], "inj:open" + S.x, mn, v), from: "the trap's dose", heatH: tmin(mn, S.t) }) || ok;
           });
           if (!ok) emote("\u{1F489} " + tFill(TRAP_LINES.injector.dud, mn), mn);
           arouse(mn, 10 + 5 * S.x);
-        }, v);
+        }, v, { scene: ready, depth: ["tease"] });
         r.trapSev = S.name;
         return true;
       }
@@ -47632,9 +47742,10 @@
       if (!k) return false;
       const V = VARIANTS[kind][k], lines = T[k];
       if (V.hold) trapHold(mn, V.hold + S.x, kind === "spray" ? "the spray rack" : "the gas");
+      const fams = kind === "spray" ? k === "milk" ? ["mess", "milk"] : ["mess"] : k === "milk" ? ["milk", "tease"] : k === "giggle" ? ["giggle"] : ["tease"];
       trapRun(mn, kind, [T.open, lines.cloud, lines.hit[S.x - 1], lines.after], () => {
         V.go(mn, S);
-      }, v);
+      }, v, { scene: [], depth: fams });
       r.trapSev = S.name;
       return true;
     }
@@ -48575,24 +48686,26 @@
       g_collar: 0.5,
       g_dressed: 0.5
     };
-    function stateBeats(mn, kind, beats) {
+    function stateBeats(mn, kind, beats, cast, fams0) {
       try {
         if (!Array.isArray(beats) || beats.length < 3) return beats;
         const n = CFG.STATE_BEATS[intensityOf(mn)];
         if (!n) return beats;
-        const s = stateOf(mn), fams = DEPTH_KIND[kind] || ["tease"], out = beats.slice(), used = /* @__PURE__ */ new Set(), where = whereOf(mn);
+        const s = stateOf(mn), fams = (fams0 && fams0.length ? fams0 : DEPTH_KIND[kind]) || ["tease"], out = beats.slice(), used = /* @__PURE__ */ new Set(), where = whereOf(mn);
+        const fit = (pool) => fitFor(mn, pool).filter((t) => castFits(t, cast));
         for (let i = 0; i < n; i++) {
-          const keys = Object.keys(s).filter((k2) => STATE_BEAT[k2] && !used.has(k2) && fitFor(mn, [].concat(...Object.values(STATE_BEAT[k2]))).length);
+          const keys = Object.keys(s).filter((k2) => STATE_BEAT[k2] && !used.has(k2) && fit([].concat(...Object.values(STATE_BEAT[k2]))).length);
           if (!keys.length) break;
           const k = weighOut(keys, (x) => STATE_BEAT_W[x] || (/^sp_/.test(x) ? 2 : /^g_/.test(x) ? 1.5 : 1));
           used.add(k);
-          const P = STATE_BEAT[k], fam = fams.find((f) => fitFor(mn, P[f]).length), own = fam ? fitFor(mn, P[fam]) : [], any = fitFor(mn, P.any);
+          const P = STATE_BEAT[k], fam = fams.find((f) => fit(P[f]).length), own = fam ? fit(P[fam]) : [], any = fit(P.any);
           const pool = own.length && (Math.random() < 0.67 || !any.length) ? own : any.length ? any : own;
           if (!pool.length) continue;
           const line = pickFresh("state:" + k + ":" + (pool === own ? fam : "any"), pool).replace(/%w/g, where);
           const lo = Math.max(1, Math.ceil((out.length - 1) / 2)), at = lo + Math.floor(Math.random() * (out.length - lo));
           out.splice(at, 0, [line]);
         }
+        out.stateKeys = used;
         return out;
       } catch (e) {
         return beats;
@@ -48634,12 +48747,13 @@
       g_collar: 1,
       g_ears: 1
     };
-    function stateTail(mn, kind, i) {
+    function stateTail(mn, kind, i, avoid) {
       try {
         if (i < 2 || Math.random() >= CFG.STATE_TAIL_CHANCE) return "";
-        const s = stateOf(mn), keys = Object.keys(s).filter((k2) => STATE_TAIL[k2] && fitFor(mn, STATE_TAIL[k2]).length);
+        const s = stateOf(mn), keys = Object.keys(s).filter((k2) => STATE_TAIL[k2] && !(avoid && avoid.has(k2)) && fitFor(mn, STATE_TAIL[k2]).length);
         if (!keys.length) return "";
         const k = weighOut(keys, (x) => STATE_TAIL_W[x] || (/^sp_/.test(x) ? 3 : /^g_/.test(x) ? 1.5 : 1));
+        if (avoid) avoid.add(k);
         return " " + tFill(pickFresh("stail:" + k, fitFor(mn, STATE_TAIL[k])), mn);
       } catch (e) {
         return "";
@@ -50105,11 +50219,11 @@
       "By the third they've stopped bothering",
       [
         "When they've all had %n once they start over, and the second round's slower and drunker and lasts till the fire under the tub goes out.",
-        "They carry %n out of the tub at the end, boiled pink and full and boneless, lay them on a pile of towels by the woodpile, and toast them with the last of the beer.",
+        "%n's boiled pink and full and boneless, held floatin' between two of them while a third takes his turn, and they toast %n with the last of the beer without pullin' out.",
         "The water's gone cloudy and %n's limp, and the lumberjacks are singin' a choppin' song and passin' them back and forth in time to it.",
         "{t}They lay %n on the edge of the tub and the last one finishes over their tits, and they all agree that's a fine sight.",
-        "At the end the biggest lumberjack wraps %n in his own flannel shirt and carries them back to the barn, full and steamin', and says the tub's free every evenin'.",
-        "%n's left floatin' in the tub as the lumberjacks climb out and go in for supper, too full and too warm to move."
+        "The biggest lumberjack saves himself for last, and takes %n slow in the steamin' water, wrapped round them like a bear round a honey pot, and murmurs that the tub's free every evenin'.",
+        "%n floats in the cloudy water between turns, too full and too warm to move, leakin' into the tub, while the lumberjacks pass the bottle over their head and argue who's next."
       ]
     );
     trapSceneMore(
@@ -50167,7 +50281,7 @@
       ],
       "The coins don't stop for a long time",
       [
-        "When the last coin drops and the last shutter closes the door clicks open, and %n crawls out with their face sticky and their belly full and their knees red.",
+        "Coin after coin after coin, and every one buys a fresh cock through the wall, and %n's face is glazed to the chin and their knees are red, and the slot still hasn't stopped clinkin'.",
         "The booth takes in more coin that night than the whole fair, and %n's kept in it till closin' time.",
         "At the end a farmhand opens the door and counts the coins out in front of %n, slow, and tells them they're very popular.",
         "The last customer pushes a coin and a note through the hole: SAME TIME TOMORROW. %n's too tired to read it.",
@@ -50716,7 +50830,7 @@
       "It strokes their swelling belly",
       [
         "When it's laid every egg it has it slips out of %n, slow, seals them with a warm stickiness, and lets them float, round-bellied and dazed, in the shallows.",
-        "It carries %n to the bank and lays them in the reeds, belly round and heavy with its clutch, and strokes their cheek with the tip of an arm before it sinks away.",
+        "It holds %n up in the shallows, belly round and heavy with its clutch, and strokes their cheek with the tip of an arm while the last few eggs settle and shift inside them.",
         "%n floats on their back in the warm water, full of eggs, their belly risin' out of the pond like a little island, and the thing circles them, pleased.",
         "It hums one last long note through the water and sinks, and the pond goes still, and %n's left with the weight of its eggs and the warmth of them inside.",
         "{t}It gives %n's tits a last gentle squeeze and lets go, and %n wades out of the pond wobblin', heavy with eggs, water runnin' off them.",
@@ -51932,7 +52046,7 @@
         "She lays her spawn in %n slow, pearl after pearl, a cold full weight, and kisses each one in through their skin.",
         "When she's laid the last pearl she carries %n to the bank and lays them in the moss, round-bellied, and slides back into the brook with a laugh.",
         "{t}She kisses %n's tits once more, cold, and leaves a little frost of river water on them, and sinks back into the pool.",
-        "%n crawls out of the brook shiverin' and full, their belly heavy with cold pearls, and the nixie waves from the steppin' stones.",
+        "%n's belly swells heavy with cold pearls, one after another, and the nixie holds them still in the current and kisses their shiverin' mouth between each.",
         "The brook carries her song away downstream, and %n's left on the bank, full of her pearls, the cold of her still in them."
       ]
     );
@@ -52678,7 +52792,7 @@
         "He finishes in %n and curls round them in the furs, and they lie there plugged and full while the blizzard howls past outside.",
         "Three times through the night, slow as snow, and by mornin' %n's belly is round and warm and sloshin'.",
         "He cums so much it runs out round him onto the furs, and he rumbles, embarrassed, and licks %n clean.",
-        "He carries %n back down the hill at dawn, full and warm and sleepy, and leaves them on the farmhouse step wrapped in one of his furs.",
+        "He keeps %n in the cave till the stars fade, full and warm and sleepy under his furs, and takes them once more at first light, slow, before he'll let them think about goin'.",
         `When he's done he licks %n's face, once, very tender, and rumbles that one word again, and this time %n's sure it's "mine".`
       ]
     );
@@ -58580,7 +58694,7 @@
         "The chain clips %n to a ring in the pen wall at just the right height for bendin' over, and the first farmhand through the gate doesn't waste it.",
         "Somebody stops the winch, has %n against the fence rail, slow and thorough, and starts it up again with them still pantin'.",
         "The winch drags %n past a row of hooks with work aprons on them, and one of the farmhands takes theirs off, folds it and lays it in the straw for %n to kneel on. Then they unbuckle.",
-        "At the end of the rail there's a little pen with clean straw and a water bowl and a sign that says RESTED STOCK, and the chain lets %n down into it at last, sore and dazed.",
+        "The chain rattles along the rail toward a little pen with clean straw and a sign that says RESTED STOCK, and stops just short of it, so %n hangs there in sight of the straw, sore and dazed and drippin', waitin' on the next pull.",
         "{t}Somebody catches %n's tits from behind as they're hauled past, one in each hand, and walks along with them a few steps, squeezin', before lettin' go."
       ]
     );
@@ -60316,7 +60430,7 @@
         "He grunts somethin' that might be 'good', and %n's past carin' what it means, mud in their mouth and moanin' through it.",
         "When he finishes he stays, heavy and hot on top of them, breathin' slow, and %n can feel his heartbeat through their back.",
         "{c}The boar-man reaches round and takes %n's muddy cock in his fist and strokes, slow, in time with himself, till they're both gruntin'.",
-        "The pig girl unties %n at last and they stay where they are, flat in the warm mud, too wrung out to climb out, and the boar-man pats their rump."
+        "The pig girl checks %n's knots, gives one a tug to be sure, and leaves them flat in the warm mud, too wrung out to wriggle, while the boar-man pats their rump and lines up again."
       ]
     );
     trapMore(
@@ -60507,7 +60621,7 @@
         "%n's told to cough, and then to cough again, and the clerk has a hand somewhere that makes the cough come out a squeak.",
         "The clerk stamps the form PASSED, then looks at it again, frowns, and says they'll have to do the whole thing over just to be sure.",
         "{t}The clerk lifts %n's tits one at a time and lets them drop, timin' the bounce with a stopwatch, and writes it down to the second.",
-        `At the end the clerk files %n's form in a drawer, stamps INSPECTED on the back of their hand, and says "next."`
+        "The clerk stamps INSPECTED on the back of %n's hand, looks at the form again, frowns, and says they'd better check the last part once more, properly, with two fingers."
       ]
     );
     trapMore(
@@ -60948,7 +61062,7 @@
         "%n swings slow on the rope, and every time they swing past the farmhand they get a little push, and a little touch somewhere new.",
         "The farmhand tugs the knot between %n's legs, very gentle, back and forth like a saw, and %n's moanin' into the hay.",
         "{t}The farmhand pinches %n's nipples where they poke out of the twine diamond and rolls them, slow, and %n's tits throb in their harness.",
-        "When the farmhand finally lets %n down they're laid in the hay and every knot's undone one by one, slow, with a kiss on each mark the twine left."
+        "The farmhand runs a thumb along every line the twine's pressed into %n, slow, kisses one of the marks, then gives the knot between their legs one more turn and watches them squirm on it."
       ]
     );
     trapMore(
@@ -61035,7 +61149,7 @@
       [
         "At the water trough the stable girl lets %n drink, then unhitches the cart and leads them into the stable by the bridle for a rub down.",
         "The stable girl brushes %n down in the stall with a soft brush, all over, and lingers in the places the harness rubbed.",
-        "{t}The stable girl unbuckles the harness strap by strap, and runs her hands over %n's tits where the straps crossed, slow, and %n leans into it.",
+        "{t}The stable girl lets the chest strap out a notch and runs her hands over %n's tits where it bit in, slow, and %n leans into it, and then she buckles it back a notch tighter than before.",
         "{v}In the stall the stable girl slides two fingers into %n's pussy from behind while they're still in the bridle, and they stamp and whinny round the bit."
       ]
     );
@@ -61219,7 +61333,7 @@
         "The new skin's so tight and thin %n can feel every breath of air on it, every touch, twice as sharp as before.",
         "The farm hands argue over whether %n needs one more coat, and settle it by givin' them one more coat.",
         "%n's set on a stool by the shed door to finish curin' in the sun, and the black warms till it's like bein' wrapped in a hot hand.",
-        "When the latex is finally peeled off at the end of the day it comes away in one long slow sheet, and %n's skin underneath is pink and tinglin' and so sensitive the air makes them gasp."
+        "The latex has set tight as a second skin now, and %n can feel every draught and every brush of a hand through it twice over, so sensitive the air alone makes them gasp and drip."
       ]
     );
     trapMore(
@@ -61420,7 +61534,7 @@
         "She lets the muzzle off for a moment so she can hear %n beg properly, and then buckles it back on, satisfied.",
         "She holds %n right at the edge and chats about the weather, and the price of butter, and the new churn, and doesn't let them over.",
         "{t}She milks %n's tits into a little jug, a squeeze on each, and holds the jug up to their face so they can see how much.",
-        "When she's done she wipes her gloves on a towel, finger by finger, unbuckles %n's mitts, and gives them a cup of fresh cream to drink."
+        "She wipes her gloves on a towel, finger by finger, and gives %n a cup of fresh cream to drink, holdin' it to their lips herself, because the mitts stay on."
       ]
     );
     trapMore(

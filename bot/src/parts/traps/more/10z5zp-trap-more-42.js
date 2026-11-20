@@ -96,4 +96,4 @@
     ["%n swings slow on the rope, and every time they swing past the farmhand they get a little push, and a little touch somewhere new.",
      "The farmhand tugs the knot between %n's legs, very gentle, back and forth like a saw, and %n's moanin' into the hay.",
      "{t}The farmhand pinches %n's nipples where they poke out of the twine diamond and rolls them, slow, and %n's tits throb in their harness.",
-     "When the farmhand finally lets %n down they're laid in the hay and every knot's undone one by one, slow, with a kiss on each mark the twine left."]);
+     "The farmhand runs a thumb along every line the twine's pressed into %n, slow, kisses one of the marks, then gives the knot between their legs one more turn and watches them squirm on it."]);

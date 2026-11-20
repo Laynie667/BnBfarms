@@ -196,11 +196,11 @@
       "A lumberjack takes %n's %h standin' up in the tub, holdin' them clear of the bottom, and they cling to his wet beard and bounce."],
     "By the third they've stopped bothering", [
       "When they've all had %n once they start over, and the second round's slower and drunker and lasts till the fire under the tub goes out.",
-      "They carry %n out of the tub at the end, boiled pink and full and boneless, lay them on a pile of towels by the woodpile, and toast them with the last of the beer.",
+      "%n's boiled pink and full and boneless, held floatin' between two of them while a third takes his turn, and they toast %n with the last of the beer without pullin' out.",
       "The water's gone cloudy and %n's limp, and the lumberjacks are singin' a choppin' song and passin' them back and forth in time to it.",
       "{t}They lay %n on the edge of the tub and the last one finishes over their tits, and they all agree that's a fine sight.",
-      "At the end the biggest lumberjack wraps %n in his own flannel shirt and carries them back to the barn, full and steamin', and says the tub's free every evenin'.",
-      "%n's left floatin' in the tub as the lumberjacks climb out and go in for supper, too full and too warm to move."]);
+      "The biggest lumberjack saves himself for last, and takes %n slow in the steamin' water, wrapped round them like a bear round a honey pot, and murmurs that the tub's free every evenin'.",
+      "%n floats in the cloudy water between turns, too full and too warm to move, leakin' into the tub, while the lumberjacks pass the bottle over their head and argue who's next."]);
   trapSceneMore("hottub",
     ["Somebody's beard is in %n's ear, somebody's is in their neck, and somebody's is lower, and the steam hides who.",
      "{c}A lumberjack holds %n's cock up out of the water and they all have a look and a laugh and a go at it.",
@@ -242,7 +242,7 @@
       "{t}Somebody finishes on %n's tits through the low hole, and the whole row of windows applauds.",
       "{c}%n's own cock is achin' and drippin' and untouched in the middle of the booth, and the speaker says no, not until the coins stop."],
     "The coins don't stop for a long time", [
-      "When the last coin drops and the last shutter closes the door clicks open, and %n crawls out with their face sticky and their belly full and their knees red.",
+      "Coin after coin after coin, and every one buys a fresh cock through the wall, and %n's face is glazed to the chin and their knees are red, and the slot still hasn't stopped clinkin'.",
       "The booth takes in more coin that night than the whole fair, and %n's kept in it till closin' time.",
       "At the end a farmhand opens the door and counts the coins out in front of %n, slow, and tells them they're very popular.",
       "The last customer pushes a coin and a note through the hole: SAME TIME TOMORROW. %n's too tired to read it.",

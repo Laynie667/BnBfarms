@@ -75,7 +75,7 @@
      "%n's told to cough, and then to cough again, and the clerk has a hand somewhere that makes the cough come out a squeak.",
      "The clerk stamps the form PASSED, then looks at it again, frowns, and says they'll have to do the whole thing over just to be sure.",
      "{t}The clerk lifts %n's tits one at a time and lets them drop, timin' the bounce with a stopwatch, and writes it down to the second.",
-     "At the end the clerk files %n's form in a drawer, stamps INSPECTED on the back of their hand, and says \"next.\""]);
+     "The clerk stamps INSPECTED on the back of %n's hand, looks at the form again, frowns, and says they'd better check the last part once more, properly, with two fingers."]);
 
   // ── the office stamps ──
   trapMore("stamp",

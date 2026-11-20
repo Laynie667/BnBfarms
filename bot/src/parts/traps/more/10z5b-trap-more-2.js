@@ -223,7 +223,7 @@
       "The eggs go in slick and warm, each one a little bigger than the last, and %n's %h is stretched round the ovipositor and drippin' into the pond."],
     "It strokes their swelling belly", [
       "When it's laid every egg it has it slips out of %n, slow, seals them with a warm stickiness, and lets them float, round-bellied and dazed, in the shallows.",
-      "It carries %n to the bank and lays them in the reeds, belly round and heavy with its clutch, and strokes their cheek with the tip of an arm before it sinks away.",
+      "It holds %n up in the shallows, belly round and heavy with its clutch, and strokes their cheek with the tip of an arm while the last few eggs settle and shift inside them.",
       "%n floats on their back in the warm water, full of eggs, their belly risin' out of the pond like a little island, and the thing circles them, pleased.",
       "It hums one last long note through the water and sinks, and the pond goes still, and %n's left with the weight of its eggs and the warmth of them inside.",
       "{t}It gives %n's tits a last gentle squeeze and lets go, and %n wades out of the pond wobblin', heavy with eggs, water runnin' off them.",

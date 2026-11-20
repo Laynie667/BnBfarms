@@ -150,5 +150,5 @@
     ["The chain clips %n to a ring in the pen wall at just the right height for bendin' over, and the first farmhand through the gate doesn't waste it.",
      "Somebody stops the winch, has %n against the fence rail, slow and thorough, and starts it up again with them still pantin'.",
      "The winch drags %n past a row of hooks with work aprons on them, and one of the farmhands takes theirs off, folds it and lays it in the straw for %n to kneel on. Then they unbuckle.",
-     "At the end of the rail there's a little pen with clean straw and a water bowl and a sign that says RESTED STOCK, and the chain lets %n down into it at last, sore and dazed.",
+     "The chain rattles along the rail toward a little pen with clean straw and a sign that says RESTED STOCK, and stops just short of it, so %n hangs there in sight of the straw, sore and dazed and drippin', waitin' on the next pull.",
      "{t}Somebody catches %n's tits from behind as they're hauled past, one in each hand, and walks along with them a few steps, squeezin', before lettin' go."]);

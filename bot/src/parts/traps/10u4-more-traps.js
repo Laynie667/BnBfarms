@@ -132,7 +132,7 @@
         r.trapWait = { kind: "tickle", until: Date.now() + CFG.TRAP_WAIT_MIN*60000, next: Date.now() + 25000 };
         if (pos) r.penned = { until: r.trapWait.until + 30000, X: pos.X, Y: pos.Y, name: "the tickle rack", by: BOTMN(), trap: true, wait: true };
         tell(mn, "🪶 It won't stop till you beg, sugar: ?beg and the words. Or hold out the whole "+CFG.TRAP_WAIT_MIN+" minutes, if you can.");
-      });
+      }, {}, { intro: true });
     },
     mirror(mn){
       const line = MIRROR_LINES[Math.floor(Math.random()*MIRROR_LINES.length)];
@@ -144,7 +144,7 @@
         trance(mn, 1);
         tell(mn, "🪞 The voice in the box wants to hear you say it, out loud, five times:\n\""+line+"\"\nSay it in chat"+(hasCompanion(mn) ? ", or tap Say it in your panel if a gag or a rule has your tongue" : ", or whisper it to me")+". The door opens on the fifth, or in "+CFG.TRAP_WAIT_MIN+" minutes if you won't.");
         try { syncCompanions(); } catch(e){}   // its Say it button (10ui-say.js)
-      });
+      }, {}, { intro: true });
     },
     paddle(mn){
       trapHold(mn, 3, "the paddle wheel");

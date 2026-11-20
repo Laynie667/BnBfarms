@@ -86,12 +86,18 @@
       const words = k === "cocktail" ? kinds.sort(() => Math.random() - 0.5).slice(0, 2).map(x => NEEDLE_WORDS[x]) : [NEEDLE_WORDS[k]];
       const style = Object.keys(T.styles)[Math.floor(Math.random()*Object.keys(T.styles).length)];
       trapHold(mn, 2 + S.x, "the injector");
-      trapRun(mn, kind, T.styles[style].concat([T.fill[S.x - 1]]), () => {
+      // (the injector's own two extra beats, the ones that fit any needle: the post, its arm, the collar and the gauge are the
+      // plain injector's, and a dart or a chair hasn't got them. The gettin'-ready beat goes before the dose, and the dose
+      // spreadin' through them after it: the dose is this story's last beat, and "it's in them now" came before it, Nov 20)
+      const NOT_HERE = /\b(collar|post|arm|gauge)\b/i;
+      const sc = (TRAP_SCENE.injector || []).map(p => p.filter(t => !NOT_HERE.test(String(t))));
+      const ready = sc[0] && sc[0].length ? [sc[0]] : [], spread = sc[1] && sc[1].length ? [sc[1]] : [];
+      trapRun(mn, kind, T.styles[style].concat([T.fill[S.x - 1]], spread), () => {
         let ok = false;
         words.forEach((w, i) => { ok = applyShot(mn, BOTMN(), w+(S.x > 1 ? " x"+S.x : ""), { open: i ? vLine(T.second, "inj:second", mn, v) : vLine(T.open[S.x - 1], "inj:open"+S.x, mn, v), from: "the trap's dose", heatH: tmin(mn, S.t) }) || ok; });
         if (!ok) emote("💉 "+tFill(TRAP_LINES.injector.dud, mn), mn);
         arouse(mn, 10 + 5*S.x);
-      }, v);
+      }, v, { scene: ready, depth: ["tease"] });
       r.trapSev = S.name; return true;
     }
     const can = Object.keys(VARIANTS[kind]).filter(k => VARIANTS[kind][k].can(mn));
@@ -99,7 +105,10 @@
     if (!k) return false;
     const V = VARIANTS[kind][k], lines = T[k];
     if (V.hold) trapHold(mn, V.hold + S.x, kind === "spray" ? "the spray rack" : "the gas");
-    trapRun(mn, kind, [T.open, lines.cloud, lines.hit[S.x - 1], lines.after], () => { V.go(mn, S); }, v);
+    // its own story, and the woven-in beats to match it (Nov 20, Laynie: "some beats seem unconnected": the giggle gas was
+    // gettin' the heat gas's beats, Moo laughin' herself hoarse and "their clit's throbbin' like a second heartbeat")
+    const fams = kind === "spray" ? (k === "milk" ? ["mess", "milk"] : ["mess"]) : k === "milk" ? ["milk", "tease"] : k === "giggle" ? ["giggle"] : ["tease"];
+    trapRun(mn, kind, [T.open, lines.cloud, lines.hit[S.x - 1], lines.after], () => { V.go(mn, S); }, v, { scene: [], depth: fams });
     r.trapSev = S.name;
     return true;
   }

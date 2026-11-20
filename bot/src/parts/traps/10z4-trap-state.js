@@ -69,22 +69,24 @@
     milkBurst: 5, milkFull: 2, milkDry: 2, ballsHeavy: 2, ballsDry: 1, heat: 5, denied: 3, edge: 2, messy: 2, parasite: 4, sym_latex: 3, sym_moss: 3,
     sym_nestling: 3, suit: 4, hugeTits: 3, bigTits: 2, bigBalls: 2, bigCock: 1, gapedV: 1, gapedB: 1, g_ringGag: 2, g_bell: 2, g_noseRing: 2, g_cage: 2,
     g_chastity: 2, g_collar: 0.5, g_dressed: 0.5 };
-  function stateBeats(mn, kind, beats){
+  function stateBeats(mn, kind, beats, cast, fams0){   // (cast: who's there, so nobody appears out of nowhere: trapCast, 10ud-trap-depth.js)
     try {
       if (!Array.isArray(beats) || beats.length < 3) return beats;
       const n = CFG.STATE_BEATS[intensityOf(mn)]; if (!n) return beats;
-      const s = stateOf(mn), fams = DEPTH_KIND[kind] || ["tease"], out = beats.slice(), used = new Set(), where = whereOf(mn);
+      const s = stateOf(mn), fams = (fams0 && fams0.length ? fams0 : DEPTH_KIND[kind]) || ["tease"], out = beats.slice(), used = new Set(), where = whereOf(mn);
+      const fit = (pool) => fitFor(mn, pool).filter(t => castFits(t, cast));
       for (let i = 0; i < n; i++){
-        const keys = Object.keys(s).filter(k => STATE_BEAT[k] && !used.has(k) && fitFor(mn, [].concat(...Object.values(STATE_BEAT[k]))).length);
+        const keys = Object.keys(s).filter(k => STATE_BEAT[k] && !used.has(k) && fit([].concat(...Object.values(STATE_BEAT[k]))).length);
         if (!keys.length) break;
         const k = weighOut(keys, x => STATE_BEAT_W[x] || (/^sp_/.test(x) ? 2 : /^g_/.test(x) ? 1.5 : 1)); used.add(k);
-        const P = STATE_BEAT[k], fam = fams.find(f => fitFor(mn, P[f]).length), own = fam ? fitFor(mn, P[fam]) : [], any = fitFor(mn, P.any);
+        const P = STATE_BEAT[k], fam = fams.find(f => fit(P[f]).length), own = fam ? fit(P[fam]) : [], any = fit(P.any);
         const pool = own.length && (Math.random() < 0.67 || !any.length) ? own : any.length ? any : own;   // their kind's own, two times in three
         if (!pool.length) continue;
         const line = pickFresh("state:"+k+":"+(pool === own ? fam : "any"), pool).replace(/%w/g, where);
         const lo = Math.max(1, Math.ceil((out.length - 1) / 2)), at = lo + Math.floor(Math.random()*(out.length - lo));
         out.splice(at, 0, [line]);
       }
+      out.stateKeys = used;   // (what these beats were about: a tail won't say it again in the same scene, trapRun)
       return out;
     } catch(e){ return beats; }
   }
@@ -92,12 +94,13 @@
   const STATE_TAIL_W = { overdue: 4, pregHeavy: 4, pregShow: 3, pregEarly: 2, eggsMany: 4, eggs: 3, over: 4, slosh: 3, heldV: 2, heldB: 2, heldM: 1,
     milkBurst: 4, milkFull: 2, milkDry: 2, ballsHeavy: 2, ballsDry: 1, heat: 4, denied: 2, edge: 2, messy: 1.5, parasite: 3, sym_latex: 2, sym_moss: 2,
     sym_nestling: 2, suit: 3, hugeTits: 2, bigTits: 2, bigBalls: 2, bigCock: 1.5, gapedV: 1, gapedB: 1, g_dressed: 1, g_collar: 1, g_ears: 1 };
-  function stateTail(mn, kind, i){
+  function stateTail(mn, kind, i, avoid){   // (avoid: the states this scene has said already: "drained flat" twice in one needle, Nov 20)
     try {
       if (i < 2 || Math.random() >= CFG.STATE_TAIL_CHANCE) return "";
-      const s = stateOf(mn), keys = Object.keys(s).filter(k => STATE_TAIL[k] && fitFor(mn, STATE_TAIL[k]).length);
+      const s = stateOf(mn), keys = Object.keys(s).filter(k => STATE_TAIL[k] && !(avoid && avoid.has(k)) && fitFor(mn, STATE_TAIL[k]).length);
       if (!keys.length) return "";
       const k = weighOut(keys, x => STATE_TAIL_W[x] || (/^sp_/.test(x) ? 3 : /^g_/.test(x) ? 1.5 : 1));
+      if (avoid) avoid.add(k);
       return " "+tFill(pickFresh("stail:"+k, fitFor(mn, STATE_TAIL[k])), mn);
     } catch(e){ return ""; }
   }

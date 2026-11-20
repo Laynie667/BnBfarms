@@ -37,7 +37,7 @@
     ["The new skin's so tight and thin %n can feel every breath of air on it, every touch, twice as sharp as before.",
      "The farm hands argue over whether %n needs one more coat, and settle it by givin' them one more coat.",
      "%n's set on a stool by the shed door to finish curin' in the sun, and the black warms till it's like bein' wrapped in a hot hand.",
-     "When the latex is finally peeled off at the end of the day it comes away in one long slow sheet, and %n's skin underneath is pink and tinglin' and so sensitive the air makes them gasp."]);
+     "The latex has set tight as a second skin now, and %n can feel every draught and every brush of a hand through it twice over, so sensitive the air alone makes them gasp and drip."]);
 
   // ── the doll press ──
   trapMore("dollmaker",

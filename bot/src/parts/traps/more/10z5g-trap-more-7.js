@@ -143,7 +143,7 @@
       "He finishes in %n and curls round them in the furs, and they lie there plugged and full while the blizzard howls past outside.",
       "Three times through the night, slow as snow, and by mornin' %n's belly is round and warm and sloshin'.",
       "He cums so much it runs out round him onto the furs, and he rumbles, embarrassed, and licks %n clean.",
-      "He carries %n back down the hill at dawn, full and warm and sleepy, and leaves them on the farmhouse step wrapped in one of his furs.",
+      "He keeps %n in the cave till the stars fade, full and warm and sleepy under his furs, and takes them once more at first light, slow, before he'll let them think about goin'.",
       "When he's done he licks %n's face, once, very tender, and rumbles that one word again, and this time %n's sure it's \"mine\"."]);
   trapSceneMore("yeti",
     ["The blizzard howls past the cave mouth and throws snow in, and none of it reaches the furs.",

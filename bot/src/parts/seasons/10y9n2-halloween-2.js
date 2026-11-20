@@ -329,7 +329,9 @@
 
   seasonTrap("halloween", "treatdoor", {
     icon: "🚪", what: "the treat door: knock, and it's a trick or a treat", limit: null, hold: 4, where: "the treat door",
-    before(mn, v){ v.trick = Math.random() < 0.5; },
+    // (the hole the trick's in, known from the start: the scene's own lines say it, and it was only picked at the end, so they
+    // read "every thrust into Moo's ," Nov 20)
+    before(mn, v){ v.trick = Math.random() < 0.5; const hh = openHole(mn); v.h = hh ? TRAP_HOLE[hh] : "ass"; },
     lines: {
       beats: (mn, v) => { const T = SEASON_LINES.treatdoor; return [T.knock].concat(v.trick ? [T.trick1, T.trick2, T.trick3] : [T.treat1, T.treat2, T.treat3]); },
       knock: ["There's a door standin' on its own in the middle of the yard, no house behind it, with a jack-o'-lantern on the step and a sign: KNOCK FOR A TREAT. %n knocks.",

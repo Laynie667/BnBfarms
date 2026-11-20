@@ -45,7 +45,7 @@
       "Every wriggle pulls something tighter. %n stops wriggling. Then starts again, because it feels so good to be stopped.",
       "%n can't reach anything, can't cover anything, can't close anything. They're exactly as open as the farm wants them.",
       "The straps creak when %n breathes. That's the most they can move now: breathing.",
-      "{t}Whatever's round %n's chest squeezes their tits out round and tight, and they throb with their own heartbeat.",
+      "{t}Held the way they are, %n's tits are pushed out round and tight, and they throb with their own heartbeat.",
       "{c}%n's cock strains against nothing at all, bobbing, the one part of them that's still free to move.",
       "%n's arms have gone heavy and floaty in the ties. Their head drops. It's easier to just hang there.",
       "Somebody checks the buckles, snugs one a notch tighter, and pats %n's flank like a well-tied calf.",
@@ -105,10 +105,82 @@
       "A farmer leans on the fence with his arms folded, like he's watching the weather, and doesn't look away once.",
     ],
   };
+  // WHO'S THERE (Nov 20, Laynie: "some beats seem unconnected"). These lines are woven into every kind of trap, and some
+  // need somebody there: a partner in them ("whoever's in them", the breath on their neck, the weight on their back), or
+  // folk about (somebody murmurin' "not yet", a fingertip, the crowd). Woven into a machine or a post or a bin of gas, that
+  // was somebody appearin' out of nowhere. The trap's own story says who's there (trapCast, from its own beats), and a
+  // line that needs somebody it hasn't got is left out. What's left is topped up with lines about the trap and them alone.
+  const NEEDS_PARTNER = /whoever's in|breath on %n's neck|weight on (?:their|%n's) back|slap of skin|big hand/i;
+  const NEEDS_PEOPLE = /\b(somebody|someone|farmhands?|farm ?hands?|farmer|onlookers?|crowd|passers-by|watchers?|bets|fingertip|a nail|a hand\b|hands find|everybody|folk|whoever)\b/i;
+  const HAS_PARTNER = /\b(he|his|him|stud|stallion|colt|wolf|wolves|bull|boar|ram|stag|buck|drake|goblins?|minotaur|werewolf|fox|foxes|lion|lions|hound|hounds|dog|dogs|tom|toms|naga|ogre|orc|satyr|centaur|whoever|farmhand's cock)\b/i;
+  const HAS_PEOPLE = /\b(somebody|someone|farmhands?|farm ?hands?|farmer|crowd|onlookers?|folk|passers-by|customers?|baker|auctioneer|plow hand|everybody|queue|watchin'|watching|the yard|the square)\b/i;
+  // (beats: the trap's own, each already down to the one line this scene will say: trapRun picks them first)
+  // (what's only a likeness doesn't count: "like a mare bein' stood for a stud" is a frame, not a stud)
+  function trapCast(beats){
+    const told = (beats || []).map(b => [].concat(b).join(" ")).join(" ").replace(/\b(like|as if|as though|the way)\b[^,.;:!?]*/gi, " ");
+    return { partner: HAS_PARTNER.test(told), people: HAS_PEOPLE.test(told) };
+  }
+  function castFits(t, cast){ return !cast || ((cast.partner || !NEEDS_PARTNER.test(t)) && (cast.people || !NEEDS_PEOPLE.test(t))); }
+  // the giggle gas's own (Nov 20: it was gettin' the heat gas's beats): ticklish past bearin', and it turns
+  DEPTH_LINES.giggle = [
+    "Every brush of air on %n's ribs sets them off again, and they squirm and wheeze and can't get away from their own skin.",
+    "%n laughs till it hurts, and somewhere in the laughin' it turns into a moan, and they can't tell which one's comin' out of them.",
+    "Their own hair tickles. Their own breath tickles. %n curls up gigglin', and that only makes it worse.",
+    "{v}%n's laughin' so hard their thighs clench, and every clench rubs their swollen clit, and the giggles go breathy and wet.",
+    "{c}%n's cock bobs and twitches every time they shake with it, hard from nothin' but not bein' able to stop.",
+    "{t}%n's tits jiggle with every helpless giggle, and the jiggle tickles, and round it goes again.",
+    "Tears run down %n's face and they're gaspin' between squeals, flushed pink from forehead to belly.",
+    "%n tries to hold still. Holdin' still tickles worse. They break, squealin', and thrash in the straw with their legs kickin'."];
+  // the trap and them, nobody else: for when the lines that need somebody are left out
+  const DEPTH_ALONE = {
+    breed: [
+      "It doesn't tire and it doesn't hurry. Every stroke goes all the way in, and every one pulls back out slow enough for %n to feel the drag of it.",
+      "{v}%n's pussy has stopped fightin' it. It just takes, wet and loose and sloppy, and squelches every time it's filled.",
+      "{nv}%n's ass has given up clenchin'. It's open and slick and takes every inch like it was made to.",
+      "There's no face to look at and nobody to beg. Just the thing in them, and the rhythm, and %n's own noises comin' back off the walls.",
+      "%n's belly bulges a little with every push, and they watch it happen, glassy-eyed, the way you'd watch a pot come to the boil.",
+      "{c}%n's cock bounces and drools with every stroke, untouched, leavin' a shiny string on whatever's under them.",
+      "{t}%n's tits swing under them, heavy and loose, slappin' together in time with it.",
+      "It finds the spot and stays on it, grindin', and %n's toes curl so hard they cramp.",
+      "%n cums without meanin' to, clenchin' and sobbin', and it doesn't even slow down. It fucks them right through it and out the other side.",
+      "{v}Every time it bottoms out it nudges the very end of %n, and their whole cunt flutters round it.",
+      "Slick runs out of %n round the shaft and down their thighs, and the sound of it is filthy."],
+    held: [
+      "%n tests the hold again. It doesn't give a hair. They go limp, and somethin' low in them throbs at how little say they've got.",
+      "Every bit of %n is out and on show and there's not a thing they can cover. Their skin prickles all over with it.",
+      "{v}Held open like this, %n can feel the air on their pussy, cool on all that wet, and it makes them clench on nothin'.",
+      "{c}%n's cock bobs out in front of them, hard and drippin', and there's no hidin' it and no touchin' it.",
+      "%n's arms burn and their legs shake, and the ache of bein' held turns warm and sticky the longer it goes on.",
+      "They squirm, and it's no use, and squirmin' rubs their thighs together, and that's worse."],
+    mess: [
+      "It's in %n's hair, behind their ears, between their toes, and pooled hot in the crease of their thighs.",
+      "Every time %n moves it squelches, and every squelch makes them blush harder.",
+      "{t}It runs off %n's nipples in fat slow drops, and they can feel every one let go.",
+      "%n licks their lips without thinkin' and gets a mouthful, and then, after a second, licks them again.",
+      "{v}It's found its way between %n's lips, warm in there, and they can't tell any more what's the mess and what's them.",
+      "%n is slick from chin to knees, and the shine on them catches the light every time they breathe."],
+    milk: [
+      "The pull doesn't stop. Draw, squeeze, let go, draw, and %n's whole body has learned to rock with it.",
+      "{t}Their nipples are drawn long and dark in the cups, swollen fat, and every pull sends a hot thread straight down between %n's legs.",
+      "{c}Every pull on their chest makes %n's cock jump, and it's drippin' as steady as the cups are.",
+      "The milk comes in spurts now, hard enough to rattle the glass, and %n moans with every one like it's bein' pulled out of their cunt.",
+      "%n's leakin' somewhere else too, and the mat under them is soaked through."],
+    tease: [
+      "It comes and goes. Every time %n gets close it eases off, and every time they slump it starts again.",
+      "{v}%n's clit's swollen fat and stickin' out, and the air movin' over it is nearly enough, and nowhere near.",
+      "{c}%n's cock throbs against nothin', leakin' a steady string, so close the tip's gone dark.",
+      "%n rocks their hips at the empty air like somethin' might be there to meet them. Nothin' is.",
+      "Every inch of %n's skin is listenin' now. A draught across their nipples nearly finishes them.",
+      "%n's thighs are soaked and their breath's all whimpers, and nothin's so much as touched them where they want it.",
+      "They beg out loud, to nobody, real words, and hearin' their own voice beggin' makes them wetter."],
+  };
   // two or three more beats, from what kind of trap it is, woven into the middle of its own story
-  function deepenBeats(mn, kind, beats){
+  // (cast: who's there, trapCast. fams: a variant's own kinds of scene, the giggle gas or an ink spray, in place of the trap's)
+  function deepenBeats(mn, kind, beats, cast, fams){
     try {
-      const kinds = DEPTH_KIND[kind] || ["tease"];
+      let kinds = (fams && fams.length ? fams : DEPTH_KIND[kind]) || ["tease"];
+      if (cast && !cast.people) kinds = kinds.filter(k => k !== "watched").concat(kinds.includes("watched") && kinds.length === 1 ? ["tease"] : []);   // (nobody about: nobody watchin')
+      if (!kinds.length) kinds = ["tease"];
       if (!Array.isArray(beats) || beats.length < 2) return beats;
       const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";   // ?intensity tender | rough | filthy (10y7-udders.js)
       const n = gentle ? 1 : hard ? 3 : 2;
@@ -116,7 +188,9 @@
       for (let i = 0; i < n; i++){
         const k = kinds[Math.floor(Math.random()*kinds.length)];
         // a different share of the pool for each beat, so no line comes up twice in one scene
-        const all = DEPTH_LINES[k]; if (!all) continue;
+        const own = (DEPTH_LINES[k] || []).filter(t => castFits(t, cast));
+        const alone = cast && (k === "breed" ? !cast.partner : !cast.people);   // (a machine or a post in them, nobody about: the trap-and-them lines go in the mix)
+        const all = !DEPTH_ALONE[k] || (own.length >= 6 && !alone) ? own : own.concat(DEPTH_ALONE[k]); if (!all.length) continue;
         const left = all.filter(t => !used.has(t)).sort(() => Math.random() - 0.5), size = Math.max(4, Math.ceil(left.length / n));
         const plain = left.filter(t => !/^\{/.test(t)).slice(0, 2);   // (two that fit any body, always)
         const pool = plain.concat(left.filter(t => !plain.includes(t)).slice(0, size - plain.length));

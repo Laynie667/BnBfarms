@@ -8,11 +8,22 @@
   */
   const TRAP_SCENE = {};
   const trapScene = (kind, ...pools) => { TRAP_SCENE[kind] = (TRAP_SCENE[kind] || []).concat(pools); };
-  // the trap's own story, with its extra beats put in before the last one
+  // the trap's own story, with its extra beats woven in. (Nov 20, Laynie: "make sure each beat makes sense like a story.
+  // some beats seem unconnected".) The first of a trap's extra beats is it gettin' going (the breeder strappin' them down
+  // and greasin' them up, the second set of cups findin' them), so it goes in after the trap's own first two beats: it
+  // used to go just before the end, and the breeder greased them up after it had been ruttin' them for a while. The rest
+  // are the scene at its height, and go in before the last beat as before.
+  // (but a first extra beat that's already in the thick of it, "poppy petals drop off the crown with every thrust", goes in
+  // with the rest before the last: most of its lines about bein' fucked, it's not a gettin'-going beat)
+  const SCENE_ACT = /\b(thrusts?|strokes?|fucks?|fuckin'|fucking|ruts?|ruttin'|pounds?|poundin'|breeds?|breedin'|bred|cums?|cummin'|knot|knots|takes %n's|in %n's (pussy|ass|cunt|mouth|%h))\b/i;
   function sceneBeats(kind, beats, own){
     const add = own || TRAP_SCENE[kind];
-    if (!add || !Array.isArray(beats) || beats.length < 2) return beats;
-    return beats.slice(0, -1).concat(add.map(p => p.slice()), [beats[beats.length - 1]]);
+    if (!add || !add.length || !Array.isArray(beats) || beats.length < 2) return beats;
+    const out = beats.slice(0, -1), last = beats[beats.length - 1];
+    const first = add[0] || [], inIt = first.filter(t => SCENE_ACT.test(String(t))).length > first.length / 2;
+    if (inIt) return out.concat(add.map(p => p.slice()), [last]);
+    out.splice(Math.min(2, out.length), 0, first.slice());
+    return out.concat(add.slice(1).map(p => p.slice()), [last]);
   }
 
   // ── the machines ──

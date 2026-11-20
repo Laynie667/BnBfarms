@@ -42,7 +42,7 @@
      "He grunts somethin' that might be 'good', and %n's past carin' what it means, mud in their mouth and moanin' through it.",
      "When he finishes he stays, heavy and hot on top of them, breathin' slow, and %n can feel his heartbeat through their back.",
      "{c}The boar-man reaches round and takes %n's muddy cock in his fist and strokes, slow, in time with himself, till they're both gruntin'.",
-     "The pig girl unties %n at last and they stay where they are, flat in the warm mud, too wrung out to climb out, and the boar-man pats their rump."]);
+     "The pig girl checks %n's knots, gives one a tug to be sure, and leaves them flat in the warm mud, too wrung out to wriggle, while the boar-man pats their rump and lines up again."]);
 
   // ── the milkin' hole ──
   trapMore("milkinghole",

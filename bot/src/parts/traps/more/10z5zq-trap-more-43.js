@@ -63,5 +63,5 @@
      "{nt}The breast collar's rubbed %n's flat chest pink, and the stable girl leans down to rub a little balm into it at the next stop."],
     ["At the water trough the stable girl lets %n drink, then unhitches the cart and leads them into the stable by the bridle for a rub down.",
      "The stable girl brushes %n down in the stall with a soft brush, all over, and lingers in the places the harness rubbed.",
-     "{t}The stable girl unbuckles the harness strap by strap, and runs her hands over %n's tits where the straps crossed, slow, and %n leans into it.",
+     "{t}The stable girl lets the chest strap out a notch and runs her hands over %n's tits where it bit in, slow, and %n leans into it, and then she buckles it back a notch tighter than before.",
      "{v}In the stall the stable girl slides two fingers into %n's pussy from behind while they're still in the bridle, and they stamp and whinny round the bit."]);

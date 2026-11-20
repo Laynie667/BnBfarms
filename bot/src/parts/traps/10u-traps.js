@@ -108,17 +108,31 @@
   const tinyMl = (v) => { const n = parseFloat(String((v && v.ml) || "").replace(/[^0-9.]/g, "")); return v && v.ml !== undefined && v.ml !== "" && Number.isFinite(n) && n < 15; };
   const mlWords = (t, v) => !tinyMl(v) ? t : t.replace(/(drained|milked)( down)? (of|by) %ml/g, "$1$2 of every last drop").replace(/%ml (fuller|heavier)/g, "a whole lot $1")
     .replace(/%ml of /g, "a flood of ").replace(/with %ml\b/g, "with a flood").replace(/%ml/g, "more than they could hold");
-  const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
+  // (and a capital to start it, whatever went in first: "a flood of feed, and the chute…" when the amount was put into words, Nov 20)
+  const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "")
+    .replace(/^(\s*["“]?)([a-z])/, (m, a, b) => a + b.toUpperCase());
   // a trap's story, a beat at a time, then what it leaves behind
-  function trapRun(mn, kind, beats, done, v, opts){   // opts.scene: this one's own two extra beats instead of the kind's (a stud's version: 10y9r2)
+  // opts.scene: this one's own two extra beats instead of the kind's (a stud's version: 10y9r2; [] for a variant, its own story)
+  // opts.depth: a variant's own kinds of woven-in beat. opts.intro: its story only leads into a hold that goes on after (the
+  // tickle rack, the mirror box), so what's woven in comes after its own last beat, while it's at them (Nov 20: "the brushes
+  // start to explore" came after Moo had laughed herself hoarse)
+  const INTRO_END = "~the hold goes on~";
+  function trapRun(mn, kind, beats, done, v, opts){
     state.trapRuns = state.trapRuns || new Map();
+    if (opts && opts.intro) beats = beats.concat([[INTRO_END]]);   // (a last beat that isn't one: everything's woven in before it, then it goes)
     beats = moreBeats(kind, beats);         // each beat with more of its own lines (10z5-trap-more.js and the batches after it)
-    if (W.__FARMHAND_TEST__ && W.__onTrapBeats) try { W.__onTrapBeats(mn, kind, beats, opts); } catch(e){}   // (tests: the trap's own beats, as they'll run)
-    beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
-    beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
-    beats = stateBeats(mn, kind, beats);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)
+    if (W.__FARMHAND_TEST__ && W.__onTrapBeats) try { W.__onTrapBeats(mn, kind, beats.filter(b => !(Array.isArray(b) && b[0] === INTRO_END)), opts); } catch(e){}   // (tests: the trap's own beats, as they'll run)
+    beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats: one early, one before its last (10ue-trap-scenes.js)
+    // its own lines picked now, one per beat, so who's in its story is what this telling of it actually says (Nov 20: a
+    // pool where one line in ten had a farmhand made every telling "have people", and somebody came out of nowhere)
+    beats = beats.map((b, i) => { const pool = Array.isArray(b) ? b : [b]; let t = null; try { t = pickFor(mn, "trap:"+kind+":"+(i + 1), pool); } catch(e){} return t ? [t] : pool; });
+    const cast = trapCast(beats);           // who's in it: a partner in them? folk about? (10ud-trap-depth.js)
+    beats = deepenBeats(mn, kind, beats, cast, opts && opts.depth);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
+    beats = stateBeats(mn, kind, beats, cast, opts && opts.depth);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)
+    const stateKeys = (beats && beats.stateKeys) || new Set();       // (the states a beat's been about: a tail won't say the same again)
     beats = nipBeats(mn, kind, beats, v);   // open nipples: knotted, laid in, pumped, fucked (10z7-nipple-traps.js)
-    const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
+    if (opts && opts.intro) beats = beats.filter(b => !(Array.isArray(b) && b[0] === INTRO_END));
+    const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()), tails: new Set() };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
     try { offerBets(mn, kind); } catch(e){ warn("bets:", e); }   // watchers get a flutter (10y3-trap-ranks.js)
     // it never lets go before its story's told
@@ -129,7 +143,12 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i)), mn);
+        // (one more sentence on the end, now and then; never the same one twice in a scene, and not till the trap's two
+        // fifths in: a stallion's "he's against the back of their womb" came the beat before he was in them, Nov 20)
+        const late = run.i > Math.max(2, Math.floor(beats.length * 0.4));
+        let tail = !late ? "" : intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i, stateKeys);
+        if (tail && run.tails.has(tail.trim())) tail = ""; else if (tail) run.tails.add(tail.trim());
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+tail, mn);
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;
@@ -167,8 +186,15 @@
     return !!run;
   }
 
+  // the milker's end, when they came to it milked out already and there was next to nothin' to take
+  const MILKER_DRY = [
+    "The can's barely wet. %n was milked out already, and the cups suck on empty teats to the end of the cycle anyway, just to be sure, till %n's sobbin' at every pull.",
+    "A few thin drops rattle into the can and that's all there is. The machine sulks, gives each sore nipple one last long tug for luck, and lets %n go.",
+    "Nothin' left in %n to give, and the cups keep pullin' at what isn't there till their nipples are swollen fat and stingin', then pop off with a wet smack.",
+    "{t}%n's tits are milked soft and empty, nipples drawn out long and tender, and the gauge never moved. The trap drops them in the straw, achin' for nothin'.",
+    "{c}It drags at %n's cock long after they've nothin' left, sleeve slurpin', till they're cryin' and drippin' thin and clear, and only then does it let them go."];
   // ── what each trap does ────────────────────────────────────
-  const INJECTOR_LOADS = ["lactation", "virility", "fertility", "heat inducer", "egg laying", "hyper pregnancy", "udder growth", "ass growth", "lactation x2", "fertility x2"];
+  const INJECTOR_LOADS =["lactation", "virility", "fertility", "heat inducer", "egg laying", "hyper pregnancy", "udder growth", "ass growth", "lactation x2", "fertility x2"];
   function openHole(mn, want){
     const order = (want ? [want] : []).concat(["vulva", "butt", "mouth"]);
     return order.find(h => (h !== "vulva" || hasVulva(mn)) && !holeBlocked(mn, h)) || null;
@@ -274,7 +300,9 @@
         const m0 = makesMilk(mn) ? p.milk : 0, s0 = seedMilkable(mn) ? p.semen : 0;
         trapRun(mn, kind, (m0 >= s0 ? T.milk : T.seed).concat(T.both), () => {
           const gotM = m0 > 0 ? drainMilk(mn, p.milk) : 0, gotS = s0 > 0 ? drainSemen(mn, p.semen) : 0;
-          emote("🥛 "+tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
+          // (next to nothin' in the can: they came to it milked out, and its end says so, Nov 20)
+          if (gotM + gotS < 15) emote("🥛 "+tFill(pickFor(mn, "trap:milker:dry", MILKER_DRY), mn), mn);
+          else emote("🥛 "+tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
           face(mn, "milked", 60); arouse(mn, 25);
         });
         break;

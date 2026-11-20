@@ -74,7 +74,7 @@
     ["She lets the muzzle off for a moment so she can hear %n beg properly, and then buckles it back on, satisfied.",
      "She holds %n right at the edge and chats about the weather, and the price of butter, and the new churn, and doesn't let them over.",
      "{t}She milks %n's tits into a little jug, a squeeze on each, and holds the jug up to their face so they can see how much.",
-     "When she's done she wipes her gloves on a towel, finger by finger, unbuckles %n's mitts, and gives them a cup of fresh cream to drink."]);
+     "She wipes her gloves on a towel, finger by finger, and gives %n a cup of fresh cream to drink, holdin' it to their lips herself, because the mitts stay on."]);
 
   // ── the black pool ──
   trapMore("blackpool",

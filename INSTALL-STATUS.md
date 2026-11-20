@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.88.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.89.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.89.0: every trap's story told in order, with nobody appearin' out of nowhere** Laynie, Nov 20: "Need a beats pass too, to make sure each beat makes sense like a story. some beats seem unconnected.. Additional slutty stuff always welcome." Read through: a sample story of every one of the 180 traps, on a cow and a bull, several times over.
+  - **The trap's own extra beats go where they belong:** the first was always put just before the end, so the breedin' frame strapped and greased them after it had been ruttin' them a while. Now a gettin'-ready beat goes in early, and one that's already in the thick of it goes in before the end.
+  - **Gas, spray and needle variants tell their own story:** they were gettin' the plain trap's beats, so the giggle gas had Moo laughin' herself hoarse while "their clit's throbbin' like a second heartbeat". The giggle gas has its own pool now, ticklish past bearin' and turnin' breathy; the sprays get the mess lines, the milk gas the milkin' ones.
+  - **Nobody appears out of nowhere:** the lines woven into every trap were picked blind, so a hose pump got "whoever's in them is getting near", an egg post "a big hand settles on the small of their back", and a bin of gas a farmhand holdin' the door shut from outside and "not yet, somebody murmurs" from inside. The farm girl reads who's in each tellin' of a story (a partner in them? folk about?) and leaves out the lines that need somebody it hasn't got. In their place, new lines about the trap and them alone: the machine that doesn't tire, the belly bulgin' with every push, beggin' out loud to nobody.
+  - **No sentence twice in a scene, and nothin' ahead of the story:** the same tail could land on two beats, and a stallion's "he's against the back of their womb" came the beat before he was in them. Tails wait till the story's two fifths in, woven beats go in its last third, and a state ("drained flat") is said once.
+  - **The tickle rack and the mirror box:** their story leads into the hold, so what's woven in comes after their own last beat, while the brushes are at them, not before they've started.
+  - **Fourteen beats that ended the story before its end** (the hot tub carried them home, then lifted them out of the tub; the booth's door clicked open, then unlocked; the yeti, the nixie, the winch, the twine, the pony cart, the rubber vat peeled off then "isn't comin' off for a while") are rewritten to stay in the scene, filthier where it fit.
+  - **And the small ones:** a milker that finds them milked dry says so (it was "more than they could hold in the can."), every line starts with a capital whatever went in first, and the treat door's trick says which hole ("every thrust into Moo's ," before).
 
 - **Bot 0.88.0: traps spring the moment you step on them, the Danger Draught on every chancy trap, and ?trap why** Laynie, Nov 20: "I noticed that traps are not triggering like they should, and danger drought doesn't seem to work on the trigger chances the way it should", then "Sounds perfect".
   - **The moment you step on one:** the farm girl only looked at who was stood where every 20 seconds, so a trap only had you if you were on its tile at that moment: walk across one, or step on and off, and it never knew. Now the game tells her every time somebody moves and she looks right then. Step on a trap and it springs within a second; seen crossin' one on a walk, it has you too. The water, the crate and the roamin' pack are looked at on a move as well.

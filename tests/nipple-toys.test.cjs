@@ -26,13 +26,19 @@ const ROOT = path.join(__dirname, "..");
     AssetBaseURL: () => "Assets/Female3DCG/x/", AssetGetPreviewPath: () => "Assets/Female3DCG/x/Preview", AssetBuildDescription: () => {}, AssetLoadAll: () => {},
     InventoryAvailable: (C, name, group) => C.Inventory.some((i) => i.Name === name && i.Group === group),
     InventoryPrerequisiteMessage: () => "OTHER", InterfaceTextGet: (k) => "MISSING " + k, ServerSend: (ev, d) => hooks.sent.push([ev, d]),
+    // the game's own way of askin' (Inventory.js): a stand-in copy of them, the item's slot left off, no member number
+    InventoryDisallow(C, asset, prereqs = asset.Prerequisite) {
+      const check = { CharacterID: "InventoryAllow", Appearance: C.Appearance.filter((i) => i.Asset.Group.Name !== asset.Group.Name), IsPlayer: () => false };
+      let Msg = ""; prereqs.some((p) => (Msg = W.InventoryPrerequisiteMessage(check, p, asset)));
+      return Msg ? W.InterfaceTextGet("Prerequisite" + Msg) : null;
+    },
   };
   hooks.sent = [];
   const mod = { hookFunction(fn, pri, h) { const orig = W[fn]; W[fn] = function (...args) { return h(args, (a) => orig.apply(this, a)); }; } };
   const T = require(tmp); fs.unlinkSync(tmp);
   const L = require(path.join(ROOT, "dispensary/src/toys-list.js").replace(/\.js$/, ".js"));
-  let open = 0;
-  T.initToys(mod, { nipsOpen: () => open, openOf: () => open });
+  let open = 0, asked = 0;
+  T.initToys(mod, { nipsOpen: () => open, openOf: (mn) => { asked = mn; return Number(mn) > 0 ? open : 0; } });   // (like nipples.js: nobody's are open)
   const G = W.AssetGroupMap.get("ItemNipples"), byName = (n) => added.find(([d]) => d.Name === n);
   ok(added.length === 15 && added.every(([, g]) => g === "ItemNipples") && G.Asset.length === 15, "fifteen of the game's toys, in the game's own nipple slot");
   ok(added.every(([d]) => d.Prerequisite.join() === "AccessBreast,FarmNipsOpen" && d.Value === -1 && d.Layer[0].Name === "Toy"), "...each needs the chest bare and the nipples open, and isn't sold on its own");
@@ -53,6 +59,16 @@ const ROOT = path.join(__dirname, "..");
   ok(W.InventoryPrerequisiteMessage(C, "FarmNipsOpen") === "" && W.InventoryPrerequisiteMessage(C, "AccessBreast") === "OTHER", "open: in it goes (the game's own checks as ever)");
   open = 0; C.Appearance = [{ Asset: { Name: "FarmNipPlug", Group: { Name: "ItemNipples" } } }];
   ok(W.InventoryPrerequisiteMessage(C, "FarmNipsOpen") === "", "one already in: swappin' it for another is fine");
+  // the way the game's item menu really asks (Nov 19, Laynie: "it doesn't recognize my open nipples")
+  const nip = { Name: "FarmNipDildo", Group: { Name: "ItemNipples" }, Prerequisite: ["FarmNipsOpen"] };
+  const me = { MemberNumber: 9, Inventory: [], Appearance: [], IsPlayer: () => true }, her = { MemberNumber: 44, Appearance: [], IsPlayer: () => false };
+  open = 0; ok(/aren't open/.test(W.InventoryDisallow(me, nip) || ""), "the game's menu, shut: no toy goes in, and it says why");
+  open = 1; ok(W.InventoryDisallow(me, nip) === null, "the game's menu, opened (the button, a dose, the leeches): in it goes, though the game asks about a stand-in copy of you");
+  open = 2; asked = 0; ok(W.InventoryDisallow(her, nip) === null && asked === 44, "...on somebody else: what their Dispensary told the room about them, not the stand-in");
+  open = 0; me.Appearance = [{ Asset: { Name: "FarmNipPlug", Group: { Name: "ItemNipples" } } }];
+  ok(W.InventoryDisallow(me, nip) === null, "...one in already: swap it for another");
+  ok(/aren't open/.test(W.InventoryDisallow({ Appearance: [], IsPlayer: () => false }, nip) || ""), "...somebody we can't tell whose: shut, as ever");
+  ok(W.InventoryPrerequisiteMessage({ MemberNumber: 9, Appearance: [], IsPlayer: () => true }, "FarmNipsOpen") === "FarmNipsShut", "...and once the game's done askin', it's forgotten who it asked about");
   W.ServerSend("ChatRoomChat", { Type: "Action", Content: "ActionUse", Dictionary: [{ SourceCharacter: 1 }, { Tag: "NextAsset", AssetName: "FarmNipBeadsXL", GroupName: "ItemNipples" }, { Tag: "Other", AssetName: "NippleSuctionCups", GroupName: "ItemNipples" }] });
   const dict = hooks.sent[0][1].Dictionary;
   ok(dict[1].Tag === "NextAsset" && dict[1].Text === "nipple beads xl" && !dict[1].AssetName && dict[2].AssetName === "NippleSuctionCups", "in chat everybody reads the toy's name, even without the Dispensary");

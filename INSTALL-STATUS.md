@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.24.1: the nipple toys go in open nipples now** Laynie, Nov 19: "I used the button to open my nipple and I can't seem to use the toys on them? it doesn't recognize my open nipples".
+  - **What was wrong:** the game's item menu doesn't check you, it checks a stand-in copy of you with the nipple slot left off, and that copy has no member number. So the toys always thought the nipples were shut, however they'd been opened: the button, /dispensary nips open, a dose, the leeches.
+  - **Now:** the Dispensary remembers who the copy stands for while the game checks. Open nipples, yours or somebody else's the room's been told about, take the toys; shut ones still say why not, and now name /dispensary nips open too.
 
 - **Bot 0.87.0 + Dispensary 0.24.0: the traps use open nipples, and the kraken** Laynie, Nov 19: "since tits are fuckable via nipple, some traps should use it. like knotting in them, eggs in them, etc.", then "all of them, and more, like the kraken".
   - **The farm girl knows whose nipples are open:** your Dispensary tells the room, and its hello says so. Traps on and nipples open, and the traps use them. Put nipples in your ?limits and they never do.

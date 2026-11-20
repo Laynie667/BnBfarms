@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.24.0
+// @version      0.24.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.24.0";
+  var VERSION = "0.24.1";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -15652,7 +15652,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return added > 0 || TOYS.every((T) => (G.Asset || []).some((a) => a && a.Name === T.id));
   }
   var SHUT = "PrerequisiteFarmNipsShut";
-  var SHUT_TEXT = "Those nipples aren't open. A Nipple Dilator or the nipple leeches open them up first.";
+  var SHUT_TEXT = "Those nipples aren't open. A Nipple Dilator, the nipple leeches or /dispensary nips open opens them up first.";
+  var asking = null;
   function initToys(mod2, deps2) {
     const hook = (fn, pri, f) => {
       try {
@@ -15689,12 +15690,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const T = args[2] === "ItemNipples" && TOY_BY[args[1]];
       return T ? next2([args[0], T.from[1], T.from[0], ...args.slice(3)]) : next2(args);
     });
+    hook("InventoryDisallow", 0, (args, next2) => {
+      const was = asking;
+      asking = args[0] || null;
+      try {
+        return next2(args);
+      } finally {
+        asking = was;
+      }
+    });
     hook("InventoryPrerequisiteMessage", 0, (args, next2) => {
       if (args[1] !== "FarmNipsOpen") return next2(args);
       try {
-        const C2 = args[0];
-        if (!C2 || toyIn(C2)) return "";
-        const n = typeof C2.IsPlayer === "function" && C2.IsPlayer() ? deps2.nipsOpen() : deps2.openOf(C2.MemberNumber);
+        const C2 = asking || args[0];
+        if (!C2) return "FarmNipsShut";
+        if (toyIn(C2)) return "";
+        const n = typeof C2.IsPlayer === "function" && C2.IsPlayer() ? deps2.nipsOpen() : C2.MemberNumber ? deps2.openOf(C2.MemberNumber) : 0;
         return n > 0 ? "" : "FarmNipsShut";
       } catch (e) {
         return "FarmNipsShut";

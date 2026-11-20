@@ -6,6 +6,9 @@
      lock plug takes a lock: each copies its game toy's own settings.
    • Whoever owns the game's toy owns its nipple version.
    • Only into nipples that are open (the Nipple Dilator, the leeches, a trained stretch); once one's in it holds them open.
+     (Nov 19 fix, Laynie: "it doesn't recognize my open nipples". The game's item menu doesn't ask about you: it asks
+     about a stand-in copy of you with the nipple slot left off (InventoryDisallow), and that copy has no member
+     number, so every toy said they were shut. Now we remember who the copy stands for while the game checks.)
    • The pictures are the repo's (toys/v1), drawn by tools/nipple-toys-art.js at each breast size. Only people with the
      Dispensary see them; in chat, everybody reads the toy's name.
 */
@@ -63,7 +66,9 @@ export function addToys() {
 }
 
 const SHUT = "PrerequisiteFarmNipsShut";
-const SHUT_TEXT = "Those nipples aren't open. A Nipple Dilator or the nipple leeches open them up first.";
+const SHUT_TEXT = "Those nipples aren't open. A Nipple Dilator, the nipple leeches or /dispensary nips open opens them up first.";
+// who the game's really askin' about: it checks prerequisites on a stand-in copy of them (InventoryDisallow)
+let asking = null;
 // deps: { nipsOpen, openOf } (nipples.js)
 export function initToys(mod, deps) {
   const hook = (fn, pri, f) => { try { if (typeof W[fn] === "function") mod.hookFunction(fn, pri, f); } catch (e) { console.warn("[Dispensary] nipple toys can't hook " + fn + ":", e); } };
@@ -75,11 +80,14 @@ export function initToys(mod, deps) {
   // whoever owns the game's toy owns its nipple version
   hook("InventoryAvailable", 0, (args, next) => { const T = args[2] === "ItemNipples" && TOY_BY[args[1]]; return T ? next([args[0], T.from[1], T.from[0], ...args.slice(3)]) : next(args); });
   // only into open nipples (or in place of one that's in already)
+  hook("InventoryDisallow", 0, (args, next) => { const was = asking; asking = args[0] || null; try { return next(args); } finally { asking = was; } });
   hook("InventoryPrerequisiteMessage", 0, (args, next) => {
     if (args[1] !== "FarmNipsOpen") return next(args);
     try {
-      const C = args[0]; if (!C || toyIn(C)) return "";
-      const n = typeof C.IsPlayer === "function" && C.IsPlayer() ? deps.nipsOpen() : deps.openOf(C.MemberNumber);
+      const C = asking || args[0];   // (the real one, not the game's stand-in copy)
+      if (!C) return "FarmNipsShut";
+      if (toyIn(C)) return "";
+      const n = typeof C.IsPlayer === "function" && C.IsPlayer() ? deps.nipsOpen() : C.MemberNumber ? deps.openOf(C.MemberNumber) : 0;
       return n > 0 ? "" : "FarmNipsShut";
     } catch (e) { return "FarmNipsShut"; }
   });

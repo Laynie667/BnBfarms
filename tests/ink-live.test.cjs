@@ -1,4 +1,4 @@
-// LIVE INK (shared/ink/live.js, Nov 17, step 2 of "build it all"): the 28 designs that print the wearer's own. Each is an
+// LIVE INK (shared/ink/live.js, Nov 17, step 2 of "build it all"): the 29 designs that print the wearer's own (the womb mark, Nov 19, the 29th). Each is an
 // item in the ink slots, drawn on the spot from what's written on it (Property.FarmInk): a count from the farm's books,
 // their number, a name, their own words. /ink writes on it; the Companion hands over the farm's counts; days without
 // cummin' is counted on the wearer's own game. No canvas in node, so a pretend one records the words drawn.
@@ -68,7 +68,7 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
 
   // the list: the live ones are items now, measured and previewed like the rest
   const live = LIST.groups.FarmInk.filter((a) => a.live);
-  ok(live.length === 28 && st.live === 28, 'all 28 live designs are in the ink slots (' + live.length + ')');
+  ok(live.length === 29 && st.live === 29, 'all 29 live designs are in the ink slots, the womb mark too (' + live.length + ')');
   ok(W.AssetGroupMap.get('FarmInk3').Asset.some((a) => a.Name === 'LiveTimesBred') && W.AssetGroupMap.get('FarmInk3').Asset.length === LIST.groups.FarmInk.length, '...in every ink slot, with the rest');
   ok(live.every((a) => fs.existsSync(path.join(__dirname, '../ink/v2/FarmInk/Preview', a.name + '.png'))), '...each with its wardrobe preview');
   ok(live.every((a) => Array.isArray(a.box) && a.s > 0 && a.w > 0 && a.h > 0), '...each measured: where it sits and how big');
@@ -160,5 +160,27 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ok(W.Player.Appearance.filter((it) => /^Farm/.test(it.Asset.Group.Name)).length === 4 && !W.Player.Appearance.some((it) => it.Asset.Group.Name === 'Cloth'), "the game's naked takes the clothes and leaves the ink on");
   W.CharacterAppearanceStripLayer(W.Player);
   ok(W.Player.Appearance.filter((it) => /^Farm/.test(it.Asset.Group.Name)).length === 4, "...and so does strippin' a layer at a time");
+  // THE WOMB MARK (Nov 19, Laynie: "I love it"): litters and what she's carryin', from the farm's books, or from her
+  // Dispensary's away from the farm; BABY FACTORY at twenty
+  {
+    const item = { Asset: { Name: 'LiveWombMark', Group: { Name: 'FarmInk1' } } }; W.Player.Appearance[0] = item;
+    const wm = () => (item.Property || {}).FarmInk || {};
+    const realNow = Date.now; let skew = 0; Date.now = () => realNow() + skew; const later = () => { skew += 61000; };   // (a count goes on once a minute a slot)
+    later(); st.counts({ loads: 13 }); st.mine({ womb: { n: 2, c: 1 } });
+    ok(wm().n === 2 && wm().c === 1, 'WOMB MARK, no farm count: her Dispensary\'s own (2 litters, carryin\' 1) ' + JSON.stringify(wm()));
+    later(); st.counts({ loads: 13, womb: { n: 4, c: 3 } });
+    ok(wm().n === 4 && wm().c === 3, '...the farm\'s books win when there are some (4 litters, carryin\' 3)');
+    later(); st.mine({ womb: { n: 5, c: 0, away: true } });
+    ok(wm().n === 5 && wm().c === 0, '...unless she\'s given birth away and the farm hasn\'t booked it yet (5, empty)');
+    later(); st.counts({ loads: 13, womb: { n: 5, c: 0 } }); st.mine({ womb: { n: 5, c: 0 } });
+    ok(wm().n === 5 && wm().c === 0, '...and the farm\'s again once she has');
+    const words = () => draw({ MemberNumber: 600, Appearance: [item] })[0].words.replace(/\|/g, '');
+    ok(!/BABY FACTORY/.test(words()), '...five litters: no BABY FACTORY yet');
+    later(); st.counts({ loads: 13, womb: { n: 20, c: 6 } });
+    ok(wm().n === 20 && /BABY FACTORY/.test(words()), 'twenty litters: BABY FACTORY under it');
+    const m = LIST.groups.FarmInk.find((a) => a.name === 'LiveWombMark');
+    ok(m && m.layers.map((l) => l.name).join() === 'White,Pink,Ink' && m.k > 0.5 && m.spot === 'womb', '...over the womb, in three colours to pick: the dots, the pink, the ink');
+    Date.now = realNow;
+  }
   out(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })().catch((e) => { out('CRASHED ' + (e && e.stack || e)); process.exit(1); });

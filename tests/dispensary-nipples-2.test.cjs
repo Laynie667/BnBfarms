@@ -51,10 +51,11 @@ function page() {
   D.st().parasites = { nips: true };
   D.latch("nips", { by: OWNER, name: "Mistress" });
   ok(D.nips() === 2 && D.trained() === 0, "the leeches hold them open, two wide; nothin' trained yet");
-  step(1);
-  ok(D.trained() === 0, "an hour held open: not yet trained to stay");
-  step(11);
-  ok(D.trained() === 2, "twelve hours held open: trained to stay two wide (" + JSON.stringify(D.nipsState().train) + ")");
+  step(0.5);
+  ok(D.trained() === 0, "half an hour held open: not yet trained to stay");
+  step(1.75);
+  ok(D.trained() === 2, "two hours and a bit held open: trained to stay two wide, a step an hour (Nov 19: \"4 hours or less\") (" + JSON.stringify(D.nipsState().train) + ")");
+  step(9.75);
   D.para(); delete D.st().para.nips;
   ok(D.nips() === 2 && D.nipsOf(ME) === 2, "the leeches gone: still open two wide, so they can still be fucked and filled");
   ok(w.ActivityCheckPrerequisite("FarmDispNipsOpen", s.w.ChatRoomCharacter[1], w.Player) === true, "...and the game's action menu still offers it");
@@ -82,6 +83,32 @@ function page() {
   ok(D.nips() === 0 && !D.active("dilator") && !D.para().nips && D.trained() === 0, "a Tightening Balm: the dilator out, the leeches off, the stretch undone");
   ok(s.actions().some((a) => /tightening balm/i.test(a) && /closed|snug/.test(a)), "...and the room hears it");
   ok(s.evs.some((e) => e.type === "nips" && e.from === ME && e.n === 0), "the Companion's told when they close (so it draws them closed)");
+
+  // forced open (Nov 19, Laynie: "a command to force dilate nipples"): hers, right now; and somebody else's, by the ladder
+  let a0 = s.actions().length;
+  s.cmd("nips open 2");
+  ok(D.nips() === 2 && D.trained() === 2, "/dispensary nips open 2: wide open right now, and trained to stay (" + D.nips() + "/" + D.trained() + ")");
+  ok(s.actions().length > a0 && /Hana/.test(s.actions().slice(-1)[0]) && /wide open/.test(s.actions().slice(-1)[0]), "...the room sees her do it (" + s.actions().slice(-1)[0] + ")");
+  s.cmd("nips gape");
+  ok(D.trained() === 3, "/dispensary nips gape: gapin' (" + D.trained() + ")");
+  n = s.local.length; s.cmd("nips open 2");
+  ok(D.trained() === 3 && /already gapin'/.test(s.local.slice(n).join(" ")), "already wider: it says so, and leaves them be");
+  ok((s.msgs("dispNips").slice(-1)[0] || {}).n === 3, "the room's Dispensaries are told how open, so the actions show for them");
+  D.nipsClose(); a0 = s.actions().length;
+  s.hidden(OWNER, "dispNipsOpen", { n: 3 });
+  ok(D.trained() === 3, "Mistress forces them open from her own Dispensary: gapin'");
+  ok(s.actions().length > a0 && /Mistress/.test(s.actions().slice(-1)[0]) && /Hana/.test(s.actions().slice(-1)[0]), "...the room sees Mistress do it (" + s.actions().slice(-1)[0] + ")");
+  ok((s.msgs("dispNipsOpenOk", OWNER).slice(-1)[0] || {}).ok === true, "...and Mistress's told it took");
+  D.nipsClose();
+  s.hidden(800, "dispNipsOpen", { n: 3 });
+  ok(D.trained() === 0 && (s.msgs("dispNipsOpenOk", 800).slice(-1)[0] || {}).why === "ladder", "a stranger who can't dose her can't force them");
+  D.st().off.dilator = true; s.hidden(OWNER, "dispNipsOpen", { n: 2 });
+  ok(D.trained() === 0 && (s.msgs("dispNipsOpenOk", OWNER).slice(-1)[0] || {}).why === "off", "the Nipple Dilator switched off: nobody forces them");
+  delete D.st().off.dilator;
+  s.cmd("nips open Mistress 2");
+  ok((s.msgs("dispNipsOpen", OWNER).slice(-1)[0] || {}).n === 2, "/dispensary nips open Mistress 2: sent to Mistress's Dispensary");
+  n = s.local.length; s.hidden(OWNER, "dispNipsOpenOk", { ok: true, n: 2 });
+  ok(/Mistress's nipples are forced open, wide open/.test(s.local.slice(n).join(" ")), "...and she hears it took");
 
   // creampies: somebody who was just in her nipple cums
   D.st().nipsHeal = false; s.needle(OWNER, "Nipple Dilator x2");

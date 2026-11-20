@@ -1,7 +1,7 @@
 /* WHAT'S IN THIS FILE (lines-nips.js)
    The lines for the Sure-Catch Serum and the Nipple Dilator (Nov 18; Laynie, Nov 17: "a effect that makes every load
    take ~ for hyper pregnancy reasons. and maybe a nipple dialator effect"), and for open nipples bein' used
-   (nipples.js). %t is the one dosed, %b whoever's usin' them. In story order: it takes, it holds, now and then, it lets go.
+   (nipples.js). %t is the one dosed, %b whoever's usin' them (or forcin' them open, %w how wide). In story order: it takes, it holds, now and then, it lets go.
 */
 import { LINES } from "./lines.js";
 
@@ -71,6 +71,22 @@ Object.assign(LINES, {
       "%t's nipple is stuffed with %b's load, and it starts leakin' back out the moment %b pulls free.",
       "%b empties into %t's tit. The stretched nipple twitches, and cream drips from it in slow strings.",
       "%t gasps as %b's load floods their nipple, warm and heavy. It doesn't stay in long: it's runnin' down their chest.",
+    ],
+    // forced open (Nov 19, /dispensary nips open): the room sees it. %w is how wide (nipples.js FORCED_WIDE): open
+    // enough to take a finger, wide open, gapin' wide
+    forced_self: [
+      "%t pinches both nipples and pulls, and pulls, till they give: %w, pink and slick and waitin'. They stay that way.",
+      "%t works their nipples open with their own fingers, gaspin' as they stretch %w. They don't close back up.",
+      "%t arches and moans as their nipples part, %w, two hungry little holes beggin' to be filled.",
+      "%t forces their own nipples %w. Their tits are fuckable now, and they know it.",
+      "%t spreads their nipples %w and shows them off, puffy and wet, made for somethin' to slide in.",
+    ],
+    forced_by: [
+      "%b takes hold of %t's nipples and forces them %w. %t whimpers as they stretch and stay that way.",
+      "%b works %t's nipples open, slow and cruel, till they're %w and drippin'. %t can't do a thing but squirm.",
+      "%t gasps as %b spreads their nipples %w. They stay that way, soft and slick, ready for whatever %b wants in them.",
+      "%b decides %t's tits should be fuckable, and makes them so: both nipples stretched %w and left that way.",
+      "%b presses and stretches till %t's nipples give, %w. %t's chest heaves, and the little holes twitch, empty and achin'.",
     ],
     self: [
       "Your own finger slides right into your open nipple. It's so strange, and so good.",

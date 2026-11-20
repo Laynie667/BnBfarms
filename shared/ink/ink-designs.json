@@ -3570,6 +3570,60 @@
     "k": 0.51
    },
    {
+    "name": "LiveWombMark",
+    "title": "Womb Mark (fills with every litter)",
+    "where": "over the womb",
+    "sheet": 7,
+    "spot": "womb",
+    "left": 51,
+    "top": 389,
+    "w": 398,
+    "h": 284,
+    "box": [
+     15,
+     0,
+     365,
+     250
+    ],
+    "s": 1.1379,
+    "layers": [
+     {
+      "name": "White",
+      "color": "#ffffff",
+      "colorize": true
+     },
+     {
+      "name": "Pink",
+      "color": "#ab2c7c",
+      "colorize": true
+     },
+     {
+      "name": "Ink",
+      "color": "#1e1423",
+      "colorize": true
+     }
+    ],
+    "pal": [
+     [
+      255,
+      255,
+      255
+     ],
+     [
+      171,
+      44,
+      124
+     ],
+     [
+      30,
+      20,
+      35
+     ]
+    ],
+    "live": true,
+    "k": 0.85
+   },
+   {
     "name": "LiveWordsBlackletter",
     "title": "Your Words: Blackletter",
     "where": "low on the belly",

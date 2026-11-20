@@ -1,5 +1,5 @@
 /* WHAT'S IN THIS FILE (shared/ink/live.js)
-   THE LIVE INK (Laynie, Nov 17: "build it all"): the 28 designs from the tattoo sheets that print somethin' of the
+   THE LIVE INK (Laynie, Nov 17: "build it all"): the 29 designs (28 from the tattoo sheets, and the womb mark) that print somethin' of the
    wearer's own. A count from the farm's books, a name, their number, a date, or their own words.
    • Each is an item in the ink slots like any other. Instead of a picture from the repo, every add-on that sees it draws
      it on the spot, from what's written on the item itself (its Property.FarmInk), so everybody sees the same numbers.
@@ -54,6 +54,7 @@ export function cleanValues(v) {
   const o = {};
   if (!v || typeof v !== "object") return o;
   if (v.n != null) { const n = num0(v.n, null, 99999); if (n != null) o.n = n; }
+  if (v.c != null) { const n = num0(v.c, null, 99); if (n != null) o.c = n; }   // (the womb mark: how many she's carryin')
   if (v.num != null) { const n = num0(v.num, null); if (n != null) o.num = n; }
   if (typeof v.t === "string") { const t = txt0(v.t, null, 28); if (t) o.t = t; }
   for (const k of ["d", "due"]) if (v[k] != null) { const n = num0(v[k], null, 4e12); if (n) o[k] = n; }
@@ -79,6 +80,12 @@ const text = A.text;
 const pct = (n) => Math.max(0, Math.min(100, n)) / 100;
 // a count that keeps on: the first 25 as tally marks, and the number beside them past that
 function tallyCount(g, x, y, n, h, w, font) { A.tally(g, x, y, Math.min(n, 25), h); }
+// letters along a smile (the womb mark's BABY FACTORY): textY is where the middle of the words sits
+function smileText(g, t, cx, textY, R, font) {
+  g.font = font; g.textAlign = "center"; g.textBaseline = "middle";
+  const span = g.measureText(t).width / R, cy = textY - R; let a = Math.PI / 2 + span / 2;
+  for (const ch of t) { const da = g.measureText(ch).width / R, mid = a - da / 2; g.save(); g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R); g.rotate(mid - Math.PI / 2); g.fillText(ch, 0, 0); g.restore(); a -= da; }
+}
 // what each needs (fields), where it comes from on its own (auto: the farm's count it follows), the sample, and the drawing
 export const LIVE = [
   { name: "LiveFarmProperty", title: "Farm Property (your number)", sheet: 1, where: "neck or hip", fields: ["num"], sample: { num: 123456 },
@@ -157,6 +164,23 @@ export const LIVE = [
     draw: (g, w, h, V) => { const cx = w / 2, cy = 116, k = Math.round(12 * pct(V.n)); g.lineCap = "butt";
       for (let i = 0; i < 12; i++) { const a0 = -Math.PI / 2 + i / 12 * Math.PI * 2 + 0.04, a1 = a0 + Math.PI * 2 / 12 - 0.08; g.lineWidth = 14; g.beginPath(); g.arc(cx, cy, 84, a0, a1); if (i < k) g.stroke(); else { g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, 91, a0, a1); g.arc(cx, cy, 77, a1, a0, true); g.closePath(); g.stroke(); } }
       g.lineWidth = 5; A.heart(g, cx, cy + 22, 44); g.stroke(); g.lineWidth = 3; A.arrowDown(g, cx, cy + 34, 20, 3); } },
+  // THE WOMB MARK (Nov 19, Laynie: "I love it"): the womb crest, twenty little hearts in a smile under it, one inked in
+  // for every litter; while she's carryin' the womb fills hot pink with a white dot for each one in there, and the whole
+  // mark glows; at twenty litters, BABY FACTORY underneath. n: litters, c: how many she's carryin' now (0: not).
+  { name: "LiveWombMark", title: "Womb Mark (fills with every litter)", sheet: 7, where: "over the womb", fields: ["n", "c"], auto: "womb", sample: { n: 0, c: 0 },
+    draw: (g, w, h, V) => { const cx = w / 2, cy = 96, s = 110, n = Math.max(0, Math.min(20, V.n | 0)), c = Math.max(0, Math.min(99, V.c | 0));
+      const hearts = (fill) => { for (let i = 0; i < 20; i++) { const a = Math.PI * (0.11 + 0.78 * i / 19), x = cx - Math.cos(a) * 138, y = cy + 48 + Math.sin(a) * 60; g.lineWidth = 1.7; A.heart(g, x, y + 4, 9); if (i < n && fill) g.fill(); else g.stroke(); } };
+      if (c) {   // carryin': a hot pink glow round the whole mark
+        for (const blur of [18, 8]) { g.save(); g.shadowColor = PINKGLOW; g.shadowBlur = blur; A.wombCrest(g, cx, cy, s, PINKGLOW); g.fillStyle = g.strokeStyle = PINKGLOW; hearts(true); g.restore(); }
+      }
+      g.fillStyle = g.strokeStyle = INK; A.wombCrest(g, cx, cy, s, INK); g.fillStyle = g.strokeStyle = INK; hearts(true);
+      if (c) {   // the womb filled in, and a dot for each one in there
+        g.fillStyle = A.PINK; A.heart(g, cx, cy + 2.2, s * 0.26 - 3); g.fill();
+        g.fillStyle = "#ffffff"; const k = Math.min(9, c);
+        for (let i = 0; i < k; i++) { const row = i < 5 ? 0 : 1, inRow = row ? k - 5 : Math.min(5, k), j = row ? i - 5 : i; g.beginPath(); g.arc(cx - (inRow - 1) * 5.5 + j * 11, cy - 10 + row * 11, 2.9, 0, Math.PI * 2); g.fill(); }
+      }
+      if (n >= 20) { g.fillStyle = INK; smileText(g, "BABY FACTORY", cx, 236, 460, "900 27px Georgia, 'Times New Roman', serif"); }
+    } },
   { name: "LiveWordsBlackletter", title: "Your Words: Blackletter", sheet: 7, where: "anywhere", fields: ["t"], sample: { t: "Breeding Stock" },
     draw: (g, w, h, V) => text(g, V.t, w / 2, h / 2, "UnifrakturMaguntia", 58, { max: 330 }) },
   { name: "LiveWordsScript", title: "Your Words: Script", sheet: 7, where: "anywhere", fields: ["t"], sample: { t: "Good Girl" },

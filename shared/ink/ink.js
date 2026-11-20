@@ -12,7 +12,7 @@
    • Only people running the Companion or the Dispensary see them (whichever loads first adds the slots, once), the
      same as Echo's clothes only show for people with Echo's mod. Everyone else sees plain skin.
    • The game draws the front only, so designs meant for the back (a tramp stamp, a butt cheek) start on the hip.
-   • THE LIVE ONES (step 2, Nov 17; live.js): 28 designs that print the wearer's own. A count from the farm's books, their
+   • THE LIVE ONES (step 2, Nov 17; live.js): 29 designs that print the wearer's own. A count from the farm's books, their
      number, a name, a date, their own words. They're drawn on the spot from what's written on the item (Property.FarmInk),
      so everybody with an add-on sees the same. The farm's counts are written on as they change (the Companion hands
      them over: counts); names and words with /ink. Days without cummin' is counted here, on the wearer's own game.
@@ -145,6 +145,7 @@ function write(W, slot, values, now) {
 const retry = {};
 // the farm's counts (the Companion hands them over from the farm girl's books) and days without cummin' (counted here)
 let counts = {};
+let mine = {};   // (Nov 19) what the Dispensary knows itself, wherever you are: the womb mark's { womb: { n, c, away } }
 const DAY = 86400000;
 const cumKey = (W) => "farmink-lastcum-" + (W.Player && W.Player.MemberNumber);
 function daysDenied(W) { let t = 0; try { t = Number(W.localStorage.getItem(cumKey(W))) || 0; } catch (e) { /* fine */ } return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0; }
@@ -155,6 +156,9 @@ function autoOf(W, auto) {
   if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
   if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
   if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;   // where the last four traps had you (Nov 18)
+  // the womb mark (Nov 19): litters and how many you're carryin'. The farm's books, unless your Dispensary knows of a
+  // birth or a layin' away that she hasn't booked yet (or there's no farm count at all)
+  if (auto === "womb") { const b = mine.womb, v = (b && b.away) || !(c && typeof c === "object") ? b : c; return v && typeof v === "object" ? { n: Number(v.n) || 0, c: Number(v.c) || 0 } : null; }
   return typeof c === "number" ? { n: c } : null;
 }
 function refreshAuto(W) {
@@ -377,6 +381,8 @@ export function registerInk(W, mod) {
   const st = (W.__farmInk = { ready: false, slots: [...INK_SLOTS, BRAND_SLOT], designs: LIST.groups.FarmInk.length + LIST.groups.FarmBrand.length, live: Object.keys(MANIFEST).length,
     // for the Companion: the farm's counts for live ink (state.ink from the farm girl)
     counts: (c) => { if (c && typeof c === "object") { counts = c; try { refreshAuto(W); } catch (e) { /* next time */ } } },
+    // for the Dispensary: what it knows itself, off the farm too (the womb mark: what you're carryin')
+    mine: (c) => { if (c && typeof c === "object") { mine = c; try { refreshAuto(W); } catch (e) { /* next time */ } } },
     write: (slot, v) => write(W, slot, v, true),
     command: (a) => inkCommand(W, a),
     // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)

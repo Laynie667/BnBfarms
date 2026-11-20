@@ -234,13 +234,20 @@ and running timers follow you between your phone and your PC, and clearing the b
      puffy pink rim round the openin', over her own nipple and under anything worn on it (body-engine.js openNip; the
      engine asks `host.nipOpen`, the Companion's drawn body asks the Dispensary, `FarmhandDispensary.nipples(mn)`).
    - **The stretch stays** (Laynie: "if the stretching persist after the leeches are removed, it would make since to be
-     able to use and fuck them, or creampie them too"): held open they train, a tenth of a level every half hour toward
-     how wide they're held, and more with every fuckin'. What's trained stays when the dose wears off or the leeches drop,
+     able to use and fuck them, or creampie them too"): held open they train, a level an hour toward how wide they're
+     held (Nov 19, Laynie: "shorten the time down to 4 hours or less": three hours held wide and they're gapin'; it was a
+     tenth every half hour, fifteen hours), and more with every fuckin'. What's trained stays when the dose wears off or the leeches drop,
      and stays usable. **"They close up slowly on their own"** is each player's switch (Laynie: "up to the individual
      player with a toggle"), on to start: half a step a day once they've been left be twelve hours.
    - **Closin' them back up** (Laynie: "need to have a way to reset them"): "Close them up" on the page,
      `/dispensary nips close`, or a **Tightening Balm** anybody on your list doses you with (in hardcore, the balm from a
      keyholder). `/dispensary nips` says how they are; `/dispensary nips heal on|off` is the switch.
+   - **Forced open** (Nov 19, Laynie: "a command to force dilate nipples"): `/dispensary nips open [1-3]` (or dilate,
+     stretch, gape, spread; wide is 2, gapin' is 3, and gapin' if you don't say) opens yours right now and trains them to
+     stay that way; the page's **Open them up** opens them a step wider. `/dispensary nips open <who> [1-3]` does it to
+     somebody else (`dispNipsOpen { n }`, answered `dispNipsOpenOk { ok, why, n }`): their Dispensary takes it from
+     anybody who can dose them, not if they've switched the Nipple Dilator off. Hardcore doesn't stop it: it only ever
+     opens them. The room sees it happen.
    - **Creampies:** whoever cums within a minute and a half of fuckin' your nipple, their Dispensary tells yours
      (`dispCream`). It wells back out (a line for the room, cum on your chest for the Companion) and is counted, its own
      count (Laynie: "its own count"). On the farm the farm girl's told (`dispNipLoad`): her own count on `?stats`, and it

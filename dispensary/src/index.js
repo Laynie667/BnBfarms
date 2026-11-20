@@ -13,7 +13,7 @@ import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, mo
 import { laterTick, craving, craveSoon, isLater } from "./later.js";
 import { initWorn, wornTick, wornGear, trigger, wornReset, GLOSS_WORDS } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
-import { initNipples, nipsInfo, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped, nipsToyUsed } from "./nipples.js";
+import { initNipples, nipsInfo, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped, nipsToyUsed, nipsForce, nipsForceSend, NIP_WORDS } from "./nipples.js";
 import { initToys } from "./toys.js";
 import { initKits, kitTick, kitNow, kitSave, kitDelete, kitNames, kitLookup, kitEnd, SPEEDS, SPEED_NAMES } from "./kits.js";
 import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset, hornyOf } from "./horny.js";
@@ -69,11 +69,14 @@ function commands() {
   try {
     W.CommandCombine([{
       Tag: "dispensary",
-      Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
+      Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [open [who] [1-3] | close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
       Action: (args) => {
         const a = String(args || "").trim().toLowerCase();
+        // forced open (Nov 19): yours, or somebody else's
+        const om = /^nips?\s+(?:open|dilate|stretch|gape|spread)(?:\s+(.*))?$/i.exec(String(args || "").trim());
+        if (om) { nipsOpenCommand(String(om[1] || "").trim()); return; }
         // your nipples (Nov 18): how they are, closin' them back up, and whether they close up on their own
-        const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
+        const nm =/^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
         if (nm) {
           if (nm[1] === "close" || nm[1] === "reset") { if (hardOn()) { local("🔒 Hardcore: closin' them back up is your keyholders' to do (a Tightening Balm from one of them does it)."); return; }
             const lt = mineToy(); if (lt && toyLocked(lt)) { local("🔒 The " + toyOf(lt).label + "'s locked in, holdin' them open. Whoever holds its key has to take it out first."); return; }
@@ -82,7 +85,7 @@ function commands() {
           if (nm[1] === "heal" && nm[2]) { if (hardOn()) { local("🔒 Hardcore: your keyholders hold that switch."); return; } st().nipsHeal = nm[2] === "on"; save(); local(nm[2] === "on" ? "Your nipples will close up slowly on their own, once they've been left be a while." : "Your nipples stay as stretched as they're trained, till somebody closes them up."); return; }
           const L2 = nipLoads(), tw = mineToy(); local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " +
             (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") +
-            (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close · /dispensary nips heal on|off"); return;
+            (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips open [1-3] · /dispensary nips open <who> [1-3] · /dispensary nips close · /dispensary nips heal on|off"); return;
         }
         // your holes (Nov 18): how open, how trained, the switches; and trainin' goals for somebody
         const hlm = /^holes?(?:\s+(heal|pain)\s+(on|off))?$/.exec(a);
@@ -174,6 +177,25 @@ function seedCommand() {
     (I.waiting ? " " + I.waiting + " waitin' to hand the farm girl." : ""));
 }
 
+// /dispensary nips open [who] [1-3 | wide | gapin'] (Nov 19, Laynie: "a command to force dilate nipples"): gapin' if
+// you don't say; yours if you don't say whose
+function nipsOpenCommand(rest) {
+  const parts = rest.split(/\s+/).filter(Boolean), last = String(parts[parts.length - 1] || "").toLowerCase();
+  const wide = /^[1-3]$/.test(last) ? Number(last) : last === "wide" ? 2 : /^(gap(e|ing|in'?)|all|full)$/.test(last) ? 3 : 0;
+  if (wide) parts.pop();
+  const meN = W.Player && W.Player.MemberNumber, whoW = parts.join(" ");
+  const who = !whoW || /^(me|myself|self|mine)$/i.test(whoW) ? meN : mouthTarget(whoW);
+  if (!who) { local("Who? Their name or member number, in this room. /dispensary nips open [1-3] does yours; /dispensary nips open <who> [1-3] does theirs."); return; }
+  if (who === meN) {
+    const r = nipsForce(wide || 3, meN);
+    local(r.ok ? "⭕ Your nipples are " + NIP_WORDS[r.n] + " now, trained to stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : ".") : "Your nipples are already " + NIP_WORDS[r.n] + ", sugar.");
+    if (r.ok && pageOpen()) redrawPage();
+    return;
+  }
+  const r = nipsForceSend(who, wide || 3);
+  local(r.ok ? "⭕ Sent to " + (nameOf(who) || "#" + who) + "'s Dispensary. If they've one and you're on their list, their nipples are " + NIP_WORDS[wide || 3] + " now." : "Couldn't reach them.");
+}
+
 // "mouth <who>": a member number, or somebody in the room by name
 function mouthTarget(w) {
   if (/^\d+$/.test(w)) return Number(w);
@@ -181,6 +203,16 @@ function mouthTarget(w) {
   return C ? C.MemberNumber : 0;
 }
 
+// (Nov 19) the womb mark (shared/ink/live.js): your litters and what you're carryin', for the live ink, wherever you
+// are. The farm's own count wins, unless you've given birth or laid away and she hasn't booked it yet.
+let wombSaid = "";
+function wombInk() {
+  const F = W.__farmInk; if (!F || typeof F.mine !== "function") return;
+  const I = carryInfo(); if (!I.known) return;
+  const S = st(), v = { womb: { n: (I.litters || 0) + (S.born ? 1 : 0), c: (I.carrying ? I.carrying.count || 1 : 0) + (I.eggs ? I.eggs.n : 0), away: !!(S.born || S.laid) } };
+  const k = JSON.stringify(v); if (k === wombSaid) return;
+  wombSaid = k; F.mine(v);
+}
 // (Nov 19, carry.js) your heat comes on anywhere through the Heat dose; a stud smells it through the room's icons
 const CARRY_DEPS = { giveHeat: (mins, line) => give("heat", { by: 260239, mins, line, upto: true }), idsOf: (mn) => iconsIds(mn) };
 // a touch on your belly while you labour helps it along; somebody holdin' a Breeder's Scan who touches your belly scans it
@@ -233,7 +265,7 @@ function start() {
   initPage();
   commands();
   tick();
-  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); holesTick(); seedTick(); breedTick(); carryTick(Date.now(), CARRY_DEPS); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
+  setInterval(() => { try { tick(); laterTick(); wornTick(); paraTick(); nipsTrainTick(); hornyTick(); hornyParaTick(); kitTick(); holesTick(); seedTick(); breedTick(); carryTick(Date.now(), CARRY_DEPS); wombInk(); nipsTell(false); tickHard(); screenTick(); hazeTick(); iconsTell(false); if (pageOpen()) redrawPage(); } catch (e) { console.warn("[Dispensary] clock:", e); } }, 5000);
   setTimeout(() => hello(true), 3000);
 }
 // after login: your account's settings are there to read
@@ -262,7 +294,7 @@ if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), dosesIn: (t) => dosesIn(t)
   carryTick: (now) => carryTick(now, CARRY_DEPS), carry: (now) => carryInfo(now), carryReset: () => carryReset(), carryFeelNow: () => carryFeelNow(), carryWelcome: (m) => carryWelcome(m), labourTouch: (f, g) => labourTouch(f, g), bellyAll: (now) => bellyAll(now),
   breedTick: (now) => breedTick(now), realLoad: (f, h) => realLoad(f, h), tied: () => tied(), ripe: (now) => ripeNow(now), hipsUp: () => hipsUp(), breedReset: () => breedReset(), breedClimax: () => breedClimax(), breedLastIn: () => breedLastIn(), breedWelcome: (m) => breedWelcome(m),
   horny: () => hornyGear(), hornyTick: (now) => { hornyTick(now); hornyParaTick(now); }, hornyBeat: (g) => hornyBeat(g), hornyClimax: () => hornyClimax(), hornyReset: () => hornyReset(),
-  nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
+  nips: () => nipsOpen(), nipsOf: (mn) => openOf(mn), nipsTrain: (now) => nipsTrainTick(now), nipsClose: () => nipsClose(), nipsForce: (n, by) => nipsForce(n, by), nipLoads: () => nipLoads(), nipsCream: (f) => nipsCream(f), nipsClimax: () => nipsClimax(), trained: () => trainedLevel(), nipsState: () => nipsState(), nipsAddOwn: () => nipsAddOwn(mod), nipsUsed: (from, k) => nipsUsed(from, k), nipsTell: (f) => nipsTell(f), suckled: (from) => paraSuckled(from) };
 
 // for the Companion, other add-ons and the tests: what's in you, read-only
 W.FarmhandDispensary = Object.freeze({

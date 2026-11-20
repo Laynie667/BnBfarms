@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.86.0
+// @version      0.86.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.86.0";
-  var COMPANION_VERSION = "0.69.0";
+  var VERSION = "0.86.1";
+  var COMPANION_VERSION = "0.70.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6438,6 +6438,7 @@
       out.heat = inHeat(p) ? Math.max(0, Math.min(100, Math.round(10 * (p.heat.until - now) / (CFG.PROD.HEAT_H * 36e5)) * 10)) : 0;
       out.loading = p.preg && p.preg.due > p.preg.since ? Math.max(0, Math.min(100, Math.round(20 * (now - p.preg.since) / (p.preg.due - p.preg.since)) * 5)) : 0;
       if (p.preg) out.bredOn = { d: Math.floor(p.preg.since / 864e5) * 864e5, due: Math.floor(p.preg.due / 864e5) * 864e5 };
+      out.womb = { n: o.litters || 0, c: (p.preg ? p.preg.count || 1 : 0) + (p.eggs ? p.eggs.n || 0 : 0) };
       const studs = Object.keys(by).map(Number).filter(Boolean);
       if (studs.length) {
         const recent = studs.slice().sort((a, b) => (by[b].at || 0) - (by[a].at || 0)), most = studs.slice().sort((a, b) => (by[b].n || 0) - (by[a].n || 0));

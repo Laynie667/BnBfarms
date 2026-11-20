@@ -15,7 +15,7 @@ import { lscgPresent, lscgApi } from "./lscg.js";
 import { safeword } from "./safeword.js";
 import { ANIMALS } from "../../shared/noises.js";
 import { hardOn, keyholders, lock, dueAt, hardLog, wards, keyDo, wardState, CHECK_DAYS, addKey, removeKey } from "./hardcore.js";
-import { nipsOpen, trainedLevel, nipsClose, lastPopped, nipLoads, NIP_WORDS } from "./nipples.js";
+import { nipsOpen, trainedLevel, nipsClose, nipsForce, lastPopped, nipLoads, NIP_WORDS } from "./nipples.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { kitNow, kitNames, SPEED_NAMES } from "./kits.js";
 import { holesNow, holesSet, dueWords } from "./holes.js";
@@ -329,8 +329,10 @@ function view() {
       h("div", null, (n ? "⭕ " + NIP_WORDS[n][0].toUpperCase() + NIP_WORDS[n].slice(1) + ", " + n + " of 3" : "Closed") + (t ? " · trained to stay " + NIP_WORDS[t] : "") + (loads.n ? " · loads taken in them: " + loads.n : "") + (mineToy() ? " · the " + toyOf(mineToy()).label + " in them" : "")),
       h("label", { style: { marginTop: "6px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.nipsHeal !== false ? true : undefined, onchange: (e) => { st().nipsHeal = e.target.checked; save(); draw(); } }),
         h("b", null, "They close up slowly on their own")),
-      h("div", { class: "fd-muted" }, "Crafted nipple gear that says dilator or stretcher holds them open while it's on. Held open (the Nipple Dilator, that gear, the leeches, a toy) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
+      h("div", { class: "fd-muted" }, "Crafted nipple gear that says dilator or stretcher holds them open while it's on. Held open (the Nipple Dilator, that gear, the leeches, a toy) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. They train a step an hour toward how wide they're held, so three hours held wide leaves them gapin'. Open them up forces them a step wider right now; /dispensary nips open <who> does it to somebody who lets you dose them. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
       h("div", { class: "fd-row", style: { marginTop: "6px" } },
+        // (Nov 19) forced open, a step wider each press, and trained to stay that way
+        h("button", { disabled: t >= 3 ? true : undefined, onclick: () => { const r = nipsForce(Math.min(3, t + 1)); note = r.ok ? "Your nipples are " + NIP_WORDS[r.n] + " now, trained to stay that way." : "They're already " + NIP_WORDS[r.n] + "."; draw(); } }, "Open them up"),
         h("button", { disabled: locked || !n || toyLocked(mineToy()) ? true : undefined, onclick: () => { nipsClose(true); const out = lastPopped(); note = (out ? "The " + out + " slides out, and your" : "Your") + " nipples are closed back up, snug as they ever were."; draw(); } }, "Close them up"),
         h("span", { class: "fd-muted" }, locked ? "Hardcore: a Tightening Balm from a keyholder does it." : toyLocked(mineToy()) ? "The " + toyOf(mineToy()).label + "'s locked in, holdin' them open: its key first." : "The Dilator out, the leeches off, any toy out, the stretch undone. A Tightening Balm does it too."))));
   }

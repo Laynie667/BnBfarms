@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.22.0
+// @version      0.23.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3788,6 +3788,60 @@ One of mods you are using is using an old version of SDK. It will work for now b
           k: 0.51
         },
         {
+          name: "LiveWombMark",
+          title: "Womb Mark (fills with every litter)",
+          where: "over the womb",
+          sheet: 7,
+          spot: "womb",
+          left: 51,
+          top: 389,
+          w: 398,
+          h: 284,
+          box: [
+            15,
+            0,
+            365,
+            250
+          ],
+          s: 1.1379,
+          layers: [
+            {
+              name: "White",
+              color: "#ffffff",
+              colorize: true
+            },
+            {
+              name: "Pink",
+              color: "#ab2c7c",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1e1423",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              171,
+              44,
+              124
+            ],
+            [
+              30,
+              20,
+              35
+            ]
+          ],
+          live: true,
+          k: 0.85
+        },
+        {
           name: "LiveWordsBlackletter",
           title: "Your Words: Blackletter",
           where: "low on the belly",
@@ -6282,6 +6336,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const n = num0(v.n, null, 99999);
       if (n != null) o.n = n;
     }
+    if (v.c != null) {
+      const n = num0(v.c, null, 99);
+      if (n != null) o.c = n;
+    }
     if (v.num != null) {
       const n = num0(v.num, null);
       if (n != null) o.num = n;
@@ -6335,6 +6393,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var pct = (n) => Math.max(0, Math.min(100, n)) / 100;
   function tallyCount(g, x, y, n, h2, w, font) {
     tally(g, x, y, Math.min(n, 25), h2);
+  }
+  function smileText(g, t, cx, textY, R, font) {
+    g.font = font;
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY - R;
+    let a = Math.PI / 2 + span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a - da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid - Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a -= da;
+    }
   }
   var LIVE = [
     {
@@ -6907,6 +6981,62 @@ One of mods you are using is using an old version of SDK. It will work for now b
         arrowDown(g, cx, cy + 34, 20, 3);
       }
     },
+    // THE WOMB MARK (Nov 19, Laynie: "I love it"): the womb crest, twenty little hearts in a smile under it, one inked in
+    // for every litter; while she's carryin' the womb fills hot pink with a white dot for each one in there, and the whole
+    // mark glows; at twenty litters, BABY FACTORY underneath. n: litters, c: how many she's carryin' now (0: not).
+    {
+      name: "LiveWombMark",
+      title: "Womb Mark (fills with every litter)",
+      sheet: 7,
+      where: "over the womb",
+      fields: ["n", "c"],
+      auto: "womb",
+      sample: { n: 0, c: 0 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 96, s = 110, n = Math.max(0, Math.min(20, V.n | 0)), c = Math.max(0, Math.min(99, V.c | 0));
+        const hearts = (fill2) => {
+          for (let i = 0; i < 20; i++) {
+            const a = Math.PI * (0.11 + 0.78 * i / 19), x = cx - Math.cos(a) * 138, y = cy + 48 + Math.sin(a) * 60;
+            g.lineWidth = 1.7;
+            heart(g, x, y + 4, 9);
+            if (i < n && fill2) g.fill();
+            else g.stroke();
+          }
+        };
+        if (c) {
+          for (const blur of [18, 8]) {
+            g.save();
+            g.shadowColor = PINKGLOW2;
+            g.shadowBlur = blur;
+            wombCrest(g, cx, cy, s, PINKGLOW2);
+            g.fillStyle = g.strokeStyle = PINKGLOW2;
+            hearts(true);
+            g.restore();
+          }
+        }
+        g.fillStyle = g.strokeStyle = INK2;
+        wombCrest(g, cx, cy, s, INK2);
+        g.fillStyle = g.strokeStyle = INK2;
+        hearts(true);
+        if (c) {
+          g.fillStyle = PINK;
+          heart(g, cx, cy + 2.2, s * 0.26 - 3);
+          g.fill();
+          g.fillStyle = "#ffffff";
+          const k = Math.min(9, c);
+          for (let i = 0; i < k; i++) {
+            const row = i < 5 ? 0 : 1, inRow = row ? k - 5 : Math.min(5, k), j = row ? i - 5 : i;
+            g.beginPath();
+            g.arc(cx - (inRow - 1) * 5.5 + j * 11, cy - 10 + row * 11, 2.9, 0, Math.PI * 2);
+            g.fill();
+          }
+        }
+        if (n >= 20) {
+          g.fillStyle = INK2;
+          smileText(g, "BABY FACTORY", cx, 236, 460, "900 27px Georgia, 'Times New Roman', serif");
+        }
+      }
+    },
     {
       name: "LiveWordsBlackletter",
       title: "Your Words: Blackletter",
@@ -7431,6 +7561,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var retry = {};
   var counts = {};
+  var mine = {};
   var DAY = 864e5;
   var cumKey = (W25) => "farmink-lastcum-" + (W25.Player && W25.Player.MemberNumber);
   function daysDenied(W25) {
@@ -7448,6 +7579,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
     if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
+    if (auto === "womb") {
+      const b = mine.womb, v = b && b.away || !(c && typeof c === "object") ? b : c;
+      return v && typeof v === "object" ? { n: Number(v.n) || 0, c: Number(v.c) || 0 } : null;
+    }
     return typeof c === "number" ? { n: c } : null;
   }
   function refreshAuto(W25) {
@@ -7784,6 +7919,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         }
       },
+      // for the Dispensary: what it knows itself, off the farm too (the womb mark: what you're carryin')
+      mine: (c) => {
+        if (c && typeof c === "object") {
+          mine = c;
+          try {
+            refreshAuto(W25);
+          } catch (e) {
+          }
+        }
+      },
       write: (slot, v) => write(W25, slot, v, true),
       command: (a) => inkCommand(W25, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
@@ -8049,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.22.0";
+  var VERSION = "0.23.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -11093,14 +11238,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var others = /* @__PURE__ */ new Map();
   function heldOpen() {
     let n = active("dilator") ? Math.max(1, Math.min(3, xOfDose("dilator"))) : 0;
-    const p = mine().nips;
+    const p = mine2().nips;
     if (p) n = Math.max(n, (p.n || 0) >= 3 ? 3 : 2);
     return Math.max(n, toyOpen(W8.Player));
   }
   var MIN4 = 6e4;
   var HOUR2 = 36e5;
   var DAY4 = 864e5;
-  var TRAIN = { step: 0.1, every: 30 * MIN4, cock: 0.15, finger: 0.05, grace: 12 * HOUR2, perDay: 0.5 };
+  var TRAIN = { step: 0.5, every: 30 * MIN4, cock: 0.15, finger: 0.05, grace: 12 * HOUR2, perDay: 0.5 };
   var trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 });
   var trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
   function nipsOpen() {
@@ -11154,13 +11299,62 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
     try {
-      if (mine().nips) letGo("nips", "quiet");
+      if (mine2().nips) letGo("nips", "quiet");
     } catch (e) {
     }
     save();
     nipsTell(false);
     if (!quiet && was) local("Your nipples close up again, snug and tender, as if they'd never been stretched.");
     return was;
+  }
+  var FORCED_WIDE = ["", "open enough to take a finger", "wide open", "gapin' wide"];
+  function nipsForce(n, by) {
+    n = Math.max(1, Math.min(3, Math.round(Number(n) || 3)));
+    const was = nipsOpen();
+    if (trainedLevel() >= n) return { ok: false, why: "already", was, n: trainedLevel() };
+    const T = trainOf(), now = Date.now(), other = !!by && by !== me3();
+    T.lvl = Math.max(T.lvl, n);
+    T.at = now;
+    T.open = now;
+    T.used = now;
+    save();
+    nipsTell();
+    const L = LINES.nips && LINES.nips[other ? "forced_by" : "forced_self"];
+    if (L && L.length) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));
+    return { ok: true, was, n };
+  }
+  function nipsForceSend(to, n) {
+    if (to === me3()) return nipsForce(n, me3());
+    try {
+      W8.ServerSend("ChatRoomChat", makeMsg("dispNipsOpen", { n: Math.max(1, Math.min(3, Math.round(Number(n) || 3))) }, to));
+      return { ok: true, sent: true };
+    } catch (e) {
+      return { ok: false, why: "send" };
+    }
+  }
+  function forceOf(from, m) {
+    const reply = (ok, why, n) => {
+      try {
+        W8.ServerSend("ChatRoomChat", makeMsg("dispNipsOpenOk", { ok, why: why || "", n: n || 0 }, from));
+      } catch (e) {
+      }
+    };
+    if (!allowed(from)) {
+      local(nameOf(from) + " tried to force your nipples open, but they aren't on your list.");
+      return reply(false, "ladder");
+    }
+    if (st().off && st().off.dilator) {
+      local(nameOf(from) + " tried to force your nipples open, but you've the Nipple Dilator switched off.");
+      return reply(false, "off");
+    }
+    const r = nipsForce(m.n, from);
+    if (!r.ok) return reply(false, r.why, r.n);
+    local("\u2B55 " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
+    reply(true, "", r.n);
+  }
+  function forceOk(from, m) {
+    const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0)));
+    local(m.ok ? "\u2B55 " + nameOf(from) + "'s nipples are forced open, " + NIP_WORDS[n] + "." : "Couldn't open " + nameOf(from) + "'s nipples: " + (m.why === "ladder" ? "you aren't on their list of who can dose them." : m.why === "off" ? "they've the Nipple Dilator switched off." : m.why === "already" ? "they're already " + NIP_WORDS[n] + "." : "that didn't take."));
   }
   function openOf(mn) {
     mn = Number(mn);
@@ -11249,7 +11443,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     T.used = Date.now();
     T.lvl = Math.min(3, T.lvl + TRAIN.finger);
     save();
-    if (mine().nips) nipsFed(0, "toy");
+    if (mine2().nips) nipsFed(0, "toy");
   }
   var CREAM_WINDOW = 90 * 1e3;
   var lastFuck = null;
@@ -11448,6 +11642,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const m = readMsg(data);
             if (m && m.type === "dispNips") onNips(data.Sender, m);
             else if (m && m.type === "dispCream") onCream(data.Sender);
+            else if (m && m.type === "dispNipsOpen") forceOf(data.Sender, m);
+            else if (m && m.type === "dispNipsOpenOk") forceOk(data.Sender, m);
             else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
           }
         } catch (e) {
@@ -13057,7 +13253,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const ids = dosesIn(text3).map((d) => d.id).filter((id) => usable(id));
     return ids.length ? ids.slice(0, 4) : DEFAULT_STRAIN.filter(usable);
   }
-  var mine = () => st().para || (st().para = {});
+  var mine2 = () => st().para || (st().para = {});
   var line2 = (kind, which, v) => {
     const L = LINES.para && LINES.para[kind] && LINES.para[kind][which];
     return L && L.length ? fill(pick(L), v).replace(/%k/g, KINDS[kind].label.toLowerCase()) : "";
@@ -13066,7 +13262,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const K3 = KINDS[kind];
     if (!K3 || !on(kind)) return false;
     if (o.by && o.by !== me8() && !allowed(o.by)) return false;
-    const P = mine();
+    const P = mine2();
     if (P[kind]) return false;
     const now = Date.now();
     P[kind] = {
@@ -13087,7 +13283,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return true;
   }
   function letGo(kind, why) {
-    const P = mine();
+    const P = mine2();
     if (!P[kind]) return false;
     delete P[kind];
     save();
@@ -13109,7 +13305,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   function paraTick() {
-    const now = Date.now(), P = mine(), worn = wornParasites();
+    const now = Date.now(), P = mine2(), worn = wornParasites();
     if ((st().wornPause || 0) <= now) {
       for (const w of worn) if (!P[w.kind] && on(w.kind)) latch(w.kind, { by: w.by, name: w.name, strain: strainOf(w.text), horny: hornyOf(w.text) });
     }
@@ -13146,7 +13342,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function paraClimax() {
-    const P = mine(), now = Date.now();
+    const P = mine2(), now = Date.now();
     if (P.latex) {
       P.latex.fed = now;
       P.latex.until = Math.min(P.latex.since + 72 * HOUR5, Math.max(P.latex.until, now + KINDS.latex.hours * HOUR5));
@@ -13163,7 +13359,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     save();
   }
   function nipsFed(from, kind) {
-    const p = mine().nips;
+    const p = mine2().nips;
     if (!p) return false;
     const now = Date.now();
     p.fed = now;
@@ -13180,14 +13376,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var suckledAt = {};
   function paraSuckled(from) {
-    const p = mine().nips;
+    const p = mine2().nips;
     if (!p || !from || from === me8() || Date.now() - (suckledAt[from] || 0) < 10 * MIN9) return false;
     suckledAt[from] = Date.now();
     send("dispPara", { kind: "nips", strain: p.strain, by: p.by || me8(), name: myName() }, from);
     return true;
   }
   function paraKissGiven(to) {
-    const P = mine();
+    const P = mine2();
     if (!to || to === me8()) return;
     if (P.lips) send("dispPara", { kind: "lips", strain: P.lips.strain, by: P.lips.by || me8(), name: myName(), horny: P.lips.horny || 0 }, to);
     if (P.brood && P.brood.eggs > 0) {
@@ -13205,7 +13401,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     latch(kind, { by: from, name: nameOf(from), strain, horny: m.horny });
   }
   function vineOk(X, Y) {
-    const p = mine().vine;
+    const p = mine2().vine;
     if (!p) return true;
     const C2 = charOf5(p.by), pos = C2 && C2.MapData && C2.MapData.Pos;
     if (!pos || typeof pos.X !== "number") return true;
@@ -13214,7 +13410,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var vineTold = 0;
   var asked = null;
   function onSay(from, m) {
-    const p = mine().mouth;
+    const p = mine2().mouth;
     if (!p || p.by !== from) return;
     const text3 = String(m.text || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 300);
     if (!text3 || /^[\/(\[]/.test(text3)) return;
@@ -13325,7 +13521,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function onNeedle(by, item, act) {
     const text3 = craftText(item), list = dosesOf(text3), at = Date.now(), done = [], later = isLater(text3);
     const maker = item && item.Craft && Number(item.Craft.MemberNumber) || 0, makerName = item && item.Craft && item.Craft.MemberName ? String(item.Craft.MemberName) : "";
-    const via = /^(SipItem|EatItem)$/.test(act || "") ? "sip" : "needle", mine2 = W14.Player && W14.Player.MemberNumber || 0;
+    const via = /^(SipItem|EatItem)$/.test(act || "") ? "sip" : "needle", mine3 = W14.Player && W14.Player.MemberNumber || 0;
     for (const { id, x, p } of list) {
       const B = BOOK[id];
       if (farmHas(id, p) && botHere()) continue;
@@ -13335,7 +13531,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         continue;
       }
       const sire = maker || by;
-      if (id === "seed" && sire !== mine2 && !allowed(sire)) {
+      if (id === "seed" && sire !== mine3 && !allowed(sire)) {
         local(fill(NOTES.notListed, { by: makerName || nameOf(sire), dose: B.label }));
         continue;
       }
@@ -15726,6 +15922,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "%b empties into %t's tit. The stretched nipple twitches, and cream drips from it in slow strings.",
         "%t gasps as %b's load floods their nipple, warm and heavy. It doesn't stay in long: it's runnin' down their chest."
       ],
+      // forced open (Nov 19, /dispensary nips open): the room sees it. %w is how wide (nipples.js FORCED_WIDE): open
+      // enough to take a finger, wide open, gapin' wide
+      forced_self: [
+        "%t pinches both nipples and pulls, and pulls, till they give: %w, pink and slick and waitin'. They stay that way.",
+        "%t works their nipples open with their own fingers, gaspin' as they stretch %w. They don't close back up.",
+        "%t arches and moans as their nipples part, %w, two hungry little holes beggin' to be filled.",
+        "%t forces their own nipples %w. Their tits are fuckable now, and they know it.",
+        "%t spreads their nipples %w and shows them off, puffy and wet, made for somethin' to slide in."
+      ],
+      forced_by: [
+        "%b takes hold of %t's nipples and forces them %w. %t whimpers as they stretch and stay that way.",
+        "%b works %t's nipples open, slow and cruel, till they're %w and drippin'. %t can't do a thing but squirm.",
+        "%t gasps as %b spreads their nipples %w. They stay that way, soft and slick, ready for whatever %b wants in them.",
+        "%b decides %t's tits should be fuckable, and makes them so: both nipples stretched %w and left that way.",
+        "%b presses and stretches till %t's nipples give, %w. %t's chest heaves, and the little holes twitch, empty and achin'."
+      ],
       self: [
         "Your own finger slides right into your open nipple. It's so strange, and so good.",
         "You can't help testin' how deep your nipple goes now. Deeper than you'd think.",
@@ -16774,7 +16986,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Add x2 to x5 for that many times as much.",
         "Seed is a dose like any other: whoever holds it and whoever crafted it both have to be on their list, and it has its own switch under Doses.",
         "The farm counts one load from the same crafter every ten minutes. More still fills them, it just isn't another load on the books.",
-        "Under Seed on this page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in."
+        "Under Seed on this page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in.",
+        "The Womb Mark, in any Farm Ink slot in the wardrobe: a little heart inked in for every litter, it glows hot pink while you're carryin' with a dot for each one in there, and at twenty litters it reads BABY FACTORY."
       ],
       see: ["horny", "holes", "farm"]
     },
@@ -16787,7 +17000,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Open them: a Nipple Dilator dose, wider the stronger it is; anythin' worn on the nipples crafted to say dilator or stretcher, like Dilator Clamps, which hold them open as long as they're on; or nipple leeches.",
         "While they're open, two new actions show on the nipples in the game's action menu: Fuck nipple, for somebody with a cock, and Finger nipple, for anybody, you too.",
         "Toys fit too. The nipple slot has nipple plugs, beads, eggs, dildos, a sound and pump-ups: the game's own toys made for an open nipple. Whoever owns the toy owns its nipple version. A toy in them holds them open.",
-        "Held open and used, they train. The stretch stays after the dose wears off or the leeches drop.",
+        "Or force them: /dispensary nips open leaves yours gapin' right now (1, 2 or 3 after it for how wide), and the Open them up button under Nipples opens them a step wider. /dispensary nips open <who> does it to somebody who lets you dose them.",
+        "Held open and used, they train, a step an hour: three hours held wide and they're gapin'. The stretch stays after the dose wears off or the leeches drop.",
         "A load in them wells back out, and it's counted.",
         "Close them up with the button under Nipples, /dispensary nips close, or a Tightening Balm."
       ],
@@ -17572,10 +17786,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
           } }),
           h("b", null, "They close up slowly on their own")
         ),
-        h("div", { class: "fd-muted" }, "Crafted nipple gear that says dilator or stretcher holds them open while it's on. Held open (the Nipple Dilator, that gear, the leeches, a toy) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
+        h("div", { class: "fd-muted" }, "Crafted nipple gear that says dilator or stretcher holds them open while it's on. Held open (the Nipple Dilator, that gear, the leeches, a toy) and used, they train: the stretch stays after the dose or the leeches are gone, and they can still be fucked and filled. They train a step an hour toward how wide they're held, so three hours held wide leaves them gapin'. Open them up forces them a step wider right now; /dispensary nips open <who> does it to somebody who lets you dose them. With this on they close half a step a day once they've been left be twelve hours. Off: they stay as they're trained."),
         h(
           "div",
           { class: "fd-row", style: { marginTop: "6px" } },
+          // (Nov 19) forced open, a step wider each press, and trained to stay that way
+          h("button", { disabled: t >= 3 ? true : void 0, onclick: () => {
+            const r = nipsForce(Math.min(3, t + 1));
+            note3 = r.ok ? "Your nipples are " + NIP_WORDS[r.n] + " now, trained to stay that way." : "They're already " + NIP_WORDS[r.n] + ".";
+            draw2();
+          } }, "Open them up"),
           h("button", { disabled: locked || !n || toyLocked(mineToy()) ? true : void 0, onclick: () => {
             nipsClose(true);
             const out = lastPopped();
@@ -17681,7 +17901,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ));
     }
     kids.push(...head("Parasites", "parasites"));
-    const inMe2 = mine();
+    const inMe2 = mine2();
     kids.push(h(
       "div",
       { class: "fd-card" },
@@ -17816,9 +18036,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       W24.CommandCombine([{
         Tag: "dispensary",
-        Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
+        Description: "[guide <topic> | safeword | page | say | nope | mouth <who> <words> | nips [open [who] [1-3] | close | heal on|off] | holes [heal|pain on|off] | train <who> <ass|pussy|throat> <size> [in 3 days] | horny on|off | seed]: The Farmhand's Dispensary. What's in you, the safeword, the settings, the mouthpiece, your nipples, your holes, horny gear, seed",
         Action: (args) => {
           const a = String(args || "").trim().toLowerCase();
+          const om = /^nips?\s+(?:open|dilate|stretch|gape|spread)(?:\s+(.*))?$/i.exec(String(args || "").trim());
+          if (om) {
+            nipsOpenCommand(String(om[1] || "").trim());
+            return;
+          }
           const nm = /^nips?(?:\s+(close|reset|heal)(?:\s+(on|off))?)?$/.exec(a);
           if (nm) {
             if (nm[1] === "close" || nm[1] === "reset") {
@@ -17846,7 +18071,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               return;
             }
             const L2 = nipLoads(), tw = mineToy();
-            local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " + (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") + (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips close \xB7 /dispensary nips heal on|off");
+            local("Your nipples: " + (nipsOpen() ? "open, " + nipsOpen() + " wide" : "closed") + (trainedLevel() ? " (trained to stay " + trainedLevel() + " wide)" : "") + ". " + (tw ? "The " + toyOf(tw).label + " is in them" + (toyLocked(tw) ? ", locked" : "") + ". " : "") + (st().nipsHeal !== false ? "They close up slowly on their own." : "They stay as they're trained.") + (L2.n ? " Loads taken in them: " + L2.n + "." : "") + " /dispensary nips open [1-3] \xB7 /dispensary nips open <who> [1-3] \xB7 /dispensary nips close \xB7 /dispensary nips heal on|off");
             return;
           }
           const hlm = /^holes?(?:\s+(heal|pain)\s+(on|off))?$/.exec(a);
@@ -18029,10 +18254,41 @@ One of mods you are using is using an old version of SDK. It will work for now b
     for (const [h2, x] of Object.entries(I.held)) if (x.ml >= 1 || x.seal) rows.push("your " + { vulva: "pussy", butt: "ass", mouth: "belly, swallowed", nips: "tits" }[h2] + ": " + amountSay(x.ml) + (x.who ? ", mostly " + x.who + "'s" : "") + (x.seal ? " (sealed with " + x.seal.name + "'s " + x.seal.g + ")" : ""));
     local((rows.length ? "\u{1F4A6} In you now: " + rows.join(" \xB7 ") + ". Your belly's " + I.pct + "% full (it holds " + amountSay(I.cap) + " before it spills)." : "\u{1F4A6} Nothin' in you right now.") + (I.loads ? " Loads you've taken: " + I.loads + ", " + amountSay(I.ml) + " all told" + (I.top.length ? "; most from " + I.top.slice(0, 3).map((t) => t.name + " (" + t.n + ")").join(", ") : "") + "." : "") + (I.waiting ? " " + I.waiting + " waitin' to hand the farm girl." : ""));
   }
+  function nipsOpenCommand(rest) {
+    const parts2 = rest.split(/\s+/).filter(Boolean), last = String(parts2[parts2.length - 1] || "").toLowerCase();
+    const wide = /^[1-3]$/.test(last) ? Number(last) : last === "wide" ? 2 : /^(gap(e|ing|in'?)|all|full)$/.test(last) ? 3 : 0;
+    if (wide) parts2.pop();
+    const meN = W24.Player && W24.Player.MemberNumber, whoW = parts2.join(" ");
+    const who2 = !whoW || /^(me|myself|self|mine)$/i.test(whoW) ? meN : mouthTarget(whoW);
+    if (!who2) {
+      local("Who? Their name or member number, in this room. /dispensary nips open [1-3] does yours; /dispensary nips open <who> [1-3] does theirs.");
+      return;
+    }
+    if (who2 === meN) {
+      const r2 = nipsForce(wide || 3, meN);
+      local(r2.ok ? "\u2B55 Your nipples are " + NIP_WORDS[r2.n] + " now, trained to stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : ".") : "Your nipples are already " + NIP_WORDS[r2.n] + ", sugar.");
+      if (r2.ok && pageOpen()) redrawPage();
+      return;
+    }
+    const r = nipsForceSend(who2, wide || 3);
+    local(r.ok ? "\u2B55 Sent to " + (nameOf(who2) || "#" + who2) + "'s Dispensary. If they've one and you're on their list, their nipples are " + NIP_WORDS[wide || 3] + " now." : "Couldn't reach them.");
+  }
   function mouthTarget(w) {
     if (/^\d+$/.test(w)) return Number(w);
     const low = String(w).toLowerCase(), C2 = (W24.ChatRoomCharacter || []).find((c) => c && c.MemberNumber !== (W24.Player && W24.Player.MemberNumber) && [c.Nickname, c.Name].some((n) => n && String(n).toLowerCase().startsWith(low)));
     return C2 ? C2.MemberNumber : 0;
+  }
+  var wombSaid = "";
+  function wombInk() {
+    const F = W24.__farmInk;
+    if (!F || typeof F.mine !== "function") return;
+    const I = carryInfo();
+    if (!I.known) return;
+    const S3 = st(), v = { womb: { n: (I.litters || 0) + (S3.born ? 1 : 0), c: (I.carrying ? I.carrying.count || 1 : 0) + (I.eggs ? I.eggs.n : 0), away: !!(S3.born || S3.laid) } };
+    const k = JSON.stringify(v);
+    if (k === wombSaid) return;
+    wombSaid = k;
+    F.mine(v);
   }
   var CARRY_DEPS = { giveHeat: (mins, line3) => give("heat", { by: 260239, mins, line: line3, upto: true }), idsOf: (mn) => iconsIds(mn) };
   var SCAN_TOUCH = /^(Caress|Rub|MassageHands|Kiss|Pet|Grope|RubItem|Lick)$/;
@@ -18085,7 +18341,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initNipples(mod);
     nipsOnSuckle(paraSuckled);
     nipsOnFarmLoad(tellNipLoad);
-    initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => mine() });
+    initHorny(mod, { nipsToyUsed: () => nipsToyUsed(), para: () => mine2() });
     initKits(mod, { end: (id) => end(id, "quiet"), byOf: (id) => st().doses[id] && st().doses[id].by || 0 });
     initHoles(mod);
     initSeed(mod);
@@ -18113,6 +18369,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         seedTick();
         breedTick();
         carryTick(Date.now(), CARRY_DEPS);
+        wombInk();
         nipsTell(false);
         tickHard();
         screenTick();
@@ -18170,7 +18427,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     wornTick: () => wornTick(),
     wornReset: () => wornReset(),
     trigger: (k, f) => trigger(k, f),
-    para: () => mine(),
+    para: () => mine2(),
     paraTick: () => paraTick(),
     latch: (k, o) => latch(k, o),
     climax: () => paraClimax(),
@@ -18236,6 +18493,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     nipsOf: (mn) => openOf(mn),
     nipsTrain: (now) => nipsTrainTick(now),
     nipsClose: () => nipsClose(),
+    nipsForce: (n, by) => nipsForce(n, by),
     nipLoads: () => nipLoads(),
     nipsCream: (f) => nipsCream(f),
     nipsClimax: () => nipsClimax(),
@@ -18263,7 +18521,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     // growth off the farm (Nov 18): { cup, ass, cock, balls } sizes up (or down) from your own. The Companion's drawn body reads it.
     grow: () => grown(),
     // the crafted parasites in you (Nov 18): [{ kind, label, by, until }]
-    parasites: () => Object.entries(mine()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
+    parasites: () => Object.entries(mine2()).map(([k, p]) => ({ kind: k, label: KINDS[k] ? KINDS[k].label : k, by: p.by, until: p.until })),
     hard: () => hardOn() ? { on: true, until: st().hard && st().hard.until || 0, due: dueAt() } : null,
     // open nipples (Nov 18, nipples.js): 0 shut, 1 to 3 open, yours or what somebody's Dispensary told the room. The
     // Companion's drawn breasts can read it.

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-19. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-20. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.86.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.86.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,8 +13,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.69.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.22.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.70.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.23.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.86.1 + Companion 0.70.0 + Dispensary 0.23.0: the Womb Mark, and nipples forced open** Laynie, Nov 19: "I love it, could I also get a command to force dilate nipples? shorten the time down to 4 hours or less".
+  - **The Womb Mark:** a new live tattoo in every Farm Ink slot in the wardrobe, over the womb. The womb crest, with twenty little hearts in a smile under it, one inked in for every litter. While you're carryin', the womb fills hot pink with a white dot for each one in there, and the whole mark glows. At twenty litters it reads BABY FACTORY underneath. It follows the farm's books (the farm girl hands the Companion `womb { n, c }`); away from the farm your Dispensary fills in a birth or a layin' she hasn't booked yet. Three colours to pick: the dots, the pink, the ink.
+  - **Nipples forced open:** `/dispensary nips open` leaves yours gapin' right now, trained to stay that way (1, 2 or 3 after it for how wide; dilate, stretch, gape and spread work too). The page's **Open them up** opens them a step wider. `/dispensary nips open <who> [1-3]` does it to somebody who lets you dose them, unless they've switched the Nipple Dilator off. The room sees it happen.
+  - **The stretch trains faster:** a step an hour held open, so three hours held wide and they're gapin' (it was fifteen). A Nipple Dilator x3 now leaves them trained gapin' by the time it wears off.
 - **Bot 0.86.0 + Companion 0.69.0 + Dispensary 0.22.0: Seed, the Breeder's Seal, and breedin' anywhere: the best baby factory wherever you go** Laynie, Nov 19: "Definitely the insemination and breeders seal, and I would love if the crafter can specify how much it deposits in which every hole, nipples, ass, pussy, or mouth in ml, l, or gallons".
   - **Seed:** a crafted syringe, baster, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, Breeding Baster, Cum Cocktail, filled with my seed) puts its crafter's own seed in you, whoever's holdin' it. The crafter writes how much and where: "500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples", "half a gallon in every hole", "both holes, 2 L". A hole with no amount gets a thick load; no hole and a needle puts it in your pussy (your ass without one), a drink or a kiss down your throat. Whoever holds it and whoever crafted it both have to be on your list.
   - **How much you hold:** your belly holds what the farm says (200 mL to start, more with a capacity shot), your tits a litre; the rest spills down your thighs (the Companion draws it). Off the farm it drains slowly, faster from a looser hole, and drips where the room can see. The Companion's drawn belly rounds out with it, anywhere.

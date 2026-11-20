@@ -66,6 +66,6 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   const text = JSON.stringify(LIST);
   ok(!/221397|232922|Alexia|Laynie/.test(text), 'no name or member number in the list (the ones that print a name or number are drawn live)');
   const liveN = LIST.groups.FarmInk.filter((x) => x.live).length;
-  ok(liveN === 28 && LIST.groups.FarmInk.some((x) => x.live && /Farm Property/.test(x.title)), 'the designs with live names, numbers and counts are drawn live, not from pictures (' + liveN + '; tests/ink-live.test.cjs)');
+  ok(liveN === 29 && LIST.groups.FarmInk.some((x) => x.live && /Farm Property/.test(x.title)), 'the designs with live names, numbers and counts are drawn live, not from pictures (' + liveN + '; tests/ink-live.test.cjs)');
   out(fails ? fails + ' FAILED' : 'ALL PASSED'); process.exit(fails ? 1 : 0);
 })().catch((e) => { out('CRASHED ' + (e && e.stack || e)); process.exit(1); });

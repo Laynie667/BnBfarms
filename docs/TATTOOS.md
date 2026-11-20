@@ -22,9 +22,13 @@ better sizing options", and "as long as it layers properly".
   The pictures are made at three times their size, so up to three times stays crisp.
   - The game's Layering button still moves, turns and layers each one, and its own scale works on top.
   - In chat: `/ink 2 size 150`, `/ink 2 wide 120`, `/ink 2 tall 80`.
-- **The live ones** (step 2, Nov 18): 28 designs that print the wearer's own:
+- **The live ones** (step 2, Nov 18): 29 designs that print the wearer's own:
   - The farm's counts: times bred, litters, litres milked, eggs laid, the cum tank, breeding facts, loading..., the
-    breeding card, the guestbook, high scores, tied ×, the heat crest, bred on (and due).
+    breeding card, the guestbook, high scores, tied ×, the heat crest, bred on (and due), and the womb mark.
+  - **The womb mark** (Nov 19): the womb crest with twenty little hearts in a smile under it, one inked in for every
+    litter. While they're carryin', the womb fills hot pink with a white dot for each one in there and the whole mark
+    glows; at twenty litters, BABY FACTORY underneath. It follows the farm's books; away from the farm the Dispensary
+    fills in a birth or a layin' the farm girl hasn't booked yet. Three colours to pick: the dots, the pink, the ink.
   - Days without cummin', counted by the wearer's own game (a ruined one doesn't reset it).
   - Their number: farm property, stock number, the ear tag.
   - A name: owned by, the keyholder, lipstick kisses, the five-star review. Their owner's name until something else is

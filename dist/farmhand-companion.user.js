@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.69.0
+// @version      0.70.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3791,6 +3791,60 @@ One of mods you are using is using an old version of SDK. It will work for now b
           k: 0.51
         },
         {
+          name: "LiveWombMark",
+          title: "Womb Mark (fills with every litter)",
+          where: "over the womb",
+          sheet: 7,
+          spot: "womb",
+          left: 51,
+          top: 389,
+          w: 398,
+          h: 284,
+          box: [
+            15,
+            0,
+            365,
+            250
+          ],
+          s: 1.1379,
+          layers: [
+            {
+              name: "White",
+              color: "#ffffff",
+              colorize: true
+            },
+            {
+              name: "Pink",
+              color: "#ab2c7c",
+              colorize: true
+            },
+            {
+              name: "Ink",
+              color: "#1e1423",
+              colorize: true
+            }
+          ],
+          pal: [
+            [
+              255,
+              255,
+              255
+            ],
+            [
+              171,
+              44,
+              124
+            ],
+            [
+              30,
+              20,
+              35
+            ]
+          ],
+          live: true,
+          k: 0.85
+        },
+        {
           name: "LiveWordsBlackletter",
           title: "Your Words: Blackletter",
           where: "low on the belly",
@@ -6285,6 +6339,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const n = num0(v.n, null, 99999);
       if (n != null) o.n = n;
     }
+    if (v.c != null) {
+      const n = num0(v.c, null, 99);
+      if (n != null) o.c = n;
+    }
     if (v.num != null) {
       const n = num0(v.num, null);
       if (n != null) o.num = n;
@@ -6338,6 +6396,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var pct = (n) => Math.max(0, Math.min(100, n)) / 100;
   function tallyCount(g, x, y, n, h2, w, font) {
     tally(g, x, y, Math.min(n, 25), h2);
+  }
+  function smileText(g, t, cx, textY, R, font) {
+    g.font = font;
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    const span = g.measureText(t).width / R, cy = textY - R;
+    let a = Math.PI / 2 + span / 2;
+    for (const ch of t) {
+      const da = g.measureText(ch).width / R, mid = a - da / 2;
+      g.save();
+      g.translate(cx + Math.cos(mid) * R, cy + Math.sin(mid) * R);
+      g.rotate(mid - Math.PI / 2);
+      g.fillText(ch, 0, 0);
+      g.restore();
+      a -= da;
+    }
   }
   var LIVE = [
     {
@@ -6910,6 +6984,62 @@ One of mods you are using is using an old version of SDK. It will work for now b
         arrowDown(g, cx, cy + 34, 20, 3);
       }
     },
+    // THE WOMB MARK (Nov 19, Laynie: "I love it"): the womb crest, twenty little hearts in a smile under it, one inked in
+    // for every litter; while she's carryin' the womb fills hot pink with a white dot for each one in there, and the whole
+    // mark glows; at twenty litters, BABY FACTORY underneath. n: litters, c: how many she's carryin' now (0: not).
+    {
+      name: "LiveWombMark",
+      title: "Womb Mark (fills with every litter)",
+      sheet: 7,
+      where: "over the womb",
+      fields: ["n", "c"],
+      auto: "womb",
+      sample: { n: 0, c: 0 },
+      draw: (g, w, h2, V) => {
+        const cx = w / 2, cy = 96, s = 110, n = Math.max(0, Math.min(20, V.n | 0)), c = Math.max(0, Math.min(99, V.c | 0));
+        const hearts = (fill) => {
+          for (let i = 0; i < 20; i++) {
+            const a = Math.PI * (0.11 + 0.78 * i / 19), x = cx - Math.cos(a) * 138, y = cy + 48 + Math.sin(a) * 60;
+            g.lineWidth = 1.7;
+            heart(g, x, y + 4, 9);
+            if (i < n && fill) g.fill();
+            else g.stroke();
+          }
+        };
+        if (c) {
+          for (const blur of [18, 8]) {
+            g.save();
+            g.shadowColor = PINKGLOW2;
+            g.shadowBlur = blur;
+            wombCrest(g, cx, cy, s, PINKGLOW2);
+            g.fillStyle = g.strokeStyle = PINKGLOW2;
+            hearts(true);
+            g.restore();
+          }
+        }
+        g.fillStyle = g.strokeStyle = INK2;
+        wombCrest(g, cx, cy, s, INK2);
+        g.fillStyle = g.strokeStyle = INK2;
+        hearts(true);
+        if (c) {
+          g.fillStyle = PINK;
+          heart(g, cx, cy + 2.2, s * 0.26 - 3);
+          g.fill();
+          g.fillStyle = "#ffffff";
+          const k = Math.min(9, c);
+          for (let i = 0; i < k; i++) {
+            const row = i < 5 ? 0 : 1, inRow = row ? k - 5 : Math.min(5, k), j = row ? i - 5 : i;
+            g.beginPath();
+            g.arc(cx - (inRow - 1) * 5.5 + j * 11, cy - 10 + row * 11, 2.9, 0, Math.PI * 2);
+            g.fill();
+          }
+        }
+        if (n >= 20) {
+          g.fillStyle = INK2;
+          smileText(g, "BABY FACTORY", cx, 236, 460, "900 27px Georgia, 'Times New Roman', serif");
+        }
+      }
+    },
     {
       name: "LiveWordsBlackletter",
       title: "Your Words: Blackletter",
@@ -7434,6 +7564,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var retry = {};
   var counts = {};
+  var mine = {};
   var DAY = 864e5;
   var cumKey = (W18) => "farmink-lastcum-" + (W18.Player && W18.Player.MemberNumber);
   function daysDenied(W18) {
@@ -7451,6 +7582,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
     if (auto === "bredOn") return c && c.d ? { d: c.d, due: c.due || null } : null;
     if (auto === "passport") return Array.isArray(c) && c.length ? { list: c } : null;
+    if (auto === "womb") {
+      const b = mine.womb, v = b && b.away || !(c && typeof c === "object") ? b : c;
+      return v && typeof v === "object" ? { n: Number(v.n) || 0, c: Number(v.c) || 0 } : null;
+    }
     return typeof c === "number" ? { n: c } : null;
   }
   function refreshAuto(W18) {
@@ -7787,6 +7922,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         }
       },
+      // for the Dispensary: what it knows itself, off the farm too (the womb mark: what you're carryin')
+      mine: (c) => {
+        if (c && typeof c === "object") {
+          mine = c;
+          try {
+            refreshAuto(W18);
+          } catch (e) {
+          }
+        }
+      },
       write: (slot, v) => write(W18, slot, v, true),
       command: (a) => inkCommand(W18, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
@@ -8064,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.69.0";
+  var VERSION = "0.70.0";
 
   // shared/species.js
   var WORDS = {
@@ -12561,9 +12706,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var seeOthers = true;
   var farm = null;
   var onBot = () => !!(W4.Player && W4.Player.MemberNumber === BOT_MEMBER);
-  var mine = { S: null, E: null };
+  var mine2 = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
-  if (W4.__FARMHAND_TEST__) W4.__drawnBody = { mine, others };
+  if (W4.__FARMHAND_TEST__) W4.__drawnBody = { mine: mine2, others };
   function load() {
     try {
       const d = JSON.parse(W4.localStorage.getItem(KEY));
@@ -12582,7 +12727,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       W4.localStorage.removeItem(FARM_KEY);
     } catch (e) {
     }
-    mine.S = S;
+    mine2.S = S;
   }
   var farmMe = null;
   var BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
@@ -12666,7 +12811,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (sig2 === fillSig) return false;
     fillSig = sig2;
     if (!S.on) return false;
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
     return true;
@@ -12678,7 +12823,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (farmMe && farmMe.cup === cup && farmMe.belly === belly && farmMe.cock === cock && farmMe.balls === balls && farmMe.pent === pent) return;
     farmMe = { cup, belly, cock, balls, pent };
     if (!S.on) return;
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
   }
@@ -12829,9 +12974,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     });
   }
   function engine() {
-    if (!mine.E && W4.Player) mine.E = makeEngine(null);
-    if (mine.E) apply(mine.E, eff());
-    return mine.E;
+    if (!mine2.E && W4.Player) mine2.E = makeEngine(null);
+    if (mine2.E) apply(mine2.E, eff());
+    return mine2.E;
   }
   var keptFor = /* @__PURE__ */ new WeakMap();
   function apply(E, s) {
@@ -12880,7 +13025,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     cockAsked = true;
     try {
       W4.FarmCock.loadStamps(COCK_HOST, () => {
-        if (mine.E) apply(mine.E, eff());
+        if (mine2.E) apply(mine2.E, eff());
         if (S.on) redraw(60);
         for (const [mn, o] of others) if (o.E) {
           apply(o.E, o.S);
@@ -13006,7 +13151,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!C2 || onBot()) return next(args);
         let E = null;
         if (C2 === W4.Player) {
-          if (S.on) E = mine.E || engine();
+          if (S.on) E = mine2.E || engine();
         } else if (seeOthers && typeof C2.MemberNumber === "number") {
           const o = others.get(C2.MemberNumber);
           if (o) {
@@ -13092,7 +13237,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
     delete S.bellyOn;
     save();
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
     if (say3) say3({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
@@ -13101,7 +13246,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     delete S.saved;
     S.cupSet = false;
     save();
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
     if (say3) say3("Back to the farm's look.");
@@ -13147,7 +13292,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (i === "auto") {
       S.cupSet = false;
       save();
-      if (mine.E) apply(mine.E, eff());
+      if (mine2.E) apply(mine2.E, eff());
       redraw(60);
       tell(true);
       if (say3) say3("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
@@ -13156,7 +13301,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
     S.cupSet = true;
     save();
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
     if (say3) say3("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
@@ -13171,9 +13316,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     s.cup = S.cupSet ? S.cup : s.cup;
     s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
     S = s;
-    mine.S = S;
+    mine2.S = S;
     save();
-    if (mine.E) apply(mine.E, eff());
+    if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
     if (say3) say3("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
@@ -13209,7 +13354,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function drawnBodyMemory() {
     let kept2 = 0, engines = 0;
-    for (const E of [mine.E, ...Array.from(others.values()).map((o) => o.E)]) if (E) {
+    for (const E of [mine2.E, ...Array.from(others.values()).map((o) => o.E)]) if (E) {
       engines++;
       try {
         kept2 += E.keptBytes ? E.keptBytes() : 0;
@@ -14069,7 +14214,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var onBot2 = () => !!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER);
   var sdk3 = null;
   var hooked3 = false;
-  var mine2 = [];
+  var mine3 = [];
   var myBrand = null;
   function brandLook(b) {
     const look = farm_look_default && farm_look_default.brand || {}, per = (look.places || {})[b.place] || {};
@@ -14117,14 +14262,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function load2() {
     try {
       const v = JSON.parse(W6.localStorage.getItem(KEY2));
-      if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
+      if (Array.isArray(v)) mine3 = v.filter(ok).slice(-MAX);
     } catch (e) {
-      mine2 = [];
+      mine3 = [];
     }
   }
   function save2() {
     try {
-      W6.localStorage.setItem(KEY2, JSON.stringify(mine2));
+      W6.localStorage.setItem(KEY2, JSON.stringify(mine3));
     } catch (e) {
     }
   }
@@ -14143,24 +14288,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint", "dye", "grape"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
     const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
-    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
-    if (mine2.length > MAX) mine2 = mine2.slice(-MAX);
+    mine3.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
+    if (mine3.length > MAX) mine3 = mine3.slice(-MAX);
     save2();
     tell2(true);
     redrawMe();
     return true;
   }
   function messWash() {
-    if (!mine2.length) return false;
-    mine2 = [];
+    if (!mine3.length) return false;
+    mine3 = [];
     save2();
     tell2(true);
     redrawMe();
     return true;
   }
   function messRinse() {
-    if (!mine2.length) return false;
-    mine2 = mine2.slice(Math.max(1, Math.ceil(mine2.length / 3)));
+    if (!mine3.length) return false;
+    mine3 = mine3.slice(Math.max(1, Math.ceil(mine3.length / 3)));
     save2();
     tell2(true);
     redrawMe();
@@ -14177,7 +14322,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function tell2(force) {
     if (!force && Date.now() - toldAt2 < 8e3) return;
     toldAt2 = Date.now();
-    send2("mess", myBrand ? { list: mine2, brand: myBrand } : { list: mine2 });
+    send2("mess", myBrand ? { list: mine3, brand: myBrand } : { list: mine3 });
   }
   function ask2() {
     if (onBot2() || Date.now() - askedAt2 < 8e3) return;
@@ -14188,7 +14333,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const mn = m.from;
     if (!mn || W6.Player && mn === W6.Player.MemberNumber || onBot2()) return;
     if (m.type === "messAsk") {
-      if (mine2.length || myBrand) setTimeout(() => tell2(), 300 + Math.random() * 1500);
+      if (mine3.length || myBrand) setTimeout(() => tell2(), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "mess") return;
@@ -14217,7 +14362,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var redrawMe = () => {
     if (W6.Player) redrawMn2(W6.Player.MemberNumber);
   };
-  var listFor = (C2) => C2 === W6.Player ? mine2 : (others2.get(C2.MemberNumber) || {}).list || [];
+  var listFor = (C2) => C2 === W6.Player ? mine3 : (others2.get(C2.MemberNumber) || {}).list || [];
   var brandFor = (C2) => C2 === W6.Player ? myBrand : (others2.get(C2.MemberNumber) || {}).brand || null;
   var imgs = /* @__PURE__ */ new Map();
   function img(src, mn) {
@@ -14425,7 +14570,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       sdk3.hookFunction("ChatRoomSync", 0, (args, next) => {
         const r = next(args);
         setTimeout(() => {
-          if (mine2.length) tell2(true);
+          if (mine3.length) tell2(true);
           ask2();
         }, 3e3);
         return r;
@@ -14441,12 +14586,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     load2();
     setInterval(() => {
       const fresh2 = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 6e4);
-      if (fresh2(mine2)) redrawMe();
+      if (fresh2(mine3)) redrawMe();
       for (const [mn, o] of others2) if (fresh2(o.list)) redrawMn2(mn);
     }, 6e4);
     setTimeout(() => {
       hook2();
-      if (mine2.length || myBrand) {
+      if (mine3.length || myBrand) {
         tell2(true);
         redrawMe();
       }
@@ -14462,7 +14607,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const ago = (t) => t ? Math.round((Date.now() - t) / 1e3) + "s ago" : "never";
     const L = [];
     L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W6.FarmMess + (W6.FarmMess && W6.FarmMess.KINDS ? " (" + Object.keys(W6.FarmMess.KINDS).length + " kinds)" : ""));
-    L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
+    L.push("on you now: " + mine3.length + (mine3.length ? " \xB7 newest " + mine3[mine3.length - 1].k + " on " + mine3[mine3.length - 1].a.join("+") + ", " + ago(mine3[mine3.length - 1].t) : ""));
     L.push("marks from the bot: " + (DIAG2.marks.length ? DIAG2.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
     L.push("your body drawn: " + DIAG2.got + " times, with a mess " + DIAG2.draws + " times");
     if (DIAG2.draw) L.push("last mess drawing: " + ago(DIAG2.draw.at) + ", " + DIAG2.draw.list + " messes, " + DIAG2.draw.pic + "; skin pictures seen: " + (DIAG2.draw.body.join(" ") || "NONE") + "; first pictures: " + (DIAG2.draw.sample || []).join(" ") + "; drawings handed over: " + (DIAG2.draw.canv || 0));
@@ -19680,12 +19825,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
     const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups();
-    const mine3 = new Set(outfit.items.map((i) => i.Group));
+    const mine4 = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
       const g = groupOf(b.Group);
       if (isClothes(g)) return false;
-      return !mine3.has(b.Group);
+      return !mine4.has(b.Group);
     });
     let worn = 0, locks = 0, skipped2 = 0;
     const added = [];
@@ -19792,8 +19937,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (Array.isArray(m.splat) && m.splat.length) {
       const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
       const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
-      const mine3 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
-      let it = mine3.find((b) => colOf(b) === col);
+      const mine4 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine4.find((b) => colOf(b) === col);
       if (!it) {
         const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
         if (g) {
@@ -19801,7 +19946,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (col) it.Color = col;
           next.push(it);
           mem.splatGroup = g;
-        } else it = mine3[0];
+        } else it = mine4[0];
       }
       if (it) {
         it.Property = Object.assign({}, it.Property || {});

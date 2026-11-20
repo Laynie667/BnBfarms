@@ -28,7 +28,8 @@
        tied           times knotted                                 punches         this card's punches (a free one every tenth)
        studs          the guestbook: the last four studs, and how many more
        scores         HIGH SCORES: the four who've bred them most
-       bredOn         { d, due } while they're carryin'                 passport   the last four places a trap had them (10uq3) */
+       bredOn         { d, due } while they're carryin'                 passport   the last four places a trap had them (10uq3)
+       womb           { n: litters, c: how many they're carryin' now } (the WOMB MARK, Nov 19) */
   function inkCounts(mn, p, now){
     const t = p.totals || {}, o = p.offspring || {}, loads = t.loads || 0, by = t.by || {};
     const out = { loads, used: loads, litters: o.litters || 0, eggs: o.eggs || 0, milked: Math.round((t.milked || 0) / 1000), tied: t.tied || 0,
@@ -36,6 +37,7 @@
     out.heat = inHeat(p) ? Math.max(0, Math.min(100, Math.round(10 * (p.heat.until - now) / (CFG.PROD.HEAT_H * 3600000)) * 10)) : 0;
     out.loading = p.preg && p.preg.due > p.preg.since ? Math.max(0, Math.min(100, Math.round(20 * (now - p.preg.since) / (p.preg.due - p.preg.since)) * 5)) : 0;
     if (p.preg) out.bredOn = { d: Math.floor(p.preg.since / 86400000) * 86400000, due: Math.floor(p.preg.due / 86400000) * 86400000 };
+    out.womb = { n: o.litters || 0, c: (p.preg ? p.preg.count || 1 : 0) + (p.eggs ? p.eggs.n || 0 : 0) };   // the womb mark (Nov 19): litters, and how many in there now
     const studs = Object.keys(by).map(Number).filter(Boolean);
     if (studs.length){
       const recent = studs.slice().sort((a, b) => (by[b].at || 0) - (by[a].at || 0)), most = studs.slice().sort((a, b) => (by[b].n || 0) - (by[a].n || 0));

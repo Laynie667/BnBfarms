@@ -17,8 +17,9 @@
      the leeches feed on it, and now and then a line only you see.
    • THE STRETCH THAT STAYS (Nov 18; Laynie: "if the stretching persist after the leeches are removed, it would make
      since to be able to use and fuck them, or creampie them too"; closin' up on their own: "up to the individual
-     player with a toggle"). Held open (the Dilator, the leeches) they train: a tenth of a level every half hour toward
-     how wide they're held, and a little more every time somethin' goes in. What's trained stays when the dose wears off
+     player with a toggle"). Held open (the Dilator, the leeches) they train: a level an hour toward
+     how wide they're held (Nov 19, Laynie: "shorten the time down to 4 hours or less": gapin' in three hours held
+     wide, where it was fifteen), and a little more every time somethin' goes in. What's trained stays when the dose wears off
      or the leeches drop, and they're still open, still offered, still usable. Your switch, on to start: they close up
      slowly on their own, half a level a day once they've gone twelve hours unopened and unused. Close them up (the
      page, /dispensary nips close, or a Tightening Balm somebody doses you with) puts them back as they were.
@@ -26,6 +27,10 @@
      minute and a half of it), it tells yours (dispCream). It wells back out: a line for the room, cum on your chest for
      everybody with the Companion, and a count of your own (loads in your tits). On the farm the farm girl's told
      (dispNipLoad): her own count, and it comes back out with your milk.
+   • FORCED OPEN (Nov 19, Laynie: "a command to force dilate nipples"): /dispensary nips open [1-3] does yours right
+     now, gapin' if you don't say how wide, and trained to stay that way, no waitin'. /dispensary nips open <who> [1-3]
+     does somebody else's (dispNipsOpen): their Dispensary takes it from anybody who can dose them, unless they've
+     switched the Nipple Dilator off. The room sees it happen. The page's Open them up button opens yours a step wider.
 */
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { LSCG_ID } from "./config.js";
@@ -53,7 +58,7 @@ function heldOpen() {
 }
 // THE STRETCH THAT STAYS: st().nipTrain { lvl (0 to 3), at (last looked at), open (last held open), used (last used) }
 const MIN = 60000, HOUR = 3600000, DAY = 86400000;
-export const TRAIN = { step: 0.1, every: 30 * MIN, cock: 0.15, finger: 0.05, grace: 12 * HOUR, perDay: 0.5 };
+export const TRAIN = { step: 0.5, every: 30 * MIN, cock: 0.15, finger: 0.05, grace: 12 * HOUR, perDay: 0.5 };
 const trainOf = () => st().nipTrain || (st().nipTrain = { lvl: 0, at: Date.now(), open: 0, used: 0 });
 export const trainedLevel = () => Math.max(0, Math.min(3, Math.floor(((st().nipTrain || {}).lvl || 0) + 1e-9)));
 // how open yours are: 0 shut, 1 to 3 (held open, or trained to stay that way)
@@ -95,6 +100,40 @@ export function nipsClose(quiet) {
   if (!quiet && was) local("Your nipples close up again, snug and tender, as if they'd never been stretched.");
   return was;
 }
+// FORCED OPEN: right open, n wide (1 to 3, gapin' if not said), and trained to stay that way. by: who did it (you, or
+// somebody on your list). The room sees it.
+const FORCED_WIDE = ["", "open enough to take a finger", "wide open", "gapin' wide"];   // (the room lines' %w)
+export function nipsForce(n, by) {
+  n = Math.max(1, Math.min(3, Math.round(Number(n) || 3)));
+  const was = nipsOpen();
+  if (trainedLevel() >= n) return { ok: false, why: "already", was, n: trainedLevel() };
+  const T = trainOf(), now = Date.now(), other = !!by && by !== me();
+  T.lvl = Math.max(T.lvl, n); T.at = now; T.open = now; T.used = now;
+  save(); nipsTell();
+  const L = LINES.nips && LINES.nips[other ? "forced_by" : "forced_self"];
+  if (L && L.length) action(fill(pick(L), { by: other ? nameOf(by) : "" }).replace(/%w/g, FORCED_WIDE[n]));
+  return { ok: true, was, n };
+}
+// somebody else's: their Dispensary decides (forceOf below)
+export function nipsForceSend(to, n) {
+  if (to === me()) return nipsForce(n, me());
+  try { W.ServerSend("ChatRoomChat", makeMsg("dispNipsOpen", { n: Math.max(1, Math.min(3, Math.round(Number(n) || 3))) }, to)); return { ok: true, sent: true }; } catch (e) { return { ok: false, why: "send" }; }
+}
+function forceOf(from, m) {
+  const reply = (ok, why, n) => { try { W.ServerSend("ChatRoomChat", makeMsg("dispNipsOpenOk", { ok, why: why || "", n: n || 0 }, from)); } catch (e) { /* fine */ } };
+  if (!allowed(from)) { local(nameOf(from) + " tried to force your nipples open, but they aren't on your list."); return reply(false, "ladder"); }
+  if (st().off && st().off.dilator) { local(nameOf(from) + " tried to force your nipples open, but you've the Nipple Dilator switched off."); return reply(false, "off"); }
+  const r = nipsForce(m.n, from);
+  if (!r.ok) return reply(false, r.why, r.n);
+  local("⭕ " + nameOf(from) + " forced your nipples open, " + NIP_WORDS[r.n] + ", and they'll stay that way" + (st().nipsHeal !== false ? " till they close up on their own." : "."));
+  reply(true, "", r.n);
+}
+function forceOk(from, m) {
+  const n = Math.max(0, Math.min(3, Math.round(Number(m.n) || 0)));
+  local(m.ok ? "⭕ " + nameOf(from) + "'s nipples are forced open, " + NIP_WORDS[n] + "."
+    : "Couldn't open " + nameOf(from) + "'s nipples: " + (m.why === "ladder" ? "you aren't on their list of who can dose them." : m.why === "off" ? "they've the Nipple Dilator switched off." : m.why === "already" ? "they're already " + NIP_WORDS[n] + "." : "that didn't take."));
+}
+
 // how open somebody's are (yours, or what their Dispensary told the room)
 export function openOf(mn) {
   mn = Number(mn);
@@ -277,6 +316,8 @@ export function initNipples(mod) {
           const m = readMsg(data);
           if (m && m.type === "dispNips") onNips(data.Sender, m);
           else if (m && m.type === "dispCream") onCream(data.Sender);
+          else if (m && m.type === "dispNipsOpen") forceOf(data.Sender, m);
+          else if (m && m.type === "dispNipsOpenOk") forceOk(data.Sender, m);
           else if (m && m.type === "dispIconsAsk") setTimeout(() => nipsTell(true), 600);
         }
       } catch (e) { console.warn("[Dispensary] nipples:", e); }

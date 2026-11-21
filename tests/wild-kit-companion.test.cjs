@@ -80,5 +80,14 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   const lg = JSON.parse(ls['fhc-gear-letgo']); for (const k of Object.keys(lg)) lg[k].at = Date.now() - 11 * 60000; ls['fhc-gear-letgo'] = JSON.stringify(lg);
   again.syncFarmGear(fresh.filter((g) => g.name !== 'Stall Blindfold'), true);
   ok(!Object.keys(JSON.parse(ls['fhc-gear-letgo'])).some((k) => k.startsWith('Stall Blindfold|')), '...and once the farm\'s list has dropped it, it\'s forgotten');
+  // Echo's Limb Teleportation Device: named in plain letters, put on as Echo's own item, only if the game has it
+  ASSETS.ItemAddon = []; window.Asset = window.Asset.filter((a) => a.Group.Name !== 'ItemAddon');
+  P.Appearance = [mk('Cloth', 'Shirt')];
+  const rings = { slot: 'addon', name: 'Barn Teleporter Rings', items: ['EchoLimbTeleporter'], rec: { a: 2, l: 1 }, only: true, until: far + 1, keep: true };
+  d = again.syncFarmGear([rings], true);
+  ok(!d.on.length && !at('ItemAddon'), 'no Echo\'s clothing mod in the game: the rings don\'t go on, and nothin\' goes on in their place');
+  ASSETS.ItemAddon = [again.ECHO_TELEPORTER]; window.Asset.push({ Name: again.ECHO_TELEPORTER, Group: { Name: 'ItemAddon', Family: 'Female3DCG' } });
+  d = again.syncFarmGear([rings], true);
+  ok(d.on.includes('Barn Teleporter Rings') && at('ItemAddon') && at('ItemAddon').Asset.Name === '隐形药水', 'with it: Echo\'s Limb Teleportation Device goes on, under its own name');
   out(fails ? 'FAIL ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })();

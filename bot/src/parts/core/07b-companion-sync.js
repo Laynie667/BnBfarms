@@ -8,7 +8,8 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", seedMilk:"seedmilk", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager", trapsOn:"traps", ownOutfit:"ownoutfit", teaseMe:"teaseme", pinMe:"pinme", broodWomb:"broodwomb" };
+                        tally:"tally", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager", trapsOn:"traps", ownOutfit:"ownoutfit", teaseMe:"teaseme", pinMe:"pinme", broodWomb:"broodwomb",
+                        wildIn:"wildtraps", wildLimbs:"wildlimbs", wildLaced:"wildlaced" };
   // (staff lookups about somebody else go to the Companion's Office tab: doc in 01b-commands.js)
 
   // amounts as the panel shows them (0.1 L steps from a litre up, 50 mL below): milk fillin' a few mL every

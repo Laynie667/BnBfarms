@@ -564,6 +564,10 @@ TRAPS (your own switch)
   ?bedrest on|off · bedded down when you're too big to walk
   ?struggle · one try at slippin' a trap that has you
   ?traps eager on · no breather between traps, no resets
+  ?traps wild on · the farm's own hidden, movin' traps, NOT for the
+    faint of heart: a whole kit kept on you till somebody else
+    frees you · ?traps wild limbs on · ?traps wild laced on
+    All three off till you say so; off, a wild tile's an ordinary trap
   ?free <who> · get a caught subject out · ?goad <who> · or don't
   ?lay · on the nest, if you're carryin' eggs · ?hunt · ?pack
   Your limits still rule, and your safeword stops a trap cold

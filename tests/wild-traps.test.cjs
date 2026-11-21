@@ -11,7 +11,7 @@ const ZONES = { barn: { a: { X: 24, Y: 2 }, b: { X: 14, Y: 2 }, group: "barn" },
   receiving: { a: { X: 14, Y: 16 }, b: { X: 22, Y: 20 }, group: "receiving" }, office: { a: { X: 26, Y: 16 }, b: { X: 34, Y: 20 }, group: "office" } };
 const SPOTS = { "trap-snare": { X: 5, Y: 5 }, "door-barn": { X: 20, Y: 2 }, "milking-1": { X: 21, Y: 9 }, "pond": { X: 3, Y: 30 } };
 store.bnb_ledger_v1 = JSON.stringify({ v: 4, people: { "221397": { mn: 221397, name: "Laynie", roles: ["PROPRIETOR"], onDuty: true, herds: [], tempKeys: [], cover: [] },
-  "500": S(500, "Moo"), "501": S(501, "Bea"), "502": S(502, "Cass"), "503": S(503, "Dot"), "504": S(504, "Eve"), "600": S(600, "Fay", { trapsOn: false }) },
+  "500": S(500, "Moo", { wildIn: true }), "501": S(501, "Bea"), "502": S(502, "Cass"), "503": S(503, "Dot"), "504": S(504, "Eve"), "600": S(600, "Fay", { trapsOn: false }) },
   applications: [], archive: {}, log: [], stuckLog: [], chores: [], wheel: [], spots: SPOTS, zones: ZONES });
 global.GM_getValue = (k, d) => k in store ? store[k] : d; global.GM_setValue = (k, v) => store[k] = v; global.GM_registerMenuCommand = () => {};
 const doc = { body: { appendChild() {} }, createElement() { return { style: {}, addEventListener() {} }; }, addEventListener() {}, getElementById() { return null; }, visibilityState: 'visible' };
@@ -35,6 +35,8 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
 const say = async (mn, msg, ms) => { handlers.ChatRoomMessage({ Sender: mn, Type: 'Whisper', Content: msg, Target: 260239 }); await wait(ms || 900); };
 const reply = (n, mn) => sent.slice(n).filter(([e, d]) => e === 'ChatRoomChat' && d && d.Type === 'Whisper' && d.Target === mn).map(([, d]) => String(d.Content)).join('\n');
 const move = (c, X, Y) => { c.MapData.Pos = { X, Y }; handlers.ChatRoomSyncMapData({ MemberNumber: c.MemberNumber, MapData: { Pos: { X, Y } } }); };
+// (some traps keep hold of them after the story: a pen, the stocks, the bench. The test lets them go before the next)
+const free = (mn) => { const r = W.FarmhandLedger().people[mn]; if (r) { r.penned = null; r.stocked = null; r.benched = null; r.trapWait = null; } };
 const done = async () => { for (let i = 0; i < 600; i++) { await wait(60); if (!(W.__st().trapRuns && W.__st().trapRuns.has(500))) break; } await wait(400); };
 const inZ = (z, p) => p.X >= Math.min(z.a.X, z.b.X) && p.X <= Math.max(z.a.X, z.b.X) && p.Y >= Math.min(z.a.Y, z.b.Y) && p.Y <= Math.max(z.a.Y, z.b.Y);
 const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidden', Content: 'FarmhandMsg', Dictionary: Object.assign({ v: 2 }, d) });
@@ -110,18 +112,27 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   // somebody with traps off walks right over one
   const w3 = W.__wild()[2]; move(fay, w3.X, w3.Y); await wait(300);
   ok(!(P(600).trapLog || []).length, 'somebody with traps off walks right over a wild one');
-  // ?traps wild off
+  // ?traps wild off (Nov 20: off till they say so, "the normal farm traps could still trigger on the wild spots")
   move(moo, 10, 10); await wait(50);
+  ok(!P(501).wildIn && W.__stateFor(501).switches.wildtraps === false, 'somebody who never said yes: wild traps off, and their Toggles say so');
   n = sent.length; await say(500, '?traps wild off');
-  ok(P(500).wildOff === true && /Wild traps: off/.test(reply(n, 500)), '?traps wild off: the wild ones leave you be');
-  P(500).trapAt = Date.now() - 5 * 60000; const n2 = (P(500).trapLog || []).length;
-  move(moo, W.__wild()[1].X, W.__wild()[1].Y); await wait(300);
-  ok((P(500).trapLog || []).length === n2, '...and stepping on one does nothin\'');
-  await say(500, '?traps wild on'); move(moo, 10, 10); await wait(50);
-  ok(P(500).wildOff === false, '?traps wild on brings them back');
+  ok(P(500).wildIn === false && /Wild traps: off for you/.test(reply(n, 500)), '?traps wild off: off for you');
+  const keptBefore = Object.values(P(500).gear || {}).filter(x => x.keep).length;
+  free(500); P(500).trapAt = Date.now() - 5 * 60000; const n2 = (P(500).trapLog || []).length, wOrd = W.__wild()[1];
+  move(moo, wOrd.X, wOrd.Y); const ordWild = W.__wildOn(500); await done();
+  ok((P(500).trapLog || []).length === n2 + 1 && !ordWild && Object.values(P(500).gear || {}).filter(x => x.keep).length === keptBefore,
+    '...steppin\' on a wild tile springs an ordinary farm trap: no wild strength, nothin\' new kept on them, nothin\' kept pushed off (traps ' + n2 + '->' + (P(500).trapLog || []).length + ', wild ' + ordWild + ', kept ' + keptBefore + '->' + Object.values(P(500).gear || {}).filter(x => x.keep).length + ', ' + ((P(500).trapLog || []).slice(-1)[0] || {}).kind + ')');
+  move(moo, 10, 10); await wait(50); move(moo, wOrd.X, wOrd.Y); await wait(300);
+  ok((P(500).trapLog || []).length === n2 + 1, '...and like any ordinary trap it waits out the breather');
+  move(moo, 10, 10); await wait(50);
+  n = sent.length; await say(500, '?traps wild on');
+  ok(P(500).wildIn === true && /NOT FOR THE FAINT OF HEART/.test(reply(n, 500)), '?traps wild on: on, with the warnin\' first');
+  ok(W.__stateFor(500).switches.wildtraps === true, '...and their Toggles show it on');
+  n = sent.length; await say(221397, '?traps wild');
+  ok(/Wild traps: off/.test(reply(n, 221397)) && /NOT FOR THE FAINT OF HEART/.test(reply(n, 221397)) && !/\(/.test(reply(n, 221397).replace(/^\(|\)$/gm, '')),'?traps wild says what they are, plainly, and that they\'re off till you say so' + (/\(/.test(reply(n, 221397)) ? ': ' + reply(n, 221397).replace(/\n/g, ' / ').slice(Math.max(0, reply(n, 221397).indexOf('(') - 80), reply(n, 221397).indexOf('(') + 40) : ''));
 
   // ── the gear: put back if they pull it off, off when somebody else does ──
-  const piece = Object.values(P(500).gear)[0].label;
+  const piece = Object.values(P(500).gear).find(x => x.keep).label;
   companion(500, { type: 'gearFreed', name: piece, by: 500 });
   await wait(200);
   ok(Object.values(P(500).gear).some(x => x.label === piece), 'they can\'t free themselves: their own Companion sayin\' they took it off changes nothin\'');
@@ -135,10 +146,38 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   await wait(400);
   ok(!(P(500).gear || {}).legs, 'a piece with a name longer than the game keeps still comes off when somebody else frees it');
   // a safeword takes every bit of it off
+  // ── laced and limbs (Nov 20: "can make use of dispensary crafts and even the limb teleporter from echoes") ──
+  const KITS2 = W.__farmSets().WILD_KITS, all = Object.values(KITS2).flat(), pieces = all.flatMap(k => k.pieces);
+  const { DOSE_WORDS } = await import(require('url').pathToFileURL(path.join(__dirname, '../shared/dose-words.js')).href);
+  const HOW = /\b(drip\w*|iv|laced|coated|soaked|infused|seeping|injector|auto[- ]?inject\w*|dosing|dispenser|pump)\b|\b(on|when|whenever|every)\s+(climax\w*|cum\w*|orgasm\w*)\b|\bwhen\s+(kiss\w*|touch\w*|spank\w*)\b/i;
+  const dosesOf = (t) => Object.entries(DOSE_WORDS).filter(([, re]) => re.test(t.toLowerCase())).map(([k]) => k);
+  const strayDose = pieces.filter(x => { const t = W.__wildDesc(x, false); return dosesOf(t).length && HOW.test(t); });
+  ok(!strayDose.length, 'unlaced, no kit piece doses anybody (' + strayDose.map(x => x.label).join(', ') + ')');
+  const badLace = pieces.filter(x => x.laced).filter(x => { const t = W.__wildDesc(x, true); return dosesOf(t).length < 1 || !HOW.test(t) || t.length > 180; });
+  ok(pieces.filter(x => x.laced).length >= 20 && !badLace.length, 'laced: every laced piece names one dose and how it gets in, and fits in what the game keeps (' + badLace.map(x => x.label + ' ' + W.__wildDesc(x, true).length).join(', ') + ')');
+  W.__companionSet(500, { limbs: true });
+  let got = new Set(); for (let i = 0; i < 40; i++) { P(500).wildKit = null; got.add(W.__wildKitFor(500, 'barn').name); }
+  ok(!all.some(k => k.limbs && got.has(k.name)), 'limbs switched off: never a kit that takes them');
+  n = sent.length; await say(500, '?traps wild limbs on');
+  ok(P(500).wildLimbs === true && /NOT FOR THE FAINT OF HEART/.test(reply(n, 500)), '?traps wild limbs on: on, with its own warnin\'');
+  got = new Set(); for (let i = 0; i < 60; i++) { P(500).wildKit = null; got.add(W.__wildKitFor(500, 'barn').name); }
+  ok(got.has("Kept as a Milkin' Torso"), 'limbs on, with Echo\'s teleporter in their game: the barn can leave them a torso');
+  W.__companionSet(500, { limbs: false }); got = new Set(); for (let i = 0; i < 40; i++) { P(500).wildKit = null; got.add(W.__wildKitFor(500, 'barn').name); }
+  ok(!got.has("Kept as a Milkin' Torso"), '...never when their game hasn\'t got it');
+  ok(['barn', 'pasture', 'receiving', 'hunt'].every(a => KITS2[a].some(k => k.limbs && k.pieces.some(x => x.slot === 'addon' && x.items[0] === 'EchoLimbTeleporter' && x.only && x.rec))) &&
+    all.filter(k => k.limbs).every(k => !k.pieces.some(x => ['legs', 'feet', 'ropeFeet', 'boots'].includes(x.slot))),
+    'a limb kit in every place, each namin\' Echo\'s device and only that, chains set, and nothin\' on the legs it takes');
+  n = sent.length; await say(500, '?traps wild laced on');
+  ok(P(500).wildLaced === true && /NOT FOR THE FAINT OF HEART/.test(reply(n, 500)), '?traps wild laced on: on, with its own warnin\'');
+  free(500); P(500).trapAt = Date.now() - 5 * 60000; move(moo, W.__wild()[2].X, W.__wild()[2].Y); await done();
+  const lg = Object.values(P(500).gear || {}).filter(x => x.keep && x.src === 'wild');
+  ok(lg.some(x => HOW.test(x.desc) && dosesOf(x.desc).length), 'caught with laced on: the kit it leaves is laced (' + P(500).wildKit + ')');
+  move(moo, 10, 10); await wait(50);
+
   // caught again in a hunt: a hunt prize
   L().hunt = { until: Date.now() + 600000, goal: 'pasture', done: [] }; W.__wildTick();
   const hl0 = (P(500).trapLog || []).length, hw = W.__wild()[0], hpos = hw.X + ',' + hw.Y;
-  P(500).trapAt = Date.now() - 5 * 60000; move(moo, hw.X, hw.Y); const hOn = W.__wildOn(500); await done();
+  free(500); P(500).trapAt = Date.now() - 5 * 60000; move(moo, hw.X, hw.Y); const hOn = W.__wildOn(500); await done();
   const hg = Object.values(P(500).gear || {});
   ok(hg.some(x => x.keep) && KITS.hunt.some(k => k.pieces.every(p => hg.some(x => x.label === p.label))), 'caught in a hunt, it leaves a hunt prize (' + P(500).wildKit + '; sprang ' + hOn + ', traps ' + hl0 + '->' + (P(500).trapLog || []).length + ' at ' + hpos + ', moo ' + JSON.stringify(moo.MapData.Pos) + ')');
   L().hunt = null; W.__wildTick();

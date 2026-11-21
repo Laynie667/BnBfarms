@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.73.0
+// @version      0.74.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.73.0";
+  var VERSION = "0.74.0";
 
   // shared/species.js
   var WORDS = {
@@ -18712,9 +18712,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
     ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
     ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
+    // Laynie, Nov 20: "add the toggles for it with a clear warning that the wild traps are more brutal, and not the kind for
+    // the faint of heart, off by default for the hard ones" (all three off till switched on)
+    ["wildtraps", "\u26A0\uFE0F Wild traps", "NOT FOR THE FAINT OF HEART. The farm's own hidden, movin' traps in the barn, the pasture and receivin': no warnin', no breather, the brutal strength, and a whole kit locked on you, ten to fifteen pieces, blind, deaf, gagged, bound and plugged, that stays on in every room till somebody ELSE takes it off. Your safeword still takes it all off. Off: a wild tile is an ordinary farm trap for you"],
+    ["wildlimbs", "\u26A0\uFE0F Wild traps: take my limbs", "NOT FOR THE FAINT OF HEART. A wild kit can take your arms and legs off at glowin' rings, Echo's Limb Teleportation Device, and leave the rest of you chained up as a torso, milked and used, till somebody else takes it off. Needs Echo's clothing mod in your game"],
+    ["wildlaced", "\u26A0\uFE0F Wild traps: laced kits", "NOT FOR THE FAINT OF HEART. A wild kit comes laced: heat, let-down, moo, sure-catch, haze, deep throat, denial, sedatives and more, dripped into you from the gear itself for as long as it's on. Your Dispensary gives them, or the farm girl on the farm, and its own switches and limits still rule"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
-  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
+  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
   function farmSwitches(ctx3, list) {
     const sw = ctx3.s.switches || {};
     return list.map(([cmd, label, desc]) => {
@@ -20678,7 +20683,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     "Hog Tie (knees)",
     "Sty Gag",
     "Sty Blindfold",
-    "Snout Ring"
+    "Snout Ring",
+    "Barn Teleporter Rings",
+    "Fence Teleporter Rings",
+    "Parcel Teleporter Rings",
+    "Trophy Teleporter Rings",
+    "Trophy Plug"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -20730,8 +20740,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     gag: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["HarnessBallGag1", "BitGag"], re: /BallGag|BitGag/ },
     gag2: { groups: ["ItemMouth2", "ItemMouth3", "ItemMouth"], names: ["HarnessPanelGag"], re: /PanelGag/ },
     hands: { groups: ["ItemHands"], names: ["PaddedLeatherMittens", "LeatherMittens"], re: /Mittens/ },
-    feet: { groups: ["ItemFeet"], names: ["LeatherAnkleCuffs"], re: /AnkleCuffs|AnkleShackles/ }
+    feet: { groups: ["ItemFeet"], names: ["LeatherAnkleCuffs"], re: /AnkleCuffs|AnkleShackles/ },
+    // Echo's Limb Teleportation Device (Nov 20, a wild kit that takes the limbs): only the item the piece names, or nothin'
+    addon: { groups: ["ItemAddon"], names: [], re: /^$/ }
   };
+  var ECHO_TELEPORTER = "\u9690\u5F62\u836F\u6C34";
+  var ITEM_ALIAS = { EchoLimbTeleporter: ECHO_TELEPORTER };
+  var itemName = (n) => ITEM_ALIAS[n] || n;
+  var nameOk = (n) => !!ITEM_ALIAS[n] || /^[A-Za-z0-9_-]{2,40}$/.test(n);
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
     "ItemArms:SteelCuffs": "Wrist",
@@ -20801,8 +20817,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return null;
       }
     };
-    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get2(n)) return n;
-    if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
+    for (const n0 of Array.isArray(prefer) ? prefer.map(String) : []) {
+      const n = itemName(n0);
+      if (nameOk(n0) && get2(n)) return n;
+    }
+    if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? itemName(String(prefer[0])) : null;
     for (const n of slot.names) if (get2(n)) return n;
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -20908,8 +20927,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const slot = GEAR_SLOTS[g.slot];
       if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
       let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x)), was = null, item = null;
-      for (const n of Array.isArray(g.items) ? g.items.map(String) : []) {
-        if (!/^[A-Za-z0-9_-]{2,40}$/.test(n)) continue;
+      for (const n0 of Array.isArray(g.items) ? g.items.map(String) : []) {
+        if (!nameOk(n0)) continue;
+        const n = itemName(n0);
         const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf2(x));
         if (home) {
           group = home;
@@ -22505,7 +22525,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function hello(again) {
     st.lastHello = Date.now();
     if (again) st.seq = 0;
-    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again });
+    let limbs = false;
+    try {
+      limbs = typeof window.AssetGet === "function" && !!window.AssetGet(window.Player.AssetFamily || "Female3DCG", "ItemAddon", ECHO_TELEPORTER);
+    } catch (e) {
+    }
+    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
   }
   function askWhole() {
     if (Date.now() - (st.wholeAt || 0) < 8e3) return;

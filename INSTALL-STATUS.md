@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.91.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.92.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.73.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.74.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.92.0 + Companion 0.74.0: wild traps off till you say so, laced kits, and kits that take your limbs** Laynie, Nov 20: "I'd like even more. can make use of dispensary crafts and even the limb teleporter from echoes. Just need to add the toggles for it with a clear warning that the wild traps are more brutal, and not the kind for the faint of heart, off by default for the hard ones, the normal farm traps could still trigger on the wild spots."
+  - **Off till you say so, with a plain warnin'.** Three new switches in the Companion's Toggles, all off to start, each sayin' NOT FOR THE FAINT OF HEART and what it does before you flip it: **⚠️ Wild traps** (`?traps wild on`), **⚠️ Wild traps: take my limbs** (`?traps wild limbs on`) and **⚠️ Wild traps: laced kits** (`?traps wild laced on`). The last two only count with Wild traps on. Everybody who had them on from earlier today starts off again.
+  - **Off, a wild tile's an ordinary farm trap.** The movin' tiles still have you: that place's traps, with the breather and the reset like any set tile, and nothin' kept on you after.
+  - **Laced kits.** Every kit has pieces that dose you from the gear itself for as long as it's on: heat mist in the plugs, let-down tonic in the milkers, moo serum in the cow hood, sure-catch serum every climax, deep throat drops in the ring gags, haze drops in the blindfolds, hair-trigger drops every time somebody touches the clamps, sedative in the shippin' gags, denial serum under the steel, an airhead elixir for the buyers, and in the dairy prize an udder growth injector every hour. Your Dispensary gives them, or the farm girl does on the farm, and its own switches and limits still say which take.
+  - **Kits that take your limbs**, with Echo's Limb Teleportation Device: arms and legs off at glowin' rings and kept somewhere else on the farm, the rest of you chained. *Kept as a Milkin' Torso* in the barn, *Hung on the Fence* in the pasture, *Parcelled* on a hand truck in receivin', and *The Trophy* for a hunt, hung upside down. Only for a game with Echo's clothing mod in it: your Companion tells the farm girl, and without it you never get one.
+  - **What's kept stays kept:** an ordinary trap's own gear never pushes a kept piece out of its spot any more. It only comes off when somebody else takes it off, or your safeword.
+  - The studio's Wild kits show the limb kits too, for a studio with Echo's mod loaded.
 
 - **Bot 0.91.0 + Companion 0.73.0: what a wild trap leaves is a whole kit, and four tame sets made whole** Laynie, Nov 20, after the renders: "I like the ideas, and the fixes, but definitely could use more complete, restrictive sets."
   - **A whole kit, from the place it hid.** A wild trap used to leave its own few pieces, or just cuffs. Now it leaves a kit, 10 to 15 pieces, every one of them kept till somebody else takes it off:

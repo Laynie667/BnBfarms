@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.91.0
+// @version      0.92.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.91.0";
-  var COMPANION_VERSION = "0.73.0";
+  var VERSION = "0.92.0";
+  var COMPANION_VERSION = "0.74.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6055,6 +6055,7 @@
         c.at = Date.now();
         c.relay = m.relay !== false;
         c.off = m.off && typeof m.off === "object" ? m.off : {};
+        c.limbs = m.limbs === true;
         if (typeof m.sh === "string") c.lastStoreH = m.sh;
         if (!keep) dropQueuedPanels(mn);
         state.companions.set(mn, c);
@@ -6418,7 +6419,10 @@
       ownOutfit: "ownoutfit",
       teaseMe: "teaseme",
       pinMe: "pinme",
-      broodWomb: "broodwomb"
+      broodWomb: "broodwomb",
+      wildIn: "wildtraps",
+      wildLimbs: "wildlimbs",
+      wildLaced: "wildlaced"
     };
     function shownMl(n) {
       n = Number(n) || 0;
@@ -15198,8 +15202,20 @@
       }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (wild) {
+      if (wild && wildFor(mn)) {
         if (fresh) wildSpring(mn, wild, now);
+        return;
+      }
+      if (wild) {
+        if (!fresh || !huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;
+        r.spotTrapAt = r.spotTrapAt || {};
+        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < trapResetMs(mn)) return;
+        const Z = CFG.WILD.ZONES[wild.g];
+        if (!springTrap(mn, "random", Z ? "trap-theme-" + Z.theme : "")) {
+          r.trapAt = now;
+          r.spotTrapAt[here] = now;
+          saveLedger();
+        }
         return;
       }
       if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;
@@ -15245,7 +15261,7 @@
       const L1 = [];
       const dg = dangerX(mn);
       L1.push("\u2022 Traps: on" + (r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "") + (dg.on ? ". A Danger Draught's in " + (you ? "them" : "you") + ": every chancy trap's half again as likely, and the traps come round sooner" : "") + ".");
-      L1.push(r.wildOff ? "\u2022 \u{1F573}\uFE0F Wild traps: off for " + (you ? "them" : "you") + " (?traps wild on)." : "\u2022 \u{1F573}\uFE0F Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is.");
+      L1.push(!r.wildIn ? "\u2022 \u{1F573}\uFE0F Wild traps: off for " + (you ? "them" : "you") + ". The farm's movin' tiles spring an ordinary trap, with the breather and the reset. ?traps wild says what the wild ones do." : "\u2022 \u{1F573}\uFE0F Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is" + (r.wildLimbs ? "; they can take " + (you ? "their" : "your") + " limbs" : "") + (r.wildLaced ? "; their kits come laced" : "") + ".");
       if (r.trapsOff) L1.push("\u2022 \u23F8\uFE0F Paused: " + (you ? "they've" : "you've") + " paused the traps.");
       if ((r.trapQuiet || 0) > now) L1.push("\u2022 \u{1F6D1} A safeword not long ago: nothin' springs for " + mmss(r.trapQuiet - now) + " yet.");
       if (quietNow(mn)) L1.push("\u2022 \u{1F92B} " + own("They've asked for quiet") + ": nothin' springs till that's over.");
@@ -15689,7 +15705,7 @@
         if (isStaff(sender))
           R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L2.trapLoads && L2.trapLoads[n] ? " [" + L2.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?trap why <who> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate) \xB7 ?traps ratings" + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else if (isSubject(sender))
-          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 ?trap why says what's holdin' them back \xB7 ?traps wild off keeps the farm's movin' ones away \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
+          R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 ?traps theme <kind> off rules out a whole kind (furry, monsters, messy\u2026)" + ((r.trapThemesOff || []).length ? " (off: " + r.trapThemesOff.join(", ") + ")" : "") + " \xB7 ?rate says how one was \xB7 ?trap why says what's holdin' them back \xB7 ?traps wild says what the farm's own wild ones do, off till you say so, not for the faint of heart \xB7 your safeword stops one cold." + (trapDayLine() ? "\n" + trapDayLine() : ""));
         else R("\u{1F9EA} Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n" + trapsList());
         return true;
       }
@@ -15697,6 +15713,9 @@
     }
     addCommand("traps trap subject subjects watersports watersport", { topic: "traps", run: (c) => trapCommand(c.cmd === "watersport" ? "watersports" : c.cmd, c.sender, c.args, c.R) });
     addCommand("eager", { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["eager"].concat(c.args), c.R) });
+    addCommand("wildtraps", { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild"].concat(c.args), c.R) });
+    addCommand("wildlimbs", { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "limbs"].concat(c.args), c.R) });
+    addCommand("wildlaced", { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "laced"].concat(c.args), c.R) });
     const TRAP_LINES = {
       injector: {
         beats: [
@@ -25069,6 +25088,9 @@
       "traps",
       "trap",
       "eager",
+      "wildtraps",
+      "wildlimbs",
+      "wildlaced",
       "potion",
       "potions",
       "dare",
@@ -32079,6 +32101,7 @@
       const r = rec(mn);
       if (!r || !slot) return false;
       r.gear = r.gear || {};
+      if (r.gear[slot] && r.gear[slot].keep && !(x && x.keep) && r.gear[slot].until > Date.now()) return false;
       r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5) * 6e4, src: src || "trap" };
       if (x && x.items) r.gear[slot].items = x.items.slice(0, 4);
       if (x && x.color) r.gear[slot].color = x.color;
@@ -63277,9 +63300,13 @@
       zonesLedger();
       return Object.entries(L2.zones || {}).filter(([, z]) => z && z.a && z.b && CFG.WILD.ZONES[z.group]).map(([n, z]) => ({ n, z, g: z.group }));
     }
+    function wildFor(mn) {
+      const r = rec(mn);
+      return !!(r && r.wildIn);
+    }
     function wildCount() {
       if (huntOn()) return CFG.WILD.MAX;
-      const on = (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== BOTMN() && isSubject(c.MemberNumber) && !(rec(c.MemberNumber) || {}).wildOff).length;
+      const on = (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== BOTMN() && isSubject(c.MemberNumber)).length;
       return Math.max(CFG.WILD.BASE, Math.min(CFG.WILD.MAX, CFG.WILD.BASE + Math.floor(on / CFG.WILD.PER)));
     }
     function wildTileOk(X, Y, self) {
@@ -63382,7 +63409,7 @@
     ];
     function wildSpring(mn, w, now) {
       const r = rec(mn);
-      if (!r || r.wildOff) return false;
+      if (!r || !wildFor(mn)) return false;
       if (now - (r.trapAt || 0) < CFG.WILD.GRACE_S * 1e3 || heldByTrap(mn) || state.trapRuns && state.trapRuns.has(mn)) return false;
       const Z = CFG.WILD.ZONES[w.g], spot = Z ? "trap-theme-" + Z.theme : "";
       let pool = [];
@@ -63425,17 +63452,25 @@
       opt: "Wrist",
       desc: "Cuffs a wild trap snapped on and locked behind their back. They don't come off for the one wearin' them: somebody else has to."
     };
+    function wildLimbsFor(mn) {
+      const r = rec(mn), c = state.companions && state.companions.get(mn);
+      return !!(r && r.wildLimbs && c && c.limbs);
+    }
     function wildKitFor(mn) {
-      const area = state.wildArea && state.wildArea.get(mn) || "barn", r = rec(mn);
-      const kits = typeof WILD_KITS !== "undefined" && (WILD_KITS[area] || WILD_KITS.barn) || [];
+      const area = state.wildArea && state.wildArea.get(mn) || "barn", r = rec(mn), limbs = wildLimbsFor(mn);
+      const kits = (typeof WILD_KITS !== "undefined" && (WILD_KITS[area] || WILD_KITS.barn) || []).filter((k) => !k.limbs || limbs);
       if (!kits.length) return null;
       const fresh = kits.filter((k) => !r || k.name !== r.wildKit);
       return (fresh.length ? fresh : kits)[Math.floor(Math.random() * (fresh.length || kits.length))];
     }
+    const WILD_STAYS = " It stays till somebody else takes it off.";
+    function wildDesc(x, laced) {
+      return (x.desc || "") + (laced && x.laced ? " " + x.laced : "") + WILD_STAYS;
+    }
     function wildGear(mn, plan) {
-      const keep = CFG.WILD.KEEP_DAYS * 1440, kit = wildKitFor(mn), used = /* @__PURE__ */ new Set(), r = rec(mn);
+      const keep = CFG.WILD.KEEP_DAYS * 1440, kit = wildKitFor(mn), used = /* @__PURE__ */ new Set(), r = rec(mn), laced = !!(r && r.wildLaced);
       const put = (x) => {
-        gearOn(mn, x.slot, x.label, (x.desc || "") + " It stays till somebody else takes it off.", keep, "wild", Object.assign({}, x, { keep: true, quiet: true }));
+        gearOn(mn, x.slot, x.label, wildDesc(x, laced), keep, "wild", Object.assign({}, x, { keep: true, quiet: true }));
         used.add(x.slot);
       };
       for (const x of kit ? kit.pieces : []) put(x);
@@ -63462,26 +63497,53 @@
       audit(by, "WILDGEAR", mn + " " + label);
       emote("\u{1F513} " + plainName(by) + " takes the " + String(label).toLowerCase() + " off " + plainName(mn) + ". It took somebody else to do it.", mn);
     }
+    const WILD_WARN = {
+      wild: "\u26A0\uFE0F NOT FOR THE FAINT OF HEART. The farm hides traps of its own in the barn, the pasture and receivin', and moves them. Step on one and it has you: no warnin', no breather, the brutal strength, held twice as long, filled half again as full, the filthiest tellin', and half the time it hands you straight on to another. When it lets go it locks a whole kit on you, ten to fifteen pieces: blind, deaf, gagged, bound, plugged, chained. It stays on, in every room, till somebody ELSE takes it off, piece by piece. Your safeword still takes every bit of it off.",
+      limbs: "\u26A0\uFE0F NOT FOR THE FAINT OF HEART. A wild trap's kit can take your arms and legs: Echo's Limb Teleportation Device sends them off somewhere on the farm and leaves the rest of you chained up as a torso, milked and used, till somebody else takes it off. Only for a game with Echo's clothing mod in it, and only people with it can see it. Your safeword still brings them back.",
+      laced: "\u26A0\uFE0F NOT FOR THE FAINT OF HEART. A wild trap's kit comes laced: heat, let-down, moo, sure-catch, haze, deep throat, denial, sedatives and more, dripped into you from the gear itself for as long as it's on you. Your Dispensary gives them, or the farm girl does on the farm, and its own switches and limits still say which doses take. Your safeword clears them."
+    };
     function wildCommand(sender, args, R) {
-      const r = rec(sender), v = String(args[1] || "").toLowerCase();
+      const r = rec(sender), a1 = String(args[1] || "").toLowerCase();
+      const which = a1 === "limbs" || a1 === "laced" ? a1 : "wild", v = String(which === "wild" ? a1 : args[2] || "").toLowerCase();
+      const field = { wild: "wildIn", limbs: "wildLimbs", laced: "wildLaced" }[which];
       if (v === "on" || v === "off") {
         if (!r) {
           R("You'll need to be on the farm's books first, sugar.");
           return;
         }
-        r.wildOff = v === "off";
+        r[field] = v === "on";
+        if (which === "wild") delete r.wildOff;
         saveLedger();
-        R(r.wildOff ? "\u{1F573}\uFE0F Wild traps: off for you. The ones the farm set itself leave you be; the set tiles still have you." : "\u{1F573}\uFE0F Wild traps: ON. The farm hides its own traps in the barn, the pasture and receiving, and moves them. No warnin', and they hit hard: what they leave on you stays till somebody else takes it off. Your safeword still stops one cold and takes it all off.");
+        syncCompanions(true);
+        if (which === "wild") R(r.wildIn ? "\u{1F573}\uFE0F Wild traps: ON for you.\n" + WILD_WARN.wild + "\n?traps wild off takes you back to the ordinary traps." : "\u{1F573}\uFE0F Wild traps: off for you. A wild tile's an ordinary farm trap for you now: that place's traps, with the breather and the reset, and nothin' kept on you after.");
+        else if (which === "limbs") R(r.wildLimbs ? "\u{1F9BE} Wild traps can take your limbs: ON.\n" + WILD_WARN.limbs + (r.wildIn ? "" : "\nIt only counts with ?traps wild on.") + ((state.companions && state.companions.get(sender) || {}).limbs ? "" : "\nYour game hasn't got Echo's clothing mod in it right now, so it'll wait till it has.") : "\u{1F9BE} Wild traps can take your limbs: off. Your arms and legs stay yours.");
+        else R(r.wildLaced ? "\u{1F489} Laced wild kits: ON.\n" + WILD_WARN.laced + (r.wildIn ? "" : "\nIt only counts with ?traps wild on.") : "\u{1F489} Laced wild kits: off. The gear's just gear.");
         return;
       }
-      R("\u{1F573}\uFE0F Wild traps are " + (r && r.wildOff ? "OFF" : "ON") + " for you, sugar: the farm hides " + wildCount() + " traps of its own in the barn, the pasture and receiving and moves them about. No warnin', no breather, and they hit harder; what they leave on you stays till somebody else takes it off. ?traps wild off|on");
+      const st = (x) => x ? "ON" : "off";
+      R("\u{1F573}\uFE0F Wild traps: " + st(r && r.wildIn) + " \xB7 they can take your limbs: " + st(r && r.wildLimbs) + " \xB7 laced: " + st(r && r.wildLaced) + ". All off till you say so.\n" + WILD_WARN.wild + "\nOff, a wild tile's an ordinary farm trap for you. ?traps wild on|off \xB7 ?traps wild limbs on|off \xB7 ?traps wild laced on|off");
     }
     function wildWhereText() {
       const ws = Array.isArray(L2.wild) ? L2.wild : [], now = Date.now();
       if (!ws.length) return "\u{1F573}\uFE0F No wild traps out: " + (wildZones().length ? "they'll be out at the next heartbeat." : "there are no barn, pasture or receiving zones on the map for them.");
       return "\u{1F573}\uFE0F WILD TRAPS (staff only: nobody else is told)\n" + ws.map((w) => "\u2022 " + (w.zone || w.g) + " at " + w.X + "," + w.Y + ", movin' in " + Math.max(0, Math.round(((w.moveAt || now) - now) / 6e4)) + " min").join("\n");
     }
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __wildTick: (t) => wildTick(t || Date.now()), __wild: () => L2.wild, __wildOn: (m) => wildOn(m) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, {
+      __wildTick: (t) => wildTick(t || Date.now()),
+      __wild: () => L2.wild,
+      __wildOn: (m) => wildOn(m),
+      __wildKitFor: (m, area) => {
+        state.wildArea = state.wildArea || /* @__PURE__ */ new Map();
+        state.wildArea.set(m, area);
+        const k = wildKitFor(m);
+        state.wildArea.delete(m);
+        return k;
+      },
+      __wildDesc: (x, laced) => wildDesc(x, laced),
+      __companionSet: (m, c) => {
+        state.companions.set(m, Object.assign(state.companions.get(m) || { ver: "test" }, c));
+      }
+    });
     const WILD_KIT_PIECE = {
       // pieces more than one kit uses
       bullRing: { slot: "nose", label: "Farm Bull Ring", items: ["NoseShackle"], desc: "A ring through the nose, for leadin' them about and showin' whose stock they are." },
@@ -63491,7 +63553,7 @@
       cowTail: { slot: "plug", label: "Farm Cow Tail", items: ["Cowtail", "TailButtPlug"], desc: "A swishin' cow's tail on a thick plug seated deep. Every step wags it." },
       cowbell: { slot: "tag", label: "Farm Cowbell", items: ["CollarCowBell", "CollarBell"], desc: "A cowbell on the collar. Every squirm, every thrust, rings it." },
       earTag: { slot: "tag", label: "Farm Ear Tag", items: ["CollarNameTagLivestock"], desc: "A yellow livestock tag: lot number, weight, bred or not yet." },
-      cowHood: { slot: "hood", label: "Farm Cow Hood", items: ["CowHood"], desc: "A rubber cow's head pulled down over theirs, ears and muzzle and all. Only the eyes are still theirs." },
+      cowHood: { slot: "hood", label: "Farm Cow Hood", laced: "Moo serum on a drip.", items: ["CowHood"], desc: "A rubber cow's head pulled down over theirs, ears and muzzle and all. Only the eyes are still theirs." },
       hoofMitts: { slot: "hands", label: "Farm Hoof Mitts", items: ["HoofMittens", "PawMittens"], desc: "Hard hooves laced over both hands. They walk on them now, and grab nothin'." }
     };
     const WILD_KITS = {
@@ -63501,16 +63563,16 @@
           tell: "%n is left on their knees in a stall: blind, deaf, ring-gagged and drippin', arms laced into a binder, legs strapped folded, the milker pullin', plugged at both ends and chained short by a belled collar.",
           pieces: [
             { slot: "hands", label: "Stall Mitts", items: ["PaddedLeatherMittens"], desc: "Padded leather balls buckled over both hands. No fingers, no grip, nothin' to work a buckle with." },
-            { slot: "cups", label: "Stall Milker", items: ["LactationPump"], desc: "Cups latched on and pullin' steady, teats stretched long down the glass, the jar fillin' whether they like it or not." },
-            { slot: "dildo", label: "Breedin' Plug", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up snug and buzzin', keepin' them open and wet for whoever's next." },
+            { slot: "cups", label: "Stall Milker", laced: "On a drip of let-down tonic.", items: ["LactationPump"], desc: "Cups latched on and pullin' steady, teats stretched long down the glass." },
+            { slot: "dildo", label: "Breedin' Plug", laced: "Sure-catch serum every climax.", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up snug and buzzin', keepin' them open and wet for whoever's next." },
             WILD_KIT_PIECE.cowTail,
             { slot: "torso", label: "Stall Harness", items: ["LeatherHarness"], desc: "Leather framin' the tits and the belly, rings for tyin' to and grabbin' by." },
             { slot: "arms", label: "Stall Armbinder", items: ["LeatherArmbinder", "ArmbinderJacket"], opt: "WrapStrap", desc: "Both arms laced into one leather sleeve behind the back and strapped over the shoulders, elbows kissin'." },
             { slot: "legs", label: "Stall Frogtie", items: ["FrogtieStraps"], desc: "Thighs strapped to calves, folded under. They kneel, knees wide, and that's all they can do." },
-            { slot: "blind", label: "Stall Blindfold", items: ["LeatherBlindfold"], desc: "Thick leather over the eyes. They hear the barn door, never who came through it." },
+            { slot: "blind", label: "Stall Blindfold", laced: "Infused with haze drops.", items: ["LeatherBlindfold"], desc: "Thick leather over the eyes. They hear the barn door, never who came through it." },
             WILD_KIT_PIECE.stallPlugs,
             WILD_KIT_PIECE.bullRing,
-            { slot: "gag", label: "Feedin' Ring", items: ["RingGag"], desc: "A steel ring behind the teeth, the mouth held open and drippin'. Open for feedin', or anythin' else." },
+            { slot: "gag", label: "Feedin' Ring", laced: "Deep throat drops on a drip.", items: ["RingGag"], desc: "A steel ring behind the teeth, the mouth held open and drippin'. Open for feedin', or anythin' else." },
             { slot: "collar", label: "Stall Collar", items: ["LeatherCollar"], desc: "Thick leather with a ring at the front for the chain." },
             WILD_KIT_PIECE.cowbell,
             { slot: "leash", label: "Stall Chain", items: ["CollarChainShort"], desc: "A short chain from the collar to a ring in the stall floor. Not long enough to stand." }
@@ -63522,8 +63584,8 @@
           pieces: [
             WILD_KIT_PIECE.hoofMitts,
             { slot: "boots", label: "Bull's Hoof Boots", items: ["ShortPonyBoots", "PonyBoots"], desc: "Hooved boots laced tight. Up on their toes, clop clop." },
-            { slot: "cups", label: "Bull's Bell Clamps", items: ["BellClamps"], desc: "Clamps bit onto both teats with a bell on each. They ring with every thrust." },
-            { slot: "dildo", label: "Bull's Warm-Up", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A swollen rubber plug buzzin' inside, keepin' them wet and gapin' for the bull." },
+            { slot: "cups", label: "Bull's Bell Clamps", laced: "Hair-trigger drops when touched.", items: ["BellClamps"], desc: "Clamps bit onto both teats with a bell on each. They ring with every thrust." },
+            { slot: "dildo", label: "Bull's Warm-Up", laced: "Infused with heat mist.", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A swollen rubber plug buzzin' inside, keepin' them wet and gapin' for the bull." },
             WILD_KIT_PIECE.cowTail,
             { slot: "torso", label: "Bull's Rope Harness", items: ["HempRopeHarness"], desc: "Rough rope round the chest and belly, a handle at the small of the back to hold them by." },
             { slot: "arms", label: "Mountin' Ropes", items: ["HempRope"], opt: "AllFours", desc: "Rope cinchin' wrists to ankles on all fours, rump up, the way a cow stands to be mounted." },
@@ -63542,8 +63604,8 @@
           tell: "%n is left out in the field as a pony: hooded and bitted, yoked with their arms up, hooves on, harnessed, teats weighted, a tail swishin' from their arse and a ball and chain at the ankle.",
           pieces: [
             WILD_KIT_PIECE.hoofMitts,
-            { slot: "cups", label: "Pasture Weighted Clamps", items: ["NippleWeightClamps"], desc: "Clamps on the teats with weights hangin' off, swingin' with every step." },
-            { slot: "dildo", label: "Trottin' Plug", items: ["VibratingDildo"], desc: "A buzzin' plug that jolts deeper with every trot." },
+            { slot: "cups", label: "Pasture Weighted Clamps", laced: "On a drip of let-down tonic.", items: ["NippleWeightClamps"], desc: "Clamps on the teats with weights hangin' off, swingin' with every step." },
+            { slot: "dildo", label: "Trottin' Plug", laced: "Infused with heat mist.", items: ["VibratingDildo"], desc: "A buzzin' plug that jolts deeper with every trot." },
             { slot: "plug", label: "Pasture Pony Tail", items: ["HorsetailPlug", "HorsetailPlug1"], color: "#6B4A2E", desc: "A long horsehair tail on a deep plug. It swishes when they're used." },
             { slot: "torso", label: "Pasture Harness", items: ["FullBodyLeatherHarness", "LeatherHarness"], desc: "Straps from collar to crotch, rings for the reins and the cart." },
             { slot: "arms", label: "Pasture Yoke", items: ["Yoke"], desc: "A wooden yoke across the shoulders, wrists locked to both ends. Arms up, chest out, nothin' covered." },
@@ -63551,7 +63613,7 @@
             { slot: "feet", label: "Pasture Ball and Chain", items: ["BallChain"], desc: "A heavy iron ball chained to an ankle. They graze where they're put." },
             WILD_KIT_PIECE.fieldPlugs,
             { slot: "hood", label: "Pasture Pony Hood", items: ["PonyHood"], desc: "A leather pony's head buckled over theirs, blinkers and all." },
-            { slot: "gag", label: "Pasture Bit", items: ["HarnessPonyBits", "BitGag"], desc: "A bit between the teeth, strapped tight, the reins hangin' for anybody to take." },
+            { slot: "gag", label: "Pasture Bit", laced: "Pony tongue drops on a drip.", items: ["HarnessPonyBits", "BitGag"], desc: "A bit between the teeth, strapped tight, the reins hangin' for anybody to take." },
             { slot: "collar", label: "Pony's Posture Collar", items: ["PostureCollar"], desc: "A stiff collar holdin' the chin up, proud as a show pony." },
             { slot: "leash", label: "Pasture Lead", items: ["CollarLeash"], desc: "A lead clipped to the collar, for whoever wants to walk them, or tie them up somewhere." }
           ]
@@ -63560,14 +63622,14 @@
           name: "Staked-Out Heifer",
           tell: "%n is left staked out in the grass on all fours, zipped into a crawl suit in a cow's hood, the milker pullin', plugged and tailed, belled, a bowl in front of them and a sign sayin' they're free to breed.",
           pieces: [
-            { slot: "cups", label: "Field Milker", items: ["LactationPump"], desc: "Cups latched on and pullin', the jar fillin' on the grass beside them." },
-            { slot: "dildo", label: "Heifer Plug", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up inside and buzzin', keepin' a heifer ready." },
+            { slot: "cups", label: "Field Milker", laced: "On a drip of let-down tonic.", items: ["LactationPump"], desc: "Cups latched on and pullin', the jar fillin' on the grass beside them." },
+            { slot: "dildo", label: "Heifer Plug", laced: "Sure-catch serum every climax.", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up inside and buzzin', keepin' a heifer ready." },
             WILD_KIT_PIECE.cowTail,
             { slot: "arms", label: "Heifer Crawl Suit", items: ["StrictLeatherPetCrawler", "BitchSuit"], desc: "Arms and legs folded and zipped into tight leather sleeves. Elbows and knees, on all fours, for good." },
             WILD_KIT_PIECE.cowHood,
             WILD_KIT_PIECE.bullRing,
             WILD_KIT_PIECE.fieldPlugs,
-            { slot: "collar", label: "Heifer Collar", items: ["LeatherCollar"], desc: "Thick leather with a ring for the stake's chain." },
+            { slot: "collar", label: "Heifer Collar", laced: "Infused with fill-out serum.", items: ["LeatherCollar"], desc: "Thick leather with a ring for the stake's chain." },
             WILD_KIT_PIECE.cowbell,
             { slot: "leash", label: "Field Stake", items: ["PetPost", "CollarChainShort"], rec: { d: 1, l: 2 }, text: ["Free", "To", "Breed"], desc: "A stake hammered into the pasture and chained to the collar. The sign's an open invitation." },
             { slot: "device", label: "Heifer's Feed Bowl", items: ["PetBowl"], desc: "A steel bowl on the grass in front of them. That's dinner." }
@@ -63582,14 +63644,14 @@
             { slot: "cups", label: "Shipping Clamps", items: ["ChainClamp"], desc: "Clamps on both teats joined by a chain, tuggin' with every breath." },
             { slot: "chestbra", label: "Shipping Bra", items: ["MetalChastityBra"], desc: "A steel bra locked over the clamps. Nobody handles the goods till they're paid for." },
             { slot: "plug", label: "Shipping Plug", items: ["EggVibePlugXXL", "InflVibeButtPlug"], desc: "A huge egg plug seated deep behind, and humming." },
-            { slot: "dildo", label: "Shipping Egg", items: ["WiredEgg", "VibratingDildo"], desc: "An egg buzzin' deep inside, wired to a box on the hand truck." },
-            { slot: "belt", label: "Shipping Belt", items: ["MetalChastityBelt"], desc: "A steel belt locked over both holes, sealin' the plugs in for the trip." },
+            { slot: "dildo", label: "Shipping Egg", laced: "Infused with aphrodisiac.", items: ["WiredEgg", "VibratingDildo"], desc: "An egg buzzin' deep inside, wired to a box on the hand truck." },
+            { slot: "belt", label: "Shipping Belt", laced: "Denial serum on a drip.", items: ["MetalChastityBelt"], desc: "A steel belt locked over both holes, sealin' the plugs in for the trip." },
             { slot: "arms", label: "Shipping Jacket", items: ["HighSecurityStraitJacket", "StraitJacket"], desc: "A heavy straitjacket, arms crossed and strapped, the crotch strap pulled tight." },
             { slot: "legs", label: "Shipping Binder", items: ["SeamlessLegBinder", "LegBinder"], desc: "One smooth sleeve from ankle to thigh. They hop, or they're carried." },
             { slot: "boots", label: "Shipping Heels", items: ["BalletHeels"], desc: "Ballet boots that keep them up on their toes, swayin'." },
             { slot: "blind", label: "Shipping Blindfold", items: ["LeatherBlindfold"], desc: "Leather over the eyes. They don't get to see where they're goin'." },
             WILD_KIT_PIECE.yardPlugs,
-            { slot: "gag", label: "Shipping Gag", items: ["PlugGag", "HarnessBallGag1"], desc: "A plug pushed in over the tongue and strapped." },
+            { slot: "gag", label: "Shipping Gag", laced: "Laced with sedative.", items: ["PlugGag", "HarnessBallGag1"], desc: "A plug pushed in over the tongue and strapped." },
             { slot: "gag2", label: "Shipping Panel", items: ["HarnessPanelGag"], desc: "A leather panel strapped over the gag. Not a word gets out." },
             { slot: "collar", label: "Shipping Collar", items: ["SteelPostureCollar", "PostureCollar"], desc: "Steel, high and tight, the chin forced up." },
             WILD_KIT_PIECE.earTag,
@@ -63600,13 +63662,13 @@
           name: "Crated and Stamped",
           tell: "%n is left nailed into a crate with only their head out: roped tight inside from shoulders to ankles, taped blind and taped quiet, plugged at both ends, nose-ringed and ear-tagged. Stamped LIVE STOCK.",
           pieces: [
-            { slot: "dildo", label: "Crate Plug", items: ["VibratingDildo"], desc: "A buzzin' plug pushed in before the lid went on." },
+            { slot: "dildo", label: "Crate Plug", laced: "Infused with heat mist.", items: ["VibratingDildo"], desc: "A buzzin' plug pushed in before the lid went on." },
             { slot: "plug", label: "Crate Plug (back)", items: ["InflVibeButtPlug"], desc: "And one behind, pumped up snug." },
             { slot: "arms", label: "Crate Rope", items: ["HempRope"], opt: "TightBoxtie", desc: "Rope cinched tight round the arms behind the back, the knots where they'll never reach." },
             { slot: "legs", label: "Crate Rope (legs)", items: ["HempRope"], opt: "FullBinding", desc: "Rope from knees to thighs, wound tight." },
             { slot: "ropeFeet", label: "Crate Rope (ankles)", items: ["HempRope"], opt: "FullBinding", desc: "And the ankles, lashed together." },
             { slot: "blind", label: "Packin' Tape", items: ["DuctTape"], opt: "Wrap", desc: "Packin' tape wound round the eyes." },
-            { slot: "gag", label: "Packin' Tape (mouth)", items: ["DuctTape"], opt: "Full", desc: "And over the mouth, smoothed flat." },
+            { slot: "gag", label: "Packin' Tape (mouth)", laced: "Laced with sedative.", items: ["DuctTape"], opt: "Full", desc: "And over the mouth, smoothed flat." },
             WILD_KIT_PIECE.yardPlugs,
             WILD_KIT_PIECE.bullRing,
             { slot: "collar", label: "Crate Collar", items: ["LeatherCollar"], desc: "A collar to hang the tag on." },
@@ -63618,12 +63680,12 @@
           name: "Inspection Frame",
           tell: "%n is left spread in a steel frame for the buyers to look over: lewd-blindfolded, deaf, ring-gagged and nose-ringed, suction pullin' at teats and clit, plugged and tagged with a lot number.",
           pieces: [
-            { slot: "cups", label: "Lot Teat Suction", items: ["NippleSuctionCups"], desc: "Suction cups pullin' the teats long, for the buyers to judge." },
+            { slot: "cups", label: "Lot Teat Suction", laced: "Hair-trigger drops when touched.", items: ["NippleSuctionCups"], desc: "Suction cups pullin' the teats long, for the buyers to judge." },
             { slot: "dildo", label: "Lot Clit Suction", items: ["ClitSuctionCup", "VibratingDildo"], desc: "A suction cup sucked onto the clit, swellin' it up for show." },
             { slot: "plug", label: "Inspection Plug", items: ["EggVibePlugXXL", "InflVibeButtPlug"], desc: "A big plug behind, to show how much they'll take." },
-            { slot: "blind", label: "Lot Blindfold", items: ["LewdBlindfold", "LeatherBlindfold"], desc: "A blindfold with somethin' filthy painted where their eyes should be." },
+            { slot: "blind", label: "Lot Blindfold", laced: "Airhead elixir on a drip.", items: ["LewdBlindfold", "LeatherBlindfold"], desc: "A blindfold with somethin' filthy painted where their eyes should be." },
             WILD_KIT_PIECE.yardPlugs,
-            { slot: "gag", label: "Inspection Ring", items: ["RingGag"], desc: "A ring holdin' the mouth open, to check the teeth, and the throat." },
+            { slot: "gag", label: "Inspection Ring", laced: "Deep throat drops on a drip.", items: ["RingGag"], desc: "A ring holdin' the mouth open, to check the teeth, and the throat." },
             WILD_KIT_PIECE.bullRing,
             { slot: "collar", label: "Inspection Collar", items: ["LeatherCollar"], desc: "A collar to hang the lot number on." },
             WILD_KIT_PIECE.earTag,
@@ -63638,12 +63700,12 @@
           pieces: [
             { slot: "hands", label: "Prize Mitts", items: ["PaddedLeatherMittens"], desc: "Padded leather balls buckled over both hands." },
             { slot: "cups", label: "Prize Bells", items: ["BellClamps"], desc: "Bell clamps on both teats. Every rock of the horse rings them." },
-            { slot: "dildo", label: "Horse's Plug", items: ["VibratingDildo"], desc: "A buzzin' plug, pushed home by every shift on the horse's edge." },
+            { slot: "dildo", label: "Horse's Plug", laced: "Denial serum on a drip.", items: ["VibratingDildo"], desc: "A buzzin' plug, pushed home by every shift on the horse's edge." },
             { slot: "plug", label: "Prize Plug", items: ["InflVibeButtPlug"], desc: "And one behind, pumped up fat." },
             { slot: "torso", label: "Breakin' Corset", items: ["ExtremeCorset", "HeavyLatexCorset"], desc: "A corset cinched till every breath's a gasp." },
             { slot: "arms", label: "Prize Binder", items: ["BoxTieArmbinder", "LeatherArmbinder"], desc: "Arms folded behind and laced into a binder, strapped over the chest." },
             WILD_KIT_PIECE.fieldPlugs,
-            { slot: "hood", label: "Prize Hood", items: ["LeatherHoodSensDep", "LeatherHoodSealed"], desc: "A padded leather hood laced shut: nothin' to see, nothin' to hear, a plug for the mouth." },
+            { slot: "hood", label: "Prize Hood", laced: "Infused with aphrodisiac.", items: ["LeatherHoodSensDep", "LeatherHoodSealed"], desc: "A padded leather hood laced shut: nothin' to see, nothin' to hear, a plug for the mouth." },
             { slot: "collar", label: "Prize Collar", items: ["LeatherCollar"], desc: "A collar for the prize ribbon, and the bell." },
             WILD_KIT_PIECE.cowbell,
             { slot: "boots", label: "Prize Wedges", items: ["BalletWedges", "BalletHeels"], desc: "Ballet wedges, so the toes can't help hold any weight off the horse." },
@@ -63655,8 +63717,8 @@
           name: "Sealed for the Dairy",
           tell: "%n is the hunt's prize: vacuum-sealed flat in a rubber bed, breathin' through a tube, deaf, the milker pullin' and both holes stuffed and buzzin' underneath, with nothin' to do but leak.",
           pieces: [
-            { slot: "cups", label: "Vac Milker", items: ["LactationPump"], desc: "The milker, pullin' under the rubber." },
-            { slot: "dildo", label: "Vac Plug", items: ["VibratingDildo"], desc: "A buzzin' plug sealed in under the rubber." },
+            { slot: "cups", label: "Vac Milker", laced: "On a drip of let-down tonic, and an udder growth injector every 60 minutes.", items: ["LactationPump"], desc: "The milker, pullin' under the rubber." },
+            { slot: "dildo", label: "Vac Plug", laced: "Sure-catch serum every climax.", items: ["VibratingDildo"], desc: "A buzzin' plug sealed in under the rubber." },
             { slot: "plug", label: "Vac Plug (back)", items: ["InflVibeButtPlug"], desc: "And one behind, pumped up fat." },
             WILD_KIT_PIECE.fieldPlugs,
             { slot: "gag", label: "Breathin' Tube", items: ["LatexRespirator"], desc: "A rubber mask and a tube. Every breath they get comes down it." },
@@ -63665,6 +63727,84 @@
         }
       ]
     };
+    const WILD_RINGS = (label, a, l) => ({
+      slot: "addon",
+      label,
+      items: ["EchoLimbTeleporter"],
+      rec: { a, l },
+      only: true,
+      desc: "Glowin' rings at the shoulders and hips where the arms and legs were. The limbs are kept elsewhere; the rings hold the rest of them."
+    });
+    WILD_KITS.barn.push({
+      name: "Kept as a Milkin' Torso",
+      limbs: true,
+      tell: "%n's arms and legs are gone, taken off at glowin' rings and hung in the barn office with a tag on, and what's left of them is chained short in a stall: blind, deaf, ring-gagged, milked and plugged, a breedin' torso for whoever wants it.",
+      pieces: [
+        WILD_RINGS("Barn Teleporter Rings", 2, 1),
+        { slot: "cups", label: "Stall Milker", laced: "On a drip of let-down tonic.", items: ["LactationPump"], desc: "Cups latched on and pullin' steady, teats stretched long down the glass." },
+        { slot: "dildo", label: "Breedin' Plug", laced: "Sure-catch serum every climax.", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up snug and buzzin', keepin' them open and wet for whoever's next." },
+        WILD_KIT_PIECE.cowTail,
+        { slot: "torso", label: "Stall Harness", items: ["LeatherHarness"], desc: "Leather framin' the tits and the belly, rings for tyin' to and grabbin' by." },
+        { slot: "blind", label: "Stall Blindfold", laced: "Infused with haze drops.", items: ["LeatherBlindfold"], desc: "Thick leather over the eyes. They hear the barn door, never who came through it." },
+        WILD_KIT_PIECE.stallPlugs,
+        WILD_KIT_PIECE.bullRing,
+        { slot: "gag", label: "Feedin' Ring", laced: "Deep throat drops on a drip.", items: ["RingGag"], desc: "A steel ring behind the teeth, the mouth held open and drippin'. Open for feedin', or anythin' else." },
+        { slot: "collar", label: "Stall Collar", items: ["LeatherCollar"], desc: "Thick leather with a ring at the front for the chain." },
+        WILD_KIT_PIECE.cowbell,
+        { slot: "leash", label: "Stall Chain", items: ["CollarChainShort"], desc: "A short chain from the collar to a ring in the stall floor." }
+      ]
+    });
+    WILD_KITS.pasture.push({
+      name: "Hung on the Fence",
+      limbs: true,
+      tell: "%n's arms and legs are taken off at the rings and nailed up somewhere along the pasture fence, and the rest of them hangs from the chains in a cow's hood, the milker pullin', stuffed and belled, for the field to use.",
+      pieces: [
+        WILD_RINGS("Fence Teleporter Rings", 1, 2),
+        WILD_KIT_PIECE.cowHood,
+        WILD_KIT_PIECE.bullRing,
+        WILD_KIT_PIECE.fieldPlugs,
+        { slot: "cups", label: "Field Milker", laced: "On a drip of let-down tonic.", items: ["LactationPump"], desc: "Cups latched on and pullin', the jar fillin' on the grass beneath them." },
+        { slot: "dildo", label: "Heifer Plug", laced: "Sure-catch serum every climax.", items: ["InflatableVibeDildo", "VibratingDildo"], desc: "A fat rubber plug pumped up inside and buzzin', keepin' a heifer ready." },
+        WILD_KIT_PIECE.cowTail,
+        { slot: "collar", label: "Heifer Collar", laced: "Infused with fill-out serum.", items: ["LeatherCollar"], desc: "Thick leather, for the bell." },
+        WILD_KIT_PIECE.cowbell
+      ]
+    });
+    WILD_KITS.receiving.push({
+      name: "Parcelled",
+      limbs: true,
+      tell: "%n's arms and legs are posted on ahead in a box of their own, and the rest of them is parcelled up on a hand truck: steel over the tits and the holes with the plugs sealed in, blind, deaf, gagged twice and ear-tagged.",
+      pieces: [
+        WILD_RINGS("Parcel Teleporter Rings", 2, 4),
+        { slot: "chestbra", label: "Shipping Bra", items: ["MetalChastityBra"], desc: "A steel bra locked on. Nobody handles the goods till they're paid for." },
+        { slot: "plug", label: "Shipping Plug", items: ["EggVibePlugXXL", "InflVibeButtPlug"], desc: "A huge egg plug seated deep behind, and humming." },
+        { slot: "dildo", label: "Shipping Egg", laced: "Infused with aphrodisiac.", items: ["WiredEgg", "VibratingDildo"], desc: "An egg buzzin' deep inside, wired to a box on the hand truck." },
+        { slot: "belt", label: "Shipping Belt", laced: "Denial serum on a drip.", items: ["MetalChastityBelt"], desc: "A steel belt locked over both holes, sealin' the plugs in for the trip." },
+        { slot: "blind", label: "Shipping Blindfold", items: ["LeatherBlindfold"], desc: "Leather over the eyes. They don't get to see where they're goin'." },
+        WILD_KIT_PIECE.yardPlugs,
+        { slot: "gag", label: "Shipping Gag", laced: "Laced with sedative.", items: ["PlugGag", "HarnessBallGag1"], desc: "A plug pushed in over the tongue and strapped." },
+        { slot: "gag2", label: "Shipping Panel", items: ["HarnessPanelGag"], desc: "A leather panel strapped over the gag. Not a word gets out." },
+        { slot: "collar", label: "Shipping Collar", items: ["SteelPostureCollar", "PostureCollar"], desc: "Steel, high and tight, the chin forced up." },
+        WILD_KIT_PIECE.earTag,
+        { slot: "device", label: "Receivin' Hand Truck", items: ["Trolley"], desc: "Strapped upright to a hand truck and wheeled wherever receivin' wants them." }
+      ]
+    });
+    WILD_KITS.hunt.push({
+      name: "The Trophy",
+      limbs: true,
+      tell: "%n is the hunt's trophy: arms and legs taken off for the trophy wall, the rest of them hung by the rings in a hood that leaves them nothin', corseted, belled and stuffed, mounted for the winners.",
+      pieces: [
+        WILD_RINGS("Trophy Teleporter Rings", 3, 3),
+        { slot: "cups", label: "Prize Bells", items: ["BellClamps"], desc: "Bell clamps on both teats. Every swing rings them." },
+        { slot: "dildo", label: "Trophy Plug", laced: "Denial serum on a drip.", items: ["VibratingDildo"], desc: "A buzzin' plug, pushed home every time they swing." },
+        { slot: "plug", label: "Prize Plug", items: ["InflVibeButtPlug"], desc: "And one behind, pumped up fat." },
+        { slot: "torso", label: "Breakin' Corset", items: ["ExtremeCorset", "HeavyLatexCorset"], desc: "A corset cinched till every breath's a gasp." },
+        WILD_KIT_PIECE.fieldPlugs,
+        { slot: "hood", label: "Prize Hood", laced: "Infused with aphrodisiac.", items: ["LeatherHoodSensDep", "LeatherHoodSealed"], desc: "A padded leather hood laced shut: nothin' to see, nothin' to hear, a plug for the mouth." },
+        { slot: "collar", label: "Prize Collar", items: ["LeatherCollar"], desc: "A collar for the prize ribbon, and the bell." },
+        WILD_KIT_PIECE.cowbell
+      ]
+    });
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);
@@ -64430,6 +64570,10 @@ TRAPS (your own switch)
   ?bedrest on|off \xB7 bedded down when you're too big to walk
   ?struggle \xB7 one try at slippin' a trap that has you
   ?traps eager on \xB7 no breather between traps, no resets
+  ?traps wild on \xB7 the farm's own hidden, movin' traps, NOT for the
+    faint of heart: a whole kit kept on you till somebody else
+    frees you \xB7 ?traps wild limbs on \xB7 ?traps wild laced on
+    All three off till you say so; off, a wild tile's an ordinary trap
   ?free <who> \xB7 get a caught subject out \xB7 ?goad <who> \xB7 or don't
   ?lay \xB7 on the nest, if you're carryin' eggs \xB7 ?hunt \xB7 ?pack
   Your limits still rule, and your safeword stops a trap cold

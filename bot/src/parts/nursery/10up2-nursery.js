@@ -133,7 +133,7 @@
 
   // ── grown-up commands and littles (15-commands.js asks before runnin' anything) ──
   const GROWN_UP_CMDS = ["milk","collect","drain","edge","denial","ruin","inseminate","breed","cum","use","bench","inspect","dose","send","whistle","brand","heat",
-    "stocks","walk","freeuse","breedable","fertile","milkable","seedmilk","parasite","symbiote","traps","trap","eager","potion","potions","dare","dares","outfitwheel",
+    "stocks","walk","freeuse","breedable","fertile","milkable","seedmilk","parasite","symbiote","traps","trap","eager","wildtraps","wildlimbs","wildlaced","potion","potions","dare","dares","outfitwheel",
     "wheel","spin","purge","coax","lend","bid","gauntlet","mysterybox","suit","keep","vat","sit","herdtraps","goad","hunt","lay","gather","pack","cleanse","corruption"];
   const SAFE_BUYS = /\b(cake|honey|maple|choc\w*|strawberr\w*|berry|slime|mud)\b/i;
   function nurseryGate(sender, cmd, args){

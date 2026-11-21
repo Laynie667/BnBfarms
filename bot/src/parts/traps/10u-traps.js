@@ -463,7 +463,17 @@
     if (!here){ state.trapAt.delete(mn); return; }
     const fresh = !was || was.spot !== here;
     if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-    if (wild){ if (fresh) wildSpring(mn, wild, now); return; }   // (no breather for a wild one: it has its own minute's grace)
+    if (wild && wildFor(mn)){ if (fresh) wildSpring(mn, wild, now); return; }   // (no breather for a wild one: it has its own minute's grace)
+    // haven't said yes to the wild ones (Nov 20, off till they do): it's an ordinary farm trap for them, that place's
+    // traps, with the breather and the reset like any set tile, and nothin' kept on them
+    if (wild){
+      if (!fresh || (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn))) return;
+      r.spotTrapAt = r.spotTrapAt || {};
+      if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < trapResetMs(mn)) return;
+      const Z = CFG.WILD.ZONES[wild.g];
+      if (!springTrap(mn, "random", Z ? "trap-theme-"+Z.theme : "")){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
+      return;
+    }
     if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < breatherMs(mn)) return;    // one trap at a time, with a breather between (not durin' a hunt)
     if (on){
       if (!fresh) return;                                                               // step off and back on to spring it again
@@ -497,7 +507,8 @@
     const L1 = [];
     const dg = dangerX(mn);
     L1.push("• Traps: on"+(r.trapEager ? ", eager (no breather, no waitin' for a trap to reset)" : "")+(dg.on ? ". A Danger Draught's in "+(you ? "them" : "you")+": every chancy trap's half again as likely, and the traps come round sooner" : "")+".");
-    L1.push(r.wildOff ? "• 🕳️ Wild traps: off for "+(you ? "them" : "you")+" (?traps wild on)." : "• 🕳️ Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is.");
+    L1.push(!r.wildIn ? "• 🕳️ Wild traps: off for "+(you ? "them" : "you")+". The farm's movin' tiles spring an ordinary trap, with the breather and the reset. ?traps wild says what the wild ones do." :
+      "• 🕳️ Wild traps: on. The farm hides its own and moves them about: no warnin', no breather, a minute after the last one's all the grace there is"+(r.wildLimbs ? "; they can take "+(you ? "their" : "your")+" limbs" : "")+(r.wildLaced ? "; their kits come laced" : "")+".");
     if (r.trapsOff) L1.push("• ⏸️ Paused: "+(you ? "they've" : "you've")+" paused the traps.");
     if ((r.trapQuiet || 0) > now) L1.push("• 🛑 A safeword not long ago: nothin' springs for "+mmss(r.trapQuiet - now)+" yet.");
     if (quietNow(mn)) L1.push("• 🤫 "+own("They've asked for quiet")+": nothin' springs till that's over.");
@@ -775,7 +786,7 @@
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
           "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+
           " · ?traps theme <kind> off rules out a whole kind (furry, monsters, messy…)"+((r.trapThemesOff || []).length ? " (off: "+r.trapThemesOff.join(", ")+")" : "")+
-          " · ?rate says how one was · ?trap why says what's holdin' them back · ?traps wild off keeps the farm's movin' ones away · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
+          " · ?rate says how one was · ?trap why says what's holdin' them back · ?traps wild says what the farm's own wild ones do, off till you say so, not for the faint of heart · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
       else R("🧪 Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n"+trapsList());
       return true;
     }
@@ -785,3 +796,7 @@
   // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
   addCommand("traps trap subject subjects watersports watersport", { topic: "traps", run: (c) => trapCommand(c.cmd === "watersport" ? "watersports" : c.cmd, c.sender, c.args, c.R) });
   addCommand("eager",                    { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["eager"].concat(c.args), c.R) });   // the no-cooldown switch, as its own command (and a Toggles switch)
+  // the wild traps' three switches, as their own commands for the Companion's Toggles (10z8-wild-traps.js; off till they say so)
+  addCommand("wildtraps",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild"].concat(c.args), c.R) });
+  addCommand("wildlimbs",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "limbs"].concat(c.args), c.R) });
+  addCommand("wildlaced",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "laced"].concat(c.args), c.R) });

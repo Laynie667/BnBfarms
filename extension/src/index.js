@@ -18,7 +18,7 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere, farmGearLetGo } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
@@ -126,7 +126,9 @@ function hello(again) {
   if (again) st.seq = 0;
   // relay: whether this Companion posts farm emotes about you as your own (Toggles, on unless you switch it off)
   // seq and sh: which panel and which store I hold, so she doesn't send them again if they're still right (Oct 27)
-  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again });
+  // limbs: this game has Echo's Limb Teleportation Device, so a wild trap's kit can take your arms and legs (Nov 20)
+  let limbs = false; try { limbs = typeof window.AssetGet === "function" && !!window.AssetGet(window.Player.AssetFamily || "Female3DCG", "ItemAddon", ECHO_TELEPORTER); } catch (e) { /* no */ }
+  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
 }
 // a patch that doesn't fit: ask once, not once per patch while the whole panel is on its way
 function askWhole() {

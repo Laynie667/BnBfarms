@@ -58,6 +58,8 @@
   function gearOn(mn, slot, label, desc, mins, src, x){
     const r = rec(mn); if (!r || !slot) return false;
     r.gear = r.gear || {};
+    // a piece a wild trap left (keep) stays till somebody else takes it off: another trap's gear doesn't push it out of its spot
+    if (r.gear[slot] && r.gear[slot].keep && !(x && x.keep) && r.gear[slot].until > Date.now()) return false;
     r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5)*60000, src: src || "trap" };
     if (x && x.items) r.gear[slot].items = x.items.slice(0, 4); if (x && x.color) r.gear[slot].color = x.color;
     if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);   // how it's set: "Hogtied", "Wide"… (the Companion's GEAR_OPT has the usual)

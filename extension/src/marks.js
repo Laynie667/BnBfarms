@@ -168,7 +168,8 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Prize Bells", "Horse's Plug", "Prize Plug", "Breakin' Corset", "Prize Binder", "Prize Hood", "Prize Collar", "Prize Wedges", "Prize Shackles",
   "The Wooden Horse", "Vac Milker", "Vac Plug", "Vac Plug (back)", "Breathin' Tube", "Dairy Vac Bed",
   "Rodeo Rope", "Saddle Bit", "Spur Clamps", "Vat Skin (legs)", "Vat Skin (head)", "Vat Plug", "Vat Collar", "Vat Binder", "Vat Binder (legs)", "Vat Heels",
-  "Mummy Wraps (feet)", "Mummy Wraps (hands)", "Mummy Wraps (head)", "Hog Tie (knees)", "Sty Gag", "Sty Blindfold", "Snout Ring"];
+  "Mummy Wraps (feet)", "Mummy Wraps (hands)", "Mummy Wraps (head)", "Hog Tie (knees)", "Sty Gag", "Sty Blindfold", "Snout Ring",
+  "Barn Teleporter Rings", "Fence Teleporter Rings", "Parcel Teleporter Rings", "Trophy Teleporter Rings", "Trophy Plug"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -220,7 +221,14 @@ export const GEAR_SLOTS = {
   gag2:     { groups: ["ItemMouth2", "ItemMouth3", "ItemMouth"], names: ["HarnessPanelGag"], re: /PanelGag/ },
   hands:    { groups: ["ItemHands"], names: ["PaddedLeatherMittens", "LeatherMittens"], re: /Mittens/ },
   feet:     { groups: ["ItemFeet"], names: ["LeatherAnkleCuffs"], re: /AnkleCuffs|AnkleShackles/ },
+  // Echo's Limb Teleportation Device (Nov 20, a wild kit that takes the limbs): only the item the piece names, or nothin'
+  addon:    { groups: ["ItemAddon"], names: [], re: /^$/ },
 };
+// a game item whose own name a piece can't carry (Echo's are in Chinese): the piece names it in plain letters
+export const ECHO_TELEPORTER = "隐形药水";   // Echo's clothing mod: "Limb Teleportation Device", in ItemAddon
+const ITEM_ALIAS = { EchoLimbTeleporter: ECHO_TELEPORTER };
+const itemName = (n) => ITEM_ALIAS[n] || n;
+const nameOk = (n) => !!ITEM_ALIAS[n] || /^[A-Za-z0-9_-]{2,40}$/.test(n);
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
 // loosest setting: cuffs unchained, a funnel gag with no funnel, a bench with no straps, the pump switched off. So each
@@ -278,8 +286,8 @@ function setGearOpt(group, name, want, rec, text) {
 // only: the piece's own items or nothin' (a witch's hat the game might not have mustn't turn into a flower crown)
 function gearAsset(group, slot, prefer, only) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
-  for (const n of (Array.isArray(prefer) ? prefer.map(String) : [])) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;   // the piece's own choice, if this game has it there
-  if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
+  for (const n0 of (Array.isArray(prefer) ? prefer.map(String) : [])) { const n = itemName(n0); if (nameOk(n0) && get(n)) return n; }   // the piece's own choice, if this game has it there
+  if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? itemName(String(prefer[0])) : null;
   for (const n of slot.names) if (get(n)) return n;
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -344,8 +352,9 @@ export function syncFarmGear(list, allow) {
     if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
     let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null, item = null;
     // the piece's own item first, in whichever spot it lives (a spreader bar asked for in "legs" goes to the ankles)
-    for (const n of (Array.isArray(g.items) ? g.items.map(String) : [])) {
-      if (!/^[A-Za-z0-9_-]{2,40}$/.test(n)) continue;
+    for (const n0 of (Array.isArray(g.items) ? g.items.map(String) : [])) {
+      if (!nameOk(n0)) continue;
+      const n = itemName(n0);
       const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf(x));
       if (home) { group = home; item = n; break; }
     }

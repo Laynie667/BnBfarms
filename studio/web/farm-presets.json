@@ -1,5 +1,5 @@
 {
- "made": "2026-11-21T03:47:46.998Z",
+ "made": "2026-11-21T05:50:04.520Z",
  "sets": [
   {
    "group": "Traps",
@@ -6173,7 +6173,7 @@
      "label": "Stall Milker",
      "when": "on",
      "mins": null,
-     "desc": "Cups latched on and pullin' steady, teats stretched long down the glass, the jar fillin' whether they like it or not.",
+     "desc": "Cups latched on and pullin' steady, teats stretched long down the glass.",
      "opt": null,
      "rec": null,
      "text": null
@@ -6685,6 +6685,249 @@
   },
   {
    "group": "Wild kits",
+   "name": "🐄 barn: Kept as a Milkin' Torso (limbs, needs Echo)",
+   "what": "they's arms and legs are gone, taken off at glowin' rings and hung in the barn office with a tag on, and what's left of them is chained short in a stall: blind, deaf, ring-gagged, milked and plugged, a breedin' torso for whoever wants it.",
+   "pieces": [
+    {
+     "slot": "addon",
+     "groups": [
+      "ItemAddon"
+     ],
+     "items": [
+      "隐形药水"
+     ],
+     "color": null,
+     "label": "Barn Teleporter Rings",
+     "when": "on",
+     "mins": null,
+     "desc": "Glowin' rings at the shoulders and hips where the arms and legs were. The limbs are kept elsewhere; the rings hold the rest of them.",
+     "opt": null,
+     "rec": {
+      "a": 2,
+      "l": 1
+     },
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Stall Milker",
+     "when": "on",
+     "mins": null,
+     "desc": "Cups latched on and pullin' steady, teats stretched long down the glass.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Breedin' Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A fat rubber plug pumped up snug and buzzin', keepin' them open and wet for whoever's next.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Cowtail",
+      "TailButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Farm Cow Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A swishin' cow's tail on a thick plug seated deep. Every step wags it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "LeatherHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Stall Harness",
+     "when": "on",
+     "mins": null,
+     "desc": "Leather framin' the tits and the belly, rings for tyin' to and grabbin' by.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Stall Blindfold",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather over the eyes. They hear the barn door, never who came through it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Stall Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. The barn goes quiet; hands are how they'll know somebody's there.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "RingGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Feedin' Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel ring behind the teeth, the mouth held open and drippin'. Open for feedin', or anythin' else.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Stall Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather with a ring at the front for the chain.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarChainShort",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Stall Chain",
+     "when": "on",
+     "mins": null,
+     "desc": "A short chain from the collar to a ring in the stall floor.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
    "name": "🌾 pasture: Put Out to Pasture",
    "what": "they is left out in the field as a pony: hooded and bitted, yoked with their arms up, hooves on, harnessed, teats weighted, a tail swishin' from their arse and a ball and chain at the ankle.",
    "pieces": [
@@ -7165,6 +7408,187 @@
      "when": "on",
      "mins": null,
      "desc": "A steel bowl on the grass in front of them. That's dinner.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🌾 pasture: Hung on the Fence (limbs, needs Echo)",
+   "what": "they's arms and legs are taken off at the rings and nailed up somewhere along the pasture fence, and the rest of them hangs from the chains in a cow's hood, the milker pullin', stuffed and belled, for the field to use.",
+   "pieces": [
+    {
+     "slot": "addon",
+     "groups": [
+      "ItemAddon"
+     ],
+     "items": [
+      "隐形药水"
+     ],
+     "color": null,
+     "label": "Fence Teleporter Rings",
+     "when": "on",
+     "mins": null,
+     "desc": "Glowin' rings at the shoulders and hips where the arms and legs were. The limbs are kept elsewhere; the rings hold the rest of them.",
+     "opt": null,
+     "rec": {
+      "a": 1,
+      "l": 2
+     },
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "CowHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Farm Cow Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A rubber cow's head pulled down over theirs, ears and muzzle and all. Only the eyes are still theirs.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Field Milker",
+     "when": "on",
+     "mins": null,
+     "desc": "Cups latched on and pullin', the jar fillin' on the grass beneath them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Heifer Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A fat rubber plug pumped up inside and buzzin', keepin' a heifer ready.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Cowtail",
+      "TailButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Farm Cow Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A swishin' cow's tail on a thick plug seated deep. Every step wags it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Heifer Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather, for the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
      "opt": null,
      "rec": null,
      "text": null
@@ -7913,6 +8337,252 @@
   },
   {
    "group": "Wild kits",
+   "name": "📦 receiving: Parcelled (limbs, needs Echo)",
+   "what": "they's arms and legs are posted on ahead in a box of their own, and the rest of them is parcelled up on a hand truck: steel over the tits and the holes with the plugs sealed in, blind, deaf, gagged twice and ear-tagged.",
+   "pieces": [
+    {
+     "slot": "addon",
+     "groups": [
+      "ItemAddon"
+     ],
+     "items": [
+      "隐形药水"
+     ],
+     "color": null,
+     "label": "Parcel Teleporter Rings",
+     "when": "on",
+     "mins": null,
+     "desc": "Glowin' rings at the shoulders and hips where the arms and legs were. The limbs are kept elsewhere; the rings hold the rest of them.",
+     "opt": null,
+     "rec": {
+      "a": 2,
+      "l": 4
+     },
+     "text": null
+    },
+    {
+     "slot": "chestbra",
+     "groups": [
+      "ItemBreast"
+     ],
+     "items": [
+      "MetalChastityBra",
+      "ForbiddenChastityBra",
+      "PolishedChastityBra",
+      "MetalChastityBra"
+     ],
+     "color": null,
+     "label": "Shipping Bra",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel bra locked on. Nobody handles the goods till they're paid for.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Shipping Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A huge egg plug seated deep behind, and humming.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "WiredEgg",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Shipping Egg",
+     "when": "on",
+     "mins": null,
+     "desc": "An egg buzzin' deep inside, wired to a box on the hand truck.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "MetalChastityBelt",
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": null,
+     "label": "Shipping Belt",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel belt locked over both holes, sealin' the plugs in for the trip.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Shipping Blindfold",
+     "when": "on",
+     "mins": null,
+     "desc": "Leather over the eyes. They don't get to see where they're goin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Shipping Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. They won't hear who's buyin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "PlugGag",
+      "HarnessBallGag1",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Shipping Gag",
+     "when": "on",
+     "mins": null,
+     "desc": "A plug pushed in over the tongue and strapped.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag2",
+     "groups": [
+      "ItemMouth2",
+      "ItemMouth3",
+      "ItemMouth"
+     ],
+     "items": [
+      "HarnessPanelGag",
+      "HarnessPanelGag"
+     ],
+     "color": null,
+     "label": "Shipping Panel",
+     "when": "on",
+     "mins": null,
+     "desc": "A leather panel strapped over the gag. Not a word gets out.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "SteelPostureCollar",
+      "PostureCollar"
+     ],
+     "color": null,
+     "label": "Shipping Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Steel, high and tight, the chin forced up.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Ear Tag",
+     "when": "on",
+     "mins": null,
+     "desc": "A yellow livestock tag: lot number, weight, bred or not yet.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Trolley",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Receivin' Hand Truck",
+     "when": "on",
+     "mins": null,
+     "desc": "Strapped upright to a hand truck and wheeled wherever receivin' wants them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
    "name": "🏆 hunt prize: Broke on the Horse",
    "what": "they is the hunt's prize: sealed in a hood that leaves them nothin' to see or hear, box-tied over mittens, cinched breathless in a corset, belled, shackled, stuffed, and left astride the wooden horse.",
    "pieces": [
@@ -8288,6 +8958,189 @@
      "when": "on",
      "mins": null,
      "desc": "A rubber bed with the air sucked out: sealed flat, not a finger movin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🏆 hunt prize: The Trophy (limbs, needs Echo)",
+   "what": "they is the hunt's trophy: arms and legs taken off for the trophy wall, the rest of them hung by the rings in a hood that leaves them nothin', corseted, belled and stuffed, mounted for the winners.",
+   "pieces": [
+    {
+     "slot": "addon",
+     "groups": [
+      "ItemAddon"
+     ],
+     "items": [
+      "隐形药水"
+     ],
+     "color": null,
+     "label": "Trophy Teleporter Rings",
+     "when": "on",
+     "mins": null,
+     "desc": "Glowin' rings at the shoulders and hips where the arms and legs were. The limbs are kept elsewhere; the rings hold the rest of them.",
+     "opt": null,
+     "rec": {
+      "a": 3,
+      "l": 3
+     },
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "BellClamps",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Prize Bells",
+     "when": "on",
+     "mins": null,
+     "desc": "Bell clamps on both teats. Every swing rings them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Trophy Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A buzzin' plug, pushed home every time they swing.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Prize Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "And one behind, pumped up fat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "ExtremeCorset",
+      "HeavyLatexCorset",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Breakin' Corset",
+     "when": "on",
+     "mins": null,
+     "desc": "A corset cinched till every breath's a gasp.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "LeatherHoodSensDep",
+      "LeatherHoodSealed",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Prize Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A padded leather hood laced shut: nothin' to see, nothin' to hear, a plug for the mouth.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Prize Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "A collar for the prize ribbon, and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
      "opt": null,
      "rec": null,
      "text": null

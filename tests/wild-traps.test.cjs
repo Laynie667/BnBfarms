@@ -35,7 +35,7 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
 const say = async (mn, msg, ms) => { handlers.ChatRoomMessage({ Sender: mn, Type: 'Whisper', Content: msg, Target: 260239 }); await wait(ms || 900); };
 const reply = (n, mn) => sent.slice(n).filter(([e, d]) => e === 'ChatRoomChat' && d && d.Type === 'Whisper' && d.Target === mn).map(([, d]) => String(d.Content)).join('\n');
 const move = (c, X, Y) => { c.MapData.Pos = { X, Y }; handlers.ChatRoomSyncMapData({ MemberNumber: c.MemberNumber, MapData: { Pos: { X, Y } } }); };
-const done = async () => { for (let i = 0; i < 150; i++) { await wait(60); if (!(W.__st().trapRuns && W.__st().trapRuns.has(500))) break; } await wait(400); };
+const done = async () => { for (let i = 0; i < 600; i++) { await wait(60); if (!(W.__st().trapRuns && W.__st().trapRuns.has(500))) break; } await wait(400); };
 const inZ = (z, p) => p.X >= Math.min(z.a.X, z.b.X) && p.X <= Math.max(z.a.X, z.b.X) && p.Y >= Math.min(z.a.Y, z.b.Y) && p.Y <= Math.max(z.a.Y, z.b.Y);
 const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidden', Content: 'FarmhandMsg', Dictionary: Object.assign({ v: 2 }, d) });
 (async () => {
@@ -80,7 +80,7 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
 
   // ── it has them: no warnin', no breather ──
   const r = P(500); r.trapAt = Date.now() - 2 * 60000; r.spotTrapAt = {}; r.gear = {};
-  const w1 = W.__wild()[0], pos = w1.X + ',' + w1.Y, n0 = (r.trapLog || []).length;
+  const w1 = W.__wild()[0], pos = w1.X + ',' + w1.Y, area1 = w1.g, n0 = (r.trapLog || []).length;
   let n = sent.length; move(moo, w1.X, w1.Y); await wait(50);
   ok(W.__wildOn(500), 'step on one two minutes after the last trap: it has them at once, breather or no');
   await done();
@@ -91,6 +91,17 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   ok(!W.__wildOn(500), '...and it stops hittin\' harder once it lets them go');
   const g = Object.values(P(500).gear || {});
   ok(g.length > 0 && g.every(x => x.keep && x.src === 'wild' && x.until > Date.now() + 7 * 86400000), 'what it left on them stays: no time on it, till somebody else takes it off (' + g.map(x => x.label).join(', ') + ')');
+  // a whole kit from the place it hid (Nov 20: "definitely could use more complete, restrictive sets")
+  const KITS = W.__farmSets().WILD_KITS, kit = (KITS[area1] || []).find(k => k.pieces.every(p => g.some(x => x.label === p.label)));
+  ok(!!kit && g.length >= 5 && P(500).wildKit === kit.name, 'what it leaves is a whole kit from ' + area1 + ' (' + (kit ? kit.name + ', ' + g.length + ' pieces' : g.map(x => x.label).join(', ')) + ')');
+  ok(/It'll take somebody else to undo any of it/.test(told), '...and the story ends on what it left them in');
+  ok(W.__farmGear(500).filter(x => x.keep).length === g.length, '...every piece of it on the list their Companion gets');
+  const fg0 = P(500).gear.leash; P(500).gear.leash = { label: 'Field Stake', desc: 'x', until: Date.now() + 86400000, src: 'wild', keep: true, items: ['PetPost'], rec: { d: 1, l: 2 }, text: ['Free', 'To', 'Breed'] };
+  const stake = W.__farmGear(500).find(x => x.name === 'Field Stake');
+  ok(stake && stake.rec && stake.rec.l === 2 && stake.text.join(' ') === 'Free To Breed', 'a stake goes to their Companion with its mud, its chain and its sign');
+  if (fg0) P(500).gear.leash = fg0; else delete P(500).gear.leash;
+  ok(Object.values(KITS).every(ks => ks.every(k => k.pieces.length >= 5 && k.pieces.every(p => p.label.length <= 28 && p.slot && p.items && p.items.length) && new Set(k.pieces.map(p => p.slot)).size === k.pieces.length)),
+    'every kit: five pieces or more, each in its own slot, each with a name that fits');
   // within a minute of the last: it lets them be
   move(moo, 10, 10); await wait(50);
   const w2 = W.__wild()[1], n1 = (P(500).trapLog || []).length; P(500).trapAt = Date.now() - 20000;
@@ -124,8 +135,13 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   await wait(400);
   ok(!(P(500).gear || {}).legs, 'a piece with a name longer than the game keeps still comes off when somebody else frees it');
   // a safeword takes every bit of it off
-  P(500).trapAt = Date.now() - 5 * 60000; move(moo, W.__wild()[0].X, W.__wild()[0].Y); await done();
-  ok(Object.values(P(500).gear || {}).some(x => x.keep), '(caught again: kept gear on)');
+  // caught again in a hunt: a hunt prize
+  L().hunt = { until: Date.now() + 600000, goal: 'pasture', done: [] }; W.__wildTick();
+  const hl0 = (P(500).trapLog || []).length, hw = W.__wild()[0], hpos = hw.X + ',' + hw.Y;
+  P(500).trapAt = Date.now() - 5 * 60000; move(moo, hw.X, hw.Y); const hOn = W.__wildOn(500); await done();
+  const hg = Object.values(P(500).gear || {});
+  ok(hg.some(x => x.keep) && KITS.hunt.some(k => k.pieces.every(p => hg.some(x => x.label === p.label))), 'caught in a hunt, it leaves a hunt prize (' + P(500).wildKit + '; sprang ' + hOn + ', traps ' + hl0 + '->' + (P(500).trapLog || []).length + ' at ' + hpos + ', moo ' + JSON.stringify(moo.MapData.Pos) + ')');
+  L().hunt = null; W.__wildTick();
   await say(500, '?safeword', 900);
   ok(!Object.values(P(500).gear || {}).some(x => x.keep), 'the safeword takes off everything a wild trap left');
 

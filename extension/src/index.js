@@ -18,7 +18,7 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere, farmGearLetGo } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
@@ -179,10 +179,26 @@ function sendCommand(text, typed) {
         (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
     }, 10000);
   } else {
+    // a safeword away from the farm (Nov 20): the farm's gear goes on in any room, and a beep can go astray, so everything
+    // she put on comes off right here, now, and stays off (marks.js), as well as tellin' her
+    if (/^(safe|safeword|red)$/i.test(text)) {
+      const n = farmGearLetGo((st.panel && st.panel.s && st.panel.s.farmGear) || []);
+      if (n) { parasiteSync(); st.panel.add("🛑 Safeword: every bit of the farm's gear comes off you now, right here. It stays off.", "notice"); }
+    }
     // not in the farm right now: a beep still reaches the bot, and it beeps back
     window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text });
     st.panel.add("The farm girl isn't in your room, so I beeped her. Her answer comes back as a beep.", "notice");
   }
+}
+// somebody else took a wild trap's kept piece off you: the farm girl's told now, or as soon as she's in your room
+// (it's already off for good here: marks.js). Kept on this computer so a reload doesn't lose it
+const FREED_Q = "fhc-freed-queue";
+function gearFreedTell(name, by) {
+  let q; try { q = JSON.parse(window.localStorage.getItem(FREED_Q)) || []; } catch (e) { q = []; }
+  if (name) q.push({ name: String(name).slice(0, 30), by: Number(by) || 0, at: Date.now() });
+  q = q.filter((x) => Date.now() - x.at < 31 * 86400000).slice(-40);
+  if (q.length && botHere()) { for (const x of q) toBot("gearFreed", { name: x.name, by: x.by }); q = []; }
+  try { window.localStorage.setItem(FREED_Q, JSON.stringify(q)); } catch (e) { /* fine */ }
 }
 
 // a long card can arrive in pieces; glue 'em back together
@@ -217,6 +233,7 @@ function parasiteSync() {
     if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
       list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
     const did = syncFarmGear(list, !!st.panel.prefs.gear);
+    if (botHere()) gearFreedTell(null);   // (any freein' she hasn't heard about yet)
     try { syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape); } catch (e2) { console.warn("[Farmhand Companion] body shape:", e2); }   // chest and hips that show the farm's sizes (marks.js)
     for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
     for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
@@ -534,15 +551,15 @@ function start() {
       const d = args[0]; let was = null;
       const same = (a, b) => !!a && !!b && String(a).slice(0, 30) === String(b).slice(0, 30);   // (the game keeps 30 letters of a piece's name)
       try {
-        const me = window.Player && window.Player.MemberNumber, kept = ((st.panel && st.panel.s && st.panel.s.farmGear) || []).filter((g) => g && g.keep).map((g) => String(g.name));
+        const me = window.Player && window.Player.MemberNumber, kept = ((st.panel && st.panel.s && st.panel.s.farmGear) || []).filter((g) => g && g.keep);
         if (kept.length && d && d.Item && d.Item.Target === me && typeof d.Source === "number" && d.Source !== me && typeof d.Item.Group === "string") {
-          const n = farmPieceIn(d.Item.Group); was = (n && kept.find((k) => same(k, n))) || null;
+          const n = farmPieceIn(d.Item.Group); was = (n && kept.find((k) => same(k.name, n))) || null;
         }
       } catch (e) { was = null; }
       const r = next(args);
       if (was) {
         try {
-          if (!same(farmPieceIn(d.Item.Group), was)) { gearFreedHere(was); toBot("gearFreed", { name: was, by: d.Source }); }
+          if (!same(farmPieceIn(d.Item.Group), was.name)) { gearFreedHere(was.name, was.until); gearFreedTell(String(was.name), d.Source); }
         } catch (e) { console.warn("[Farmhand Companion] gear freed:", e); }
       }
       return r;

@@ -154,7 +154,21 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Pup's Tail Plug", "Rubber Pup Tail", "Parasite Tail", "Parasite Sleeves", "Parasite Stockings", "Ooze Gloves", "Ooze Sleeves", "Ooze Stockings",
   "Ooze Skin (legs)", "Ooze Skin (body)", "Ooze Sleeve", "Silk Harness", "Silk Gloves", "Silk Stockings", "Weaver's Cocoon", "Deep's Tail",
   "Deep's Sleeves", "Deep's Stockings", "Deep's Embrace", "Deep's Coil", "Gloss Gloves", "Gloss Sleeves", "Gloss Stockings", "Gloss Skin (legs)",
-  "Gloss Skin (body)", "Gloss Heels", "Gloss Sheath"];
+  "Gloss Skin (body)", "Gloss Heels", "Gloss Sheath",
+  // Nov 20: the wild traps' kits (10z8b-wild-kits.js), and the fuller hogtie, saddle, mummy and rubber vat
+  "Wild Trap Cuffs", "Farm Bull Ring", "Stall Plugs", "Pasture Plugs", "Shipping Plugs", "Farm Cow Tail", "Farm Cowbell", "Farm Ear Tag", "Farm Cow Hood",
+  "Farm Hoof Mitts", "Stall Mitts", "Stall Milker", "Breedin' Plug", "Stall Harness", "Stall Armbinder", "Stall Frogtie", "Stall Blindfold", "Feedin' Ring",
+  "Stall Collar", "Stall Chain", "Bull's Hoof Boots", "Bull's Bell Clamps", "Bull's Warm-Up", "Bull's Rope Harness", "Mountin' Ropes", "Muddy Stake",
+  "Pasture Weighted Clamps", "Trottin' Plug", "Pasture Pony Tail", "Pasture Harness", "Pasture Yoke", "Pasture Hooves", "Pasture Ball and Chain",
+  "Pasture Pony Hood", "Pasture Bit", "Pony's Posture Collar", "Pasture Lead", "Field Milker", "Heifer Plug", "Heifer Crawl Suit", "Heifer Collar",
+  "Field Stake", "Heifer's Feed Bowl", "Shipping Clamps", "Shipping Bra", "Shipping Plug", "Shipping Egg", "Shipping Belt", "Shipping Jacket",
+  "Shipping Binder", "Shipping Heels", "Shipping Blindfold", "Shipping Gag", "Shipping Panel", "Shipping Collar", "Receivin' Hand Truck", "Crate Plug",
+  "Crate Plug (back)", "Crate Rope", "Crate Rope (legs)", "Crate Rope (ankles)", "Packin' Tape", "Packin' Tape (mouth)", "Crate Collar", "Shippin' Crate",
+  "Lot Teat Suction", "Lot Clit Suction", "Inspection Plug", "Lot Blindfold", "Inspection Ring", "Inspection Collar", "Inspection Frame", "Prize Mitts",
+  "Prize Bells", "Horse's Plug", "Prize Plug", "Breakin' Corset", "Prize Binder", "Prize Hood", "Prize Collar", "Prize Wedges", "Prize Shackles",
+  "The Wooden Horse", "Vac Milker", "Vac Plug", "Vac Plug (back)", "Breathin' Tube", "Dairy Vac Bed",
+  "Rodeo Rope", "Saddle Bit", "Spur Clamps", "Vat Skin (legs)", "Vat Skin (head)", "Vat Plug", "Vat Collar", "Vat Binder", "Vat Binder (legs)", "Vat Heels",
+  "Mummy Wraps (feet)", "Mummy Wraps (hands)", "Mummy Wraps (head)", "Hog Tie (knees)", "Sty Gag", "Sty Blindfold", "Snout Ring"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -196,6 +210,16 @@ export const GEAR_SLOTS = {
   // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
   // wearin' one, the leash and the tag clip to it instead
   collar:   { groups: ["ItemNeck"], names: [], re: /^$/ },
+  // WILD TRAP KITS (Nov 20, Laynie: "definitely could use more complete, restrictive sets"): blind, deaf, a ring through
+  // the nose, gagged two deep (a plug under a panel), mittened, the ankles too. Each puts on the item its piece names
+  // first, wherever that lives; these are only the stand-ins
+  blind:    { groups: ["ItemHead"], names: ["LeatherBlindfold", "FullBlindfold"], re: /Blindfold/ },
+  earplugs: { groups: ["ItemEars"], names: ["HeavyDutyEarPlugs", "LightDutyEarPlugs"], re: /EarPlugs/ },
+  nose:     { groups: ["ItemNose"], names: ["NoseShackle"], re: /^NoseShackle$/ },
+  gag:      { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["HarnessBallGag1", "BitGag"], re: /BallGag|BitGag/ },
+  gag2:     { groups: ["ItemMouth2", "ItemMouth3", "ItemMouth"], names: ["HarnessPanelGag"], re: /PanelGag/ },
+  hands:    { groups: ["ItemHands"], names: ["PaddedLeatherMittens", "LeatherMittens"], re: /Mittens/ },
+  feet:     { groups: ["ItemFeet"], names: ["LeatherAnkleCuffs"], re: /AnkleCuffs|AnkleShackles/ },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
@@ -215,18 +239,40 @@ function itemHome(name, slot, taken) {
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
   // (clothes never go anywhere but their own spot: a tentacle TAIL is not the game's tentacles for the arms, Oct 27)
-  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
+  // (and an item the slot's own spot has goes there or nowhere: tape is in nearly every spot, and the arms' tape mustn't
+  // end up over the mouth because the arms were taken, Nov 20)
+  const own = homes.filter((g) => slot.groups.includes(g));
+  if (own.length) return own.find((g) => !taken(g)) || null;
+  return slot.takeover ? null : homes.find((g) => !taken(g)) || null;
 }
-// set an item the way GEAR_OPT (or the piece) says, through the game's own extended-item setter
-function setGearOpt(group, name, want) {
+// a sign's words (the stake's "Free / To / Breed"): plain letters, short, three lines at most
+const signWords = (text) => {
+  if (!Array.isArray(text) || !text.length) return null;
+  const w = text.slice(0, 3).map((s) => String(s || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 12));
+  return { Text: w[0] || "", Text2: w[1] || "", Text3: w[2] || "" };
+};
+// set an item the way GEAR_OPT (or the piece) says, through the game's own extended-item setter. A modular item (the stake:
+// its mud, its chain) takes a record instead (rec: { d: 1, l: 2 }), and a sign takes its words (text) once it's set
+function setGearOpt(group, name, want, rec, text) {
   try {
     const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P(), group) : null;
     if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
-    const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype);
-    if (!data || data.archetype !== "typed" || !Array.isArray(data.options)) return false;
-    const i = data.options.findIndex((o) => o.Name === want); if (i < 0) return false;
-    window.ExtendedItemSetOptionByRecord(P(), it, { typed: i }, { push: true, refresh: true, C_Source: P() });
-    return true;
+    const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype), words = signWords(text);
+    let record = null;
+    if (data && data.archetype === "typed" && want && Array.isArray(data.options)) {
+      const i = data.options.findIndex((o) => o.Name === want); if (i >= 0) record = { typed: i };
+    } else if (data && data.archetype === "modular" && rec && typeof rec === "object" && Array.isArray(data.modules)) {
+      const got = {};
+      for (const m of data.modules) { const v = rec[m.Key]; if (Number.isInteger(v) && v >= 0 && v < (m.Options || []).length) got[m.Key] = v; }
+      if (Object.keys(got).length) record = Object.assign({}, (it.Property && it.Property.TypeRecord) || {}, got);
+    }
+    if (record) window.ExtendedItemSetOptionByRecord(P(), it, record, { push: !words, refresh: true, C_Source: P() });
+    if (words) {
+      it.Property = Object.assign(it.Property || {}, words);
+      if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P(), false);
+      if (typeof window.ChatRoomCharacterItemUpdate === "function") window.ChatRoomCharacterItemUpdate(P(), group);
+    }
+    return !!(record || words);
   } catch (e) { console.warn("[Farmhand Companion] gear setting:", e); return false; }
 }
 // only: the piece's own items or nothin' (a witch's hat the game might not have mustn't turn into a flower crown)
@@ -251,9 +297,20 @@ const gearMemSave = (m) => { try { window.localStorage.setItem(GEAR_KEY, JSON.st
 const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null));
 // WHAT A WILD TRAP LEFT (Nov 20, Laynie: "Id even let the gear remain til removed by someone else"): a piece the farm
 // keeps (keep) is put back if they pull it off themselves, like all the farm's gear; when somebody ELSE takes it off,
-// index.js tells the farm girl (gearFreed), and till her word comes back it's not put back on (freedHere).
-const freedHere = new Map();   // name → till when it's left off
-export function gearFreedHere(name) { freedHere.set(String(name), Date.now() + 120000); }
+// index.js tells the farm girl (gearFreed), and it's never put back on here. The farm's gear goes on in any room, so
+// this is kept on this computer: somebody frees them in a room the farm girl isn't in, and it stays off till she hears.
+// The same for a safeword said away from the farm (farmGearLetGo): everything she put on comes off at once, here.
+// Each is known by its name and its time (name|until): a fresh piece from a later trap is a new one.
+const LETGO_KEY = "fhc-gear-letgo";
+const letGo = () => { try { return JSON.parse(window.localStorage.getItem(LETGO_KEY)) || {}; } catch (e) { return {}; } };
+const letGoSave = (m) => { try { window.localStorage.setItem(LETGO_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
+const pieceKey = (name, until) => String(name).slice(0, 30) + "|" + (Number(until) || 0);
+export function gearFreedHere(name, until) { const m = letGo(); m[pieceKey(name, until)] = { why: "freed", at: Date.now() }; letGoSave(m); }
+export function farmGearLetGo(list) {
+  const m = letGo(); let n = 0;
+  for (const g of (Array.isArray(list) ? list : [])) if (g && g.name) { m[pieceKey(g.name, g.until)] = { why: "safe", at: Date.now() }; n++; }
+  letGoSave(m); return n;
+}
 // the farm piece in one of their spots, if there is one (its name)
 export function farmPieceIn(group) {
   try { const b = (P() && P().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group); if (!b) return null;
@@ -262,7 +319,12 @@ export function farmPieceIn(group) {
 // list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()) && !((freedHere.get(g.name) || 0) > Date.now()))
+  const lg = letGo(), now = Date.now();
+  // (let go of what the farm's stopped listin' for a while, or a month on)
+  let pruned = false;
+  for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 86400000 || (now - (lg[k].at || 0) > 600000 && !(list || []).some((g) => g && pieceKey(g.name, g.until) === k))) { delete lg[k]; pruned = true; }
+  if (pruned) letGoSave(lg);
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)])
     .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
@@ -301,12 +363,12 @@ export function syncFarmGear(list, allow) {
     if (color !== "Default") it.Color = color;
     next.push(it); did.on.push(g.name); mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item }; learnName(String(g.name).slice(0, 30));
     const opt = (typeof g.opt === "string" && g.opt) || GEAR_OPT[group + ":" + item];
-    if (opt) setLater.push([group, item, opt]);
+    if (opt || g.rec || g.text) setLater.push([group, item, opt, g.rec, g.text]);
   }
   gearMemSave(mem);
   if (did.on.length || did.off.length) commit(next);
-  // and set the way they're meant to be (cuffs chained, the spreader wide), once they're on
-  for (const [gr, nm, op] of setLater) setGearOpt(gr, nm, op);
+  // and set the way they're meant to be (cuffs chained, the spreader wide, the stake's sign), once they're on
+  for (const [gr, nm, op, rc, tx] of setLater) setGearOpt(gr, nm, op, rc, tx);
   return did;
 }
 

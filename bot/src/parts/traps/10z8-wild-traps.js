@@ -93,12 +93,18 @@
     const r = rec(mn); if (!r || r.wildOff) return false;
     if (now - (r.trapAt || 0) < CFG.WILD.GRACE_S*1000 || heldByTrap(mn) || (state.trapRuns && state.trapRuns.has(mn))) return false;
     const Z = CFG.WILD.ZONES[w.g], spot = Z ? "trap-theme-"+Z.theme : "";
-    // (could anything spring? else it lies quiet and stays where it is)
-    const can = (spot && themePool(mn, spot).length) || Object.keys(TRAP_KINDS).some(k => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
-    if (!can) return false;
+    // what springs: the season's pack now and then, else the place's, else any trap, only ever one that can have them (a
+    // blind pick from the season's pack could miss, and a wild trap never misses). Nothin' at all: it lies quiet where it is
+    let pool = [];
+    try { const sp = spot ? seasonPick(mn, spot) : null; if (sp && Array.isArray(sp.kinds)) pool = sp.kinds.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k)); } catch(e){ warn("wild trap season:", e); }
+    if (!pool.length && spot) pool = themePool(mn, spot);
+    if (!pool.length) pool = Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
+    if (!pool.length) return false;
+    const kind = trapWeighted(mn, pool).kind;
     state.wildRun = state.wildRun || new Map(); state.wildRun.set(mn, now + 30*60000);
+    state.wildArea = state.wildArea || new Map(); state.wildArea.set(mn, huntOn() ? "hunt" : (w.g || "barn"));   // (whose kit it leaves: 10z8b-wild-kits.js)
     emote("🕳️ "+tFill(pickFor(mn, "wild:open", WILD_OPEN), mn), mn);
-    const why = springTrap(mn, "random", spot);
+    const why = springTrap(mn, kind, spot);
     if (why){ state.wildRun.delete(mn); return false; }
     r.trapAt = now; r.wildN = (r.wildN || 0) + 1;
     audit(BOTMN(), "WILDTRAP", mn+" in "+(w.zone || w.g || "?"));
@@ -106,15 +112,28 @@
     return true;
   }
   // it's done with them (trapRun's end, 10u-traps.js): the farm stops hittin' harder
-  function wildDone(mn){ if (state.wildRun) state.wildRun.delete(mn); }
-  // WHAT IT LEAVES ON THEM (trapGearDone, 10y-farm-gear.js): every piece it leaves stays till somebody else takes it off,
-  // and if it'd leave nothin', cuffs behind their back
+  function wildDone(mn){ if (state.wildRun) state.wildRun.delete(mn); if (state.wildArea) state.wildArea.delete(mn); }
+  // WHAT IT LEAVES ON THEM (trapGearDone, 10y-farm-gear.js): a whole kit from the place it hid (10z8b-wild-kits.js: blind,
+  // deaf, gagged, bound, plugged, belled, chained; a hunt prize in a hunt), and whatever the trap itself leaves where the
+  // kit's left room. Every piece stays till somebody else takes it off. Never the same kit twice runnin' for one of them.
   const WILD_CUFFS = { when: "after", slot: "arms", label: "Wild Trap Cuffs", items: ["LeatherCuffs", "SteelCuffs"], opt: "Wrist",
     desc: "Cuffs a wild trap snapped on and locked behind their back. They don't come off for the one wearin' them: somebody else has to." };
+  function wildKitFor(mn){
+    const area = (state.wildArea && state.wildArea.get(mn)) || "barn", r = rec(mn);
+    const kits = (typeof WILD_KITS !== "undefined" && (WILD_KITS[area] || WILD_KITS.barn)) || [];
+    if (!kits.length) return null;
+    const fresh = kits.filter(k => !r || k.name !== r.wildKit);
+    return (fresh.length ? fresh : kits)[Math.floor(Math.random()*(fresh.length || kits.length))];
+  }
   function wildGear(mn, plan){
-    const after = (plan || []).filter(x => x.when === "after" && x.slot);
-    const keep = CFG.WILD.KEEP_DAYS*1440;
-    for (const x of (after.length ? after : [WILD_CUFFS])) gearOn(mn, x.slot, x.label, (x.desc || "")+" It stays till somebody else takes it off.", keep, "wild", Object.assign({}, x, { keep: true }));
+    const keep = CFG.WILD.KEEP_DAYS*1440, kit = wildKitFor(mn), used = new Set(), r = rec(mn);
+    const put = (x) => { gearOn(mn, x.slot, x.label, (x.desc || "")+" It stays till somebody else takes it off.", keep, "wild", Object.assign({}, x, { keep: true, quiet: true })); used.add(x.slot); };
+    for (const x of (kit ? kit.pieces : [])) put(x);
+    for (const x of (plan || []).filter(x => x.when === "after" && x.slot && !used.has(x.slot))) put(x);
+    if (!used.size) put(WILD_CUFFS);
+    if (r && kit){ r.wildKit = kit.name; }
+    saveLedger(); syncCompanions(true);
+    if (kit && kit.tell) emote("🕳️ "+tFill(kit.tell, mn)+" It'll take somebody else to undo any of it.", mn);
   }
   // their Companion: somebody else took a kept piece off them (the wearer themselves can't: it's put back)
   function wildGearFreed(mn, m){

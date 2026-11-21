@@ -63,7 +63,10 @@
     if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);   // how it's set: "Hogtied", "Wide"… (the Companion's GEAR_OPT has the usual)
     if (x && x.only) r.gear[slot].only = true;   // only the items it names, or nothin' (a costume piece the game might not have: Oct 27)
     if (x && x.keep) r.gear[slot].keep = true;   // stays till somebody else takes it off: what a wild trap leaves (10z8-wild-traps.js)
-    saveLedger(); syncCompanions(true);
+    // a modular item's settings (the stake: mud, a chain lead) and a sign's words ("Free / To / Breed"): Nov 20, the wild kits
+    if (x && x.rec && typeof x.rec === "object") r.gear[slot].rec = Object.fromEntries(Object.entries(x.rec).filter(([k, v]) => /^[a-z]{1,3}$/.test(k) && Number.isInteger(v) && v >= 0 && v < 20).slice(0, 8));
+    if (x && Array.isArray(x.text)) r.gear[slot].text = x.text.slice(0, 3).map(s => String(s).slice(0, 12));
+    if (!(x && x.quiet)){ saveLedger(); syncCompanions(true); }   // (a whole kit goes on, then it's saved and sent once)
     return true;
   }
   function gearOff(mn, slot, src){
@@ -99,7 +102,7 @@
   // what their Companion should have on them right now
   function farmGearFor(mn){
     const r = rec(mn), now = Date.now(), out = [];
-    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}));
+    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}, g.rec ? { rec: g.rec } : {}, g.text ? { text: g.text } : {}));
     if (mn === CFG.BOT_MEMBER) for (const g of seasonCostume()) out.push(g);   // the farm girl dressed for the season (10y9m-seasons.js)
     if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
     if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);

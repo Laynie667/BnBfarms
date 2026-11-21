@@ -223,9 +223,13 @@
              "Every visitor whispers somethin' kind to the mummy's consort."],
     filthy: ["Wrapped up like a present with every hole unwrapped, %n's the haunted barn's free-use exhibit.", "The visitors finger and fondle %n like a museum piece nobody's guardin'.",
              "%n's leakin' through the linen, and the mummy says it's the finest offerin' it's had in three thousand years."],
-    gear: [{ when: "hold", slot: "arms", label: "Mummy Wraps (arms)", items: ["HempRope"], color: "#E3D9BF", desc: "Old linen bandages wound round and round, pinnin' their arms to their sides." },
-           { when: "hold", slot: "legs", label: "Mummy Wraps (legs)", items: ["HempRope"], color: "#E3D9BF", desc: "Linen wound from the ankles to the thighs, neat as a parcel, with a gap left where it matters." },
-           { when: "hold", slot: "torso", label: "Mummy Wraps (body)", items: ["HempRopeHarness"], color: "#E3D9BF", desc: "Linen criss-crossed over their chest and belly, smellin' of cedar, every bit that ought to show left showin'." }],
+    // (Nov 20, Laynie: "I like the ideas, and the fixes". A few strips of rope; now wrapped head to toe in linen, the
+    // game's own tape in its mummy settings, with the tits and the gap between the legs left bare)
+    gear: [{ when: "hold", slot: "arms", label: "Mummy Wraps (arms)", items: ["DuctTape", "HempRope"], opt: "ExposedComplete", color: "#E3D9BF", desc: "Old linen bandages wound round and round from neck to hips, pinnin' their arms to their sides, every bit that ought to show left showin'." },
+           { when: "hold", slot: "legs", label: "Mummy Wraps (legs)", items: ["DuctTape", "HempRope"], opt: "CutOut", color: "#E3D9BF", desc: "Linen wound from the ankles to the thighs, neat as a parcel, with a gap left where it matters." },
+           { when: "hold", slot: "feet", label: "Mummy Wraps (feet)", items: ["DuctTape"], opt: "CompleteFeet", color: "#E3D9BF", desc: "The ankles and feet bound up together in linen. They hop, or they're carried." },
+           { when: "hold", slot: "hands", label: "Mummy Wraps (hands)", items: ["DuctTape"], color: "#E3D9BF", desc: "Each hand wrapped into a fat linen club. No fingers." },
+           { when: "hold", slot: "blind", label: "Mummy Wraps (head)", items: ["DuctTape"], opt: "Mummy", color: "#E3D9BF", desc: "Linen wound over the whole head, smellin' of cedar, one little gap at the mouth." }],
     depth: ["held", "watched", "tease"], tw: ["crowd", "night"], places: ["bench", "office", "rubber", "cabin"], sound: "rope", soundEnd: "ropelong", tags: ["restraint", "monsters", "public"],
   });
 

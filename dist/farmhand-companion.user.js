@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.72.0
+// @version      0.73.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.72.0";
+  var VERSION = "0.73.0";
 
   // shared/species.js
   var WORDS = {
@@ -9508,16 +9508,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         MOULD.cover.set(key3, v);
         return v;
       }
-      function bellyAuto(src, x, y, ctx3, behind, pieceKey) {
+      function bellyAuto(src, x, y, ctx3, behind, pieceKey2) {
         if (!ctx3.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
         const m0 = new RegExp(SLOT_SRC2).exec(src);
         if (!m0) return false;
         if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
-        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx3, "under|" + (pieceKey || src), "under");
-        const pk = pieceKey || src;
+        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx3, "under|" + (pieceKey2 || src), "under");
+        const pk = pieceKey2 || src;
         if (bellyCover(src, x, y, ctx3) >= 0.15) MOULD.lies.add(pk);
         if (!MOULD.lies.has(pk)) return false;
-        return mouldCanvas(src, x, y, ctx3, "auto|" + (pieceKey || src), "auto");
+        return mouldCanvas(src, x, y, ctx3, "auto|" + (pieceKey2 || src), "auto");
       }
       function pieceSpan(pk, src, x, y) {
         const span = MOULD.span.get("p|" + pk) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
@@ -20572,7 +20572,113 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     "Gloss Skin (legs)",
     "Gloss Skin (body)",
     "Gloss Heels",
-    "Gloss Sheath"
+    "Gloss Sheath",
+    // Nov 20: the wild traps' kits (10z8b-wild-kits.js), and the fuller hogtie, saddle, mummy and rubber vat
+    "Wild Trap Cuffs",
+    "Farm Bull Ring",
+    "Stall Plugs",
+    "Pasture Plugs",
+    "Shipping Plugs",
+    "Farm Cow Tail",
+    "Farm Cowbell",
+    "Farm Ear Tag",
+    "Farm Cow Hood",
+    "Farm Hoof Mitts",
+    "Stall Mitts",
+    "Stall Milker",
+    "Breedin' Plug",
+    "Stall Harness",
+    "Stall Armbinder",
+    "Stall Frogtie",
+    "Stall Blindfold",
+    "Feedin' Ring",
+    "Stall Collar",
+    "Stall Chain",
+    "Bull's Hoof Boots",
+    "Bull's Bell Clamps",
+    "Bull's Warm-Up",
+    "Bull's Rope Harness",
+    "Mountin' Ropes",
+    "Muddy Stake",
+    "Pasture Weighted Clamps",
+    "Trottin' Plug",
+    "Pasture Pony Tail",
+    "Pasture Harness",
+    "Pasture Yoke",
+    "Pasture Hooves",
+    "Pasture Ball and Chain",
+    "Pasture Pony Hood",
+    "Pasture Bit",
+    "Pony's Posture Collar",
+    "Pasture Lead",
+    "Field Milker",
+    "Heifer Plug",
+    "Heifer Crawl Suit",
+    "Heifer Collar",
+    "Field Stake",
+    "Heifer's Feed Bowl",
+    "Shipping Clamps",
+    "Shipping Bra",
+    "Shipping Plug",
+    "Shipping Egg",
+    "Shipping Belt",
+    "Shipping Jacket",
+    "Shipping Binder",
+    "Shipping Heels",
+    "Shipping Blindfold",
+    "Shipping Gag",
+    "Shipping Panel",
+    "Shipping Collar",
+    "Receivin' Hand Truck",
+    "Crate Plug",
+    "Crate Plug (back)",
+    "Crate Rope",
+    "Crate Rope (legs)",
+    "Crate Rope (ankles)",
+    "Packin' Tape",
+    "Packin' Tape (mouth)",
+    "Crate Collar",
+    "Shippin' Crate",
+    "Lot Teat Suction",
+    "Lot Clit Suction",
+    "Inspection Plug",
+    "Lot Blindfold",
+    "Inspection Ring",
+    "Inspection Collar",
+    "Inspection Frame",
+    "Prize Mitts",
+    "Prize Bells",
+    "Horse's Plug",
+    "Prize Plug",
+    "Breakin' Corset",
+    "Prize Binder",
+    "Prize Hood",
+    "Prize Collar",
+    "Prize Wedges",
+    "Prize Shackles",
+    "The Wooden Horse",
+    "Vac Milker",
+    "Vac Plug",
+    "Vac Plug (back)",
+    "Breathin' Tube",
+    "Dairy Vac Bed",
+    "Rodeo Rope",
+    "Saddle Bit",
+    "Spur Clamps",
+    "Vat Skin (legs)",
+    "Vat Skin (head)",
+    "Vat Plug",
+    "Vat Collar",
+    "Vat Binder",
+    "Vat Binder (legs)",
+    "Vat Heels",
+    "Mummy Wraps (feet)",
+    "Mummy Wraps (hands)",
+    "Mummy Wraps (head)",
+    "Hog Tie (knees)",
+    "Sty Gag",
+    "Sty Blindfold",
+    "Snout Ring"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -20614,7 +20720,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     cloak: { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
     // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
     // wearin' one, the leash and the tag clip to it instead
-    collar: { groups: ["ItemNeck"], names: [], re: /^$/ }
+    collar: { groups: ["ItemNeck"], names: [], re: /^$/ },
+    // WILD TRAP KITS (Nov 20, Laynie: "definitely could use more complete, restrictive sets"): blind, deaf, a ring through
+    // the nose, gagged two deep (a plug under a panel), mittened, the ankles too. Each puts on the item its piece names
+    // first, wherever that lives; these are only the stand-ins
+    blind: { groups: ["ItemHead"], names: ["LeatherBlindfold", "FullBlindfold"], re: /Blindfold/ },
+    earplugs: { groups: ["ItemEars"], names: ["HeavyDutyEarPlugs", "LightDutyEarPlugs"], re: /EarPlugs/ },
+    nose: { groups: ["ItemNose"], names: ["NoseShackle"], re: /^NoseShackle$/ },
+    gag: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["HarnessBallGag1", "BitGag"], re: /BallGag|BitGag/ },
+    gag2: { groups: ["ItemMouth2", "ItemMouth3", "ItemMouth"], names: ["HarnessPanelGag"], re: /PanelGag/ },
+    hands: { groups: ["ItemHands"], names: ["PaddedLeatherMittens", "LeatherMittens"], re: /Mittens/ },
+    feet: { groups: ["ItemFeet"], names: ["LeatherAnkleCuffs"], re: /AnkleCuffs|AnkleShackles/ }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -20639,18 +20755,39 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function itemHome(name, slot, taken) {
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P3().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
-    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
+    const own = homes.filter((g) => slot.groups.includes(g));
+    if (own.length) return own.find((g) => !taken(g)) || null;
+    return slot.takeover ? null : homes.find((g) => !taken(g)) || null;
   }
-  function setGearOpt(group, name, want) {
+  var signWords = (text3) => {
+    if (!Array.isArray(text3) || !text3.length) return null;
+    const w = text3.slice(0, 3).map((s) => String(s || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 12));
+    return { Text: w[0] || "", Text2: w[1] || "", Text3: w[2] || "" };
+  };
+  function setGearOpt(group, name, want, rec, text3) {
     try {
       const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P3(), group) : null;
       if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
-      const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype);
-      if (!data || data.archetype !== "typed" || !Array.isArray(data.options)) return false;
-      const i = data.options.findIndex((o) => o.Name === want);
-      if (i < 0) return false;
-      window.ExtendedItemSetOptionByRecord(P3(), it, { typed: i }, { push: true, refresh: true, C_Source: P3() });
-      return true;
+      const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype), words = signWords(text3);
+      let record = null;
+      if (data && data.archetype === "typed" && want && Array.isArray(data.options)) {
+        const i = data.options.findIndex((o) => o.Name === want);
+        if (i >= 0) record = { typed: i };
+      } else if (data && data.archetype === "modular" && rec && typeof rec === "object" && Array.isArray(data.modules)) {
+        const got = {};
+        for (const m of data.modules) {
+          const v = rec[m.Key];
+          if (Number.isInteger(v) && v >= 0 && v < (m.Options || []).length) got[m.Key] = v;
+        }
+        if (Object.keys(got).length) record = Object.assign({}, it.Property && it.Property.TypeRecord || {}, got);
+      }
+      if (record) window.ExtendedItemSetOptionByRecord(P3(), it, record, { push: !words, refresh: true, C_Source: P3() });
+      if (words) {
+        it.Property = Object.assign(it.Property || {}, words);
+        if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P3(), false);
+        if (typeof window.ChatRoomCharacterItemUpdate === "function") window.ChatRoomCharacterItemUpdate(P3(), group);
+      }
+      return !!(record || words);
     } catch (e) {
       console.warn("[Farmhand Companion] gear setting:", e);
       return false;
@@ -20705,9 +20842,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   };
   var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
-  var freedHere = /* @__PURE__ */ new Map();
-  function gearFreedHere(name) {
-    freedHere.set(String(name), Date.now() + 12e4);
+  var LETGO_KEY = "fhc-gear-letgo";
+  var letGo2 = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(LETGO_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var letGoSave = (m) => {
+    try {
+      window.localStorage.setItem(LETGO_KEY, JSON.stringify(m));
+    } catch (e) {
+    }
+  };
+  var pieceKey = (name, until) => String(name).slice(0, 30) + "|" + (Number(until) || 0);
+  function gearFreedHere(name, until) {
+    const m = letGo2();
+    m[pieceKey(name, until)] = { why: "freed", at: Date.now() };
+    letGoSave(m);
+  }
+  function farmGearLetGo(list) {
+    const m = letGo2();
+    let n = 0;
+    for (const g of Array.isArray(list) ? list : []) if (g && g.name) {
+      m[pieceKey(g.name, g.until)] = { why: "safe", at: Date.now() };
+      n++;
+    }
+    letGoSave(m);
+    return n;
   }
   function farmPieceIn(group) {
     try {
@@ -20721,7 +20884,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function syncFarmGear(list, allow) {
     if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()) && !((freedHere.get(g.name) || 0) > Date.now())).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
+    const lg = letGo2(), now = Date.now();
+    let pruned = false;
+    for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 864e5 || now - (lg[k].at || 0) > 6e5 && !(list || []).some((g) => g && pieceKey(g.name, g.until) === k)) {
+      delete lg[k];
+      pruned = true;
+    }
+    if (pruned) letGoSave(lg);
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)]).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
@@ -20787,11 +20957,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item };
       learnName(String(g.name).slice(0, 30));
       const opt = typeof g.opt === "string" && g.opt || GEAR_OPT[group + ":" + item];
-      if (opt) setLater.push([group, item, opt]);
+      if (opt || g.rec || g.text) setLater.push([group, item, opt, g.rec, g.text]);
     }
     gearMemSave(mem);
     if (did.on.length || did.off.length) commit2(next);
-    for (const [gr, nm, op] of setLater) setGearOpt(gr, nm, op);
+    for (const [gr, nm, op, rc, tx] of setLater) setGearOpt(gr, nm, op, rc, tx);
     return did;
   }
   var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
@@ -22395,8 +22565,34 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         st.panel.add('No answer to "' + text3 + `" yet. The farm girl may be busy, or not runnin' the newest bot. ` + (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
       }, 1e4);
     } else {
+      if (/^(safe|safeword|red)$/i.test(text3)) {
+        const n = farmGearLetGo(st.panel && st.panel.s && st.panel.s.farmGear || []);
+        if (n) {
+          parasiteSync();
+          st.panel.add("\u{1F6D1} Safeword: every bit of the farm's gear comes off you now, right here. It stays off.", "notice");
+        }
+      }
       window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text3 });
       st.panel.add("The farm girl isn't in your room, so I beeped her. Her answer comes back as a beep.", "notice");
+    }
+  }
+  var FREED_Q = "fhc-freed-queue";
+  function gearFreedTell(name, by) {
+    let q2;
+    try {
+      q2 = JSON.parse(window.localStorage.getItem(FREED_Q)) || [];
+    } catch (e) {
+      q2 = [];
+    }
+    if (name) q2.push({ name: String(name).slice(0, 30), by: Number(by) || 0, at: Date.now() });
+    q2 = q2.filter((x) => Date.now() - x.at < 31 * 864e5).slice(-40);
+    if (q2.length && botHere2()) {
+      for (const x of q2) toBot("gearFreed", { name: x.name, by: x.by });
+      q2 = [];
+    }
+    try {
+      window.localStorage.setItem(FREED_Q, JSON.stringify(q2));
+    } catch (e) {
     }
   }
   function collect(m) {
@@ -22424,6 +22620,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
         list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
       const did = syncFarmGear(list, !!st.panel.prefs.gear);
+      if (botHere2()) gearFreedTell(null);
       try {
         syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape);
       } catch (e2) {
@@ -22985,10 +23182,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         let was = null;
         const same = (a, b) => !!a && !!b && String(a).slice(0, 30) === String(b).slice(0, 30);
         try {
-          const me4 = window.Player && window.Player.MemberNumber, kept2 = (st.panel && st.panel.s && st.panel.s.farmGear || []).filter((g) => g && g.keep).map((g) => String(g.name));
+          const me4 = window.Player && window.Player.MemberNumber, kept2 = (st.panel && st.panel.s && st.panel.s.farmGear || []).filter((g) => g && g.keep);
           if (kept2.length && d && d.Item && d.Item.Target === me4 && typeof d.Source === "number" && d.Source !== me4 && typeof d.Item.Group === "string") {
             const n = farmPieceIn(d.Item.Group);
-            was = n && kept2.find((k) => same(k, n)) || null;
+            was = n && kept2.find((k) => same(k.name, n)) || null;
           }
         } catch (e) {
           was = null;
@@ -22996,9 +23193,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const r = next(args);
         if (was) {
           try {
-            if (!same(farmPieceIn(d.Item.Group), was)) {
-              gearFreedHere(was);
-              toBot("gearFreed", { name: was, by: d.Source });
+            if (!same(farmPieceIn(d.Item.Group), was.name)) {
+              gearFreedHere(was.name, was.until);
+              gearFreedTell(String(was.name), d.Source);
             }
           } catch (e) {
             console.warn("[Farmhand Companion] gear freed:", e);

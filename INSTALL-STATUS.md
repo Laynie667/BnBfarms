@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-20. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-21. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.90.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.91.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.72.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.73.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.91.0 + Companion 0.73.0: what a wild trap leaves is a whole kit, and four tame sets made whole** Laynie, Nov 20, after the renders: "I like the ideas, and the fixes, but definitely could use more complete, restrictive sets."
+  - **A whole kit, from the place it hid.** A wild trap used to leave its own few pieces, or just cuffs. Now it leaves a kit, 10 to 15 pieces, every one of them kept till somebody else takes it off:
+    - **The barn:** *Stalled and Bred*: blind, deaf, a bull ring through the nose, a ring gag holdin' the mouth open, an armbinder over mittens, frogtied on their knees, the milker pullin', a cow-tail plug and a fat plug in front, chained short to the floor by a cowbelled collar. Or *Mounted for the Bull*: roped down on all fours in a cow's hood, hooves on, bells on the teats, stuffed, chained to a muddy stake whose sign says "Bred On Demand".
+    - **The pasture:** *Put Out to Pasture*: pony hood and bit, yoked with the arms up, hoof mitts and strict hooves, ball and chain, a full harness, weighted teats, a horsehair tail, on a lead. Or *Staked-Out Heifer*: zipped on all fours into a crawl suit, cow hood, nose ring, deaf, milked, tailed and stuffed, belled, a feed bowl in the grass and a stake that says "Free To Breed".
+    - **Receivin':** *Tagged for Shipping*: strait-jacketed on a hand truck, legs in one sleeve, ballet heels, blind and deaf, a plug gag under a panel, steel over the tits and over both holes with the plugs sealed in, a steel posture collar and a yellow ear tag. Or *Crated and Stamped*: roped tight from shoulders to ankles inside a crate with only the head out, taped blind and taped quiet, plugged, nose-ringed and tagged. Or the *Inspection Frame*: spread in a steel frame for the buyers, a lewd blindfold, deaf, ring-gagged, suction on teats and clit.
+    - **A hunt prize** when a hunt's on: *Broke on the Horse*, sealed in a sense-dep hood, box-tied over mittens, corseted breathless, belled, shackled and stuffed astride the wooden horse; or *Sealed for the Dairy*, vacuum-sealed flat in a rubber bed, breathin' through a tube with the milker and two plugs goin' underneath.
+    - Never the same kit twice runnin' for one of them, and the story ends on what it left them in.
+    - **A wild trap never misses:** now and then one drew a season trap that couldn't have them, and nothin' sprang. It only draws ones that can now.
+  - **Four tame sets made whole:** the bucking saddle is ridden now, the Sybian under them, arms roped behind, a bit in the teeth, buzzin' clamps. The rubber vat leaves them dipped head to heels, catsuit, vacuum hood, sheath gag, posture collar, seamless arm and leg binders and heels. The mummy is wrapped head to toe in linen with the tits and the gap between the legs left bare. The hogtie adds the knees, a ball gag, a blindfold and a sow's ring through the nose.
+  - **New spots their Companion fills:** a blindfold, ear plugs, a nose ring, a second gag over the first, mittens and the ankles. A stake gets its mud, its chain and its sign. A piece only ever goes in its own spot: tape for the arms waits if the arms are taken, it never lands on the mouth.
+  - **Safe anywhere:** the farm's gear goes on in any room. Now a safeword said away from the farm, the panel's button or ?safe, takes every bit of it off right there and keeps it off, as well as beepin' the farm girl. A piece somebody else frees in another room stays off on that computer, through a reload, and the farm girl is told the next time she's in the room with them.
+  - **The studio shows them as the game does:** its farm sets now set each piece the way the Companion does, so the hogtie shows hogtied (it always was in the game) and the stakes show their signs. The wild kits are there as their own group.
 
 - **Bot 0.90.0 + Companion 0.72.0: wild traps, the farm's own, hidden and movin' about** Laynie, Nov 20: "What if trap spots place and move themselves at random? more when a hunt is active?", then "id like for the spots I have set to stay as is, but 3-8 roaming spots would be great. the barn and pasture mostly, and receiving." and "they hit harder, more ruthlessly, and by suprise with much much heavier consequences. Id even let the gear remain til removed by someone else."
   - **The set tiles stay just as they are.** On top of them the farm girl hides traps of her own: three, one more for every two people in the room with traps on, eight at most, and all eight in a hunt. They sit on open tiles in the barn, the pasture and receiving (the barn and pasture most), never on a wall, a set trap or the tile beside one, the safe barn, or under somebody's feet. Each creeps to a new tile every 10 to 15 minutes, every 2 to 3 in a hunt, and one that's just had somebody moves on at once.

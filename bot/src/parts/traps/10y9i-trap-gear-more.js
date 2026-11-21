@@ -7,10 +7,18 @@
      when: "hold" while the trap has them · "after" for mins once it's done
   */
   Object.assign(TRAP_GEAR, {
-    saddle:     [{ when: "hold", slot: "device", label: "Buckin' Saddle", items: ["SaddleStand", "WoodenHorse"],
-                   desc: "A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back." },
+    // (Nov 20, Laynie: "I like the ideas, and the fixes". The Saddle Stand stood beside them; now they're sat on it, the
+    // game's Sybian, roped and bitted for the ride)
+    saddle:     [{ when: "hold", slot: "device", label: "Buckin' Saddle", items: ["Sybian", "WoodenHorse", "SaddleStand"],
+                   desc: "A humpbacked saddle on a motor, straddled with every bit of their weight, buckin' and buzzin' and never tirin'. Something thick in the seat rides them right back." },
                  { when: "hold", slot: mn => stopperFor(mn, "vulva"), label: "Saddle Post", items: ["PenisDildo", "VibratingDildo"],
-                   desc: "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck." }],
+                   desc: "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck." },
+                 { when: "hold", slot: "ropeArms", label: "Rodeo Rope", items: ["HempRope"], opt: "WristElbowHarnessTie",
+                   desc: "Wrists and elbows roped behind the back and cinched into a chest harness. No grabbin' the horn: they ride it no-hands." },
+                 { when: "hold", slot: "gag", label: "Saddle Bit", items: ["BitGag", "HarnessPonyBits"],
+                   desc: "A bit between the teeth with the reins hangin' off it, for whoever wants to steer." },
+                 { when: "hold", slot: "cups", label: "Spur Clamps", items: ["VibeNippleClamp", "ChainClamp"],
+                   desc: "Buzzin' clamps on both teats that kick up every time the saddle does." }],
     net:        [{ when: "hold", slot: "device", label: "Hayloft Net", items: ["Net"],
                    desc: "A coarse rope net hauled up into the rafters, its catch dangling and turning slowly, every curve pushed out through the mesh." }],
     bell:       [{ when: "after", slot: "tag", label: "Lost Cow Bell", items: ["CollarCowBell", "CollarBell"], mins: 30,

@@ -14,7 +14,7 @@ const ROOT = new URL("..", import.meta.url).pathname.replace(/^\/([A-Z]:)/i, "$1
 const esbuild = require("esbuild"), tmp = join(tmpdir(), "fh-slots-" + process.pid + ".cjs");
 await esbuild.build({ entryPoints: [join(ROOT, "extension/src/marks.js")], bundle: true, format: "cjs", outfile: tmp, logLevel: "silent" });
 globalThis.window = globalThis.window || {};
-const { GEAR_SLOTS } = require(tmp);
+const { GEAR_SLOTS, GEAR_OPT } = require(tmp);
 
 // the bot, on a stand-in page, just long enough to read its lists
 const store = {};
@@ -35,7 +35,9 @@ const pieceOut = (x, body) => {
   if (typeof slot === "function") slot = body === "pussy" ? "dildo" : "plug";
   const S = GEAR_SLOTS[slot]; if (!S) return null;
   const mins = typeof x.mins === "function" ? "" : x.mins;
-  return { slot, groups: S.groups, items: (x.items || []).concat(S.names), color: x.color || (Array.isArray(S.color) ? S.color : S.color || null), label: x.label || x.name, when: x.when || "on", mins: mins || null, desc: x.desc || "" };
+  // (opt, rec, text: how the Companion sets it, Nov 20: the studio sets them too, so its pictures match the game)
+  return { slot, groups: S.groups, items: (x.items || []).concat(S.names), color: x.color || (Array.isArray(S.color) ? S.color : S.color || null), label: x.label || x.name, when: x.when || "on", mins: mins || null, desc: x.desc || "",
+    opt: x.opt || null, rec: x.rec || null, text: x.text || null };
 };
 const sets = [];
 for (const [kind, list] of Object.entries(F.TRAP_GEAR)) {
@@ -61,7 +63,13 @@ for (const [kind, list] of Object.entries(F.SYM_GEAR || {})) {
     if (pieces.length) sets.push({ group: "Symbiotes", name: (kind === "latex" ? "🖤 livin' latex" : "🌱 milk moss") + ", stage " + st, what: "as far as it has grown", pieces });
   }
 }
+// the wild traps' kits (10z8b-wild-kits.js): what one leaves on them, a whole kit at a time
+const PLACE = { barn: "🐄 barn", pasture: "🌾 pasture", receiving: "📦 receiving", hunt: "🏆 hunt prize" };
+for (const [place, kits] of Object.entries(F.WILD_KITS || {})) for (const k of kits) {
+  const pieces = k.pieces.map((x) => pieceOut(x, "pussy")).filter(Boolean);
+  if (pieces.length) sets.push({ group: "Wild kits", name: (PLACE[place] || place) + ": " + k.name, what: String(k.tell || "").replace(/%n/g, "they"), pieces });
+}
 const messes = Object.entries(F.MESS).map(([name, color]) => ({ name, color, traps: Object.entries(F.MESS_BY_TRAP).filter(([, m]) => m[0] === name).map(([k]) => k) }));
-writeFileSync(join(ROOT, "studio/web/farm-presets.json"), JSON.stringify({ made: new Date().toISOString(), sets, messes }, null, 1));
+writeFileSync(join(ROOT, "studio/web/farm-presets.json"), JSON.stringify({ made: new Date().toISOString(), sets, messes, opts: GEAR_OPT }, null, 1));
 quiet("✅ " + sets.length + " equipment sets and " + messes.length + " messes → studio/web/farm-presets.json");
 process.exit(0);

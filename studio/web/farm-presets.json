@@ -1,5 +1,5 @@
 {
- "made": "2026-10-26T06:25:57.178Z",
+ "made": "2026-11-21T03:47:46.998Z",
  "sets": [
   {
    "group": "Traps",
@@ -23,7 +23,10 @@
      "label": "Pump Bung",
      "when": "after",
      "mins": 10,
-     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
+     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -50,7 +53,10 @@
      "label": "Pump Bung",
      "when": "after",
      "mins": 10,
-     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
+     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -75,7 +81,10 @@
      "label": "Egg Post Plug",
      "when": "after",
      "mins": 15,
-     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
+     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -101,7 +110,10 @@
      "label": "Egg Post Plug",
      "when": "after",
      "mins": 15,
-     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
+     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -124,7 +136,10 @@
      "label": "The Water's Grip",
      "when": "hold",
      "mins": null,
-     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time."
+     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "torso",
@@ -141,7 +156,10 @@
      "label": "The Water's Embrace",
      "when": "hold",
      "mins": null,
-     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch."
+     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "legs",
@@ -157,7 +175,10 @@
      "label": "The Water's Coils",
      "when": "hold",
      "mins": null,
-     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying."
+     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "dildo",
@@ -176,7 +197,10 @@
      "label": "Slime Seal",
      "when": "after",
      "mins": 15,
-     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
+     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -199,7 +223,10 @@
      "label": "The Water's Grip",
      "when": "hold",
      "mins": null,
-     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time."
+     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "torso",
@@ -216,7 +243,10 @@
      "label": "The Water's Embrace",
      "when": "hold",
      "mins": null,
-     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch."
+     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "legs",
@@ -232,7 +262,10 @@
      "label": "The Water's Coils",
      "when": "hold",
      "mins": null,
-     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying."
+     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "plug",
@@ -252,7 +285,10 @@
      "label": "Slime Seal",
      "when": "after",
      "mins": 15,
-     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
+     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -278,7 +314,10 @@
      "label": "Boar's Plug",
      "when": "after",
      "mins": 20,
-     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
+     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -305,7 +344,10 @@
      "label": "Boar's Plug",
      "when": "after",
      "mins": 20,
-     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
+     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -330,7 +372,10 @@
      "label": "Seed Pod Stem",
      "when": "after",
      "mins": 10,
-     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
+     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -356,7 +401,10 @@
      "label": "Seed Pod Stem",
      "when": "after",
      "mins": 10,
-     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
+     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -379,7 +427,10 @@
      "label": "Slime Sleeves",
      "when": "after",
      "mins": null,
-     "desc": "Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move."
+     "desc": "Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "legs",
@@ -395,7 +446,10 @@
      "label": "Slime Stockings",
      "when": "after",
      "mins": null,
-     "desc": "Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too."
+     "desc": "Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -422,7 +476,10 @@
      "label": "Denial Clamp",
      "when": "after",
      "mins": null,
-     "desc": "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go."
+     "desc": "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -445,7 +502,10 @@
      "label": "Growth Cups",
      "when": "after",
      "mins": 30,
-     "desc": "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger."
+     "desc": "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -468,7 +528,10 @@
      "label": "Trap Milker",
      "when": "hold",
      "mins": null,
-     "desc": "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not."
+     "desc": "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -493,7 +556,10 @@
      "label": "Winch Chain",
      "when": "after",
      "mins": null,
-     "desc": "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on."
+     "desc": "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -517,7 +583,10 @@
      "label": "Feed Chute",
      "when": "hold",
      "mins": null,
-     "desc": "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum."
+     "desc": "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -539,7 +608,10 @@
      "label": "Snare Rope",
      "when": "hold",
      "mins": null,
-     "desc": "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases."
+     "desc": "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "ropeFeet",
@@ -553,7 +625,10 @@
      "label": "Snare Hobble",
      "when": "hold",
      "mins": null,
-     "desc": "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach."
+     "desc": "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -578,7 +653,10 @@
      "label": "Breedin' Frame Cuffs",
      "when": "hold",
      "mins": null,
-     "desc": "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud."
+     "desc": "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -603,7 +681,10 @@
      "label": "Kennel Lead",
      "when": "hold",
      "mins": null,
-     "desc": "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door."
+     "desc": "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -628,7 +709,10 @@
      "label": "Pack's Knot",
      "when": "after",
      "mins": 10,
-     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
+     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -654,7 +738,10 @@
      "label": "Pack's Knot",
      "when": "after",
      "mins": 10,
-     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
+     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -679,7 +766,10 @@
      "label": "Stud's Stopper",
      "when": "after",
      "mins": 10,
-     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
+     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -705,7 +795,10 @@
      "label": "Stud's Stopper",
      "when": "after",
      "mins": 10,
-     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
+     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -727,7 +820,10 @@
      "label": "The Pillory",
      "when": "hold",
      "mins": null,
-     "desc": "The farm's pillory, neck and wrists locked through the boards. Anybody walking past is welcome to the rest."
+     "desc": "The farm's pillory, neck and wrists locked through the boards. Anybody walking past is welcome to the rest.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "ropeFeet",
@@ -743,7 +839,10 @@
      "label": "Pillory Spreader",
      "when": "after",
      "mins": null,
-     "desc": "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like."
+     "desc": "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -767,7 +866,10 @@
      "label": "Trough Leeches",
      "when": "after",
      "mins": 20,
-     "desc": "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner."
+     "desc": "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -782,15 +884,19 @@
       "ItemDevices"
      ],
      "items": [
-      "SaddleStand",
+      "Sybian",
       "WoodenHorse",
+      "SaddleStand",
       "WoodenStocks"
      ],
      "color": null,
      "label": "Buckin' Saddle",
      "when": "hold",
      "mins": null,
-     "desc": "A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back."
+     "desc": "A humpbacked saddle on a motor, straddled with every bit of their weight, buckin' and buzzin' and never tirin'. Something thick in the seat rides them right back.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "dildo",
@@ -808,7 +914,70 @@
      "label": "Saddle Post",
      "when": "hold",
      "mins": null,
-     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck."
+     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Rodeo Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "Wrists and elbows roped behind the back and cinched into a chest harness. No grabbin' the horn: they ride it no-hands.",
+     "opt": "WristElbowHarnessTie",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "BitGag",
+      "HarnessPonyBits",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Saddle Bit",
+     "when": "hold",
+     "mins": null,
+     "desc": "A bit between the teeth with the reins hangin' off it, for whoever wants to steer.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "VibeNippleClamp",
+      "ChainClamp",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Spur Clamps",
+     "when": "hold",
+     "mins": null,
+     "desc": "Buzzin' clamps on both teats that kick up every time the saddle does.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -823,15 +992,19 @@
       "ItemDevices"
      ],
      "items": [
-      "SaddleStand",
+      "Sybian",
       "WoodenHorse",
+      "SaddleStand",
       "WoodenStocks"
      ],
      "color": null,
      "label": "Buckin' Saddle",
      "when": "hold",
      "mins": null,
-     "desc": "A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back."
+     "desc": "A humpbacked saddle on a motor, straddled with every bit of their weight, buckin' and buzzin' and never tirin'. Something thick in the seat rides them right back.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "plug",
@@ -850,7 +1023,70 @@
      "label": "Saddle Post",
      "when": "hold",
      "mins": null,
-     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck."
+     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Rodeo Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "Wrists and elbows roped behind the back and cinched into a chest harness. No grabbin' the horn: they ride it no-hands.",
+     "opt": "WristElbowHarnessTie",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "BitGag",
+      "HarnessPonyBits",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Saddle Bit",
+     "when": "hold",
+     "mins": null,
+     "desc": "A bit between the teeth with the reins hangin' off it, for whoever wants to steer.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "VibeNippleClamp",
+      "ChainClamp",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Spur Clamps",
+     "when": "hold",
+     "mins": null,
+     "desc": "Buzzin' clamps on both teats that kick up every time the saddle does.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -872,7 +1108,10 @@
      "label": "Hayloft Net",
      "when": "hold",
      "mins": null,
-     "desc": "A coarse rope net hauled up into the rafters, its catch dangling and turning slowly, every curve pushed out through the mesh."
+     "desc": "A coarse rope net hauled up into the rafters, its catch dangling and turning slowly, every curve pushed out through the mesh.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -896,7 +1135,10 @@
      "label": "Lost Cow Bell",
      "when": "after",
      "mins": 30,
-     "desc": "A big iron cowbell padlocked to the collar. Its tag reads LOST COW, RETURN TO THE BARN. It clanks at every step."
+     "desc": "A big iron cowbell padlocked to the collar. Its tag reads LOST COW, RETURN TO THE BARN. It clanks at every step.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -919,7 +1161,10 @@
      "label": "Teasin' Stall",
      "when": "hold",
      "mins": null,
-     "desc": "A narrow steel stall that smells of heat, with a padded dummy rocking just out of reach on the other side of the bars."
+     "desc": "A narrow steel stall that smells of heat, with a padded dummy rocking just out of reach on the other side of the bars.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -941,7 +1186,10 @@
      "label": "Sheep Dip",
      "when": "hold",
      "mins": null,
-     "desc": "A tall can of warm, soapy dip, filled to the chin, with brushes waiting to scrub everything below the waterline."
+     "desc": "A tall can of warm, soapy dip, filled to the chin, with brushes waiting to scrub everything below the waterline.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -964,7 +1212,10 @@
      "label": "Breedin' Crate",
      "when": "hold",
      "mins": null,
-     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate."
+     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "dildo",
@@ -982,7 +1233,10 @@
      "label": "Sire's Stopper",
      "when": "after",
      "mins": 15,
-     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them."
+     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1005,7 +1259,10 @@
      "label": "Breedin' Crate",
      "when": "hold",
      "mins": null,
-     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate."
+     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "plug",
@@ -1024,7 +1281,10 @@
      "label": "Sire's Stopper",
      "when": "after",
      "mins": 15,
-     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them."
+     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1047,7 +1307,10 @@
      "label": "Carousel Milkers",
      "when": "hold",
      "mins": null,
-     "desc": "The milking carousel's cups, latched on at the first station and pulling hard as the platform turns."
+     "desc": "The milking carousel's cups, latched on at the first station and pulling hard as the platform turns.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -1064,7 +1327,10 @@
      "label": "Carousel Cuffs",
      "when": "hold",
      "mins": null,
-     "desc": "Padded cuffs that hold them bent over the carousel's rail, station after station, lap after lap."
+     "desc": "Padded cuffs that hold them bent over the carousel's rail, station after station, lap after lap.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1090,7 +1356,10 @@
      "label": "Plow Bit",
      "when": "hold",
      "mins": null,
-     "desc": "A bit between the teeth with reins running back to the plow handles. Every turn of the furrow is steered by a tug."
+     "desc": "A bit between the teeth with reins running back to the plow handles. Every turn of the furrow is steered by a tug.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "torso",
@@ -1108,7 +1377,10 @@
      "label": "Plow Harness",
      "when": "hold",
      "mins": null,
-     "desc": "A heavy leather harness girthed tight at the chest and hips, traces buckled on behind to the old plow."
+     "desc": "A heavy leather harness girthed tight at the chest and hips, traces buckled on behind to the old plow.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1130,7 +1402,10 @@
      "label": "Bale Twine",
      "when": "after",
      "mins": null,
-     "desc": "Baling twine knotted round the ankles to keep the legs apart and the rump right where it is, sticking out of the hay."
+     "desc": "Baling twine knotted round the ankles to keep the legs apart and the rump right where it is, sticking out of the hay.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1152,7 +1427,10 @@
      "label": "Scarecrow Post",
      "when": "hold",
      "mins": null,
-     "desc": "The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all."
+     "desc": "The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -1168,7 +1446,10 @@
      "label": "Scarecrow Ropes",
      "when": "hold",
      "mins": null,
-     "desc": "Rough rope lashing both arms out along the crossbar. The crows aren't scared. The farmhands aren't either."
+     "desc": "Rough rope lashing both arms out along the crossbar. The crows aren't scared. The farmhands aren't either.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1191,7 +1472,10 @@
      "label": "Clothespins",
      "when": "hold",
      "mins": null,
-     "desc": "Wooden clothespins biting everywhere they'll grip, a whole basketful, each one stinging as the line sways."
+     "desc": "Wooden clothespins biting everywhere they'll grip, a whole basketful, each one stinging as the line sways.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -1207,7 +1491,10 @@
      "label": "Washin' Line",
      "when": "hold",
      "mins": null,
-     "desc": "Strung up by the wrists on the washing line between two posts, hung out to dry with the sheets."
+     "desc": "Strung up by the wrists on the washing line between two posts, hung out to dry with the sheets.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1229,7 +1516,10 @@
      "label": "Fair Stocks",
      "when": "hold",
      "mins": null,
-     "desc": "The fairground stocks, head and hands through the boards, with a pie stall doing brisk trade right next to them."
+     "desc": "The fairground stocks, head and hands through the boards, with a pie stall doing brisk trade right next to them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1252,7 +1542,10 @@
      "label": "Breedin' Wheel",
      "when": "hold",
      "mins": null,
-     "desc": "A great painted wheel, spread-eagled across it and spinning, with a different stud waiting at every stop."
+     "desc": "A great painted wheel, spread-eagled across it and spinning, with a different stud waiting at every stop.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1274,7 +1567,10 @@
      "label": "Windmill Sails",
      "when": "hold",
      "mins": null,
-     "desc": "Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again."
+     "desc": "Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1296,7 +1592,10 @@
      "label": "Kissin' Gate",
      "when": "hold",
      "mins": null,
-     "desc": "Stuck halfway through the kissing gate, front in one field and rump in the other. The toll to pass is posted on the post."
+     "desc": "Stuck halfway through the kissing gate, front in one field and rump in the other. The toll to pass is posted on the post.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1318,7 +1617,10 @@
      "label": "The Fence",
      "when": "hold",
      "mins": null,
-     "desc": "Stuck halfway through a hole in the fence, with strangers at both ends."
+     "desc": "Stuck halfway through a hole in the fence, with strangers at both ends.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1340,7 +1642,10 @@
      "label": "Collection Bench",
      "when": "hold",
      "mins": null,
-     "desc": "The collection bench: strapped face down, hips up, with a jar waiting underneath and a sign that reads VAT COLLECTION."
+     "desc": "The collection bench: strapped face down, hips up, with a jar waiting underneath and a sign that reads VAT COLLECTION.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1362,7 +1667,10 @@
      "label": "Auction Block",
      "when": "hold",
      "mins": null,
-     "desc": "Up on the auction block in the display frame, turned slowly so every bidder can see every inch of the lot."
+     "desc": "Up on the auction block in the display frame, turned slowly so every bidder can see every inch of the lot.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1386,7 +1694,10 @@
      "label": "Fountain Cuffs",
      "when": "hold",
      "mins": null,
-     "desc": "Brass cuffs on short chains bolted to the fountain's rim, holding them right under the warm, slow curtain of chocolate."
+     "desc": "Brass cuffs on short chains bolted to the fountain's rim, holding them right under the warm, slow curtain of chocolate.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1409,7 +1720,10 @@
      "label": "Bakery Bench",
      "when": "hold",
      "mins": null,
-     "desc": "A long floured baker's bench with leather straps at wrist, waist and knee, built to hold something still while it's decorated."
+     "desc": "A long floured baker's bench with leather straps at wrist, waist and knee, built to hold something still while it's decorated.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "tag",
@@ -1426,7 +1740,10 @@
      "label": "Price Tag",
      "when": "after",
      "mins": 20,
-     "desc": "A little card tag on a ribbon at the collar, in the baker's curly hand: FRESH TODAY, ONE SLICE PER CUSTOMER."
+     "desc": "A little card tag on a ribbon at the collar, in the baker's curly hand: FRESH TODAY, ONE SLICE PER CUSTOMER.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1451,7 +1768,10 @@
      "label": "Cream Funnel",
      "when": "hold",
      "mins": null,
-     "desc": "A wide steel funnel buckled between the teeth, so the cream that misses the skin goes somewhere useful."
+     "desc": "A wide steel funnel buckled between the teeth, so the cream that misses the skin goes somewhere useful.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1475,7 +1795,10 @@
      "label": "Kneeling Spreader",
      "when": "hold",
      "mins": null,
-     "desc": "A short steel bar between the knees, keeping them knelt wide and low in the middle of the ring."
+     "desc": "A short steel bar between the knees, keeping them knelt wide and low in the middle of the ring.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -1492,7 +1815,10 @@
      "label": "Behind-the-Back Cuffs",
      "when": "hold",
      "mins": null,
-     "desc": "Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind."
+     "desc": "Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1517,7 +1843,10 @@
      "label": "Grooming Noose",
      "when": "hold",
      "mins": null,
-     "desc": "The grooming table's steel arm and its loop, clipped to the collar so they stand still and pretty for the brush."
+     "desc": "The grooming table's steel arm and its loop, clipped to the collar so they stand still and pretty for the brush.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "tag",
@@ -1534,7 +1863,10 @@
      "label": "Best in Kennel Rosette",
      "when": "after",
      "mins": 30,
-     "desc": "A big satin rosette on the collar, BEST IN KENNEL in gold thread, still smelling of show shampoo."
+     "desc": "A big satin rosette on the collar, BEST IN KENNEL in gold thread, still smelling of show shampoo.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1557,7 +1889,10 @@
      "label": "Whelping Box",
      "when": "hold",
      "mins": null,
-     "desc": "A low padded box in a warm shed, built for one thing, with a sign above it: BREEDING IN PROGRESS."
+     "desc": "A low padded box in a warm shed, built for one thing, with a sign above it: BREEDING IN PROGRESS.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1582,7 +1917,10 @@
      "label": "Yard Post Lead",
      "when": "hold",
      "mins": null,
-     "desc": "A short chain from the collar to the iron post in the dog yard: just long enough to kneel, too short to go anywhere."
+     "desc": "A short chain from the collar to the iron post in the dog yard: just long enough to kneel, too short to go anywhere.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1606,7 +1944,10 @@
      "label": "Check Stall Cups",
      "when": "hold",
      "mins": null,
-     "desc": "The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check."
+     "desc": "The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1629,7 +1970,10 @@
      "label": "The Bench",
      "when": "hold",
      "mins": null,
-     "desc": "The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it."
+     "desc": "The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1651,7 +1995,10 @@
      "label": "Square Stocks",
      "when": "hold",
      "mins": null,
-     "desc": "The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays."
+     "desc": "The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1674,7 +2021,10 @@
      "label": "Trophy Mount",
      "when": "hold",
      "mins": null,
-     "desc": "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME."
+     "desc": "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1698,7 +2048,10 @@
      "label": "Lumberjack's Grip",
      "when": "hold",
      "mins": null,
-     "desc": "A length of logging rope round the wrists, so they don't float off while they're passed round the tub."
+     "desc": "A length of logging rope round the wrists, so they don't float off while they're passed round the tub.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1720,7 +2073,10 @@
      "label": "Hog Tie",
      "when": "hold",
      "mins": null,
-     "desc": "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot."
+     "desc": "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot.",
+     "opt": "FullBinding",
+     "rec": null,
+     "text": null
     },
     {
      "slot": "ropeArms",
@@ -1735,7 +2091,88 @@
      "label": "Hog Tie (arms)",
      "when": "hold",
      "mins": null,
-     "desc": "The other half of the hogtie, the wrists, cinched to the ankles."
+     "desc": "The other half of the hogtie, the wrists, cinched to the ankles.",
+     "opt": "Hogtied",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Hog Tie (knees)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Rope round the knees and thighs too, so there's no kickin' while they're carried to the trough.",
+     "opt": "FullBinding",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "HarnessBallGag1",
+      "BitGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Sty Gag",
+     "when": "hold",
+     "mins": null,
+     "desc": "A ball gag buckled in, so the squeals come out muffled and drippin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Sty Blindfold",
+     "when": "hold",
+     "mins": null,
+     "desc": "A strip of leather over the eyes. They hear the snufflin' and the laughin', and never see who's next.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Snout Ring",
+     "when": "hold",
+     "mins": null,
+     "desc": "A ring through the nose like a sow's, for leadin' them about by.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1763,7 +2200,10 @@
      "label": "Booth Ring",
      "when": "hold",
      "mins": null,
-     "desc": "A ring gag the booth hands out at the door, so the customers get their copper's worth."
+     "desc": "A ring gag the booth hands out at the door, so the customers get their copper's worth.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1786,7 +2226,10 @@
      "label": "Through-the-Wall Cups",
      "when": "hold",
      "mins": null,
-     "desc": "Whatever's on the other side of the milking hole has cups, and they are very, very strong."
+     "desc": "Whatever's on the other side of the milking hole has cups, and they are very, very strong.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1812,7 +2255,10 @@
      "label": "Feedbag",
      "when": "hold",
      "mins": null,
-     "desc": "A canvas feedbag strapped over the face, full of warm mash, and it doesn't come off till it's empty."
+     "desc": "A canvas feedbag strapped over the face, full of warm mash, and it doesn't come off till it's empty.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1836,7 +2282,10 @@
      "label": "AUDITED Tag",
      "when": "after",
      "mins": 20,
-     "desc": "A brass tag on the collar stamped AUDITED, with the date punched in underneath."
+     "desc": "A brass tag on the collar stamped AUDITED, with the date punched in underneath.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1860,7 +2309,10 @@
      "label": "Inspection Tag",
      "when": "after",
      "mins": 30,
-     "desc": "An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number."
+     "desc": "An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1882,7 +2334,10 @@
      "label": "Goblin Rope",
      "when": "hold",
      "mins": null,
-     "desc": "Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help."
+     "desc": "Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "tag",
@@ -1899,7 +2354,10 @@
      "label": "Goblin Trophy Token",
      "when": "after",
      "mins": 30,
-     "desc": "A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT."
+     "desc": "A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1921,7 +2379,10 @@
      "label": "Pit Stakes",
      "when": "hold",
      "mins": null,
-     "desc": "Ankles staked wide in the straw of the breeding pit, so the goblins can work in turns."
+     "desc": "Ankles staked wide in the straw of the breeding pit, so the goblins can work in turns.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1946,7 +2407,10 @@
      "label": "Market Rope",
      "when": "hold",
      "mins": null,
-     "desc": "A frayed rope round the neck, held by whichever goblin's bid is highest this minute."
+     "desc": "A frayed rope round the neck, held by whichever goblin's bid is highest this minute.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -1968,7 +2432,10 @@
      "label": "Cart Lashings",
      "when": "hold",
      "mins": null,
-     "desc": "Every bit of string the goblins own, lashing wrists and ankles to the cart bed."
+     "desc": "Every bit of string the goblins own, lashing wrists and ankles to the cart bed.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "ropeFeet",
@@ -1983,7 +2450,10 @@
      "label": "Cart Lashings (legs)",
      "when": "hold",
      "mins": null,
-     "desc": "More string, round the ankles, tied to the cart wheels' axle."
+     "desc": "More string, round the ankles, tied to the cart wheels' axle.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2007,7 +2477,10 @@
      "label": "Tribute Token",
      "when": "after",
      "mins": 30,
-     "desc": "A tusk on a leather thong: the warchief's tribute token, meaning his."
+     "desc": "A tusk on a leather thong: the warchief's tribute token, meaning his.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2030,7 +2503,10 @@
      "label": "Breeding Chair",
      "when": "hold",
      "mins": null,
-     "desc": "A tilted chair in worn red leather with stirrups, straps at the wrists and waist, built to keep hips up."
+     "desc": "A tilted chair in worn red leather with stirrups, straps at the wrists and waist, built to keep hips up.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2054,7 +2530,10 @@
      "label": "Squeeze Chute",
      "when": "hold",
      "mins": null,
-     "desc": "The cattle chute's padded steel sides, closed snug, and a head gate across the neck."
+     "desc": "The cattle chute's padded steel sides, closed snug, and a head gate across the neck.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2076,7 +2555,10 @@
      "label": "Baler Twine",
      "when": "hold",
      "mins": null,
-     "desc": "Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing."
+     "desc": "Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "torso",
@@ -2094,7 +2576,10 @@
      "label": "Twine Harness",
      "when": "hold",
      "mins": null,
-     "desc": "A diamond of twine over the chest and down the belly, knotted tight."
+     "desc": "A diamond of twine over the chest and down the belly, knotted tight.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2118,7 +2603,10 @@
      "label": "Milkmaid's Yoke",
      "when": "hold",
      "mins": null,
-     "desc": "A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side."
+     "desc": "A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2143,7 +2631,10 @@
      "label": "Cart Bit",
      "when": "hold",
      "mins": null,
-     "desc": "A steel bit and bridle, reins running back to the driver's hands."
+     "desc": "A steel bit and bridle, reins running back to the driver's hands.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "torso",
@@ -2162,7 +2653,10 @@
      "label": "Cart Harness",
      "when": "hold",
      "mins": null,
-     "desc": "A pony's harness: breastcollar, girth, traces to the cart shafts."
+     "desc": "A pony's harness: breastcollar, girth, traces to the cart shafts.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2187,7 +2681,10 @@
      "label": "Churn Harness",
      "when": "hold",
      "mins": null,
-     "desc": "A leather harness hooked to the churn's arm, for walking round and round."
+     "desc": "A leather harness hooked to the churn's arm, for walking round and round.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2209,7 +2706,10 @@
      "label": "Vacuum Bed",
      "when": "hold",
      "mins": null,
-     "desc": "A frame strung with a double sheet of black latex, zipped shut round them and sucked flat, every curve of them printed in rubber."
+     "desc": "A frame strung with a double sheet of black latex, zipped shut round them and sucked flat, every curve of them printed in rubber.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2231,7 +2731,28 @@
      "label": "Vat Skin",
      "when": "after",
      "mins": 20,
-     "desc": "The vat's latex, set into a seamless glossy skin from the neck down. It peels off eventually. Not yet."
+     "desc": "The vat's latex, set into a seamless glossy skin from the neck down. It peels off eventually. Not yet.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Vat Skin (legs)",
+     "when": "after",
+     "mins": 20,
+     "desc": "Set glossy and seamless from the hips to the toes, squeakin' at every step they can't take.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "gloves",
@@ -2246,7 +2767,124 @@
      "label": "Vat Skin (hands)",
      "when": "after",
      "mins": 20,
-     "desc": "Dipped to the elbows and set: smooth black latex over every finger, squeakin' when they make a fist."
+     "desc": "Dipped to the elbows and set: smooth black latex over every finger, squeakin' when they make a fist.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "VacHood",
+      "LatexHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Vat Skin (head)",
+     "when": "after",
+     "mins": 20,
+     "desc": "Dipped head and all: the latex set skin-tight over the face, a little hole to breathe through and nothin' more.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "LatexSheathGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": "#121214",
+     "label": "Vat Plug",
+     "when": "after",
+     "mins": 20,
+     "desc": "Rubber set in the mouth as well, a fat sheath down over the tongue.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LatexPostureCollar"
+     ],
+     "color": "#121214",
+     "label": "Vat Collar",
+     "when": "after",
+     "mins": 20,
+     "desc": "The latex set thick and stiff round the neck, holdin' the chin up.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "SeamlessLatexArmbinder",
+      "LatexArmbinder",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#121214",
+     "label": "Vat Binder",
+     "when": "after",
+     "mins": 20,
+     "desc": "The arms came out of the vat stuck together behind the back, one seamless rubber sleeve.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "SeamlessLegBinder",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#121214",
+     "label": "Vat Binder (legs)",
+     "when": "after",
+     "mins": 20,
+     "desc": "And the legs, set together into one smooth rubber tail.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "BalletHeels",
+      "ThighHighLatexHeels"
+     ],
+     "color": "#121214",
+     "label": "Vat Heels",
+     "when": "after",
+     "mins": 20,
+     "desc": "Feet set pointed in rubber ballet heels.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2269,7 +2907,10 @@
      "label": "Doll Hood",
      "when": "hold",
      "mins": null,
-     "desc": "A tight black latex hood pulled over the whole head and smoothed down, with a doll's painted smile where a face should be."
+     "desc": "A tight black latex hood pulled over the whole head and smoothed down, with a doll's painted smile where a face should be.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -2286,7 +2927,10 @@
      "label": "Doll Binder",
      "when": "hold",
      "mins": null,
-     "desc": "A seamless latex sleeve that swallows both arms behind them, laced to the shoulders, so a doll stands the way it's posed."
+     "desc": "A seamless latex sleeve that swallows both arms behind them, laced to the shoulders, so a doll stands the way it's posed.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "tag",
@@ -2303,7 +2947,10 @@
      "label": "Doll Tag",
      "when": "after",
      "mins": 20,
-     "desc": "A little card on a string round the neck, in the press's tidy print: FARM DOLL. HANDLE FREELY. POLISH WEEKLY."
+     "desc": "A little card on a string round the neck, in the press's tidy print: FARM DOLL. HANDLE FREELY. POLISH WEEKLY.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2327,7 +2974,10 @@
      "label": "Stall Sheath",
      "when": "hold",
      "mins": null,
-     "desc": "A black rubber sheath that seals them in from collar to hip with two cut-outs, so the only thing the stall can see is teats."
+     "desc": "A black rubber sheath that seals them in from collar to hip with two cut-outs, so the only thing the stall can see is teats.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "cups",
@@ -2344,7 +2994,10 @@
      "label": "Rubber Cups",
      "when": "hold",
      "mins": null,
-     "desc": "Soft black rubber cups sucked on through the sheath's openings, pullin' slow and steady, droplets beadin' on the latex round them."
+     "desc": "Soft black rubber cups sucked on through the sheath's openings, pullin' slow and steady, droplets beadin' on the latex round them.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2366,7 +3019,10 @@
      "label": "Inflatable Body Bag",
      "when": "hold",
      "mins": null,
-     "desc": "A thick black rubber bag zipped up to the chin and pumped till it hugs like a fist. Every squeeze from outside lands everywhere at once."
+     "desc": "A thick black rubber bag zipped up to the chin and pumped till it hugs like a fist. Every squeeze from outside lands everywhere at once.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2388,7 +3044,10 @@
      "label": "Dairymaid's Mitts",
      "when": "hold",
      "mins": null,
-     "desc": "Ball-shaped latex mitts strapped on at the wrist. No fingers, no grip, nothing to stop her hands with."
+     "desc": "Ball-shaped latex mitts strapped on at the wrist. No fingers, no grip, nothing to stop her hands with.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "lips",
@@ -2406,7 +3065,10 @@
      "label": "Dairymaid's Muzzle",
      "when": "hold",
      "mins": null,
-     "desc": "A smooth rubber muzzle over the mouth and chin, so the only sounds that get out are the wet, muffled ones."
+     "desc": "A smooth rubber muzzle over the mouth and chin, so the only sounds that get out are the wet, muffled ones.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2429,7 +3091,10 @@
      "label": "Black Pool Latex (legs)",
      "when": "hold",
      "mins": null,
-     "desc": "Livin' latex from the pool, climbed up both legs to the hip and set like warm tar, holdin' them knee-deep where they stood."
+     "desc": "Livin' latex from the pool, climbed up both legs to the hip and set like warm tar, holdin' them knee-deep where they stood.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -2445,15 +3110,54 @@
      "label": "Black Pool Latex (arms)",
      "when": "hold",
      "mins": null,
-     "desc": "A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'."
+     "desc": "A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
   {
    "group": "Traps",
-   "name": "🦴 rubberpup",
-   "what": "the rubber kennel: a latex pup hood and mitts, and you're taught to beg",
+   "name": "🦴 rubberpup (pussy)",
+   "what": "the rubber kennel: zipped into a whole rubber pup outfit (catsuit, pup hood, a petsuit with padded paws, collar and bone tag, leash and tail) and taught to beg",
    "pieces": [
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Skin",
+     "when": "hold",
+     "mins": null,
+     "desc": "A black latex catsuit rolled on from the toes up and smoothed down tight, talc and all, so the pup underneath shines like a wet nose from the neck down.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Skin (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "The catsuit's legs, glossy and seamless, moulded over hips and thighs and down to the toes.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
     {
      "slot": "hood",
      "groups": [
@@ -2461,28 +3165,2135 @@
      ],
      "items": [
       "LatexDogHood",
+      "LatexDogMask",
       "LatexHood"
      ],
      "color": "#121214",
      "label": "Rubber Pup Hood",
      "when": "hold",
      "mins": null,
-     "desc": "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs."
+     "desc": "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
-     "slot": "mitts",
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "PawPaddedPetsuitArms",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Rubber Petsuit",
+     "when": "hold",
+     "mins": null,
+     "desc": "Arms folded at the elbow and laced into the petsuit's latex sleeves, with fat padded paws on the ends. Pups walk on their elbows here.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "PawPaddedPetsuitLegs",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Rubber Petsuit (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Legs folded at the knee and laced snug into the petsuit, padded where they meet the floor. Pups kneel, and pups crawl.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "DogCollar"
+     ],
+     "color": "#9E1B24",
+     "label": "Kennel Collar",
+     "when": "hold",
+     "mins": null,
+     "desc": "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "DogCollar"
+     ],
+     "color": "#9E1B24",
+     "label": "Kennel Collar",
+     "when": "after",
+     "mins": 30,
+     "desc": "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarPupBone",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Good Pup Tag",
+     "when": "hold",
+     "mins": null,
+     "desc": "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarPupBone",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Good Pup Tag",
+     "when": "after",
+     "mins": 30,
+     "desc": "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarLeash",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Kennel Leash",
+     "when": "hold",
+     "mins": null,
+     "desc": "A short red lead clipped to the collar ring, held by the kennel hand, or looped over the kennel post when they're busy.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "PuppyTailPlug1",
+      "PuppyTailPlug",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Pup's Tail Plug",
+     "when": "hold",
+     "mins": null,
+     "desc": "A fluffy puppy tail on a smooth plug, worked in slow and given a tug to check it's seated. It wags when they wiggle, and they wiggle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "PuppyTailStrap",
+      "PuppyTailStrap1",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Tail",
+     "when": "hold",
+     "mins": null,
+     "desc": "A glossy black puppy tail strapped on at the base of the spine, and it wags when they wiggle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🦴 rubberpup (no pussy)",
+   "what": "the rubber kennel: zipped into a whole rubber pup outfit (catsuit, pup hood, a petsuit with padded paws, collar and bone tag, leash and tail) and taught to beg",
+   "pieces": [
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Skin",
+     "when": "hold",
+     "mins": null,
+     "desc": "A black latex catsuit rolled on from the toes up and smoothed down tight, talc and all, so the pup underneath shines like a wet nose from the neck down.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Skin (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "The catsuit's legs, glossy and seamless, moulded over hips and thighs and down to the toes.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "LatexDogHood",
+      "LatexDogMask",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Hood",
+     "when": "hold",
+     "mins": null,
+     "desc": "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "PawPaddedPetsuitArms",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Rubber Petsuit",
+     "when": "hold",
+     "mins": null,
+     "desc": "Arms folded at the elbow and laced into the petsuit's latex sleeves, with fat padded paws on the ends. Pups walk on their elbows here.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "PawPaddedPetsuitLegs",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Rubber Petsuit (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Legs folded at the knee and laced snug into the petsuit, padded where they meet the floor. Pups kneel, and pups crawl.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "DogCollar"
+     ],
+     "color": "#9E1B24",
+     "label": "Kennel Collar",
+     "when": "hold",
+     "mins": null,
+     "desc": "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "DogCollar"
+     ],
+     "color": "#9E1B24",
+     "label": "Kennel Collar",
+     "when": "after",
+     "mins": 30,
+     "desc": "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarPupBone",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Good Pup Tag",
+     "when": "hold",
+     "mins": null,
+     "desc": "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarPupBone",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Good Pup Tag",
+     "when": "after",
+     "mins": 30,
+     "desc": "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarLeash",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Kennel Leash",
+     "when": "hold",
+     "mins": null,
+     "desc": "A short red lead clipped to the collar ring, held by the kennel hand, or looped over the kennel post when they're busy.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "PuppyTailPlug1",
+      "PuppyTailPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Pup's Tail Plug",
+     "when": "hold",
+     "mins": null,
+     "desc": "A fluffy puppy tail on a smooth plug, worked in slow and given a tug to check it's seated. It wags when they wiggle, and they wiggle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "PuppyTailStrap",
+      "PuppyTailStrap1",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Tail",
+     "when": "hold",
+     "mins": null,
+     "desc": "A glossy black puppy tail strapped on at the base of the spine, and it wags when they wiggle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎃 headless",
+   "what": "the headless horseman at the covered bridge, and his pumpkin grinnin' while he has you",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#1C1C1C",
+     "label": "Horseman's Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "A loop of the horseman's black rope round their wrists, tied off to the bridge rail.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🕷️ spider",
+   "what": "the spider queen in the hayloft: webbed up, silk-tied, and a clutch of her eggs",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Net",
+      "WoodenStocks"
+     ],
+     "color": "#E8E8E8",
+     "label": "Spider's Web",
+     "when": "hold",
+     "mins": null,
+     "desc": "A web as big as a barn door, every strand sticky and strong as rope, and they're hung in the middle of it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#F4F4F4",
+     "label": "Spider Silk",
+     "when": "hold",
+     "mins": null,
+     "desc": "Wrists wound together in fine white silk, round and round, soft as cotton and impossible to pull apart.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🔥 revel",
+   "what": "the Samhain fire: masked revellers, the dance round the bonfire, and antlers to wear after",
+   "pieces": [
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "ReindeerBand",
+      "FlowerCrown"
+     ],
+     "color": "#4A3424",
+     "label": "Samhain Antlers",
+     "when": "after",
+     "mins": 30,
+     "desc": "A crown of antlers the revellers put on them by the fire, dark and polished and tied with red thread.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎃 pumpkinpatch",
+   "what": "stuck in the giant pumpkin to the waist, and the patch's pickers help themselves",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "KabeshiriWall",
+      "WoodenStocks"
+     ],
+     "color": "#E07A1F",
+     "label": "The Great Pumpkin",
+     "when": "hold",
+     "mins": null,
+     "desc": "A pumpkin as big as a hay wagon, hollowed out, with a hole in the side they're stuck halfway through: head and arms in the pumpkin, the rest out in the patch.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍏 bobbing",
+   "what": "apple bobbin': hands tied behind you, face in the barrel, and somebody behind you takes their chance",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#8B5A2B",
+     "label": "Bobbin' Ties",
+     "when": "hold",
+     "mins": null,
+     "desc": "Their hands tied behind their back with a bit of twine, the way you bob for apples properly.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧙 cauldron",
+   "what": "the witch's cauldron: stewed in her bubblin' brew, and it does somethin' to you",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "MilkCan",
+      "WoodenStocks"
+     ],
+     "color": "#1A1A1A",
+     "label": "The Witch's Cauldron",
+     "when": "hold",
+     "mins": null,
+     "desc": "A great black iron pot, big enough to sit in up to the chin, bubblin' with somethin' warm and purple that smells of plums and spice.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧹 broomstick",
+   "what": "the witch's broom: tied on, and it hums and bucks and keeps you right at the edge",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1C1C1C",
+     "label": "Broom Ties",
+     "when": "hold",
+     "mins": null,
+     "desc": "Black cord round both thighs, tyin' them to the broom so they can't fall off, and can't get off either.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍎 candyapple",
+   "what": "the caramel vat at the fair: dipped like a candy apple, stuck on a post, and licked by the whole fair",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#C47A2C",
+     "label": "Candy Stick",
+     "when": "hold",
+     "mins": null,
+     "desc": "Their wrists tied up over their head to the candy stall's post, like an apple on a stick.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍬 taffy",
+   "what": "the taffy puller: stretched on its arms, pulled and folded, tickled and sugared",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#F4A6C6",
+     "label": "Taffy Hooks (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Pink candy-striped cord from both wrists to the taffy puller's arms, pullin' them wide on every turn.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#F4A6C6",
+     "label": "Taffy Hooks (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Pink candy-striped cord round both ankles, hooked to the puller's other arm.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧻 mummy",
+   "what": "the old sarcophagus: wrapped in linen by the mummy, head to toe, and left on show with the right bits bare",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "DuctTape",
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#E3D9BF",
+     "label": "Mummy Wraps (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Old linen bandages wound round and round from neck to hips, pinnin' their arms to their sides, every bit that ought to show left showin'.",
+     "opt": "ExposedComplete",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "DuctTape",
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#E3D9BF",
+     "label": "Mummy Wraps (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Linen wound from the ankles to the thighs, neat as a parcel, with a gap left where it matters.",
+     "opt": "CutOut",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "feet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "DuctTape",
+      "LeatherAnkleCuffs"
+     ],
+     "color": "#E3D9BF",
+     "label": "Mummy Wraps (feet)",
+     "when": "hold",
+     "mins": null,
+     "desc": "The ankles and feet bound up together in linen. They hop, or they're carried.",
+     "opt": "CompleteFeet",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hands",
      "groups": [
       "ItemHands"
      ],
      "items": [
-      "LatexBondageMitts",
-      "LatexBondageMitts"
+      "DuctTape",
+      "PaddedLeatherMittens",
+      "LeatherMittens"
      ],
-     "color": "#121214",
-     "label": "Rubber Paws",
+     "color": "#E3D9BF",
+     "label": "Mummy Wraps (hands)",
      "when": "hold",
      "mins": null,
-     "desc": "Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else."
+     "desc": "Each hand wrapped into a fat linen club. No fingers.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "DuctTape",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": "#E3D9BF",
+     "label": "Mummy Wraps (head)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Linen wound over the whole head, smellin' of cedar, one little gap at the mouth.",
+     "opt": "Mummy",
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "👗 costumetrunk",
+   "what": "the costume trunk in the attic: shut in, and out again dressed as somethin' else for an hour",
+   "pieces": [
+    {
+     "slot": "ears",
+     "groups": [
+      "HairAccessory2"
+     ],
+     "items": [
+      "KittenEars2"
+     ],
+     "color": "#1A1A1A",
+     "label": "Costume Ears",
+     "when": "after",
+     "mins": 60,
+     "desc": "A pair of costume ears out of the attic's trunk: a cat's, a bunny's, a fox's, a pup's, a pony's, a mouse's or a cow's. They come off in an hour.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tail",
+     "groups": [
+      "TailStraps"
+     ],
+     "items": [
+      "KittenTailStrap1"
+     ],
+     "color": "#1A1A1A",
+     "label": "Costume Tail",
+     "when": "after",
+     "mins": 60,
+     "desc": "The tail to go with the ears, strapped on snug. It wags a little on its own.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧊 frozenpond",
+   "what": "the frozen duck pond: your skates froze fast in the ice, and every skater on the pond takes a turn",
+   "pieces": [
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#CFE8F5",
+     "label": "Frozen Fast",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ice up over both their boots and round the ankles, froze solid. They're not goin' anywhere till somebody fetches a kettle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍪 gingerbread",
+   "what": "the gingerbread man the bakers brought to life: six foot of warm spiced dough, a candy-cane cock, and icin' all over you after",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#C8102E",
+     "label": "Bakery Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A red ribbon off the cake boxes, tied round their wrists and looped over the bakin' table's leg.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌿 mistletoe",
+   "what": "the mistletoe over the kissin' gate: tied up under it, and everybody who passes owes a kiss, and collects",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#B3122E",
+     "label": "Mistletoe Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A red velvet ribbon tyin' their wrists up to the kissin' gate's post, right under the mistletoe.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🏔️ yeti",
+   "what": "the yeti down from the hills: twice your size, warm as a stove under all that white fur, and he wants somebody to keep him company till spring",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "FurBlanketWrap",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Yeti's Fur Wrap",
+     "when": "after",
+     "mins": 20,
+     "desc": "One of the yeti's own white furs, wrapped round them snug as a cocoon and tied off. Warm as anything. Not easy to get out of.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎁 giftwrap",
+   "what": "gift-wrapped: tied up in ribbon, popped in a box with a bow on top, tagged UNWRAP ME and left under the farm's big tree",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#C8102E",
+     "label": "Gift Ribbon (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red satin ribbon round and round their wrists, tied off in a fat bow.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#C8102E",
+     "label": "Gift Ribbon (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red satin ribbon round their legs from the ankles up, neat as a parcel.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "GiftBox",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Gift Box",
+     "when": "hold",
+     "mins": null,
+     "desc": "A big gift box wrapped in red paper, the lid left off so everybody can see what's inside, tagged UNWRAP ME.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧦 stocking",
+   "what": "the giant stockin' on the hearth: popped in up to the chest, hung on its hook, and filled by everybody passin'",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#C8102E",
+     "label": "The Big Stockin'",
+     "when": "hold",
+     "mins": null,
+     "desc": "The giant stockin's red wool, snug round their arms and holdin' them to their sides while they hang on the hearth.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#C8102E",
+     "label": "Stockin' Stuffer",
+     "when": "after",
+     "mins": 20,
+     "desc": "The buzzin' egg from the toe of the stockin', still buzzin', tucked in snug right where it settled.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "☕ cocoastand",
+   "what": "the cocoa stand at the winter fair: milked straight into the pot if you make milk, or the cocoa's poured over you, and either way the fair drinks up",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#7A3B1E",
+     "label": "Cocoa Stand Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A brown satin ribbon round their knees, tied to the counter's leg so they can't wriggle off while they're bein' served.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "❄️ frostfae",
+   "what": "the frost-fae in the hedgerow: cold kisses, frost on every bit of you, and kept right at the edge for their game",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#D8ECFA",
+     "label": "Frost Lace",
+     "when": "hold",
+     "mins": null,
+     "desc": "Lace spun out of hoarfrost round their wrists, fine as spider silk. It doesn't melt, and it doesn't let go.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "⛄ snowman",
+   "what": "the farmyard snowman: packed into him to the chin by the farmhands, the good bits dug out, and the whole yard plays",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Snowman",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "The Farmyard Snowman",
+     "when": "hold",
+     "mins": null,
+     "desc": "Packed into the farmyard snowman up to the chin, patted smooth, with a scarf on top and the good bits dug out.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪵 yulelog",
+   "what": "the Yule log: tied astride it as it's hauled in from the woods, and every bump of the track grinds the old knot into you",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#B3122E",
+     "label": "Yule Log Ribbons",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red ribbon round their ankles and knees, tyin' them astride the Yule log as it's hauled in.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "👑 hollyking",
+   "what": "the solstice play: the Holly King and the Oak King fight for the year, and the prize is you, and they share it",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#1F5C2E",
+     "label": "Solstice Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "Green ribbon round their wrists, tyin' them to the post in the middle of the solstice ring.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "FlowerCrown",
+      "FlowerCrown"
+     ],
+     "color": "#1F5C2E",
+     "label": "Holly King's Crown",
+     "when": "after",
+     "mins": 30,
+     "desc": "The Holly King's own crown of holly and red berries, put on their head after the play. Till midsummer.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🏹 wildhunt",
+   "what": "the Wild Hunt: spectral huntsmen ride down out of the storm on the longest night, and you're the quarry they've caught",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#AEB9CC",
+     "label": "The Hunt's Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "A rope of silver mist from the Wild Hunt, round their wrists. It's cold as moonlight and it doesn't let go.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍎 wassail",
+   "what": "wassailin' the orchard: tied to the oldest apple tree, toasted with cider, licked clean, and the first wassailer gets the luck",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#B3122E",
+     "label": "Wassail Ribbons",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red and green ribbons, like the ones tied on the oldest apple tree, tyin' their wrists round its trunk.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌿 ivy",
+   "what": "the ivy on the old barn: it winds round you, holds you to the wall, and lays its berry pods in you",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#2F5E1F",
+     "label": "Ivy (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ivy wound round and round their wrists and arms, holdin' them to the old barn wall.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#2F5E1F",
+     "label": "Ivy (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ivy wound round their legs, holdin' them apart against the warm stone.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🕯️ longnight",
+   "what": "the longest night: tied in the ring of candles that has to burn till dawn, and the wax drips, an hour at a time, till the sun comes back",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#7A1020",
+     "label": "Vigil Cord (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red cord round their wrists, tied out to a peg at the edge of the ring of candles.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#7A1020",
+     "label": "Vigil Cord (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Red cord round their ankles, tied out to the pegs, holdin' them spread in the middle of the candles.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍃 greenman",
+   "what": "the Green Man: a farmhand in a mask of new leaves steps out of the hedge and claims the first bloom of spring, and crowns you with it after",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#3E6B2A",
+     "label": "Ivy Bands",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ivy, wound round their wrists by the Green Man and tied to a hawthorn root.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "FlowerCrown",
+      "FlowerCrown"
+     ],
+     "color": null,
+     "label": "First Bloom Crown",
+     "when": "after",
+     "mins": 30,
+     "desc": "A crown of violets and primroses the Green Man wove for the first bloom of spring.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌱 sowing",
+   "what": "the first sowin': laid in the first furrow of spring and tied to the plough, and the sowers sow you before they sow the field",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#7A5A3A",
+     "label": "Plough Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "The plough's own rope, round their ankles and tied off to the handles, holdin' them spread across the first furrow.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥚 eggdye",
+   "what": "the egg-dyein' tubs: dunked in one colour after another till you're as pastel as the eggs, and the dyers paint flowers on you while you dry",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#E7A3C8",
+     "label": "Dye-Tub Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A pastel pink ribbon round their wrists, tied to the edge of the dye tub so they don't float off.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "⚖️ balance",
+   "what": "the equinox see-saw: the day on one end and the night on the other, and you're what balances them, sat down on the post in the middle",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#C9A227",
+     "label": "See-Saw Straps",
+     "when": "hold",
+     "mins": null,
+     "desc": "Gold and black straps round their thighs, holdin' them sat on the middle post of the equinox see-saw.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌊 nixie",
+   "what": "the thaw-brook nixie: the spring brook's water spirit pulls you in, cold hands and colder kisses, and leaves a clutch of her pearly spawn",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#4F7F5C",
+     "label": "Waterweed",
+     "when": "hold",
+     "mins": null,
+     "desc": "Long green waterweed out of the nixie's hair, wound round their wrists and holdin' them in the deep pool.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥚 hiddeneggs (pussy)",
+   "what": "the egg hunt: stuffed with chocolate eggs and hidden in the straw for the herd to find, and the hunters find every last one",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Easter Egg Plug",
+     "when": "hold",
+     "mins": null,
+     "desc": "A big round egg plug, pastel and smooth, keepin' the chocolate eggs in till the hunt starts.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥚 hiddeneggs (no pussy)",
+   "what": "the egg hunt: stuffed with chocolate eggs and hidden in the straw for the herd to find, and the hunters find every last one",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Easter Egg Plug",
+     "when": "hold",
+     "mins": null,
+     "desc": "A big round egg plug, pastel and smooth, keepin' the chocolate eggs in till the hunt starts.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍫 chocfountain",
+   "what": "the chocolate fountain at the Easter fair: dipped in warm chocolate up to the neck, and licked clean by everybody with a sweet tooth",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#5A321C",
+     "label": "Fountain Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A brown satin ribbon round their knees, tied to the rim of the chocolate fountain.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐰 bunnysuit",
+   "what": "the bunny suit rack: zipped into a bunny girl suit, ears and cuffs and a tail plug, and set out on the Easter display for the fair to play with",
+   "pieces": [
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "BunnySuit",
+      "LatexCatsuit"
+     ],
+     "color": null,
+     "label": "Bunny Girl Suit",
+     "when": "hold",
+     "mins": null,
+     "desc": "A tight satin bunny girl suit, cut low and high, with a big bow at the throat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "ears",
+     "groups": [
+      "HairAccessory2"
+     ],
+     "items": [
+      "BunnyEars1",
+      "BunnyEars2"
+     ],
+     "color": null,
+     "label": "Bunny Suit Ears",
+     "when": "hold",
+     "mins": null,
+     "desc": "Tall satin bunny ears on a band, pink inside.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cloak",
+     "groups": [
+      "ClothAccessory"
+     ],
+     "items": [
+      "BunnyCollarCuffs"
+     ],
+     "color": null,
+     "label": "Bunny Collar and Cuffs",
+     "when": "hold",
+     "mins": null,
+     "desc": "A white collar with a bow tie, and white cuffs, the proper bunny girl kind.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "BunnyTailPlug1",
+      "BunnyTailPlug2",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Bunny Tail Plug",
+     "when": "hold",
+     "mins": null,
+     "desc": "A round white fluffy bunny tail on a plug, slid in and given a little tug to check.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧺 basket",
+   "what": "the giant Easter basket: tied in a nest of paper grass in a basket as big as a bathtub, bow and all, and delivered to somebody's door",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#F7B8D0",
+     "label": "Basket Ribbon (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Pastel pink ribbon round their wrists, tied in a bow, keepin' them nested in the Easter basket.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#B8DDF7",
+     "label": "Basket Ribbon (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Pastel blue ribbon round their ankles, so they stay curled up in the paper grass till they're unwrapped.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍬 marshmallow",
+   "what": "the marshmallow vat: dunked in warm marshmallow fluff, rolled in pastel sugar like a marshmallow chick, and nibbled",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#F6C7D8",
+     "label": "Sugar Twine",
+     "when": "hold",
+     "mins": null,
+     "desc": "Pink candy-striped baker's twine round their wrists, holdin' them in the marshmallow vat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎨 eggroll",
+   "what": "egg rollin': sealed in a giant painted egg and rolled down the big hill, and whoever catches it at the bottom gets to open it",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#F2D16B",
+     "label": "Egg-Roll Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A pastel yellow ribbon round their ankles, so they roll nice and round inside the giant painted egg.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "👒 bonnet",
+   "what": "the bonnet parade: paraded round the yard in an Easter bonnet and not much else, and judged on every inch, slowly",
+   "pieces": [
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "Bonnet1",
+      "Bonnet2",
+      "FlowerCrown"
+     ],
+     "color": null,
+     "label": "Parade Bonnet",
+     "when": "hold",
+     "mins": null,
+     "desc": "An Easter bonnet covered in silk primroses and ribbons, tied under the chin. The most dressed bit of them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍫 chocbunny",
+   "what": "the chocolate bunny mould: pressed into the big mould, set in a shell of chocolate in the cold room, and broken out a bite at a time",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#4A2A18",
+     "label": "Mould Straps",
+     "when": "hold",
+     "mins": null,
+     "desc": "The chocolate bunny mould's leather straps, buckled round their legs to hold the two halves shut while it sets.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "👑 oakking",
+   "what": "the midsummer play: the Holly King comes to win the year back from the Oak King, two farmhands crowned for it, and the prize is you, shared",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#E8B923",
+     "label": "Midsummer Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "Yellow ribbon round their wrists, tyin' them to the pole in the middle of the midsummer ring.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "FlowerCrown",
+      "FlowerCrown"
+     ],
+     "color": "#5C7A2E",
+     "label": "Oak King's Crown",
+     "when": "after",
+     "mins": 30,
+     "desc": "The Oak King's crown of oak leaves and acorns, put on their head after the play. Till Yule.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍄 fairyring",
+   "what": "the fairy ring: step into the ring of toadstools on Midsummer's Eve, and the fae folk dance you round till dawn and every one of them takes a turn",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#B9E2C8",
+     "label": "Fae Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A pale green ribbon that wasn't there a moment ago, round their wrists, and it won't untie till the music stops.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "☀️ sunwheel",
+   "what": "the sun wheel: tied spread on the great wooden wheel on the green, garlanded with flowers, and turned with the sun all afternoon",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WheelFortune",
+      "LuckyWheel",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "The Sun Wheel",
+     "when": "hold",
+     "mins": null,
+     "desc": "A great wooden wheel painted gold, spokes like sunbeams, with them tied spread across it like the sun in the middle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#F2C14E",
+     "label": "Rose Garlands",
+     "when": "hold",
+     "mins": null,
+     "desc": "Garlands of yellow roses tied round their wrists, fastened to the rim of the sun wheel.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍯 mead",
+   "what": "the mead hall: bent over the barrel, the midsummer mead poured down your back, and the brewers lick off every drop to taste the batch",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#B8862B",
+     "label": "Barrel Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "Rope round their wrists, tied off to the iron hoops of the mead barrel so they stay bent over it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌾 lastsheaf",
+   "what": "the last sheaf: bound up in the last sheaf of the harvest with twine, and every reaper takes a turn for luck",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#D9B860",
+     "label": "Sheaf Twine",
+     "when": "hold",
+     "mins": null,
+     "desc": "Harvest twine, bindin' the last wheat round them at the chest and hips, arms bound in among the stalks.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#D9B860",
+     "label": "Sheaf Twine (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "More harvest twine, round the wheat at their knees, so the sheaf holds its shape.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌽 cornmaiden",
+   "what": "the corn maiden: woven into a corn dolly of straw, hung from the barn rafters for luck, and set at the head of the harvest table",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": "#E3C66D",
+     "label": "Corn Dolly Plaits",
+     "when": "hold",
+     "mins": null,
+     "desc": "Gold straw plaited tight round their arms in the old corn dolly patterns, so they hang like a corn maiden.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#E3C66D",
+     "label": "Corn Dolly Plaits (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Straw plaits round their legs, plaited together at the knees, a red ribbon at the ankle.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍇 grapestomp",
+   "what": "treadin' the grapes: tipped into the wine vat with the treaders, slippin' and slidin' in the grapes till you're purple to the eyebrows",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#5B2245",
+     "label": "Vintner's Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A purple ribbon round their wrists, tied to the rim of the grape vat so they can't climb out before the treadin's done.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍎 ciderpress",
+   "what": "the cider press: laid in the press among the apples and pressed slow, and if you make milk it's milked into the cider",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "LeatherCuffs",
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#6B4A2B",
+     "label": "Press Strap",
+     "when": "hold",
+     "mins": null,
+     "desc": "The cider press's leather strap, buckled over their wrists so they lie still among the apples while it's wound down.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "👑 harvestcrown",
+   "what": "crowned at the harvest home: paraded on the last wagon in the harvest crown, and given to the harvesters at the supper",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope"
+     ],
+     "color": "#B3122E",
+     "label": "Wagon Ribbon",
+     "when": "hold",
+     "mins": null,
+     "desc": "A red ribbon round their wrists, tied to the rail of the last wagon so the crowned one doesn't fall off the sheaves.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "PoppyCrown",
+      "FlowerCrown",
+      "FlowerCrown"
+     ],
+     "color": null,
+     "label": "The Harvest Crown",
+     "when": "after",
+     "mins": 30,
+     "desc": "A crown of red poppies and wheat ears, for the one the harvesters crowned. Worn the rest of the night.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍽️ harvestsupper",
+   "what": "the harvest supper: laid down the middle of the long table as the centrepiece, the feast heaped on you, and everyone eats off you",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Ribbons",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#C9A227",
+     "label": "Table Ribbons",
+     "when": "hold",
+     "mins": null,
+     "desc": "Gold harvest ribbons round their wrists, tied to the legs of the long table so the centrepiece stays put.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2505,7 +5316,10 @@
      "label": "Growin' Plug",
      "when": "on",
      "mins": null,
-     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done."
+     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2529,7 +5343,10 @@
      "label": "Growin' Plug",
      "when": "on",
      "mins": null,
-     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done."
+     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2552,7 +5369,10 @@
      "label": "Hungry Belt",
      "when": "on",
      "mins": null,
-     "desc": "A pretty filigree belt that locked itself the moment it touched skin. It hums against everything it covers, never quite enough, and it eats every orgasm before it starts."
+     "desc": "A pretty filigree belt that locked itself the moment it touched skin. It hums against everything it covers, never quite enough, and it eats every orgasm before it starts.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2575,7 +5395,10 @@
      "label": "Milkmaid's Cups",
      "when": "on",
      "mins": null,
-     "desc": "Two silver cups that latched on by themselves and began to pull. Whatever they're doing in there, the udders behind them are filling twice as fast to keep up."
+     "desc": "Two silver cups that latched on by themselves and began to pull. Whatever they're doing in there, the udders behind them are filling twice as fast to keep up.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2598,7 +5421,10 @@
      "label": "Glutton's Funnel",
      "when": "on",
      "mins": null,
-     "desc": "A gilded funnel that strapped itself between the teeth. Every ten minutes it pours another helping down, warm and thick, whether there's room or not."
+     "desc": "A gilded funnel that strapped itself between the teeth. Every ten minutes it pours another helping down, warm and thick, whether there's room or not.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2621,7 +5447,10 @@
      "label": "The Hobble",
      "when": "on",
      "mins": null,
-     "desc": "Two dainty cuffs joined by a hand's length of chain. They looked like anklets in the box. Every step now is a tiny, swaying shuffle."
+     "desc": "Two dainty cuffs joined by a hand's length of chain. They looked like anklets in the box. Every step now is a tiny, swaying shuffle.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2644,7 +5473,10 @@
      "label": "Living Suit (legs)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2667,7 +5499,10 @@
      "label": "Living Suit (legs)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "belt",
@@ -2684,7 +5519,10 @@
      "label": "Living Suit (hips)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2707,7 +5545,10 @@
      "label": "Living Suit (legs)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "belt",
@@ -2724,7 +5565,10 @@
      "label": "Living Suit (hips)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "cups",
@@ -2740,7 +5584,10 @@
      "label": "Living Suit (chest)",
      "when": "on",
      "mins": null,
-     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2763,7 +5610,10 @@
      "label": "Living Suit (legs)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "belt",
@@ -2780,7 +5630,10 @@
      "label": "Living Suit (hips)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "cups",
@@ -2796,7 +5649,10 @@
      "label": "Living Suit (chest)",
      "when": "on",
      "mins": null,
-     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -2812,7 +5668,10 @@
      "label": "Living Suit (arms)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves."
+     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2835,7 +5694,10 @@
      "label": "Living Suit (legs)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "belt",
@@ -2852,7 +5714,10 @@
      "label": "Living Suit (hips)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "cups",
@@ -2868,7 +5733,10 @@
      "label": "Living Suit (chest)",
      "when": "on",
      "mins": null,
-     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "arms",
@@ -2884,7 +5752,10 @@
      "label": "Living Suit (arms)",
      "when": "on",
      "mins": null,
-     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves."
+     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "lips",
@@ -2902,7 +5773,10 @@
      "label": "Living Suit (mouth)",
      "when": "on",
      "mins": null,
-     "desc": "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now."
+     "desc": "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2924,7 +5798,10 @@
      "label": "Livin' Latex (hands)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading."
+     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2946,7 +5823,10 @@
      "label": "Livin' Latex (hands)",
      "when": "on",
      "mins": null,
-     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading."
+     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "socks",
@@ -2961,7 +5841,10 @@
      "label": "Livin' Latex (feet)",
      "when": "on",
      "mins": null,
-     "desc": "Black latex grown smooth over feet and calves, seamless."
+     "desc": "Black latex grown smooth over feet and calves, seamless.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "suitLower",
@@ -2976,7 +5859,10 @@
      "label": "Livin' Latex (legs)",
      "when": "on",
      "mins": null,
-     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -2998,7 +5884,10 @@
      "label": "Livin' Latex (arms)",
      "when": "on",
      "mins": null,
-     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black."
+     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "socks",
@@ -3013,7 +5902,10 @@
      "label": "Livin' Latex (feet)",
      "when": "on",
      "mins": null,
-     "desc": "Black latex grown smooth over feet and calves, seamless."
+     "desc": "Black latex grown smooth over feet and calves, seamless.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "suitLower",
@@ -3028,7 +5920,10 @@
      "label": "Livin' Latex (legs)",
      "when": "on",
      "mins": null,
-     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "suit",
@@ -3043,7 +5938,10 @@
      "label": "Livin' Latex (body)",
      "when": "on",
      "mins": null,
-     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself."
+     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -3065,7 +5963,10 @@
      "label": "Livin' Latex (arms)",
      "when": "on",
      "mins": null,
-     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black."
+     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "socks",
@@ -3080,7 +5981,10 @@
      "label": "Livin' Latex (feet)",
      "when": "on",
      "mins": null,
-     "desc": "Black latex grown smooth over feet and calves, seamless."
+     "desc": "Black latex grown smooth over feet and calves, seamless.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "suitLower",
@@ -3095,7 +5999,10 @@
      "label": "Livin' Latex (legs)",
      "when": "on",
      "mins": null,
-     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "suit",
@@ -3110,7 +6017,10 @@
      "label": "Livin' Latex (body)",
      "when": "on",
      "mins": null,
-     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself."
+     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "boots",
@@ -3125,7 +6035,10 @@
      "label": "Livin' Latex (heels)",
      "when": "on",
      "mins": null,
-     "desc": "It's grown itself a pair of thigh-high heels. Its idea, not theirs."
+     "desc": "It's grown itself a pair of thigh-high heels. Its idea, not theirs.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -3147,7 +6060,10 @@
      "label": "Milk Moss",
      "when": "on",
      "mins": null,
-     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -3169,7 +6085,10 @@
      "label": "Milk Moss",
      "when": "on",
      "mins": null,
-     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   },
@@ -3191,7 +6110,10 @@
      "label": "Milk Moss",
      "when": "on",
      "mins": null,
-     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad.",
+     "opt": null,
+     "rec": null,
+     "text": null
     },
     {
      "slot": "hat",
@@ -3206,7 +6128,2169 @@
      "label": "Milk Moss (bloom)",
      "when": "on",
      "mins": null,
-     "desc": "The moss has bloomed: little white flowers, and a crown of them in the hair."
+     "desc": "The moss has bloomed: little white flowers, and a crown of them in the hair.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🐄 barn: Stalled and Bred",
+   "what": "they is left on their knees in a stall: blind, deaf, ring-gagged and drippin', arms laced into a binder, legs strapped folded, the milker pullin', plugged at both ends and chained short by a belled collar.",
+   "pieces": [
+    {
+     "slot": "hands",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "PaddedLeatherMittens",
+      "PaddedLeatherMittens",
+      "LeatherMittens"
+     ],
+     "color": null,
+     "label": "Stall Mitts",
+     "when": "on",
+     "mins": null,
+     "desc": "Padded leather balls buckled over both hands. No fingers, no grip, nothin' to work a buckle with.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Stall Milker",
+     "when": "on",
+     "mins": null,
+     "desc": "Cups latched on and pullin' steady, teats stretched long down the glass, the jar fillin' whether they like it or not.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Breedin' Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A fat rubber plug pumped up snug and buzzin', keepin' them open and wet for whoever's next.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Cowtail",
+      "TailButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Farm Cow Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A swishin' cow's tail on a thick plug seated deep. Every step wags it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "LeatherHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Stall Harness",
+     "when": "on",
+     "mins": null,
+     "desc": "Leather framin' the tits and the belly, rings for tyin' to and grabbin' by.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "LeatherArmbinder",
+      "ArmbinderJacket",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Stall Armbinder",
+     "when": "on",
+     "mins": null,
+     "desc": "Both arms laced into one leather sleeve behind the back and strapped over the shoulders, elbows kissin'.",
+     "opt": "WrapStrap",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "FrogtieStraps",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Stall Frogtie",
+     "when": "on",
+     "mins": null,
+     "desc": "Thighs strapped to calves, folded under. They kneel, knees wide, and that's all they can do.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Stall Blindfold",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather over the eyes. They hear the barn door, never who came through it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Stall Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. The barn goes quiet; hands are how they'll know somebody's there.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "RingGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Feedin' Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel ring behind the teeth, the mouth held open and drippin'. Open for feedin', or anythin' else.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Stall Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather with a ring at the front for the chain.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarChainShort",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Stall Chain",
+     "when": "on",
+     "mins": null,
+     "desc": "A short chain from the collar to a ring in the stall floor. Not long enough to stand.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🐄 barn: Mounted for the Bull",
+   "what": "they is left roped down on all fours in a cow's hood, rump up and stuffed, hooves on, teats belled, chained to a muddy stake with a sign that says what they're for.",
+   "pieces": [
+    {
+     "slot": "hands",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "HoofMittens",
+      "PawMittens",
+      "PaddedLeatherMittens",
+      "LeatherMittens"
+     ],
+     "color": null,
+     "label": "Farm Hoof Mitts",
+     "when": "on",
+     "mins": null,
+     "desc": "Hard hooves laced over both hands. They walk on them now, and grab nothin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "ShortPonyBoots",
+      "PonyBoots",
+      "ThighHighLatexHeels"
+     ],
+     "color": null,
+     "label": "Bull's Hoof Boots",
+     "when": "on",
+     "mins": null,
+     "desc": "Hooved boots laced tight. Up on their toes, clop clop.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "BellClamps",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Bull's Bell Clamps",
+     "when": "on",
+     "mins": null,
+     "desc": "Clamps bit onto both teats with a bell on each. They ring with every thrust.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Bull's Warm-Up",
+     "when": "on",
+     "mins": null,
+     "desc": "A swollen rubber plug buzzin' inside, keepin' them wet and gapin' for the bull.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Cowtail",
+      "TailButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Farm Cow Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A swishin' cow's tail on a thick plug seated deep. Every step wags it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "HempRopeHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Bull's Rope Harness",
+     "when": "on",
+     "mins": null,
+     "desc": "Rough rope round the chest and belly, a handle at the small of the back to hold them by.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Mountin' Ropes",
+     "when": "on",
+     "mins": null,
+     "desc": "Rope cinchin' wrists to ankles on all fours, rump up, the way a cow stands to be mounted.",
+     "opt": "AllFours",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "CowHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Farm Cow Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A rubber cow's head pulled down over theirs, ears and muzzle and all. Only the eyes are still theirs.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Stall Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. The barn goes quiet; hands are how they'll know somebody's there.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Stall Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather with a ring at the front for the chain.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "PetPost",
+      "CollarChainShort",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Muddy Stake",
+     "when": "on",
+     "mins": null,
+     "desc": "A post driven into the mud and chained to the collar. The sign says what they're for.",
+     "opt": null,
+     "rec": {
+      "d": 1,
+      "l": 2
+     },
+     "text": [
+      "Bred",
+      "On",
+      "Demand"
+     ]
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🌾 pasture: Put Out to Pasture",
+   "what": "they is left out in the field as a pony: hooded and bitted, yoked with their arms up, hooves on, harnessed, teats weighted, a tail swishin' from their arse and a ball and chain at the ankle.",
+   "pieces": [
+    {
+     "slot": "hands",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "HoofMittens",
+      "PawMittens",
+      "PaddedLeatherMittens",
+      "LeatherMittens"
+     ],
+     "color": null,
+     "label": "Farm Hoof Mitts",
+     "when": "on",
+     "mins": null,
+     "desc": "Hard hooves laced over both hands. They walk on them now, and grab nothin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleWeightClamps",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Pasture Weighted Clamps",
+     "when": "on",
+     "mins": null,
+     "desc": "Clamps on the teats with weights hangin' off, swingin' with every step.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Trottin' Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A buzzin' plug that jolts deeper with every trot.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "HorsetailPlug",
+      "HorsetailPlug1",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#6B4A2E",
+     "label": "Pasture Pony Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A long horsehair tail on a deep plug. It swishes when they're used.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "FullBodyLeatherHarness",
+      "LeatherHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Pasture Harness",
+     "when": "on",
+     "mins": null,
+     "desc": "Straps from collar to crotch, rings for the reins and the cart.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Yoke",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Pasture Yoke",
+     "when": "on",
+     "mins": null,
+     "desc": "A wooden yoke across the shoulders, wrists locked to both ends. Arms up, chest out, nothin' covered.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "StrictPonyBoots",
+      "PonyBoots",
+      "ThighHighLatexHeels"
+     ],
+     "color": null,
+     "label": "Pasture Hooves",
+     "when": "on",
+     "mins": null,
+     "desc": "Strict hoof boots, up on the toes for good. They trot now; they don't walk.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "feet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "BallChain",
+      "LeatherAnkleCuffs"
+     ],
+     "color": null,
+     "label": "Pasture Ball and Chain",
+     "when": "on",
+     "mins": null,
+     "desc": "A heavy iron ball chained to an ankle. They graze where they're put.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "PonyHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Pasture Pony Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A leather pony's head buckled over theirs, blinkers and all.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "HarnessPonyBits",
+      "BitGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Pasture Bit",
+     "when": "on",
+     "mins": null,
+     "desc": "A bit between the teeth, strapped tight, the reins hangin' for anybody to take.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "PostureCollar"
+     ],
+     "color": null,
+     "label": "Pony's Posture Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "A stiff collar holdin' the chin up, proud as a show pony.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarLeash",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Pasture Lead",
+     "when": "on",
+     "mins": null,
+     "desc": "A lead clipped to the collar, for whoever wants to walk them, or tie them up somewhere.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🌾 pasture: Staked-Out Heifer",
+   "what": "they is left staked out in the grass on all fours, zipped into a crawl suit in a cow's hood, the milker pullin', plugged and tailed, belled, a bowl in front of them and a sign sayin' they're free to breed.",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Field Milker",
+     "when": "on",
+     "mins": null,
+     "desc": "Cups latched on and pullin', the jar fillin' on the grass beside them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Heifer Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A fat rubber plug pumped up inside and buzzin', keepin' a heifer ready.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Cowtail",
+      "TailButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Farm Cow Tail",
+     "when": "on",
+     "mins": null,
+     "desc": "A swishin' cow's tail on a thick plug seated deep. Every step wags it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "StrictLeatherPetCrawler",
+      "BitchSuit",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Heifer Crawl Suit",
+     "when": "on",
+     "mins": null,
+     "desc": "Arms and legs folded and zipped into tight leather sleeves. Elbows and knees, on all fours, for good.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "CowHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Farm Cow Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A rubber cow's head pulled down over theirs, ears and muzzle and all. Only the eyes are still theirs.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Heifer Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Thick leather with a ring for the stake's chain.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "PetPost",
+      "CollarChainShort",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Field Stake",
+     "when": "on",
+     "mins": null,
+     "desc": "A stake hammered into the pasture and chained to the collar. The sign's an open invitation.",
+     "opt": null,
+     "rec": {
+      "d": 1,
+      "l": 2
+     },
+     "text": [
+      "Free",
+      "To",
+      "Breed"
+     ]
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "PetBowl",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Heifer's Feed Bowl",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel bowl on the grass in front of them. That's dinner.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "📦 receiving: Tagged for Shipping",
+   "what": "they is left strapped upright on a hand truck: jacketed, legs bound in one sleeve, up on ballet heels, blind and deaf, gagged twice over, steel locked over tits and holes with the plugs sealed in, ear-tagged for shippin'.",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "ChainClamp",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Shipping Clamps",
+     "when": "on",
+     "mins": null,
+     "desc": "Clamps on both teats joined by a chain, tuggin' with every breath.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "chestbra",
+     "groups": [
+      "ItemBreast"
+     ],
+     "items": [
+      "MetalChastityBra",
+      "ForbiddenChastityBra",
+      "PolishedChastityBra",
+      "MetalChastityBra"
+     ],
+     "color": null,
+     "label": "Shipping Bra",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel bra locked over the clamps. Nobody handles the goods till they're paid for.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Shipping Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A huge egg plug seated deep behind, and humming.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "WiredEgg",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Shipping Egg",
+     "when": "on",
+     "mins": null,
+     "desc": "An egg buzzin' deep inside, wired to a box on the hand truck.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "MetalChastityBelt",
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": null,
+     "label": "Shipping Belt",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel belt locked over both holes, sealin' the plugs in for the trip.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HighSecurityStraitJacket",
+      "StraitJacket",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Shipping Jacket",
+     "when": "on",
+     "mins": null,
+     "desc": "A heavy straitjacket, arms crossed and strapped, the crotch strap pulled tight.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "SeamlessLegBinder",
+      "LegBinder",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Shipping Binder",
+     "when": "on",
+     "mins": null,
+     "desc": "One smooth sleeve from ankle to thigh. They hop, or they're carried.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "BalletHeels",
+      "ThighHighLatexHeels"
+     ],
+     "color": null,
+     "label": "Shipping Heels",
+     "when": "on",
+     "mins": null,
+     "desc": "Ballet boots that keep them up on their toes, swayin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Shipping Blindfold",
+     "when": "on",
+     "mins": null,
+     "desc": "Leather over the eyes. They don't get to see where they're goin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Shipping Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. They won't hear who's buyin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "PlugGag",
+      "HarnessBallGag1",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Shipping Gag",
+     "when": "on",
+     "mins": null,
+     "desc": "A plug pushed in over the tongue and strapped.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag2",
+     "groups": [
+      "ItemMouth2",
+      "ItemMouth3",
+      "ItemMouth"
+     ],
+     "items": [
+      "HarnessPanelGag",
+      "HarnessPanelGag"
+     ],
+     "color": null,
+     "label": "Shipping Panel",
+     "when": "on",
+     "mins": null,
+     "desc": "A leather panel strapped over the gag. Not a word gets out.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "SteelPostureCollar",
+      "PostureCollar"
+     ],
+     "color": null,
+     "label": "Shipping Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "Steel, high and tight, the chin forced up.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Ear Tag",
+     "when": "on",
+     "mins": null,
+     "desc": "A yellow livestock tag: lot number, weight, bred or not yet.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Trolley",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Receivin' Hand Truck",
+     "when": "on",
+     "mins": null,
+     "desc": "Strapped upright to a hand truck and wheeled wherever receivin' wants them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "📦 receiving: Crated and Stamped",
+   "what": "they is left nailed into a crate with only their head out: roped tight inside from shoulders to ankles, taped blind and taped quiet, plugged at both ends, nose-ringed and ear-tagged. Stamped LIVE STOCK.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Crate Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A buzzin' plug pushed in before the lid went on.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Crate Plug (back)",
+     "when": "on",
+     "mins": null,
+     "desc": "And one behind, pumped up snug.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Crate Rope",
+     "when": "on",
+     "mins": null,
+     "desc": "Rope cinched tight round the arms behind the back, the knots where they'll never reach.",
+     "opt": "TightBoxtie",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Crate Rope (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Rope from knees to thighs, wound tight.",
+     "opt": "FullBinding",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Crate Rope (ankles)",
+     "when": "on",
+     "mins": null,
+     "desc": "And the ankles, lashed together.",
+     "opt": "FullBinding",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "DuctTape",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Packin' Tape",
+     "when": "on",
+     "mins": null,
+     "desc": "Packin' tape wound round the eyes.",
+     "opt": "Wrap",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "DuctTape",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Packin' Tape (mouth)",
+     "when": "on",
+     "mins": null,
+     "desc": "And over the mouth, smoothed flat.",
+     "opt": "Full",
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Shipping Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. They won't hear who's buyin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Crate Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "A collar to hang the tag on.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Ear Tag",
+     "when": "on",
+     "mins": null,
+     "desc": "A yellow livestock tag: lot number, weight, bred or not yet.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WoodenBoxOpenHead",
+      "WoodenBox",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Shippin' Crate",
+     "when": "on",
+     "mins": null,
+     "desc": "A slatted crate nailed shut round them, only the head stickin' out. Stamped LIVE STOCK, THIS WAY UP.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "📦 receiving: Inspection Frame",
+   "what": "they is left spread in a steel frame for the buyers to look over: lewd-blindfolded, deaf, ring-gagged and nose-ringed, suction pullin' at teats and clit, plugged and tagged with a lot number.",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Lot Teat Suction",
+     "when": "on",
+     "mins": null,
+     "desc": "Suction cups pullin' the teats long, for the buyers to judge.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "ClitSuctionCup",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Lot Clit Suction",
+     "when": "on",
+     "mins": null,
+     "desc": "A suction cup sucked onto the clit, swellin' it up for show.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Inspection Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A big plug behind, to show how much they'll take.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "blind",
+     "groups": [
+      "ItemHead"
+     ],
+     "items": [
+      "LewdBlindfold",
+      "LeatherBlindfold",
+      "LeatherBlindfold",
+      "FullBlindfold"
+     ],
+     "color": null,
+     "label": "Lot Blindfold",
+     "when": "on",
+     "mins": null,
+     "desc": "A blindfold with somethin' filthy painted where their eyes should be.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Shipping Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. They won't hear who's buyin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "RingGag",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Inspection Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring holdin' the mouth open, to check the teeth, and the throat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "nose",
+     "groups": [
+      "ItemNose"
+     ],
+     "items": [
+      "NoseShackle",
+      "NoseShackle"
+     ],
+     "color": null,
+     "label": "Farm Bull Ring",
+     "when": "on",
+     "mins": null,
+     "desc": "A ring through the nose, for leadin' them about and showin' whose stock they are.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Inspection Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "A collar to hang the lot number on.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Ear Tag",
+     "when": "on",
+     "mins": null,
+     "desc": "A yellow livestock tag: lot number, weight, bred or not yet.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "TheDisplayFrame",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Inspection Frame",
+     "when": "on",
+     "mins": null,
+     "desc": "A steel frame holdin' them spread and upright, turned to the light.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🏆 hunt prize: Broke on the Horse",
+   "what": "they is the hunt's prize: sealed in a hood that leaves them nothin' to see or hear, box-tied over mittens, cinched breathless in a corset, belled, shackled, stuffed, and left astride the wooden horse.",
+   "pieces": [
+    {
+     "slot": "hands",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "PaddedLeatherMittens",
+      "PaddedLeatherMittens",
+      "LeatherMittens"
+     ],
+     "color": null,
+     "label": "Prize Mitts",
+     "when": "on",
+     "mins": null,
+     "desc": "Padded leather balls buckled over both hands.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "BellClamps",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Prize Bells",
+     "when": "on",
+     "mins": null,
+     "desc": "Bell clamps on both teats. Every rock of the horse rings them.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Horse's Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A buzzin' plug, pushed home by every shift on the horse's edge.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Prize Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "And one behind, pumped up fat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "ExtremeCorset",
+      "HeavyLatexCorset",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Breakin' Corset",
+     "when": "on",
+     "mins": null,
+     "desc": "A corset cinched till every breath's a gasp.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "BoxTieArmbinder",
+      "LeatherArmbinder",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Prize Binder",
+     "when": "on",
+     "mins": null,
+     "desc": "Arms folded behind and laced into a binder, strapped over the chest.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "LeatherHoodSensDep",
+      "LeatherHoodSealed",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Prize Hood",
+     "when": "on",
+     "mins": null,
+     "desc": "A padded leather hood laced shut: nothin' to see, nothin' to hear, a plug for the mouth.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "collar",
+     "groups": [
+      "ItemNeck"
+     ],
+     "items": [
+      "LeatherCollar"
+     ],
+     "color": null,
+     "label": "Prize Collar",
+     "when": "on",
+     "mins": null,
+     "desc": "A collar for the prize ribbon, and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Farm Cowbell",
+     "when": "on",
+     "mins": null,
+     "desc": "A cowbell on the collar. Every squirm, every thrust, rings it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "BalletWedges",
+      "BalletHeels",
+      "ThighHighLatexHeels"
+     ],
+     "color": null,
+     "label": "Prize Wedges",
+     "when": "on",
+     "mins": null,
+     "desc": "Ballet wedges, so the toes can't help hold any weight off the horse.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "feet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "AnkleShackles",
+      "LeatherAnkleCuffs"
+     ],
+     "color": null,
+     "label": "Prize Shackles",
+     "when": "on",
+     "mins": null,
+     "desc": "Steel shackles at the ankles, hangin' heavy either side of the horse.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WoodenHorse",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "The Wooden Horse",
+     "when": "on",
+     "mins": null,
+     "desc": "A narrow wooden ridge they straddle with all their weight on the worst of it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    }
+   ]
+  },
+  {
+   "group": "Wild kits",
+   "name": "🏆 hunt prize: Sealed for the Dairy",
+   "what": "they is the hunt's prize: vacuum-sealed flat in a rubber bed, breathin' through a tube, deaf, the milker pullin' and both holes stuffed and buzzin' underneath, with nothin' to do but leak.",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Vac Milker",
+     "when": "on",
+     "mins": null,
+     "desc": "The milker, pullin' under the rubber.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Vac Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A buzzin' plug sealed in under the rubber.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "InflVibeButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Vac Plug (back)",
+     "when": "on",
+     "mins": null,
+     "desc": "And one behind, pumped up fat.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "earplugs",
+     "groups": [
+      "ItemEars"
+     ],
+     "items": [
+      "HeavyDutyEarPlugs",
+      "HeavyDutyEarPlugs",
+      "LightDutyEarPlugs"
+     ],
+     "color": null,
+     "label": "Pasture Plugs",
+     "when": "on",
+     "mins": null,
+     "desc": "Plugs pushed deep in both ears. Nothin' but their own heartbeat and the bell.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "gag",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "LatexRespirator",
+      "HarnessBallGag1",
+      "BitGag"
+     ],
+     "color": null,
+     "label": "Breathin' Tube",
+     "when": "on",
+     "mins": null,
+     "desc": "A rubber mask and a tube. Every breath they get comes down it.",
+     "opt": null,
+     "rec": null,
+     "text": null
+    },
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "VacBedDeluxe",
+      "Vacbed",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Dairy Vac Bed",
+     "when": "on",
+     "mins": null,
+     "desc": "A rubber bed with the air sucked out: sealed flat, not a finger movin'.",
+     "opt": null,
+     "rec": null,
+     "text": null
     }
    ]
   }
@@ -3215,7 +8299,9 @@
   {
    "name": "cake",
    "color": "#FFD8E6",
-   "traps": []
+   "traps": [
+    "taffy"
+   ]
   },
   {
    "name": "cream",
@@ -3229,7 +8315,10 @@
   {
    "name": "honey",
    "color": "#E0A030",
-   "traps": []
+   "traps": [
+    "mead",
+    "harvestsupper"
+   ]
   },
   {
    "name": "maple",
@@ -3241,7 +8330,11 @@
   {
    "name": "chocolate",
    "color": "#4A2A18",
-   "traps": []
+   "traps": [
+    "hiddeneggs",
+    "chocfountain",
+    "chocbunny"
+   ]
   },
   {
    "name": "strawberry",
@@ -3266,7 +8359,8 @@
    "color": "#5FAE3A",
    "traps": [
     "vines",
-    "clutch"
+    "clutch",
+    "ivy"
    ]
   },
   {
@@ -3277,7 +8371,8 @@
     "mudpit",
     "hogtie",
     "goblincart",
-    "mudslide"
+    "mudslide",
+    "sowing"
    ]
   },
   {
@@ -3288,6 +8383,126 @@
     "slop",
     "feedbag"
    ]
+  },
+  {
+   "name": "pumpkin",
+   "color": "#E07A1F",
+   "traps": [
+    "headless",
+    "pumpkinpatch"
+   ]
+  },
+  {
+   "name": "caramel",
+   "color": "#B8702A",
+   "traps": [
+    "candyapple"
+   ]
+  },
+  {
+   "name": "ecto",
+   "color": "#7FEAD0",
+   "traps": [
+    "ghost"
+   ]
+  },
+  {
+   "name": "cider",
+   "color": "#D9902E",
+   "traps": [
+    "revel",
+    "bobbing",
+    "wassail"
+   ]
+  },
+  {
+   "name": "brew",
+   "color": "#7A3FB0",
+   "traps": [
+    "cauldron"
+   ]
+  },
+  {
+   "name": "ink",
+   "color": "#15121C",
+   "traps": []
+  },
+  {
+   "name": "icing",
+   "color": "#FFFDF8",
+   "traps": [
+    "gingerbread"
+   ]
+  },
+  {
+   "name": "cocoa",
+   "color": "#6E4128",
+   "traps": []
+  },
+  {
+   "name": "eggnog",
+   "color": "#F1E0AA",
+   "traps": []
+  },
+  {
+   "name": "peppermint",
+   "color": "#E23A52",
+   "traps": []
+  },
+  {
+   "name": "wax",
+   "color": "#A3162B",
+   "traps": [
+    "longnight"
+   ]
+  },
+  {
+   "name": "dye",
+   "color": "#E7A3C8",
+   "traps": [
+    "eggdye"
+   ]
+  },
+  {
+   "name": "pollen",
+   "color": "#F2C230",
+   "traps": [
+    "puck"
+   ]
+  },
+  {
+   "name": "marshmallow",
+   "color": "#FCE6EF",
+   "traps": [
+    "marshmallow"
+   ]
+  },
+  {
+   "name": "grape",
+   "color": "#5B2245",
+   "traps": [
+    "grapestomp"
+   ]
   }
- ]
+ ],
+ "opts": {
+  "ItemArms:LeatherCuffs": "Wrist",
+  "ItemArms:SteelCuffs": "Wrist",
+  "ItemArms:WristShackles": "Behind",
+  "ItemArms:WoodenCuffs": "HandsBack",
+  "ItemArms:HempRope": "BoxTie",
+  "ItemLegs:LeatherLegCuffs": "Chained",
+  "ItemLegs:HempRope": "Basic",
+  "ItemFeet:HempRope": "Basic",
+  "ItemFeet:SpreaderMetal": "Wide",
+  "ItemFeet:HeavySpreaderMetal": "Wide",
+  "ItemFeet:WoodenCuffs": "Spread2",
+  "ItemMouth:FunnelGag": "Funnel",
+  "ItemMouth2:FunnelGag": "Funnel",
+  "ItemMouth3:FunnelGag": "Funnel",
+  "ItemNipples:LactationPump": "MediumSuction",
+  "ItemDevices:BondageBench": "Normal",
+  "ItemTorso:HempRopeHarness": "Harness",
+  "ItemTorso2:HempRopeHarness": "Harness"
+ }
 }

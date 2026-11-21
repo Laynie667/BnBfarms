@@ -700,6 +700,15 @@
       InventoryWear(S.C, item, group, null, null, null, null, false);
       const it = worn(group);
       if (!it || it.Asset.Name !== item) { missed.push(p.label); continue; }
+      // set the way the Companion sets it (Nov 20: the hogtie showed standin' up here, though the game had them hogtied):
+      // the piece's own setting or the usual one (opt), a modular item's (rec: the stake's mud and chain), a sign's words
+      try {
+        const want = p.opt || ((FARM.data && FARM.data.opts) || {})[group + ":" + item];
+        const data = typeof ExtendedItemGetData === "function" ? ExtendedItemGetData(it.Asset, it.Asset.Archetype) : null;
+        if (data && data.archetype === "typed" && want) { const i = data.options.findIndex((o) => o.Name === want); if (i >= 0) ExtendedItemSetOptionByRecord(S.C, it, { typed: i }, { push: false, refresh: false }); }
+        else if (data && data.archetype === "modular" && p.rec) ExtendedItemSetOptionByRecord(S.C, it, Object.assign({}, (it.Property && it.Property.TypeRecord) || {}, p.rec), { push: false, refresh: false });
+        if (Array.isArray(p.text)) it.Property = Object.assign(it.Property || {}, { Text: p.text[0] || "", Text2: p.text[1] || "", Text3: p.text[2] || "" });
+      } catch (e) { console.warn("[studio] settin' " + item + ":", e); }
       if (p.color) it.Color = Array.isArray(p.color) ? p.color.slice() : ((it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).length > 1 ? (it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).map(() => p.color) : p.color);
       FARM.on.push({ group, item }); got.push(p.label + " (" + item + ")");
     }

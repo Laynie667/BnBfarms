@@ -1,6 +1,10 @@
 /* WHAT'S IN THIS FILE (page.js)
    THE DISPENSARY'S PAGE: Preferences → Extensions → The Farmhand's Dispensary (/dispensary opens it too).
-   What's in you now, the safeword, who can dose you, the clock, and each dose's own switch.
+   Laid out like the Farmhand Companion's (Nov 21, Laynie: "can you organize the dispensary similar to the farmhand
+   companion"): the safeword always at the top, a "Find a setting" box, and PAGES down the side, each a few cards about
+   one thing. Every setting is on exactly one page (tests/dispensary-page.test.cjs checks):
+     In you now · Who and when · Doses · Gear and kits · Nipples and holes · Breedin' · On your screen ·
+     Hardcore and keys · Guides · About
 */
 import { h } from "../../extension/src/dom.js";
 import { LADDER, PROPRIETORS } from "./config.js";
@@ -29,10 +33,11 @@ import { BOT } from "./config.js";
 
 const W = window, ID = "FarmhandDispensary";
 let box = null, note = "";
-let guide = "", guidesOpen = null;   // the guide open now; the list shown (null: shown till you've opened one)
+let guide = "";   // the guide open now
+let pageId = "now", find = "", box0 = false;   // the page you're on, what you're lookin' for in "Find a setting", opened yet this visit
 
 const CSS = `
-#fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(760px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
+#fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(900px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;z-index:2147483000;padding:14px 18px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;
   border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
 @media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fd-page{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px}}
@@ -59,6 +64,17 @@ const CSS = `
 #fd-page .fd-try{background:#1e1822;border:1px dashed #6e5a78;border-radius:7px;padding:6px 10px;margin:6px 0}
 #fd-page .fd-try code{font:13px/1.4 ui-monospace,Consolas,monospace;color:#ffd9a8;background:#0000;word-break:break-word}
 #fd-page .fd-try button{font-size:11.5px;min-height:22px;padding:0 7px;margin-left:6px}
+#fd-page .fd-set{display:flex;gap:16px;align-items:flex-start}
+#fd-page .fd-nav{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+#fd-page .fd-nav button{text-align:left;min-height:36px;padding:0 10px;border-radius:8px;border:none;background:transparent;font-weight:600}
+#fd-page .fd-nav button.fd-on{background:#2b2230;color:#d9b3e6}
+#fd-page .fd-body{flex:1;min-width:0}
+#fd-page .fd-body > h3:first-child,#fd-page .fd-body > .fd-head:first-child h3{margin-top:0}
+#fd-page .fd-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#2b2230;border:1px solid #6e2330;border-radius:8px;padding:8px 12px;margin:4px 0 10px}
+#fd-page input.fd-find{width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;background:#1b151e;color:#ecdfe8;border:1px solid #6e5a78;margin:0 0 10px;font:inherit}
+#fd-page .fd-found{margin:10px 0 2px;color:#b3a2b8;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+@media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fd-page .fd-set{flex-direction:column}#fd-page .fd-nav{width:auto;flex-direction:row;flex-wrap:wrap;position:static}
+  #fd-page .fd-nav button{min-height:32px;border:1px solid #4a3a52;border-radius:999px}}
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
 function styles() {
@@ -202,42 +218,45 @@ function guideView(G) {
 // a section's heading, its guide a tap away, and that guide under it when it's open there
 const head = (title, id) => [h("div", { class: "fd-head" }, h("h3", null, title), id ? h("button", { class: "fd-how", "aria-label": "How " + title + " works", onclick: () => (guide === id && guideWhere === title ? (guide = "", draw()) : showGuide(id, title)) }, "📖 How it works") : null),
   guideWhere === title && GUIDE_BY[guide] ? guideView(GUIDE_BY[guide]) : null];   // (a see-also opens in the same place)
-function guidesCard() {
-  const open = guidesOpen == null ? !st().guided : guidesOpen, G = guideWhere === "top" ? GUIDE_BY[guide] : null;
-  const out = [h("div", { class: "fd-head" }, h("h3", null, "📖 Guides"), h("button", { class: "fd-how", onclick: () => { guidesOpen = !open; if (open && guideWhere === "top") guide = ""; draw(); } }, open ? "Hide the list" : "Show every guide"))];
-  out.push(h("div", { class: "fd-card" },
-    h("div", { class: "fd-muted" }, open ? "How everythin' in here works, step by step, with crafts you can copy word for word. Every section below has its own 📖 How it works too."
-      : "Step by step, for everythin' in here. Every section below has its own 📖 How it works."),
-    open ? h("div", { class: "fd-chips" }, GUIDES.map((g) => h("button", { class: "fd-chip" + (G && g.id === G.id ? " fd-on" : ""), onclick: () => (G && g.id === G.id ? (guide = "", draw()) : showGuide(g.id, "top")) }, g.icon + " " + g.title))) : null));
+// the Guides page: every guide, and the one open under the list
+function guidesPage() {
+  const G = guideWhere === "top" ? GUIDE_BY[guide] : null;
+  const out = [h("h3", null, "📖 Guides"), h("div", { class: "fd-card" },
+    h("div", { class: "fd-muted" }, "How everythin' in here works, step by step, with crafts you can copy word for word. Every section on the other pages has its own 📖 How it works too."),
+    h("div", { class: "fd-chips" }, GUIDES.map((g) => h("button", { class: "fd-chip" + (G && g.id === G.id ? " fd-on" : ""), onclick: () => (G && g.id === G.id ? (guide = "", draw()) : showGuide(g.id, "top")) }, g.icon + " " + g.title))))];
   if (G) out.push(guideView(G));
   return out;
 }
 // /dispensary guide <topic>: the page, open at that guide
 export function guideNext(id) { pendingGuide = GUIDE_BY[id] ? id : ""; }
 
-function view() {
-  const S = st(), now = doseIds().filter(active), locked = hardOn() ? true : undefined;
-  const kids = [];
-  kids.push(h("div", { class: "fd-row", style: { marginBottom: "6px" } },
-    h("h2", null, "💉 The Farmhand's Dispensary"),
-    h("button", { onclick: () => { if (typeof W.PreferenceSubscreenExtensionsClear === "function") W.PreferenceSubscreenExtensionsClear(); else close(); } }, "Back")));
-  if (note) kids.push(h("div", { class: "fd-note" }, note));
-  if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "🔒 Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
-  kids.push(...guidesCard());
+// the way out, at the top of every page: never more than a tap away
+function safeBar() {
+  const locked = hardOn(), n = doseIds().filter(active).length;
+  return h("div", { class: "fd-bar" },
+    locked
+      ? h("button", { class: "fd-safe", onclick: () => { safeword("page"); note = "🗝️ Your keyholders have been asked to let you out."; draw(); } }, "🗝️ Ask to be let out")
+      : h("button", { class: "fd-safe", onclick: () => { safeword("page"); note = "Safeword: every dose lifted."; draw(); } }, "🔴 Safeword: lift every dose"),
+    h("span", { class: "fd-muted", style: { flex: "1 1 220px" } }, (n ? n + " dose" + (n === 1 ? "" : "s") + " in you. " : "Nothin' in you. ") + (locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does."
+      : "The game's own safeword does it too, and so does /dispensary safeword.")));
+}
 
-  // in you now, and the way out
+// ── the pages ──
+function nowPage() {
+  const S = st(), now = doseIds().filter(active);
+  const kids = [];
+  // in you now
   kids.push(...head("In you now", "start"));
   kids.push(h("div", { class: "fd-card" },
     now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " ×" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
     Object.values(S.grow || {}).some((v) => v) ? h("div", null, "📏 Grown (it stays): " + Object.entries(S.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
     S.later.length ? h("div", null, "💊 " + (S.later.length === 1 ? "A time-release capsule's" : S.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
-    h("div", { class: "fd-row", style: { marginTop: "8px" } },
-      locked
-        ? h("button", { class: "fd-safe", onclick: () => { safeword("page"); note = "🗝️ Your keyholders have been asked to let you out."; draw(); } }, "🗝️ Ask to be let out")
-        : h("button", { class: "fd-safe", onclick: () => { safeword("page"); note = "Safeword: every dose lifted."; draw(); } }, "🔴 Safeword: lift every dose"),
-      h("span", { class: "fd-muted" }, locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does."
-        : "The game's own safeword does it too, and so does /dispensary safeword."))));
-
+    h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Your safeword is at the top of every page.")));
+  return kids;
+}
+function whoPage() {
+  const S = st(), locked = hardOn() ? true : undefined;
+  const kids = [];
   // who can dose you
   kids.push(...head("Who can dose you", "safety"));
   const sel = h("select", { "aria-label": "Who can dose you", disabled: locked, onchange: (e) => { st().who = e.target.value; save(); note = ""; draw(); } },
@@ -251,7 +270,11 @@ function view() {
   kids.push(h("div", { class: "fd-card" },
     h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S.penalty + "%)")),
     h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S.clock))));
-
+  return kids;
+}
+function screenPage() {
+  const S = st();
+  const kids = [];
   // what you see, and your animal
   kids.push(...head("Touches", "pick"));
   kids.push(h("div", { class: "fd-card" },
@@ -265,7 +288,11 @@ function view() {
       h("select", { "aria-label": "Your animal", onchange: (e) => { st().species = e.target.value; save(); draw(); } },
         [h("option", { value: "", selected: !S.species ? true : undefined }, S.speciesFarm ? "The farm's word (" + S.speciesFarm + ")" : "Cow, till the farm says")]
           .concat(ANIMALS.map((a) => h("option", { value: a, selected: S.species === a ? true : undefined }, a)))))));
-
+  return kids;
+}
+function dosesPage() {
+  const S = st(), locked = hardOn() ? true : undefined;
+  const kids = [];
   // the doses
   kids.push(...head("Doses", "craft"));
   const lscg = lscgPresent();
@@ -292,6 +319,11 @@ function view() {
     h("div", { class: "fd-muted" }, "The same dose again within " + TOLERANCE_HOURS + " hours takes a fifth less for each one before it, down to two fifths. You're told when it does."),
     h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.cravings ? true : undefined, onchange: (e) => { st().cravings = e.target.checked ? Date.now() : 0; save(); draw(); } }), h("b", null, "Cravings")),
     h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")));
+  return kids;
+}
+function gearPage() {
+  const S = st(), locked = hardOn() ? true : undefined;
+  const kids = [];
   // gear that doses (Nov 18, worn.js)
   kids.push(...head("Gear, drinks and kisses", "gear"));
   kids.push(h("div", { class: "fd-card fd-muted" },
@@ -311,7 +343,7 @@ function view() {
       h("div", { class: "fd-row", style: { marginTop: "6px", gap: "10px" } },
         h("select", { "aria-label": "What kits put on you", disabled: locked, onchange: (e) => { st().kitWhat = e.target.value; save(); draw(); } },
           [["both", "Clothes and restraints"], ["clothes", "Only clothes"], ["binds", "Only restraints"]].map(([v, t]) => h("option", { value: v, selected: (S.kitWhat || "both") === v ? true : undefined }, t))),
-        h("select", { "aria-label": "How fast kits go on", onchange: (e) => { st().kitSpeed = e.target.value; save(); draw(); } },
+        h("select", { "aria-label": "How fast kits go on", disabled: locked, onchange: (e) => { st().kitSpeed = e.target.value; save(); draw(); } },
           Object.keys(SPEED_NAMES).map((v) => h("option", { value: v, selected: (S.kitSpeed || "steady") === v ? true : undefined }, SPEED_NAMES[v])))),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A dose that says \"kit: <name>\" puts its crafter's saved outfit on you (one saved in LSCG, or on their Dispensary), a piece at a time, held on half an hour a dose: anythin' taken off creeps back on. Never your body, nothin' you've blocked, never over somethin' locked. When it's over, your old outfit slips back on. Its pieces keep their crafts, so horny gear in it is horny."),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "Your kits: " + (n.own.length ? n.own.join(", ") : "none yet") + (n.lscg.length ? " · in LSCG: " + n.lscg.join(", ") : "") + ". /dispensary kit save <name> keeps what you're wearin'.")));
@@ -322,6 +354,12 @@ function view() {
     h("label", null, h("input", { type: "checkbox", disabled: locked, checked: S.hornyOn !== false ? true : undefined, onchange: (e) => { st().hornyOn = e.target.checked; save(); draw(); } }),
       h("b", null, "Horny gear can use me")),
     h("div", { class: "fd-muted" }, "Crafted gear that says horny or hungry has its way with you, all by itself, every few minutes (insatiable or ravenous: every couple): plugs and dildos thrust, nipple gear suckles, gags fuck your throat, ropes and belts grind. It pushes your arousal up, and close enough it makes you cum. \"Breeding\" on it too: it fills you when you cum. A parasite that says horny is twice as busy.")));
+  kids.push(...parasitesCards(S, locked));
+  return kids;
+}
+function bodyPage() {
+  const S = st(), locked = hardOn() ? true : undefined;
+  const kids = [];
   // your nipples (Nov 18, nipples.js): how open, trained, the switch, and closin' them back up
   kids.push(...head("Nipples", "nipples"));
   { const n = nipsOpen(), t = trainedLevel(), loads = nipLoads();
@@ -352,6 +390,11 @@ function view() {
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A toy in you stretches you to its size. One size bigger than you're trained is a good stretch, two aches, three or more hurts (or only aches, with that switch off); a cruel or sadist one always means it. A trainer (crafted to say stretcher, trainer, gaper or dilator, or cruel, or with a goal like \"goal: gaping\" or \"train her to loose in 3 days\") trains you up while it's in, faster the bigger it is: a size every 12 hours at one size bigger, 6 hours at three. A pump or beads crafted as a trainer grows with you. Fingers, fists, cocks and toys count too, and a load in a loose hole drips back out. Healin' on: left be a day, they close half a size a day. Anybody who can dose you can set a goal: /dispensary train <who> <ass|pussy|throat> <size> [in 3 days]. A Tightening Balm that names a hole closes it up."),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, N.sync ? "On the farm's books: the farm girl keeps them, and gets what happens off the farm next time you're in her room" + (N.waiting ? " (" + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin')." : ".") : "These are your Dispensary's own numbers. On the farm, the farm girl keeps the books.")));
   }
+  return kids;
+}
+function breedPage() {
+  const S = st(), locked = hardOn() ? true : undefined;
+  const kids = [];
   // breedin' (Nov 19, carry.js): what you're carryin' by the farm's books, wherever you are
   kids.push(...head("Breedin'", "breeding"));
   { const K = carryInfo(), STAGE = { early: "just took", show: "showin'", heavy: "heavy and close", due: "due right now" }, rows = [];
@@ -384,7 +427,11 @@ function view() {
         h("span", { class: "fd-muted" }, locked ? "Hardcore: it drains on its own, or your keyholders take the seal out." : farmHere ? "On the farm, the farm girl's books say what's in you." : "Anythin' not sealed in drains away at once.")),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, "A crafted needle, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, filled with my seed) puts its crafter's own seed in you, as much as it says, where it says: \"500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples\", or \"in every hole\". A Breeder's Seal (gear that says so) keeps every drop in the hole it's in, opens only for its maker's seed, and while it's in only its maker's loads can catch. Off the farm it drains slowly and drips; your Dispensary hands every load to the farm girl, where it can catch with its crafter as sire" + (I.no === "breedable" ? ". She isn't bookin' yours right now: ?breedable on, in her room." : I.waiting ? " (" + I.waiting + " waitin' for her)." : "."))));
   }
-  // crafted parasites (Nov 18, parasites.js): each kind yours to switch on
+  return kids;
+}
+// crafted parasites (Nov 18, parasites.js): each kind yours to switch on (on the Gear and kits page)
+function parasitesCards(S, locked) {
+  const kids = [];
   kids.push(...head("Parasites", "parasites"));
   const inMe = paraIn();
   kids.push(h("div", { class: "fd-card" },
@@ -395,19 +442,89 @@ function view() {
     h("label", { style: { marginTop: "8px" } }, h("input", { type: "checkbox", disabled: locked, checked: S.mouthAuto ? true : undefined, onchange: (e) => { st().mouthAuto = e.target.checked; save(); draw(); } }),
       h("span", null, "The mouthpiece's words go straight out, without askin' me first")),
     h("div", { class: "fd-muted" }, "What each does: parasite lips feed you their crafter's strain and spread by a kiss; livin' latex drinks your climaxes; milk moss keeps you leakin'; the nestling grows your belly every time you cum; the brood mother lays little ones you pass on by a kiss; the leash vine keeps you near its crafter on a map; the mouthpiece lets its crafter put words in your mouth (/dispensary say, or nope).")));
-  if (lscg) {
+  return kids;
+}
+function hardPage() { return [...keyholdersCard(), ...hardCard(), ...keysCard()]; }
+function aboutPage() {
+  const kids = [];
+  kids.push(h("h3", null, "ℹ The Farmhand's Dispensary v" + VERSION));
+  kids.push(h("div", { class: "fd-card fd-muted" }, "B&B Farm's dosing add-on: crafted needles, drinks and gear that dose whoever they're used on or worn by, anywhere. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest. Your safeword lifts every dose, and your limits are yours."));
+  if (lscgPresent()) {
     kids.push(...head("LSCG", "farm"));
     kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi()
       ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left."
       : "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's."));
   }
-  kids.push(...keyholdersCard(), ...hardCard(), ...keysCard());
-  kids.push(h("div", { class: "fd-muted", style: { marginTop: "14px" } }, "The Farmhand's Dispensary v" + VERSION + " · B&B Farm. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest."));
+  return kids;
+}
+
+// every page, in the order down the side (the Companion's settings, the same way: extension/src/views/settingspages.js)
+export const PAGES = [
+  { id: "now", label: "💉 In you now", render: nowPage },
+  { id: "who", label: "🛡 Who and when", render: whoPage },
+  { id: "doses", label: "🧪 Doses", render: dosesPage },
+  { id: "gear", label: "⛓ Gear and kits", render: gearPage },
+  { id: "body", label: "⭕ Nipples and holes", render: bodyPage },
+  { id: "breed", label: "🍼 Breedin'", render: breedPage },
+  { id: "screen", label: "✨ On your screen", render: screenPage },
+  { id: "hard", label: "🔒 Hardcore and keys", render: hardPage },
+  { id: "guides", label: "📖 Guides", render: guidesPage },
+  { id: "about", label: "ℹ About", render: aboutPage },
+];
+// one page drawn safely: a page that breaks says so, and the rest still work
+const drawPage = (p) => { try { return p.render().filter((k) => k != null); } catch (e) { console.warn("[Dispensary]", e); return [h("div", { class: "fd-card fd-note" }, p.label + " hit a snag. The other pages still work.")]; } };
+// "Find a setting": every card on every page with those words in it, under the page it's on
+function findResults(q) {
+  const want = q.trim().toLowerCase(), out = [];
+  for (const p of PAGES) {
+    if (p.id === "guides") continue;   // (the guides have their own list)
+    const tmp = h("div", null, drawPage(p));
+    const hits = [...tmp.querySelectorAll(".fd-card")].filter((c) => !c.classList.contains("fd-guide") && !(c.parentElement && c.parentElement.closest(".fd-card")) && c.textContent.toLowerCase().includes(want));
+    if (hits.length) out.push(h("div", { class: "fd-found" }, p.label), ...hits);
+  }
+  return out.length ? out : [h("div", { class: "fd-muted" }, "Nothin' matches \"" + q.trim() + "\". Try fewer letters, or look through the pages.")];
+}
+function view() {
+  const locked = hardOn() ? true : undefined, cur = PAGES.find((p) => p.id === pageId) || PAGES[0];
+  const kids = [];
+  kids.push(h("div", { class: "fd-row", style: { marginBottom: "6px" } },
+    h("h2", null, "💉 The Farmhand's Dispensary"),
+    h("button", { onclick: () => { if (typeof W.PreferenceSubscreenExtensionsClear === "function") W.PreferenceSubscreenExtensionsClear(); else close(); } }, "Back")));
+  if (note) kids.push(h("div", { class: "fd-note" }, note));
+  if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "🔒 Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
+  kids.push(safeBar());
+  // typin' redraws only what's under the box, so it keeps the focus and a phone's keyboard stays up
+  const body = h("div", { class: "fd-body" });
+  const fill = () => body.replaceChildren(...(find.trim() ? findResults(find) : drawPage(cur)));
+  kids.push(h("input", { class: "fd-find", type: "search", placeholder: "Find a setting…", "aria-label": "Find a setting", value: find, oninput: (e) => { find = e.target.value; fill(); } }));
+  fill();
+  kids.push(h("div", { class: "fd-set" },
+    h("nav", { class: "fd-nav", "aria-label": "Dispensary pages" }, PAGES.map((p) =>
+      h("button", { class: p === cur && !find.trim() ? "fd-on" : "", "aria-current": p === cur && !find.trim() ? "page" : undefined, onclick: () => { find = ""; pageId = p.id; guide = ""; draw(); try { box.scrollTop = 0; } catch (e) { /* fine */ } } }, p.label))),
+    body));
   return kids;
 }
 function draw() { if (box) box.replaceChildren(...view().filter((k) => k != null)); }   // (a heading's guide spot is empty till it's open)
-export function open() { close(); styles(); if (pendingGuide) { guide = pendingGuide; guideWhere = "top"; guidesOpen = true; pendingGuide = ""; if (!st().guided) { st().guided = true; save(); } } box = W.document.createElement("div"); box.id = "fd-page"; W.document.body.appendChild(box); draw(); }
-export function close() { if (box) { box.remove(); box = null; } note = ""; guide = ""; guidesOpen = null; }
+// a page by any word for it (/dispensary page hardcore, /dispensary page seed)
+const PAGE_WORDS = { now: "now", in: "now", inyounow: "now", who: "who", when: "who", whoandwhen: "who", clock: "who", ladder: "who", dose: "doses", doses: "doses",
+  gear: "gear", kit: "gear", kits: "gear", gearandkits: "gear", horny: "gear", parasite: "gear", parasites: "gear", drinks: "gear",
+  body: "body", nipple: "body", nipples: "body", hole: "body", holes: "body", nipplesandholes: "body", breed: "breed", breedin: "breed", breeding: "breed", seed: "breed",
+  pregnancy: "breed", screen: "screen", onyourscreen: "screen", touches: "screen", icons: "screen", animal: "screen",
+  hard: "hard", hardcore: "hard", keys: "hard", keyholders: "hard", hardcoreandkeys: "hard", guide: "guides", guides: "guides", about: "about", version: "about" };
+export function pageFor(w) { return PAGE_WORDS[String(w || "").toLowerCase().replace(/[^a-z]/g, "")] || null; }
+export const pageNames = () => PAGES.map((p) => p.label.replace(/^\S+\s+/, "")).join(", ");
+let pendingPage = "";
+// which: a page to open on (now, who, doses, gear, body, breed, screen, hard, guides, about)
+export function open(which) {
+  close(); styles();
+  which = (typeof which === "string" && which) || pendingPage; pendingPage = "";
+  if (which && PAGES.some((p) => p.id === which)) pageId = which;
+  else if (!st().guided && !box0) pageId = "guides";   // (till you've opened a guide, it opens on the Guides, as the list at the top used to)
+  box0 = true;
+  if (pendingGuide) { guide = pendingGuide; guideWhere = "top"; pageId = "guides"; pendingGuide = ""; if (!st().guided) { st().guided = true; save(); } }
+  box = W.document.createElement("div"); box.id = "fd-page"; W.document.body.appendChild(box); draw();
+}
+export function close() { if (box) { box.remove(); box = null; } note = ""; guide = ""; find = ""; }
 export const pageOpen = () => !!box;
 // (the clock's redraw waits while you're pickin' somethin', so a list doesn't snap shut under your finger)
 export function redrawPage(force) { const a = W.document.activeElement; if (!force && box && a && box.contains(a) && /^(SELECT|INPUT)$/.test(a.tagName)) return; draw(); }
@@ -422,7 +539,9 @@ export function initPage() {
     return true;
   } catch (e) { console.warn("[Dispensary] its page couldn't go in the game's Extensions:", e); return false; }
 }
-export function openPage() {
+// which: the page to open on (from pageFor), or the one you were on
+export function openPage(which) {
+  pendingPage = which || "";
   try { if (typeof W.PreferenceSubscreenExtensionsOpen === "function") { W.PreferenceSubscreenExtensionsOpen(ID); return true; } } catch (e) { /* below */ }
   open();
   return true;

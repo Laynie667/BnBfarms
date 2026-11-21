@@ -286,6 +286,7 @@ function page(opts) {
 
   // the page
   const dp = s.pages.find((x) => x.Identifier === "FarmhandDispensary"); dp.load();
+  [...w.document.querySelectorAll("#fd-page .fd-nav button")].find((b) => /Gear and kits/.test(b.textContent)).click();   // (in pages since Nov 21)
   const pg = w.document.getElementById("fd-page");
   ok(/Gear, drinks and kisses/.test(pg.textContent) && /Parasites/.test(pg.textContent) && pg.querySelectorAll("input[type=checkbox]").length >= 7, "the page: gear, and a switch for each kind of parasite");
   dp.exit();

@@ -187,6 +187,7 @@ function page(opts) {
   // the page
   const dp = s.pages.find((x) => x.Identifier === "FarmhandDispensary");
   dp.load();
+  [...s.w.document.querySelectorAll("#fd-page .fd-nav button")].find((b) => /Doses/.test(b.textContent)).click();   // (in pages since Nov 21)
   const pg = s.w.document.getElementById("fd-page");
   ok(pg.querySelector("select[aria-label='Where Tender goes']") && /Tolerance/.test(pg.textContent) && /Cravings/.test(pg.textContent) && /time-release/.test(pg.textContent),
     "the page: where Tender goes, tolerance, cravings, and how time-release works");

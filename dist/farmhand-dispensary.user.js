@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.24.1
+// @version      0.25.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.24.1";
+  var VERSION = "0.25.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -16801,7 +16801,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       intro: "The Dispensary doses you from crafted items, anywhere in the club: a needle, a drink, a treat, somethin' you wear. Nothin' takes that you haven't let in, and the way out is always one button.",
       steps: [
         "Pick who can dose you under Who can dose you. It starts at your owner, your lovers and the farm. You can always dose yourself.",
-        "Look down the Doses list and switch off anythin' you don't want. Off is a hard no, from anybody.",
+        "Look down the Doses page and switch off anythin' you don't want. Off is a hard no, from anybody.",
         "Pick your clock: While online only counts down while you're logged in. Real time keeps goin' while you're away, and every dose runs longer to make up for it.",
         "Somebody on your list uses a crafted needle, drink or treat on you. The words on it are the dose: the room sees it go in, and it shows under In you now with the time left.",
         "Had enough? The red Safeword button, the game's own safeword, or /dispensary safeword lifts every dose at once."
@@ -16809,7 +16809,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       tips: [
         "Only you need the Dispensary for it to work on you. Whoever holds the needle doesn't.",
         "/dispensary on its own tells you what's in you and who can dose you. /dispensary page opens this page.",
-        "Screen touches and dose icons are only seen by people with the Dispensary, and you can switch both off under Touches."
+        "Screen touches and dose icons are only seen by people with the Dispensary, and you can switch both off under Touches, on the On your screen page."
       ],
       see: ["craft", "give", "safety"]
     },
@@ -16889,7 +16889,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       intro: "Doses that wait, doses that take less the more you have, and doses you start wantin'.",
       steps: [
         "Time-release: a needle or drink that also says time-release, slow-release, delayed or capsule doesn't hit at once. It goes off 5 to 40 minutes later, at a moment nobody knows, and waits for them to be in a room so it's seen. Up to five can wait in somebody.",
-        "Tolerance, your switch under How doses take you: the same dose again within 3 hours takes a fifth less for each one before it, down to two fifths. You're told when it does.",
+        "Tolerance, your switch under How doses take you, on the Doses page: the same dose again within 3 hours takes a fifth less for each one before it, down to two fifths. You're told when it does.",
         "Cravings, your switch too: once you've had six doses in three days, now and then, with nothin' in you, you want another. A note only you see. On the farm the farm girl notices and offers: say ?fix and she sees to it."
       ],
       craft: [
@@ -16932,7 +16932,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       title: "Kits",
       intro: "A kit is a saved outfit a dose puts on somebody, a piece at a time, held on while the dose lasts.",
       steps: [
-        "To be dressed by kits, switch on Kits can dress me under Kits. It's off to start. Pick clothes, restraints or both, and how fast it goes on.",
+        "To be dressed by kits, switch on Kits can dress me under Kits, on the Gear and kits page. It's off to start. Pick clothes, restraints or both, and how fast it goes on.",
         "To make a kit, put the outfit on yourself and type /dispensary kit save <name>. You can keep eight. An outfit you've saved in LSCG works too, by its name.",
         "Craft a dose that says Kit: <name> on a needle, a drink or gear.",
         "Dose somebody with it while you're in the room. Their Dispensary asks yours for the outfit, and it creeps onto them, held on for half an hour a dose. Anythin' they take off creeps back on.",
@@ -16988,7 +16988,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Take the seal out and most of what it held gushes out with it.",
         "Off the farm, what's in them drains slowly, faster from a looser hole, and drips down their thighs where the room can see. A plug or a seal holds it in.",
         "Every load goes to the farm girl's books, straight away if she's in the room, or the next time they're in hers. There it can catch, with the crafter as sire: they need ?breedable on, and Fertile. A Sure-Catch Serum makes it take.",
-        "Breed me anywhere, your switch under Seed, off to start: off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books, and on the farm's, where it can catch. Only from somebody on your list.",
+        "Breed me anywhere, your switch under Seed on the Breedin' page, off to start: off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books, and on the farm's, where it can catch. Only from somebody on your list.",
         "A knotted cock ties you: for its minutes you can't step away from them on a map, and the room sees it swell and lock. It never stops you leavin' a room. Theirs knows it's knotted when they run the Dispensary too and the farm's measured their cock.",
         "Keep it in: on all fours, knees spread, or hogtied within five minutes of a load in your pussy or ass, and it gets another chance to take, half again as likely.",
         "Ripe days: Fertile on the farm, two days in every seven you're ripe, achin' for it, and every load takes twice as easy. You feel them anywhere, and now and then the room can tell.",
@@ -17011,7 +17011,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "Add x2 to x5 for that many times as much.",
         "Seed is a dose like any other: whoever holds it and whoever crafted it both have to be on their list, and it has its own switch under Doses.",
         "The farm counts one load from the same crafter every ten minutes. More still fills them, it just isn't another load on the books.",
-        "Under Seed on this page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in.",
+        "Under Seed on the Breedin' page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in.",
         "The Womb Mark, in any Farm Ink slot in the wardrobe: a little heart inked in for every litter, it glows hot pink while you're carryin' with a dot for each one in there, and at twenty litters it reads BABY FACTORY."
       ],
       see: ["horny", "holes", "farm"]
@@ -17036,7 +17036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { name: "Dilator Clamps", note: "worn on the nipples: keeps them open the whole time they're clamped on", expect: [] }
       ],
       tips: [
-        "Your switch: They close up slowly on their own, half a step a day once they've been left be twelve hours. Off, they stay as they're trained.",
+        "Your switch, on the Nipples and holes page: They close up slowly on their own, half a step a day once they've been left be twelve hours. Off, they stay as they're trained.",
         "A locked nipple plug holds them open till whoever holds its key takes it out."
       ],
       see: ["holes", "parasites", "pick"]
@@ -17062,7 +17062,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ],
       tips: [
         "Pussy and ass sizes: tight, snug, slightly gaped, gaped, loose, well-used, gaping, wide open, cavernous, ruined. A throat: gaggy, tight, learnin', eager, practiced, trained, deep, greedy, past gaggin', bottomless.",
-        "Your switches: They close up slowly on their own, off to start, and Too-big toys can hurt, on to start. Off, a too-big toy only aches.",
+        "Your switches, on the Nipples and holes page: They close up slowly on their own, off to start, and Too-big toys can hurt, on to start. Off, a too-big toy only aches.",
         "On the farm's books, the farm girl keeps your numbers, and your Dispensary hands her what happened off the farm next time you're in her room.",
         "/dispensary holes shows all three, and /dispensary train <who> clear lifts a goal."
       ],
@@ -17074,7 +17074,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       title: "Parasites",
       intro: "Crafted critters that latch on and do their own thing. Every kind is yours to switch on, and all are off to start.",
       steps: [
-        "Switch on each kind you'll take, under Parasites.",
+        "Switch on each kind you'll take, under Parasites on the Gear and kits page.",
         "Somebody crafts an item that names one, a gag, a plug, a collar, a harness, anythin', and puts it on you. The crafter has to be on your list.",
         "Most latch on and stay even once the item comes off. The leash vine and the mouthpiece only work while worn.",
         "Name doses on the item too, and that's its strain: what it feeds you. None named, it feeds you the farm's own brew.",
@@ -17130,7 +17130,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ],
       tips: [
         "Your keyholders can check in, let you out with every dose lifted, change who can dose you, your clock and which doses are on, or end it. Every change shows to you, and the last few are listed under Hardcore.",
-        "Holdin' somebody's key? Keys you hold shows up at the bottom of your page: Check in, Let out, End hardcore, and Their settings when you're in a room together. Out of the room it goes by beep, which needs you to be friends.",
+        "Holdin' somebody's key? Keys you hold shows up on the Hardcore and keys page: Check in, Let out, End hardcore, and Their settings when you're in a room together. Out of the room it goes by beep, which needs you to be friends.",
         "The farm's own ?safeword always works, hardcore or not."
       ],
       see: ["safety", "start"]
@@ -17160,7 +17160,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       intro: "Everythin' you can type, in chat. Most of it's on this page too.",
       steps: [
         "/dispensary: what's in you, and who can dose you.",
-        "/dispensary page: opens this page. /dispensary guide <topic> opens a guide.",
+        "/dispensary page: opens this page. /dispensary page <which> opens straight on one: doses, gear, holes, seed, hardcore, and the rest. /dispensary guide <topic> opens a guide.",
         "/dispensary safeword: lifts every dose. In hardcore, asks your keyholders to let you out.",
         "/dispensary nips, then close, or heal on or off.",
         "/dispensary holes, then heal on or off, or pain on or off.",
@@ -17253,9 +17253,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var box2 = null;
   var note3 = "";
   var guide = "";
-  var guidesOpen = null;
+  var pageId = "now";
+  var find = "";
+  var box0 = false;
   var CSS3 = `
-#fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(760px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
+#fd-page{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(900px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;z-index:2147483000;padding:14px 18px;box-sizing:border-box;background:#211a24;color:#ecdfe8;border:2px solid #b78ac8;
   border-radius:12px;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 30px #000a}
 @media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fd-page{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px}}
@@ -17282,6 +17284,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
 #fd-page .fd-try{background:#1e1822;border:1px dashed #6e5a78;border-radius:7px;padding:6px 10px;margin:6px 0}
 #fd-page .fd-try code{font:13px/1.4 ui-monospace,Consolas,monospace;color:#ffd9a8;background:#0000;word-break:break-word}
 #fd-page .fd-try button{font-size:11.5px;min-height:22px;padding:0 7px;margin-left:6px}
+#fd-page .fd-set{display:flex;gap:16px;align-items:flex-start}
+#fd-page .fd-nav{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+#fd-page .fd-nav button{text-align:left;min-height:36px;padding:0 10px;border-radius:8px;border:none;background:transparent;font-weight:600}
+#fd-page .fd-nav button.fd-on{background:#2b2230;color:#d9b3e6}
+#fd-page .fd-body{flex:1;min-width:0}
+#fd-page .fd-body > h3:first-child,#fd-page .fd-body > .fd-head:first-child h3{margin-top:0}
+#fd-page .fd-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#2b2230;border:1px solid #6e2330;border-radius:8px;padding:8px 12px;margin:4px 0 10px}
+#fd-page input.fd-find{width:100%;box-sizing:border-box;padding:6px 10px;border-radius:8px;background:#1b151e;color:#ecdfe8;border:1px solid #6e5a78;margin:0 0 10px;font:inherit}
+#fd-page .fd-found{margin:10px 0 2px;color:#b3a2b8;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+@media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fd-page .fd-set{flex-direction:column}#fd-page .fd-nav{width:auto;flex-direction:row;flex-wrap:wrap;position:static}
+  #fd-page .fd-nav button{min-height:32px;border:1px solid #4a3a52;border-radius:999px}}
 @media (pointer:coarse){#fd-page select,#fd-page input{font-size:16px}#fd-page button{min-height:40px}}
 `;
   function styles() {
@@ -17548,40 +17561,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
     h("div", { class: "fd-head" }, h("h3", null, title), id ? h("button", { class: "fd-how", "aria-label": "How " + title + " works", onclick: () => guide === id && guideWhere === title ? (guide = "", draw2()) : showGuide(id, title) }, "\u{1F4D6} How it works") : null),
     guideWhere === title && GUIDE_BY[guide] ? guideView(GUIDE_BY[guide]) : null
   ];
-  function guidesCard() {
-    const open2 = guidesOpen == null ? !st().guided : guidesOpen, G = guideWhere === "top" ? GUIDE_BY[guide] : null;
-    const out = [h("div", { class: "fd-head" }, h("h3", null, "\u{1F4D6} Guides"), h("button", { class: "fd-how", onclick: () => {
-      guidesOpen = !open2;
-      if (open2 && guideWhere === "top") guide = "";
-      draw2();
-    } }, open2 ? "Hide the list" : "Show every guide"))];
-    out.push(h(
+  function guidesPage() {
+    const G = guideWhere === "top" ? GUIDE_BY[guide] : null;
+    const out = [h("h3", null, "\u{1F4D6} Guides"), h(
       "div",
       { class: "fd-card" },
-      h("div", { class: "fd-muted" }, open2 ? "How everythin' in here works, step by step, with crafts you can copy word for word. Every section below has its own \u{1F4D6} How it works too." : "Step by step, for everythin' in here. Every section below has its own \u{1F4D6} How it works."),
-      open2 ? h("div", { class: "fd-chips" }, GUIDES.map((g) => h("button", { class: "fd-chip" + (G && g.id === G.id ? " fd-on" : ""), onclick: () => G && g.id === G.id ? (guide = "", draw2()) : showGuide(g.id, "top") }, g.icon + " " + g.title))) : null
-    ));
+      h("div", { class: "fd-muted" }, "How everythin' in here works, step by step, with crafts you can copy word for word. Every section on the other pages has its own \u{1F4D6} How it works too."),
+      h("div", { class: "fd-chips" }, GUIDES.map((g) => h("button", { class: "fd-chip" + (G && g.id === G.id ? " fd-on" : ""), onclick: () => G && g.id === G.id ? (guide = "", draw2()) : showGuide(g.id, "top") }, g.icon + " " + g.title)))
+    )];
     if (G) out.push(guideView(G));
     return out;
   }
   function guideNext(id) {
     pendingGuide = GUIDE_BY[id] ? id : "";
   }
-  function view2() {
-    const S3 = st(), now = doseIds().filter(active), locked = hardOn() ? true : void 0;
-    const kids = [];
-    kids.push(h(
+  function safeBar() {
+    const locked = hardOn(), n = doseIds().filter(active).length;
+    return h(
       "div",
-      { class: "fd-row", style: { marginBottom: "6px" } },
-      h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
-      h("button", { onclick: () => {
-        if (typeof W23.PreferenceSubscreenExtensionsClear === "function") W23.PreferenceSubscreenExtensionsClear();
-        else close2();
-      } }, "Back")
-    ));
-    if (note3) kids.push(h("div", { class: "fd-note" }, note3));
-    if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "\u{1F512} Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
-    kids.push(...guidesCard());
+      { class: "fd-bar" },
+      locked ? h("button", { class: "fd-safe", onclick: () => {
+        safeword("page");
+        note3 = "\u{1F5DD}\uFE0F Your keyholders have been asked to let you out.";
+        draw2();
+      } }, "\u{1F5DD}\uFE0F Ask to be let out") : h("button", { class: "fd-safe", onclick: () => {
+        safeword("page");
+        note3 = "Safeword: every dose lifted.";
+        draw2();
+      } }, "\u{1F534} Safeword: lift every dose"),
+      h("span", { class: "fd-muted", style: { flex: "1 1 220px" } }, (n ? n + " dose" + (n === 1 ? "" : "s") + " in you. " : "Nothin' in you. ") + (locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does." : "The game's own safeword does it too, and so does /dispensary safeword."))
+    );
+  }
+  function nowPage() {
+    const S3 = st(), now = doseIds().filter(active);
+    const kids = [];
     kids.push(...head("In you now", "start"));
     kids.push(h(
       "div",
@@ -17589,21 +17602,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       now.length ? now.map((id) => h("div", null, BOOK[id].icon + " " + BOOK[id].label + (st().doses[id].x > 1 ? " \xD7" + st().doses[id].x : "") + partLabel(id) + ": " + timeLeft(leftMs(id)) + " left" + (S3.clock === "online" ? " of your time here" : ""))) : h("div", { class: "fd-muted" }, "Nothin'. You're clear."),
       Object.values(S3.grow || {}).some((v) => v) ? h("div", null, "\u{1F4CF} Grown (it stays): " + Object.entries(S3.grow).filter(([, v]) => v).map(([k, v]) => ({ cup: "tits", ass: "ass", cock: "cock", balls: "balls" })[k] + " " + (v > 0 ? "+" : "") + v).join(", ") + ". A reducing serum takes a size back off.") : null,
       S3.later.length ? h("div", null, "\u{1F48A} " + (S3.later.length === 1 ? "A time-release capsule's" : S3.later.length + " time-release capsules are") + " waitin' in you. You won't know when.") : null,
-      h(
-        "div",
-        { class: "fd-row", style: { marginTop: "8px" } },
-        locked ? h("button", { class: "fd-safe", onclick: () => {
-          safeword("page");
-          note3 = "\u{1F5DD}\uFE0F Your keyholders have been asked to let you out.";
-          draw2();
-        } }, "\u{1F5DD}\uFE0F Ask to be let out") : h("button", { class: "fd-safe", onclick: () => {
-          safeword("page");
-          note3 = "Safeword: every dose lifted.";
-          draw2();
-        } }, "\u{1F534} Safeword: lift every dose"),
-        h("span", { class: "fd-muted" }, locked ? "Hardcore: your safeword asks your keyholders to let you out. Your doses stay till one of them does." : "The game's own safeword does it too, and so does /dispensary safeword.")
-      )
+      h("div", { class: "fd-muted", style: { marginTop: "6px" } }, "Your safeword is at the top of every page.")
     ));
+    return kids;
+  }
+  function whoPage() {
+    const S3 = st(), locked = hardOn() ? true : void 0;
+    const kids = [];
     kids.push(...head("Who can dose you", "safety"));
     const sel = h(
       "select",
@@ -17632,6 +17637,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("div", { class: "fd-row", style: { gap: "18px" } }, radio("online", "While online"), radio("real", "Real time (+" + S3.penalty + "%)")),
       h("div", { class: "fd-muted", style: { marginTop: "4px" } }, clockTip(S3.clock))
     ));
+    return kids;
+  }
+  function screenPage() {
+    const S3 = st();
+    const kids = [];
     kids.push(...head("Touches", "pick"));
     kids.push(h(
       "div",
@@ -17668,6 +17678,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         )
       )
     ));
+    return kids;
+  }
+  function dosesPage() {
+    const S3 = st(), locked = hardOn() ? true : void 0;
+    const kids = [];
     kids.push(...head("Doses", "craft"));
     const lscg = lscgPresent();
     for (const id of doseIds()) {
@@ -17729,6 +17744,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } }), h("b", null, "Cravings")),
       h("div", { class: "fd-muted" }, "Once you've had " + CRAVE_AFTER + " doses in " + CRAVE_DAYS + " days, now and then, while nothin's in you, you want another (a note only you see). On the farm the farm girl notices, and offers: say ?fix and she sees to it. Only doses from here on count.")
     ));
+    return kids;
+  }
+  function gearPage() {
+    const S3 = st(), locked = hardOn() ? true : void 0;
+    const kids = [];
     kids.push(...head("Gear, drinks and kisses", "gear"));
     kids.push(h(
       "div",
@@ -17767,7 +17787,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           ),
           h(
             "select",
-            { "aria-label": "How fast kits go on", onchange: (e) => {
+            { "aria-label": "How fast kits go on", disabled: locked, onchange: (e) => {
               st().kitSpeed = e.target.value;
               save();
               draw2();
@@ -17795,6 +17815,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       h("div", { class: "fd-muted" }, 'Crafted gear that says horny or hungry has its way with you, all by itself, every few minutes (insatiable or ravenous: every couple): plugs and dildos thrust, nipple gear suckles, gags fuck your throat, ropes and belts grind. It pushes your arousal up, and close enough it makes you cum. "Breeding" on it too: it fills you when you cum. A parasite that says horny is twice as busy.')
     ));
+    kids.push(...parasitesCards(S3, locked));
+    return kids;
+  }
+  function bodyPage() {
+    const S3 = st(), locked = hardOn() ? true : void 0;
+    const kids = [];
     kids.push(...head("Nipples", "nipples"));
     {
       const n = nipsOpen(), t = trainedLevel(), loads = nipLoads();
@@ -17876,6 +17902,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fd-muted", style: { marginTop: "4px" } }, N.sync ? "On the farm's books: the farm girl keeps them, and gets what happens off the farm next time you're in her room" + (N.waiting ? " (" + N.waiting + " change" + (N.waiting === 1 ? "" : "s") + " waitin')." : ".") : "These are your Dispensary's own numbers. On the farm, the farm girl keeps the books.")
       ));
     }
+    return kids;
+  }
+  function breedPage() {
+    const S3 = st(), locked = hardOn() ? true : void 0;
+    const kids = [];
     kids.push(...head("Breedin'", "breeding"));
     {
       const K3 = carryInfo(), STAGE = { early: "just took", show: "showin'", heavy: "heavy and close", due: "due right now" }, rows = [];
@@ -17926,6 +17957,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fd-muted", style: { marginTop: "4px" } }, `A crafted needle, drink or bit of gear that says it carries seed (Insemination, Seed Syringe, Cum Shot, filled with my seed) puts its crafter's own seed in you, as much as it says, where it says: "500 ml pussy, 1 L ass, 2 gallons mouth, 50 ml nipples", or "in every hole". A Breeder's Seal (gear that says so) keeps every drop in the hole it's in, opens only for its maker's seed, and while it's in only its maker's loads can catch. Off the farm it drains slowly and drips; your Dispensary hands every load to the farm girl, where it can catch with its crafter as sire` + (I.no === "breedable" ? ". She isn't bookin' yours right now: ?breedable on, in her room." : I.waiting ? " (" + I.waiting + " waitin' for her)." : "."))
       ));
     }
+    return kids;
+  }
+  function parasitesCards(S3, locked) {
+    const kids = [];
     kids.push(...head("Parasites", "parasites"));
     const inMe2 = mine2();
     kids.push(h(
@@ -17962,24 +17997,155 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       h("div", { class: "fd-muted" }, "What each does: parasite lips feed you their crafter's strain and spread by a kiss; livin' latex drinks your climaxes; milk moss keeps you leakin'; the nestling grows your belly every time you cum; the brood mother lays little ones you pass on by a kiss; the leash vine keeps you near its crafter on a map; the mouthpiece lets its crafter put words in your mouth (/dispensary say, or nope).")
     ));
-    if (lscg) {
+    return kids;
+  }
+  function hardPage() {
+    return [...keyholdersCard(), ...hardCard(), ...keysCard()];
+  }
+  function aboutPage() {
+    const kids = [];
+    kids.push(h("h3", null, "\u2139 The Farmhand's Dispensary v" + VERSION));
+    kids.push(h("div", { class: "fd-card fd-muted" }, "B&B Farm's dosing add-on: crafted needles, drinks and gear that dose whoever they're used on or worn by, anywhere. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest. Your safeword lifts every dose, and your limits are yours."));
+    if (lscgPresent()) {
       kids.push(...head("LSCG", "farm"));
       kids.push(h("div", { class: "fd-card fd-muted" }, lscgApi2() ? "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's. Our doses are in LSCG's Drug Enhancements list too: switch them on there as well to see a bar with the time left." : "LSCG is loaded. Its sedative, aphrodisiac, mind control, suggestible and antidote are LSCG's."));
     }
-    kids.push(...keyholdersCard(), ...hardCard(), ...keysCard());
-    kids.push(h("div", { class: "fd-muted", style: { marginTop: "14px" } }, "The Farmhand's Dispensary v" + VERSION + " \xB7 B&B Farm. On the farm, the farm girl keeps the farm's books and your Dispensary does the rest."));
+    return kids;
+  }
+  var PAGES = [
+    { id: "now", label: "\u{1F489} In you now", render: nowPage },
+    { id: "who", label: "\u{1F6E1} Who and when", render: whoPage },
+    { id: "doses", label: "\u{1F9EA} Doses", render: dosesPage },
+    { id: "gear", label: "\u26D3 Gear and kits", render: gearPage },
+    { id: "body", label: "\u2B55 Nipples and holes", render: bodyPage },
+    { id: "breed", label: "\u{1F37C} Breedin'", render: breedPage },
+    { id: "screen", label: "\u2728 On your screen", render: screenPage },
+    { id: "hard", label: "\u{1F512} Hardcore and keys", render: hardPage },
+    { id: "guides", label: "\u{1F4D6} Guides", render: guidesPage },
+    { id: "about", label: "\u2139 About", render: aboutPage }
+  ];
+  var drawPage = (p) => {
+    try {
+      return p.render().filter((k) => k != null);
+    } catch (e) {
+      console.warn("[Dispensary]", e);
+      return [h("div", { class: "fd-card fd-note" }, p.label + " hit a snag. The other pages still work.")];
+    }
+  };
+  function findResults(q) {
+    const want = q.trim().toLowerCase(), out = [];
+    for (const p of PAGES) {
+      if (p.id === "guides") continue;
+      const tmp = h("div", null, drawPage(p));
+      const hits = [...tmp.querySelectorAll(".fd-card")].filter((c) => !c.classList.contains("fd-guide") && !(c.parentElement && c.parentElement.closest(".fd-card")) && c.textContent.toLowerCase().includes(want));
+      if (hits.length) out.push(h("div", { class: "fd-found" }, p.label), ...hits);
+    }
+    return out.length ? out : [h("div", { class: "fd-muted" }, `Nothin' matches "` + q.trim() + '". Try fewer letters, or look through the pages.')];
+  }
+  function view2() {
+    const locked = hardOn() ? true : void 0, cur = PAGES.find((p) => p.id === pageId) || PAGES[0];
+    const kids = [];
+    kids.push(h(
+      "div",
+      { class: "fd-row", style: { marginBottom: "6px" } },
+      h("h2", null, "\u{1F489} The Farmhand's Dispensary"),
+      h("button", { onclick: () => {
+        if (typeof W23.PreferenceSubscreenExtensionsClear === "function") W23.PreferenceSubscreenExtensionsClear();
+        else close2();
+      } }, "Back")
+    ));
+    if (note3) kids.push(h("div", { class: "fd-note" }, note3));
+    if (locked) kids.push(h("div", { class: "fd-card fd-note" }, "\u{1F512} Hardcore: your keyholders hold these settings. You can look, but only they can change them."));
+    kids.push(safeBar());
+    const body = h("div", { class: "fd-body" });
+    const fill2 = () => body.replaceChildren(...find.trim() ? findResults(find) : drawPage(cur));
+    kids.push(h("input", { class: "fd-find", type: "search", placeholder: "Find a setting\u2026", "aria-label": "Find a setting", value: find, oninput: (e) => {
+      find = e.target.value;
+      fill2();
+    } }));
+    fill2();
+    kids.push(h(
+      "div",
+      { class: "fd-set" },
+      h("nav", { class: "fd-nav", "aria-label": "Dispensary pages" }, PAGES.map((p) => h("button", { class: p === cur && !find.trim() ? "fd-on" : "", "aria-current": p === cur && !find.trim() ? "page" : void 0, onclick: () => {
+        find = "";
+        pageId = p.id;
+        guide = "";
+        draw2();
+        try {
+          box2.scrollTop = 0;
+        } catch (e) {
+        }
+      } }, p.label))),
+      body
+    ));
     return kids;
   }
   function draw2() {
     if (box2) box2.replaceChildren(...view2().filter((k) => k != null));
   }
-  function open() {
+  var PAGE_WORDS = {
+    now: "now",
+    in: "now",
+    inyounow: "now",
+    who: "who",
+    when: "who",
+    whoandwhen: "who",
+    clock: "who",
+    ladder: "who",
+    dose: "doses",
+    doses: "doses",
+    gear: "gear",
+    kit: "gear",
+    kits: "gear",
+    gearandkits: "gear",
+    horny: "gear",
+    parasite: "gear",
+    parasites: "gear",
+    drinks: "gear",
+    body: "body",
+    nipple: "body",
+    nipples: "body",
+    hole: "body",
+    holes: "body",
+    nipplesandholes: "body",
+    breed: "breed",
+    breedin: "breed",
+    breeding: "breed",
+    seed: "breed",
+    pregnancy: "breed",
+    screen: "screen",
+    onyourscreen: "screen",
+    touches: "screen",
+    icons: "screen",
+    animal: "screen",
+    hard: "hard",
+    hardcore: "hard",
+    keys: "hard",
+    keyholders: "hard",
+    hardcoreandkeys: "hard",
+    guide: "guides",
+    guides: "guides",
+    about: "about",
+    version: "about"
+  };
+  function pageFor(w) {
+    return PAGE_WORDS[String(w || "").toLowerCase().replace(/[^a-z]/g, "")] || null;
+  }
+  var pageNames = () => PAGES.map((p) => p.label.replace(/^\S+\s+/, "")).join(", ");
+  var pendingPage = "";
+  function open(which) {
     close2();
     styles();
+    which = typeof which === "string" && which || pendingPage;
+    pendingPage = "";
+    if (which && PAGES.some((p) => p.id === which)) pageId = which;
+    else if (!st().guided && !box0) pageId = "guides";
+    box0 = true;
     if (pendingGuide) {
       guide = pendingGuide;
       guideWhere = "top";
-      guidesOpen = true;
+      pageId = "guides";
       pendingGuide = "";
       if (!st().guided) {
         st().guided = true;
@@ -17998,7 +18164,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     note3 = "";
     guide = "";
-    guidesOpen = null;
+    find = "";
   }
   var pageOpen = () => !!box2;
   function redrawPage(force) {
@@ -18029,7 +18195,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   }
-  function openPage() {
+  function openPage(which) {
+    pendingPage = which || "";
     try {
       if (typeof W23.PreferenceSubscreenExtensionsOpen === "function") {
         W23.PreferenceSubscreenExtensionsOpen(ID);
@@ -18145,8 +18312,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
             safeword("command");
             return;
           }
-          if (/^(page|settings|open)$/.test(a)) {
-            openPage();
+          const pgm = /^(?:page|settings|open)(?:\s+(.+))?$/.exec(a);
+          if (pgm) {
+            const p = pgm[1] ? pageFor(pgm[1]) : null;
+            if (pgm[1] && !p) local("No page called that. The pages: " + pageNames() + ".");
+            openPage(p);
             return;
           }
           if (/^say$/.test(a)) {

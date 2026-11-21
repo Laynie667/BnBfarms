@@ -39,7 +39,7 @@ import { initSafeword, safeword } from "./safeword.js";
 import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
 import { initSpeech, dosedSpeech } from "./speech.js";
 import { screenTick } from "./screen.js";
-import { initPage, openPage, pageOpen, redrawPage, timeLeft, guideNext } from "./page.js";
+import { initPage, openPage, pageOpen, redrawPage, timeLeft, guideNext, pageFor, pageNames } from "./page.js";
 import { GUIDES, guideFor } from "./guides.js";
 import { ladderWho, allowed } from "./ladder.js";
 import { local, nameOf } from "./say.js";
@@ -108,7 +108,9 @@ function commands() {
           guideNext(G.id); openPage(); return;
         }
         if (/^(safe|safeword|red)$/.test(a)) { safeword("command"); return; }
-        if (/^(page|settings|open)$/.test(a)) { openPage(); return; }
+        // (Nov 21) /dispensary page <which>: straight to that page (hardcore, doses, seed…)
+        const pgm = /^(?:page|settings|open)(?:\s+(.+))?$/.exec(a);
+        if (pgm) { const p = pgm[1] ? pageFor(pgm[1]) : null; if (pgm[1] && !p) local("No page called that. The pages: " + pageNames() + "."); openPage(p); return; }
         // the mouthpiece: say what its crafter asked, or let it pass; or, as the crafter, send some words
         if (/^say$/.test(a)) { if (!sayAsked(true)) local("Nobody's asked you to say anything."); return; }
         if (/^(nope|no|pass)$/.test(a)) { if (!sayAsked(false)) local("Nobody's asked you to say anything."); return; }

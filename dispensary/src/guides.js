@@ -1,7 +1,7 @@
 /* WHAT'S IN THIS FILE (guides.js)
    THE GUIDES (Laynie, Nov 19: "need to make guides in the dispensary for everything"). One guide for every part of the
    Dispensary, on its own page: what it is, how to do it step by step, crafts to try word for word, and the things worth
-   knowin'. Each section of the page has a 📖 button that opens its guide; /dispensary guide <topic> does too.
+   knowin'. Each section on its pages has a 📖 button that opens its guide; /dispensary guide <topic> does too.
    Every "Try it" craft is checked by a test (dispensary-guides.test.cjs): the words on it really are the doses it says.
 */
 export const GUIDES = [
@@ -10,7 +10,7 @@ export const GUIDES = [
     intro: "The Dispensary doses you from crafted items, anywhere in the club: a needle, a drink, a treat, somethin' you wear. Nothin' takes that you haven't let in, and the way out is always one button.",
     steps: [
       "Pick who can dose you under Who can dose you. It starts at your owner, your lovers and the farm. You can always dose yourself.",
-      "Look down the Doses list and switch off anythin' you don't want. Off is a hard no, from anybody.",
+      "Look down the Doses page and switch off anythin' you don't want. Off is a hard no, from anybody.",
       "Pick your clock: While online only counts down while you're logged in. Real time keeps goin' while you're away, and every dose runs longer to make up for it.",
       "Somebody on your list uses a crafted needle, drink or treat on you. The words on it are the dose: the room sees it go in, and it shows under In you now with the time left.",
       "Had enough? The red Safeword button, the game's own safeword, or /dispensary safeword lifts every dose at once.",
@@ -18,7 +18,7 @@ export const GUIDES = [
     tips: [
       "Only you need the Dispensary for it to work on you. Whoever holds the needle doesn't.",
       "/dispensary on its own tells you what's in you and who can dose you. /dispensary page opens this page.",
-      "Screen touches and dose icons are only seen by people with the Dispensary, and you can switch both off under Touches.",
+      "Screen touches and dose icons are only seen by people with the Dispensary, and you can switch both off under Touches, on the On your screen page.",
     ],
     see: ["craft", "give", "safety"],
   },
@@ -90,7 +90,7 @@ export const GUIDES = [
     intro: "Doses that wait, doses that take less the more you have, and doses you start wantin'.",
     steps: [
       "Time-release: a needle or drink that also says time-release, slow-release, delayed or capsule doesn't hit at once. It goes off 5 to 40 minutes later, at a moment nobody knows, and waits for them to be in a room so it's seen. Up to five can wait in somebody.",
-      "Tolerance, your switch under How doses take you: the same dose again within 3 hours takes a fifth less for each one before it, down to two fifths. You're told when it does.",
+      "Tolerance, your switch under How doses take you, on the Doses page: the same dose again within 3 hours takes a fifth less for each one before it, down to two fifths. You're told when it does.",
       "Cravings, your switch too: once you've had six doses in three days, now and then, with nothin' in you, you want another. A note only you see. On the farm the farm girl notices and offers: say ?fix and she sees to it.",
     ],
     craft: [
@@ -129,7 +129,7 @@ export const GUIDES = [
     id: "kits", icon: "👗", title: "Kits",
     intro: "A kit is a saved outfit a dose puts on somebody, a piece at a time, held on while the dose lasts.",
     steps: [
-      "To be dressed by kits, switch on Kits can dress me under Kits. It's off to start. Pick clothes, restraints or both, and how fast it goes on.",
+      "To be dressed by kits, switch on Kits can dress me under Kits, on the Gear and kits page. It's off to start. Pick clothes, restraints or both, and how fast it goes on.",
       "To make a kit, put the outfit on yourself and type /dispensary kit save <name>. You can keep eight. An outfit you've saved in LSCG works too, by its name.",
       "Craft a dose that says Kit: <name> on a needle, a drink or gear.",
       "Dose somebody with it while you're in the room. Their Dispensary asks yours for the outfit, and it creeps onto them, held on for half an hour a dose. Anythin' they take off creeps back on.",
@@ -181,7 +181,7 @@ export const GUIDES = [
       "Take the seal out and most of what it held gushes out with it.",
       "Off the farm, what's in them drains slowly, faster from a looser hole, and drips down their thighs where the room can see. A plug or a seal holds it in.",
       "Every load goes to the farm girl's books, straight away if she's in the room, or the next time they're in hers. There it can catch, with the crafter as sire: they need ?breedable on, and Fertile. A Sure-Catch Serum makes it take.",
-      "Breed me anywhere, your switch under Seed, off to start: off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books, and on the farm's, where it can catch. Only from somebody on your list.",
+      "Breed me anywhere, your switch under Seed on the Breedin' page, off to start: off the farm, a real cock that cums in you, through the game's own actions, leaves a real load of theirs on your books, and on the farm's, where it can catch. Only from somebody on your list.",
       "A knotted cock ties you: for its minutes you can't step away from them on a map, and the room sees it swell and lock. It never stops you leavin' a room. Theirs knows it's knotted when they run the Dispensary too and the farm's measured their cock.",
       "Keep it in: on all fours, knees spread, or hogtied within five minutes of a load in your pussy or ass, and it gets another chance to take, half again as likely.",
       "Ripe days: Fertile on the farm, two days in every seven you're ripe, achin' for it, and every load takes twice as easy. You feel them anywhere, and now and then the room can tell.",
@@ -204,7 +204,7 @@ export const GUIDES = [
       "Add x2 to x5 for that many times as much.",
       "Seed is a dose like any other: whoever holds it and whoever crafted it both have to be on their list, and it has its own switch under Doses.",
       "The farm counts one load from the same crafter every ten minutes. More still fills them, it just isn't another load on the books.",
-      "Under Seed on this page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in.",
+      "Under Seed on the Breedin' page, and with /dispensary seed: what's in them now, whose it is, and every load they've taken. Let it all out empties what isn't sealed in.",
       "The Womb Mark, in any Farm Ink slot in the wardrobe: a little heart inked in for every litter, it glows hot pink while you're carryin' with a dot for each one in there, and at twenty litters it reads BABY FACTORY.",
     ],
     see: ["horny", "holes", "farm"],
@@ -227,7 +227,7 @@ export const GUIDES = [
       { name: "Dilator Clamps", note: "worn on the nipples: keeps them open the whole time they're clamped on", expect: [] },
     ],
     tips: [
-      "Your switch: They close up slowly on their own, half a step a day once they've been left be twelve hours. Off, they stay as they're trained.",
+      "Your switch, on the Nipples and holes page: They close up slowly on their own, half a step a day once they've been left be twelve hours. Off, they stay as they're trained.",
       "A locked nipple plug holds them open till whoever holds its key takes it out.",
     ],
     see: ["holes", "parasites", "pick"],
@@ -251,7 +251,7 @@ export const GUIDES = [
     ],
     tips: [
       "Pussy and ass sizes: tight, snug, slightly gaped, gaped, loose, well-used, gaping, wide open, cavernous, ruined. A throat: gaggy, tight, learnin', eager, practiced, trained, deep, greedy, past gaggin', bottomless.",
-      "Your switches: They close up slowly on their own, off to start, and Too-big toys can hurt, on to start. Off, a too-big toy only aches.",
+      "Your switches, on the Nipples and holes page: They close up slowly on their own, off to start, and Too-big toys can hurt, on to start. Off, a too-big toy only aches.",
       "On the farm's books, the farm girl keeps your numbers, and your Dispensary hands her what happened off the farm next time you're in her room.",
       "/dispensary holes shows all three, and /dispensary train <who> clear lifts a goal.",
     ],
@@ -261,7 +261,7 @@ export const GUIDES = [
     id: "parasites", icon: "🐛", title: "Parasites",
     intro: "Crafted critters that latch on and do their own thing. Every kind is yours to switch on, and all are off to start.",
     steps: [
-      "Switch on each kind you'll take, under Parasites.",
+      "Switch on each kind you'll take, under Parasites on the Gear and kits page.",
       "Somebody crafts an item that names one, a gag, a plug, a collar, a harness, anythin', and puts it on you. The crafter has to be on your list.",
       "Most latch on and stay even once the item comes off. The leash vine and the mouthpiece only work while worn.",
       "Name doses on the item too, and that's its strain: what it feeds you. None named, it feeds you the farm's own brew.",
@@ -313,7 +313,7 @@ export const GUIDES = [
     ],
     tips: [
       "Your keyholders can check in, let you out with every dose lifted, change who can dose you, your clock and which doses are on, or end it. Every change shows to you, and the last few are listed under Hardcore.",
-      "Holdin' somebody's key? Keys you hold shows up at the bottom of your page: Check in, Let out, End hardcore, and Their settings when you're in a room together. Out of the room it goes by beep, which needs you to be friends.",
+      "Holdin' somebody's key? Keys you hold shows up on the Hardcore and keys page: Check in, Let out, End hardcore, and Their settings when you're in a room together. Out of the room it goes by beep, which needs you to be friends.",
       "The farm's own ?safeword always works, hardcore or not.",
     ],
     see: ["safety", "start"],
@@ -339,7 +339,7 @@ export const GUIDES = [
     intro: "Everythin' you can type, in chat. Most of it's on this page too.",
     steps: [
       "/dispensary: what's in you, and who can dose you.",
-      "/dispensary page: opens this page. /dispensary guide <topic> opens a guide.",
+      "/dispensary page: opens this page. /dispensary page <which> opens straight on one: doses, gear, holes, seed, hardcore, and the rest. /dispensary guide <topic> opens a guide.",
       "/dispensary safeword: lifts every dose. In hardcore, asks your keyholders to let you out.",
       "/dispensary nips, then close, or heal on or off.",
       "/dispensary holes, then heal on or off, or pain on or off.",

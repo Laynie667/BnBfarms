@@ -14,7 +14,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.74.1** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Dispensary 0.25.0: its page laid out like the Companion's** Laynie, Nov 21: "can you organize the dispensary similar to the farmhand companion, and make sure absolutely everything is in the way it is supposed to be".
+  - **Pages down the side, like the Companion's settings:** 💉 In you now · 🛡 Who and when · 🧪 Doses · ⛓ Gear and kits · ⭕ Nipples and holes · 🍼 Breedin' · ✨ On your screen · 🔒 Hardcore and keys · 📖 Guides · ℹ About. On a phone they wrap into buttons across the top. Nothin' was taken out: every switch, list and button that was on the one long page is on one of these.
+  - **The safeword is at the top of every page,** with how many doses are in you; in hardcore it's the button to ask to be let out.
+  - **Find a setting:** type a word and every card with it shows, under the page it's on, and its switches work right there.
+  - **Straight to a page:** `/dispensary page hardcore`, `/dispensary page doses`, `/dispensary page seed` and so on.
+  - **The first time, it opens on the Guides;** once you've opened one, on In you now. Every section still has its 📖 How it works, and the guides now say which page a switch is on.
+  - **Checked:** every setting is on exactly one page, a switch for every dose and every crafted parasite, every page draws, and in hardcore every one of them is held for your keyholders. That turned up one that wasn't: how fast kits go on could still be changed in hardcore. It's held now too.
+  - The Companion's Toggles had the same kind of gap earlier today (the wild traps' switches on no page); both now have a check that fails if a setting is ever left off.
 
 - **Bot 0.92.1 + Companion 0.74.1: the wild traps' switches show up** Laynie, Nov 21: "I dont see the toggles". The three switches were made but put on no settings page. They're on the Farm switches page now (Preferences → Extensions → Farmhand Companion), in their own card under Traps and play: **⚠️ Wild traps: not for the faint of heart**, with Wild traps, Take my limbs and Laced kits, each with its warnin', all off to start. A new check fails if a farm switch is ever left off every page again. The Dispensary has no switch of its own for them: its dose switches still say which laced doses take.
 

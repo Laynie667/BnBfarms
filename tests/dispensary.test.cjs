@@ -218,16 +218,18 @@ function page(opts) {
   // ---- HARDCORE (Laynie, Nov 17: "it can be set to have no end date, but a keyholder ... needs to ping the hardcore users
   // dispensary and companion atleast once every 30 days, otherwise, it will unlock after 30 days without the ping")
   const DAY = 86400000;
+  // (the page is in pages since Nov 21, like the Companion's: open the one a check needs)
+  const toPage = (w, label) => { const b = [...w.document.querySelectorAll("#fd-page .fd-nav button")].find((x) => x.textContent.includes(label)); if (b) b.click(); };
   const lone = page({ noOwner: true }); await wait(1300);
   ok(lone.D().keyholders().length === 0 && lone.D().lock(7).why === "nokey" && !lone.D().hardOn(), "no owner and not farm stock: no keyholder, so hardcore won't switch on");
-  lone.pages[0].load();
+  lone.pages[0].load(); toPage(lone.w, "Hardcore and keys");
   const lockBtn = [...lone.w.document.querySelectorAll("#fd-page button")].find((b) => /Lock me in/.test(b.textContent));
   ok(lockBtn && lockBtn.disabled && /no keyholder yet/.test(lone.w.document.getElementById("fd-page").textContent), "...the page says why, and the button won't press");
   const hc = page({ bot: true }); await wait(1300);
   const HC = hc.D();
   hc.fromBot("dispWelcome", { farm: [BOT], stock: true });
   ok(HC.keyholders().join() === [OWNER, 221397, 232922].join(), "on the farm's books: your owner, and the proprietors, hold your key");
-  hc.pages[0].load();
+  hc.pages[0].load(); toPage(hc.w, "Hardcore and keys");
   let warned = "";
   hc.w.confirm = (t) => { warned = t; return true; };
   const endSel = hc.w.document.querySelector("#fd-page select[aria-label='When hardcore ends']");
@@ -237,6 +239,7 @@ function page(opts) {
   ok(/won't lift your doses/.test(warned) && /30 days with no keyholder checkin' in/.test(warned) && /Mistress/.test(warned), "...after a plain warning: what it means, who holds the key, when it ends");
   const ann = hc.to(OWNER, "dispHard").pop();
   ok(ann && ann.on === true && ann.keys.includes(OWNER), "your keyholder in the room hears about it");
+  toPage(hc.w, "Who and when");
   const pg2 = hc.w.document.getElementById("fd-page");
   ok(/Hardcore: your keyholders hold these settings/.test(pg2.textContent) && pg2.querySelector("select[aria-label='Who can dose you']").disabled, "the page locks: you can look, not change");
   ok([...pg2.querySelectorAll("button")].some((b) => /Ask to be let out/.test(b.textContent)), "...and the safeword button asks to be let out");
@@ -283,7 +286,7 @@ function page(opts) {
   // ---- keyholders by member number (Laynie, Nov 17: "there should be a way to add keyholders by id")
   const ak = page({ noOwner: true }); await wait(1300);
   const AK = ak.D();
-  ak.pages[0].load();
+  ak.pages[0].load(); toPage(ak.w, "Hardcore and keys");
   const keyIn = ak.w.document.querySelector("#fd-page input[aria-label='Add a keyholder by member number']");
   keyIn.value = String(FRIEND); keyIn.dispatchEvent(new ak.w.Event("input"));
   [...ak.w.document.querySelectorAll("#fd-page button")].find((b) => b.textContent === "Add").click();
@@ -326,7 +329,7 @@ function page(opts) {
   ok(kh.to(ME, "dispKey").some((d) => d.do === "check"), "sharin' a room with somebody whose key you hold: your Dispensary checks in for you");
   kh.fromBot("dispHard", { on: true, until: 0, due: Date.now() + 30 * DAY, keys: [OWNER], name: "Hana" }, ME);
   ok(kh.to(ME, "dispKey").filter((d) => d.do === "check").length === 1, "...once an hour, not every time they say so");
-  kh.pages[0].load();
+  kh.pages[0].load(); toPage(kh.w, "Hardcore and keys");
   const kp = kh.w.document.getElementById("fd-page");
   ok(/Keys you hold/.test(kp.textContent) && /Hana \(600\)/.test(kp.textContent), "the page lists who you hold keys for");
   [...kp.querySelectorAll("button")].find((b) => /Let out/.test(b.textContent)).click();
@@ -401,11 +404,12 @@ function page(opts) {
 
   // ---- the page
   ok(p.pages.length === 1 && p.pages[0].Identifier === "FarmhandDispensary", "its own page in Preferences → Extensions");
-  p.pages[0].load();
+  p.pages[0].load(); toPage(p.w, "Who and when");
   const pg = p.w.document.getElementById("fd-page");
   ok(pg && /Who can dose you/.test(pg.textContent) && pg.querySelectorAll("select[aria-label='Who can dose you'] option").length === 8, "...who can dose you, all eight rungs");
   const tips = [...pg.querySelectorAll("label[title]")].map((l) => l.getAttribute("title"));
   ok(tips.some((t) => /keep running while you're logged off/.test(t) && /50% longer/.test(t) && /lasts 3 hours/.test(t)), "...the real-time tip says the penalty plainly: a 2-hour dose lasts 3");
+  toPage(p.w, "Doses");
   ok(/Safeword: lift every dose/.test(pg.textContent) && /Denial Serum/.test(pg.textContent) && /Sedative/.test(pg.textContent), "...the safeword button, and each dose with its own switch");
   p.pages[0].exit();
   ok(!p.w.document.getElementById("fd-page"), "...and it closes");

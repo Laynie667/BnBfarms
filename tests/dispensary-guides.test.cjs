@@ -84,17 +84,24 @@ async function boot(settings) {
   const cmd = cmds.find((x) => x.Tag === "dispensary");
   cmd.Action("page"); await wait(50);
   const page = () => w.document.getElementById("fd-page");
-  ok(page() && /📖 Guides/.test(page().textContent) && page().querySelectorAll(".fd-chip").length === GUIDES.length, "the page opens with every guide listed at the top, the first time");
+  // (Nov 21: the page is in pages now, like the Companion's: dispensary-page.test.cjs checks the rest)
+  const go = async (label) => { const b = [...page().querySelectorAll(".fd-nav button")].find((x) => x.textContent.includes(label)); if (b) b.click(); await wait(20); };
+  ok(page() && /📖 Guides/.test(page().textContent) && page().querySelectorAll(".fd-chip").length === GUIDES.length, "the first time, the page opens on the Guides, every guide listed");
   ok(![...page().childNodes].some((n) => n.nodeType === 3 && /null|undefined/.test(n.textContent)), "...and no stray \"null\" where a guide isn't open");
-  const how = [...page().querySelectorAll("button.fd-how")].filter((b) => /How it works/.test(b.textContent));
-  ok(how.length >= 13, "every section has its own 📖 How it works (" + how.length + ")");
+  let how = 0, heads = [];
+  for (const p of ["In you now", "Who and when", "Doses", "Gear and kits", "Nipples and holes", "Breedin'", "On your screen", "Hardcore and keys"]) {
+    await go(p); how += [...page().querySelectorAll(".fd-body button.fd-how")].filter((b) => /How it works/.test(b.textContent)).length;
+    heads = heads.concat([...page().querySelectorAll(".fd-head h3")].map((x) => x.textContent));
+  }
+  ok(how >= 13, "every section has its own 📖 How it works (" + how + ")");
   // the Holes section's guide opens right under its heading
-  const holesBtn = how.find((b) => /Holes/.test(b.getAttribute("aria-label")));
+  await go("Nipples and holes");
+  const holesBtn = [...page().querySelectorAll("button.fd-how")].find((b) => /Holes/.test(b.getAttribute("aria-label")));
   holesBtn.click(); await wait(20);
-  const gc = page().querySelector(".fd-guide"), heads = [...page().querySelectorAll(".fd-head h3")].map((x) => x.textContent);
+  const gc = page().querySelector(".fd-guide");
   ok(gc && /Hole training/.test(gc.textContent) && gc.previousElementSibling && /Holes/.test(gc.previousElementSibling.textContent), "📖 on Holes opens Hole training right under the Holes heading");
   ok(gc.querySelectorAll("ol li").length === GUIDE_BY.holes.steps.length && /Cruel Training Plug/.test(gc.textContent) && /goal: gaping in 2 days/.test(gc.textContent), "...with its steps and its crafts to try, word for word");
-  ok(D.st().guided === true, "...and the list at the top folds away from now on");
+  ok(D.st().guided === true, "...and from now on it opens on In you now, not the Guides");
   // a see-also goes to that guide, in the same place
   [...gc.querySelectorAll(".fd-chip")].find((b) => /Nipples/.test(b.textContent)).click(); await wait(20);
   ok(/Nipples/.test(page().querySelector(".fd-guide h4").textContent) && page().querySelectorAll(".fd-guide").length === 1, "a see-also opens that guide in its place");
@@ -114,6 +121,6 @@ async function boot(settings) {
   ({ w, D, cmds } = await boot(saved));
   ok(D.st().guided === true, "after a reload, it still knows you've opened the guides");
   cmds.find((x) => x.Tag === "dispensary").Action("page"); await wait(50);
-  ok(!w.document.getElementById("fd-page").querySelector(".fd-chip"), "...so the list at the top stays folded, a tap away");
+  ok(!w.document.getElementById("fd-page").querySelector(".fd-chip") && /In you now/.test((w.document.querySelector("#fd-page .fd-nav button.fd-on") || {}).textContent || ""), "...so it opens on In you now, the Guides a tap away");
   out(fails ? "\n❌ " + fails + " failed" : "\n✅ all passed"); process.exit(fails ? 1 : 0);
 })();

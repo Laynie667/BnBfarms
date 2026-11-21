@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.74.0
+// @version      0.74.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.74.0";
+  var VERSION = "0.74.1";
 
   // shared/species.js
   var WORDS = {
@@ -17838,6 +17838,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
     ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+    // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
+    ["\u26A0\uFE0F Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
   ];
   var pref = (ctx3, key3, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key3], () => {

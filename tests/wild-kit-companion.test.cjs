@@ -89,5 +89,13 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ASSETS.ItemAddon = [again.ECHO_TELEPORTER]; window.Asset.push({ Name: again.ECHO_TELEPORTER, Group: { Name: 'ItemAddon', Family: 'Female3DCG' } });
   d = again.syncFarmGear([rings], true);
   ok(d.on.includes('Barn Teleporter Rings') && at('ItemAddon') && at('ItemAddon').Asset.Name === '隐形药水', 'with it: Echo\'s Limb Teleportation Device goes on, under its own name');
+  // every farm switch has a place on the settings pages (Nov 20, Laynie: "I dont see the toggles": the wild traps'
+  // three were in the list of switches but on no page)
+  const fs = require('fs');
+  const lv = fs.readFileSync(path.join(__dirname, '../extension/src/views/livestock.js'), 'utf8'), sp = fs.readFileSync(path.join(__dirname, '../extension/src/views/settingspages.js'), 'utf8');
+  const ids = [...lv.slice(lv.indexOf('export const SWITCH_INFO'), lv.indexOf('];', lv.indexOf('export const SWITCH_INFO'))).matchAll(/\[\s*"([a-z]+)",\s*"/g)].map((m) => m[1]);
+  const shown = new Set([...sp.matchAll(/"([a-z]+)"/g)].map((m) => m[1]));
+  const lost = ids.filter((id) => !shown.has(id));
+  ok(ids.length > 20 && ids.includes('wildtraps') && !lost.length, 'every farm switch shows on a settings page (' + ids.length + ' switches; on none: ' + lost.join(', ') + ')');
   out(fails ? 'FAIL ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })();

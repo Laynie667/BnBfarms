@@ -25,6 +25,8 @@ const FARM_GROUPS = [
   ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
   ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
   ["🪤 Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+  // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
+  ["⚠️ Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
   ["🪱 Things that latch on", ["parasite", "symbiote", "watersports"]],
 ];
 // a switch the Companion keeps on this computer: on is on, or (flip) on unless it's been switched off

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.92.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.92.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.74.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.74.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.24.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.92.1 + Companion 0.74.1: the wild traps' switches show up** Laynie, Nov 21: "I dont see the toggles". The three switches were made but put on no settings page. They're on the Farm switches page now (Preferences → Extensions → Farmhand Companion), in their own card under Traps and play: **⚠️ Wild traps: not for the faint of heart**, with Wild traps, Take my limbs and Laced kits, each with its warnin', all off to start. A new check fails if a farm switch is ever left off every page again. The Dispensary has no switch of its own for them: its dose switches still say which laced doses take.
 
 - **Bot 0.92.0 + Companion 0.74.0: wild traps off till you say so, laced kits, and kits that take your limbs** Laynie, Nov 20: "I'd like even more. can make use of dispensary crafts and even the limb teleporter from echoes. Just need to add the toggles for it with a clear warning that the wild traps are more brutal, and not the kind for the faint of heart, off by default for the hard ones, the normal farm traps could still trigger on the wild spots."
   - **Off till you say so, with a plain warnin'.** Three new switches in the Companion's Toggles, all off to start, each sayin' NOT FOR THE FAINT OF HEART and what it does before you flip it: **⚠️ Wild traps** (`?traps wild on`), **⚠️ Wild traps: take my limbs** (`?traps wild limbs on`) and **⚠️ Wild traps: laced kits** (`?traps wild laced on`). The last two only count with Wild traps on. Everybody who had them on from earlier today starts off again.

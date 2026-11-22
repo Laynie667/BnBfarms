@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-21. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-22. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.92.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.93.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.74.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.75.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.93.0 + Companion 0.75.0: no more fights over your gear, no more floodin' the server, no Body Treatise loop, and no false friend nags** Laynie, Nov 21: "I keep getting disconnected. I am friends with the bot, but she keeps sending messages saying i am not", "it keeps taking off the things i put on, and putting back the things it tries to take off", "whan i try to move, it disconnects too".
+  - **What was droppin' you: Echo's Body Treatise.** Laynie's console showed it plain. Since the game's November update, every time the server hands your own character back, the game checks the Treatise, calls it unfinished, finds nothin' to fix, and sends your whole look back up anyway. Round and round, till the server cuts you off. Add-ons off doesn't stop it, because it's the item on you. So the farm doesn't write on the Treatise any more: farm words and the day's tally go on the game's own body writing. A Treatise the farm put on you comes off once, when your Companion starts, and you're told why. One you put on yourself stays yours: once a week while it's on, you get a heads-up and where to take it off. A locked one's never pulled.
+  - **The game's server cuts off any game that sends it 50 messages in one second.** Your Companion now never lets more than 40 go out in a second, from anything in your game: a burst waits its turn, a fraction of a second, in order, and nothin's lost.
+  - **No more fights over a piece.** When somethin' kept takin' a farm piece off, your Companion kept puttin' it back, as fast as it could, and every swap went to the server. Now a piece is put back three times in two minutes at most, then left off for ten, and you're told. And your gear is put on at most once every two and a half seconds.
+  - **Every drop is written down:** `/farmmem` now shows why the game dropped you (what the server said, or that the line went), how much had just been sent and what it was, and the busiest second there's been.
+  - **No false friend nag after a drop:** the farm girl's friend check waited for the server's list of who's online, which lags somebody who's just come back. You were nagged five seconds after reconnectin'. Now nobody's counted till they've been here three minutes.
+  - **What a wild trap left stays only while your wild traps are on.** The night they were on for everybody, kits went on people who'd never said yes, and stayed. Those come off now, and switchin' wild traps off takes yours off too, the same as your safeword.
 
 - **Dispensary 0.25.0: its page laid out like the Companion's** Laynie, Nov 21: "can you organize the dispensary similar to the farmhand companion, and make sure absolutely everything is in the way it is supposed to be".
   - **Pages down the side, like the Companion's settings:** 💉 In you now · 🛡 Who and when · 🧪 Doses · ⛓ Gear and kits · ⭕ Nipples and holes · 🍼 Breedin' · ✨ On your screen · 🔒 Hardcore and keys · 📖 Guides · ℹ About. On a phone they wrap into buttons across the top. Nothin' was taken out: every switch, list and button that was on the one long page is on one of these.

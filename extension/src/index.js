@@ -18,12 +18,13 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
+import { initNetGuard } from "./netguard.js";
 import { initBotScreen, screenNapping } from "./botscreen.js";
 import { initAllocWatch } from "./allocwatch.js";
 import { initTrim } from "./trimpics.js";
@@ -230,6 +231,10 @@ function parasiteSync() {
   try {
     const s = st.panel && st.panel.s;
     if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
+    // (never more than once every 2.5 seconds: a run of state updates used to put your gear on, and send it, each time)
+    const gap = Date.now() - (st.gearSyncAt || 0);
+    if (gap < 2500) { if (!st.gearSyncT) st.gearSyncT = setTimeout(() => { st.gearSyncT = null; parasiteSync(); }, 2600 - gap); return; }
+    st.gearSyncAt = Date.now();
     let list = Array.isArray(s.farmGear) ? s.farmGear : [];
     // an older farm girl only says "parasite": that's still a piece of gear
     if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
@@ -239,6 +244,7 @@ function parasiteSync() {
     try { syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape); } catch (e2) { console.warn("[Farmhand Companion] body shape:", e2); }   // chest and hips that show the farm's sizes (marks.js)
     for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
     for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
+    for (const n of (did.stuck || [])) toChat("The farm's " + n + " keeps comin' off you, so it's left off for ten minutes.", "#c9a35b", true);
   } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }
 }
 // a little's paddin' (ABCL) and Littlish Club grown-ups, sent to the farm when it changes (only for littles on the nursery list)
@@ -502,10 +508,15 @@ function start() {
   // the record: what lands in your chat, your beeps and your commands, to the farm girl by the hour (chatlog.js).
   // Always for the proprietors; anybody else only with Toggles → "Send a record..." on.
   initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere });
+  initNetGuard(mod);   // never 50 messages in a second (the server's cut-off), and every drop written down (netguard.js, /farmmem)
   initMemlog();        // a log of how big things are, for chasing a page that runs out of room (memlog.js, /farmmem)
   initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());   // your settings as a file in a folder you pick (localsave.js)
   initTrim(mod);       // the game never lets go of a picture: past 380 MB on the graphics card, old unused ones go (trimpics.js)
   setTimeout(() => scaleTrialCleanup(), 15000);   // what the old scale trial left on anybody (marks.js)
+  // Echo's Body Treatise loops the game's own check since R134 and gets you cut off: one the farm wrote on comes off, once
+  // you're in a room; one of your own gets a heads-up once a week (marks.js)
+  const treatiseOnce = () => { if (window.CurrentScreen !== "ChatRoom" || !window.Player || !Array.isArray(window.Player.Appearance)) { setTimeout(treatiseOnce, 5000); return; } treatiseCleanup((t) => toChat(t, "#c9a35b", true)); };
+  setTimeout(treatiseOnce, 15000);
   initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)
   // the bot hands this page's own-account messages straight here (see toBot above)
   window.__farmhandOwnPanel = (data) => { if (!onBotAccount()) return; const m = readMsg(data); if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } } };

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.92.1
+// @version      0.93.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.92.1";
-  var COMPANION_VERSION = "0.74.1";
+  var VERSION = "0.93.0";
+  var COMPANION_VERSION = "0.75.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -23982,6 +23982,11 @@
         warn("tithe:", e);
       }
     }
+    if (CFG.FRIEND_SETTLE_MIN === void 0) CFG.FRIEND_SETTLE_MIN = 3;
+    function friendArrived(mn) {
+      if (state.friendMiss) state.friendMiss.delete(mn);
+      (state.friendSeenAt = state.friendSeenAt || /* @__PURE__ */ new Map()).set(mn, Date.now());
+    }
     if (CFG.FRIEND_NAG_H === void 0) CFG.FRIEND_NAG_H = 6;
     if (CFG.FRIEND_GRACE_H === void 0) CFG.FRIEND_GRACE_H = 48;
     const FRIEND_HOW = "Click my character, then my profile, and press Add to friends. Or type /friendlistadd " + CFG.BOT_MEMBER + " in chat.";
@@ -24019,6 +24024,8 @@
           }
           continue;
         }
+        const came = state.friendSeenAt && state.friendSeenAt.get(mn) || 0;
+        if (now - came < CFG.FRIEND_SETTLE_MIN * 6e4 || m.at < came + CFG.FRIEND_SETTLE_MIN * 6e4) continue;
         const miss = (state.friendMiss.get(mn) || 0) + 1;
         state.friendMiss.set(mn, miss);
         if (miss < 2) continue;
@@ -63366,7 +63373,38 @@
       }
       return false;
     }
+    function wildLetGo(mn, quiet) {
+      const r = rec(mn);
+      if (!r || !r.gear) return 0;
+      let n = 0;
+      for (const s of Object.keys(r.gear)) if (r.gear[s] && r.gear[s].keep && r.gear[s].src === "wild") {
+        delete r.gear[s];
+        n++;
+      }
+      if (n && !quiet) {
+        saveLedger();
+        syncCompanions(true);
+      }
+      return n;
+    }
+    function wildCleanOnce() {
+      if (L2.wildClean >= 1) return;
+      L2.wildClean = 1;
+      let n = 0;
+      for (const k of Object.keys(L2.people)) {
+        const r = L2.people[k];
+        if (r && !r.wildIn) n += wildLetGo(Number(k), true);
+      }
+      if (n) audit(BOTMN(), "WILDCLEAN", n + " kept wild-trap pieces off people who haven't switched wild traps on");
+      saveLedger();
+      if (n) syncCompanions(true);
+    }
     function wildTick(now) {
+      try {
+        wildCleanOnce();
+      } catch (e) {
+        warn("wild clean:", e);
+      }
       L2.wild = Array.isArray(L2.wild) ? L2.wild : [];
       if (!wildZones().length) {
         if (L2.wild.length) {
@@ -63515,7 +63553,8 @@
         if (which === "wild") delete r.wildOff;
         saveLedger();
         syncCompanions(true);
-        if (which === "wild") R(r.wildIn ? "\u{1F573}\uFE0F Wild traps: ON for you.\n" + WILD_WARN.wild + "\n?traps wild off takes you back to the ordinary traps." : "\u{1F573}\uFE0F Wild traps: off for you. A wild tile's an ordinary farm trap for you now: that place's traps, with the breather and the reset, and nothin' kept on you after.");
+        if (which === "wild" && !r.wildIn) wildLetGo(sender);
+        if (which === "wild") R(r.wildIn ? "\u{1F573}\uFE0F Wild traps: ON for you.\n" + WILD_WARN.wild + "\n?traps wild off takes you back to the ordinary traps." : "\u{1F573}\uFE0F Wild traps: off for you. A wild tile's an ordinary farm trap for you now: that place's traps, with the breather and the reset, and nothin' kept on you after. Anything a wild trap left on you comes off now.");
         else if (which === "limbs") R(r.wildLimbs ? "\u{1F9BE} Wild traps can take your limbs: ON.\n" + WILD_WARN.limbs + (r.wildIn ? "" : "\nIt only counts with ?traps wild on.") + ((state.companions && state.companions.get(sender) || {}).limbs ? "" : "\nYour game hasn't got Echo's clothing mod in it right now, so it'll wait till it has.") : "\u{1F9BE} Wild traps can take your limbs: off. Your arms and legs stay yours.");
         else R(r.wildLaced ? "\u{1F489} Laced wild kits: ON.\n" + WILD_WARN.laced + (r.wildIn ? "" : "\nIt only counts with ?traps wild on.") : "\u{1F489} Laced wild kits: off. The gear's just gear.");
         return;
@@ -69881,6 +69920,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const mn = data.Character.MemberNumber;
           if (mn === CFG.BOT_MEMBER) return;
           state.lastHealthy = Date.now();
+          try {
+            friendArrived(mn);
+          } catch (e) {
+            warn("friend check:", e);
+          }
           greet(mn);
           onArrive(mn);
           if (state.noMove) state.noMove.delete(mn);

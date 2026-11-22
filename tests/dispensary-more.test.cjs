@@ -146,7 +146,8 @@ function page(opts) {
   ok(s.game.timer === 12, "Hair Trigger and Tender together: 2 → 12 on the nipples");
   D.end("hairtrigger"); D.end("tender");
 
-  // time-release capsules
+  // time-release capsules (the Companion's send guard holds anything past 40 a second: let the burst above go out first)
+  for (let i = 0, n = -1; i < 20 && n !== s.sent.length; i++) { n = s.sent.length; await wait(1100); }
   let na = s.actions().length;
   s.needle(OWNER, "Hiccup Fizz, time-release capsule");
   ok(!D.active("hiccup") && D.st().later.length === 1 && s.actions().slice(na).some((t) => /capsule|small and slow|Not yet|sweet time/.test(t)), "a time-release capsule: nothin' yet, and the room knows somethin's waitin'");

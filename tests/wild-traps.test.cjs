@@ -115,8 +115,10 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   // ?traps wild off (Nov 20: off till they say so, "the normal farm traps could still trigger on the wild spots")
   move(moo, 10, 10); await wait(50);
   ok(!P(501).wildIn && W.__stateFor(501).switches.wildtraps === false, 'somebody who never said yes: wild traps off, and their Toggles say so');
+  const keptOn = Object.values(P(500).gear || {}).filter(x => x.keep).length;
   n = sent.length; await say(500, '?traps wild off');
   ok(P(500).wildIn === false && /Wild traps: off for you/.test(reply(n, 500)), '?traps wild off: off for you');
+  ok(keptOn > 0 && !Object.values(P(500).gear || {}).some(x => x.keep) && /comes off now/.test(reply(n, 500)), '...and what a wild trap left on them comes off (Nov 21: kept only while they say yes)');
   const keptBefore = Object.values(P(500).gear || {}).filter(x => x.keep).length;
   free(500); P(500).trapAt = Date.now() - 5 * 60000; const n2 = (P(500).trapLog || []).length, wOrd = W.__wild()[1];
   move(moo, wOrd.X, wOrd.Y); const ordWild = W.__wildOn(500); await done();
@@ -128,6 +130,9 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
   n = sent.length; await say(500, '?traps wild on');
   ok(P(500).wildIn === true && /NOT FOR THE FAINT OF HEART/.test(reply(n, 500)), '?traps wild on: on, with the warnin\' first');
   ok(W.__stateFor(500).switches.wildtraps === true, '...and their Toggles show it on');
+  // (caught again, for the gear checks below)
+  free(500); P(500).trapAt = Date.now() - 5 * 60000; move(moo, W.__wild()[0].X, W.__wild()[0].Y); await done(); move(moo, 10, 10); await wait(50);
+  ok(Object.values(P(500).gear || {}).some(x => x.keep), '(caught again: a kit on them)');
   n = sent.length; await say(221397, '?traps wild');
   ok(/Wild traps: off/.test(reply(n, 221397)) && /NOT FOR THE FAINT OF HEART/.test(reply(n, 221397)) && !/\(/.test(reply(n, 221397).replace(/^\(|\)$/gm, '')),'?traps wild says what they are, plainly, and that they\'re off till you say so' + (/\(/.test(reply(n, 221397)) ? ': ' + reply(n, 221397).replace(/\n/g, ' / ').slice(Math.max(0, reply(n, 221397).indexOf('(') - 80), reply(n, 221397).indexOf('(') + 40) : ''));
 

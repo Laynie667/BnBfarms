@@ -123,6 +123,7 @@
         const mn = data.Character.MemberNumber;
         if (mn===CFG.BOT_MEMBER) return;
         state.lastHealthy = Date.now();
+        try { friendArrived(mn); } catch(e){ warn("friend check:", e); }   // (back from a drop: the friend check waits for the server's list to catch up)
         greet(mn);
         onArrive(mn);
         if (state.noMove) state.noMove.delete(mn);   // back in the room: their game gets a fresh ask (05-map.js)

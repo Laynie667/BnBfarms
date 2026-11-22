@@ -8,6 +8,7 @@ import { messMemory } from "./messes.js";
 import { trimStats, cacheSize, leftLoaded } from "./trimpics.js";
 import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
+import { netText } from "./netguard.js";
 import { lookSent } from "./look.js";
 import { screenSkipped, screenLight, screenNapOn, screenNaps, screenNapping, screenSpecks } from "./botscreen.js";
 import { allocLine } from "./allocwatch.js";
@@ -98,6 +99,8 @@ export function initMemlog() {
     W.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
       tick();
       let drawing = ""; try { drawing = drawnBodyPerfText(); } catch (e) { /* fine */ }   // (Nov 20: what drawin' people takes on this browser)
+      let net = ""; try { net = netText(); } catch (e) { /* fine */ }   // (Nov 21: the drops, and the busiest second sent)
+      drawing = (net ? net + "\n" : "") + drawing;
       const text = "Companion v" + VERSION + "\n" + sentLine() + (drawing ? "\n" + drawing : "") + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
       try { W.navigator.clipboard.writeText((drawing ? drawing + "\n" : "") + JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
       if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 120000);

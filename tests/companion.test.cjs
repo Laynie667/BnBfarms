@@ -332,13 +332,14 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "mark", dress: true }); await wait(50);
   out("15 dressed again ->", (loaded || []).some((b) => b.Group === "Cloth" && b.Name === "Shirt"));
   bot({ type: "mark", wash: true }); await wait(50);
-  // 17. Echo's Body Treatise, when the game has it: words all over, and the day's tally on the waist
+  // 17. Echo's Body Treatise (Nov 21): even when the game has it, the farm writes the game's own way (the Treatise loops the
+  // game's check since R134 and gets folks cut off), and the day's tally is a written line too
   G.BodyMarkings2_Luzi = { Name: "BodyMarkings2_Luzi", Clothing: false, Category: "Appearance" };
   bot({ type: "mark", write: { line: "cum bucket", area: "hips" } }); await wait(50);
   bot({ type: "mark", tally: "USED 3X TODAY" }); await wait(50);
-  const bt = (loaded || []).find((b) => b.Group === "BodyMarkings2_Luzi");
-  out("17 the Body Treatise is written on: a hip place, and the tally on the waist ->", !!bt, bt && [12, 13, 14].some((i) => bt.Property["Text" + (i * 3 + 1)] === "CUM BUCKET" && bt.Property.TypeRecord[String.fromCharCode(97 + i)] === 1),
-    bt && bt.Property.Text34 === "USED 3X TODAY");
+  const bw17 = (loaded || []).find((b) => b.Name === "BodyWritings");
+  out("17 no Body Treatise goes on; the words and the tally go on the body writing ->", !(loaded || []).some((b) => b.Group === "BodyMarkings2_Luzi"), !!bw17 && bw17.Property.Text === "USED 3X TODAY" && bw17.Property.Text2 === "CUM BUCKET");
+  bot({ type: "mark", wash: true }); await wait(50);
   delete G.BodyMarkings2_Luzi;
   // 16. staff cards from add-ons only on the Staff panel's Farm extras
   bot({ type: "state", state: Object.assign({}, STATE, { mods: { x: { label: "Test add-on", cards: [{ title: "Staff thing", staff: true, text: "staff only bits" }, { title: "Mine", text: "for everybody" }] } } }) });

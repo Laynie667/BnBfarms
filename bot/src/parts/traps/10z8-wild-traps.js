@@ -74,8 +74,25 @@
     }
     return false;
   }
+  // KEPT GEAR ONLY WHILE THEY'VE SAID YES (Nov 21). The night wild traps were on for everybody (Bot 0.90.0 and 0.91.0),
+  // kits went on people who never switched them on, and stayed. So: what a wild trap left stays only while their wild
+  // traps are on. Switched off (or never on), it comes off, the same as their safeword would do it.
+  function wildLetGo(mn, quiet){
+    const r = rec(mn); if (!r || !r.gear) return 0;
+    let n = 0; for (const s of Object.keys(r.gear)) if (r.gear[s] && r.gear[s].keep && r.gear[s].src === "wild"){ delete r.gear[s]; n++; }
+    if (n && !quiet){ saveLedger(); syncCompanions(true); }
+    return n;
+  }
+  function wildCleanOnce(){
+    if (L.wildClean >= 1) return;
+    L.wildClean = 1; let n = 0;
+    for (const k of Object.keys(L.people)){ const r = L.people[k]; if (r && !r.wildIn) n += wildLetGo(Number(k), true); }
+    if (n) audit(BOTMN(), "WILDCLEAN", n+" kept wild-trap pieces off people who haven't switched wild traps on");
+    saveLedger(); if (n) syncCompanions(true);
+  }
   // every heartbeat (trapTick): as many as there should be, each movin' on when it's due
   function wildTick(now){
+    try { wildCleanOnce(); } catch(e){ warn("wild clean:", e); }
     L.wild = Array.isArray(L.wild) ? L.wild : [];
     if (!wildZones().length){ if (L.wild.length){ L.wild = []; saveLedger(); } return; }
     let changed = false;
@@ -176,8 +193,9 @@
     if (v === "on" || v === "off"){
       if (!r){ R("You'll need to be on the farm's books first, sugar."); return; }
       r[field] = v === "on"; if (which === "wild") delete r.wildOff; saveLedger(); syncCompanions(true);
+      if (which === "wild" && !r.wildIn) wildLetGo(sender);   // (off: what a wild trap left comes off too)
       if (which === "wild") R(r.wildIn ? "🕳️ Wild traps: ON for you.\n"+WILD_WARN.wild+"\n?traps wild off takes you back to the ordinary traps." :
-        "🕳️ Wild traps: off for you. A wild tile's an ordinary farm trap for you now: that place's traps, with the breather and the reset, and nothin' kept on you after.");
+        "🕳️ Wild traps: off for you. A wild tile's an ordinary farm trap for you now: that place's traps, with the breather and the reset, and nothin' kept on you after. Anything a wild trap left on you comes off now.");
       else if (which === "limbs") R(r.wildLimbs ? "🦾 Wild traps can take your limbs: ON.\n"+WILD_WARN.limbs+(r.wildIn ? "" : "\nIt only counts with ?traps wild on.")+((state.companions && state.companions.get(sender) || {}).limbs ? "" : "\nYour game hasn't got Echo's clothing mod in it right now, so it'll wait till it has.") :
         "🦾 Wild traps can take your limbs: off. Your arms and legs stay yours.");
       else R(r.wildLaced ? "💉 Laced wild kits: ON.\n"+WILD_WARN.laced+(r.wildIn ? "" : "\nIt only counts with ?traps wild on.") : "💉 Laced wild kits: off. The gear's just gear.");

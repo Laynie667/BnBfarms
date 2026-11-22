@@ -89,6 +89,15 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ASSETS.ItemAddon = [again.ECHO_TELEPORTER]; window.Asset.push({ Name: again.ECHO_TELEPORTER, Group: { Name: 'ItemAddon', Family: 'Female3DCG' } });
   d = again.syncFarmGear([rings], true);
   ok(d.on.includes('Barn Teleporter Rings') && at('ItemAddon') && at('ItemAddon').Asset.Name === '隐形药水', 'with it: Echo\'s Limb Teleportation Device goes on, under its own name');
+  // a fight: somethin' keeps takin' a piece off. It's put back three times in two minutes, then left off for ten
+  // (Nov 21, Laynie: "it keeps taking off the things i put on, and putting back the things it tries to take off")
+  P.Appearance = [mk('Cloth', 'Shirt')];
+  const fight = [{ slot: 'nose', name: 'Fought Ring', items: ['NoseShackle'], until: far + 7, keep: true }];
+  let puts = 0, stuckSaid = null;
+  for (let i = 0; i < 6; i++) { const d2 = again.syncFarmGear(fight, true); puts += d2.on.length; if (d2.stuck && d2.stuck.length) stuckSaid = d2.stuck; P.Appearance = P.Appearance.filter((it) => it.Asset.Group.Name !== 'ItemNose'); }
+  ok(puts === 3 && stuckSaid && stuckSaid[0] === 'Fought Ring', 'a piece that keeps comin\' off: put back three times, then left off (' + puts + ' times)');
+  ok(!again.syncFarmGear(fight, true).on.length, '...and it stays off for now, so a fight can\'t flood the server');
+
   // every farm switch has a place on the settings pages (Nov 20, Laynie: "I dont see the toggles": the wild traps'
   // three were in the list of switches but on no page)
   const fs = require('fs');

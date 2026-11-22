@@ -10,6 +10,12 @@
          (the same as ?unregister: paperwork archived, keys pulled, off the whitelist), and staff are told
      Friendin' the bot any time before then clears it. Proprietors and staff are reminded but never taken off.
   */
+  // (Nov 21, Laynie: "I keep getting disconnected. I am friends with the bot, but she keeps sending messages saying i am
+  // not." The server's online-friends answer lags somebody who's just come back from a drop: she was told off five
+  // seconds after she was back. So nobody's counted missin' till they've been here CFG.FRIEND_SETTLE_MIN minutes, and
+  // the answer's newer than that.)
+  if (CFG.FRIEND_SETTLE_MIN === undefined) CFG.FRIEND_SETTLE_MIN = 3;
+  function friendArrived(mn){ if (state.friendMiss) state.friendMiss.delete(mn); (state.friendSeenAt = state.friendSeenAt || new Map()).set(mn, Date.now()); }
   if (CFG.FRIEND_NAG_H === undefined) CFG.FRIEND_NAG_H = 6;
   if (CFG.FRIEND_GRACE_H === undefined) CFG.FRIEND_GRACE_H = 48;
   const FRIEND_HOW = "Click my character, then my profile, and press Add to friends. Or type /friendlistadd "+CFG.BOT_MEMBER+" in chat.";
@@ -41,6 +47,8 @@
         if (r.friendNag){ const was = r.friendNag; r.friendNag = null; saveLedger(); if (was.n) tell(mn, "💌 Thank you for friendin' me, sugar! My notes reach you now, and you're all set."); }
         continue;
       }
+      const came = (state.friendSeenAt && state.friendSeenAt.get(mn)) || 0;
+      if (now - came < CFG.FRIEND_SETTLE_MIN*60000 || m.at < came + CFG.FRIEND_SETTLE_MIN*60000) continue;   // (just here, or back from a drop: the server's list catches up first)
       const miss = (state.friendMiss.get(mn) || 0) + 1; state.friendMiss.set(mn, miss);
       if (miss < 2) continue;
       const g = r.friendNag = r.friendNag || { first: 0, last: 0, n: 0 };

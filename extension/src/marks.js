@@ -12,12 +12,9 @@ const KEY = "fhc-marks";            // { splatGroup, writeGroup }: where the far
 const STRIP_KEY = "fhc-strip-backup";
 const SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];     // Splatters fits any of these; the first free one is used
 const WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];            // BodyWritings fits either
-// Echo's Clothing Mod's Body Treatise (if they have it): 15 places, 3 lines each. Places 0-14 are collarbone,
-// chest, ribs, waist, hips, each right / center / left. Module keys a..o turn a place on; its lines are
-// Text{i*3+1}..Text{i*3+3}.
+// Echo's Clothing Mod's Body Treatise. The farm wrote on it from Oct 9 to Nov 21, and doesn't any more: since the
+// game's November update it trips the game's own check (see treatiseCleanup below).
 const TREATISE = { group: "BodyMarkings2_Luzi", name: "身体论文" };
-const T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
-const TALLY_PLACE = 11;   // waist left: the running tally lives here
 // the Splatters item's parts, by area (module keys)
 const AREAS = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
 // a load runs: from the mouth down onto the breasts, from the breasts down the belly… (a third of the time)
@@ -72,29 +69,8 @@ export function markBody(m, prefs) {
       }
     }
   }
-  // ── Body Treatise first (Echo's mod): a word in a free line near where it belongs, all over the body ──
-  if ((m.write && cleanText(m.write.line)) || m.tally) {
-    if (groupOf(TREATISE.group)) {
-      let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
-      if (!it && !has(TREATISE.group)) { it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } }; next.push(it); mem.treatise = true; }
-      if (it) {
-        const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-        const put = (place, line, text) => { pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase(); tr[String.fromCharCode(97 + place)] = 1; };
-        if (m.tally) { put(TALLY_PLACE, 1, String(m.tally)); did.push("tally"); }
-        if (m.write && cleanText(m.write.line)) {
-          const pref = T_AREAS[m.write.area] || (m.write.pos !== undefined ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
-          const all = [...pref, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref.includes(i) && i !== TALLY_PLACE)];
-          let spot = null;
-          for (const pl of all) { for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) { spot = [pl, ln]; break; } if (spot) break; }
-          if (!spot) spot = [pref[0], 1 + Math.floor(Math.random() * 3)];   // covered all over: write over somethin'
-          put(spot[0], spot[1], m.write.line); did.push("writing");
-        }
-        save(mem); commit(next);
-        return { ok: true, did };
-      }
-    }
-  }
-  // ── a line written on the body (newest on top; three lines, the oldest drops off) ──
+  // ── a line written on the body (newest on top; three lines, the oldest drops off). The day's tally is a line too ──
+  if (!(m.write && cleanText(m.write.line)) && m.tally && cleanText(String(m.tally))) m = Object.assign({}, m, { write: { line: String(m.tally) } });
   if (m.write && cleanText(m.write.line)) {
     let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
     if (!it) {
@@ -314,6 +290,8 @@ const letGo = () => { try { return JSON.parse(window.localStorage.getItem(LETGO_
 const letGoSave = (m) => { try { window.localStorage.setItem(LETGO_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
 const pieceKey = (name, until) => String(name).slice(0, 30) + "|" + (Number(until) || 0);
 export function gearFreedHere(name, until) { const m = letGo(); m[pieceKey(name, until)] = { why: "freed", at: Date.now() }; letGoSave(m); }
+// a piece that keeps comin' off (syncFarmGear): when it went on lately, and till when it's left off
+const putAt = new Map(), stuckUntil = new Map(), PUT_MAX = 3, PUT_WINDOW = 120000, STUCK_MS = 600000;
 export function farmGearLetGo(list) {
   const m = letGo(); let n = 0;
   for (const g of (Array.isArray(list) ? list : [])) if (g && g.name) { m[pieceKey(g.name, g.until)] = { why: "safe", at: Date.now() }; n++; }
@@ -332,7 +310,11 @@ export function syncFarmGear(list, allow) {
   let pruned = false;
   for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 86400000 || (now - (lg[k].at || 0) > 600000 && !(list || []).some((g) => g && pieceKey(g.name, g.until) === k))) { delete lg[k]; pruned = true; }
   if (pruned) letGoSave(lg);
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)])
+  // (a piece the game, another mod or the wearer keeps takin' off isn't put back more than 3 times in 2 minutes: then it's
+  // left off for 10. Nov 21, Laynie: "it keeps taking off the things i put on, and putting back the things it tries to take
+  // off", and her game was cut off by the server for sendin' too much. A fight can't run away like that again.)
+  for (const [n, t] of stuckUntil) if (t <= now) stuckUntil.delete(n);
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name))
     .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
@@ -348,6 +330,8 @@ export function syncFarmGear(list, allow) {
   // on: listed, and not on you
   for (const g of want) {
     if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
+    const hist = (putAt.get(g.name) || []).filter((t) => now - t < PUT_WINDOW);
+    if (hist.length >= PUT_MAX) { stuckUntil.set(g.name, now + STUCK_MS); putAt.delete(g.name); (did.stuck = did.stuck || []).push(g.name); continue; }
     const slot = GEAR_SLOTS[g.slot];
     if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
     let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null, item = null;
@@ -371,6 +355,7 @@ export function syncFarmGear(list, allow) {
         Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
     if (color !== "Default") it.Color = color;
     next.push(it); did.on.push(g.name); mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item }; learnName(String(g.name).slice(0, 30));
+    putAt.set(g.name, hist.concat(now));
     const opt = (typeof g.opt === "string" && g.opt) || GEAR_OPT[group + ":" + item];
     if (opt || g.rec || g.text) setLater.push([group, item, opt, g.rec, g.text]);
   }
@@ -432,6 +417,33 @@ export function washMarks() {
   save({});
   commit(next);
   return { ok: true, did: ["wash"] };
+}
+
+// ── Echo's Body Treatise (Nov 21) ──
+// Laynie: "I keep getting disconnected", with everything turned off. Since the game's November update, every time the
+// server hands your own character back, the game checks the Treatise, calls it unfinished, finds nothin' to change,
+// and sends your whole look back up anyway. The server answers, and round it goes, till the server cuts you off for
+// sendin' too much. So the farm doesn't write on it any more (the game's own body writing instead). One the farm put
+// on you comes off once, when your Companion starts. One you put on yourself stays yours: once a week while you wear
+// it, you're told what it's been doin', and where to take it off.
+const TREATISE_NOTE_KEY = "fhc-treatise-note", WEEK = 7 * 86400000;
+export function treatiseCleanup(note) {
+  try {
+    const C = P(); if (!C || !Array.isArray(C.Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, did: [] };
+    const mem = load(), on = C.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === TREATISE.group);
+    if (!on) { if (mem.treatise) { delete mem.treatise; save(mem); } return { ok: true, did: [] }; }
+    if (mem.treatise && !lockedGroups().has(TREATISE.group)) {
+      commit(bundle().filter((b) => b.Group !== TREATISE.group));
+      delete mem.treatise; save(mem);
+      if (note) note("The Body Treatise the farm wrote on you is off now. Since the game's November update it's been knockin' folks offline. The farm writes on your skin the game's own way instead.");
+      return { ok: true, did: ["off"] };
+    }
+    let last = 0; try { last = Number(window.localStorage.getItem(TREATISE_NOTE_KEY)) || 0; } catch (e) { /* fine */ }
+    if (Date.now() - last < WEEK) return { ok: true, did: [] };
+    try { window.localStorage.setItem(TREATISE_NOTE_KEY, String(Date.now())); } catch (e) { /* fine */ }
+    if (note) note("Heads up: you're wearin' Echo's Body Treatise. Since the game's November update it can make your game re-send your look over and over till the server drops you. If you keep gettin' disconnected, take it off in the wardrobe.");
+    return { ok: true, did: ["told"] };
+  } catch (e) { return { ok: false, did: [] }; }
 }
 
 // a rinse at the water (Oct 26): one patch of the farm's splatters comes off (never the writing)

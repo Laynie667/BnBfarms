@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.95.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.96.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.3** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.76.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.77.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.96.0 + Companion 0.77.0: strapped into the milkin' stall, a way to the nest, and a futa's cock layered over the clothes** From the suggestion box, Laynie, Nov 23: "#10 true, that should be on a toggle with equipment, like a stand, symbian, and lactation pump. so those wanting immersion can toggle it on. removed after", "#30 ... add a "Move to nest" command or button", "#55 interesting".
+  - **?stallgear** (Nikto's #10; off to start, Toggles → Milk). A milkin' session puts the stall's own gear on: the lactation pump on their teats when it's milkin' them, and under them the stall's Sybian (with a pussy to ride it) or the spreadin' stand (without). Steppin' off the stall mid-session puts them straight back on it. It all comes off when the session's done, and their safeword lets them loose, gear and all, for half an hour. The switch is their say-so for the gear, so it doesn't need "Farm can put real gear on me".
+  - **?nest** (Crystal's #30) walks them to the farm's nest (the nearest, if there's more than one), where ?lay and ?gather work, and their Companion has a 🥚 To the nest button while they're carryin' eggs. The game's map has brown chickens (eatin', idle and sleepin', under floor animals) to stand on or beside the nest tile.
+  - **A futa's cock layered above the clothes** (Nadine's #55). The drawn belly and breasts go on right after the last of the skin, and the genitals counted as skin: layered above the clothes with the game's own layering, they held it all back, and the breasts went on over the clothes. Now genitals layered above the clothes don't hold the skin back, the belly and breasts go on under the clothes as they should, and a hard cock that comes after is drawn right where the game puts it.
 
 - **Bot 0.95.0 + Conditioning 1.1.3: your books come back when you're approved again, and the lines sweep: nobody hears about parts they haven't got, a gentler milk nag, hooves on a horse** From the suggestion box, Laynie, Nov 23: "#8/22 yes, that seems fair", "it definitely is worth a sweep", "#35 could be fixable", "#48 could be fixable", "#54 please fix".
   - **Your books come back** (Nikto's #8 and #22: "lost all my ribbons, had to redo the application and lost all the stats, achievements"). Somebody taken off the books (?unregister, a contract never signed, the farm girl never friended back) always had their paperwork kept in the archive, but nothin' put it back. Now when staff ?approve somebody the archive knows, what was theirs comes back first: ribbons, titles, feats, trophies, the album, ink and brands, trained holes, their farm numbers, trap ranks, marks, bought roam passes, every switch they'd set, their kinks and their words for themselves, and their old application to see again. Never their roles (staff give those), contracts, herds, keys, or anything that was happenin' to them right then (gear, a trap, a parasite, a pregnancy, what was in them). The new application's answers win. Staff see what came back, and they're welcomed back with it.

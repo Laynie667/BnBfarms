@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.95.0
+// @version      0.96.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3131,8 +3131,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.95.0";
-  var COMPANION_VERSION = "0.76.0";
+  var VERSION = "0.96.0";
+  var COMPANION_VERSION = "0.77.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4195,7 +4195,7 @@
     addCommand("nomilk", { topic: "milk", staff: true });
     addCommand("inspect", { topic: "milk", staff: true });
     addCommand("shotlog", { topic: "milk", staff: true });
-    addCommand("breedable fertile naturalheat mpreg pinme broodwomb", { topic: "breeding" });
+    addCommand("breedable fertile naturalheat mpreg pinme broodwomb stallgear", { topic: "breeding" });
     addCommand("breed", { topic: "breeding" });
     addCommand("cum", { topic: "breeding" });
     addCommand("yes no", { topic: "breeding" });
@@ -6648,6 +6648,7 @@
       daresOn: "dares",
       benchOn: "bench",
       mpreg: "mpreg",
+      stallGear: "stallgear",
       watersports: "watersports",
       parasiteOn: "parasite",
       symbioteOn: "symbiote",
@@ -8073,6 +8074,7 @@
         const mn = C2.MemberNumber, now = Date.now();
         if (!on || !rec(mn)) {
           const p0 = rec(mn) && prodOf(mn);
+          if (p0 && p0.stall && on === false && stallHold(mn, p0)) continue;
           if (p0) {
             p0.stallSeen = 0;
             p0.stallWhyTold = false;
@@ -8157,9 +8159,11 @@
             kind: doM && doS ? "both" : doM ? "milk" : "cock",
             nextBeat: now + 15e3,
             nextOpen: now + CFG.PROD.STALL_LINE_MIN * 6e4,
-            opens: 0
+            opens: 0,
+            spot: { X: pos.X, Y: pos.Y }
           };
           sound(mn, "stall");
+          if (rec(mn).stallGear) syncCompanions(true);
           tell(mn, "\u{1F95B} The stall latches on. About " + mins + " minutes to drain you down to a quarter, sugar. Stay put.");
         }
         if (!p.stall) continue;
@@ -8214,6 +8218,7 @@
         if (done) {
           p.stall = null;
           p.stallPaused = null;
+          if (rec(mn).stallGear) syncCompanions(true);
           try {
             stallDialDone(mn, st);
           } catch (e) {
@@ -12294,6 +12299,44 @@
       "The radio in the office plays something old and slow, faint through the wall.",
       "Somebody's mucking out the next stall over, and the scrape of the shovel keeps time with the pump."
     );
+    const STALL_SAFE_MIN = 30;
+    function stallGear(mn) {
+      const r = rec(mn), p = r && prodOf(mn), now = Date.now();
+      if (!r || !r.stallGear || !p || !p.stall || (p.stallFreeUntil || 0) > now) return [];
+      const st = p.stall, until = Math.ceil(((st.until || now + 30 * 6e4) + 5 * 6e4) / 6e4) * 6e4, out = [];
+      if (st.kind !== "cock") out.push({
+        slot: "cups",
+        name: "Stall Milker",
+        items: ["LactationPump"],
+        always: true,
+        until,
+        desc: "The milkin' stall's own cups, latched on and pullin' till you're drained to a quarter."
+      });
+      out.push(hasVulva(mn) ? { slot: "device", name: "Stall Sybian", items: ["Sybian"], always: true, until, desc: "The stall's saddle, hummin' under you the whole time you're milked." } : { slot: "device", name: "Stall Stand", items: ["LegSpreadDisplayStand"], always: true, until, desc: "The stall's stand, holdin' you spread and still for the milkin'." });
+      return out;
+    }
+    function stallHold(mn, p) {
+      const r = rec(mn), now = Date.now();
+      if (!r || !r.stallGear || !p || !p.stall || !p.stall.spot || (p.stallFreeUntil || 0) > now) return false;
+      if (now - (p.stall.heldAt || 0) < 4e3) return true;
+      p.stall.heldAt = now;
+      p.stall.seenAt = now;
+      teleport(mn, p.stall.spot, false, true);
+      if (!p.stall.heldTold) {
+        p.stall.heldTold = true;
+        whisper(mn, "\u{1F95B} Uh-uh, sugar. You're strapped in till the stall's done with you. Your safeword lets you loose.");
+      }
+      return true;
+    }
+    function stallLet(mn) {
+      const p = rec(mn) && prodOf(mn);
+      if (!p) return false;
+      p.stallFreeUntil = Date.now() + STALL_SAFE_MIN * 6e4;
+      saveLedger();
+      syncCompanions(true);
+      return true;
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __stallGear: (m) => stallGear(m), __stallHold: (m) => stallHold(m, prodOf(m)) });
     function ribbonsOf(mn) {
       const r = rec(mn);
       return r ? r.ribbons || 0 : 0;
@@ -32631,6 +32674,7 @@
       for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}, g.rec ? { rec: g.rec } : {}, g.text ? { text: g.text } : {}));
       if (mn === CFG.BOT_MEMBER) for (const g of seasonCostume()) out.push(g);
       if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
+      for (const g of stallGear(mn)) out.push(g);
       if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
       for (const g of symGear(mn)) out.push(g);
       return out;
@@ -35560,6 +35604,37 @@
       leaderDose: ["%x takes %n by the collar, turns them round and slides a needle into the fat of their ass like they're dosin' their own heifer. Which they are."]
     };
     addCommand("whistle send dose herdtraps sit broody album holes vat", { topic: "traps", run: (c) => keepersCommand(c.cmd, c.sender, c.args, c.R) });
+    function toNest(mn, R) {
+      const names = nestSpots();
+      if (!names.length) {
+        R("\u{1F95A} The farm hasn't got a nest set up yet, sugar. Staff make one with ?spot set nest.");
+        return false;
+      }
+      const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos;
+      const pts = names.map((n) => spotFor(n)).filter(Boolean);
+      const d = (p2) => pos ? Math.abs(p2.X - pos.X) + Math.abs(p2.Y - pos.Y) : 0;
+      const pt = pts.sort((a, b) => d(a) - d(b))[0];
+      if (!pt) {
+        R("\u{1F95A} I can't find the nest on the map right now, sugar.");
+        return false;
+      }
+      if (!C2) {
+        R("\u{1F95A} You've got to be here on the farm for that, sugar.");
+        return false;
+      }
+      if (pos && d(pt) === 0) {
+        R("\u{1F95A} You're sittin' right on the nest, sugar. ?lay when you're ready.");
+        return true;
+      }
+      if (!teleport(mn, pt, true)) {
+        R("\u{1F95A} You're tied to somethin' and can't go just now, sugar.");
+        return false;
+      }
+      const p = prodOf(mn);
+      R("\u{1F95A} Off to the nest with you, sugar." + (p && p.eggs ? " Settle in, and ?lay when they're ready to come." : " ?gather collects what's in it."));
+      return true;
+    }
+    addCommand("nest tonest", { topic: "breeding", run: (c) => toNest(c.sender, c.R) });
     const uLine = (key, mn, v) => tFill(pickFor(mn, "udd:" + key, UDDER_LINES[key]), mn, v);
     const onBooks = (mn) => {
       const r = rec(mn);
@@ -65472,6 +65547,7 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?hunt start [minutes] \xB7 ?hunt stop \xB7 proprietors
   ?pack on|off \xB7 the roamin' wolf pack (needs a trap-wolves den)
   ?gather \xB7 collect what's in the nest (?spot set nest)
+  ?nest \xB7 walk to the nest (the Companion's \u{1F95A} To the nest button too)
   ?spot set crate \xB7 a box only subjects can open
   ?cleanse <who> \xB7 5 of your ribbons: 20 off their corruption
   ?whistle <which> <who> \xB7 call one of the farm's own to a subject
@@ -68138,6 +68214,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             warn("safeword hitch:", e);
           }
           try {
+            stallLet(sender);
+          } catch (e) {
+            warn("safeword stall:", e);
+          }
+          try {
             dispSafe(sender);
           } catch (e) {
             warn("safeword dispensary:", e);
@@ -69567,13 +69648,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "naturalheat":
         case "mpreg":
         case "pinme":
-        case "broodwomb": {
+        case "broodwomb":
+        case "stallgear": {
           const r = rec(sender);
           if (!r || !r.roles.length) {
             R("That's just for folks on the books, sugar. Say ?apply first!");
             break;
           }
-          const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd;
+          const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd === "stallgear" ? "stallGear" : cmd;
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
             R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. For example: ?" + cmd + " on");
@@ -69584,7 +69666,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           const on = v === "on" || v === "yes";
-          if (on && field !== "pinMe" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")) {
+          if (on && field !== "pinMe" && field !== "stallGear" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
           }
@@ -69597,10 +69679,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             fertile: "Fertile (can catch)",
             mpreg: "Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)",
             naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days",
+            stallGear: "Strapped into the stall (a milkin' session puts the stall's pump on your teats and its Sybian or stand under you, and you stay in the stall till it's done; it all comes off after, and your safeword lets you loose)",
             broodWomb: "Brood Womb (every load that lands while you're already carryin' takes too, and adds to your litter, up to the farm's hyper sizes)",
             pinMe: "Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)"
           }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
-          if (field === "pinMe" && !on) syncCompanions(true);
+          if ((field === "pinMe" || field === "stallGear") && !on) syncCompanions(true);
           break;
         }
         case "breed": {

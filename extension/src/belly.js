@@ -132,8 +132,13 @@ function skinGate(C) {
   const layers = C && C.AppearanceLayers;
   if (!Array.isArray(layers) || !layers.length) return null;
   const groupOf = (l) => (l && l.Asset && l.Asset.Group && l.Asset.Group.Name) || "";
+  // (genitals layered ABOVE the clothes, with the game's own layering: they don't hold the skin back. Waitin' for them put
+  // the belly and the drawn breasts on after the clothes, over them. Nadine's #55, Nov 4: "as a futa: having my cock layered
+  // above clothes makes my expanded chest peak out of them as well")
+  const worn = (l) => { const g = l && l.Asset && l.Asset.Group; return !!g && (g.Clothing === true || g.Category === "Item") && !SKIN_UNDER[g.Name]; };
+  let firstWorn = layers.length; for (let i = 0; i < layers.length; i++) if (worn(layers[i])) { firstWorn = i; break; }
   let last = -1, at = 0;
-  for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf(layers[i])]) last = i;
+  for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf(layers[i])] && (groupOf(layers[i]) !== "Pussy" || i < firstWorn)) last = i;
   if (last < 0) return null;
   // (the game's picture addresses are relative, "Assets/Female3DCG/Pussy/…", with no slash in front: a pattern that
   // wanted one never matched, the gate never opened, and the belly went on last, over everything. Oct 12.)

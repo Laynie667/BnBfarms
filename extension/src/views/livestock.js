@@ -134,7 +134,7 @@ function me(ctx) {
         sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 86400000)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" · "),
         body: () => [
           s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - now) / 86400000)) + " day(s)"),
-          s.eggs && h("div", null, "🥚 " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
+          s.eggs && h("div", null, "🥚 " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due. "), btn("🥚 To the nest", () => ctx.send("nest"))),
           h("div", null, btn("Pedigree", () => ctx.send("pedigree")), btn("Eggs", () => ctx.send("eggs")), btn("Body tab ›", () => ctx.setUi({ goTab: "body" })))] },
       bodyNow(s).length && { id: "body", label: "📏 Body", sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" · "),
         body: () => [h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null, b.note ? muted(b.note) : null))),
@@ -354,6 +354,7 @@ export const SWITCH_INFO = [
   // Laynie, Nov 19: "I want to be the best baby factory wherever I go" (off till switched on)
   ["broodwomb", "Brood Womb", "Already carryin'? Every load that lands in you takes too, and adds to your litter, bigger and bigger, up to the farm's hyper sizes"], ["praise", "Praise", "Let staff's praise count"],
   // Laynie, Nov 7: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic" (off till switched on)
+  ["stallgear", "Strapped into the stall", "A milkin' session puts the stall's pump on your teats and its Sybian or stand under you, and you stay in the stall till it's done. It all comes off after; your safeword lets you loose."],
   ["pinme", "Can be pinned", "Fill up past bursting, or grow too big, and you're stuck right where you stand till you're milked down, drained or given a reducer shot: twenty minutes at most, and your safeword frees you. Off: you just waddle"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],

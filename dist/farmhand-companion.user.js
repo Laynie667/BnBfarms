@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.76.0
+// @version      0.77.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.76.0";
+  var VERSION = "0.77.0";
 
   // shared/species.js
   var WORDS = {
@@ -11767,7 +11767,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin });
                       GEN.cvKey = key3;
                     }
-                    if (hard) {
+                    if (hard && !done) {
                       if (!blink) ctx3.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
@@ -12553,8 +12553,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const layers = C2 && C2.AppearanceLayers;
     if (!Array.isArray(layers) || !layers.length) return null;
     const groupOf4 = (l) => l && l.Asset && l.Asset.Group && l.Asset.Group.Name || "";
+    const worn = (l) => {
+      const g = l && l.Asset && l.Asset.Group;
+      return !!g && (g.Clothing === true || g.Category === "Item") && !SKIN_UNDER[g.Name];
+    };
+    let firstWorn = layers.length;
+    for (let i = 0; i < layers.length; i++) if (worn(layers[i])) {
+      firstWorn = i;
+      break;
+    }
     let last2 = -1, at = 0;
-    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf4(layers[i])]) last2 = i;
+    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf4(layers[i])] && (groupOf4(layers[i]) !== "Pussy" || i < firstWorn)) last2 = i;
     if (last2 < 0) return null;
     const slot = new RegExp(SLOT_SRC);
     return (src) => {
@@ -17982,7 +17991,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
   var FARM_GROUPS = [
     ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
-    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
+    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme", "stallgear"]],
     ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
     // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
     ["\u26A0\uFE0F Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
@@ -18536,7 +18545,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" \xB7 "),
           body: () => [
             s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " day(s)"),
-            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
+            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due. "), btn("\u{1F95A} To the nest", () => ctx3.send("nest"))),
             h("div", null, btn("Pedigree", () => ctx3.send("pedigree")), btn("Eggs", () => ctx3.send("eggs")), btn("Body tab \u203A", () => ctx3.setUi({ goTab: "body" })))
           ]
         },
@@ -18849,6 +18858,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["broodwomb", "Brood Womb", "Already carryin'? Every load that lands in you takes too, and adds to your litter, bigger and bigger, up to the farm's hyper sizes"],
     ["praise", "Praise", "Let staff's praise count"],
     // Laynie, Nov 7: "we can add a 'can be pinned toggle'. some players seem really frustrated with the mechanic" (off till switched on)
+    ["stallgear", "Strapped into the stall", "A milkin' session puts the stall's pump on your teats and its Sybian or stand under you, and you stay in the stall till it's done. It all comes off after; your safeword lets you loose."],
     ["pinme", "Can be pinned", "Fill up past bursting, or grow too big, and you're stuck right where you stand till you're milked down, drained or given a reducer shot: twenty minutes at most, and your safeword frees you. Off: you just waddle"],
     ["degrade", "Degrade", "Let staff's degradin' count"],
     ["tally", "Tally marks", "Show your tally on ?who and the board"],
@@ -20338,6 +20348,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var OLD_TAG = "[B&B Farm gear]";
   var FARM_NAMES = [
     "Parasite Lips",
+    "Stall Milker",
+    "Stall Sybian",
+    "Stall Stand",
     "Parasite Belt",
     "Pump Bung",
     "Egg Post Plug",

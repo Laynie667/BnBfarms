@@ -854,6 +854,7 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?hunt start [minutes] · ?hunt stop · proprietors
   ?pack on|off · the roamin' wolf pack (needs a trap-wolves den)
   ?gather · collect what's in the nest (?spot set nest)
+  ?nest · walk to the nest (the Companion's 🥚 To the nest button too)
   ?spot set crate · a box only subjects can open
   ?cleanse <who> · 5 of your ribbons: 20 off their corruption
   ?whistle <which> <who> · call one of the farm's own to a subject

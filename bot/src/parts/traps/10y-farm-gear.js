@@ -107,6 +107,7 @@
     for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}, g.only ? { only: true } : {}, g.keep ? { keep: true } : {}, g.rec ? { rec: g.rec } : {}, g.text ? { text: g.text } : {}));
     if (mn === CFG.BOT_MEMBER) for (const g of seasonCostume()) out.push(g);   // the farm girl dressed for the season (10y9m-seasons.js)
     if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
+    for (const g of stallGear(mn)) out.push(g);   // strapped into the milkin' stall, their own switch (10k3-stall-gear.js)
     if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
     for (const g of symGear(mn)) out.push(g);   // a symbiote, as far as it's grown (10v5-symbiote-spread.js)   // the livin' suit, as far as it has spread (10y5-cursed.js)   // lips, suckers, root: whatever has bloomed (10v2-parasite-more.js)
     return out;

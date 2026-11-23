@@ -1218,7 +1218,8 @@
         try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
         try { tempOutfitEnd(sender, "safe"); } catch(e){ warn("safeword outfit wheel:", e); }   // a wheel or Wrong Barn outfit comes off (10un-outfit-wheel.js)
         try { reinsLet(sender, "safe"); } catch(e){ warn("safeword reins:", e); }   // off anybody's reins (10y9s-reins.js)
-        try { hitchLet(sender, "safe"); } catch(e){ warn("safeword hitch:", e); }   // untied from a hitchin' post (10y9u-hitch.js)
+        try { hitchLet(sender, "safe"); } catch(e){ warn("safeword hitch:", e); }
+        try { stallLet(sender); } catch(e){ warn("safeword stall:", e); }   // unstrapped from the milkin' stall, gear and all (10k3-stall-gear.js)   // untied from a hitchin' post (10y9u-hitch.js)
         try { dispSafe(sender); } catch(e){ warn("safeword dispensary:", e); }   // every dose in their Dispensary, and its farm side (10ur2-dispensary.js)
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
@@ -2161,22 +2162,23 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      case "breedable": case "fertile": case "naturalheat": case "mpreg": case "pinme": case "broodwomb": {
+      case "breedable": case "fertile": case "naturalheat": case "mpreg": case "pinme": case "broodwomb": case "stallgear": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
-        const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd;
+        const field = cmd === "naturalheat" ? "naturalHeat" : cmd === "pinme" ? "pinMe" : cmd === "broodwomb" ? "broodWomb" : cmd === "stallgear" ? "stallGear" : cmd;
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. For example: ?"+cmd+" on"); break; }
         if (!v){ R(switchStatus(cmd, !!r[field])); break; }
         const on = v === "on" || v === "yes";
-        if (on && field !== "pinMe" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
+        if (on && field !== "pinMe" && field !== "stallGear" && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r[field] = on;
         if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
         saveLedger(); audit(sender, field.toUpperCase(), on?"on":"off");
         R({ breedable:"Breedable", fertile:"Fertile (can catch)", mpreg:"Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days",
+            stallGear:"Strapped into the stall (a milkin' session puts the stall's pump on your teats and its Sybian or stand under you, and you stay in the stall till it's done; it all comes off after, and your safeword lets you loose)",
             broodWomb:"Brood Womb (every load that lands while you're already carryin' takes too, and adds to your litter, up to the farm's hyper sizes)",
             pinMe:"Can be pinned (too full or too big to move: stuck where you stand till you're milked down, drained or given a reducer shot, twenty minutes at most, and your safeword frees you)" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
-        if (field === "pinMe" && !on) syncCompanions(true);   // (anybody pinned right now is let go on the next tick)
+        if ((field === "pinMe" || field === "stallGear") && !on) syncCompanions(true);   // (pinned, or the stall's gear: let go on the next tick)   // (anybody pinned right now is let go on the next tick)
         break;
       }
 

@@ -902,6 +902,7 @@
       if (!on || !rec(mn)){
         // walked past, or stepped off: a session in progress just pauses for a minute before it ends
         const p0 = rec(mn) && prodOf(mn);
+        if (p0 && p0.stall && on === false && stallHold(mn, p0)) continue;   // strapped in (?stallgear): straight back on the stall (10k3-stall-gear.js)
         if (p0){
           p0.stallSeen = 0; p0.stallWhyTold = false; p0.stallKeptTold = false;   // next visit they're told again
           if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000){
@@ -975,8 +976,9 @@
         p.stall = { since: now, seenAt: now, mins, total, got: { m:0, s:0 },
                     rateM: total.m / mins, rateS: total.s / mins,
                     kind: doM && doS ? "both" : doM ? "milk" : "cock",
-                    nextBeat: now + 15000, nextOpen: now + CFG.PROD.STALL_LINE_MIN*60000, opens: 0 };
+                    nextBeat: now + 15000, nextOpen: now + CFG.PROD.STALL_LINE_MIN*60000, opens: 0, spot: { X: pos.X, Y: pos.Y } };
         sound(mn, "stall");
+        if (rec(mn).stallGear) syncCompanions(true);   // strapped in: the stall's gear goes on (10k3-stall-gear.js)
         tell(mn, "🥛 The stall latches on. About "+mins+" minutes to drain you down to a quarter, sugar. Stay put.");
       }
       if (!p.stall) continue;
@@ -1026,6 +1028,7 @@
       }
       if (done){
         p.stall = null; p.stallPaused = null;
+        if (rec(mn).stallGear) syncCompanions(true);   // the stall's gear comes off
         try { stallDialDone(mn, st); } catch(e){ warn("dial:", e); }
         sound(mn, "unlatch");   // the cups let go
         if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3000);

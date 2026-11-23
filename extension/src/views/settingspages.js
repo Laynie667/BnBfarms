@@ -23,7 +23,7 @@ import { workCard } from "./staff.js";
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
 const FARM_GROUPS = [
   ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
-  ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme"]],
+  ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme", "stallgear"]],
   ["🪤 Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
   // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
   ["⚠️ Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],

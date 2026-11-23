@@ -120,7 +120,12 @@ const tick=async()=>{ W.__roamTick(); await wait(500); };
     ok(cs.every(k=>Object.keys(k.rules).length<=30), 'still within BC+\'s 30 rules ('+cs.map(k=>Object.keys(k.rules).length).join(',')+')');
     const p=cs.slice(3); ok(p.every(k=>k.rules['chat.forbidLeaving'] && /permanent/.test(k.terms)) && !c.rules['chat.forbidLeaving'], 'permanent ones forbid leavin\' the room and say so; the others don\'t');
     L().contracts=(L().contracts||[]).concat([{key:'pz',mn:500,status:'signed',durationMin:0,rules:Object.keys(p[1].rules)}]);
-    let n2=sent.length; await say(500,'?roam start',900); ok(/permanent contract keeps you in the room/.test(all(n2)) && !(P(500).roam.until>Date.now()), '?roam start on a permanent contract: no pass spent');
+    // (Nov 23, Laynie: "might let perm contracts buy roaming passes, but theirs runs 30 minutes of freedom instead of a hour")
+    P(500).roamPasses=1; P(500).roam.until=0;
+    let n2=sent.length; await say(500,'?roam start',900); const left=P(500).roam.until-Date.now();
+    ok(left>28*60000 && left<=30*60000 && /half an hour/.test(all(n2)) && /Companion walks you out/.test(all(n2)), '?roam start on a permanent contract: a pass, half an hour, and the Companion walks them out the door BC+ keeps shut');
+    ok(W.__stateFor(500).roam.perm===true && W.__stateFor(500).roam.mins===30, '...and their Companion is told it\'s a permanent contract\'s half hour');
+    P(500).roam.until=0;
     L().contracts=L().contracts.filter(k=>k.key!=='pz'); }
   ok(!warns.some(w=>/roam/i.test(w)), 'no errors: '+warns.filter(w=>/roam/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);

@@ -10,6 +10,7 @@
 //   3. every piece that was locked in the saved outfit gets a high security padlock keyed to the farm
 import { BOT_MEMBER } from "./config.js";
 import { commitLook } from "./look.js";
+import { BODY_BITS } from "./marks.js";
 const BACKUP_KEY = "fhc-outfit-backup";
 // lock details are never saved or copied: the farm puts its own locks on
 const LOCK_FIELDS = ["LockedBy", "LockMemberNumber", "LockMemberName", "LockMessage", "CombinationNumber", "Password", "Hint", "LockSet",
@@ -60,11 +61,12 @@ export function wearOutfit(data, keys) {
   if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
   const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
   const mine = new Set(outfit.items.map((i) => i.Group));
-  // clothes come off (unless locked on), restraints stay unless the outfit puts somethin' in that spot
+  // clothes come off (unless locked on), restraints stay unless the outfit puts somethin' in that spot. Ears, tails and
+  // wings are part of them, not clothes (marks.js BODY_BITS, Nov 23): they stay, unless the outfit brings its own
   const next = cur.filter((b) => {
     if (stuck.has(b.Group)) return true;
     const g = groupOf(b.Group);
-    if (isClothes(g)) return false;
+    if (isClothes(g)) return BODY_BITS.test(b.Group) && !mine.has(b.Group);
     return !mine.has(b.Group);
   });
   let worn = 0, locks = 0, skipped = 0;
@@ -88,6 +90,31 @@ export function wearOutfit(data, keys) {
   try { window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added })); } catch (e) { /* no storage: no change-back */ }
   commit(next);
   return { ok: true, worn, locks, skipped };
+}
+
+// BACK ON THE FARM UNDER A CONTRACT (Nov 23; Laynie: "also reapplying their farm outfits upon them returning, if contracted
+// and anything is missing"). Only the outfit's pieces whose spot is EMPTY on them go back on: whatever's in a spot now (put
+// there by them, staff or a keyholder) stays. Locked like the first time. Nothin' else is touched, and the change-back copy
+// (what they wore before the farm first dressed them) is kept as it was. groups: the spots the farm saw empty.
+export function topUpOutfit(data, keys, groups) {
+  const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
+  if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
+  const cur = window.ServerAppearanceBundle(P().Appearance), have = new Set(cur.map((b) => b.Group)), only = new Set(groups || []);
+  const next = cur.slice();
+  let worn = 0, locks = 0;
+  for (const it of outfit.items) {
+    const g = groupOf(it.Group);
+    if (!g || !(isClothes(g) || isItem(g)) || have.has(it.Group) || (only.size && !only.has(it.Group))) continue;
+    const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
+    if ((it.locked || canLock(it)) && keys && keys.length) {
+      b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
+      Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
+      locks++;
+    }
+    next.push(b); have.add(it.Group); worn++;
+  }
+  if (worn) commit(next);
+  return { ok: true, worn, locks };
 }
 
 // back into what they wore before the farm dressed them (locked farm pieces stay till a keyholder opens 'em).

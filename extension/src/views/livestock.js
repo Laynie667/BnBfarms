@@ -166,10 +166,10 @@ function me(ctx) {
   ];
 }
 function roamBody(ctx) {
-  const r = ctx.s.roam;
-  return [r.until ? muted("Roamin' now: back on the farm by " + clock(r.until) + ", or the farm girl fetches you.")
-                  : muted(r.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
-    h("div", null, r.until ? btn("I'm back", () => ctx.send("roam back")) : r.left ? btn("Roam for an hour", () => ctx.send("roam start"), true) : null,
+  const r = ctx.s.roam, span = r.mins === 30 ? "half an hour" : r.mins && r.mins !== 60 ? r.mins + " minutes" : "an hour";
+  return [r.until ? muted("Roamin' now: back on the farm by " + clock(r.until) + ", or the farm girl whistles you home, wherever you are.")
+                  : muted(r.left ? (span[0].toUpperCase() + span.slice(1)) + " off the farm each; the whole map is yours either way. " + (r.perm ? "Your contract keeps the door shut, so the Companion walks you out." : "Walk out the door and a pass starts.") + " Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
+    h("div", null, r.until ? btn("I'm back", () => ctx.send("roam back")) : r.left ? btn("Roam for " + span, () => ctx.send("roam start"), true) : null,
       r.until ? null : btn("Buy a pass · " + (r.price || 30) + " 🎀", () => ctx.send("buy roampass")))];
 }
 

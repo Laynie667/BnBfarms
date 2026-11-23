@@ -126,6 +126,7 @@
         try { friendArrived(mn); } catch(e){ warn("friend check:", e); }   // (back from a drop: the friend check waits for the server's list to catch up)
         greet(mn);
         onArrive(mn);
+        (state.topUp = state.topUp || new Set()).add(mn);   // back on the farm: their farm outfit's checked when their Companion says hello (10c-outfits.js)
         if (state.noMove) state.noMove.delete(mn);   // back in the room: their game gets a fresh ask (05-map.js)
         welcomeBack(mn);   // back after hours away: what they missed (10p-lookout.js)
         later(()=>deliverMail(mn), 8000);   // anything kept for them while they were away

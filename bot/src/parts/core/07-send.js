@@ -538,10 +538,13 @@
       later(()=>syncCompanions(), 800);
       try { companionTooOld(mn, String(m.ver||"")); } catch(e){}
       try { if (!keep) companionOutdated(mn, ver); } catch(e){ warn("update note:", e); }
-      { const r = rec(mn); if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500); if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2000); }   // an outfit their contract still owes them (10c-outfits.js)
+      { const r = rec(mn); if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500); if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2000);
+        // back on the farm under a contract: anything missin' from their farm outfit goes back on (10c-outfits.js, Nov 23)
+        else if (r && !r.outfitOwed && !r.tempOutfit && state.topUp && state.topUp.has(mn)){ state.topUp.delete(mn); later(() => { try { outfitTopUp(mn); } catch(e){ warn("outfit top-up:", e); } }, 4000); } }   // an outfit their contract still owes them (10c-outfits.js)
       return;
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }
+    if (m.type === "roamSpent"){ try { roamSpent(mn, m); } catch(e){ warn("roam:", e); } return; }   // a pass their Companion kept while they were away (homeward.js)
     if (m.type === "bodyFarmAsk"){ farmLookAsk(mn, m); return; }
     if (m.type === "outfitSave"){ saveOutfit(mn, m); return; }
     if (m.type === "outfitAnswer"){ outfitAnswer(mn, m); return; }

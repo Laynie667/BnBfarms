@@ -51,18 +51,23 @@
     } catch(e){ return false; }
   }
   function roamKeptIn(mn){ return !!(L.contracts && L.contracts.some(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving"))); }
+  // how long a pass runs: an hour, or half an hour on a permanent contract (Nov 23)
+  const roamMins = (mn) => roamKeptIn(mn) ? CFG.ROAM_PASS_PERM_MIN : CFG.ROAM_PASS_MIN;
+  const roamSpan = (mins) => mins === 60 ? "an hour" : mins === 30 ? "half an hour" : mins+" minutes";
   function roamStart(mn, auto){
     const g = roamOf(mn); if (!g) return false;
     if (g.until > Date.now()) return true;
-    // a permanent contract forbids leavin' the room outright (Oct 26), so a pass would only be wasted
-    if (roamKeptIn(mn)) return false;
+    // a permanent contract's BC+ Forbid leaving keeps the door shut, but its pass is half an hour now (Nov 23, Laynie: "might
+    // let perm contracts buy roaming passes, but theirs runs 30 minutes"): their Companion walks them out (homeward.js)
     if (roamLeft(mn) <= 0) return false;
     if (g.used < roamFree(mn)) g.used++; else { const r = rec(mn); r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1); }
     g.wentAt = auto ? Date.now() : 0;
-    g.until = Date.now() + CFG.ROAM_PASS_MIN * 60000; g.warned = []; g.strayAt = 0; saveLedger(); syncCompanions(true);
+    const mins = roamMins(mn);
+    g.until = Date.now() + mins * 60000; g.warned = []; g.strayAt = 0; saveLedger(); syncCompanions(true);
     const back = clockOf(g.until), left = roamLeft(mn);
     beep(mn, auto ? "🧭 You wandered off the farm, sugar, so that's a roam pass spent. Back by "+back+". "+left+" left."
-                  : "🧭 Off you go, sugar. You've got an hour: back by "+back+", or I'll fetch you. "+left+" left.");
+                  : "🧭 Off you go, sugar. You've got "+roamSpan(mins)+": back by "+back+", or I'll fetch you. "+left+" left."+
+                    (roamKeptIn(mn) ? " Your contract keeps the door shut, so your Companion walks you out." : ""));
     audit(mn, "ROAM_START", auto ? "auto" : "asked");
     return true;
   }
@@ -147,8 +152,7 @@
     const g = roamOf(t), now = Date.now();
     if (!other && ["start", "go", "now", "on"].includes(a0)){
       if (g.until > now){ R("🧭 You're already roamin', sugar: back by "+clockOf(g.until)+"."); return; }
-      if (roamKeptIn(sender)){ R("🧭 Your permanent contract keeps you in the room, sugar, so there's no roamin' on it. Your passes are still yours."); return; }
-      if (!roamStart(sender, false)) R("🧭 You haven't got a roam pass, sugar. ?buy roampass, "+CFG.ROAM_PASS_PRICE+" ribbons for an hour, or your herd leader can give you one.");
+      if (!roamStart(sender, false)) R("🧭 You haven't got a roam pass, sugar. ?buy roampass, "+CFG.ROAM_PASS_PRICE+" ribbons for "+roamSpan(roamMins(sender))+", or your herd leader can give you one.");
       return;
     }
     if (!other && ["back", "home", "end", "off"].includes(a0)){
@@ -156,13 +160,33 @@
       else R("🧭 You're not roamin' right now.");
       return;
     }
-    R("🧭 "+(t === sender ? "Your" : plainName(t)+"'s")+" roam passes: "+roamLeft(t)+", an hour off the farm each (?buy roampass, "+CFG.ROAM_PASS_PRICE+" ribbons)"+(g.until > now ? " · roamin' now, back by "+clockOf(g.until) : "")+
+    R("🧭 "+(t === sender ? "Your" : plainName(t)+"'s")+" roam passes: "+roamLeft(t)+", "+roamSpan(roamMins(t))+" off the farm each (?buy roampass, "+CFG.ROAM_PASS_PRICE+" ribbons)"+(g.until > now ? " · roamin' now, back by "+clockOf(g.until) : "")+
       ". "+(t === sender ? "?roam start, then go where you like; walk off the farm and one starts by itself. Late back, or out with none left, and I fetch you." : ""));
   }
   function roamState(mn){
     const x = roamContract(mn); if (!x) return null;
     const g = roamOf(mn);
-    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: perkPrice(mn, CFG.ROAM_PASS_PRICE), safe: (rec(mn).roamSafeUntil || 0) > Date.now() };   // safe: their Companion opens the gate (index.js)
+    // (Nov 23) and what their Companion needs to keep the rules off the farm, where I can't reach them (homeward.js): how
+    // long a pass runs, a permanent contract, the contract's end, the farm's room, who may summon them
+    let by = [CFG.BOT_MEMBER]; try { by = by.concat(farmInfo().staff || []); } catch(e){}
+    const snap = L.roomSnapshot && L.roomSnapshot.room;
+    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: perkPrice(mn, CFG.ROAM_PASS_PRICE), safe: (rec(mn).roamSafeUntil || 0) > Date.now(),   // safe: their Companion opens the gate (index.js)
+      mins: roamMins(mn), perm: roamKeptIn(mn), ends: x.until || 0, room: CFG.ROOM_NAME, space: (snap && snap.Space) || "X", by: [...new Set(by)].filter(Number.isInteger).slice(0, 60) };
+  }
+  // their Companion walked them off and back while I couldn't see (homeward.js): a pass it started for them comes off their
+  // books, and late back is late back. at: when it happened; started: the Companion started the pass itself (one of
+  // mine has already come off); late: they were whistled home past their pass
+  function roamSpent(mn, m){
+    const g = roamOf(mn), r = rec(mn); if (!g || !r || !roamContract(mn)) return false;
+    const at = Number(m && m.at) || 0;
+    if (!at || at > Date.now() || Date.now() - at > 24*3600000 || (g.spent || []).includes(at)) return false;   // (each one once)
+    g.spent = (g.spent || []).concat(at).slice(-10);
+    const mine = g.wentAt && Math.abs(g.wentAt - at) < 30*60000;   // one I started myself for the same trip
+    if (m && m.started && !mine && roamLeft(mn) > 0){ if (g.used < roamFree(mn)) g.used++; else r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1); }
+    saveLedger(); syncCompanions(true); audit(mn, "ROAM_AWAY", (m && m.late ? "late " : "")+"from their Companion");
+    if (m && m.late) roamPenalty(mn, "was late back from their roam");
+    tell(mn, "🧭 Welcome home, sugar. "+(m && m.late ? "You were late, so that's a naughty mark. " : "")+roamLeft(mn)+" pass"+(roamLeft(mn) === 1 ? "" : "es")+" left.");
+    return true;
   }
   // An old Companion has no farm gate (it came in 0.40): a pet on a summonable contract runnin' one walks straight out,
   // and only the summon brings them back (Laynie, Oct 24: "registered and contracted pets being able to leave the room

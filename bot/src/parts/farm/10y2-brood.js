@@ -210,6 +210,9 @@
       if (g.urge) out.push("👄 It wants you to "+{ kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get into a glory stall" }[g.urge.kind]+": "+mins(g.urge.until)+" min.");
     }
     if (p.deniedUntil > now) out.push("🚫 No cummin' for "+mins(p.deniedUntil)+" min.");
+    // a knot, either end of it (Nov 23, Crystal's #74: "a timer in the status for when your knot (not just the other party's knot) releases")
+    if (p.tieUntil > now) out.push("🔒 Knotted to "+plainName(p.tiedTo)+": "+mins(p.tieUntil)+" min till it lets go.");
+    for (const k of knotsIn(mn)) out.push("🔒 Your knot's locked in "+plainName(k.t)+": "+mins(k.until)+" min till it lets go.");
     if (p.eggs) out.push("🥚 Carryin' "+p.eggs.n+" eggs"+(bellyStage(mn) ? " (belly: "+BELLY[bellyStage(mn)]+")" : "")+". ?lay at the nest"+(now - p.eggs.since < CFG.NEST_MIN_H*3600000 ? " in "+mins(p.eggs.since + CFG.NEST_MIN_H*3600000)+" min" : " any time")+".");
     for (const [slot, g] of Object.entries(r.gear || {})) if (g.until > now) out.push("⛓️ "+g.label+": "+mins(g.until)+" min.");
     if (r.gluedUntil > now) out.push("🍯 Sticky feet: "+mins(r.gluedUntil)+" min.");

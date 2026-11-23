@@ -106,6 +106,7 @@
     ROAM_PASS_PRICE: 30,         // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
     ROAM_PASS_HOLD: 3,           // most passes they can carry
     ROAM_PASS_MIN: 60,
+    ROAM_PASS_PERM_MIN: 30,      // a permanent contract's pass: half an hour (Laynie, Nov 23: "might let perm contracts buy roaming passes, but theirs runs 30 minutes")
     ROAM_WARN_MIN: [10, 2],      // whispers before a pass runs out
     ROAM_GRACE_S: 60,            // off the farm with no pass left: this long, then summoned
     ROAM_RESUMMON_MIN: 5,        // still not home after a summon: try again this often

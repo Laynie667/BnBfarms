@@ -17,7 +17,7 @@ import { speciesKeyOf } from "../../shared/species.js";
 import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
-import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
+import { captureOutfit, wearOutfit, topUpOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
@@ -25,6 +25,7 @@ import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
 import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initNetGuard } from "./netguard.js";
+import { initHomeward, homeKeep, homeLocalPass, homeWantOut, homeSafe } from "./homeward.js";
 import { initBotScreen, screenNapping } from "./botscreen.js";
 import { initAllocWatch } from "./allocwatch.js";
 import { initTrim } from "./trimpics.js";
@@ -170,6 +171,9 @@ function relay(m) {
 function sendCommand(text, typed) {
   text = String(text || "").trim();
   if (!text) return;
+  // (homeward.js) a roam pass asked for: a permanent contract's door is shut, so the Companion walks them out; a safeword:
+  // nobody whistles them home for a while
+  try { if (/^roam (start|go|now|on)$/i.test(text)) homeWantOut(); if (/^(safe|safeword|red)$/i.test(text)) homeSafe(); } catch (e) { /* fine */ }
   if (botHere()) {
     if (!st.welcomed) hello();
     toBot("cmd", typed ? { text } : { text, btn: true });   // btn: a button or switch, never an answer to a question
@@ -309,7 +313,10 @@ function onFarmMsg(m) {
       break;
     case "state":
       if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
-      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); inkSync(); trophyTell(m.state.trophies); try { messBrand(brandShown(m.state.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink); }
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); inkSync(); trophyTell(m.state.trophies); try { messBrand(brandShown(m.state.brand)); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } inkCounts(m.state.ink);
+        // the farm girl's whistle (homeward.js): their roam rules, kept for when they're off the farm; and a pass it kept
+        // for them while they were away, for her books now they're back
+        try { homeKeep(m.state); const l = homeLocalPass(); if (l) toBot("roamSpent", l); } catch (e) { console.warn("[Farmhand Companion] whistle:", e); } }
       break;
     case "reply":
     case "notice": {
@@ -336,6 +343,13 @@ function onFarmMsg(m) {
       toChat(String(m.text || "") + "  (pick in your 🌾 panel)", "#c9a35b");
       break;
     case "outfit":
+      // back on the farm under a contract: only what's missin' goes back on (outfits.js topUpOutfit, Nov 23)
+      if (m.auto && Array.isArray(m.topup)) {
+        let r; try { r = topUpOutfit(String(m.data || ""), Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], m.topup.map(String)); } catch (e) { r = { ok: false, why: e.message }; }
+        if (r.ok && r.worn) st.panel.add("👗 Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
+        toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0 });
+        break;
+      }
       // with a contract they've just signed: on at once, no second askin' (they can still change back from the panel)
       if (m.auto) { const ok = api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] }); if (ok) toChat("👗 You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b"); break; }
       st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), desc: String(m.desc || "").slice(0, 1200), data: String(m.data || ""),
@@ -508,6 +522,7 @@ function start() {
   // the record: what lands in your chat, your beeps and your commands, to the farm girl by the hour (chatlog.js).
   // Always for the proprietors; anybody else only with Toggles → "Send a record..." on.
   initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere });
+  initHomeward(mod, { botMn: BOT_MEMBER, say: (t) => toChat(t, "#c9a35b", true) });   // the farm girl's whistle: home from anywhere, no BC+ or friendin' needed (homeward.js)
   initNetGuard(mod);   // never 50 messages in a second (the server's cut-off), and every drop written down (netguard.js, /farmmem)
   initMemlog();        // a log of how big things are, for chasing a page that runs out of room (memlog.js, /farmmem)
   initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());   // your settings as a file in a folder you pick (localsave.js)

@@ -97,6 +97,25 @@
     const err = offerOutfit(mn, o.slot, "It goes with your new contract", true);
     if (err){ r.outfitOwed = null; saveLedger(); notifyStaff("👗 Couldn't dress "+plainName(mn)+" for their contract: "+err, false); }
   }
+  // BACK ON THE FARM, DRESSED AGAIN (Nov 23; Laynie: "also reapplying their farm outfits upon them returning, if contracted
+  // and anything is missing"). Somebody under a contract, dressed for it once (contractDressedAt), comes back to the farm:
+  // any piece of their farm outfit whose spot is EMPTY on them goes back on (padlocked like the first time). A spot with
+  // somethin' else in it is left be (they, staff or a keyholder put that there: Oct 23, "whatever staff change stays
+  // changed"). Their own outfit (?ownoutfit) and a temporary one (the outfit wheel) are never topped up.
+  function outfitTopUp(mn){
+    const r = rec(mn); if (!r || r.ownOutfit || !r.contractDressedAt || r.tempOutfit || !hasCompanion(mn)) return false;
+    contractsLedger(); if (!L.contracts.some(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()))) return false;
+    outfitsLedger();
+    const slot = r.contractSlot || outfitSlotFor(mn), o = slot && (L.outfits[slot] || farmOutfit(slot)); if (!o || !o.data) return false;
+    let items = []; try { items = (JSON.parse(W.LZString.decompressFromBase64(String(o.data))) || {}).items || []; } catch(e){ return false; }
+    const C = charFor(mn); if (!C || !Array.isArray(C.Appearance)) return false;
+    const worn = new Set(C.Appearance.map(a => a && a.Asset && a.Asset.Group && a.Asset.Group.Name).filter(Boolean));
+    const missing = [...new Set(items.map(it => it && it.Group).filter(g => g && !worn.has(g)))];
+    if (!missing.length) return false;
+    enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), auto: true, topup: missing.slice(0, 40), id: ++companionSeq }, mn));
+    audit(CFG.BOT_MEMBER, "OUTFIT_TOPUP_SENT", mn+" "+missing.length);
+    return true;
+  }
   // a proprietor's Companion sent what they're wearin'
   function saveOutfit(mn, m){
     if (!isProprietor(mn)){ toCompanion(mn, "Savin' farm outfits is for the proprietors, sugar.", "reply"); return; }
@@ -112,9 +131,14 @@
   // their Companion tells me what happened, so staff and the room know
   function outfitAnswer(mn, m){
     try { tempOutfitAnswer(mn, m); } catch(e){ warn("temp outfit:", e); }   // the outfit wheel, the Wrong Barn (10un-outfit-wheel.js)
+    if (m.answer === "topped"){   // a top-up on their return: only what was missin' (outfitTopUp below)
+      audit(mn, "OUTFIT_TOPUP", String(m.slot||"")+" "+(m.worn|0));
+      if (onMap(mn) && (m.worn|0) > 0) emote("👗 The farm girl tuts and puts "+plainName(mn)+" back in their farm outfit: "+(m.worn|0)+" piece"+((m.worn|0) === 1 ? "" : "s")+" they'd come home without"+(m.locks ? ", padlocked back on" : "")+".");
+      return;
+    }
     if (m.answer === "worn"){
       audit(mn, "OUTFIT_WORN", String(m.slot||""));
-      { const r = rec(mn); if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot||"")){ r.outfitOwed = null; r.contractDressedAt = Date.now(); saveLedger(); } }
+      { const r = rec(mn); if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot||"")){ r.outfitOwed = null; r.contractDressedAt = Date.now(); r.contractSlot = String(m.slot||""); saveLedger(); } }
       if (onMap(mn)) emote("👗 "+plainName(mn)+" changes into "+(String(m.slot||"").startsWith("uniform:") ? "their farm uniform" : /^farm:/.test(String(m.slot||"")) && farmName(String(m.slot)) ? "the "+farmName(String(m.slot)) : "their farm outfit")+(m.locks ? ", and the padlocks click shut" : "")+".");
     } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot||""));
     else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
@@ -137,7 +161,7 @@
     R(r.ownOutfit ? "👗 Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no."
                   : "👗 Bring your own outfit: off. "+(r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
   }
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m), __outfitTopUp: (m) => outfitTopUp(m) });
 
   // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
   addCommand("ownoutfit myoutfit",       { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });   // bring your own outfit

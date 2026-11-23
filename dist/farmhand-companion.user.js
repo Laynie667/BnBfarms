@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.75.1
+// @version      0.76.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5805,8 +5805,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W19, H) {
-    const t = cy - H / 2, L = cx - W19 / 2, R = cx + W19 / 2;
+  function shield(g, cx, cy, W20, H) {
+    const t = cy - H / 2, L = cx - W20 / 2, R = cx + W20 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6668,9 +6668,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W19 = 192, H = 226;
+        const x0 = 94, y0 = 12, W20 = 192, H = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W19, H);
+        g.strokeRect(x0, y0, W20, H);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6678,20 +6678,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W19 - 8, yy);
+            g.fillText(right, x0 + W20 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W19 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W20 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W19 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W20 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W19 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W20 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W19 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W20 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7219,8 +7219,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W19, d, V) {
-    doc = W19.document;
+  function drawCard(W20, d, V) {
+    doc = W20.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7248,7 +7248,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W19, d, m, layer, V) {
+  function picture(W20, d, m, layer, V) {
     const key3 = d.name + "|" + JSON.stringify(V);
     let set2 = cache.get(key3);
     if (set2) {
@@ -7257,30 +7257,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W19, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W20, d, V), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key3, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W19, u);
+      for (const u of Object.values(os)) forget(W20, u);
     }
     return set2[layer] || null;
   }
-  function forget(W19, url) {
+  function forget(W20, url) {
     try {
-      const m = W19.GLDrawImageCache;
+      const m = W20.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W19.DrawImageCache;
+      const m = W20.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W19.GLDrawCanvas && W19.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W20.GLDrawCanvas && W20.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7384,19 +7384,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W19, a) {
-    Wd = W19;
+  function openInkPanel(W20, a) {
+    Wd = W20;
     api = a;
     close();
-    if (!W19.document.getElementById("fi-style")) {
-      const s = W19.document.createElement("style");
+    if (!W20.document.getElementById("fi-style")) {
+      const s = W20.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W19.document.head.appendChild(s);
+      W20.document.head.appendChild(s);
     }
-    box = W19.document.createElement("div");
+    box = W20.document.createElement("div");
     box.id = "fi-panel";
-    W19.document.body.appendChild(box);
+    W20.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7492,9 +7492,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
-  function describe(W19) {
+  function describe(W20) {
     for (const slot of ALL_SLOTS) {
-      const G = W19.AssetGroupMap && W19.AssetGroupMap.get(slot);
+      const G = W20.AssetGroupMap && W20.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7503,32 +7503,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W19) => typeof W19.AssetGroupAdd === "function" && typeof W19.AssetAdd === "function" && W19.AssetGroupMap && W19.AssetGroupMap.size > 30;
-  function addSlots(W19) {
+  var gameReady = (W20) => typeof W20.AssetGroupAdd === "function" && typeof W20.AssetAdd === "function" && W20.AssetGroupMap && W20.AssetGroupMap.size > 30;
+  function addSlots(W20) {
     let added = false;
     for (const slot of ALL_SLOTS) {
-      if (W19.AssetGroupMap.has(slot)) continue;
-      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W19.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W19.AssetAdd(G, a, W19.AssetFemale3DCGExtended || {}, def);
+      if (W20.AssetGroupMap.has(slot)) continue;
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W20.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W20.AssetAdd(G, a, W20.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
-    describe(W19);
+    describe(W20);
     return added;
   }
   var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
-  function liveSrc(W19, C2, slot, name, layer) {
+  function liveSrc(W20, C2, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W19, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+      return picture(W20, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W19) {
-    const P5 = W19.Player, out = [];
+  function wornLive(W20) {
+    const P5 = W20.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P5, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7536,8 +7536,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W19, slot, values, now) {
-    const it = itemIn(W19.Player, slot);
+  function write(W20, slot, values, now) {
+    const it = itemIn(W20.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7547,17 +7547,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W19), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W20), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(W19.Player);
+      if (typeof W20.CharacterRefresh === "function") W20.CharacterRefresh(W20.Player);
     } catch (e) {
     }
     try {
-      if (typeof W19.ChatRoomCharacterItemUpdate === "function") W19.ChatRoomCharacterItemUpdate(W19.Player, slot);
+      if (typeof W20.ChatRoomCharacterItemUpdate === "function") W20.ChatRoomCharacterItemUpdate(W20.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7566,17 +7566,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var counts = {};
   var mine = {};
   var DAY = 864e5;
-  var cumKey = (W19) => "farmink-lastcum-" + (W19.Player && W19.Player.MemberNumber);
-  function daysDenied(W19) {
+  var cumKey = (W20) => "farmink-lastcum-" + (W20.Player && W20.Player.MemberNumber);
+  function daysDenied(W20) {
     let t = 0;
     try {
-      t = Number(W19.localStorage.getItem(cumKey(W19))) || 0;
+      t = Number(W20.localStorage.getItem(cumKey(W20))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W19, auto) {
-    if (auto === "denied") return { n: daysDenied(W19) };
+  function autoOf(W20, auto) {
+    if (auto === "denied") return { n: daysDenied(W20) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
@@ -7588,12 +7588,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W19) {
-    for (const { slot, name, item } of wornLive(W19)) {
+  function refreshAuto(W20) {
+    for (const { slot, name, item } of wornLive(W20)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W19, d.auto);
-      if (v) write(W19, slot, v);
+      const v = autoOf(W20, d.auto);
+      if (v) write(W20, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7628,7 +7628,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W19) => "farmink-done-" + (W19.Player && W19.Player.MemberNumber);
+  var doneKey = (W20) => "farmink-done-" + (W20.Player && W20.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
@@ -7641,21 +7641,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W19, list, on3, now, opts) {
+  function farmInkSync(W20, list, on3, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P5 = W19.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W19.InventoryWear !== "function") return null;
+    const P5 = W20.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W20.InventoryWear !== "function") return null;
     now = now || Date.now();
     const want = on3 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed2 = [];
     let done = {};
     try {
-      done = JSON.parse(W19.localStorage.getItem(doneKey(W19))) || {};
+      done = JSON.parse(W20.localStorage.getItem(doneKey(W20))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W19.InventoryRemove === "function") W19.InventoryRemove(P5, slot, false);
+        if (typeof W20.InventoryRemove === "function") W20.InventoryRemove(P5, slot, false);
         else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7702,7 +7702,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (itemIn(P5, slot)) remove(slot);
       const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W19.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
+        W20.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
@@ -7717,29 +7717,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W19.localStorage.setItem(doneKey(W19), JSON.stringify(done));
+      W20.localStorage.setItem(doneKey(W20), JSON.stringify(done));
     } catch (e) {
     }
     if (changed2.length) {
       try {
-        if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(P5);
+        if (typeof W20.CharacterRefresh === "function") W20.CharacterRefresh(P5);
       } catch (e) {
       }
       try {
-        if (typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(P5);
+        if (typeof W20.ChatRoomCharacterUpdate === "function") W20.ChatRoomCharacterUpdate(P5);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W19) => {
-    const id = farmOf(itemIn(W19.Player, BRAND_SLOT));
+  var farmBrandWorn = (W20) => {
+    const id = farmOf(itemIn(W20.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W19, C2) => {
+  var dosed = (W20, C2) => {
     try {
-      const D = W19.FarmhandDispensary;
+      const D = W20.FarmhandDispensary;
       return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
     } catch (e) {
       return false;
@@ -7757,29 +7757,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.trophy === "string" ? f.trophy : null;
   };
-  function trophyWorn(W19) {
+  function trophyWorn(W20) {
     const o = {};
     for (const s of INK_SLOTS) {
-      const id = trophyOf(itemIn(W19.Player, s));
+      const id = trophyOf(itemIn(W20.Player, s));
       if (id) o[id] = s;
     }
     return o;
   }
-  var roomSees = (W19, P5) => {
+  var roomSees = (W20, P5) => {
     try {
-      if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(P5);
+      if (typeof W20.CharacterRefresh === "function") W20.CharacterRefresh(P5);
     } catch (e) {
     }
     try {
-      if (typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(P5);
+      if (typeof W20.ChatRoomCharacterUpdate === "function") W20.ChatRoomCharacterUpdate(P5);
     } catch (e) {
     }
   };
-  function trophyWear(W19, t, slot) {
-    const P5 = W19.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || typeof W19.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  function trophyWear(W20, t, slot) {
+    const P5 = W20.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || typeof W20.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
     if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
-    const worn = trophyWorn(W19);
+    const worn = trophyWorn(W20);
     if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
     if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
     slot = slot || INK_SLOTS.find((s) => !itemIn(P5, s));
@@ -7789,100 +7789,100 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }) };
     if (itemIn(P5, slot)) {
       try {
-        W19.InventoryRemove(P5, slot, false);
+        W20.InventoryRemove(P5, slot, false);
       } catch (e) {
         return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
       }
     }
     try {
-      W19.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
+      W20.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
     } catch (e) {
       return { ok: false, why: "the game wouldn't take it" };
     }
     const it = itemIn(P5, slot);
     if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
-    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W19, d.auto) : null;
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W20, d.auto) : null;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
-    roomSees(W19, P5);
+    roomSees(W20, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
-  function trophyOff(W19, id) {
-    const P5 = W19.Player, slot = P5 && trophyWorn(W19)[id];
+  function trophyOff(W20, id) {
+    const P5 = W20.Player, slot = P5 && trophyWorn(W20)[id];
     if (!slot) return { ok: true, already: true };
     try {
-      if (typeof W19.InventoryRemove === "function") W19.InventoryRemove(P5, slot, false);
+      if (typeof W20.InventoryRemove === "function") W20.InventoryRemove(P5, slot, false);
       else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
     } catch (e) {
       return { ok: false, why: "it wouldn't come off" };
     }
-    roomSees(W19, P5);
+    roomSees(W20, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W19, t) => {
+  var say = (W20, t) => {
     try {
-      if (typeof W19.ChatRoomSendLocal === "function") {
-        const d = W19.document.createElement("div");
+      if (typeof W20.ChatRoomSendLocal === "function") {
+        const d = W20.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W19.ChatRoomSendLocal(d.outerHTML);
+        W20.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W19) {
+  function wornAll(W20) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W19.Player, slot);
+      const it = itemIn(W20.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W19) => ({ worn: () => wornAll(W19), write: (slot, v) => write(W19, slot, v, true), command: (a) => inkCommand(W19, a) });
-  function inkCommand(W19, args) {
+  var panelApi = (W20) => ({ worn: () => wornAll(W20), write: (slot, v) => write(W20, slot, v, true), command: (a) => inkCommand(W20, a) });
+  function inkCommand(W20, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W19);
-    if (!a && W19.document && W19.document.body) {
-      openInkPanel(W19, panelApi(W19));
+    const worn = wornLive(W20);
+    if (!a && W20.document && W20.document.body) {
+      openInkPanel(W20, panelApi(W20));
       return;
     }
-    if (/^why$/i.test(a)) return say(W19, whyText());
+    if (/^why$/i.test(a)) return say(W20, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W19.Player, slot2)) return say(W19, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W19, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W19, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W20.Player, slot2)) return say(W20, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W20, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W20, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W19, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W19, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W20, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W20, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W19.Player, slot);
-    if (!it) return say(W19, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W19, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W20.Player, slot);
+    if (!it) return say(W20, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W20, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W19, "");
+    if (!rest) return inkCommand(W20, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W19, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W19, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W19);
-    say(W19, "Written on " + d.title + ".");
+    else return say(W20, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W20, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W20);
+    say(W20, "Written on " + d.title + ".");
   }
-  function farmInkEntry(W19) {
-    const PD = W19.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W19.PropertyDataEntry;
+  function farmInkEntry(W20) {
+    const PD = W20.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W20.PropertyDataEntry;
     if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
     const same = (a, b) => {
       try {
@@ -7905,9 +7905,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return true;
   }
-  function registerInk(W19, mod3) {
-    if (W19.__farmInk) return W19.__farmInk;
-    const st2 = W19.__farmInk = {
+  function registerInk(W20, mod3) {
+    if (W20.__farmInk) return W20.__farmInk;
+    const st2 = W20.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7917,7 +7917,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W19);
+            refreshAuto(W20);
           } catch (e) {
           }
         }
@@ -7927,26 +7927,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           mine = c;
           try {
-            refreshAuto(W19);
+            refreshAuto(W20);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W19, slot, v, true),
-      command: (a) => inkCommand(W19, a),
+      write: (slot, v) => write(W20, slot, v, true),
+      command: (a) => inkCommand(W20, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on3, opts) => farmInkSync(W19, list, on3, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W19),
+      farm: (list, on3, opts) => farmInkSync(W20, list, on3, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W20),
       // trophies (the Companion's 🏆 Trophies row)
-      trophyWear: (t2, slot) => trophyWear(W19, t2, slot),
-      trophyOff: (id) => trophyOff(W19, id),
-      trophyWorn: () => trophyWorn(W19),
-      worn: () => wornLive(W19).map(({ slot, name }) => ({ slot, name }))
+      trophyWear: (t2, slot) => trophyWear(W20, t2, slot),
+      trophyOff: (id) => trophyOff(W20, id),
+      trophyWorn: () => trophyWorn(W20),
+      worn: () => wornLive(W20).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook4 = (name, pri, fn) => {
         try {
-          if (typeof W19[name] === "function") mod3.hookFunction(name, pri, fn);
+          if (typeof W20[name] === "function") mod3.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7967,7 +7967,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W19);
+          describe(W20);
         } catch (e) {
         }
         return r;
@@ -7985,14 +7985,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen3 = /* @__PURE__ */ new Set(), notReady = [];
         const ready2 = (u) => {
           try {
-            const c = W19.GLDrawImageCache;
+            const c = W20.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain2, self, u, x, y, o) => {
-          const T2 = W19.__farmInkTint;
+          const T2 = W20.__farmInkTint;
           if (typeof T2 !== "function") return false;
           let t2;
           try {
@@ -8032,7 +8032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W19, C2, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W20, C2, lm[1], lm[2], lm[3]);
               seen3.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
@@ -8046,7 +8046,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W19, C2)) return void 0;
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W20, C2)) return void 0;
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -8059,7 +8059,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W19, C2, seen3, notReady);
+          note2(W20, C2, seen3, notReady);
         } catch (e) {
         }
         return out;
@@ -8075,7 +8075,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C2);
+          if (back && typeof W20.CharacterLoadCanvas === "function") W20.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
@@ -8092,8 +8092,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             back++;
           }
           if (back) {
-            if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(C2, false);
-            if (args[2] && typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(C2);
+            if (typeof W20.CharacterRefresh === "function") W20.CharacterRefresh(C2, false);
+            if (args[2] && typeof W20.ChatRoomCharacterUpdate === "function") W20.ChatRoomCharacterUpdate(C2);
           }
         } catch (e) {
         }
@@ -8102,13 +8102,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W19);
+          addSlots(W20);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      if (typeof W19.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+      if (typeof W20.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
         const r = next(args);
         try {
           const it = args[0];
@@ -8117,13 +8117,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      farmInkEntry(W19);
+      farmInkEntry(W20);
       hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
-          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W19.ActivityOrgasmRuined) {
-            W19.localStorage.setItem(cumKey(W19), String(Date.now()));
-            setTimeout(() => refreshAuto(W19), 1e3);
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W20.ActivityOrgasmRuined) {
+            W20.localStorage.setItem(cumKey(W20), String(Date.now()));
+            setTimeout(() => refreshAuto(W20), 1e3);
           }
         } catch (e) {
         }
@@ -8131,53 +8131,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W19)) return;
+      if (!gameReady(W20)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W19);
+        addSlots(W20);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C2 of W19.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C2);
+          for (const C2 of W20.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W20.CharacterLoadCanvas === "function") W20.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W19.CommandCombine === "function") W19.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W19, a) }]);
+        if (typeof W20.CommandCombine === "function") W20.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W20, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W19.Player && W19.Player.Appearance) refreshAuto(W19);
+        if (W20.Player && W20.Player.Appearance) refreshAuto(W20);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W19.addEventListener("farmhand-dispensary", (e) => {
+      W20.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W19.Player && W19.Player.MemberNumber;
-        const C2 = (W19.Player && W19.Player.MemberNumber === mn ? W19.Player : (W19.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C2 && wearsDosedOnly(C2) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C2);
+        const mn = d.type === "icons" ? d.from : W20.Player && W20.Player.MemberNumber;
+        const C2 = (W20.Player && W20.Player.MemberNumber === mn ? W20.Player : (W20.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W20.CharacterLoadCanvas === "function") W20.CharacterLoadCanvas(C2);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C2 of W19.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W19.CharacterLoadCanvas === "function") W19.CharacterLoadCanvas(C2);
+        for (const C2 of W20.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W20.CharacterLoadCanvas === "function") W20.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W19, C2, seen3, notReady) {
+  function note2(W20, C2, seen3, notReady) {
     if (!C2 || !Array.isArray(C2.Appearance)) return;
     const pose = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose)) return;
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.75.1";
+  var VERSION = "0.76.0";
 
   // shared/species.js
   var WORDS = {
@@ -9367,11 +9367,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W19 = window;
-      const takesDrawings = () => typeof W19.GLDrawLoadTransient === "function";
+      const W20 = window;
+      const takesDrawings = () => typeof W20.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W19.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W19.DrawCacheImage, W19.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W20.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W20.DrawCacheImage, W20.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen3 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -9380,7 +9380,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (seen3 == null) seen3 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W19.DrawGetImage(src);
+          W20.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -10639,7 +10639,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W20 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W21 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -10648,7 +10648,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on3 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on3) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W20 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W21 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -10667,26 +10667,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W20 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W21 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W20 + 1.5;
+                      g.lineWidth = W21 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W20;
+                      g.lineWidth = W21;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W20 * 0.18, p[1] + dx / L * W20 * 0.18];
+                        return [p[0] - dy / L * W21 * 0.18, p[1] + dx / L * W21 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W20 * 0.22);
+                      g.lineWidth = Math.max(1, W21 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -12096,12 +12096,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (st2) return stampCanvas(st2, o, o.skin || [236, 204, 196]);
       const K2 = KINDS2[o.kind] || KINDS2.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
       const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K2.soft));
-      const W19 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
-      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W19 * 1.25 : 0;
+      const W20 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
+      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W20 * 1.25 : 0;
       const col = K2.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K2.sheath === "skin" || !K2.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K2.sheath;
       const bend = (hard ? 0.11 : 0.09) * L;
-      const widest = W19 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
-      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W19 : W19 * 1.2) + 10, down = Math.max(hard ? W19 * 1.5 : L + W19, drop2 + br * 1.5) + 12;
+      const widest = W20 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
+      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W20 : W20 * 1.2) + 10, down = Math.max(hard ? W20 * 1.5 : L + W20, drop2 + br * 1.5) + 12;
       const cv = document.createElement("canvas");
       cv.width = Math.ceil(half * 2);
       cv.height = Math.ceil(up + down);
@@ -12111,14 +12111,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.lineJoin = "round";
       g.lineCap = "round";
       const sack = () => {
-        const top = oy + W19 * 0.2, cy = top + drop2, r = br;
+        const top = oy + W20 * 0.2, cy = top + drop2, r = br;
         const path = () => {
           g.beginPath();
-          g.moveTo(ox - W19 * 0.9, top);
+          g.moveTo(ox - W20 * 0.9, top);
           g.bezierCurveTo(ox - r * 1.1, top + drop2 * 0.35, ox - r * 2.05, cy - r * 0.5, ox - r * 1.75, cy + r * 0.45);
           g.bezierCurveTo(ox - r * 1.5, cy + r * 1.3, ox - r * 0.35, cy + r * 1.4, ox, cy + r * 0.95);
           g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);
-          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W19 * 0.9, top);
+          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W20 * 0.9, top);
           g.closePath();
         };
         const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
@@ -12164,8 +12164,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const shaft = (dx, lean) => {
         const dir = hard ? -1 : 1, N2 = 56, kn = (t) => knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0;
-        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W19 * 0.15)];
-        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W19;
+        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W20 * 0.15)];
+        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W20;
         const L0 = [], R0 = [];
         for (let i = 0; i <= N2; i++) {
           const t = i / N2, c = cen(t), c2 = cen(Math.min(1, t + 0.01)), c1 = cen(Math.max(0, t - 0.01));
@@ -12197,7 +12197,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         along.addColorStop(1, rgb2(K2.tipCol, 1.04));
         g.fillStyle = along;
         g.fillRect(0, 0, cv.width, cv.height);
-        const across = g.createLinearGradient(ox + dx - W19 * 1.6, 0, ox + dx + W19 * 1.6, 0);
+        const across = g.createLinearGradient(ox + dx - W20 * 1.6, 0, ox + dx + W20 * 1.6, 0);
         across.addColorStop(0.12, "rgba(110,50,48,0.34)");
         across.addColorStop(0.36, "rgba(255,255,255,0.10)");
         across.addColorStop(0.6, "rgba(0,0,0,0)");
@@ -12209,14 +12209,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.strokeStyle = line3(col);
           g.lineWidth = 1.2;
           g.beginPath();
-          g.moveTo(c[0] - W19 * 1.4, c[1]);
-          g.quadraticCurveTo(c[0], c[1] + dir * W19 * 0.5, c[0] + W19 * 1.4, c[1]);
+          g.moveTo(c[0] - W20 * 1.4, c[1]);
+          g.quadraticCurveTo(c[0], c[1] + dir * W20 * 0.5, c[0] + W20 * 1.4, c[1]);
           g.stroke();
           g.fillStyle = "rgba(222,150,152,0.45)";
           for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) {
             const c3 = cen(b2);
             g.beginPath();
-            g.ellipse(c3[0] + a * W19, c3[1], r * W19, r * W19 * 1.5, 0, 0, Math.PI * 2);
+            g.ellipse(c3[0] + a * W20, c3[1], r * W20, r * W20 * 1.5, 0, 0, Math.PI * 2);
             g.fill();
           }
         }
@@ -12241,15 +12241,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.stroke();
           const e = cen(0.985);
           g.beginPath();
-          g.moveTo(e[0], e[1] - dir * W19 * 0.25);
-          g.lineTo(e[0], e[1] + dir * W19 * 0.12);
+          g.moveTo(e[0], e[1] - dir * W20 * 0.25);
+          g.lineTo(e[0], e[1] + dir * W20 * 0.12);
           g.stroke();
           if (K2.cleft) {
             const a = cen(K2.headAt + 0.02), b2 = cen(0.97);
             g.globalAlpha = 0.5;
             g.beginPath();
             g.moveTo(a[0], a[1]);
-            g.quadraticCurveTo(a[0] + W19 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
+            g.quadraticCurveTo(a[0] + W20 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
             g.stroke();
             g.globalAlpha = 1;
           }
@@ -12279,8 +12279,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (false) {
           g.beginPath();
           const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68);
-          g.moveTo(a[0] - W19 * 0.3, a[1]);
-          g.bezierCurveTo(b2[0] - W19 * 0.8, b2[1], b2[0] + W19 * 0.4, b2[1], c4[0] - W19 * 0.1, c4[1]);
+          g.moveTo(a[0] - W20 * 0.3, a[1]);
+          g.bezierCurveTo(b2[0] - W20 * 0.8, b2[1], b2[0] + W20 * 0.4, b2[1], c4[0] - W20 * 0.1, c4[1]);
           g.stroke();
         }
         {
@@ -12300,18 +12300,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.beginPath();
             g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2);
             g.fill();
-            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W19 * 0.9);
+            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W20 * 0.9);
             sh2.addColorStop(0, "rgba(110,50,48,0.30)");
             sh2.addColorStop(1, "rgba(110,50,48,0)");
             g.fillStyle = sh2;
-            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W19 * 0.9), cv.width, W19 * 0.9);
+            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W20 * 0.9), cv.width, W20 * 0.9);
           }
         }
         g.restore();
         if (K2.barbs) {
           g.fillStyle = line3(col);
           for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) {
-            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W19 * 0.22);
+            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W20 * 0.22);
             g.beginPath();
             g.moveTo(p[0], p[1] - dir * s2 * 0.6);
             g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4);
@@ -12333,14 +12333,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           const cE = cen(M / N2);
-          g.quadraticCurveTo(cE[0], cE[1] + dir * W19 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
+          g.quadraticCurveTo(cE[0], cE[1] + dir * W20 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
           for (let i = M; i >= 0; i--) {
             const c = cen(i / N2), p = R0[i];
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           g.closePath();
         };
-        const sg = g.createLinearGradient(ox + dx - W19 * 1.6, 0, ox + dx + W19 * 1.6, 0);
+        const sg = g.createLinearGradient(ox + dx - W20 * 1.6, 0, ox + dx + W20 * 1.6, 0);
         sg.addColorStop(0, rgb2(sh, 0.97));
         sg.addColorStop(0.36, rgb2(sh, 1));
         sg.addColorStop(1, rgb2(sh, 0.96));
@@ -12366,12 +12366,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         shafts();
       }
       g.globalCompositeOperation = "destination-out";
-      const melt = g.createLinearGradient(0, oy - W19 * 0.5, 0, oy + W19 * 0.7);
+      const melt = g.createLinearGradient(0, oy - W20 * 0.5, 0, oy + W20 * 0.7);
       melt.addColorStop(0, "rgba(0,0,0,1)");
       melt.addColorStop(1, "rgba(0,0,0,0)");
       if (!hard) {
         g.fillStyle = melt;
-        g.fillRect(0, oy - W19 * 1.4, cv.width, W19 * 2.1);
+        g.fillRect(0, oy - W20 * 1.4, cv.width, W20 * 2.1);
       }
       g.globalCompositeOperation = "source-over";
       return cv;
@@ -14103,14 +14103,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W19 = c.width, H = c.height, d = x.getImageData(0, 0, W19, H).data, seen3 = new Uint8Array(W19 * H), out = [];
-      for (let i = 0; i < W19 * H; i++) {
+      const W20 = c.width, H = c.height, d = x.getImageData(0, 0, W20, H).data, seen3 = new Uint8Array(W20 * H), out = [];
+      for (let i = 0; i < W20 * H; i++) {
         if (seen3[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen3[i] = 1;
-        let x0 = W19, y0 = H, x1 = 0, y1 = 0, n = 0;
+        let x0 = W20, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W19, py = p / W19 | 0;
+          const p = q2.pop(), px = p % W20, py = p / W20 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -14118,8 +14118,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W19 || ny >= H) continue;
-            const k = ny * W19 + nx;
+            if (nx < 0 || ny < 0 || nx >= W20 || ny >= H) continue;
+            const k = ny * W20 + nx;
             if (!seen3[k] && d[k * 4 + 3] >= 16) {
               seen3[k] = 1;
               q2.push(k);
@@ -15432,16 +15432,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] screen nap unavailable:", e);
     }
     setInterval(() => {
-      const inRoom = W10.CurrentScreen === "ChatRoom";
-      if (wasRoom && !inRoom && screenLight()) redraw2([W10.Player, W10.InformationSheetSelection].filter(Boolean));
-      if (!wasRoom && inRoom && screenLight()) for (const C2 of [W10.Player].concat(W10.ChatRoomCharacter || [])) {
+      const inRoom2 = W10.CurrentScreen === "ChatRoom";
+      if (wasRoom && !inRoom2 && screenLight()) redraw2([W10.Player, W10.InformationSheetSelection].filter(Boolean));
+      if (!wasRoom && inRoom2 && screenLight()) for (const C2 of [W10.Player].concat(W10.ChatRoomCharacter || [])) {
         try {
           speck(C2);
         } catch (e) {
         }
       }
-      if (!inRoom) roomAt = 0;
-      wasRoom = inRoom;
+      if (!inRoom2) roomAt = 0;
+      wasRoom = inRoom2;
     }, 1e3);
   }
 
@@ -17622,7 +17622,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function logTab(ctx3) {
     const ui = ctx3.ui, who2 = ctx3.s.logWho || [], res = ui.logRows;
     const ask3 = () => ctx3.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
-    const save7 = () => {
+    const save8 = () => {
       try {
         const blob = new Blob([(res.rows || []).map(line2).join("\n")], { type: "text/plain" }), a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -17666,7 +17666,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (e.key === "Enter") ask3();
           } })
         ),
-        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save7) : null)
+        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save8) : null)
       ),
       res ? card(
         title(res.busy ? "Lookin'\u2026" : (res.total || 0) + " lines" + (res.total > (res.rows || []).length ? ", the newest " + res.rows.length + " shown" : "")),
@@ -18600,13 +18600,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   function roamBody(ctx3) {
-    const r = ctx3.s.roam;
+    const r = ctx3.s.roam, span = r.mins === 30 ? "half an hour" : r.mins && r.mins !== 60 ? r.mins + " minutes" : "an hour";
     return [
-      r.until ? muted("Roamin' now: back on the farm by " + clock2(r.until) + ", or the farm girl fetches you.") : muted(r.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
+      r.until ? muted("Roamin' now: back on the farm by " + clock2(r.until) + ", or the farm girl whistles you home, wherever you are.") : muted(r.left ? span[0].toUpperCase() + span.slice(1) + " off the farm each; the whole map is yours either way. " + (r.perm ? "Your contract keeps the door shut, so the Companion walks you out." : "Walk out the door and a pass starts.") + " Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
       h(
         "div",
         null,
-        r.until ? btn("I'm back", () => ctx3.send("roam back")) : r.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
+        r.until ? btn("I'm back", () => ctx3.send("roam back")) : r.left ? btn("Roam for " + span, () => ctx3.send("roam start"), true) : null,
         r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
       )
     ];
@@ -20239,138 +20239,6 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
 
-  // extension/src/outfits.js
-  var BACKUP_KEY = "fhc-outfit-backup";
-  var LOCK_FIELDS = [
-    "LockedBy",
-    "LockMemberNumber",
-    "LockMemberName",
-    "LockMessage",
-    "CombinationNumber",
-    "Password",
-    "Hint",
-    "LockSet",
-    "LockPickSeed",
-    "RemoveTimer",
-    "RemoveItem",
-    "ShowTimer",
-    "EnableRandomInput",
-    "MemberNumberList",
-    "MemberNumberListKeys",
-    "RemoveOnUnlock"
-  ];
-  var P2 = () => window.Player;
-  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
-  var isClothes = (g) => !!(g && g.Clothing);
-  var isItem = (g) => !!(g && g.Category === "Item");
-  var lockedGroups = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-  function unlocked(prop) {
-    const c = Object.assign({}, prop || {});
-    for (const k of LOCK_FIELDS) delete c[k];
-    if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
-    return c;
-  }
-  var commit = (bundle3) => commitLook(bundle3);
-  function captureOutfit() {
-    const items = [];
-    let locks = 0;
-    for (const it of P2().Appearance) {
-      const g = it.Asset && it.Asset.Group;
-      if (!g || !(isClothes(g) || isItem(g))) continue;
-      const b = window.ServerBundledItemFromAppearanceItem(it);
-      const locked2 = !!(it.Property && it.Property.LockedBy);
-      if (locked2) locks++;
-      items.push(Object.assign({}, b, { Property: unlocked(b.Property), locked: locked2 }));
-    }
-    return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
-  }
-  function canLock(it) {
-    try {
-      const A = window.AssetGet && window.AssetGet(P2().AssetFamily || "Female3DCG", it.Group, it.Name);
-      if (!A) return false;
-      const tr = it.Property && it.Property.TypeRecord;
-      if (A.AllowLockType && tr && typeof tr === "object") return Object.entries(tr).some(([k, i]) => A.AllowLockType[k] && A.AllowLockType[k].has && A.AllowLockType[k].has(i));
-      return !!A.AllowLock;
-    } catch (e) {
-      return false;
-    }
-  }
-  function wearOutfit(data, keys) {
-    const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
-    if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
-    const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups();
-    const mine4 = new Set(outfit.items.map((i) => i.Group));
-    const next = cur.filter((b) => {
-      if (stuck.has(b.Group)) return true;
-      const g = groupOf(b.Group);
-      if (isClothes(g)) return false;
-      return !mine4.has(b.Group);
-    });
-    let worn = 0, locks = 0, skipped2 = 0;
-    const added = [];
-    for (const it of outfit.items) {
-      const g = groupOf(it.Group);
-      if (!g || !(isClothes(g) || isItem(g))) continue;
-      if (stuck.has(it.Group)) {
-        skipped2++;
-        continue;
-      }
-      const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
-      if ((it.locked || canLock(it)) && keys && keys.length) {
-        b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
-        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P2().MemberNumber, MemberNumberListKeys: keys.join(",") });
-        locks++;
-      }
-      next.push(b);
-      worn++;
-      if (isItem(g)) added.push(it.Group);
-    }
-    try {
-      window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added }));
-    } catch (e) {
-    }
-    commit(next);
-    return { ok: true, worn, locks, skipped: skipped2 };
-  }
-  function changeBack(opts) {
-    let bk = null;
-    try {
-      bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY));
-    } catch (e) {
-    }
-    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
-    const stuck = lockedGroups();
-    if (opts && opts.farmLocks) for (const it of P2().Appearance) {
-      const pr = it.Property || {}, g = it.Asset.Group.Name, keys = String(pr.MemberNumberListKeys || "").split(",").map(Number);
-      if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P2().MemberNumber && keys.includes(BOT_MEMBER) && ((bk.added || []).includes(g) || isClothes(groupOf(g)))) stuck.delete(g);
-    }
-    const next = window.ServerAppearanceBundle(P2().Appearance).filter((b) => {
-      if (stuck.has(b.Group)) return true;
-      const g = groupOf(b.Group);
-      if (isClothes(g)) return false;
-      return !(bk.added || []).includes(b.Group);
-    });
-    const have = new Set(next.map((b) => b.Group));
-    for (const b of bk.bundle) {
-      const g = groupOf(b.Group);
-      if (have.has(b.Group) || stuck.has(b.Group)) continue;
-      if (isClothes(g) || isItem(g) && (bk.added || []).includes(b.Group)) next.push(b);
-    }
-    commit(next);
-    try {
-      window.localStorage.removeItem(BACKUP_KEY);
-    } catch (e) {
-    }
-    return { ok: true, stillLocked: stuck.size };
-  }
-  var hasBackup = () => {
-    try {
-      return !!window.localStorage.getItem(BACKUP_KEY);
-    } catch (e) {
-      return false;
-    }
-  };
-
   // extension/src/marks.js
   var KEY4 = "fhc-marks";
   var STRIP_KEY = "fhc-strip-backup";
@@ -20380,7 +20248,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
   var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
   var SPILL_CHANCE = 0.35;
-  var P3 = () => window.Player;
+  var P2 = () => window.Player;
   var load3 = () => {
     try {
       return JSON.parse(window.localStorage.getItem(KEY4)) || {};
@@ -20394,13 +20262,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
   };
-  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P3().AssetFamily, name) : null;
-  var bundle = () => window.ServerAppearanceBundle(P3().Appearance);
-  var lockedGroups2 = () => new Set(P3().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-  var commit2 = (next) => commitLook(next);
+  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
+  var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
+  var lockedGroups = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var commit = (next) => commitLook(next);
   var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
   function markBody(m, prefs2) {
-    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
     const did = [];
     if (m.wash) return washMarks();
     if (!prefs2.marks) return { ok: false, why: "off" };
@@ -20412,7 +20280,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const mine4 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
       let it = mine4.find((b) => colOf(b) === col);
       if (!it) {
-        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
+        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf(x));
         if (g) {
           it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
           if (col) it.Color = col;
@@ -20445,7 +20313,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (m.write && cleanText(m.write.line)) {
       let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
       if (!it) {
-        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf2(x));
+        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf(x));
         if (g) {
           it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
           next.push(it);
@@ -20463,7 +20331,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     if (!did.length) return { ok: false, why: "no room" };
     save4(mem);
-    commit2(next);
+    commit(next);
     return { ok: true, did };
   }
   var FARM_TAG = "BnB Farm gear.";
@@ -20878,7 +20746,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function itemHome(name, slot, taken) {
     const all = Array.isArray(window.Asset) ? window.Asset : [];
-    const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P3().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
+    const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P2().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
     const own = homes.filter((g) => slot.groups.includes(g));
     if (own.length) return own.find((g) => !taken(g)) || null;
     return slot.takeover ? null : homes.find((g) => !taken(g)) || null;
@@ -20890,7 +20758,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function setGearOpt(group, name, want, rec, text3) {
     try {
-      const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P3(), group) : null;
+      const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P2(), group) : null;
       if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
       const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype), words = signWords(text3);
       let record = null;
@@ -20905,11 +20773,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         if (Object.keys(got).length) record = Object.assign({}, it.Property && it.Property.TypeRecord || {}, got);
       }
-      if (record) window.ExtendedItemSetOptionByRecord(P3(), it, record, { push: !words, refresh: true, C_Source: P3() });
+      if (record) window.ExtendedItemSetOptionByRecord(P2(), it, record, { push: !words, refresh: true, C_Source: P2() });
       if (words) {
         it.Property = Object.assign(it.Property || {}, words);
-        if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P3(), false);
-        if (typeof window.ChatRoomCharacterItemUpdate === "function") window.ChatRoomCharacterItemUpdate(P3(), group);
+        if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2(), false);
+        if (typeof window.ChatRoomCharacterItemUpdate === "function") window.ChatRoomCharacterItemUpdate(P2(), group);
       }
       return !!(record || words);
     } catch (e) {
@@ -20918,7 +20786,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function gearAsset(group, slot, prefer, only) {
-    const fam = P3().AssetFamily, get2 = (n) => {
+    const fam = P2().AssetFamily, get2 = (n) => {
       try {
         return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
       } catch (e) {
@@ -20952,7 +20820,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   var isFarmGear = (b) => {
     const c = b.Craft, d = c ? String(c.Description || "") : "";
-    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P3().MemberNumber)));
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
   };
   var GEAR_KEY = "fhc-gear";
   var gearMem = () => {
@@ -21006,7 +20874,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function farmPieceIn(group) {
     try {
-      const b = (P3() && P3().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group);
+      const b = (P2() && P2().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group);
       if (!b) return null;
       const mem = gearMem();
       return gearNameOf({ Group: group, Name: b.Asset.Name, Craft: b.Craft }, mem);
@@ -21015,7 +20883,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function syncFarmGear(list, allow) {
-    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
     const lg = letGo2(), now = Date.now();
     let pruned = false;
     for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 864e5 || now - (lg[k].at || 0) > 6e5 && !(list || []).some((g) => g && pieceKey(g.name, g.until) === k)) {
@@ -21025,7 +20893,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (pruned) letGoSave(lg);
     for (const [n, t] of stuckUntil) if (t <= now) stuckUntil.delete(n);
     const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name)).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
-    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
+    const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
       const n = gearNameOf(b, mem);
@@ -21047,11 +20915,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       const slot = GEAR_SLOTS[g.slot];
       if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
-      let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x)), was = null, item = null;
+      let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null, item = null;
       for (const n0 of Array.isArray(g.items) ? g.items.map(String) : []) {
         if (!nameOk(n0)) continue;
         const n = itemName(n0);
-        const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf2(x));
+        const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf(x));
         if (home) {
           group = home;
           item = n;
@@ -21059,7 +20927,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       }
       if (!group && slot.takeover) {
-        group = slot.groups.find((x) => groupOf2(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
+        group = slot.groups.find((x) => groupOf(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
         if (group) {
           was = next.find((b) => b.Group === group);
           next = next.filter((b) => b !== was);
@@ -21085,8 +20953,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           Color: Array.isArray(color) ? color.join(",") : color,
           Lock: "",
           Private: true,
-          MemberNumber: P3().MemberNumber,
-          MemberName: P3().Name,
+          MemberNumber: P2().MemberNumber,
+          MemberName: P2().Name,
           ItemProperty: {},
           Type: null,
           TypeRecord: null
@@ -21102,14 +20970,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (opt || g.rec || g.text) setLater.push([group, item, opt, g.rec, g.text]);
     }
     gearMemSave(mem);
-    if (did.on.length || did.off.length) commit2(next);
+    if (did.on.length || did.off.length) commit(next);
     for (const [gr, nm, op, rc, tx] of setLater) setGearOpt(gr, nm, op, rc, tx);
     return did;
   }
   var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
   var SHAPE_KEY = "fhc-shape";
   function syncShape(shape, allow) {
-    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
     let mem;
     try {
       mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
@@ -21125,7 +20993,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const at = order.indexOf(own);
       if (at < 0) continue;
       const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
-      if (typeof window.AssetGet === "function" && !window.AssetGet(P3().AssetFamily, group, want)) continue;
+      if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
       if (want !== b.Name) {
         b.Name = want;
         did.push(group + " " + want);
@@ -21137,13 +21005,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
     } catch (e) {
     }
-    if (did.length) commit2(next);
+    if (did.length) commit(next);
     return did;
   }
   var TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
   function scaleTrialCleanup() {
     try {
-      const C2 = P3();
+      const C2 = P2();
       if (!C2 || !Array.isArray(C2.Appearance)) return false;
       let n = 0;
       for (const it of C2.Appearance) {
@@ -21170,17 +21038,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function washMarks() {
-    const mem = load3(), stuck = lockedGroups2();
+    const mem = load3(), stuck = lockedGroups();
     const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
     save4({});
-    commit2(next);
+    commit(next);
     return { ok: true, did: ["wash"] };
   }
   var TREATISE_NOTE_KEY = "fhc-treatise-note";
   var WEEK = 7 * 864e5;
   function treatiseCleanup(note4) {
     try {
-      const C2 = P3();
+      const C2 = P2();
       if (!C2 || !Array.isArray(C2.Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, did: [] };
       const mem = load3(), on3 = C2.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === TREATISE.group);
       if (!on3) {
@@ -21190,8 +21058,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return { ok: true, did: [] };
       }
-      if (mem.treatise && !lockedGroups2().has(TREATISE.group)) {
-        commit2(bundle().filter((b) => b.Group !== TREATISE.group));
+      if (mem.treatise && !lockedGroups().has(TREATISE.group)) {
+        commit(bundle().filter((b) => b.Group !== TREATISE.group));
         delete mem.treatise;
         save4(mem);
         if (note4) note4("The Body Treatise the farm wrote on you is off now. Since the game's November update it's been knockin' folks offline. The farm writes on your skin the game's own way instead.");
@@ -21214,16 +21082,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function rinseMarks() {
-    const stuck = lockedGroups2(), cur = bundle();
+    const stuck = lockedGroups(), cur = bundle();
     const i = cur.findIndex((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) && !stuck.has(b.Group));
     if (i < 0) return { ok: true, did: [] };
     cur.splice(i, 1);
-    commit2(cur);
+    commit(cur);
     return { ok: true, did: ["rinse"] };
   }
+  var BODY_BITS = /^(HairAccessory\d|TailStraps|Wings)$/;
   function stripMe(prefs2) {
     if (!prefs2.strip) return { ok: false, why: "off" };
-    const cur = bundle(), stuck = lockedGroups2();
+    const cur = bundle(), stuck = lockedGroups();
     if (!window.localStorage.getItem(STRIP_KEY)) {
       try {
         window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
@@ -21232,11 +21101,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     const mem = load3();
     const next = cur.filter((b) => {
-      const g = groupOf2(b.Group);
-      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
+      const g = groupOf(b.Group);
+      return !(g && g.Clothing) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
     });
     if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
-    commit2(next);
+    commit(next);
     return { ok: true, did: ["strip"] };
   }
   function dressMe() {
@@ -21248,16 +21117,170 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
     const next = bundle(), have = new Set(next.map((b) => b.Group));
     for (const b of bk.bundle) {
-      const g = groupOf2(b.Group);
+      const g = groupOf(b.Group);
       if (g && g.Clothing && !have.has(b.Group)) next.push(b);
     }
-    commit2(next);
+    commit(next);
     try {
       window.localStorage.removeItem(STRIP_KEY);
     } catch (e) {
     }
     return { ok: true, did: ["dress"] };
   }
+
+  // extension/src/outfits.js
+  var BACKUP_KEY = "fhc-outfit-backup";
+  var LOCK_FIELDS = [
+    "LockedBy",
+    "LockMemberNumber",
+    "LockMemberName",
+    "LockMessage",
+    "CombinationNumber",
+    "Password",
+    "Hint",
+    "LockSet",
+    "LockPickSeed",
+    "RemoveTimer",
+    "RemoveItem",
+    "ShowTimer",
+    "EnableRandomInput",
+    "MemberNumberList",
+    "MemberNumberListKeys",
+    "RemoveOnUnlock"
+  ];
+  var P3 = () => window.Player;
+  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P3().AssetFamily, name) : null;
+  var isClothes = (g) => !!(g && g.Clothing);
+  var isItem = (g) => !!(g && g.Category === "Item");
+  var lockedGroups2 = () => new Set(P3().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  function unlocked(prop) {
+    const c = Object.assign({}, prop || {});
+    for (const k of LOCK_FIELDS) delete c[k];
+    if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
+    return c;
+  }
+  var commit2 = (bundle3) => commitLook(bundle3);
+  function captureOutfit() {
+    const items = [];
+    let locks = 0;
+    for (const it of P3().Appearance) {
+      const g = it.Asset && it.Asset.Group;
+      if (!g || !(isClothes(g) || isItem(g))) continue;
+      const b = window.ServerBundledItemFromAppearanceItem(it);
+      const locked2 = !!(it.Property && it.Property.LockedBy);
+      if (locked2) locks++;
+      items.push(Object.assign({}, b, { Property: unlocked(b.Property), locked: locked2 }));
+    }
+    return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
+  }
+  function canLock(it) {
+    try {
+      const A = window.AssetGet && window.AssetGet(P3().AssetFamily || "Female3DCG", it.Group, it.Name);
+      if (!A) return false;
+      const tr = it.Property && it.Property.TypeRecord;
+      if (A.AllowLockType && tr && typeof tr === "object") return Object.entries(tr).some(([k, i]) => A.AllowLockType[k] && A.AllowLockType[k].has && A.AllowLockType[k].has(i));
+      return !!A.AllowLock;
+    } catch (e) {
+      return false;
+    }
+  }
+  function wearOutfit(data, keys) {
+    const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
+    if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
+    const cur = window.ServerAppearanceBundle(P3().Appearance), stuck = lockedGroups2();
+    const mine4 = new Set(outfit.items.map((i) => i.Group));
+    const next = cur.filter((b) => {
+      if (stuck.has(b.Group)) return true;
+      const g = groupOf2(b.Group);
+      if (isClothes(g)) return BODY_BITS.test(b.Group) && !mine4.has(b.Group);
+      return !mine4.has(b.Group);
+    });
+    let worn = 0, locks = 0, skipped2 = 0;
+    const added = [];
+    for (const it of outfit.items) {
+      const g = groupOf2(it.Group);
+      if (!g || !(isClothes(g) || isItem(g))) continue;
+      if (stuck.has(it.Group)) {
+        skipped2++;
+        continue;
+      }
+      const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
+      if ((it.locked || canLock(it)) && keys && keys.length) {
+        b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P3().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        locks++;
+      }
+      next.push(b);
+      worn++;
+      if (isItem(g)) added.push(it.Group);
+    }
+    try {
+      window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added }));
+    } catch (e) {
+    }
+    commit2(next);
+    return { ok: true, worn, locks, skipped: skipped2 };
+  }
+  function topUpOutfit(data, keys, groups2) {
+    const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
+    if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
+    const cur = window.ServerAppearanceBundle(P3().Appearance), have = new Set(cur.map((b) => b.Group)), only = new Set(groups2 || []);
+    const next = cur.slice();
+    let worn = 0, locks = 0;
+    for (const it of outfit.items) {
+      const g = groupOf2(it.Group);
+      if (!g || !(isClothes(g) || isItem(g)) || have.has(it.Group) || only.size && !only.has(it.Group)) continue;
+      const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
+      if ((it.locked || canLock(it)) && keys && keys.length) {
+        b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P3().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        locks++;
+      }
+      next.push(b);
+      have.add(it.Group);
+      worn++;
+    }
+    if (worn) commit2(next);
+    return { ok: true, worn, locks };
+  }
+  function changeBack(opts) {
+    let bk = null;
+    try {
+      bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY));
+    } catch (e) {
+    }
+    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
+    const stuck = lockedGroups2();
+    if (opts && opts.farmLocks) for (const it of P3().Appearance) {
+      const pr = it.Property || {}, g = it.Asset.Group.Name, keys = String(pr.MemberNumberListKeys || "").split(",").map(Number);
+      if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P3().MemberNumber && keys.includes(BOT_MEMBER) && ((bk.added || []).includes(g) || isClothes(groupOf2(g)))) stuck.delete(g);
+    }
+    const next = window.ServerAppearanceBundle(P3().Appearance).filter((b) => {
+      if (stuck.has(b.Group)) return true;
+      const g = groupOf2(b.Group);
+      if (isClothes(g)) return false;
+      return !(bk.added || []).includes(b.Group);
+    });
+    const have = new Set(next.map((b) => b.Group));
+    for (const b of bk.bundle) {
+      const g = groupOf2(b.Group);
+      if (have.has(b.Group) || stuck.has(b.Group)) continue;
+      if (isClothes(g) || isItem(g) && (bk.added || []).includes(b.Group)) next.push(b);
+    }
+    commit2(next);
+    try {
+      window.localStorage.removeItem(BACKUP_KEY);
+    } catch (e) {
+    }
+    return { ok: true, stillLocked: stuck.size };
+  }
+  var hasBackup = () => {
+    try {
+      return !!window.localStorage.getItem(BACKUP_KEY);
+    } catch (e) {
+      return false;
+    }
+  };
 
   // extension/src/statue.js
   var W14 = window;
@@ -21622,9 +21645,265 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   if (W14.__FARMHAND_TEST__) W14.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf3, turnedOf };
 
-  // extension/src/chatlog.js
+  // extension/src/homeward.js
   var W15 = window;
-  var KEY5 = "farmhand-chatlog";
+  var KEY5 = "fhc-home";
+  var WARN_S = 30;
+  var SAFE_MIN = 30;
+  var TICK_MS = 5e3;
+  var BUSY_MAX = 3 * 6e4;
+  var BUSY = /* @__PURE__ */ new Set(["Appearance", "Crafting", "Wardrobe", "Shop", "Shop2", "InformationSheet", "Preference", "FriendList", "Title", "OnlineProfile"]);
+  var deps = { botMn: 0, say: null, onBack: null };
+  var walking = false;
+  var countdown = null;
+  var retryAt = 0;
+  var busySince = 0;
+  var wantOutAt = 0;
+  var load4 = () => {
+    try {
+      return JSON.parse(W15.localStorage.getItem(KEY5)) || null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var save5 = (h2) => {
+    try {
+      if (h2) W15.localStorage.setItem(KEY5, JSON.stringify(h2));
+      else W15.localStorage.removeItem(KEY5);
+    } catch (e) {
+    }
+  };
+  var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  var clock3 = (t) => {
+    const d = new Date(t);
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  };
+  var loggedIn = () => !!(W15.Player && W15.Player.MemberNumber) && W15.CurrentScreen !== "Login" && W15.CurrentScreen !== "Relog";
+  var inRoom = () => W15.CurrentScreen === "ChatRoom" && !!W15.ChatRoomData;
+  var atFarm = (h2) => inRoom() && !!h2 && String(W15.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
+  function tell4(text3) {
+    try {
+      if (inRoom() && deps.say) {
+        deps.say(text3);
+        return;
+      }
+    } catch (e) {
+    }
+    try {
+      if (typeof W15.ServerShowBeep === "function") W15.ServerShowBeep(text3, 8e3, { silent: false });
+    } catch (e) {
+    }
+  }
+  function homeKeep(s) {
+    if (!s || typeof s !== "object") return;
+    const ro = s.roam, prev = load4(), now = Date.now();
+    if (!ro) {
+      if (prev) save5(null);
+      return;
+    }
+    const h2 = {
+      room: String(ro.room || prev && prev.room || "B&B Farm"),
+      space: String(ro.space || prev && prev.space || "X"),
+      until: Number(ro.until) || 0,
+      left: Number(ro.left) || 0,
+      mins: Number(ro.mins) || 60,
+      perm: !!ro.perm,
+      ends: Number(s.contract && s.contract.until || ro.ends) || 0,
+      by: Array.isArray(ro.by) ? ro.by.filter(Number.isInteger).slice(0, 60) : [],
+      safeUntil: Math.max(ro.safe ? now + SAFE_MIN * 6e4 : 0, prev && prev.safeUntil || 0),
+      warned: [],
+      at: now
+    };
+    if (prev && prev.until === h2.until) h2.warned = prev.warned || [];
+    if (prev && prev.local && !(h2.until > now)) h2.local = prev.local;
+    save5(h2);
+    if (h2.perm && h2.until > now && wantOutAt && now - wantOutAt < 9e4 && atFarm(h2)) {
+      wantOutAt = 0;
+      walkOut(h2);
+    }
+  }
+  function homeWantOut() {
+    wantOutAt = Date.now();
+  }
+  function homeSafe() {
+    const h2 = load4();
+    if (!h2) return;
+    h2.safeUntil = Date.now() + SAFE_MIN * 6e4;
+    save5(h2);
+    cancel();
+  }
+  function homeLocalPass() {
+    const h2 = load4();
+    if (!h2 || !h2.local) return null;
+    const l = h2.local;
+    delete h2.local;
+    save5(h2);
+    return l;
+  }
+  function cancel() {
+    if (countdown) {
+      clearTimeout(countdown.t);
+      countdown = null;
+    }
+  }
+  function whistle(h2, why) {
+    if (countdown) return;
+    const warn = deps.warnS || WARN_S;
+    tell4("\u{1F9ED} " + why + " The farm girl's whistle carries all the way out here: back on the farm in " + warn + " seconds.");
+    countdown = { at: Date.now(), t: setTimeout(() => {
+      countdown = null;
+      const h22 = load4();
+      if (h22 && !atFarm(h22) && !(h22.safeUntil > Date.now())) walkHome(h22);
+    }, warn * 1e3) };
+  }
+  async function walkHome(h2) {
+    if (walking || !h2) return false;
+    walking = true;
+    try {
+      tell4("\u{1F9ED} Home to the farm you go, sugar.");
+      try {
+        if (typeof W15.ServerPlayerIsInChatRoom === "function" && W15.ServerPlayerIsInChatRoom() && typeof W15.ChatRoomLeave === "function") W15.ChatRoomLeave(true);
+      } catch (e) {
+      }
+      if (typeof W15.ChatSearchStart === "function") await W15.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+      for (let i = 0; i < 20 && W15.CurrentScreen !== "ChatSearch"; i++) await sleep(500);
+      let res = null;
+      if (typeof W15.ServerRoomJoin === "function") res = await W15.ServerRoomJoin(h2.room);
+      else {
+        W15.ServerSend("ChatRoomJoin", { Name: h2.room });
+        res = null;
+      }
+      const err = res && res.error ? String(res.error.message || res.error) : "";
+      if (err) {
+        retryAt = Date.now() + 3e4;
+        tell4(/full/i.test(err) ? "\u{1F9ED} The farm's full right now. You'll go in the moment there's a space." : "\u{1F9ED} Couldn't get you through the farm gate (" + err.slice(0, 60) + "). Tryin' again shortly.");
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.warn("[Farmhand Companion] walkin' home:", e);
+      retryAt = Date.now() + 3e4;
+      return false;
+    } finally {
+      walking = false;
+    }
+  }
+  async function walkOut(h2) {
+    if (walking) return;
+    walking = true;
+    try {
+      tell4("\u{1F9ED} The farm girl walks you out to the gate, sugar. Half an hour: back by " + clock3(h2.until) + ", or she whistles you home.");
+      if (typeof W15.ChatRoomLeave === "function") W15.ChatRoomLeave(true);
+      if (typeof W15.ChatSearchStart === "function") await W15.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+    } catch (e) {
+      console.warn("[Farmhand Companion] walkin' out:", e);
+    } finally {
+      walking = false;
+    }
+  }
+  function homeTick() {
+    const h2 = load4();
+    if (!h2) {
+      cancel();
+      return;
+    }
+    const now = Date.now();
+    if (h2.ends && h2.ends <= now) {
+      save5(null);
+      cancel();
+      return;
+    }
+    if (!loggedIn() || walking) return;
+    if (h2.safeUntil > now || atFarm(h2)) {
+      cancel();
+      busySince = 0;
+      return;
+    }
+    if (retryAt > now) return;
+    if (BUSY.has(String(W15.CurrentScreen || ""))) {
+      if (!busySince) busySince = now;
+      if (now - busySince < BUSY_MAX) return;
+    } else busySince = 0;
+    if (h2.until > now) {
+      const mins = Math.ceil((h2.until - now) / 6e4);
+      for (const w of [10, 2]) if (mins <= w && !(h2.warned || []).includes(w)) {
+        h2.warned = (h2.warned || []).concat(w);
+        save5(h2);
+        tell4(w > 2 ? "\u{1F9ED} " + mins + " minutes left on your roam pass, sugar. Start headin' home." : "\u{1F9ED} " + mins + " minutes, sugar. Be back on the farm or she whistles you home.");
+        break;
+      }
+      return;
+    }
+    if (h2.left > 0 && !h2.spentFor && !h2.until) {
+      const len = (h2.perm ? 30 : h2.mins || 60) * 6e4;
+      h2.left--;
+      h2.until = now + len;
+      h2.warned = [];
+      h2.local = { at: now, started: true };
+      h2.spentFor = now;
+      save5(h2);
+      tell4("\u{1F9ED} You're off the farm, sugar, so that's a roam pass spent: back by " + clock3(h2.until) + ". " + h2.left + " left.");
+      return;
+    }
+    if (h2.until && !h2.late) {
+      h2.late = true;
+      if (!h2.local) h2.local = { at: h2.until };
+      h2.local.late = true;
+      save5(h2);
+    }
+    whistle(h2, h2.until ? "Your roam's over, sugar." : "You're off the farm without a roam pass, sugar.");
+  }
+  function homeBeep(data) {
+    const h2 = load4();
+    if (!h2 || !data) return false;
+    const from = Number(data.MemberNumber) || 0, msg = String(data.Message || "");
+    if (!/^\s*summon\b/i.test(msg)) return false;
+    if (from !== deps.botMn && !(h2.by || []).includes(from)) return false;
+    if (h2.safeUntil > Date.now() || atFarm(h2) || h2.ends && h2.ends <= Date.now()) return false;
+    h2.until = 0;
+    h2.spentFor = Date.now();
+    save5(h2);
+    cancel();
+    whistle(h2, "You've been summoned home, sugar.");
+    return true;
+  }
+  function initHomeward(mod3, d) {
+    deps = Object.assign(deps, d || {});
+    try {
+      mod3.hookFunction("ServerAccountBeep", 4, (args, next) => {
+        try {
+          homeBeep(args[0]);
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] the whistle can't hear beeps:", e);
+    }
+    for (const fn of ["ChatRoomSafewordRevert", "ChatRoomSafewordRelease"]) {
+      try {
+        mod3.hookFunction(fn, 4, (args, next) => {
+          try {
+            homeSafe();
+          } catch (e) {
+          }
+          return next(args);
+        });
+      } catch (e) {
+      }
+    }
+    setInterval(() => {
+      try {
+        homeTick();
+      } catch (e) {
+        console.warn("[Farmhand Companion] whistle:", e);
+      }
+    }, TICK_MS);
+  }
+
+  // extension/src/chatlog.js
+  var W16 = window;
+  var KEY6 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
   var rows2 = [];
@@ -21635,7 +21914,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W15.localStorage.getItem(KEY5));
+    const v = JSON.parse(W16.localStorage.getItem(KEY6));
     if (Array.isArray(v)) rows2 = v.slice(-MAX3);
   } catch (e) {
     rows2 = [];
@@ -21644,7 +21923,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W15.localStorage.setItem(KEY5, JSON.stringify(rows2));
+        W16.localStorage.setItem(KEY6, JSON.stringify(rows2));
       } catch (e) {
         rows2 = rows2.slice(-300);
       }
@@ -21672,7 +21951,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function flush2() {
-    if (!on2() || !rows2.length || !botHere() || typeof W15.ServerSend !== "function") return;
+    if (!on2() || !rows2.length || !botHere() || typeof W16.ServerSend !== "function") return;
     let sent2 = 0;
     for (let part = 0; part < 4 && rows2.length; part++) {
       const batch = [];
@@ -21684,7 +21963,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         size += s;
       }
       try {
-        W15.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W16.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent2 += batch.length;
       } catch (e) {
         rows2 = batch.concat(rows2);
@@ -21748,28 +22027,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/keys.js
-  var W16 = window;
-  var KEY6 = "fhc-wards";
+  var W17 = window;
+  var KEY7 = "fhc-wards";
   var wards = {};
   try {
-    wards = JSON.parse(W16.localStorage.getItem(KEY6)) || {};
+    wards = JSON.parse(W17.localStorage.getItem(KEY7)) || {};
   } catch (e) {
     wards = {};
   }
-  var save5 = () => {
+  var save6 = () => {
     try {
-      W16.localStorage.setItem(KEY6, JSON.stringify(wards));
+      W17.localStorage.setItem(KEY7, JSON.stringify(wards));
     } catch (e) {
     }
   };
-  var me3 = () => W16.Player && W16.Player.MemberNumber || 0;
-  var here = (mn) => (W16.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var me3 = () => W17.Player && W17.Player.MemberNumber || 0;
+  var here = (mn) => (W17.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
   var say2 = () => {
   };
   function sendTo(mn, data) {
     try {
-      if (here(mn) && typeof W16.ServerSend === "function") {
-        W16.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
+      if (here(mn) && typeof W17.ServerSend === "function") {
+        W17.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
         return true;
       }
     } catch (e) {
@@ -21780,9 +22059,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function keyDo(mn, what) {
     if (sendTo(mn, { do: what })) return "in the room";
     try {
-      if (typeof W16.ServerSend !== "function") return null;
-      const nm = W16.Player && (W16.Player.Nickname || W16.Player.Name) || "Your keyholder";
-      W16.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
+      if (typeof W17.ServerSend !== "function") return null;
+      const nm = W17.Player && (W17.Player.Nickname || W17.Player.Name) || "Your keyholder";
+      W17.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
       return "by beep";
     } catch (e) {
       return null;
@@ -21795,7 +22074,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!m.on) {
         if (wards[from]) {
           delete wards[from];
-          save5();
+          save6();
         }
         return true;
       }
@@ -21805,12 +22084,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         wards[from].checked = now;
         sendTo(from, { do: "check" });
       }
-      save5();
+      save6();
       return true;
     }
     if (m.type === "dispAsk" && wards[from]) {
       wards[from].asked = Date.now();
-      save5();
+      save6();
       say2("\u{1F5DD}\uFE0F " + (wards[from].name || "#" + from) + " is askin' to be let out of hardcore. /keys letout " + from + " lifts every dose in them; /keys end " + from + " ends their hardcore.");
       return true;
     }
@@ -21848,37 +22127,37 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const how = keyDo(mn, what);
     if (wards[mn] && what === "check") {
       wards[mn].checked = Date.now();
-      save5();
+      save6();
     }
     if (wards[mn] && what === "end") {
       delete wards[mn];
-      save5();
+      save6();
     }
     say2(how ? "\u{1F5DD}\uFE0F Sent " + how + ". Their Dispensary does it if you really hold their key." : "\u{1F5DD}\uFE0F Couldn't reach them just now.");
   }
   function initKeys(sayLocal) {
     say2 = sayLocal;
-    if (typeof W16.CommandCombine === "function") {
+    if (typeof W17.CommandCombine === "function") {
       try {
-        W16.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
+        W17.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
       } catch (e) {
       }
     }
   }
 
   // extension/src/nursery.js
-  var KEY7 = "fhc-nursery";
+  var KEY8 = "fhc-nursery";
   var P4 = () => window.Player;
-  var load4 = () => {
+  var load5 = () => {
     try {
-      return JSON.parse(window.localStorage.getItem(KEY7)) || {};
+      return JSON.parse(window.localStorage.getItem(KEY8)) || {};
     } catch (e) {
       return {};
     }
   };
-  var save6 = (v) => {
+  var save7 = (v) => {
     try {
-      window.localStorage.setItem(KEY7, JSON.stringify(v));
+      window.localStorage.setItem(KEY8, JSON.stringify(v));
     } catch (e) {
     }
   };
@@ -21896,7 +22175,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!g || !g.group || !g.name) return { ok: false, why: "nothin' to put on" };
     if (!exists(g.group, g.name)) return { ok: false, why: "the game doesn't have that one" };
     if (locked(g.group)) return { ok: false, why: "there's somethin' locked there" };
-    const mem = load4();
+    const mem = load5();
     mem.gear = mem.gear || {};
     let next = bundle2();
     const there = next.find((b) => b.Group === g.group);
@@ -21904,21 +22183,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     next = next.filter((b) => b.Group !== g.group).concat([{ Group: g.group, Name: g.name }]);
     commit3(next);
     mem.gear[g.group] = g.name;
-    save6(mem);
+    save7(mem);
     return { ok: true };
   }
   function nurseryOff(group) {
     if (!ready()) return { ok: false, why: "not in a room" };
-    const mem = load4(), gear = mem.gear || {};
+    const mem = load5(), gear = mem.gear || {};
     const groups2 = group ? [group] : Object.keys(gear);
     const next = bundle2().filter((b) => !(groups2.includes(b.Group) && gear[b.Group] === b.Name && !locked(b.Group)));
     for (const g of groups2) delete gear[g];
     mem.gear = gear;
-    save6(mem);
+    save7(mem);
     commit3(next);
     return { ok: true };
   }
-  var nurseryWorn = () => Object.assign({}, load4().gear || {});
+  var nurseryWorn = () => Object.assign({}, load5().gear || {});
   function nurseryChange() {
     const A = window.ABCL, did = [];
     try {
@@ -21941,9 +22220,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       if (ready() && exists("BodyMarkings", "BabyPowderDust") && !bundle2().some((b) => b.Group === "BodyMarkings")) {
         commit3(bundle2().concat([{ Group: "BodyMarkings", Name: "BabyPowderDust" }]));
-        const mem = load4();
+        const mem = load5();
         mem.powderUntil = Date.now() + 10 * 6e4;
-        save6(mem);
+        save7(mem);
         did.push("powder");
       }
     } catch (e) {
@@ -21953,11 +22232,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function nurseryPowderTick() {
     try {
-      const mem = load4();
+      const mem = load5();
       if (!mem.powderUntil || Date.now() < mem.powderUntil || !ready()) return;
       const next = bundle2().filter((b) => !(b.Group === "BodyMarkings" && b.Name === "BabyPowderDust"));
       mem.powderUntil = 0;
-      save6(mem);
+      save7(mem);
       commit3(next);
     } catch (e) {
     }
@@ -22005,19 +22284,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/trophies.js
-  var W17 = window;
+  var W18 = window;
   var WEEK2 = 7 * 864e5;
-  var key2 = () => "farm-trophies-" + (W17.Player && W17.Player.MemberNumber || 0);
+  var key2 = () => "farm-trophies-" + (W18.Player && W18.Player.MemberNumber || 0);
   function seen2() {
     try {
-      return JSON.parse(W17.localStorage.getItem(key2())) || {};
+      return JSON.parse(W18.localStorage.getItem(key2())) || {};
     } catch (e) {
       return {};
     }
   }
   function keep2(o) {
     try {
-      W17.localStorage.setItem(key2(), JSON.stringify(o));
+      W18.localStorage.setItem(key2(), JSON.stringify(o));
     } catch (e) {
     }
   }
@@ -22043,7 +22322,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     s[String(id)] = "done";
     keep2(s);
   }
-  var ink = () => W17.__farmInk && typeof W17.__farmInk.trophyWear === "function" ? W17.__farmInk : null;
+  var ink = () => W18.__farmInk && typeof W18.__farmInk.trophyWear === "function" ? W18.__farmInk : null;
   function trophyWear2(t, slot) {
     const I = ink();
     if (!I) return { ok: false, why: "the ink slots haven't loaded yet (reload the page if it stays like this)" };
@@ -22072,7 +22351,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/cues.js
-  var W18 = window;
+  var W19 = window;
   var ctx2 = null;
   function initCues(c) {
     ctx2 = c;
@@ -22091,15 +22370,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     gear: ctx2.panel.prefs.gear ? void 0 : true,
     ink: ctx2.panel.prefs.ink ? void 0 : true
   });
-  var mapOn = () => typeof W18.ChatRoomMapViewIsActive === "function" && W18.ChatRoomMapViewIsActive() && W18.Player && W18.Player.MapData && W18.Player.MapData.Pos;
-  var others4 = () => (W18.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W18.Player && W18.Player.MemberNumber));
+  var mapOn = () => typeof W19.ChatRoomMapViewIsActive === "function" && W19.ChatRoomMapViewIsActive() && W19.Player && W19.Player.MapData && W19.Player.MapData.Pos;
+  var others4 = () => (W19.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W19.Player && W19.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W18.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W18.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others4().filter((c) => W18.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others4().filter((c) => typeof W18.ChatRoomMapViewCharacterIsHearable === "function" && W18.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W18.Player && W18.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W19.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W19.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others4().filter((c) => W19.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others4().filter((c) => typeof W19.ChatRoomMapViewCharacterIsHearable === "function" && W19.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W19.Player && W19.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key3 = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key3 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -22115,13 +22394,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W18.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W19.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W18.ChatRoomMapViewWidth || 40, high = W18.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
+    const wide = W19.ChatRoomMapViewWidth || 40, high = W19.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key3(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -22151,8 +22430,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref2("noLead") || !mapOn() || typeof W18.ChatRoomMapViewMove !== "function") return no();
-    const from = W18.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref2("noLead") || !mapOn() || typeof W19.ChatRoomMapViewMove !== "function") return no();
+    const from = W19.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -22171,7 +22450,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function stepWalk() {
-    const w = walk, p = W18.Player && W18.Player.MapData && W18.Player.MapData.Pos;
+    const w = walk, p = W19.Player && W19.Player.MapData && W19.Player.MapData.Pos;
     const end = (ok2) => {
       if (walk === w) walk = null;
       stepping = false;
@@ -22198,9 +22477,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W18.ChatRoomMapViewMovement == null) {
+    if (W19.ChatRoomMapViewMovement == null) {
       try {
-        W18.ChatRoomMapViewMove(w.path[w.i]);
+        W19.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -22222,7 +22501,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W18.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W18.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W19.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W19.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
@@ -22234,7 +22513,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me4 = W18.Player.MapData.Pos;
+      const me4 = W19.Player.MapData.Pos;
       if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
@@ -22262,12 +22541,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref2("noFace") || typeof W18.CharacterSetFacialExpression !== "function" || !W18.Player) return;
+    if (!f || !pref2("noFace") || typeof W19.CharacterSetFacialExpression !== "function" || !W19.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W18.CharacterSetFacialExpression(W18.Player, g, e, secs);
-        if (g === "Eyes") W18.CharacterSetFacialExpression(W18.Player, "Eyes2", e, secs);
+        W19.CharacterSetFacialExpression(W19.Player, g, e, secs);
+        if (g === "Eyes") W19.CharacterSetFacialExpression(W19.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -22316,35 +22595,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref2("noSound") || typeof W18.AudioPlayInstantSound !== "function") return;
-    const vol = W18.Player && W18.Player.AudioSettings && W18.Player.AudioSettings.Volume || 0;
+    if (!f || !pref2("noSound") || typeof W19.AudioPlayInstantSound !== "function") return;
+    const vol = W19.Player && W19.Player.AudioSettings && W19.Player.AudioSettings.Volume || 0;
     try {
-      W18.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W19.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el2 = W18.document.getElementById("fhc-trance");
+    let el2 = W19.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el2) el2.remove();
       return;
     }
     if (!el2) {
-      el2 = W18.document.createElement("div");
+      el2 = W19.document.createElement("div");
       el2.id = "fhc-trance";
       el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W18.document.getElementById("fhc-trance-css")) {
-        const s = W18.document.createElement("style");
+      if (!W19.document.getElementById("fhc-trance-css")) {
+        const s = W19.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W18.document.head.appendChild(s);
+        W19.document.head.appendChild(s);
       }
-      W18.document.body.appendChild(el2);
+      W19.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W18.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W19.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el2.style.opacity = "1";
     });
   }
@@ -22416,13 +22695,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref2("noFeelings") || W18.CurrentScreen !== "ChatRoom" || !W18.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W19.CurrentScreen !== "ChatRoom" || !W19.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx2.panel.s, items = (W18.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W19.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W18.Player.ArousalSettings && W18.Player.ArousalSettings.Progress || 0;
+      const arousal = W19.Player.ArousalSettings && W19.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -22446,11 +22725,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W18.DrawText !== "function") return;
-      const R = W18.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W18.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W19.DrawText !== "function") return;
+      const R = W19.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W19.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C2 = (W18.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W18.ChatRoomMapViewCharacterIsVisible(C2)) continue;
+        const C2 = (W19.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W19.ChatRoomMapViewCharacterIsVisible(C2)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -22459,7 +22738,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me4.X + R) * tile, sy = (C2.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W18.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W19.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -22476,11 +22755,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W18.Player || !W18.Player.ArousalSettings || typeof W18.ActivitySetArousal !== "function") return;
-      if (W18.Player.ArousalSettings.Active === "Inactive" || W18.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W18.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W19.Player || !W19.Player.ArousalSettings || typeof W19.ActivitySetArousal !== "function") return;
+      if (W19.Player.ArousalSettings.Active === "Inactive" || W19.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W19.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W18.ActivitySetArousal(W18.Player, next);
+      if (next > cur || m.add < 0) W19.ActivitySetArousal(W19.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -22488,11 +22767,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W18.Player && Array.isArray(W18.Player.Appearance) ? W18.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W18.DialogCanUnlock === "function" && !W18.DialogCanUnlock(W18.Player, it)));
+  var vibeToys = () => (W19.Player && Array.isArray(W19.Player.Appearance) ? W19.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W19.DialogCanUnlock === "function" && !W19.DialogCanUnlock(W19.Player, it)));
   function vibePush(toys) {
-    if (typeof W18.CharacterRefresh === "function") W18.CharacterRefresh(W18.Player, false);
-    if (typeof W18.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W18.ChatRoomCharacterItemUpdate(W18.Player, it.Asset.Group.Name));
-    else if (typeof W18.ChatRoomCharacterUpdate === "function") W18.ChatRoomCharacterUpdate(W18.Player);
+    if (typeof W19.CharacterRefresh === "function") W19.CharacterRefresh(W19.Player, false);
+    if (typeof W19.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W19.ChatRoomCharacterItemUpdate(W19.Player, it.Asset.Group.Name));
+    else if (typeof W19.ChatRoomCharacterUpdate === "function") W19.ChatRoomCharacterUpdate(W19.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -22548,7 +22827,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W18.ChatRoomMapViewHasSuperPowers === "function" && W18.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W19.ChatRoomMapViewHasSuperPowers === "function" && W19.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -22739,6 +23018,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function sendCommand(text3, typed) {
     text3 = String(text3 || "").trim();
     if (!text3) return;
+    try {
+      if (/^roam (start|go|now|on)$/i.test(text3)) homeWantOut();
+      if (/^(safe|safeword|red)$/i.test(text3)) homeSafe();
+    } catch (e) {
+    }
     if (botHere2()) {
       if (!st.welcomed) hello();
       toBot("cmd", typed ? { text: text3 } : { text: text3, btn: true });
@@ -22975,6 +23259,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             console.warn("[Farmhand Companion] reins:", e);
           }
           inkCounts(m.state.ink);
+          try {
+            homeKeep(m.state);
+            const l = homeLocalPass();
+            if (l) toBot("roamSpent", l);
+          } catch (e) {
+            console.warn("[Farmhand Companion] whistle:", e);
+          }
         }
         break;
       case "reply":
@@ -23000,6 +23291,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         toChat(String(m.text || "") + "  (pick in your \u{1F33E} panel)", "#c9a35b");
         break;
       case "outfit":
+        if (m.auto && Array.isArray(m.topup)) {
+          let r;
+          try {
+            r = topUpOutfit(String(m.data || ""), Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], m.topup.map(String));
+          } catch (e) {
+            r = { ok: false, why: e.message };
+          }
+          if (r.ok && r.worn) st.panel.add("\u{1F457} Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
+          toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0 });
+          break;
+        }
         if (m.auto) {
           const ok2 = api2.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
           if (ok2) toChat("\u{1F457} You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b");
@@ -23301,6 +23603,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     initBotScreen(mod2, () => st.panel && st.panel.prefs || {});
     initAllocWatch(() => onBotAccount(), mod2);
     initChatlog(mod2, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere: botHere2 });
+    initHomeward(mod2, { botMn: BOT_MEMBER, say: (t) => toChat(t, "#c9a35b", true) });
     initNetGuard(mod2);
     initMemlog();
     initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());

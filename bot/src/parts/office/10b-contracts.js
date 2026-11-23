@@ -59,7 +59,7 @@
     if (perm) rules["chat.forbidLeaving"] = BCPLUS.makeSpec("chat.forbidLeaving", {});
     BCPLUS.fillRules(rules, who);
     if (when && when.conditions) BCPLUS.applyConditions(rules, when.conditions, when.only);   // when they apply (Oct 19: ?contract offer … when room=private)
-    return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who)+(perm ? " This one is permanent: you don't leave the room at all, so roam passes don't apply." : ""), duration: BCPLUS.durationFrom(durKey),
+    return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who)+(perm ? " This one is permanent: the door stays shut, and a roam pass only buys you half an hour off the farm. The farm girl walks you out, and whistles you home." : ""), duration: BCPLUS.durationFrom(durKey),
                                  depth: tpl.base, policy: tpl.policy, rules });
   }
   // "value as typed" → what BC+ wants for that setting

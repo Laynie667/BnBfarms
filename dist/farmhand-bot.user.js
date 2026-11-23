@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.93.2
+// @version      0.94.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3131,8 +3131,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.93.2";
-  var COMPANION_VERSION = "0.75.1";
+  var VERSION = "0.94.0";
+  var COMPANION_VERSION = "0.76.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3245,6 +3245,8 @@
       ROAM_PASS_HOLD: 3,
       // most passes they can carry
       ROAM_PASS_MIN: 60,
+      ROAM_PASS_PERM_MIN: 30,
+      // a permanent contract's pass: half an hour (Laynie, Nov 23: "might let perm contracts buy roaming passes, but theirs runs 30 minutes")
       ROAM_WARN_MIN: [10, 2],
       // whispers before a pass runs out
       ROAM_GRACE_S: 60,
@@ -6292,11 +6294,29 @@
           const r = rec(mn);
           if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500);
           if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2e3);
+          else if (r && !r.outfitOwed && !r.tempOutfit && state.topUp && state.topUp.has(mn)) {
+            state.topUp.delete(mn);
+            later(() => {
+              try {
+                outfitTopUp(mn);
+              } catch (e) {
+                warn("outfit top-up:", e);
+              }
+            }, 4e3);
+          }
         }
         return;
       }
       if (m.type === "bye") {
         state.companions.delete(mn);
+        return;
+      }
+      if (m.type === "roamSpent") {
+        try {
+          roamSpent(mn, m);
+        } catch (e) {
+          warn("roam:", e);
+        }
         return;
       }
       if (m.type === "bodyFarmAsk") {
@@ -7326,6 +7346,14 @@
         if (Math.abs(op.X - pos.X) <= CFG.HEAT_SCENT_TILES && Math.abs(op.Y - pos.Y) <= CFG.HEAT_SCENT_TILES) return om;
       }
       return null;
+    }
+    function knotsIn(mn) {
+      const now = Date.now(), out = [];
+      for (const k of Object.keys(L2.people)) {
+        const p = L2.people[k] && L2.people[k].prod;
+        if (p && p.tiedTo === mn && p.tieUntil > now) out.push({ t: Number(k), until: p.tieUntil });
+      }
+      return out;
     }
     function untie(mn, force) {
       const p = prodOf(mn);
@@ -9655,8 +9683,9 @@
         ml(p.semen) + " of " + ml(semenCap(mn)) + " \xB7 last collected " + ago(p.lastCollectAt),
         p.pentUp && "\u{1F624} Pent up: next load's a big one",
         p.deniedUntil > now && "\u{1F6AB} Denied: no fillin' anybody for " + hrsLeft(p.deniedUntil),
-        p.tieUntil > now && "\u{1F512} Tied to " + plainName(p.tiedTo) + " for " + Math.ceil((p.tieUntil - now) / 6e4) + " more minutes"
+        ...knotsIn(mn).map((k) => "\u{1F512} Your knot's locked in " + plainName(k.t) + " for " + Math.ceil((k.until - now) / 6e4) + " more minute" + (Math.ceil((k.until - now) / 6e4) === 1 ? "" : "s"))
       ]);
+      if (p.tieUntil > now) sec("\u{1F512} KNOTTED", ["Tied to " + plainName(p.tiedTo) + " for " + Math.ceil((p.tieUntil - now) / 6e4) + " more minute" + (Math.ceil((p.tieUntil - now) / 6e4) === 1 ? "" : "s")]);
       const holeName = { vulva: "Pussy", butt: "Ass", mouth: "Swallowed" };
       const holding = HOLES.filter((h) => h !== "vulva" || hasVulva(mn) || p.held.vulva > 0).map((h) => holeName[h] + " " + ml(p.held[h] || 0)).join(" \xB7 ");
       sec("\u{1FAD9} HOLDING \xB7 " + Math.round(100 * held / cap) + "% full", [
@@ -9921,7 +9950,7 @@
       if (when && when.conditions) applyConditions(rules, when.conditions, when.only);
       return makeContract({
         title: fillWho(tpl.title, who),
-        terms: fillWho(fill(tpl.terms || "", mn), who) + (perm ? " This one is permanent: you don't leave the room at all, so roam passes don't apply." : ""),
+        terms: fillWho(fill(tpl.terms || "", mn), who) + (perm ? " This one is permanent: the door stays shut, and a roam pass only buys you half an hour off the farm. The farm girl walks you out, and whistles you home." : ""),
         duration: durationFrom(durKey),
         depth: tpl.base,
         policy: tpl.policy,
@@ -10236,6 +10265,29 @@
         notifyStaff("\u{1F457} Couldn't dress " + plainName(mn) + " for their contract: " + err, false);
       }
     }
+    function outfitTopUp(mn) {
+      const r = rec(mn);
+      if (!r || r.ownOutfit || !r.contractDressedAt || r.tempOutfit || !hasCompanion(mn)) return false;
+      contractsLedger();
+      if (!L2.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()))) return false;
+      outfitsLedger();
+      const slot = r.contractSlot || outfitSlotFor(mn), o = slot && (L2.outfits[slot] || farmOutfit(slot));
+      if (!o || !o.data) return false;
+      let items = [];
+      try {
+        items = (JSON.parse(W.LZString.decompressFromBase64(String(o.data))) || {}).items || [];
+      } catch (e) {
+        return false;
+      }
+      const C2 = charFor(mn);
+      if (!C2 || !Array.isArray(C2.Appearance)) return false;
+      const worn = new Set(C2.Appearance.map((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name).filter(Boolean));
+      const missing2 = [...new Set(items.map((it) => it && it.Group).filter((g) => g && !worn.has(g)))];
+      if (!missing2.length) return false;
+      enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), auto: true, topup: missing2.slice(0, 40), id: ++companionSeq }, mn));
+      audit(CFG.BOT_MEMBER, "OUTFIT_TOPUP_SENT", mn + " " + missing2.length);
+      return true;
+    }
     function saveOutfit(mn, m) {
       if (!isProprietor(mn)) {
         toCompanion(mn, "Savin' farm outfits is for the proprietors, sugar.", "reply");
@@ -10263,6 +10315,11 @@
       } catch (e) {
         warn("temp outfit:", e);
       }
+      if (m.answer === "topped") {
+        audit(mn, "OUTFIT_TOPUP", String(m.slot || "") + " " + (m.worn | 0));
+        if (onMap(mn) && (m.worn | 0) > 0) emote("\u{1F457} The farm girl tuts and puts " + plainName(mn) + " back in their farm outfit: " + (m.worn | 0) + " piece" + ((m.worn | 0) === 1 ? "" : "s") + " they'd come home without" + (m.locks ? ", padlocked back on" : "") + ".");
+        return;
+      }
       if (m.answer === "worn") {
         audit(mn, "OUTFIT_WORN", String(m.slot || ""));
         {
@@ -10270,6 +10327,7 @@
           if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot || "")) {
             r.outfitOwed = null;
             r.contractDressedAt = Date.now();
+            r.contractSlot = String(m.slot || "");
             saveLedger();
           }
         }
@@ -10304,7 +10362,7 @@
       syncCompanions(true);
       R(r.ownOutfit ? "\u{1F457} Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no." : "\u{1F457} Bring your own outfit: off. " + (r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
     }
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m), __outfitTopUp: (m) => outfitTopUp(m) });
     addCommand("ownoutfit myoutfit", { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });
     function zonesLedger() {
       L2.zones = L2.zones || {};
@@ -14542,7 +14600,8 @@
       if (p.pentUp) out.push({ icon: "\u{1F624}", text: "Pent up" });
       if (r.dare && r.dare.until > now) out.push({ icon: "\u{1F3B2}", text: "Dare", until: r.dare.until });
       for (const f of activePotions(mn)) out.push({ icon: "\u{1F9EA}", text: (potionDef(f.id) || {}).name || f.id, until: f.until });
-      if (p.tieUntil > now) out.push({ icon: "\u{1F512}", text: "Knotted", until: p.tieUntil });
+      if (p.tieUntil > now) out.push({ icon: "\u{1F512}", text: "Knotted to " + plainName(p.tiedTo), until: p.tieUntil });
+      for (const k of knotsIn(mn)) out.push({ icon: "\u{1F512}", text: "Your knot's in " + plainName(k.t), until: k.until });
       {
         const x = reinsOf(mn);
         if (x) out.push({ icon: "\u{1F434}", text: "On " + plainName(x.by) + "'s reins", until: x.until });
@@ -23857,11 +23916,12 @@
     function roamKeptIn(mn) {
       return !!(L2.contracts && L2.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving")));
     }
+    const roamMins = (mn) => roamKeptIn(mn) ? CFG.ROAM_PASS_PERM_MIN : CFG.ROAM_PASS_MIN;
+    const roamSpan = (mins) => mins === 60 ? "an hour" : mins === 30 ? "half an hour" : mins + " minutes";
     function roamStart(mn, auto) {
       const g = roamOf(mn);
       if (!g) return false;
       if (g.until > Date.now()) return true;
-      if (roamKeptIn(mn)) return false;
       if (roamLeft(mn) <= 0) return false;
       if (g.used < roamFree(mn)) g.used++;
       else {
@@ -23869,13 +23929,14 @@
         r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1);
       }
       g.wentAt = auto ? Date.now() : 0;
-      g.until = Date.now() + CFG.ROAM_PASS_MIN * 6e4;
+      const mins = roamMins(mn);
+      g.until = Date.now() + mins * 6e4;
       g.warned = [];
       g.strayAt = 0;
       saveLedger();
       syncCompanions(true);
       const back = clockOf(g.until), left = roamLeft(mn);
-      beep(mn, auto ? "\u{1F9ED} You wandered off the farm, sugar, so that's a roam pass spent. Back by " + back + ". " + left + " left." : "\u{1F9ED} Off you go, sugar. You've got an hour: back by " + back + ", or I'll fetch you. " + left + " left.");
+      beep(mn, auto ? "\u{1F9ED} You wandered off the farm, sugar, so that's a roam pass spent. Back by " + back + ". " + left + " left." : "\u{1F9ED} Off you go, sugar. You've got " + roamSpan(mins) + ": back by " + back + ", or I'll fetch you. " + left + " left." + (roamKeptIn(mn) ? " Your contract keeps the door shut, so your Companion walks you out." : ""));
       audit(mn, "ROAM_START", auto ? "auto" : "asked");
       return true;
     }
@@ -24006,11 +24067,7 @@
           R("\u{1F9ED} You're already roamin', sugar: back by " + clockOf(g.until) + ".");
           return;
         }
-        if (roamKeptIn(sender)) {
-          R("\u{1F9ED} Your permanent contract keeps you in the room, sugar, so there's no roamin' on it. Your passes are still yours.");
-          return;
-        }
-        if (!roamStart(sender, false)) R("\u{1F9ED} You haven't got a roam pass, sugar. ?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons for an hour, or your herd leader can give you one.");
+        if (!roamStart(sender, false)) R("\u{1F9ED} You haven't got a roam pass, sugar. ?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons for " + roamSpan(roamMins(sender)) + ", or your herd leader can give you one.");
         return;
       }
       if (!other && ["back", "home", "end", "off"].includes(a0)) {
@@ -24022,13 +24079,50 @@
         } else R("\u{1F9ED} You're not roamin' right now.");
         return;
       }
-      R("\u{1F9ED} " + (t === sender ? "Your" : plainName(t) + "'s") + " roam passes: " + roamLeft(t) + ", an hour off the farm each (?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons)" + (g.until > now ? " \xB7 roamin' now, back by " + clockOf(g.until) : "") + ". " + (t === sender ? "?roam start, then go where you like; walk off the farm and one starts by itself. Late back, or out with none left, and I fetch you." : ""));
+      R("\u{1F9ED} " + (t === sender ? "Your" : plainName(t) + "'s") + " roam passes: " + roamLeft(t) + ", " + roamSpan(roamMins(t)) + " off the farm each (?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons)" + (g.until > now ? " \xB7 roamin' now, back by " + clockOf(g.until) : "") + ". " + (t === sender ? "?roam start, then go where you like; walk off the farm and one starts by itself. Late back, or out with none left, and I fetch you." : ""));
     }
     function roamState(mn) {
       const x = roamContract(mn);
       if (!x) return null;
       const g = roamOf(mn);
-      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: perkPrice(mn, CFG.ROAM_PASS_PRICE), safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
+      let by = [CFG.BOT_MEMBER];
+      try {
+        by = by.concat(farmInfo().staff || []);
+      } catch (e) {
+      }
+      const snap = L2.roomSnapshot && L2.roomSnapshot.room;
+      return {
+        left: roamLeft(mn),
+        of: roamPasses(mn, x),
+        until: g.until > Date.now() ? g.until : 0,
+        price: perkPrice(mn, CFG.ROAM_PASS_PRICE),
+        safe: (rec(mn).roamSafeUntil || 0) > Date.now(),
+        // safe: their Companion opens the gate (index.js)
+        mins: roamMins(mn),
+        perm: roamKeptIn(mn),
+        ends: x.until || 0,
+        room: CFG.ROOM_NAME,
+        space: snap && snap.Space || "X",
+        by: [...new Set(by)].filter(Number.isInteger).slice(0, 60)
+      };
+    }
+    function roamSpent(mn, m) {
+      const g = roamOf(mn), r = rec(mn);
+      if (!g || !r || !roamContract(mn)) return false;
+      const at = Number(m && m.at) || 0;
+      if (!at || at > Date.now() || Date.now() - at > 24 * 36e5 || (g.spent || []).includes(at)) return false;
+      g.spent = (g.spent || []).concat(at).slice(-10);
+      const mine = g.wentAt && Math.abs(g.wentAt - at) < 30 * 6e4;
+      if (m && m.started && !mine && roamLeft(mn) > 0) {
+        if (g.used < roamFree(mn)) g.used++;
+        else r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1);
+      }
+      saveLedger();
+      syncCompanions(true);
+      audit(mn, "ROAM_AWAY", (m && m.late ? "late " : "") + "from their Companion");
+      if (m && m.late) roamPenalty(mn, "was late back from their roam");
+      tell(mn, "\u{1F9ED} Welcome home, sugar. " + (m && m.late ? "You were late, so that's a naughty mark. " : "") + roamLeft(mn) + " pass" + (roamLeft(mn) === 1 ? "" : "es") + " left.");
+      return true;
     }
     const verNum = (v) => String(v || "0").split(".").map((n) => parseInt(n, 10) || 0).reduce((a, n, i) => a + n * Math.pow(1e3, 2 - i), 0);
     function companionTooOld(mn, ver) {
@@ -32692,6 +32786,8 @@
         if (g.urge) out.push("\u{1F444} It wants you to " + { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get into a glory stall" }[g.urge.kind] + ": " + mins(g.urge.until) + " min.");
       }
       if (p.deniedUntil > now) out.push("\u{1F6AB} No cummin' for " + mins(p.deniedUntil) + " min.");
+      if (p.tieUntil > now) out.push("\u{1F512} Knotted to " + plainName(p.tiedTo) + ": " + mins(p.tieUntil) + " min till it lets go.");
+      for (const k of knotsIn(mn)) out.push("\u{1F512} Your knot's locked in " + plainName(k.t) + ": " + mins(k.until) + " min till it lets go.");
       if (p.eggs) out.push("\u{1F95A} Carryin' " + p.eggs.n + " eggs" + (bellyStage(mn) ? " (belly: " + BELLY[bellyStage(mn)] + ")" : "") + ". ?lay at the nest" + (now - p.eggs.since < CFG.NEST_MIN_H * 36e5 ? " in " + mins(p.eggs.since + CFG.NEST_MIN_H * 36e5) + " min" : " any time") + ".");
       for (const [slot, g] of Object.entries(r.gear || {})) if (g.until > now) out.push("\u26D3\uFE0F " + g.label + ": " + mins(g.until) + " min.");
       if (r.gluedUntil > now) out.push("\u{1F36F} Sticky feet: " + mins(r.gluedUntil) + " min.");
@@ -70262,6 +70358,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           greet(mn);
           onArrive(mn);
+          (state.topUp = state.topUp || /* @__PURE__ */ new Set()).add(mn);
           if (state.noMove) state.noMove.delete(mn);
           welcomeBack(mn);
           later(() => deliverMail(mn), 8e3);

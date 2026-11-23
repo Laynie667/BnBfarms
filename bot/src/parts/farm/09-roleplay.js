@@ -435,8 +435,10 @@
       ml(p.semen)+" of "+ml(semenCap(mn))+" · last collected "+ago(p.lastCollectAt),
       p.pentUp && "😤 Pent up: next load's a big one",
       p.deniedUntil > now && "🚫 Denied: no fillin' anybody for "+hrsLeft(p.deniedUntil),
-      p.tieUntil > now && "🔒 Tied to "+plainName(p.tiedTo)+" for "+Math.ceil((p.tieUntil-now)/60000)+" more minutes"
+      ...knotsIn(mn).map(k => "🔒 Your knot's locked in "+plainName(k.t)+" for "+Math.ceil((k.until-now)/60000)+" more minute"+(Math.ceil((k.until-now)/60000) === 1 ? "" : "s"))
     ]);
+    // (Nov 23) knotted yourself: shown to anybody, cock or not (it sat in the cum section, so only a stud ever saw it)
+    if (p.tieUntil > now) sec("🔒 KNOTTED", ["Tied to "+plainName(p.tiedTo)+" for "+Math.ceil((p.tieUntil-now)/60000)+" more minute"+(Math.ceil((p.tieUntil-now)/60000) === 1 ? "" : "s")]);
     // what they're holding, per hole they've got (a mouthful ends up in the stomach)
     const holeName = { vulva:"Pussy", butt:"Ass", mouth:"Swallowed" };
     const holding = HOLES.filter(h => h !== "vulva" || hasVulva(mn) || p.held.vulva > 0)

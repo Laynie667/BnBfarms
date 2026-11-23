@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.93.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.94.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.75.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.76.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.94.0 + Companion 0.76.0: the farm girl's whistle in the Companion, half-hour passes on permanent contracts, the farm outfit back on when you're home, ears and tails left on, and your own knot's timer** Laynie, Nov 23: "It might be worth building the farm girls summon into the companion itself, so summoning cattle back doesnt rely on bc plus or being friends", then yes to 30 seconds' warnin', pullin' them from anywhere, BC+'s summon kept as a backup, "might let perm contracts buy roaming passes, but theirs runs 30 minutes of freedom instead of a hour", and "also reapplying their farm outfits upon them returning, if contracted and anything is missing".
+  - **The whistle lives in the Companion now.** Off the farm the farm girl can only reach somebody by beep, and a beep only arrives if they've friended her, so the Companion keeps their roam rules on their own computer while they're on the farm, and keeps the time itself once they're off it. A note at 10 and 2 minutes left on a pass. Out of time, or out with no pass: 30 seconds' warnin', then it walks them home, out of wherever they are (past a leash or a locked door, the way BC+'s summon does it) and into the farm. A full farm: in the moment there's a space. Busy in the wardrobe or crafting: it waits a few minutes for them.
+  - **Holdin' a pass and off the farm** (logged in somewhere else, or pulled away): one starts by itself, as the farm girl would start it, and comes off her books when they're back. Late back is late back: the naughty mark and the fine, once they're home.
+  - **A summon from the farm girl or staff** (her "summon · …" beep) does the same: 30 seconds, then home, pass or no pass. BC+'s own summon still works alongside it, as the backup.
+  - **Never** after their safeword (the farm's or the game's, for half an hour), once the contract's over, or with the Companion off.
+  - **Permanent contracts roam too**, half an hour a pass. Their BC+ Forbid leaving still keeps the exit button shut, but it lets forced moves through, so the Roam button in their panel has the Companion walk them out to the lobby, and the whistle brings them back. No re-signin': the 19 permanent contracts already signed work as they are. New permanent contracts say so in their terms.
+  - **Back on the farm, back in the farm outfit.** Somebody under a contract who was dressed for it comes home: any piece of their farm outfit whose spot is empty on them goes back on, padlocked like the first time. A spot with somethin' else in it is left be (staff changes still stay changed), and somebody who brings their own outfit, or is in the outfit wheel's, is never topped up. The room sees the farm girl tut and dress them.
+  - **Ears, tails, wings and hair bits stay on** (Nikto's #14). The game files them as clothes, but they're part of who somebody is: "Farm can strip me" and the farm's outfits leave them be, unless an outfit brings its own tail.
+  - **Your own knot's timer** (Crystal's #74): the stud sees "Your knot's locked in Moo: 12 min till it lets go" in their panel and in ?stats, and whoever's knotted sees who to, cock or not (it used to sit in the cum section, so only a stud ever saw it).
 
 - **Bot 0.93.2: the farm office gets itself back after a drop, and strap-ons loaded with their crafter's seed** Laynie, Nov 23: "need to make the relog feature more robust, it seems not to currently work", "i meant the bot relogging after a disconnect". And Alexia's ask: "making the strapons capable of using the crafters cum when arousal is high enough for climax".
   - **Why the bot stayed gone.** The players' records showed it back in a minute or two after most drops, but gone four hours on Nov 11, half an hour on Nov 22 and eight hours the night of Nov 23. Since the game's November update, when the server throws a game off (sendin' too much, a second login, a restart) the game closes its own connection and never opens it again. The bot sat waitin' for the server to come back. Then the watchdog reloaded the page after 5 minutes, and a reload can stop dead at "Are you sure you want to leave the club?" (WCE asks that, if its Confirm leaving is on) with nobody there to click.

@@ -286,6 +286,13 @@
     return null;
   }
   // a knot lets go
+  // who a stud's knot is locked in right now, and till when (Nov 23, Crystal's #74: "A timer in the status for when your
+  // knot (not just the other party's knot) releases would be nice. In case of mutual ties and all that")
+  function knotsIn(mn){
+    const now = Date.now(), out = [];
+    for (const k of Object.keys(L.people)){ const p = L.people[k] && L.people[k].prod; if (p && p.tiedTo === mn && p.tieUntil > now) out.push({ t: Number(k), until: p.tieUntil }); }
+    return out;
+  }
   function untie(mn, force){
     const p = prodOf(mn);
     if (!p || !p.tieUntil) return;

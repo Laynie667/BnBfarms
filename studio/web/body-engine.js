@@ -167,7 +167,7 @@ window.FarmBodyEngine = function (host) {
   // the piece grown to the belly, if it covers it and nothing else has been chosen for it: the canvas, false (nothing to grow) or null (not ready)
   function bellyAuto(src, x, y, ctx, behind, pieceKey) { if (!ctx.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
     // worn things only: not her hands, her skin or her hair
-    const m0 = new RegExp(SLOT_SRC).exec(src); if (!m0) return false; if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
+    const m0 = new RegExp(SLOT_SRC).exec(src); if (!m0) return false; if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false; if (rigidSrc(src)) return false;
     // Panties go UNDER: her belly hangs in front of them and hides them, only their sides at her hips showing (Laynie, Oct 14:
     // "panties can be hidden by the large belly").
     if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx, "under|" + (pieceKey || src), "under");
@@ -494,6 +494,13 @@ window.FarmBodyEngine = function (host) {
   // chest wear, whatever slot it's in (a straitjacket is in the arms slot, a cape in the neck's). Hair is left alone:
   // it falls over them, it isn't worn on them.
   const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
+  // FURNITURE STAYS STRAIGHT (Nov 21, Laynie: the wild kits "dont size correctly with the tits and bellies in game"). A frame,
+  // stocks, a cage, a crate, the horse or a hand truck is steel and wood, but it was fitted like cloth: the inspection frame's
+  // bars bent round her breasts. So furniture is drawn as the game draws it, straight, in front of her, and her tits and
+  // belly fill out behind and around it. What wraps her body (a vac bed, a sack, a body bag, the fur wrap, a net, a cloak,
+  // cement) still takes her shape.
+  const WRAPS = /^(?:Vac|BurlapSack|InflatableBodyBag|InflatableRestraintBag|LongBag|FurBlanketWrap|Net(?=[_.])|ConcealingCloak|Cement|LatexbeltBed)/;
+  const rigidSrc = (src) => { if (typeof src !== "string") return false; const m = new RegExp(SLOT_SRC).exec(src); return !!m && m[1] === "ItemDevices" && !WRAPS.test(src.slice(src.lastIndexOf("/") + 1)); };
   // Straps don't stretch: a thin strap blown up to the size of the breast stops being a strap (the open harnesses and
   // frame bras came out as blobs). So those pieces are REDRAWN on drawn breasts, out of a few kinds of strap laid on
   // the breast's own outline, at a strap's width whatever the size:
@@ -1310,7 +1317,7 @@ window.FarmBodyEngine = function (host) {
                 try { const p0 = edgesOf(src); if (p0) { let t0 = -1, t1 = -1; for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) { if (t0 < 0) t0 = j; t1 = j; }
                     if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; put(name, src, x, y + (ctx.breast.fit.mapY(cyL) - cyL), o); return; } } } catch (e) { warnSome("[studio] decal:", e); }
               }
-              if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
+              if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src) && !rigidSrc(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
                 try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.012) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } }   /* ("nipple" goes through dressDraw too: it reads the choice itself) */ catch (e) { warnSome("[studio] chest wear:", e); } }
@@ -1344,7 +1351,7 @@ window.FarmBodyEngine = function (host) {
             }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);
-                const gname2 = groupOf(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q || q.mode !== "under") ? (m ? bellyShade(m, x - MOULD.M, y, ctx) : bellyShade(mouldImg(src), x, y, ctx)) : null;
+                const gname2 = groupOf(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && !rigidSrc(src) && (!q || q.mode !== "under") ? (m ? bellyShade(m, x - MOULD.M, y, ctx) : bellyShade(mouldImg(src), x, y, ctx)) : null;
                 if (formed) { put(name, formed, m ? x - MOULD.M : x, y, o, src); drawn = true; }
                 else if (m) { put(name, m, x - MOULD.M, y, o, src); drawn = true; } } } catch (e) { warnSome("[studio] mould:", e); }
             if (!drawn) put(name, src, x, y, o);
@@ -1364,6 +1371,6 @@ window.FarmBodyEngine = function (host) {
   }
 
   return { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
-    BREAST, BREAST_SLIDERS, keptBytes, perf, shrink, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
+    BREAST, BREAST_SLIDERS, keptBytes, perf, shrink, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, rigidSrc, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
 };
 })();

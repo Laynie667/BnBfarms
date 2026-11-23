@@ -1,5 +1,5 @@
 {
- "made": "2026-11-21T05:50:04.520Z",
+ "made": "2026-11-22T02:39:36.328Z",
  "sets": [
   {
    "group": "Traps",
@@ -7019,8 +7019,8 @@
       "ItemTorso2"
      ],
      "items": [
-      "FullBodyLeatherHarness",
       "LeatherHarness",
+      "LeatherStrapHarness",
       "TentacleSuit",
       "HempRopeHarness"
      ],

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.93.0
+// @version      0.93.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3046,8 +3046,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.93.0";
-  var COMPANION_VERSION = "0.75.0";
+  var VERSION = "0.93.1";
+  var COMPANION_VERSION = "0.75.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -63646,7 +63646,10 @@
             { slot: "cups", label: "Pasture Weighted Clamps", laced: "On a drip of let-down tonic.", items: ["NippleWeightClamps"], desc: "Clamps on the teats with weights hangin' off, swingin' with every step." },
             { slot: "dildo", label: "Trottin' Plug", laced: "Infused with heat mist.", items: ["VibratingDildo"], desc: "A buzzin' plug that jolts deeper with every trot." },
             { slot: "plug", label: "Pasture Pony Tail", items: ["HorsetailPlug", "HorsetailPlug1"], color: "#6B4A2E", desc: "A long horsehair tail on a deep plug. It swishes when they're used." },
-            { slot: "torso", label: "Pasture Harness", items: ["FullBodyLeatherHarness", "LeatherHarness"], desc: "Straps from collar to crotch, rings for the reins and the cart." },
+            // (not the Full Body Leather Harness: the game counts it as an arm restraint, elbows pinned behind and legs closed, and
+            // beside the yoke the two fought over her arms. The game drew neither: no arms, and the hooves floatin' under her
+            // tits. Nov 21, Laynie: the kits "dont size correctly with the tits and bellies in game".)
+            { slot: "torso", label: "Pasture Harness", items: ["LeatherHarness", "LeatherStrapHarness"], desc: "Straps from collar to crotch, rings for the reins and the cart." },
             { slot: "arms", label: "Pasture Yoke", items: ["Yoke"], desc: "A wooden yoke across the shoulders, wrists locked to both ends. Arms up, chest out, nothin' covered." },
             { slot: "boots", label: "Pasture Hooves", items: ["StrictPonyBoots", "PonyBoots"], desc: "Strict hoof boots, up on the toes for good. They trot now; they don't walk." },
             { slot: "feet", label: "Pasture Ball and Chain", items: ["BallChain"], desc: "A heavy iron ball chained to an ankle. They graze where they're put." },

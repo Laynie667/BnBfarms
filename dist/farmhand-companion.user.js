@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.75.0
+// @version      0.75.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.75.0";
+  var VERSION = "0.75.1";
 
   // shared/species.js
   var WORDS = {
@@ -9513,6 +9513,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const m0 = new RegExp(SLOT_SRC2).exec(src);
         if (!m0) return false;
         if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
+        if (rigidSrc(src)) return false;
         if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx3, "under|" + (pieceKey2 || src), "under");
         const pk = pieceKey2 || src;
         if (bellyCover(src, x, y, ctx3) >= 0.15) MOULD.lies.add(pk);
@@ -10083,6 +10084,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const ARM_GROUPS = /* @__PURE__ */ new Set(["ItemArms", "Bracelet"]);
       const heldNow = () => false;
       const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
+      const WRAPS = /^(?:Vac|BurlapSack|InflatableBodyBag|InflatableRestraintBag|LongBag|FurBlanketWrap|Net(?=[_.])|ConcealingCloak|Cement|LatexbeltBed)/;
+      const rigidSrc = (src) => {
+        if (typeof src !== "string") return false;
+        const m = new RegExp(SLOT_SRC2).exec(src);
+        return !!m && m[1] === "ItemDevices" && !WRAPS.test(src.slice(src.lastIndexOf("/") + 1));
+      };
       const STRAPS = {
         FrameBra1: { ring: 6, centre: 4 },
         FrameBra2: { ring: 3.5, cross: 2.5 },
@@ -11717,7 +11724,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[studio] decal:", e);
                     }
                   }
-                  if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) {
+                  if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src) && !rigidSrc(src)) {
                     const piece = pieceOf(src), how = piece && BREAST.wear[piece.key] || "";
                     try {
                       const im0 = piece && ctx3.breast && mouldImg(src);
@@ -11774,7 +11781,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 try {
                   if (ctx3.belly && !fit.behind && typeof src === "string") {
                     const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx3, q2.key, q2.mode) : bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key);
-                    const gname2 = groupOf4(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx3) : bellyShade(mouldImg(src), x, y, ctx3) : null;
+                    const gname2 = groupOf4(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && !rigidSrc(src) && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx3) : bellyShade(mouldImg(src), x, y, ctx3) : null;
                     if (formed) {
                       put2(name, formed, m ? x - MOULD.M : x, y, o, src);
                       drawn = true;
@@ -11863,6 +11870,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         ARM_GROUPS,
         heldNow,
         chestSlot,
+        rigidSrc,
         STRAPS,
         gameBreast,
         upperName,

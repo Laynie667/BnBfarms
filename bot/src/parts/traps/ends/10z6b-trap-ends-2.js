@@ -41,7 +41,8 @@
       "{t}%n's let go with syrup set hard in two little amber drips off their nipples, and the farmhands argue about who gets to lick them off.",
       "The last farmhand licks the last of the syrup off %n's chin, says \"best breakfast I've had,\" and unties the rope.",
       "{c}%n's let go with syrup still settin' on their cock in a glossy shell, and every time they move it cracks a little.",
-      "%n peels their thighs apart with a sticky noise, and their arms off their sides, and walks home very slowly, sweet as a toffee apple."]);
+      // (Nov 23: the toffee apple line got a 👎, Rosey's #61. Stiff and cute, not hot. This one isn't.)
+      "%n's thighs come apart with a wet, sticky kiss when the rope drops, and they waddle home glazed head to toe, lickin' syrup off their own lips and achin' for somebody to finish the job."]);
     end(BATCH2_LINES, "pieeat", "end", [
       "The judge hands %n a ribbon that says TRIED VERY HARD, pins it to their creamy collar, and points them to the hose.",
       "%n's untied from the chair with crust in their hair and jam in their ears, and the winner comes over and shakes their sticky hand.",

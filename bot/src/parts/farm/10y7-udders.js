@@ -99,7 +99,7 @@
       privateLine(mn, uLine("over"+st, mn), "emote");
       if (st >= 2){ emote("🥛 "+uLine("overRoom"+st, mn), mn); bodyMark(mn, { splat: ["chest"], color: "#FFFFFF", mess: "milk" }); }
     }
-    if (st >= 4 && now - (p.fullNag || 0) > 10*60000 && !quietNow(mn) && charFor(mn)){ p.fullNag = now; privateLine(mn, uLine("over4nag", mn), "emote"); arouse(mn, 8, 90); }
+    if (st >= 4 && now - (p.fullNag || 0) > (CFG.OVERDUE_NAG_MIN || 30)*60000 && !quietNow(mn) && charFor(mn)){ p.fullNag = now; privateLine(mn, uLine("over4nag", mn), "emote"); arouse(mn, 8, 90); }
   }
   const OVERDUE_WORD = ["", "tight", "leakin'", "engorged", "burstin'"];
 
@@ -457,9 +457,16 @@
     over2: ["A bead of milk wells at each teat and runs. You're leakin', and you can't stop it."],
     over3: ["They're hard as melons now and hot to the touch, the skin shiny with it. Every heartbeat throbs in them."],
     over4: ["You can't think. There's only how full you are, the ache, the drip, and the need to have somethin' latch on and take it."],
+    // (Nov 23, Ella's #48 👎: three lines, every ten minutes, for hours. Now every half hour, and more of them)
     over4nag: ["Milk is runnin' down your belly in two steady lines. You'd let anybody milk you right now. Anybody.",
                "Your udders are so tight they shake when you breathe. You catch yourself squeezin' them and it only makes it worse.",
-               "You're dribblin' with every step and lowin' under your breath. Get to a stall."],
+               "You're dribblin' with every step and lowin' under your breath. Get to a stall.",
+               "Every heartbeat throbs in your teats. They're hot, hard and shinin', and the smallest brush of cloth makes you gasp.",
+               "You've soaked through again. The straw where you were standin' is wet and sweet-smellin', and everybody can tell why.",
+               "You keep cuppin' your udders without meanin' to, tryin' to take the weight. It doesn't help. Nothin' helps but a milker.",
+               "A drop beads on each teat, swells, and runs. Then another. You've stopped bein' able to tell when it starts.",
+               "Your back aches from the weight out front. You'd crawl to the stall on your knees if it meant gettin' emptied.",
+               "The sound of the pump from the dairy makes your teats tingle and let down on their own. Go. Get to a stall."],
     overRoom2: ["Two wet patches are spreadin' down %n's front. Somebody's overdue for milkin' and startin' to leak.",
                 "%n's teats are drippin' steady, a bead at a time, and they keep pressin' an arm across to hide it."],
     overRoom3: ["%n's udders have swollen up round and hard, veins standin' out, milk runnin' in threads. They wince when anything touches them.",

@@ -14,7 +14,11 @@
        balls, pussy, both, or a femboy's. Each named trap has its own, and there are shared ones.
   */
   const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|nb|ok|np|nn|v|c|t|f|m)\})+/;   // {np}: nipples open, {nn}: shut (Nov 19, 10z7-nipple-traps.js)   // {nb}: nonbinary (Oct 19)   // {ok}: already fitted (an add-on did it), leave it be
-  const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+  // (Nov 23, the sweep for Nikto's #11/#12: "right where they're wettest" went to men, so wettest and the like count too)
+  const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix|wettest|labia|snatch|twats?|quim|honeypot)\b/i;
+  // their OWN cock (somebody else's is anybody's to hear about): left out for a body without one (Nov 23, Lyn's #35:
+  // "?wash seems pretty likely to play dialogue that should only play if you have a dick, even if you dont")
+  const OWN_COCK = /(%n's|\byour|\btheir own|\btheir) (hard |stiff |achin' |aching |throbbin' |throbbing |leakin' |leaking |swollen |caged |little |neglected |poor |pretty little |fat |heavy )?(cock|dick|prick|cockhead|balls)\b/i;
   const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
   // the farm's own girls (the farm girl, the dairy girl…) are who they are whoever the line's about (Oct 27: a line naming
@@ -45,6 +49,7 @@
     if (BODY_TAG.test(s)) return true;                       // a tagged line was written for this body
     if (!b.vulva && VULVA_WORDS.test(s)) return false;
     if (!b.tits && TITS_WORDS.test(s)) return false;
+    if (!b.cock && OWN_COCK.test(s)) return false;
     if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s.replace(NPC_GIRL, ""))) return false;
     return true;
   }
@@ -53,11 +58,17 @@
       if (!Array.isArray(list) || !list.length || !rec(mn)) return pickFresh(key, list);
       const b = bodyOf(mn), tagged = list.filter(l => tagsFit(l, b)), best = tagged.filter(l => wordsFit(l, b));
       if (W.__FARMHAND_TEST__ && typeof W.__pickSeen === "function") W.__pickSeen(key, list);   // (tests: which pools are thin for which body)
-      return pickFresh(key, best.length ? best : tagged.length ? tagged : list);
+      // nothin' fits: an untagged line (its words get swapped, bodyWords) before one tagged for somebody else's body,
+      // which would go out as it is (Nov 23, Lyn's #35: a cock line in ?wash for somebody without one)
+      const untagged = list.filter(l => !BODY_TAG.test(String(l)));
+      return pickFresh(key, best.length ? best : tagged.length ? tagged : untagged.length ? untagged : list);
     } catch(e){ return pickFresh(key, list); }
   }
   // the last resort: the words themselves, swapped for parts this body has
-  const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
+  const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"],
+    [/\bwettest\b/g, "neediest"], [/\blabia\b/g, "rim"], [/\bsnatch\b/g, "hole"], [/\btwats\b/g, "holes"], [/\btwat\b/g, "hole"], [/\bquim\b/g, "hole"], [/\bhoneypot\b/g, "hole"]];
+  // their own cock, on a body without one (with a pussy: the clit; without: the crotch)
+  const swapNoCock = (t, vulva) => t.replace(new RegExp(OWN_COCK.source, "gi"), (m, who, adj, part) => who+" "+(adj || "")+(/^balls$/i.test(part) ? (vulva ? "pussy" : "crotch") : (vulva ? "clit" : "crotch")));
   const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   // (the farm girl stays the farm girl whoever she's talkin' about: "the farm boy brushes Rex" was her, Oct 26)
@@ -68,8 +79,9 @@
       const written = BODY_TAG.test(String(text));   // a tagged line was written for the body it's shown to: no swappin'
       let t = String(text).replace(BODY_TAG, "");
       if (written || !mn || !L || !L.people || !L.people[mn]) return t;
-      if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
+      if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !OWN_COCK.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
       const b = bodyOf(mn);
+      if (!b.cock) t = swapNoCock(t, b.vulva);   // (before the pussy swap: a clit put here stays a clit)
       if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
       if (!b.tits) for (const [re, w] of (b.g === "femboy" ? SWAP_FEMBOY : SWAP_FLAT)) t = t.replace(re, w);
       if (b.g === "male") for (const [re, w] of SWAP_MALE) t = t.replace(re, w);

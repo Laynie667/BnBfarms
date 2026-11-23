@@ -125,8 +125,12 @@ function words(mn) {
   if (b && (b.g === "male" || b.g === "femboy") && MALE[key]) Object.assign(w, MALE[key]);
   // udders for somebody with tits; a cock gets its balls; anybody else just their body
   if (UDDER_KINDS.includes(key) && b && !b.tits) w.p = b.cock ? "heavy balls" : "body";
+  // what their hands are now: hooves on a cow, a horse, a goat; paws on a pup, a kitty, a bunny; claws on a dragon
+  // (Nov 23, Lucira's #54: "During the hypnosis, my limbs are reffered too as paws despite being a horse")
+  w.paws = HOOVES.includes(key) ? "hooves" : key === "dragon" ? "claws" : "paws";
   return w;
 }
+const HOOVES = ["cow", "pony", "horse", "goat", "sheep", "pig", "bull", "deer"];
 function petName(mn) {
   const w = words(mn), r = api.rec(mn) || {}, t = me(mn).tier;
   // degrade: the name gets rougher a tier sooner; praise: it stays sweet a tier longer
@@ -136,7 +140,7 @@ function petName(mn) {
 function say(mn, line) {
   const w = words(mn);
   return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p)
-    .replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn))
+    .replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/\{paws\}/g, w.paws || "paws")
     // a word dropped in at the start of a sentence gets its capital (live: "That's alright. cows don't need words.")
     .replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
 }

@@ -5,10 +5,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.94.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.95.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.3** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.95.0 + Conditioning 1.1.3: your books come back when you're approved again, and the lines sweep: nobody hears about parts they haven't got, a gentler milk nag, hooves on a horse** From the suggestion box, Laynie, Nov 23: "#8/22 yes, that seems fair", "it definitely is worth a sweep", "#35 could be fixable", "#48 could be fixable", "#54 please fix".
+  - **Your books come back** (Nikto's #8 and #22: "lost all my ribbons, had to redo the application and lost all the stats, achievements"). Somebody taken off the books (?unregister, a contract never signed, the farm girl never friended back) always had their paperwork kept in the archive, but nothin' put it back. Now when staff ?approve somebody the archive knows, what was theirs comes back first: ribbons, titles, feats, trophies, the album, ink and brands, trained holes, their farm numbers, trap ranks, marks, bought roam passes, every switch they'd set, their kinks and their words for themselves, and their old application to see again. Never their roles (staff give those), contracts, herds, keys, or anything that was happenin' to them right then (gear, a trap, a parasite, a pregnancy, what was in them). The new application's answers win. Staff see what came back, and they're welcomed back with it.
+  - **Pussy lines on men** (Nikto's #11, #12, #18). The farm already left out lines with pussy, womb or clit for somebody without one, but not "right where they're wettest", which went to men. Wettest, labia, snatch, twat, quim and honeypot count now. The heat mist and the heat tease have their own lines for a cock ("leakin' a steady string onto the straw") and for no pussy. The naga trap "fills you at both ends" instead of "takes two holes at once". A potion's line was never fitted to the body at all; it is now.
+  - **Cock lines on folk without one** (Lyn's #35, ?wash). The farm never checked a line about somebody's OWN cock: now "%n's cock", "your balls" and the like are left out for a body without one (somebody else's cock is anybody's to hear about). And when nothin' in a pool fit somebody, it used to fall back on any line, even one tagged for a cock; now it takes an untagged one and swaps the words (a cock becomes a clit, or the crotch).
+  - **The overdue-milk nag** (Ella's #48 👎): every half hour instead of every ten minutes, and nine lines instead of three.
+  - **Paws on a horse** (Lucira's #54): the Conditioning script said "your hands are paws now" to anybody in hoof mitts. It says hooves for a cow, pony, horse, goat, sheep, pig, bull or deer, claws for a dragon, and paws for the rest.
+  - **The toffee apple endin'** (Rosey's #61 👎) is rewritten, sticky and hot instead of stiff and cute.
 
 - **Bot 0.94.0 + Companion 0.76.0: the farm girl's whistle in the Companion, half-hour passes on permanent contracts, the farm outfit back on when you're home, ears and tails left on, and your own knot's timer** Laynie, Nov 23: "It might be worth building the farm girls summon into the companion itself, so summoning cattle back doesnt rely on bc plus or being friends", then yes to 30 seconds' warnin', pullin' them from anywhere, BC+'s summon kept as a backup, "might let perm contracts buy roaming passes, but theirs runs 30 minutes of freedom instead of a hour", and "also reapplying their farm outfits upon them returning, if contracted and anything is missing".
   - **The whistle lives in the Companion now.** Off the farm the farm girl can only reach somebody by beep, and a beep only arrives if they've friended her, so the Companion keeps their roam rules on their own computer while they're on the farm, and keeps the time itself once they're off it. A note at 10 and 2 minutes left on a pass. Out of time, or out with no pass: 30 seconds' warnin', then it walks them home, out of wherever they are (past a leash or a locked door, the way BC+'s summon does it) and into the farm. A full farm: in the moment there's a space. Busy in the wardrobe or crafting: it waits a few minutes for them.

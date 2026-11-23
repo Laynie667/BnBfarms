@@ -1362,7 +1362,10 @@
             && !isProprietor(sender)){
           R("Sorry, sugar, hirin' staff (farmhand, mandated, herdmaster) is just for the proprietors. You can still approve livestock, guest, luxury or gloryhole."); break;
         }
+        const fresh = !L.people[t];
         const r = rec(t,true);
+        // back on the books after bein' taken off: what was theirs comes back from the archive first (10uo2-books-back.js)
+        let back = null; if (fresh){ try { back = booksBack(t); } catch(e){ warn("books back:", e); } }
         r.name = plainName(t); r.registeredAt = Date.now();
         for (const role of roles) if (!r.roles.includes(role)) r.roles.push(role);
         const idx = L.applications.findIndex(a=>a.mn===t);
@@ -1388,7 +1391,9 @@
           ready = "\n\n📜 They asked for "+dp.label+", "+d.label+". It's ready when you are: ?contract show "+dp.key+" "+t+" to look it over, then ?contract offer "+dp.key+" "+t+" "+d.key+" to send it.";
         }
         R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready+
-          (r.contractBy ? "\n⏳ They have "+CFG.CONTRACT_GRACE_H+" hours to sign a farm contract, or they come off the books." : ""));
+          (r.contractBy ? "\n⏳ They have "+CFG.CONTRACT_GRACE_H+" hours to sign a farm contract, or they come off the books." : "")+
+          (back ? "\n📦 Back on the books: their old ribbons ("+back.ribbons+"), feats, switches and farm numbers came back from the archive." : ""));
+        if (back) later(() => tell(t, "📦 Welcome back, sugar. The farm kept your books: your "+back.ribbons+" ribbons, your feats, your farm numbers and every switch you'd set are just how you left them."), 6000);
         outfitsLedger();
         if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t) && !/^farm:/.test(outfitSlotFor(t)) && !rec(t).ownOutfit) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4000);   // (the farm's own starter outfits go on with their first contract, once: 10b-contracts.js)
         beep(t,

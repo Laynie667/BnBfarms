@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.94.0
+// @version      0.95.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3131,7 +3131,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.94.0";
+  var VERSION = "0.95.0";
   var COMPANION_VERSION = "0.76.0";
 
   // bot-parts:farmhand-bot-parts
@@ -13773,7 +13773,12 @@
       musk: ["The Blue Ribbon Musk on %n's skin has the stud halfway to mindless.", "Whoever's at %n can't stop breathin' in the musk on their neck."],
       clover: ["Milk sprays from %n's Clover-swollen teats with every thrust.", "%n's heavy breasts leak a warm stream down their belly the whole time."],
       heavy: ["%n's overfull udder swings and leaks, achin' with every slam.", "Every thrust squeezes milk out of %n's swollen, untouchable teats."],
-      heatmist: ["%n is so wet from the heat mist it's pourin' down their thighs.", "%n's heat-flushed pussy grips like it's been waitin' all day."],
+      heatmist: [
+        "{v}%n is so wet from the heat mist it's pourin' down their thighs.",
+        "{v}%n's heat-flushed pussy grips like it's been waitin' all day.",
+        "{c}%n's cock won't go down in the heat mist: it's leakin' a steady string onto the straw.",
+        "{nv}%n's flushed and squirmin' from the heat mist, their ass clenchin' on nothin', hungry for somethin' to fill it."
+      ],
       needy: ["%n is so needy they're pushin' back for more before it's even started.", "%n sobs with relief at bein' filled at last."],
       bitterroot: ["%n gets close, so close, and the Bitterroot snatches it away again. Ruined, and still bein' used.", "%n whines; the Bitterroot won't let 'em cum no matter how good it feels."],
       golden: ["%n goes off like a firework, golden and shakin', the second they're touched.", "%n cums almost at once, glowin' and loose."],
@@ -13784,7 +13789,7 @@
       const on = activePotions(mn).map((f) => f.id).filter((id2) => FX_BITS[id2]);
       if (!on.length) return "";
       const id = on[Math.floor(Math.random() * on.length)];
-      return fxFill(pickFresh("fxbit:" + id, FX_BITS[id]), mn, (rec(mn).fx || {})[id]);
+      return fxFill(bodyWords(mn, pickFor(mn, "fxbit:" + id, FX_BITS[id])), mn, (rec(mn).fx || {})[id]);
     }
     const FARM_SLICES = [
       // rewards
@@ -16492,7 +16497,8 @@
       boar: { icon: "\u{1F417}", what: "the boar that lives in the wallow, and a long, muddy tie", limit: /\b(mud|filth|humiliat|knot)/i },
       toms: { icon: "\u{1F408}", what: "two barn toms with barbs that leave you in heat", limit: /\b(barb|pain)/i },
       drake: { icon: "\u{1F409}", what: "a dragon-man who breeds you on his nest and leaves a clutch", limit: null },
-      naga: { icon: "\u{1F40D}", what: "a naga who coils you up and takes two holes at once", limit: /\b(double|coil|snake)/i },
+      naga: { icon: "\u{1F40D}", what: "a naga who coils you up and fills you at both ends", limit: /\b(double|coil|snake)/i },
+      // (Nov 23, Nikto's #12: "two holes" made no sense for a man)
       kennel: { icon: "\u{1F415}", what: "a latched kennel and a mastiff who trains you on his knot", limit: /\b(knot|anal|cage)/i },
       hive: { icon: "\u{1F41D}", what: "a hive queen who feeds you honey and lays in you", limit: /\b(insect|bug)/i },
       goat: { icon: "\u{1F410}", what: "a billy goat who puts you on your knees and uses your mouth", limit: /\b(oral|throat)/i },
@@ -23310,7 +23316,8 @@
         "Don't wipe it. It's the farm's now, same as you."
       ],
       heat: [
-        "Your heat's got you so wet and twitchy you can't sit still, sugar.",
+        "{v}Your heat's got you so wet and twitchy you can't sit still, sugar.",
+        "{nv}Your heat's got you leakin' and twitchy, sugar. You can't sit still for wantin' somethin' in you.",
         "The studs can smell you from across the yard. Their heads come up when you pass.",
         "You keep brushin' up against things. Fences. Posts. People. Somethin's got to scratch that itch.",
         "That hot needy throb won't quiet down till somebody fills you. You know it won't.",
@@ -24955,6 +24962,125 @@
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __latch: (m, h) => parasiteLatch(m, h), __svc: () => svc() });
     addCommand("services service coax", { topic: "services", run: (c) => serviceCommand(c.cmd, c.sender, c.args, c.R) });
+    const BOOKS_BACK = [
+      "species",
+      "gender",
+      "chest",
+      "futa",
+      "anthro",
+      "callMe",
+      "nameSet",
+      "herdWord",
+      "ribbons",
+      "ribbonsEver",
+      "buys",
+      "roamPasses",
+      "titles",
+      "tier",
+      "feats",
+      "trophies",
+      "album",
+      "tats",
+      "tatSeen",
+      "brand",
+      "branded",
+      "holes",
+      "prod",
+      "studForms",
+      "waterForms",
+      "milkCums",
+      "trapRank",
+      "trapN",
+      "trapLog",
+      "wildN",
+      "chainN",
+      "quotaBest",
+      "naughtyMarks",
+      "praised",
+      "degraded",
+      "corr",
+      "corrMarks",
+      "corrBy",
+      "corrGrew",
+      "corrBrand",
+      "corrWord",
+      "corrNoise",
+      "symbioteN",
+      "parasiteN",
+      "tentacled",
+      "broodWomb",
+      "bredBack",
+      "teaseOptIn",
+      "teaseMe",
+      "trapsOn",
+      "trapsOff",
+      "trapKinds",
+      "trapThemesOff",
+      "trapEager",
+      "trapRate",
+      "trapSev",
+      "trapQuiet",
+      "intensity",
+      "breedable",
+      "freeuse",
+      "fertile",
+      "naturalHeat",
+      "hypno",
+      "echs",
+      "potionsOn",
+      "daresOn",
+      "benchOn",
+      "parasiteOn",
+      "symbioteOn",
+      "praiseMe",
+      "degradeMe",
+      "watersports",
+      "mpreg",
+      "messesOn",
+      "chatlogOn",
+      "jarok",
+      "milkable",
+      "seedMilk",
+      "pinMe",
+      "wildIn",
+      "wildLimbs",
+      "wildLaced",
+      "lscgSplat",
+      "stallDial",
+      "ownOutfit",
+      "rateAskOff",
+      "neverCall",
+      "noGroom",
+      "noBed",
+      "kryptonite",
+      "kryptoSafe",
+      "limits",
+      "triggers",
+      "aftercare"
+    ];
+    const PROD_NOW = ["eggs", "preg", "heat", "tieUntil", "tiedTo", "pin", "stall", "lastFill", "scent", "deniedUntil", "milkDeniedUntil", "pentUp", "toyAt"];
+    function booksBack(t) {
+      const r = rec(t), old = L2.archive && L2.archive[t];
+      if (!r || !old || old === r) return null;
+      let n = 0;
+      for (const k of BOOKS_BACK) {
+        if (old[k] === void 0 || old[k] === null || old[k] === "") continue;
+        r[k] = JSON.parse(JSON.stringify(old[k]));
+        n++;
+      }
+      if (r.prod) {
+        for (const k of PROD_NOW) delete r.prod[k];
+        r.prod.held = { vulva: 0, butt: 0, mouth: 0 };
+        r.prod.boosts = {};
+        r.prod.last = Date.now();
+      }
+      if (old.application) r.oldApplication = JSON.parse(JSON.stringify(old.application));
+      r.booksBackAt = Date.now();
+      saveLedger();
+      audit(CFG.BOT_MEMBER, "BOOKS_BACK", t + " " + n + " kept");
+      return { n, ribbons: r.ribbons || 0, feats: r.feats ? Object.keys(r.feats).length : 0 };
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __booksBack: (t) => booksBack(t) });
     const NURSERY_LINES = {
       // ── little space, on and off ──
       spaceOn: [
@@ -35582,7 +35708,7 @@
           bodyMark(mn, { splat: ["chest"], color: "#FFFFFF", mess: "milk" });
         }
       }
-      if (st >= 4 && now - (p.fullNag || 0) > 10 * 6e4 && !quietNow(mn) && charFor(mn)) {
+      if (st >= 4 && now - (p.fullNag || 0) > (CFG.OVERDUE_NAG_MIN || 30) * 6e4 && !quietNow(mn) && charFor(mn)) {
         p.fullNag = now;
         privateLine(mn, uLine("over4nag", mn), "emote");
         arouse(mn, 8, 90);
@@ -36184,10 +36310,17 @@
       over2: ["A bead of milk wells at each teat and runs. You're leakin', and you can't stop it."],
       over3: ["They're hard as melons now and hot to the touch, the skin shiny with it. Every heartbeat throbs in them."],
       over4: ["You can't think. There's only how full you are, the ache, the drip, and the need to have somethin' latch on and take it."],
+      // (Nov 23, Ella's #48 👎: three lines, every ten minutes, for hours. Now every half hour, and more of them)
       over4nag: [
         "Milk is runnin' down your belly in two steady lines. You'd let anybody milk you right now. Anybody.",
         "Your udders are so tight they shake when you breathe. You catch yourself squeezin' them and it only makes it worse.",
-        "You're dribblin' with every step and lowin' under your breath. Get to a stall."
+        "You're dribblin' with every step and lowin' under your breath. Get to a stall.",
+        "Every heartbeat throbs in your teats. They're hot, hard and shinin', and the smallest brush of cloth makes you gasp.",
+        "You've soaked through again. The straw where you were standin' is wet and sweet-smellin', and everybody can tell why.",
+        "You keep cuppin' your udders without meanin' to, tryin' to take the weight. It doesn't help. Nothin' helps but a milker.",
+        "A drop beads on each teat, swells, and runs. Then another. You've stopped bein' able to tell when it starts.",
+        "Your back aches from the weight out front. You'd crawl to the stall on your knees if it meant gettin' emptied.",
+        "The sound of the pump from the dairy makes your teats tingle and let down on their own. Go. Get to a stall."
       ],
       overRoom2: [
         "Two wet patches are spreadin' down %n's front. Somebody's overdue for milkin' and startin' to leak.",
@@ -36535,7 +36668,7 @@
       },
       vines: {
         tender: ["The vines wrap %n like they're holdin' somethin' precious.", "The pollen comes in a warm sigh, and the heat it brings is slow and lovely.", "The pods go in gentle, and the vines stroke their belly after like they're proud."],
-        filthy: ["Vines up every hole at once and %n's lettin' them, hips goin' like a bitch in season.", "The pollen has them so wet the vines slide in and out squelchin'.", "Planted full of seed pods and left drippin' sap down both thighs."]
+        filthy: ["Vines up every hole at once and %n's lettin' them, hips goin' like a bitch in season.", "The pollen has them so slick the vines slide in and out squelchin'.", "Planted full of seed pods and left drippin' sap down both thighs."]
       },
       slime: {
         tender: ["The slime is warm and it moves over %n like slow water, curious, not cruel.", "It eats their clothes a thread at a time and leaves their skin soft as a baby's.", "It settles in their lap and hums, and %n finds themselves strokin' it back."],
@@ -36917,7 +37050,8 @@
     const TRAP_SOUND_END = { collection: "unlatch", stocks: "wood", saddle: "unlatch", net: "straw", crate: "gate", carousel: "unlatch", milker: "unlatch", clamp: "lock", pump: "hiss", winch: "chain", kennel: "gate", cups: "unlatch", weights: "unlatch", breeder: "unlatch", paddle: "paddle", wolves: "chain" };
     const CUSTOM_SOUND = { dose: "clip", hold: "cuffs", fill: "inflate", breed: "machine", strip: "rip", write: "clip" };
     const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|nb|ok|np|nn|v|c|t|f|m)\})+/;
-    const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+    const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix|wettest|labia|snatch|twats?|quim|honeypot)\b/i;
+    const OWN_COCK = /(%n's|\byour|\btheir own|\btheir) (hard |stiff |achin' |aching |throbbin' |throbbing |leakin' |leaking |swollen |caged |little |neglected |poor |pretty little |fat |heavy )?(cock|dick|prick|cockhead|balls)\b/i;
     const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
     const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
     const NPC_GIRL = /\b(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) girls?\b/gi;
@@ -36952,6 +37086,7 @@
       if (BODY_TAG.test(s)) return true;
       if (!b.vulva && VULVA_WORDS.test(s)) return false;
       if (!b.tits && TITS_WORDS.test(s)) return false;
+      if (!b.cock && OWN_COCK.test(s)) return false;
       if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s.replace(NPC_GIRL, ""))) return false;
       return true;
     }
@@ -36960,12 +37095,30 @@
         if (!Array.isArray(list2) || !list2.length || !rec(mn)) return pickFresh(key, list2);
         const b = bodyOf(mn), tagged = list2.filter((l) => tagsFit(l, b)), best = tagged.filter((l) => wordsFit(l, b));
         if (W.__FARMHAND_TEST__ && typeof W.__pickSeen === "function") W.__pickSeen(key, list2);
-        return pickFresh(key, best.length ? best : tagged.length ? tagged : list2);
+        const untagged = list2.filter((l) => !BODY_TAG.test(String(l)));
+        return pickFresh(key, best.length ? best : tagged.length ? tagged : untagged.length ? untagged : list2);
       } catch (e) {
         return pickFresh(key, list2);
       }
     }
-    const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
+    const SWAP_NO_VULVA = [
+      [/\bpussies\b/g, "asses"],
+      [/\bpussy\b/g, "ass"],
+      [/\bcunts\b/g, "holes"],
+      [/\bcunt\b/g, "hole"],
+      [/\bslit\b/g, "crack"],
+      [/\bwomb\b/g, "belly"],
+      [/\bcervix\b/g, "guts"],
+      [/\bclit\b/g, "cock"],
+      [/\bwettest\b/g, "neediest"],
+      [/\blabia\b/g, "rim"],
+      [/\bsnatch\b/g, "hole"],
+      [/\btwats\b/g, "holes"],
+      [/\btwat\b/g, "hole"],
+      [/\bquim\b/g, "hole"],
+      [/\bhoneypot\b/g, "hole"]
+    ];
+    const swapNoCock = (t, vulva) => t.replace(new RegExp(OWN_COCK.source, "gi"), (m, who, adj, part) => who + " " + (adj || "") + (/^balls$/i.test(part) ? vulva ? "pussy" : "crotch" : vulva ? "clit" : "crotch"));
     const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
     const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
     const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "beast"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
@@ -36975,8 +37128,9 @@
         const written = BODY_TAG.test(String(text));
         let t = String(text).replace(BODY_TAG, "");
         if (written || !mn || !L2 || !L2.people || !L2.people[mn]) return t;
-        if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
+        if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !OWN_COCK.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
         const b = bodyOf(mn);
+        if (!b.cock) t = swapNoCock(t, b.vulva);
         if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
         if (!b.tits) for (const [re, w] of b.g === "femboy" ? SWAP_FEMBOY : SWAP_FLAT) t = t.replace(re, w);
         if (b.g === "male") for (const [re, w] of SWAP_MALE) t = t.replace(re, w);
@@ -62430,7 +62584,8 @@
         "{t}%n's let go with syrup set hard in two little amber drips off their nipples, and the farmhands argue about who gets to lick them off.",
         `The last farmhand licks the last of the syrup off %n's chin, says "best breakfast I've had," and unties the rope.`,
         "{c}%n's let go with syrup still settin' on their cock in a glossy shell, and every time they move it cracks a little.",
-        "%n peels their thighs apart with a sticky noise, and their arms off their sides, and walks home very slowly, sweet as a toffee apple."
+        // (Nov 23: the toffee apple line got a 👎, Rosey's #61. Stiff and cute, not hot. This one isn't.)
+        "%n's thighs come apart with a wet, sticky kiss when the rope drops, and they waddle home glazed head to toe, lickin' syrup off their own lips and achin' for somebody to finish the job."
       ]);
       end(BATCH2_LINES, "pieeat", "end", [
         "The judge hands %n a ribbon that says TRIED VERY HARD, pins it to their creamy collar, and points them to the hose.",
@@ -68178,7 +68333,16 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("Sorry, sugar, hirin' staff (farmhand, mandated, herdmaster) is just for the proprietors. You can still approve livestock, guest, luxury or gloryhole.");
             break;
           }
+          const fresh = !L2.people[t];
           const r = rec(t, true);
+          let back = null;
+          if (fresh) {
+            try {
+              back = booksBack(t);
+            } catch (e) {
+              warn("books back:", e);
+            }
+          }
           r.name = plainName(t);
           r.registeredAt = Date.now();
           for (const role of roles) if (!r.roles.includes(role)) r.roles.push(role);
@@ -68214,7 +68378,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             saveLedger();
             ready = "\n\n\u{1F4DC} They asked for " + dp.label + ", " + d.label + ". It's ready when you are: ?contract show " + dp.key + " " + t + " to look it over, then ?contract offer " + dp.key + " " + t + " " + d.key + " to send it.";
           }
-          R("\u2705 " + plainName(t) + " \u2014 " + roleString(t) + "\n\u{1F511} " + keyString(t) + (r.species ? "\n\u{1F43E} " + r.species : "") + (r.gender ? " \xB7 " + r.gender : "") + ready + (r.contractBy ? "\n\u23F3 They have " + CFG.CONTRACT_GRACE_H + " hours to sign a farm contract, or they come off the books." : ""));
+          R("\u2705 " + plainName(t) + " \u2014 " + roleString(t) + "\n\u{1F511} " + keyString(t) + (r.species ? "\n\u{1F43E} " + r.species : "") + (r.gender ? " \xB7 " + r.gender : "") + ready + (r.contractBy ? "\n\u23F3 They have " + CFG.CONTRACT_GRACE_H + " hours to sign a farm contract, or they come off the books." : "") + (back ? "\n\u{1F4E6} Back on the books: their old ribbons (" + back.ribbons + "), feats, switches and farm numbers came back from the archive." : ""));
+          if (back) later(() => tell(t, "\u{1F4E6} Welcome back, sugar. The farm kept your books: your " + back.ribbons + " ribbons, your feats, your farm numbers and every switch you'd set are just how you left them."), 6e3);
           outfitsLedger();
           if (L2.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t) && !/^farm:/.test(outfitSlotFor(t)) && !rec(t).ownOutfit) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4e3);
           beep(

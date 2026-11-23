@@ -57,7 +57,8 @@
       "You're still sloshin' when you walk. Every step reminds you who had you.",
       "Don't wipe it. It's the farm's now, same as you."],
     heat: [
-      "Your heat's got you so wet and twitchy you can't sit still, sugar.",
+      "{v}Your heat's got you so wet and twitchy you can't sit still, sugar.",
+      "{nv}Your heat's got you leakin' and twitchy, sugar. You can't sit still for wantin' somethin' in you.",
       "The studs can smell you from across the yard. Their heads come up when you pass.",
       "You keep brushin' up against things. Fences. Posts. People. Somethin's got to scratch that itch.",
       "That hot needy throb won't quiet down till somebody fills you. You know it won't.",

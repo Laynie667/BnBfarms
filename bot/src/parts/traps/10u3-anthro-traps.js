@@ -30,7 +30,7 @@
     boar:     { icon: "🐗", what: "the boar that lives in the wallow, and a long, muddy tie", limit: /\b(mud|filth|humiliat|knot)/i },
     toms:     { icon: "🐈", what: "two barn toms with barbs that leave you in heat", limit: /\b(barb|pain)/i },
     drake:    { icon: "🐉", what: "a dragon-man who breeds you on his nest and leaves a clutch", limit: null },
-    naga:     { icon: "🐍", what: "a naga who coils you up and takes two holes at once", limit: /\b(double|coil|snake)/i },
+    naga:     { icon: "🐍", what: "a naga who coils you up and fills you at both ends", limit: /\b(double|coil|snake)/i },   // (Nov 23, Nikto's #12: "two holes" made no sense for a man)
     kennel:   { icon: "🐕", what: "a latched kennel and a mastiff who trains you on his knot", limit: /\b(knot|anal|cage)/i },
     hive:     { icon: "🐝", what: "a hive queen who feeds you honey and lays in you", limit: /\b(insect|bug)/i },
     goat:     { icon: "🐐", what: "a billy goat who puts you on your knees and uses your mouth", limit: /\b(oral|throat)/i },

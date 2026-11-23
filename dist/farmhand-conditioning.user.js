@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      1.1.2
+// @version      1.1.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -176,7 +176,7 @@
       ],
       nhl: [
         "There was never a person. There was only ever a {a} that thought it was one.",
-        "Hands are paws. Words are noises. Wanting is waiting. That's all you need.",
+        "Hands are {paws}. Words are noises. Wanting is waiting. That's all you need.",
         "When you're touched, you push into it like an animal. When you're left, you wait like one.",
         "{t}Your udders are for milking. That's what they're for. That's what you're for.",
         "{c}You're for breeding now. Your cock knows it even if the rest of you forgets.",
@@ -225,8 +225,8 @@
       "The hood holds you close and quiet. Nothing in here but my voice."
     ],
     paws: [
-      "Your hands are paws now. Paws don't grab. Paws don't hold. Paws wait.",
-      "Feel how useless your paws are. Isn't it a relief, not having to do anything with them?"
+      "Your hands are {paws} now. {paws} don't grab. {paws} don't hold. {paws} wait.",
+      "Feel how useless your {paws} are. Isn't it a relief, not having to do anything with them?"
     ],
     arms: [
       "Your arms are tied, so you don't have to decide anything with them. Let them rest.",
@@ -364,8 +364,10 @@
     const w = Object.assign({}, SPECIES[key]), b = bodyOf(api, mn);
     if (b && (b.g === "male" || b.g === "femboy") && MALE[key]) Object.assign(w, MALE[key]);
     if (UDDER_KINDS.includes(key) && b && !b.tits) w.p = b.cock ? "heavy balls" : "body";
+    w.paws = HOOVES.includes(key) ? "hooves" : key === "dragon" ? "claws" : "paws";
     return w;
   }
+  var HOOVES = ["cow", "pony", "horse", "goat", "sheep", "pig", "bull", "deer"];
   function petName(mn) {
     const w = words(mn), r = api.rec(mn) || {}, t = me(mn).tier;
     const i = Math.max(0, Math.min(3, r.degradeMe ? t + 1 : r.praiseMe ? t - 1 : t));
@@ -373,7 +375,7 @@
   }
   function say(mn, line) {
     const w = words(mn);
-    return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+    return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/\{paws\}/g, w.paws || "paws").replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
   }
   var handful = (list, n, b) => {
     const pool = fitting(list, b).slice();
@@ -528,7 +530,7 @@
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "1.1.2",
+    version: "1.1.3",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
     setup(a) {

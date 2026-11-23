@@ -71,7 +71,9 @@
     musk: ["The Blue Ribbon Musk on %n's skin has the stud halfway to mindless.", "Whoever's at %n can't stop breathin' in the musk on their neck."],
     clover: ["Milk sprays from %n's Clover-swollen teats with every thrust.", "%n's heavy breasts leak a warm stream down their belly the whole time."],
     heavy: ["%n's overfull udder swings and leaks, achin' with every slam.", "Every thrust squeezes milk out of %n's swollen, untouchable teats."],
-    heatmist: ["%n is so wet from the heat mist it's pourin' down their thighs.", "%n's heat-flushed pussy grips like it's been waitin' all day."],
+    heatmist: ["{v}%n is so wet from the heat mist it's pourin' down their thighs.", "{v}%n's heat-flushed pussy grips like it's been waitin' all day.",
+               "{c}%n's cock won't go down in the heat mist: it's leakin' a steady string onto the straw.",
+               "{nv}%n's flushed and squirmin' from the heat mist, their ass clenchin' on nothin', hungry for somethin' to fill it."],
     needy: ["%n is so needy they're pushin' back for more before it's even started.", "%n sobs with relief at bein' filled at last."],
     bitterroot: ["%n gets close, so close, and the Bitterroot snatches it away again. Ruined, and still bein' used.", "%n whines; the Bitterroot won't let 'em cum no matter how good it feels."],
     golden: ["%n goes off like a firework, golden and shakin', the second they're touched.", "%n cums almost at once, glowin' and loose."],
@@ -82,5 +84,5 @@
     const on = activePotions(mn).map(f => f.id).filter(id => FX_BITS[id]);
     if (!on.length) return "";
     const id = on[Math.floor(Math.random() * on.length)];
-    return fxFill(pickFresh("fxbit:" + id, FX_BITS[id]), mn, (rec(mn).fx || {})[id]);
+    return fxFill(bodyWords(mn, pickFor(mn, "fxbit:" + id, FX_BITS[id])), mn, (rec(mn).fx || {})[id]);   // (fitted to their body: Nov 23)
   }

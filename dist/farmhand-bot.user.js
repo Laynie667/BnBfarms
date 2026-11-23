@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.93.1
+// @version      0.93.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2986,6 +2986,9 @@
   var FARM_DOSES = ["denial", "sedative", "needy", "hairtrigger", "bitterroot", "moo", "hiccup", "feather", "heat", "suggestible", "growcup", "gape", "growcock", "growballs", "reducing", "purge", "quicken"];
 
   // shared/seed.js
+  var SEED_DEFAULT_ML = 50;
+  var SEED_HOLE_MAX = 2e4;
+  var GALLON_ML = 3785;
   var SEED_GAP_MS = 10 * 6e4;
   var SEAL_WORDS = loosen(/\b(breeder['’]?s seal|breeding seal|sire['’]?s seal|(?:seed|cum) (?:seal|lock|keeper|stopper))\b/);
   function sealHolesOf(group) {
@@ -3007,9 +3010,91 @@
     }
     return out;
   }
+  var WORDN = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
   var UNIT = "(ml|mls|millilit(?:er|re)s?|cc|l|ltrs?|lit(?:er|re)s?|gal|gals|gallons?)";
   var NUM = "(\\d{1,3}(?:,\\d{3})+|\\d+(?:[.,]\\d+)?(?:\\s*\\/\\s*\\d+)?|half\\s+an?|an?\\s+half|(?:a\\s+)?quarter(?:\\s+of)?(?:\\s+an?)?|half|one|two|three|four|five|six|seven|eight|nine|ten|an?)";
   var AMOUNT = new RegExp("(?<![a-z0-9.,/])" + NUM + "[\\s_-]*(?:full[\\s_-]+)?" + UNIT + "(?![a-z])", "g");
+  function valueOf(s) {
+    s = String(s).trim().replace(/\s+/g, " ");
+    let m = /^(\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return Number(m[1]) / Math.max(1, Number(m[2]));
+    if (/^\d{1,3}(,\d{3})+$/.test(s)) return Number(s.replace(/,/g, ""));
+    if (/^\d/.test(s)) return Number(s.replace(",", "."));
+    if (/half/.test(s)) return 0.5;
+    if (/quarter/.test(s)) return 0.25;
+    return WORDN[s] || 1;
+  }
+  var mlOf = (n, u) => n * (/^(ml|mls|cc|millilit)/.test(u) ? 1 : /^gal/.test(u) ? GALLON_ML : 1e3);
+  function amountsIn(text) {
+    const out = [], t = String(text || "").toLowerCase();
+    AMOUNT.lastIndex = 0;
+    let m;
+    while (m = AMOUNT.exec(t)) {
+      const ml = mlOf(valueOf(m[1]), m[2]);
+      if (ml > 0) out.push({ ml: Math.min(SEED_HOLE_MAX, Math.round(ml)), at: m.index });
+    }
+    return out;
+  }
+  var HOLE_FIND = [
+    ["every", /\b(?:every|all|each)(?:[\s_-]+(?:of[\s_-]+)?(?:her|his|their|your|my|the|its|three|four))?[\s_-]+holes?\b/g],
+    ["both", /\bboth(?:[\s_-]+(?:of[\s_-]+)?(?:her|his|their|your|my|the))?[\s_-]+holes\b/g],
+    ["vulva", /\b(?:pussy|pussies|cunt|vulva|vagina\w*|womb|slit|cooch|twat|front[\s_-]?hole)\b/g],
+    ["butt", /\b(?:ass|arse|asshole|butt|butthole|anus|anal|rear|bum|backdoor|bowels?|back[\s_-]?hole)\b/g],
+    ["mouth", /\b(?:mouth|throat|oral|gullet|stomach)\b/g],
+    ["nips", /\b(?:nipples?|nips|teats?|tits?|titties|breasts?|boobs?|udders?)\b/g]
+  ];
+  function holesIn(text) {
+    const out = [], t = String(text || "").toLowerCase();
+    for (const [k, re] of HOLE_FIND) {
+      re.lastIndex = 0;
+      let m;
+      while (m = re.exec(t)) out.push({ k, at: m.index });
+    }
+    return out.sort((a, b) => a.at - b.at);
+  }
+  var CLAUSE = /(?<!\d),|,(?!\d)|[;|\n]+|\.(?!\d)|\s(?:then|plus)\s/;
+  function seedAmounts(text) {
+    const t = String(text || "").toLowerCase().replace(/_+/g, " "), out = {};
+    const add = (k, v) => {
+      out[k] = Math.min(SEED_HOLE_MAX, (out[k] || 0) + Math.max(0, Math.round(v)));
+    };
+    const orphanH = [], orphanA = [];
+    for (const c of t.split(CLAUSE)) {
+      if (!c || !c.trim()) continue;
+      const A = amountsIn(c), H = holesIn(c);
+      if (!H.length) {
+        for (const a of A) orphanA.push(a.ml);
+        continue;
+      }
+      if (!A.length) {
+        for (const x of H) orphanH.push(x.k);
+        continue;
+      }
+      if (A.length === 1) {
+        for (const x of H) add(x.k, A[0].ml);
+        continue;
+      }
+      if (A.length === H.length) {
+        H.forEach((x, i) => add(x.k, A[i].ml));
+        continue;
+      }
+      for (const x of H) {
+        let best = A[0], bd = Infinity;
+        for (const a of A) {
+          const d = Math.abs(a.at - x.at);
+          if (d < bd) {
+            bd = d;
+            best = a;
+          }
+        }
+        add(x.k, best.ml);
+      }
+    }
+    if (orphanH.length) orphanH.forEach((k, i) => add(k, orphanA.length ? orphanA[Math.min(i, orphanA.length - 1)] : SEED_DEFAULT_ML));
+    else if (orphanA.length && !Object.keys(out).length) add("any", orphanA.reduce((a, b) => a + b, 0));
+    if (!Object.keys(out).length) add("any", SEED_DEFAULT_ML);
+    return out;
+  }
 
   // shared/guides.js
   var PUBLIC_GROUPS = [
@@ -3046,7 +3131,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.93.1";
+  var VERSION = "0.93.2";
   var COMPANION_VERSION = "0.75.1";
 
   // bot-parts:farmhand-bot-parts
@@ -3099,8 +3184,8 @@
       KEEPALIVE_NUDGE: false,
       // also shuffle position occasionally (off Oct 24: the hidden keep-alive is enough, and the hop read as the bot leavin' its home spot)
       NUDGE_MIN: 11,
-      WATCHDOG_MIN: 5,
-      // reload the page if broken this long
+      WATCHDOG_MIN: 10,
+      // reload the page if broken this long (Nov 23: the bot reopens its own connection first, 06b-relog.js)
       WATCHDOG_ENABLED: true,
       KEY_SYNC_ENABLED: true,
       KEY_SYNC_ON_JOIN: true,
@@ -5171,7 +5256,7 @@
       } catch (e) {
       }
       const mins = Math.round((Date.now() - state.lastHealthy) / 6e4);
-      return "Farmhand v" + VERSION + "\n\nGame found:   " + (typeof W.ServerSend === "function") + "\nLogged in:    " + isLoggedIn() + "\nIn room:      " + inRoom() + "\nRoom admin:   " + botIsAdmin() + "\nTimer:        " + (state.worker ? "worker \u2705" : "setInterval \u26A0\uFE0F") + "\nLast healthy: " + mins + " min ago\nFriends:      " + fl + "\nHeard msgs:   " + state.heard + "\nCompanions:   " + companionCount() + "\nSend queue:   " + state.queue.length + (state.urgent.length ? " (+" + state.urgent.length + " urgent)" : "") + "\nMap saved:    " + (L2 && L2.roomSnapshot ? new Date(L2.roomSnapshot.at).toLocaleString() : "not yet") + "\nRegistered:   " + Object.keys(L2 ? L2.people : {}).length + "\nOn call:      " + forcedStaff().length + "\nPending apps: " + (L2 ? L2.applications.length : 0) + "\nUser saved:   " + (c.user ? "yes (" + c.user + ")" : "NO");
+      return "Farmhand v" + VERSION + "\n\nGame found:   " + (typeof W.ServerSend === "function") + "\nLogged in:    " + isLoggedIn() + "\nIn room:      " + inRoom() + "\nRoom admin:   " + botIsAdmin() + "\nTimer:        " + (state.worker ? "worker \u2705" : "setInterval \u26A0\uFE0F") + "\nLast healthy: " + mins + " min ago\nDrops:        " + dropsText() + "\nFriends:      " + fl + "\nHeard msgs:   " + state.heard + "\nCompanions:   " + companionCount() + "\nSend queue:   " + state.queue.length + (state.urgent.length ? " (+" + state.urgent.length + " urgent)" : "") + "\nMap saved:    " + (L2 && L2.roomSnapshot ? new Date(L2.roomSnapshot.at).toLocaleString() : "not yet") + "\nRegistered:   " + Object.keys(L2 ? L2.people : {}).length + "\nOn call:      " + forcedStaff().length + "\nPending apps: " + (L2 ? L2.applications.length : 0) + "\nUser saved:   " + (c.user ? "yes (" + c.user + ")" : "NO");
     }
     function exportLedger() {
       const txt = JSON.stringify(L2, null, 2);
@@ -5366,6 +5451,14 @@
         return;
       }
       const now = Date.now();
+      if (state.dupUntil > now) {
+        setBadge("the bot's account was opened somewhere else: takin' it back in " + Math.ceil((state.dupUntil - now) / 6e4) + " min", "#ffc49b");
+        return;
+      }
+      if (!serverUp()) {
+        if (!reopen()) setBadge("waitin' for the server to come back\u2026", "#ffc49b");
+        return;
+      }
       if (now - state.lastLoginAttempt < (state.loginTried >= 3 ? 12e4 : 15e3)) return;
       try {
         const a = W.document.activeElement;
@@ -5374,10 +5467,6 @@
           return;
         }
       } catch (e) {
-      }
-      if (!serverUp()) {
-        setBadge("waitin' for the server to come back\u2026", "#ffc49b");
-        return;
       }
       state.lastLoginAttempt = now;
       state.loginTried++;
@@ -5487,6 +5576,125 @@
         warn(e);
       }
     }
+    if (CFG.RECONNECT_FIRST_S === void 0) CFG.RECONNECT_FIRST_S = 10;
+    if (CFG.RECONNECT_MAX_S === void 0) CFG.RECONNECT_MAX_S = 120;
+    if (CFG.DUP_LOGIN_WAIT_MIN === void 0) CFG.DUP_LOGIN_WAIT_MIN = 3;
+    if (CFG.DROP_TELL_MIN === void 0) CFG.DROP_TELL_MIN = 5;
+    const DROPS_KEY = "bnb_drops", DROPS_KEEP = 20;
+    function dropsList() {
+      try {
+        const d = JSON.parse(GM_getValue(DROPS_KEY, "[]"));
+        return Array.isArray(d) ? d : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function dropsSave(d) {
+      try {
+        GM_setValue(DROPS_KEY, JSON.stringify(d.slice(-DROPS_KEEP)));
+      } catch (e) {
+      }
+    }
+    const dropWords = (w) => ({
+      ErrorRateLimited: "the server cut it off for sendin' too much",
+      ErrorDuplicatedLogin: "the bot's account was opened somewhere else",
+      "transport close": "the line went",
+      "transport error": "the line went",
+      "ping timeout": "no answer from the server in time",
+      "io server disconnect": "the server closed it",
+      "io client disconnect": "the game closed it"
+    })[w] || w || "the line went";
+    function dropped(why) {
+      const now = Date.now();
+      why = String(why || "");
+      if (why === "ErrorDuplicatedLogin") state.dupUntil = now + CFG.DUP_LOGIN_WAIT_MIN * 6e4;
+      if (state.droppedAt) {
+        if (why && !state.dropWhy) {
+          state.dropWhy = why;
+          const d2 = dropsList(), last = d2[d2.length - 1];
+          if (last && !last.back) {
+            last.why = why.slice(0, 40);
+            dropsSave(d2);
+          }
+        }
+        return;
+      }
+      state.droppedAt = now;
+      state.dropWhy = why;
+      state.reconnectTries = 0;
+      state.reconnectAt = 0;
+      const d = dropsList();
+      d.push({ at: now, why: why.slice(0, 40) });
+      dropsSave(d);
+      warn("Dropped: " + dropWords(why) + ".");
+    }
+    function droppedBack() {
+      if (!state.droppedAt) return;
+      const mins = Math.round((Date.now() - state.droppedAt) / 6e4), why = state.dropWhy;
+      const d = dropsList(), last = d[d.length - 1];
+      if (last && !last.back) {
+        last.back = Date.now();
+        dropsSave(d);
+      }
+      state.droppedAt = 0;
+      state.dropWhy = "";
+      state.reconnectTries = 0;
+      state.reconnectAt = 0;
+      state.dupUntil = 0;
+      log("Back on duty after a drop of " + mins + " min (" + dropWords(why) + ").");
+      if (mins >= CFG.DROP_TELL_MIN) {
+        try {
+          for (const p of CFG.PROPRIETORS) beep(p, "\u{1F4F6} The farm office dropped " + mins + " minutes ago, " + dropWords(why) + ", and it's back on duty now.");
+        } catch (e) {
+        }
+      }
+    }
+    function reopen() {
+      const s = W.ServerSocket, now = Date.now();
+      if (!s || typeof s.connect !== "function" || s.connected) return false;
+      if (!state.droppedAt) dropped("");
+      if (state.dupUntil > now) return false;
+      if (s.active && now - state.droppedAt < CFG.RECONNECT_MAX_S * 1e3) return false;
+      const wait = Math.min(CFG.RECONNECT_MAX_S, CFG.RECONNECT_FIRST_S * Math.pow(2, state.reconnectTries || 0)) * 1e3;
+      if (now - Math.max(state.droppedAt, state.reconnectAt || 0) < wait) return false;
+      state.reconnectAt = now;
+      state.reconnectTries = (state.reconnectTries || 0) + 1;
+      log("The connection's closed: openin' it again (try " + state.reconnectTries + ").");
+      setBadge("reconnectin'\u2026 (" + state.reconnectTries + ")", "#ffc49b");
+      try {
+        s.connect();
+        return true;
+      } catch (e) {
+        warn("reconnect:", e);
+        return false;
+      }
+    }
+    function leaveQuietly() {
+      try {
+        W.onbeforeunload = null;
+      } catch (e) {
+      }
+      try {
+        const P = W.BeforeUnloadEvent && W.BeforeUnloadEvent.prototype;
+        if (P) {
+          Object.defineProperty(P, "returnValue", { configurable: true, get() {
+            return "";
+          }, set() {
+          } });
+          Object.defineProperty(P, "preventDefault", { configurable: true, writable: true, value: function() {
+          } });
+        }
+      } catch (e) {
+        warn("leave prompt:", e);
+      }
+    }
+    function dropsText() {
+      const d = dropsList().slice(-4);
+      if (!d.length) return "none written down";
+      const clock2 = (t) => new Date(t).toLocaleString(void 0, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      return d.map((x) => clock2(x.at) + ": " + dropWords(x.why) + (x.back ? ", back after " + Math.max(0, Math.round((x.back - x.at) / 6e4)) + " min" : ", not back yet")).join(" \xB7 ");
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __reopen: reopen, __dropped: dropped, __droppedBack: droppedBack, __dropsList: dropsList, __leaveQuietly: leaveQuietly, __watchdog: () => watchdog(), __dropsText: dropsText });
     function keepalive() {
       const now = Date.now();
       if (now - state.lastKeepalive < CFG.KEEPALIVE_MIN * 6e4) return;
@@ -5528,10 +5736,18 @@
       }
     }
     function watchdog() {
-      if (!CFG.WATCHDOG_ENABLED || state.reloading || state.dormant) return;
+      if (!CFG.WATCHDOG_ENABLED || state.dormant) return;
+      if (state.reloading) {
+        if (Date.now() - state.reloading < 12e4) return;
+        state.reloading = 0;
+        warn("WATCHDOG: the reload didn't happen. Tryin' again.");
+      }
+      const broken = typeof W.ServerSend !== "function";
+      if (!broken && state.roomFullAt && Date.now() - state.roomFullAt < 6e4) return;
+      if (!broken && state.dupUntil > Date.now()) return;
       const stale = Date.now() - state.lastHealthy;
       if (stale > CFG.WATCHDOG_MIN * 6e4) {
-        state.reloading = true;
+        state.reloading = Date.now();
         warn("WATCHDOG: unhealthy for " + Math.round(stale / 6e4) + " min. Reloading.");
         setBadge("watchdog reload\u2026", "#ff9b9b");
         try {
@@ -5539,6 +5755,7 @@
         } catch (e) {
         }
         later(() => {
+          leaveQuietly();
           try {
             W.location.reload();
           } catch (e) {
@@ -7989,6 +8206,7 @@
     }
     function doCum(stud, t, hole, R, auto, opt) {
       opt = opt || {};
+      const S = opt.strap || null;
       if (!rec(stud)) {
         R("You need to be on the books for that, sugar. Say ?apply first!");
         return false;
@@ -7998,24 +8216,24 @@
         R(plainName(t) + " ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it).");
         return false;
       }
-      const gone = missing(stud, t);
+      const gone = missing(S ? S.wearer : stud, t);
       if (gone) {
         R(gone === stud ? "You've gotta be here on the map for that, sugar." : plainName(t) + " isn't here on the map right now, hon. You both need to be in the room.");
         return false;
       }
       if (!opt.second && !breedConsent(stud, t)) {
-        askBreed(stud, t, hole);
+        askBreed(stud, t, hole, S && S.wearer);
         R("I've asked " + plainName(t) + " first, sugar. Once they say yes, go right ahead.");
         return false;
       }
       const sp = prodOf(stud), tp = prodOf(t);
-      seePenis(stud);
+      if (!S) seePenis(stud);
       seePenis(t);
       if (hole === "vulva" && !hasVulva(t)) {
         R(plainName(t) + " doesn't have a pussy to fill, hon. Try their ass or mouth, like ?cum " + plainName(t) + " ass. (If they're futa, they can say ?futa on.)");
         return false;
       }
-      const penBlock = makesSemen(stud) && holeBlocked(stud, "penis");
+      const penBlock = !S && makesSemen(stud) && holeBlocked(stud, "penis");
       if (penBlock) {
         R("Can't do it, sugar: your cock is locked up in " + penBlock + ". Get it off first!");
         blockedTease(stud, t, hole, penBlock, true);
@@ -8028,12 +8246,12 @@
         blockedTease(stud, t, hole, holeBlock, false);
         return false;
       }
-      if (sp.deniedUntil > Date.now()) {
+      if (!S && sp.deniedUntil > Date.now()) {
         R("\u{1F6AB} Not yet, sugar. You're denied for " + Math.ceil((sp.deniedUntil - Date.now()) / 6e4) + " more minutes. Ache for it.");
         return false;
       }
       const T = makesSemen(stud) ? typeInfo(stud) : CFG.PENIS_TYPES.human;
-      const knot = makesSemen(stud) && knotted(stud);
+      const knot = !S && makesSemen(stud) && knotted(stud);
       const pent = opt.load ? !!opt.pent : !!sp.pentUp;
       let load = opt.load || 0, rest = 0;
       if (!opt.load) {
@@ -8067,7 +8285,7 @@
         }
       }
       sp.totals.given += load;
-      const pen = sizeOf(stud, "penis"), need = penisNeeds(pen);
+      const pen = S ? S.size || 7 : sizeOf(stud, "penis"), need = penisNeeds(pen), tool = S ? "strap-on" : "cock";
       let gagged = 0, trained = false;
       const funnel = hole === "mouth" && funnelOn(t);
       const loose = hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t, "throat") && dispOn(t, "deepthroat");
@@ -8115,12 +8333,12 @@
         draconic: " Every ridge drags deliciously on the way.",
         double: opt.load || opt.half ? " Both cocks throb and unload at once." : ""
       }[penisType(stud)] || "";
-      let o = "\u{1F4A6} " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") " + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + holeText(hole)) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
+      let o = "\u{1F4A6} " + (S ? plainName(S.wearer) + " hits the edge with " + S.name + " buried in " + plainName(t) + ", and it pumps " + loadWord(load) + " (" + ml(load) + ") of " + plainName(stud) + "'s seed " : (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") ") + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + holeText(hole)) + "." + (makesSemen(stud) && !S ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
       if (sealOpen) o += " " + plainName(t) + "'s " + seal.name + " opens for " + plainName(stud) + " alone, and seals every drop in behind.";
       if (opt.edged) o += " Edged " + opt.edged + " time" + (opt.edged === 1 ? "" : "s") + " first, it just keeps on comin'.";
       if (hole === "mouth" && makesSemen(stud)) o += " " + seedTaste(stud, pent);
-      if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" cock and drools ' + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
-      if (loose) o += " Dosed loose, " + plainName(t) + "'s throat takes every inch of that " + pen + '" cock without a single gag' + (trained ? ", and it's learnin' fast: " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
+      if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" ' + tool + " and drools " + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
+      if (loose) o += " Dosed loose, " + plainName(t) + "'s throat takes every inch of that " + pen + '" ' + tool + " without a single gag" + (trained ? ", and it's learnin' fast: " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
       if (hole !== "mouth" && makesSemen(stud)) {
         const gape = sizeOf(t, hole);
         const needK = need + (knot ? 1 : 0);
@@ -8128,7 +8346,7 @@
         if (opt.rough) to = Math.min(CFG.SIZES[hole].max, to + 1);
         if (to > gape) {
           setSize(t, hole, to, false);
-          o += opt.rough ? " Pounded that hard, " + plainName(t) + "'s " + (hole === "vulva" ? "pussy" : "ass") + " is left " + sizeWord(hole, sizeOf(t, hole)) + " and twitchin'!" : " That " + pen + '" ' + sizeWord("penis", pen) + " cock leaves 'em " + sizeWord(hole, sizeOf(t, hole)) + "!";
+          o += opt.rough ? " Pounded that hard, " + plainName(t) + "'s " + (hole === "vulva" ? "pussy" : "ass") + " is left " + sizeWord(hole, sizeOf(t, hole)) + " and twitchin'!" : " That " + pen + '" ' + sizeWord("penis", pen) + " " + tool + " leaves 'em " + sizeWord(hole, sizeOf(t, hole)) + "!";
         } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
       }
       let caught = null;
@@ -8175,7 +8393,7 @@
         eggTypesNote(tp, clutch, penisType(stud) === "draconic" ? -16 : stud);
       }
       saveLedger();
-      audit(stud, "CUM", stud + "\u2192" + t + " " + hole + " " + Math.round(load));
+      audit(stud, "CUM", stud + "\u2192" + t + " " + hole + " " + Math.round(load) + (S ? " strap-on worn by " + S.wearer : ""));
       if (!opt.second && Math.random() < 0.6) {
         const tb = tailBit(t, hole, stud);
         if (tb) o += " " + tb;
@@ -8224,11 +8442,11 @@
     function okBreed(stud, t) {
       state.breedOk.set(t + ":" + stud, Date.now() + CFG.BREED_OK_H * 36e5);
     }
-    function askBreed(stud, t, hole) {
+    function askBreed(stud, t, hole, via) {
       const a = state.breedAsks.get(t), now = Date.now();
       if (a && a.stud === stud && now - a.at < 6e4) return;
-      state.breedAsks.set(t, { stud, hole: hole || null, at: now });
-      askCard(t, "breed", "\u{1F402} " + plainName(stud) + " wants to breed you" + (hole ? " (" + holeText(hole) + ")" : "") + ", sugar. Say yes or no (?yes or ?no works too). Say ?freeuse on if you'd rather never be asked.");
+      state.breedAsks.set(t, { stud, hole: hole || null, at: now, via: via || 0 });
+      askCard(t, "breed", (via ? "\u{1F402} " + plainName(via) + "'s strap-on is loaded with " + plainName(stud) + "'s seed, and it's in your " + (hole ? holeText(hole) : "hole") + ". Let " + plainName(stud) + "'s seed breed you, sugar? Say yes or no (?yes or ?no works too). " : "\u{1F402} " + plainName(stud) + " wants to breed you" + (hole ? " (" + holeText(hole) + ")" : "") + ", sugar. Say yes or no (?yes or ?no works too). ") + "Say ?freeuse on if you'd rather never be asked.");
     }
     function answerBreed(t, yes) {
       const a = state.breedAsks.get(t);
@@ -8238,6 +8456,21 @@
       }
       state.breedAsks.delete(t);
       const stud = a.stud;
+      if (a.via) {
+        if (!yes) {
+          tell(t, "Understood, hon. None of " + plainName(stud) + "'s seed goes in you.");
+          tell(a.via, "\u{1F402} " + plainName(t) + " said no to " + plainName(stud) + "'s seed, sugar. Your strap-on stays dry in them.");
+          return true;
+        }
+        okBreed(stud, t);
+        tell(a.via, "\u{1F402} " + plainName(t) + " said yes to " + plainName(stud) + "'s seed. Keep goin': when you hit the edge, that strap-on pumps it in.");
+        try {
+          strapCheck(a.via);
+        } catch (e) {
+          warn("strap-on:", e);
+        }
+        return true;
+      }
       if (!yes) {
         tell(t, "Understood, hon. I told " + plainName(stud) + " no.");
         tell(stud, "\u{1F402} " + plainName(t) + " said no, sugar. Please leave it be.");
@@ -8929,7 +9162,7 @@
       tick();
       return true;
     }
-    function onBodyActivity(act, focus, src, tgt) {
+    function onBodyActivity(act, focus, src, tgt, toy) {
       parasiteKiss(act, focus, src, tgt);
       try {
         symbioteTouch(act, focus, src, tgt);
@@ -8953,6 +9186,7 @@
         if (rec(tgt) && makesMilk(tgt)) nurse(tgt, src);
         return;
       } else return;
+      if (stud === src && toy && toy.AssetName && strapSeen(src, bred, hole, toy.AssetName, toy.GroupName)) return;
       if (!rec(stud) || !makesSemen(stud)) return;
       const rb = rec(bred);
       if (!rb || !rb.breedable || limitBlocks(bred)) return;
@@ -9158,8 +9392,9 @@
           tgt = old && old.MemberNumber;
         }
         const focus = pick("FocusGroupName") || String(data.Content || "").split("-")[1];
+        const toy = dict.find((d) => d && d.Tag === "ActivityAsset") || null;
         try {
-          onBodyActivity(String(act || ""), focus, src, tgt);
+          onBodyActivity(String(act || ""), focus, src, tgt, toy);
         } catch (e) {
           warn("body activity:", e);
         }
@@ -45851,6 +46086,98 @@
       tags: ["monsters", "pregnancy"],
       writes: ["SPAWNED", "NIXIE'S", "BROOK BRED", "PEARLS"]
     });
+    if (CFG.STRAP_EDGE === void 0) CFG.STRAP_EDGE = 90;
+    if (CFG.STRAP_REARM === void 0) CFG.STRAP_REARM = 70;
+    if (CFG.STRAP_AGAIN_S === void 0) CFG.STRAP_AGAIN_S = 120;
+    if (CFG.STRAP_IN_MIN === void 0) CFG.STRAP_IN_MIN = 4;
+    const STRAP_ASSET = /strap-?on/i;
+    const STRAP_WORDS = /\b(breeding|seeding|breeder)\b/i;
+    const strapText = (it) => {
+      const c = it && it.Craft;
+      return c ? (String(c.Name || "") + " " + String(c.Description || "")).replace(/_+/g, " ") : "";
+    };
+    function seededStrap(wearer, assetName, groupName) {
+      if (!assetName || !STRAP_ASSET.test(assetName)) return null;
+      const C2 = charFor(wearer);
+      if (!C2 || !Array.isArray(C2.Appearance)) return null;
+      const it = C2.Appearance.find((a) => a && a.Asset && a.Asset.Name === assetName && (!groupName || a.Asset.Group && a.Asset.Group.Name === groupName));
+      if (!it || !it.Craft) return null;
+      const text = strapText(it);
+      if (!STRAP_WORDS.test(text) && !DOSE_WORDS.seed.test(text.toLowerCase())) return null;
+      const crafter = Number(it.Craft.MemberNumber) || 0;
+      if (!crafter) return null;
+      return { crafter, cname: String(it.Craft.MemberName || "") || "#" + crafter, name: String(it.Craft.Name || assetName).slice(0, 40), text };
+    }
+    function strapLoad(crafter, text) {
+      let ml2 = 0;
+      try {
+        const a = seedAmounts(text);
+        ml2 = a.any || a.vulva || a.butt || a.mouth || 0;
+      } catch (e) {
+      }
+      if (!ml2) {
+        const sp = prodOf(crafter), T = makesSemen(crafter) ? typeInfo(crafter) : CFG.PENIS_TYPES.human;
+        ml2 = Math.max(SEED_DEFAULT_ML, (sp && sp.semen || 0) * CFG.PROD.LOAD_SHARE) * (T && T.loadX || 1);
+      }
+      return Math.max(5, Math.min(ml2, 1e3));
+    }
+    function strapSeen(wearer, t, hole, assetName, groupName) {
+      const S = seededStrap(wearer, assetName, groupName);
+      if (!S) return false;
+      if (S.crafter === t) return true;
+      state.straps = state.straps || /* @__PURE__ */ new Map();
+      const now = Date.now(), was = state.straps.get(wearer);
+      const fresh = !was || was.t !== t || was.hole !== hole || now - was.lastSeen > CFG.STRAP_IN_MIN * 6e4;
+      state.straps.set(wearer, Object.assign(was && !fresh ? was : { at: now, lastFire: 0, armed: true }, { crafter: S.crafter, cname: S.cname, name: S.name, text: S.text, t, hole, lastSeen: now }));
+      if (fresh) {
+        const known2 = rec(S.crafter) && makesSemen(S.crafter);
+        emote("\u{1F402} " + plainName(wearer) + " is in " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : holeText(hole)) + " with " + S.name + ", and it's loaded with " + (known2 ? plainName(S.crafter) : S.cname) + "'s seed. The farm girl marks it in the stud book.");
+        if (!known2) whisper(wearer, "\u{1F402} That one says it's loaded, sugar, but " + S.cname + " isn't a stud on the farm's books, so it's got nothin' real to give. Once they are, it will.");
+      }
+      strapCheck(wearer);
+      return true;
+    }
+    function strapCheck(wearer, progress) {
+      const sc = state.straps && state.straps.get(wearer);
+      if (!sc) return false;
+      const now = Date.now();
+      if (now - sc.lastSeen > CFG.STRAP_IN_MIN * 6e4 || !onMap(wearer) || !onMap(sc.t)) {
+        state.straps.delete(wearer);
+        return false;
+      }
+      const a = typeof progress === "number" ? progress : arousalOf(wearer);
+      if (a < CFG.STRAP_REARM) sc.armed = true;
+      if (a < CFG.STRAP_EDGE) return false;
+      if (!sc.armed && now - sc.lastFire < CFG.STRAP_AGAIN_S * 1e3) return false;
+      if (!rec(sc.crafter) || !makesSemen(sc.crafter)) return false;
+      const r = strapPump(wearer, sc);
+      if (r === "asked") return false;
+      sc.armed = false;
+      sc.lastFire = now;
+      return r;
+    }
+    function strapPump(wearer, sc) {
+      const t = sc.t, crafter = sc.crafter, rt = rec(t);
+      if (!rt || !rt.breedable || limitBlocks(t)) return false;
+      if (!breedConsent(crafter, t)) {
+        askBreed(crafter, t, sc.hole, wearer);
+        return "asked";
+      }
+      const r = doCum(crafter, t, sc.hole, () => {
+      }, true, { load: strapLoad(crafter, sc.text), strap: { wearer, name: sc.name } });
+      return !!r;
+    }
+    function strapTick() {
+      if (!state.straps) return;
+      for (const w of [...state.straps.keys()]) {
+        try {
+          strapCheck(w);
+        } catch (e) {
+          warn("strap-on:", e);
+        }
+      }
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __strapSeen: strapSeen, __strapCheck: strapCheck, __straps: () => state.straps, __strapLoad: strapLoad });
     Object.assign(MESS, { marshmallow: "#FCE6EF" });
     const MON3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     function easterWeek(dt) {
@@ -64288,6 +64615,11 @@ ROLEPLAY IT
     all over her face, tits, belly\u2026 to paint 'em instead. Pounds or
     rough stretches 'em extra; slow or gentle doesn't stretch at all.
   \u2022 The game's Penetrate, or someone ridin' your cock, opens the scene.
+  \u2022 A SEEDED STRAP-ON: one crafted with breeding, seeding or breeder
+    in its name or description carries its crafter's seed, whoever
+    wears it. When its wearer hits the edge, it pumps the crafter's
+    load in, with the crafter's potency, even if they're not here.
+    An amount in the craft (300 ml) is what it gives.
   \u2022 Fills, breedin' and conception show as room emotes, and everyone
     involved has to be here on the map.
 
@@ -69975,15 +70307,36 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         log("SearchResponse:", d);
         if (d === "CannotFindRoom" || d === "RoomNotFound") later(tryCreateRoom, 1500);
         if (d === "JoinedRoom") later(() => snapshotRoom(true), 5e3);
+        if (d === "RoomFull") {
+          state.roomFullAt = Date.now();
+          setBadge("the farm's full: waitin' for a space\u2026", "#ffc49b");
+        }
       });
       on("ChatRoomCreateResponse", (d) => log("CreateResponse:", d));
       on("LoginResponse", (d) => {
         if (typeof d === "string" && /invalid|password|banned|locked/i.test(d)) loginRefused();
         else if (d && typeof d === "object") state.loginTried = 0;
       });
-      on("disconnect", () => {
+      on("disconnect", (reason) => {
         warn("Socket disconnected.");
         setBadge("disconnected", "#ff9b9b");
+        try {
+          dropped(typeof reason === "string" ? reason : "");
+        } catch (e) {
+        }
+      });
+      on("ForceDisconnect", (why) => {
+        try {
+          dropped(typeof why === "string" ? why : "");
+        } catch (e) {
+        }
+      });
+      on("ChatRoomSyncArousal", (d) => {
+        try {
+          if (d && state.straps && state.straps.has(d.MemberNumber)) strapCheck(d.MemberNumber, Number(d.Progress));
+        } catch (e) {
+          warn("strap-on:", e);
+        }
       });
       on("connect", () => {
         log("Socket reconnected.");
@@ -70058,6 +70411,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         }
         state.lastHealthy = Date.now();
         state.reloading = false;
+        if (state.droppedAt) {
+          try {
+            droppedBack();
+          } catch (e) {
+            warn("drop:", e);
+          }
+        }
         const admin = botIsAdmin();
         let fl = 0;
         try {
@@ -70095,6 +70455,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           roamTick();
         } catch (e) {
           warn("roam:", e);
+        }
+        try {
+          strapTick();
+        } catch (e) {
+          warn("strap-on:", e);
         }
         try {
           nurseryTick();

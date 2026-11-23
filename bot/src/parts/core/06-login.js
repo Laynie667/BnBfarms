@@ -92,6 +92,7 @@
       "\nRoom admin:   " + botIsAdmin() +
       "\nTimer:        " + (state.worker ? "worker ✅" : "setInterval ⚠️") +
       "\nLast healthy: " + mins + " min ago" +
+      "\nDrops:        " + dropsText() +
       "\nFriends:      " + fl +
       "\nHeard msgs:   " + state.heard +
       "\nCompanions:   " + companionCount() +
@@ -227,14 +228,17 @@
     if (!user || !pass){ setBadge("no login saved — click me","#ff9b9b"); return; }
     if (GM_getValue("bnb_login_bad", "") === credPrint(user, pass)){ setBadge("saved login refused — log in by hand, or fix it in the Tampermonkey menu","#ff9b9b"); return; }
     const now = Date.now();
+    // the bot's account was opened somewhere else: they get a few minutes before it's taken back (06b-relog.js)
+    if (state.dupUntil > now){ setBadge("the bot's account was opened somewhere else: takin' it back in "+Math.ceil((state.dupUntil-now)/60000)+" min","#ffc49b"); return; }
+    // no connection: a login sent now goes nowhere (and isn't counted). The game reopens a dropped line by itself, but
+    // not one the server threw off (R134 closes that one for good): the bot opens it again (06b-relog.js)
+    if (!serverUp()){ if (!reopen()) setBadge("waitin' for the server to come back…","#ffc49b"); return; }
     if (now - state.lastLoginAttempt < (state.loginTried >= 3 ? 120000 : 15000)) return;   // after three tries, every two minutes
     try {
       // somebody's typin' in the login boxes: leave them be
       const a = W.document.activeElement;
       if (a && (a.id === "InputName" || a.id === "InputPassword")){ setBadge("waitin' while somebody logs in…"); return; }
     } catch(e){}
-    // the server's gone: the game reconnects by itself, and a login sent now goes nowhere (and isn't counted)
-    if (!serverUp()){ setBadge("waitin' for the server to come back…","#ffc49b"); return; }
     state.lastLoginAttempt = now; state.loginTried++; state.loginSent = false;
     const relog = (() => { try { return W.CurrentScreen === "Relog"; } catch(e){ return false; } })();
     const name = relog && W.Player && W.Player.AccountName ? W.Player.AccountName : user;

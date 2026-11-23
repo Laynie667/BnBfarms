@@ -50,14 +50,19 @@
   }
 
   function watchdog(){
-    if (!CFG.WATCHDOG_ENABLED || state.reloading || state.dormant) return;   // a quiet copy isn't stuck, it's standing by
+    if (!CFG.WATCHDOG_ENABLED || state.dormant) return;   // a quiet copy isn't stuck, it's standing by
+    // (Nov 23, 06b-relog.js) a reload that never happened, somethin' stopped it: after two minutes it's tried again
+    if (state.reloading){ if (Date.now() - state.reloading < 120000) return; state.reloading = 0; warn("WATCHDOG: the reload didn't happen. Tryin' again."); }
+    const broken = typeof W.ServerSend !== "function";
+    if (!broken && state.roomFullAt && Date.now() - state.roomFullAt < 60000) return;   // the farm's full: a reload won't make a space
+    if (!broken && state.dupUntil > Date.now()) return;   // somebody else has the bot's account for a few minutes
     const stale = Date.now() - state.lastHealthy;
     if (stale > CFG.WATCHDOG_MIN*60000){
-      state.reloading = true;
+      state.reloading = Date.now();
       warn("WATCHDOG: unhealthy for "+Math.round(stale/60000)+" min. Reloading.");
       setBadge("watchdog reload…","#ff9b9b");
       try { for (const p of CFG.PROPRIETORS) beep(p, "⚠️ Oops, the farm office tripped over its own boots. Reloadin' now, back in a jiffy!"); } catch(e){}
-      later(()=>{ try { W.location.reload(); } catch(e){} }, 3000);
+      later(()=>{ leaveQuietly(); try { W.location.reload(); } catch(e){} }, 3000);   // (nothin' may ask "leave the club?" on the way)
     }
   }
 

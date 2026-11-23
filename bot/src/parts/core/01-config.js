@@ -48,7 +48,7 @@
     KEEPALIVE_MIN: 4,            // invisible server traffic every N minutes
     KEEPALIVE_NUDGE: false,      // also shuffle position occasionally (off Oct 24: the hidden keep-alive is enough, and the hop read as the bot leavin' its home spot)
     NUDGE_MIN: 11,
-    WATCHDOG_MIN: 5,             // reload the page if broken this long
+    WATCHDOG_MIN: 10,            // reload the page if broken this long (Nov 23: the bot reopens its own connection first, 06b-relog.js)
     WATCHDOG_ENABLED: true,
 
     KEY_SYNC_ENABLED: true,

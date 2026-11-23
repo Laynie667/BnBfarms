@@ -155,11 +155,17 @@
       // which never comes, so the room was never rebuilt)
       if (d==="CannotFindRoom" || d==="RoomNotFound") later(tryCreateRoom,1500);
       if (d==="JoinedRoom") later(()=>snapshotRoom(true), 5000);
+      // (Nov 23) the farm's full: the room's limit keeps out even its admin. Keep tryin', and don't reload over it
+      if (d==="RoomFull"){ state.roomFullAt = Date.now(); setBadge("the farm's full: waitin' for a space…","#ffc49b"); }
     });
     on("ChatRoomCreateResponse", d=>log("CreateResponse:",d));
     // a login answer that's a word, not an account, is a refusal ("InvalidNamePassword")
     on("LoginResponse", d=>{ if (typeof d === "string" && /invalid|password|banned|locked/i.test(d)) loginRefused(); else if (d && typeof d === "object") state.loginTried = 0; });
-    on("disconnect", ()=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); });
+    on("disconnect", (reason)=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); try { dropped(typeof reason === "string" ? reason : ""); } catch(e){} });
+    // the server throwin' the bot off, and why (sendin' too much, the account opened elsewhere): 06b-relog.js
+    on("ForceDisconnect", (why)=>{ try { dropped(typeof why === "string" ? why : ""); } catch(e){} });
+    // somebody's arousal moved: a seeded strap-on's wearer at the edge pumps (10y9w-strap-seed.js)
+    on("ChatRoomSyncArousal", (d)=>{ try { if (d && state.straps && state.straps.has(d.MemberNumber)) strapCheck(d.MemberNumber, Number(d.Progress)); } catch(e){ warn("strap-on:", e); } });
     // back online: log back in right away rather than at the next heartbeat (Oct 25: Opera GX freezes a background tab
     // and the reconnect lands while it's asleep)
     on("connect", ()=>{ log("Socket reconnected."); state.lastHealthy = Date.now(); state.lastLoginAttempt = 0; later(heartbeat, 2500); });

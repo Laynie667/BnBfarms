@@ -233,6 +233,11 @@ ROLEPLAY IT
     all over her face, tits, belly… to paint 'em instead. Pounds or
     rough stretches 'em extra; slow or gentle doesn't stretch at all.
   • The game's Penetrate, or someone ridin' your cock, opens the scene.
+  • A SEEDED STRAP-ON: one crafted with breeding, seeding or breeder
+    in its name or description carries its crafter's seed, whoever
+    wears it. When its wearer hits the edge, it pumps the crafter's
+    load in, with the crafter's potency, even if they're not here.
+    An amount in the craft (300 ml) is what it gives.
   • Fills, breedin' and conception show as room emotes, and everyone
     involved has to be here on the map.
 

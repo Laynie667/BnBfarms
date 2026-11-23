@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.93.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.93.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.93.2: the farm office gets itself back after a drop, and strap-ons loaded with their crafter's seed** Laynie, Nov 23: "need to make the relog feature more robust, it seems not to currently work", "i meant the bot relogging after a disconnect". And Alexia's ask: "making the strapons capable of using the crafters cum when arousal is high enough for climax".
+  - **Why the bot stayed gone.** The players' records showed it back in a minute or two after most drops, but gone four hours on Nov 11, half an hour on Nov 22 and eight hours the night of Nov 23. Since the game's November update, when the server throws a game off (sendin' too much, a second login, a restart) the game closes its own connection and never opens it again. The bot sat waitin' for the server to come back. Then the watchdog reloaded the page after 5 minutes, and a reload can stop dead at "Are you sure you want to leave the club?" (WCE asks that, if its Confirm leaving is on) with nobody there to click.
+  - **Now the bot opens the connection again itself**, 10 seconds after the drop, then a little longer each try, never more than 2 minutes apart, then logs back in and walks back into the farm. The page is only reloaded when nothin' else has worked for 10 minutes, nothin' can ask "leave?" on the way out, and a reload that still doesn't happen is tried again.
+  - **A full farm is waited out.** At 20 the room keeps out even its admin; the bot keeps tryin' for a space instead of reloadin' over it.
+  - **The bot's account opened somewhere else**: it waits 3 minutes before takin' it back, so whoever opened it isn't kicked straight off.
+  - **Every drop is written down**: when, what the server said, and how long it took to get back (the bot's Tampermonkey status shows the last few). A drop of 5 minutes or more, the proprietors get a note once it's back.
+  - **Seeded strap-ons.** A strap-on crafted with breeding, seeding or breeder in its name or description (the Dispensary's breeding-gear words) carries its crafter's seed, whoever wears it and whether the crafter's here or not. Its wearer fucks somebody with it (the game's Penetrate), and when the wearer hits the edge (90 on the game's meter), it pumps the crafter's load in: a real load with the crafter's potency, their line, their catch, their scent, their tally. A denied wearer held at the edge pumps it again every two minutes; one who drops back down and climbs again sets it off again. The one bein' filled goes by their own breedin' switches, the same as for any stud: not breedable, nothin' goes in; not free use, they're asked first, told whose seed it is and whose strap-on. An amount in the craft (300 ml) is what it gives; otherwise the crafter's own good load, and it doesn't drain the crafter. On the farm for now.
 
 - **Bot 0.93.1 + Companion 0.75.1: the wild kits fit your tits and belly** Laynie, Nov 21: "The ones we made for the brutal traps, they dont size correctly with the tits and bellies in game", then "yes, make them fit". All thirteen kits were drawn on J cups and the farm belly, put on the way the Companion puts them on in game. Two were wrong, and neither was the drawn body changin': the fitting hasn't changed since Nov 18. The first renders were on a small-chested stand-in, where nothin' needs fittin'.
   - **Furniture stays straight.** The inspection frame was fitted like cloth, and its steel side bars bent round your tits. Furniture (frames, stocks, the horse, cages, crates, the hand truck) is drawn as the game draws it now, in front of you, and your tits and belly bulge out around it. What wraps your body still takes your shape: the vac beds, a sack, a body bag, the fur wrap, a net, the cloak, cement.

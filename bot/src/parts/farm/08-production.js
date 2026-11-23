@@ -1038,24 +1038,28 @@
   // the stud fills a hole: used by ?cum and by the breeding scene's auto-fill
   function doCum(stud, t, hole, R, auto, opt){
     opt = opt || {};
+    // opt.strap { wearer, name }: a seeded strap-on (10y9w-strap-seed.js). The seed is the stud's (its crafter: their
+    // potency, their line, their catch), but it's the wearer who's in them, so the crafter needn't be here, and their
+    // own cock (locked up, denied, knotted, its size) has nothin' to do with it
+    const S = opt.strap || null;
     if (!rec(stud)){ R("You need to be on the books for that, sugar. Say ?apply first!"); return false; }
     const rt = rec(t);
     if (!rt || !rt.breedable || limitBlocks(t)){ R(plainName(t)+" ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it)."); return false; }
-    const gone = missing(stud, t);
+    const gone = missing(S ? S.wearer : stud, t);
     if (gone){ R(gone === stud ? "You've gotta be here on the map for that, sugar." : plainName(t)+" isn't here on the map right now, hon. You both need to be in the room."); return false; }
-    if (!opt.second && !breedConsent(stud, t)){ askBreed(stud, t, hole); R("I've asked "+plainName(t)+" first, sugar. Once they say yes, go right ahead."); return false; }
+    if (!opt.second && !breedConsent(stud, t)){ askBreed(stud, t, hole, S && S.wearer); R("I've asked "+plainName(t)+" first, sugar. Once they say yes, go right ahead."); return false; }
     const sp = prodOf(stud), tp = prodOf(t);
-    seePenis(stud); seePenis(t);
+    if (!S) seePenis(stud); seePenis(t);
     if (hole === "vulva" && !hasVulva(t)){ R(plainName(t)+" doesn't have a pussy to fill, hon. Try their ass or mouth, like ?cum "+plainName(t)+" ass. (If they're futa, they can say ?futa on.)"); return false; }
-    const penBlock = makesSemen(stud) && holeBlocked(stud, "penis");
+    const penBlock = !S && makesSemen(stud) && holeBlocked(stud, "penis");
     if (penBlock){ R("Can't do it, sugar: your cock is locked up in "+penBlock+". Get it off first!"); blockedTease(stud, t, hole, penBlock, true); return false; }
     const seal = sealIn(t, hole), sealOpen = !!(seal && seal.by === stud);   // a Breeder's Seal opens for its maker alone (10ur2-dispensary.js)
     const holeBlock = seal ? (sealOpen ? null : seal.name) : holeBlocked(t, hole);
     if (holeBlock){ R("Whoa there, hon! "+plainName(t)+"'s "+({ vulva:"pussy", butt:"ass" }[hole] || hole)+" is blocked by "+holeBlock+". That'll have to come off before you can fill it."); blockedTease(stud, t, hole, holeBlock, false); return false; }
     // a pent-up stud empties everything, and then some
-    if (sp.deniedUntil > Date.now()){ R("🚫 Not yet, sugar. You're denied for "+Math.ceil((sp.deniedUntil-Date.now())/60000)+" more minutes. Ache for it."); return false; }
+    if (!S && sp.deniedUntil > Date.now()){ R("🚫 Not yet, sugar. You're denied for "+Math.ceil((sp.deniedUntil-Date.now())/60000)+" more minutes. Ache for it."); return false; }
     const T = makesSemen(stud) ? typeInfo(stud) : CFG.PENIS_TYPES.human;
-    const knot = makesSemen(stud) && knotted(stud);
+    const knot = !S && makesSemen(stud) && knotted(stud);
     const pent = opt.load ? !!opt.pent : !!sp.pentUp;
     let load = opt.load || 0, rest = 0;
     if (!opt.load){
@@ -1078,7 +1082,7 @@
       if (opt.half){ rest = load/2; load = load/2; }
     }
     sp.totals.given += load;
-    const pen = sizeOf(stud, "penis"), need = penisNeeds(pen);
+    const pen = S ? (S.size || 7) : sizeOf(stud, "penis"), need = penisNeeds(pen), tool = S ? "strap-on" : "cock";
     // a throat that's not ready for it gags and drools some back out, but it learns
     let gagged = 0, trained = false;
     const funnel = hole === "mouth" && funnelOn(t);   // straight down the funnel: no gaggin'
@@ -1114,13 +1118,14 @@
     tp.lastStud = stud;
     const flavor = { equine:" That flared head swells wide with every pulse.", feline:" Those barbs make sure every last drop counts.",
                      draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "" }[penisType(stud)] || "";
-    let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") "+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+holeText(hole))+"."+(makesSemen(stud) ? flavor : "")+" "+
+    let o = "💦 "+(S ? plainName(S.wearer)+" hits the edge with "+S.name+" buried in "+plainName(t)+", and it pumps "+loadWord(load)+" ("+ml(load)+") of "+plainName(stud)+"'s seed "
+                    : (pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") ")+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+holeText(hole))+"."+(makesSemen(stud) && !S ? flavor : "")+" "+
             plainName(t)+" is "+Math.round(100*heldTotal(tp)/capacity(t))+"% full"+(spilt>0 ? ", and "+ml(spilt)+" spills out" : "")+".";
     if (sealOpen) o += " "+plainName(t)+"'s "+seal.name+" opens for "+plainName(stud)+" alone, and seals every drop in behind.";
     if (opt.edged) o += " Edged "+opt.edged+" time"+(opt.edged === 1 ? "" : "s")+" first, it just keeps on comin'.";
     if (hole === "mouth" && makesSemen(stud)) o += " "+seedTaste(stud, pent);
-    if (gagged >= 1) o += " "+plainName(t)+" gags on that "+pen+"\" cock and drools "+ml(gagged)+" back up"+(trained ? ", but that throat's learnin': it's "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
-    if (loose) o += " Dosed loose, "+plainName(t)+"'s throat takes every inch of that "+pen+"\" cock without a single gag"+(trained ? ", and it's learnin' fast: "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
+    if (gagged >= 1) o += " "+plainName(t)+" gags on that "+pen+"\" "+tool+" and drools "+ml(gagged)+" back up"+(trained ? ", but that throat's learnin': it's "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
+    if (loose) o += " Dosed loose, "+plainName(t)+"'s throat takes every inch of that "+pen+"\" "+tool+" without a single gag"+(trained ? ", and it's learnin' fast: "+sizeWord("throat", sizeOf(t,"throat"))+" now" : "")+".";
     if (hole !== "mouth" && makesSemen(stud)){
       const gape = sizeOf(t, hole);
       const needK = need + (knot ? 1 : 0);    // a knot stretches 'em one more
@@ -1130,7 +1135,7 @@
       if (to > gape){
         setSize(t, hole, to, false);
         o += opt.rough ? " Pounded that hard, "+plainName(t)+"'s "+(hole === "vulva" ? "pussy" : "ass")+" is left "+sizeWord(hole, sizeOf(t,hole))+" and twitchin'!"
-                       : " That "+pen+"\" "+sizeWord("penis", pen)+" cock leaves 'em "+sizeWord(hole, sizeOf(t,hole))+"!";
+                       : " That "+pen+"\" "+sizeWord("penis", pen)+" "+tool+" leaves 'em "+sizeWord(hole, sizeOf(t,hole))+"!";
       } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
     }
     let caught = null;
@@ -1171,7 +1176,7 @@
       else tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000*perkEggDaysX(t) };
       eggTypesNote(tp, clutch, penisType(stud) === "draconic" ? -16 : stud);   // a draconic stud's are drake eggs
     }
-    saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
+    saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load)+(S ? " strap-on worn by "+S.wearer : ""));
     if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }
     if (!opt.second && Math.random() < 0.7){ const pb = potionBit(t); if (pb) o += " "+pb; }   // a potion they're on (10m2)   // their tail, if they wear one (10r-looks.js)
     emote(o, t);   // about the one bred (the stud is named too, so both get it)
@@ -1216,11 +1221,14 @@
     const u = state.breedOk.get(t+":"+stud); return !!(u && u > Date.now());
   }
   function okBreed(stud, t){ state.breedOk.set(t+":"+stud, Date.now() + CFG.BREED_OK_H*3600000); }
-  function askBreed(stud, t, hole){
+  // via: a seeded strap-on's wearer (10y9w-strap-seed.js): it's the stud's seed, in the wearer's strap-on
+  function askBreed(stud, t, hole, via){
     const a = state.breedAsks.get(t), now = Date.now();
     if (a && a.stud === stud && now - a.at < 60000) return;
-    state.breedAsks.set(t, { stud, hole: hole || null, at: now });
-    askCard(t, "breed", "🐂 "+plainName(stud)+" wants to breed you"+(hole ? " ("+holeText(hole)+")" : "")+", sugar. Say yes or no (?yes or ?no works too). "+
+    state.breedAsks.set(t, { stud, hole: hole || null, at: now, via: via || 0 });
+    askCard(t, "breed", (via
+      ? "🐂 "+plainName(via)+"'s strap-on is loaded with "+plainName(stud)+"'s seed, and it's in your "+(hole ? holeText(hole) : "hole")+". Let "+plainName(stud)+"'s seed breed you, sugar? Say yes or no (?yes or ?no works too). "
+      : "🐂 "+plainName(stud)+" wants to breed you"+(hole ? " ("+holeText(hole)+")" : "")+", sugar. Say yes or no (?yes or ?no works too). ")+
             "Say ?freeuse on if you'd rather never be asked.");
   }
   function answerBreed(t, yes){
@@ -1228,6 +1236,14 @@
     if (!a || Date.now() - a.at > CFG.BREED_ASK_MIN*60000){ state.breedAsks.delete(t); return false; }
     state.breedAsks.delete(t);
     const stud = a.stud;
+    // a seeded strap-on (10y9w-strap-seed.js): the answer goes to its wearer; the crafter's seed goes in at their edge
+    if (a.via){
+      if (!yes){ tell(t, "Understood, hon. None of "+plainName(stud)+"'s seed goes in you."); tell(a.via, "🐂 "+plainName(t)+" said no to "+plainName(stud)+"'s seed, sugar. Your strap-on stays dry in them."); return true; }
+      okBreed(stud, t);
+      tell(a.via, "🐂 "+plainName(t)+" said yes to "+plainName(stud)+"'s seed. Keep goin': when you hit the edge, that strap-on pumps it in.");
+      try { strapCheck(a.via); } catch(e){ warn("strap-on:", e); }
+      return true;
+    }
     if (!yes){
       tell(t, "Understood, hon. I told "+plainName(stud)+" no.");
       tell(stud, "🐂 "+plainName(t)+" said no, sugar. Please leave it be.");

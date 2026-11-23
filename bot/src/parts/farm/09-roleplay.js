@@ -136,7 +136,7 @@
      (or switch) their breedin' scene to that hole, same as ?breed. Then cum words fill it.
      When someone rides a stud's penis with their pussy or ass (LSCG), same thing the other way.
      When someone sucks or nibbles a milker's nipples, I drain a little milk, like a nursing emote. */
-  function onBodyActivity(act, focus, src, tgt){
+  function onBodyActivity(act, focus, src, tgt, toy){
     parasiteKiss(act, focus, src, tgt);   // a kiss on the mouth can pass the parasite on (10v-parasite.js)
     try { symbioteTouch(act, focus, src, tgt); } catch(e){ warn("symbiote touch:", e); }   // livin' latex flows across (10v5-symbiote-spread.js)
     if (!src || !tgt || src === tgt) return;
@@ -151,6 +151,8 @@
       if (rec(tgt) && makesMilk(tgt)) nurse(tgt, src);
       return;
     } else return;
+    // a strap-on loaded with its crafter's seed (Nov 23): the wearer's in them, and the crafter's seed goes in at the edge
+    if (stud === src && toy && toy.AssetName && strapSeen(src, bred, hole, toy.AssetName, toy.GroupName)) return;
     if (!rec(stud) || !makesSemen(stud)) return;
     const rb = rec(bred);
     if (!rb || !rb.breedable || limitBlocks(bred)) return;
@@ -289,7 +291,8 @@
       if (typeof src !== "number") src = data.Sender;
       if (typeof tgt !== "number"){ const old = dict.find(d => d && d.Tag === "TargetCharacter"); tgt = old && old.MemberNumber; }
       const focus = pick("FocusGroupName") || (String(data.Content||"").split("-")[1]);
-      try { onBodyActivity(String(act||""), focus, src, tgt); } catch(e){ warn("body activity:", e); }
+      const toy = dict.find(d => d && d.Tag === "ActivityAsset") || null;   // what they did it with (a strap-on, a dildo…)
+      try { onBodyActivity(String(act||""), focus, src, tgt, toy); } catch(e){ warn("body activity:", e); }
       try { shotTouch(tgt, src); } catch(e){ warn("hair trigger:", e); }   // a hair-trigger shot (10ur-shots-more.js)
       return;
     }

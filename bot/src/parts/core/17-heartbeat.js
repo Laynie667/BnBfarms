@@ -45,6 +45,7 @@
       // healthy
       state.lastHealthy = Date.now();
       state.reloading = false;
+      if (state.droppedAt){ try { droppedBack(); } catch(e){ warn("drop:", e); } }   // back after a drop: written down, a long one told (06b-relog.js)
 
       const admin = botIsAdmin();
       let fl = 0; try { fl = (W.Player.FriendList||[]).length; } catch(e){}
@@ -71,6 +72,7 @@
       try { teaseMeTick(); } catch(e){ warn("tease:", e); }
       try { echsTick(); } catch(e){ warn("echs:", e); }
       try { roamTick(); } catch(e){ warn("roam:", e); }
+      try { strapTick(); } catch(e){ warn("strap-on:", e); }   // a seeded strap-on's wearer at the edge (10y9w-strap-seed.js)
       try { nurseryTick(); } catch(e){ warn("nursery:", e); }
       try { shotsMoreTick(); } catch(e){ warn("shots more:", e); }
       try { featsTick(); } catch(e){ warn("feats:", e); }

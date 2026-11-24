@@ -37,6 +37,7 @@ import { initSettings } from "./settings.js";
 import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick, nurseryStatsNow } from "./nursery.js";
 import { trophyNews, trophyNext, trophyAnswered, trophyWear, trophyOff, trophyWorn } from "./trophies.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
+import { LS, onAccount, initAcct } from "./acct.js";   // each account its own (Nov 24)
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -201,11 +202,11 @@ function sendCommand(text, typed) {
 // (it's already off for good here: marks.js). Kept on this computer so a reload doesn't lose it
 const FREED_Q = "fhc-freed-queue";
 function gearFreedTell(name, by) {
-  let q; try { q = JSON.parse(window.localStorage.getItem(FREED_Q)) || []; } catch (e) { q = []; }
+  let q; try { q = JSON.parse(LS.getItem(FREED_Q)) || []; } catch (e) { q = []; }
   if (name) q.push({ name: String(name).slice(0, 30), by: Number(by) || 0, at: Date.now() });
   q = q.filter((x) => Date.now() - x.at < 31 * 86400000).slice(-40);
   if (q.length && botHere()) { for (const x of q) toBot("gearFreed", { name: x.name, by: x.by }); q = []; }
-  try { window.localStorage.setItem(FREED_Q, JSON.stringify(q)); } catch (e) { /* fine */ }
+  try { LS.setItem(FREED_Q, JSON.stringify(q)); } catch (e) { /* fine */ }
 }
 
 // a long card can arrive in pieces; glue 'em back together
@@ -509,6 +510,10 @@ function pickClick() {
 function start() {
   loadStore();
   st.panel = new Panel(sendCommand, api);
+  // EVERY ACCOUNT ITS OWN (acct.js, Nov 24): a different account on this tab starts clean, with nothin' of the last one's
+  // farm (its roles, its gear, its sizes) till the farm girl says what this one's are
+  onAccount((mn, first) => { if (first) return; st.gotState = false; st.lastState = null; st.welcomed = false; st.lastHello = 0; st.panel.s = { name: "", onBooks: false }; try { st.panel.renderSoon(); } catch (e) { /* fine */ } });
+  initAcct();
   initSettings(st.panel);   // Preferences → Extensions → Farmhand Companion (settings.js)
   // switched off on that page: nothin' else starts (the page stays, to switch it back on)
   if (st.panel.prefs.off) { st.panel.show(false); console.log("[Farmhand Companion] v" + VERSION + " is switched off (Preferences → Extensions → Farmhand Companion)"); return; }
@@ -669,7 +674,7 @@ function start() {
         if (k === "ink") { api.inkSync(); api.rehello(); }
         if (/^no/.test(k)) api.rehello();
       });
-      if (said.length) { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* fine */ } st.panel.render(); }
+      if (said.length) { try { LS.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* fine */ } st.panel.render(); }
       return said.map((x) => "Companion " + x);
     },
   });

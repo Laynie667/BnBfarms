@@ -5,10 +5,11 @@
    farm (ABCL), with who their Littlish Club grown-ups are. Nothin' the nursery put on is ever locked, and nothin' it
    didn't put on is ever taken off.
 */
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 const KEY = "fhc-nursery";   // { gear: { Group: Name }, powderUntil }
 const P = () => window.Player;
-const load = () => { try { return JSON.parse(window.localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
-const save = (v) => { try { window.localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* fine */ } };
+const load = () => { try { return JSON.parse(LS.getItem(KEY)) || {}; } catch (e) { return {}; } };
+const save = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch (e) { /* fine */ } };
 const ready = () => P() && Array.isArray(P().Appearance) && typeof window.ServerAppearanceBundle === "function" && typeof window.ServerAppearanceLoadFromBundle === "function";
 const bundle = () => window.ServerAppearanceBundle(P().Appearance);
 function commit(next) {

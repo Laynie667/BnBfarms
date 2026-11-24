@@ -86,6 +86,7 @@
     if (ANTHRO[kind] && limitBlocks(mn, "breed")) return "their limits rule it out";
     if (TRAP_NEEDS[kind]){ const w = TRAP_NEEDS[kind](mn); if (w) return w; }
     if (r.trapWait) return "a trap already has them";
+    { const fb = farmBusy(mn); if (fb) return fb; }   // (the farm has them just now: one thing at a time, Nov 24, 10h-body.js)
     if (ANTHRO[kind] && !ANTHRO[kind].person && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";   // (the farm girl's a person: 10y9l)
     if (benchedNow(mn) || stockedNow(mn) || r.penned || (prodOf(mn) && prodOf(mn).stall)) return "they're held somewhere already";
     if (state.trapRuns && state.trapRuns.has(mn)) return "a trap already has them";
@@ -455,6 +456,7 @@
   // one subject, right now: on a trap tile or in the water? (one visit is one roll: state.trapAt holds the spot they're on)
   function trapCheck(mn, now){
     if (mn === BOTMN() || !isSubject(mn)) return;
+    if (farmBusy(mn)) return;   // (walked by the farm, or under with the farm girl: the tiles they cross leave them be, Nov 24)
     state.trapAt = state.trapAt || new Map();
     const r = rec(mn);
     const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));   // (water and troughs too: on the tile, not beside it, Oct 24)

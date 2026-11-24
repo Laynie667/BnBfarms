@@ -301,7 +301,7 @@ function page(opts) {
   // ---- the Companion in hardcore: its game-rule switches stay put; your keyholder sets them
   const cw = page({ companion: true }); await wait(1500);
   const CW = cw.D();
-  const prefs = () => { try { return JSON.parse(cw.w.localStorage.getItem("fhc-prefs")) || {}; } catch (e) { return {}; } };
+  const prefs = () => { try { return JSON.parse(cw.w.localStorage.getItem("fhc-prefs@" + cw.w.Player.MemberNumber)) || {}; } catch (e) { return {}; } };
   CW.lock(0);
   const comp = cw.pages.find((x) => x.Identifier === "FarmhandCompanion");
   comp.load();

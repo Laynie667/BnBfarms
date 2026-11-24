@@ -17,11 +17,12 @@
    • Never: for ROAM_SAFE_MIN after their safeword (the farm's or the game's), once the contract's over, or with the
      Companion off.
 */
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 const W = window, KEY = "fhc-home", WARN_S = 30, SAFE_MIN = 30, TICK_MS = 5000, BUSY_MAX = 3 * 60000;
 const BUSY = new Set(["Appearance", "Crafting", "Wardrobe", "Shop", "Shop2", "InformationSheet", "Preference", "FriendList", "Title", "OnlineProfile"]);
 let deps = { botMn: 0, say: null, onBack: null }, walking = false, countdown = null, retryAt = 0, busySince = 0, wantOutAt = 0;
-const load = () => { try { return JSON.parse(W.localStorage.getItem(KEY)) || null; } catch (e) { return null; } };
-const save = (h) => { try { if (h) W.localStorage.setItem(KEY, JSON.stringify(h)); else W.localStorage.removeItem(KEY); } catch (e) { /* fine */ } };
+const load = () => { try { return JSON.parse(LS.getItem(KEY)) || null; } catch (e) { return null; } };
+const save = (h) => { try { if (h) LS.setItem(KEY, JSON.stringify(h)); else LS.removeItem(KEY); } catch (e) { /* fine */ } };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const clock = (t) => { const d = new Date(t); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 const loggedIn = () => !!(W.Player && W.Player.MemberNumber) && W.CurrentScreen !== "Login" && W.CurrentScreen !== "Relog";
@@ -146,6 +147,7 @@ export function initHomeward(mod, d) {
     try { mod.hookFunction(fn, 4, (args, next) => { try { homeSafe(); } catch (e) { /* fine */ } return next(args); }); } catch (e) { /* that one's not in this game */ }
   }
   setInterval(() => { try { homeTick(); } catch (e) { console.warn("[Farmhand Companion] whistle:", e); } }, TICK_MS);
+  onAccount(() => { cancel(); walking = false; retryAt = 0; wantOutAt = 0; });   // (a different account: never whistled home on the last one's rules, Nov 24)
 }
 // (tests)
 export const homeState = () => ({ h: load(), countdown: !!countdown, walking, retryAt });

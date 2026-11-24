@@ -21,6 +21,7 @@ import { NURSERY_TABS } from "./views/nursery.js";
 import { settingsAvailable, openSettings } from "./settings.js";
 import { bcplusCanOpen, openBcplus } from "./addons.js";
 import { settingsView } from "./views/settingspages.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 
 const VIEWS = {
   guest: { label: "Guest", tabs: GUEST_TABS },
@@ -30,8 +31,8 @@ const VIEWS = {
   nursery: { label: "🧸 Nursery", tabs: NURSERY_TABS, keepRow: true },   // only for people on the nursery list (views/nursery.js); its own look
 };
 
-function loadPrefs() { try { return JSON.parse(window.localStorage.getItem(PREFS_KEY)) || {}; } catch (e) { return {}; } }
-function savePrefs(p) { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* private window: fine */ } }
+function loadPrefs() { try { return JSON.parse(LS.getItem(PREFS_KEY)) || {}; } catch (e) { return {}; } }
+function savePrefs(p) { try { LS.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* private window: fine */ } }
 
 export class Panel {
   constructor(onCommand, api) {
@@ -45,6 +46,8 @@ export class Panel {
     this.ui = {};
     this.prefs = loadPrefs();
     if (this.prefs.chatToo === undefined) this.prefs.chatToo = true;   // farm messages show in chat too, unless they switch it off
+    // (each account its own toggles, Nov 24: read again when somebody logs in, and again for a different account)
+    onAccount(() => { this.prefs = loadPrefs(); if (this.prefs.chatToo === undefined) this.prefs.chatToo = true; try { this.renderSoon(); } catch (e) { /* not drawn yet */ } });
     this.status = "…";
     const doc = window.document;
 

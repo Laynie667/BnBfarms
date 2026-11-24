@@ -57,7 +57,7 @@
   // in the stocks or a pen, on the bench, strapped in the stall, knotted, hitched or in a trap, was led to me for the
   // trance and put straight back by the hold, over and over. Now they're left where they're held, and I step over to
   // them for it instead, and back to my spot after: echsHome.)
-  function echsHeld(mn){ try { return reinsHeld(mn) || !!(prodOf(mn) || {}).pin; } catch(e){ return false; } }
+  function echsHeld(mn){ try { return heldElsewhere(mn) || !!(prodOf(mn) || {}).pin; } catch(e){ return false; } }
   function echsBeside(mn){
     if (!mapRoom()) return;
     const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);

@@ -36,9 +36,9 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   H.homeKeep(state({ until: now() + 9 * 60000 })); room('Somewhere Else'); said.length = 0; H.homeTick();
   ok(/9 minutes left on your roam pass/.test(all()), 'off the farm with 9 minutes left: a note, from the Companion itself');
   H.homeTick(); ok(said.length === 1, '...once');
-  let h = H.homeState().h; h.until = now() + 90000; ls['fhc-home'] = JSON.stringify(h); H.homeTick();
+  let h = H.homeState().h; h.until = now() + 90000; ls['fhc-home@500'] = JSON.stringify(h); H.homeTick();
   ok(/2 minutes, sugar/.test(all()), '...and at 2 minutes');
-  h = H.homeState().h; h.until = now() - 1000; ls['fhc-home'] = JSON.stringify(h); said.length = 0; moves.length = 0; H.homeTick();
+  h = H.homeState().h; h.until = now() - 1000; ls['fhc-home@500'] = JSON.stringify(h); said.length = 0; moves.length = 0; H.homeTick();
   ok(H.homeState().countdown && /Your roam's over.*back on the farm in 1 seconds/.test(all()), 'the pass runs out: the whistle, with its warnin\'');
   await wait(1500);
   ok(moves.join(',') === 'leave,search X,join B&B Farm' && window.ChatRoomData.Name === 'B&B Farm', 'then home: out of that room (leash or locked door, it\'s a forced move), the room search, and into the farm');

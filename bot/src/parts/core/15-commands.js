@@ -721,7 +721,7 @@
         const types = Object.keys(CFG.PENIS_TYPES);
         const help = "Types: "+types.map(k => CFG.PENIS_TYPES[k].label === k ? k : k+" ("+CFG.PENIS_TYPES[k].label+")").join(", ")+
                      ". Set yours with ?cock <type>, like ?cock equine. Any of 'em can carry a knot: a crafted shot with \"knotting\" gives one (canine comes knotted). "+
-                     "Shots with canine, equine, feline (or barbed), draconic, double cock or humanizer change the type.";
+                     "Shots with canine, equine, feline (or barbed), draconic, double cock, ovipositor cock or humanizer change the type.";
         let t = sender, a = args.slice();
         if (a.length > 1 || (a.length === 1 && !types.includes(a[0].toLowerCase()) && !/^(types|list)$/i.test(a[0]))){
           const w = resolveTarget(a[0]);
@@ -760,6 +760,8 @@
           }
         }
         if (!rec(who)){ R("You need to be on the books first, sugar. Say ?apply!"); break; }
+        // changin' your own KIND takes a morphin' draught once you've got one (Nov 24, 10l4-morph.js); staff set anybody's
+        if (who === sender && !isStaff(sender)){ const no = morphNeeded(sender, animal); if (no){ R(no); break; } }
         rec(who).species = animal.toLowerCase().trim().slice(0, 40);
         saveLedger(); audit(sender, "SPECIES", who+" "+rec(who).species);
         const k = speciesKey(who);

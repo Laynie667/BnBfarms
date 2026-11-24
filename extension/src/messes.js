@@ -18,6 +18,7 @@ import FARM_LOOK from "../../shared/farm-look.json";   // window.FarmBrand: the 
 const cleanBrand = (b) => W.FarmBrand.clean(b), brandReady = (b) => W.FarmBrand.ready(b), paintBrand = (...a) => W.FarmBrand.paint(...a);
 import { makeMsg } from "../../shared/protocol.js";
 import { BOT_MEMBER } from "./config.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 
 const W = window, KEY = "farmhand-messes", MAX = 60;
 // the bot's own account never draws anybody's messes, so it never asks for them or keeps them (Oct 27: every ask made
@@ -51,8 +52,8 @@ const BY_COLOR = { "#fff4dc": "cream", "#e0a030": "honey", "#8b4a1c": "maple", "
   "#e7a3c8": "dye", "#f2c230": "pollen", "#fce6ef": "marshmallow", "#5b2245": "grape" };
 const AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
 
-function load() { try { const v = JSON.parse(W.localStorage.getItem(KEY)); if (Array.isArray(v)) mine = v.filter(ok).slice(-MAX); } catch (e) { mine = []; } }
-function save() { try { W.localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* fine */ } }
+function load() { try { const v = JSON.parse(LS.getItem(KEY)); if (Array.isArray(v)) mine = v.filter(ok).slice(-MAX); } catch (e) { mine = []; } }
+function save() { try { LS.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* fine */ } }
 const ok = (e) => e && typeof e.k === "string" && W.FarmMess && W.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
 const clean = (list) => (Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : []);
 
@@ -227,6 +228,7 @@ function hook() {
 }
 export function initMesses(mod) {
   sdk = mod; load();
+  onAccount(() => load());   // (each account its own messes, Nov 24)
   // a fresh mess keeps running for its first five minutes: drawn again once a minute while it does
   setInterval(() => {
     const fresh = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 60000);

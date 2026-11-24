@@ -48,6 +48,18 @@
      If it can't (no path, they're enclosed or suspended, they switched it off) or they haven't arrived in
      90 seconds, the bot teleports them after all. */
   function canLead(mn){ return cueable(mn, "lead") && onMap(mn); }
+  // ONE THING HAS THEM AT A TIME (Nov 24; Laynie: "trap suppression when being led by the farm, like to start a hypno
+  // session, to avoid players being grabbed by more than one thing that will leash or tether them and result in a tug of
+  // war"). While the farm has hold of somebody, walkin' them somewhere or reachin' for their ECHS and keepin' them under,
+  // no trap springs on them (not a set tile, not a wild one, not one sprung by hand) and nobody's reins pull them about.
+  // → why, or "" when the farm hasn't got them
+  function farmBusy(mn){
+    const now = Date.now();
+    if (state.leads) for (const l of state.leads.values()) if (l.mn === mn && now - l.at < 95000) return "the farm's walkin' them somewhere";
+    const v = state.echs && state.echs.get(mn);
+    if (v && ["Asked", "AttemptMade", "InductionInProgress", "Hypnotized"].includes(v.phase) && now - (v.at || 0) < 31*60000) return "they're with the farm girl, in a trance";
+    return "";
+  }
   function lead(mn, pt, urgent, why){
     state.leads = state.leads || new Map();
     for (const [id, l] of state.leads) if (l.mn === mn) state.leads.delete(id);   // a newer one replaces it
@@ -56,6 +68,7 @@
     enqueue(makeMsg("lead", { X: pt.X, Y: pt.Y, id, why: why || "" }, mn), urgent);
     return true;
   }
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __farmBusy: (m) => farmBusy(m), __lead: (m, pt) => lead(m, pt) });
   function leadAnswer(mn, m){
     const l = state.leads && state.leads.get(m.id);
     if (!l || l.mn !== mn) return;

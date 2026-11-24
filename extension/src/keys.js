@@ -11,11 +11,13 @@
    <who> is a member number or a name. Only their Dispensary decides whether you really hold a key: this just asks.
 */
 import { makeMsg } from "../../shared/protocol.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 
 const W = window, KEY = "fhc-wards";
 let wards = {};
-try { wards = JSON.parse(W.localStorage.getItem(KEY)) || {}; } catch (e) { wards = {}; }
-const save = () => { try { W.localStorage.setItem(KEY, JSON.stringify(wards)); } catch (e) { /* fine */ } };
+const loadWards = () => { try { wards = JSON.parse(LS.getItem(KEY)) || {}; } catch (e) { wards = {}; } };
+loadWards(); onAccount(loadWards);   // (each account its own wards, Nov 24)
+const save = () => { try { LS.setItem(KEY, JSON.stringify(wards)); } catch (e) { /* fine */ } };
 const me = () => (W.Player && W.Player.MemberNumber) || 0;
 const here = (mn) => (W.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
 let say = () => {};

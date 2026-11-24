@@ -214,7 +214,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const fb = D.getElementById("fhc-btn"), ev = (t, x, y, el) => (el || w).dispatchEvent(new w.MouseEvent(t, { clientX: x, clientY: y, bubbles: true }));
   w.innerWidth = 800; w.innerHeight = 600;
   ev("pointerdown", 5, 5, fb); ev("pointermove", 200, 150); ev("pointerup", 200, 150); fb.click();
-  const saved = JSON.parse(w.localStorage.getItem("fhc-prefs") || "{}");
+  const saved = JSON.parse(w.localStorage.getItem("fhc-prefs@" + w.Player.MemberNumber) || "{}");
   out("10 dragged button moves and is remembered ->", fb.style.left === "195px", !!saved.btnPos);
   const wasOpen = D.getElementById("fhc-panel").classList.contains("open");
   fb.click(); out("10 a plain tap still opens/closes ->", D.getElementById("fhc-panel").classList.contains("open") !== wasOpen);

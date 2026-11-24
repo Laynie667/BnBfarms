@@ -249,7 +249,7 @@
   // ── the hayloft ──
   seasonTrap("halloween", "spider", {
     icon: "🕷️", what: "the spider queen in the hayloft: webbed up, silk-tied, and a clutch of her eggs", limit: /\b(spiders?|insects?|bugs?|eggs?|ovipos|webs?|clutch)\b/i,
-    stud: { sire: -64, name: "the spider queen", type: "draconic", loads: 1, ml: 140, hold: 8, hole: "vulva", bonus: 0, where: "the spider queen's web", eggs: true },
+    stud: { sire: -64, name: "the spider queen", type: "ovipositor", loads: 1, ml: 140, hold: 8, hole: "vulva", bonus: 0, where: "the spider queen's web", eggs: true },
     needs: mn => limitBlocks(mn, "eggs") ? "their limits rule it out" : null,
     lines: {
       beats: [

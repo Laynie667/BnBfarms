@@ -77,9 +77,9 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   d = again.syncFarmGear(fresh, true);
   ok(!d.on.includes('Stall Blindfold') && !at('ItemHead'), '...after a reload too, till the farm hears and drops it');
   // the farm drops it: after a while it's forgotten (so the same name can be put on fresh one day)
-  const lg = JSON.parse(ls['fhc-gear-letgo']); for (const k of Object.keys(lg)) lg[k].at = Date.now() - 11 * 60000; ls['fhc-gear-letgo'] = JSON.stringify(lg);
+  const lg = JSON.parse(ls['fhc-gear-letgo@500']); for (const k of Object.keys(lg)) lg[k].at = Date.now() - 11 * 60000; ls['fhc-gear-letgo@500'] = JSON.stringify(lg);
   again.syncFarmGear(fresh.filter((g) => g.name !== 'Stall Blindfold'), true);
-  ok(!Object.keys(JSON.parse(ls['fhc-gear-letgo'])).some((k) => k.startsWith('Stall Blindfold|')), '...and once the farm\'s list has dropped it, it\'s forgotten');
+  ok(!Object.keys(JSON.parse(ls['fhc-gear-letgo@500'])).some((k) => k.startsWith('Stall Blindfold|')), '...and once the farm\'s list has dropped it, it\'s forgotten');
   // Echo's Limb Teleportation Device: named in plain letters, put on as Echo's own item, only if the game has it
   ASSETS.ItemAddon = []; window.Asset = window.Asset.filter((a) => a.Group.Name !== 'ItemAddon');
   P.Appearance = [mk('Cloth', 'Shirt')];

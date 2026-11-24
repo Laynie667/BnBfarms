@@ -85,10 +85,10 @@ const spring=async(mn,kind)=>{ free(mn); const n=sent.length; await say(221397,'
     n=sent.length; await say(800,'?traps',900); ok(/Trap of the day: ✂️ wire/.test(all(n)), '...and so does ?traps'); }
 
   // ── whole kinds of trap ──
-  { let n=sent.length; await say(500,'?traps theme',900); ok(/KINDS OF TRAP FOR YOU/.test(all(n)) && (all(n).match(/: on/g)||[]).length===10, '?traps theme lists ten kinds, all on');
+  { let n=sent.length; await say(500,'?traps theme',900); ok(/KINDS OF TRAP FOR YOU/.test(all(n)) && (all(n).match(/: on/g)||[]).length===11, '?traps theme lists eleven kinds, all on (spiders since Nov 24)');
     n=sent.length; await say(500,'?traps theme furry off',900); ok(/Furry folk: off/.test(all(n)), '?traps theme furry off');
     n=sent.length; await say(221397,'?trap spring 500 wolves',900); ok(/they've switched off furry traps/.test(all(n)), '...and not even a proprietor can spring the wolves on them');
-    const th=W.__stateFor(500).trapThemes; ok(th && th.length===10 && th.find(t=>t.id==='furry').on===false, 'the Companion has the switches');
+    const th=W.__stateFor(500).trapThemes; ok(th && th.length===11 && th.find(t=>t.id==='furry').on===false, 'the Companion has the switches');
     await say(500,'?traps theme monsters off',700);
     n=sent.length; await say(221397,'?trap spring 500 tentacle',900); ok(/monster traps/.test(all(n)), 'monsters off: the water leaves them be');
     n=sent.length; await say(500,'?traps theme eggs',900); ok(/Pregnancy and eggs is on/.test(all(n)) && /tentacle/.test(all(n)), '?traps theme <kind> says what\'s in it (words work too: eggs)');

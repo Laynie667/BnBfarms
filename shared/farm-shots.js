@@ -91,7 +91,7 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
     e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks · canine, equine, feline (barbed), draconic, double cock,
-    humanizer, knotting, knot remover · see ?help cocks
+    ovipositor cock, humanizer, knotting, knot remover · see ?help cocks
 
 WORN ITEMS
   • lactation, virility, fertility · smaller boosts while worn

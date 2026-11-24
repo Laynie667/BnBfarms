@@ -123,14 +123,18 @@
     const Z = CFG.WILD.ZONES[w.g], spot = Z ? "trap-theme-"+Z.theme : "";
     // what springs: the season's pack now and then, else the place's, else any trap, only ever one that can have them (a
     // blind pick from the season's pack could miss, and a wild trap never misses). Nothin' at all: it lies quiet where it is
+    // (Nov 24) now and then it's somethin' else hidin' there: a spider, or behind receivin', the lab (10z8c-spiders.js)
+    let odd = null; try { if (!huntOn()) odd = wildOdd(mn, w); } catch(e){ warn("wild trap odd:", e); }
     let pool = [];
-    try { const sp = spot ? seasonPick(mn, spot) : null; if (sp && Array.isArray(sp.kinds)) pool = sp.kinds.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k)); } catch(e){ warn("wild trap season:", e); }
-    if (!pool.length && spot) pool = themePool(mn, spot);
-    if (!pool.length) pool = Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
-    if (!pool.length) return false;
-    const kind = trapWeighted(mn, pool).kind;
+    if (!odd){
+      try { const sp = spot ? seasonPick(mn, spot) : null; if (sp && Array.isArray(sp.kinds)) pool = sp.kinds.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k)); } catch(e){ warn("wild trap season:", e); }
+      if (!pool.length && spot) pool = themePool(mn, spot);
+      if (!pool.length) pool = Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
+      if (!pool.length) return false;
+    }
+    const kind = odd ? odd.kind : trapWeighted(mn, pool).kind;
     state.wildRun = state.wildRun || new Map(); state.wildRun.set(mn, now + 30*60000);
-    state.wildArea = state.wildArea || new Map(); state.wildArea.set(mn, huntOn() ? "hunt" : (w.g || "barn"));   // (whose kit it leaves: 10z8b-wild-kits.js)
+    state.wildArea = state.wildArea || new Map(); state.wildArea.set(mn, odd ? odd.area : huntOn() ? "hunt" : (w.g || "barn"));   // (whose kit it leaves: 10z8b-wild-kits.js; a spider's cocoon, the lab's prototype)
     emote("🕳️ "+tFill(pickFor(mn, "wild:open", WILD_OPEN), mn), mn);
     const why = springTrap(mn, kind, spot);
     if (why){ state.wildRun.delete(mn); return false; }

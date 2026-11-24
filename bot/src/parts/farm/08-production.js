@@ -1129,7 +1129,8 @@
     if (F && F.open && F.cls === "load" && F.entrants[stud]){ F.loads = F.loads || {}; F.loads[stud] = Math.max(F.loads[stud]||0, load); }
     tp.lastStud = stud;
     const flavor = { equine:" That flared head swells wide with every pulse.", feline:" Those barbs make sure every last drop counts.",
-                     draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "" }[penisType(stud)] || "";
+                     draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "",
+                     ovipositor:" The ovipositor swells in a slow wave from root to tip, and slick gel floods out ahead of what's comin'." }[penisType(stud)] || "";
     let o = "💦 "+(S ? plainName(S.wearer)+" hits the edge with "+S.name+" buried in "+plainName(t)+", and it pumps "+loadWord(load)+" ("+ml(load)+") of "+plainName(stud)+"'s seed "
                     : (pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") ")+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+holeText(hole))+"."+(makesSemen(stud) && !S ? flavor : "")+" "+
             plainName(t)+" is "+Math.round(100*heldTotal(tp)/capacity(t))+"% full"+(spilt>0 ? ", and "+ml(spilt)+" spills out" : "")+".";
@@ -1151,7 +1152,7 @@
       } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
     }
     let caught = null;
-    if (canCatchIn(t, hole)){
+    if (canCatchIn(t, hole) && !(T && T.eggs)){   // (an ovipositor's seed never catches: it lays instead, Nov 24)
       const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) *
                     (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
       tp.lastFill = { at: Date.now(), stud, ml: kept, hole };
@@ -1179,8 +1180,10 @@
     let clutch = 0;
     // an "eggs" item or shot (or a Broodmare Tonic): any stud can leave a clutch, and far likelier
     const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
-    if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") &&
-        Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))){
+    // (an ovipositor, Nov 24: it lays every time, in somebody who's said ?eggs on)
+    const ovi = !!(T && T.eggs) && makesSemen(stud);
+    if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || ovi || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") &&
+        (ovi || Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1)))){
       const [lo,hi] = CFG.EGG_COUNT, [dl,dh] = CFG.EGG_DAYS;
       clutch = Math.round((lo + Math.floor(Math.random()*(hi-lo+1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));   // stacked egg shots, fertility, heat, Tentacle Musk: a bigger clutch
       clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
@@ -1192,7 +1195,8 @@
     if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }
     if (!opt.second && Math.random() < 0.7){ const pb = potionBit(t); if (pb) o += " "+pb; }   // a potion they're on (10m2)   // their tail, if they wear one (10r-looks.js)
     emote(o, t);   // about the one bred (the stud is named too, so both get it)
-    if (clutch > 0) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
+    if (clutch > 0) emote(ovi ? "🥚 "+plainName(stud)+"'s ovipositor pulses, and pulses again, and "+plainName(t)+" feels every one go in: a string of "+clutch+" slick eggs packed deep and settlin'. They'll be layin' them in a few days."
+                              : "🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
     if (sc0) sc0.lastCum = Date.now();
     // the knot ties 'em: leashed together till it goes down
     if (knot && !opt.second){

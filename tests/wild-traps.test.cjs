@@ -43,6 +43,7 @@ const companion = (mn, d) => handlers.ChatRoomMessage({ Sender: mn, Type: 'Hidde
 (async () => {
   await wait(3500);
   const cfg = W.__cfg; cfg.USER_COOLDOWN_S = 0; cfg.SEND_INTERVAL_MS = 1; cfg.TRAP_BEAT_S = 0.03; cfg.CHAIN_CHANCE = 0; cfg.WILD.CHAIN = 0; cfg.AFTER_CHANCE = 0;
+  cfg.SPIDERS.CHANCE = { barn: 0, pasture: 0, receiving: 0 }; cfg.SPIDERS.LAB_CHANCE = 0;   // (the spiders and the lab have their own test: spiders-morph)
   await say(500, '?stats', 400);
 
   // ── where they go, and how many ──

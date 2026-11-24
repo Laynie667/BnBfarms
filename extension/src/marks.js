@@ -8,6 +8,7 @@
    ?wash (or the Companion's Wash up) takes off the splatters and the writing the farm put on you.
 */
 import { commitLook } from "./look.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 const KEY = "fhc-marks";            // { splatGroup, writeGroup }: where the farm put things, so ?wash only takes those
 const STRIP_KEY = "fhc-strip-backup";
 const SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];     // Splatters fits any of these; the first free one is used
@@ -22,8 +23,8 @@ const SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" 
 const SPILL_CHANCE = 0.35;
 
 const P = () => window.Player;
-const load = () => { try { return JSON.parse(window.localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
-const save = (v) => { try { window.localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* fine */ } };
+const load = () => { try { return JSON.parse(LS.getItem(KEY)) || {}; } catch (e) { return {}; } };
+const save = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch (e) { /* fine */ } };
 const groupOf = (name) => (typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null);
 const bundle = () => window.ServerAppearanceBundle(P().Appearance);
 const lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
@@ -275,14 +276,14 @@ function gearAsset(group, slot, prefer, only) {
   return hit ? hit.Name : (typeof window.AssetGet !== "function" ? slot.names[0] : null);
 }
 const NAMES_KEY = "fhc-gear-names";
-const knownNames = () => { try { return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []); } catch (e) { return FARM_NAMES; } };
-const learnName = (n) => { try { const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []; if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80))); } catch (e) { /* fine */ } };
+const knownNames = () => { try { return FARM_NAMES.concat(JSON.parse(LS.getItem(NAMES_KEY)) || []); } catch (e) { return FARM_NAMES; } };
+const learnName = (n) => { try { const have = JSON.parse(LS.getItem(NAMES_KEY)) || []; if (!FARM_NAMES.includes(n) && !have.includes(n)) LS.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80))); } catch (e) { /* fine */ } };
 const isFarmGear = (b) => { const c = b.Craft, d = c ? String(c.Description || "") : ""; return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || (knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)))); };
 // what we put where, kept on this computer too: if the game ever hands an item back without its crafted name,
 // we still know it's ours and can take it off again
 const GEAR_KEY = "fhc-gear";
-const gearMem = () => { try { return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {}; } catch (e) { return {}; } };
-const gearMemSave = (m) => { try { window.localStorage.setItem(GEAR_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
+const gearMem = () => { try { return JSON.parse(LS.getItem(GEAR_KEY)) || {}; } catch (e) { return {}; } };
+const gearMemSave = (m) => { try { LS.setItem(GEAR_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
 const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null));
 // WHAT A WILD TRAP LEFT (Nov 20, Laynie: "Id even let the gear remain til removed by someone else"): a piece the farm
 // keeps (keep) is put back if they pull it off themselves, like all the farm's gear; when somebody ELSE takes it off,
@@ -291,8 +292,8 @@ const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem)
 // The same for a safeword said away from the farm (farmGearLetGo): everything she put on comes off at once, here.
 // Each is known by its name and its time (name|until): a fresh piece from a later trap is a new one.
 const LETGO_KEY = "fhc-gear-letgo";
-const letGo = () => { try { return JSON.parse(window.localStorage.getItem(LETGO_KEY)) || {}; } catch (e) { return {}; } };
-const letGoSave = (m) => { try { window.localStorage.setItem(LETGO_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
+const letGo = () => { try { return JSON.parse(LS.getItem(LETGO_KEY)) || {}; } catch (e) { return {}; } };
+const letGoSave = (m) => { try { LS.setItem(LETGO_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
 const pieceKey = (name, until) => String(name).slice(0, 30) + "|" + (Number(until) || 0);
 export function gearFreedHere(name, until) { const m = letGo(); m[pieceKey(name, until)] = { why: "freed", at: Date.now() }; letGoSave(m); }
 // a piece that keeps comin' off (syncFarmGear): when it went on lately, and till when it's left off
@@ -395,7 +396,7 @@ const SHAPE_KEY = "fhc-shape";   // { BodyUpper: { own, set }, BodyLower: { own,
 // shape: { up, low } = steps above (or below) your own shape; null or switched off = your own shape back. Returns what changed.
 export function syncShape(shape, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
-  let mem; try { mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {}; } catch (e) { mem = {}; }
+  let mem; try { mem = JSON.parse(LS.getItem(SHAPE_KEY)) || {}; } catch (e) { mem = {}; }
   const next = bundle().map((b) => Object.assign({}, b)), did = [];
   for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
     const order = SHAPES[group], b = next.find((x) => x.Group === group); if (!b) continue;
@@ -408,7 +409,7 @@ export function syncShape(shape, allow) {
     if (want !== b.Name) { b.Name = want; did.push(group + " " + want); }
     if (want === own) delete mem[group]; else mem[group] = { own, set: want };
   }
-  try { window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem)); } catch (e) { /* fine */ }
+  try { LS.setItem(SHAPE_KEY, JSON.stringify(mem)); } catch (e) { /* fine */ }
   if (did.length) commit(next);
   return did;
 }
@@ -460,9 +461,9 @@ export function treatiseCleanup(note) {
       if (note) note("The Body Treatise the farm wrote on you is off now. Since the game's November update it's been knockin' folks offline. The farm writes on your skin the game's own way instead.");
       return { ok: true, did: ["off"] };
     }
-    let last = 0; try { last = Number(window.localStorage.getItem(TREATISE_NOTE_KEY)) || 0; } catch (e) { /* fine */ }
+    let last = 0; try { last = Number(LS.getItem(TREATISE_NOTE_KEY)) || 0; } catch (e) { /* fine */ }
     if (Date.now() - last < WEEK) return { ok: true, did: [] };
-    try { window.localStorage.setItem(TREATISE_NOTE_KEY, String(Date.now())); } catch (e) { /* fine */ }
+    try { LS.setItem(TREATISE_NOTE_KEY, String(Date.now())); } catch (e) { /* fine */ }
     if (note) note("Heads up: you're wearin' Echo's Body Treatise. Since the game's November update it can make your game re-send your look over and over till the server drops you. If you keep gettin' disconnected, take it off in the wardrobe.");
     return { ok: true, did: ["told"] };
   } catch (e) { return { ok: false, did: [] }; }
@@ -483,7 +484,7 @@ export const BODY_BITS = /^(HairAccessory\d|TailStraps|Wings)$/;
 export function stripMe(prefs) {
   if (!prefs.strip) return { ok: false, why: "off" };
   const cur = bundle(), stuck = lockedGroups();
-  if (!window.localStorage.getItem(STRIP_KEY)) { try { window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur })); } catch (e) { /* no storage: no dressin' back */ } }
+  if (!LS.getItem(STRIP_KEY)) { try { LS.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur })); } catch (e) { /* no storage: no dressin' back */ } }
   const mem = load();
   // (the farm's own marks stay on; and so do ears, tails, wings and hair bits: the game files them as clothes, but they're
   // part of who somebody is. Nikto's #14, Oct 11: "for me these items are considered part of the characters body")
@@ -494,11 +495,11 @@ export function stripMe(prefs) {
 }
 export function dressMe() {
   let bk = null;
-  try { bk = JSON.parse(window.localStorage.getItem(STRIP_KEY)); } catch (e) { /* none */ }
+  try { bk = JSON.parse(LS.getItem(STRIP_KEY)); } catch (e) { /* none */ }
   if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
   const next = bundle(), have = new Set(next.map((b) => b.Group));
   for (const b of bk.bundle) { const g = groupOf(b.Group); if (g && g.Clothing && !have.has(b.Group)) next.push(b); }
   commit(next);
-  try { window.localStorage.removeItem(STRIP_KEY); } catch (e) { /* fine */ }
+  try { LS.removeItem(STRIP_KEY); } catch (e) { /* fine */ }
   return { ok: true, did: ["dress"] };
 }

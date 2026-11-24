@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.26.0
+// @version      0.27.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.26.0";
+  var VERSION = "0.27.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -16880,7 +16880,7 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
     e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
-    humanizer, knotting, knot remover \xB7 see ?help cocks
+    ovipositor cock, humanizer, knotting, knot remover \xB7 see ?help cocks
 
 WORN ITEMS
   \u2022 lactation, virility, fertility \xB7 smaller boosts while worn

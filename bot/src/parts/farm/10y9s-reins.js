@@ -33,7 +33,9 @@
   // who's on this leader's reins (they're all here in the room: the reins come off when anybody leaves)
   function onReinsOf(leader){ return Object.keys(L.people).map(Number).filter(m => { const x = reinsOf(m); return x && x.by === leader; }); }
   // somethin' else of the farm's has hold of them just now: the reins wait
-  function reinsHeld(mn){
+  function reinsHeld(mn){ return heldElsewhere(mn) || !!farmBusy(mn); }   // (and while the farm itself has them, Nov 24: no tug of war)
+  // somethin' of the farm's holds them where they are (a trap, a pen, the stocks, the bench, the stall, a knot, a hitch)
+  function heldElsewhere(mn){
     const r = rec(mn) || {}, p = prodOf(mn) || {}, now = Date.now();
     return !!(heldByTrap(mn) || (r.penned && r.penned.until > now) || (r.stocked && r.stocked.until > now) || (r.benched && r.benched.until > now) ||
               (p.stall && p.stall.until) || p.tieUntil > now || hitchedNow(mn));   // (or hitched to a post: 10y9u-hitch.js)

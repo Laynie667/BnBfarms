@@ -356,6 +356,8 @@ THE TYPES
   feline · barbed, every vulva fill rolls like heat
   draconic · ridged, stretches and trains throats faster
   double · ?cum <who> vulva+butt fills two at once
+  ovipositor · lays a clutch of eggs every time, in anybody who's
+    said ?eggs on, and its seed never catches
   Dogs, wolves and foxes start canine, horses equine, cats feline.
 
 KNOTS · any type can carry one
@@ -480,6 +482,10 @@ TRAPS (your own switch)
     faint of heart: a whole kit kept on you till somebody else
     frees you · ?traps wild limbs on · ?traps wild laced on
     All three off till you say so; off, a wild tile's an ordinary trap
+    Spiders hide in the wild ones too: a trapdoor in the floor, a drider
+    in the pasture trees, a weaver in the barn rafters. Cocooned, laid
+    in, and paid for the silk. ?traps theme spiders off if they're not
+    for you. And behind receivin', the doc's lab: a prototype to test.
   ?free <who> · get a caught subject out · ?goad <who> · or don't
   ?lay · on the nest, if you're carryin' eggs · ?hunt · ?pack
   Your limits still rule, and your safeword stops a trap cold
@@ -993,6 +999,8 @@ Say ?keys to see what you're holdin', hon.`;
 🕳️ GLORYHOLES — installed in the pens, left for whoever wanders past
 
 🍼 Bred, you carry the SIRE's kind: his litter, his days, his young. A dog's leaves pups in three days, a stallion's one big foal in eight, whatever you are. ?species list shows every kind.
+
+🧪 ?species picks your kind the first time, free. After that, changin' what you are takes a morphin' draught from the store: ?buy morph <animal>. Half an hour of ears, tail, hooves or paws and then the voice, and you're that kind for good, farm outfit and all, till the next one.
 
 And if you're somethin' we ain't listed, say so anyhow, sugar. We've taken in stranger!`;
 

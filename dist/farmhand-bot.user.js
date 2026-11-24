@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.98.0
+// @version      0.99.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2846,7 +2846,7 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
     e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
-    humanizer, knotting, knot remover \xB7 see ?help cocks
+    ovipositor cock, humanizer, knotting, knot remover \xB7 see ?help cocks
 
 WORN ITEMS
   \u2022 lactation, virility, fertility \xB7 smaller boosts while worn
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.98.0";
-  var COMPANION_VERSION = "0.79.0";
+  var VERSION = "0.99.0";
+  var COMPANION_VERSION = "0.80.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3341,6 +3341,8 @@ GOOD TO KNOW
       ROAM_ON: true,
       ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },
       // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
+      MORPH: { PRICE: 25, MINS: 30 },
+      // the morphin' draught: ribbons, and how long the change takes (10l4-morph.js, Nov 24)
       ROAM_PASS_PRICE: 30,
       // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
       ROAM_PASS_HOLD: 3,
@@ -3741,8 +3743,11 @@ GOOD TO KNOW
         feline: { label: "barbed feline", loadX: 1, stretchX: 1, throatX: 1, heat: true },
         // every vulva fill rolls like they're in heat
         draconic: { label: "ridged draconic", loadX: 1.2, stretchX: 2, throatX: 2 },
-        double: { label: "double", loadX: 1, stretchX: 1, throatX: 1, double: true }
+        double: { label: "double", loadX: 1, stretchX: 1, throatX: 1, double: true },
         // ?cum <who> vulva+butt
+        // (Nov 24, the suggestion box's #65; Laynie: "ovipositer as cock type"): it pumps a clutch of eggs into whoever's
+        // said ?eggs on, every time, and seed that never catches. Thick, slick and long: it stretches like an equine.
+        ovipositor: { label: "ovipositor", loadX: 0.7, stretchX: 1.5, throatX: 1.5, eggs: true }
       },
       SPECIES_PENIS: { dog: "canine", pup: "canine", wolf: "canine", fox: "canine", horse: "equine", pony: "equine", cat: "feline", kitt: "feline" },
       // crafted shot words that change the type for good (spaces, hyphens and capitals don't matter)
@@ -3752,7 +3757,8 @@ GOOD TO KNOW
         feline: ["feline", "barbed"],
         draconic: ["draconic"],
         double: ["double cock", "double penis", "hemipenes", "twin cock"],
-        human: ["humanizer", "human cock"]
+        human: ["humanizer", "human cock"],
+        ovipositor: ["ovipositor cock", "ovipositor shot", "ovipositor serum", "egg-laying cock"]
       },
       KNOT_ADD_TAGS: ["knotting", "add knot", "knot shot"],
       KNOT_REMOVE_TAGS: ["knot remover", "unknotting"],
@@ -8469,7 +8475,8 @@ GOOD TO KNOW
         equine: " That flared head swells wide with every pulse.",
         feline: " Those barbs make sure every last drop counts.",
         draconic: " Every ridge drags deliciously on the way.",
-        double: opt.load || opt.half ? " Both cocks throb and unload at once." : ""
+        double: opt.load || opt.half ? " Both cocks throb and unload at once." : "",
+        ovipositor: " The ovipositor swells in a slow wave from root to tip, and slick gel floods out ahead of what's comin'."
       }[penisType(stud)] || "";
       let o = "\u{1F4A6} " + (S ? plainName(S.wearer) + " hits the edge with " + S.name + " buried in " + plainName(t) + ", and it pumps " + loadWord(load) + " (" + ml(load) + ") of " + plainName(stud) + "'s seed " : (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") ") + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + holeText(hole)) + "." + (makesSemen(stud) && !S ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
       if (sealOpen) o += " " + plainName(t) + "'s " + seal.name + " opens for " + plainName(stud) + " alone, and seals every drop in behind.";
@@ -8488,7 +8495,7 @@ GOOD TO KNOW
         } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
       }
       let caught = null;
-      if (canCatchIn(t, hole)) {
+      if (canCatchIn(t, hole) && !(T && T.eggs)) {
         const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) * (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
         tp.lastFill = { at: Date.now(), stud, ml: kept, hole };
         caught = rollConception(t, stud, kept, bonus, hole);
@@ -8522,7 +8529,8 @@ GOOD TO KNOW
       }
       let clutch = 0;
       const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
-      if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") && Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))) {
+      const ovi = !!(T && T.eggs) && makesSemen(stud);
+      if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || ovi || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") && (ovi || Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1)))) {
         const [lo, hi] = CFG.EGG_COUNT, [dl, dh] = CFG.EGG_DAYS;
         clutch = Math.round((lo + Math.floor(Math.random() * (hi - lo + 1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));
         clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
@@ -8541,7 +8549,7 @@ GOOD TO KNOW
         if (pb) o += " " + pb;
       }
       emote(o, t);
-      if (clutch > 0) emote("\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
+      if (clutch > 0) emote(ovi ? "\u{1F95A} " + plainName(stud) + "'s ovipositor pulses, and pulses again, and " + plainName(t) + " feels every one go in: a string of " + clutch + " slick eggs packed deep and settlin'. They'll be layin' them in a few days." : "\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
       if (sc0) sc0.lastCum = Date.now();
       if (knot && !opt.second) {
         const frac = (sizeOf(stud, "knot") - 1) / (CFG.SIZES.knot.max - 1), span = CFG.TIE_MAX_M - CFG.TIE_MIN_M;
@@ -11422,6 +11430,15 @@ GOOD TO KNOW
     function canLead(mn) {
       return cueable(mn, "lead") && onMap(mn);
     }
+    function farmBusy(mn) {
+      const now = Date.now();
+      if (state.leads) {
+        for (const l of state.leads.values()) if (l.mn === mn && now - l.at < 95e3) return "the farm's walkin' them somewhere";
+      }
+      const v = state.echs && state.echs.get(mn);
+      if (v && ["Asked", "AttemptMade", "InductionInProgress", "Hypnotized"].includes(v.phase) && now - (v.at || 0) < 31 * 6e4) return "they're with the farm girl, in a trance";
+      return "";
+    }
     function lead(mn, pt, urgent, why) {
       state.leads = state.leads || /* @__PURE__ */ new Map();
       for (const [id2, l] of state.leads) if (l.mn === mn) state.leads.delete(id2);
@@ -11430,6 +11447,7 @@ GOOD TO KNOW
       enqueue(makeMsg("lead", { X: pt.X, Y: pt.Y, id, why: why || "" }, mn), urgent);
       return true;
     }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __farmBusy: (m) => farmBusy(m), __lead: (m, pt) => lead(m, pt) });
     function leadAnswer(mn, m) {
       const l = state.leads && state.leads.get(m.id);
       if (!l || l.mn !== mn) return;
@@ -12661,6 +12679,7 @@ GOOD TO KNOW
       { id: "skipchore", name: "Skip a chore", price: 4, desc: "Your chore comes off the board. Nobody needs to know." },
       { id: "purity", name: "A Purity Tonic", price: CFG.PURITY_PRICE, desc: "Bitter, cold and clean. Takes 20 off your corruption and lifts the newest thing it changed in you (and any latex it left). Once a week." },
       { id: "roampass", name: "A roam pass", price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
+      { id: "morph", name: "A morphin' draught", price: CFG.MORPH ? CFG.MORPH.PRICE : 25, desc: "Turns you into another kind, for good, till your next one: ears, tail, hooves or paws, then your voice, over half an hour. Your farm outfit follows. ?buy morph <animal>" },
       { id: "grace", name: "Quota grace", price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
       { id: "greeting", name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
       { id: "tag", name: "A ribbon tag", price: 5, desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
@@ -12826,6 +12845,10 @@ GOOD TO KNOW
           done("\u{1F6C1} Your luxury day starts now, sugar: 24 hours. (" + ribbonsOf(sender) + " ribbons left)");
           return;
         }
+        case "morph":
+          morphBuy(sender, text, price, R, done);
+          return;
+        // (10l4-morph.js: it takes the ribbons itself, Nov 24)
         case "skipchore": {
           if (!r.chore) {
             R("You haven't got a chore right now, sugar, so keep your ribbons.");
@@ -13118,6 +13141,138 @@ GOOD TO KNOW
     }
     addCommand("ribbons ribbon buy gift", { topic: "ribbons", run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });
     addCommand("store", { topic: "ribbons", words: true, run: (c) => ribbonCommand(c.cmd, c.sender, c.args, c.R) });
+    if (!CFG.MORPH) CFG.MORPH = { PRICE: 25, MINS: 30 };
+    const MORPH_BITS = {
+      cow: { a: "cow", ears: "soft, floppy cow ears", tail: "a long cow's tail with a tuft on the end", feet: "hooves", sound: "a long, low moo" },
+      bull: { a: "bull", ears: "short cow ears and a pair of stubby horns", tail: "a tufted bull's tail", feet: "heavy hooves", sound: "a deep snort" },
+      pony: { a: "pony", ears: "pert pony ears", tail: "a long, swishin' pony tail", feet: "neat little hooves", sound: "a breathy whinny" },
+      horse: { a: "horse", ears: "tall horse ears", tail: "a long, flowin' horse's tail", feet: "hooves", sound: "a high whinny" },
+      deer: { a: "deer", ears: "big, soft deer ears", tail: "a little white flag of a tail", feet: "dainty hooves", sound: "a thin bleat" },
+      pig: { a: "pig", ears: "floppy pig ears", tail: "a curly pink tail", feet: "trotters", sound: "a happy grunt" },
+      pup: { a: "pup", ears: "floppy puppy ears", tail: "a waggin' puppy tail", feet: "soft paws", sound: "a yip" },
+      dog: { a: "dog", ears: "pricked dog ears", tail: "a waggin' tail", feet: "paws", sound: "a bark" },
+      kitt: { a: "kitty", ears: "soft kitten ears", tail: "a long, curious kitty tail", feet: "little paws", sound: "a mew" },
+      cat: { a: "cat", ears: "pointed cat ears", tail: "a slinkin' cat's tail", feet: "paws", sound: "a purr" },
+      goblin: { a: "goblin", ears: "long, pointy goblin ears", tail: "a skinny green tail with a tuft on the end", feet: "clawed green feet", sound: "a filthy little cackle" },
+      bunny: { a: "bunny", ears: "long, floppy bunny ears", tail: "a fluffy cotton tail", feet: "big, soft bunny feet", sound: "a little squeak" },
+      rabbit: { a: "rabbit", ears: "long rabbit ears", tail: "a fluffy white tail", feet: "big rabbit feet", sound: "a thump of one foot" },
+      fox: { a: "fox", ears: "big, pointed fox ears", tail: "a thick, bushy fox tail", feet: "black paws", sound: "a sharp yip" },
+      wolf: { a: "wolf", ears: "pointed wolf ears", tail: "a heavy wolf's tail", feet: "big paws", sound: "a low howl" },
+      goat: { a: "goat", ears: "floppy goat ears and little curled horns", tail: "a short, flickin' goat tail", feet: "cloven hooves", sound: "a loud bleat" },
+      sheep: { a: "sheep", ears: "soft sheep ears", tail: "a fluffy little lamb's tail", feet: "neat hooves", sound: "a tremblin' baa" },
+      rat: { a: "rat", ears: "round pink rat ears", tail: "a long, bare rat's tail", feet: "pink little paws", sound: "a squeak" },
+      dragon: { a: "dragon", ears: "swept-back horns and finned ears", tail: "a heavy, scaled tail", feet: "clawed feet", sound: "a rumblin' growl" }
+    };
+    const MORPH_LINES = {
+      drink: [
+        "%n tips back the morphin' draught. It goes down warm and thick and tastes of %was, then of %a, then of nothin' they've got a word for.",
+        "%n drains the little bottle in one go and shudders. Somethin' in them has started rewritin' itself, and it's in no hurry.",
+        `The draught fizzes on %n's tongue and settles low and warm. The farm girl takes the empty bottle and pats their cheek. "Won't be long now, sugar."`
+      ],
+      ears: [
+        "%n's ears itch, then burn, then stretch, and by the time they get a hand up there they're %ears.",
+        "There's a tug at the sides of %n's head, like somebody's pullin' gently, and when it stops they've got %ears.",
+        "%n's ears go hot and soft and start movin' on their own, turnin' after every sound: %ears, and they twitch."
+      ],
+      tail: [
+        "Somethin' pushes out at the base of %n's spine and keeps on pushin': %tail, and it's already swishin'.",
+        "%n squirms and reaches back, and there's %tail there now, warm and theirs and impossible to keep still.",
+        "A tickle low on %n's back turns into %tail, unfurlin' slow, and the whole room watches it happen."
+      ],
+      feet: [
+        "%n's hands and feet ache and curl, and when they look down they've got %feet.",
+        "%n stumbles, and catches themselves on %feet that weren't there a minute ago.",
+        "The ache runs down %n's arms and legs and settles at the ends of them, and when it fades they're standin' on %feet."
+      ],
+      voice: [
+        "%n opens their mouth to say somethin', and what comes out is %sound. That's it, then: they're %a stock now, through and through.",
+        "%n tries to laugh and it comes out as %sound, and the farm girl writes the new kind on their card without a word. %A, for good.",
+        "The last of it settles with a shiver, and %n lets out %sound before they can stop it. Every bit %a now."
+      ]
+    };
+    const MORPH_STEPS = [["ears", 0.25], ["tail", 0.5], ["feet", 0.75], ["voice", 1]];
+    const morphBits = (k) => MORPH_BITS[k] || { a: k || "animal", ears: "ears that aren't the ones they had", tail: "a tail", feet: "feet that aren't feet any more", sound: "a sound no person makes" };
+    function morphLine(mn, key, m) {
+      const to = morphBits(m.kind), was = morphBits(m.fromKind);
+      const v = { ears: to.ears, tail: to.tail, feet: to.feet, sound: to.sound, a: to.a, A: to.a.charAt(0).toUpperCase() + to.a.slice(1), was: m.fromKind ? was.a : "whatever they were" };
+      let t = pickFor(mn, "morph:" + key, MORPH_LINES[key]);
+      for (const [k, val] of Object.entries(v)) t = t.split("%" + k).join(val);
+      return tFill(t, mn);
+    }
+    function morphNeeded(mn, animal) {
+      const r = rec(mn);
+      if (!r || !r.species) return "";
+      const k0 = speciesKey(mn), k1 = speciesKeyOf(String(animal || "").toLowerCase()) || "default";
+      if (k0 === "default" || k1 === k0) return "";
+      return "\u{1F9EA} You're " + (MORPH_BITS[k0] ? "a " + MORPH_BITS[k0].a : r.species) + " on the farm's books now, sugar, and changin' what you are takes a morphin' draught: ?buy morph " + String(animal || "<animal>").trim() + ", " + perkPrice(mn, CFG.MORPH.PRICE) + " ribbons. " + (r.morph ? "You've one workin' on you already." : "Callin' yourself somethin' else of the same kind is still free.");
+    }
+    function morphBuy(mn, text, price, R, done) {
+      const r = rec(mn), word = String(text || "").toLowerCase().replace(/[^a-z' -]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+      if (!word) {
+        R("\u{1F9EA} A morphin' draught turns you into another kind, for good, till the next one: ?buy morph <animal>, like ?buy morph pig. Over half an hour: ears, tail, hooves or paws, then your voice. " + price + " ribbons.");
+        return;
+      }
+      const k = speciesKeyOf(word);
+      if (!k || !CFG.SPECIES[k] || k === "default") {
+        R("\u{1F9EA} I don't brew one for that, sugar. The kinds: " + Object.keys(MORPH_BITS).filter((x) => CFG.SPECIES[x]).join(", ") + ".");
+        return;
+      }
+      if (r.morph) {
+        R("\u{1F9EA} You've already got one workin' on you, sugar. Let it finish.");
+        return;
+      }
+      if (r.species && speciesKey(mn) === k) {
+        R("\u{1F9EA} You're already " + (MORPH_BITS[k] ? "a " + MORPH_BITS[k].a : word) + ", sugar. Keep your ribbons. (?species " + word + " changes what you're called, free.)");
+        return;
+      }
+      if (!spendRibbons(mn, price, "a morphin' draught")) {
+        R("That's " + price + " ribbons, sugar, and you've only got " + ribbonsOf(mn) + ".");
+        return;
+      }
+      const now = Date.now();
+      r.morph = { to: word, kind: k, from: r.species || "", fromKind: r.species ? speciesKey(mn) : "", at: now, until: now + CFG.MORPH.MINS * 6e4, step: 0 };
+      saveLedger();
+      audit(mn, "MORPH", (r.morph.fromKind || "?") + " > " + k);
+      if (charFor(mn)) emote("\u{1F9EA} " + morphLine(mn, "drink", r.morph), mn);
+      done("\u{1F9EA} Down it goes: " + price + " ribbons. Over the next " + CFG.MORPH.MINS + " minutes you turn " + (MORPH_BITS[k] ? "into a " + MORPH_BITS[k].a : "into " + word) + ", for good, till your next draught. (" + ribbonsOf(mn) + " ribbons left)");
+    }
+    function morphTick() {
+      const now = Date.now();
+      for (const k of Object.keys(L2.people)) {
+        const r = L2.people[k], m = r && r.morph;
+        if (!m) continue;
+        const mn = Number(k), f = Math.min(1, (now - m.at) / Math.max(1, m.until - m.at));
+        while (m.step < MORPH_STEPS.length && f >= MORPH_STEPS[m.step][1]) {
+          const [key] = MORPH_STEPS[m.step];
+          m.step++;
+          if (key === "voice") morphDone(mn, r, m);
+          else if (charFor(mn)) emote("\u{1F9EA} " + morphLine(mn, key, m), mn);
+          saveLedger();
+        }
+      }
+    }
+    function morphDone(mn, r, m) {
+      r.species = m.to;
+      r.morph = null;
+      if (charFor(mn)) emote("\u{1F9EA} " + morphLine(mn, "voice", m), mn);
+      else tell(mn, "\u{1F9EA} While you were away, the draught finished its work: you're " + (MORPH_BITS[m.kind] ? "a " + MORPH_BITS[m.kind].a : m.to) + " now, for good, till your next one.");
+      audit(mn, "MORPHED", m.kind);
+      try {
+        if (r.contractDressedAt && !r.ownOutfit) {
+          const slot = outfitSlotFor(mn);
+          if (slot) {
+            r.contractDressedAt = 0;
+            r.outfitOwed = { slot, at: Date.now() };
+            later(() => contractOutfitNow(mn), 2500);
+          }
+        }
+      } catch (e) {
+        warn("morph outfit:", e);
+      }
+      saveLedger();
+      syncCompanions(true);
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __morphTick: () => morphTick(), __morphNeeded: (mn, a) => morphNeeded(mn, a), __morphBits: () => MORPH_BITS });
     const POTIONS = [
       {
         id: "clover",
@@ -15216,6 +15371,10 @@ GOOD TO KNOW
         if (w) return w;
       }
       if (r.trapWait) return "a trap already has them";
+      {
+        const fb = farmBusy(mn);
+        if (fb) return fb;
+      }
       if (ANTHRO[kind] && !ANTHRO[kind].person && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";
       if (benchedNow(mn) || stockedNow(mn) || r.penned || prodOf(mn) && prodOf(mn).stall) return "they're held somewhere already";
       if (state.trapRuns && state.trapRuns.has(mn)) return "a trap already has them";
@@ -15730,6 +15889,7 @@ GOOD TO KNOW
     }
     function trapCheck(mn, now) {
       if (mn === BOTMN() || !isSubject(mn)) return;
+      if (farmBusy(mn)) return;
       state.trapAt = state.trapAt || /* @__PURE__ */ new Map();
       const r = rec(mn);
       const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));
@@ -23890,7 +24050,7 @@ GOOD TO KNOW
     }
     function echsHeld(mn) {
       try {
-        return reinsHeld(mn) || !!(prodOf(mn) || {}).pin;
+        return heldElsewhere(mn) || !!(prodOf(mn) || {}).pin;
       } catch (e) {
         return false;
       }
@@ -40675,7 +40835,7 @@ GOOD TO KNOW
       icon: "\u{1F577}\uFE0F",
       what: "the spider queen in the hayloft: webbed up, silk-tied, and a clutch of her eggs",
       limit: /\b(spiders?|insects?|bugs?|eggs?|ovipos|webs?|clutch)\b/i,
-      stud: { sire: -64, name: "the spider queen", type: "draconic", loads: 1, ml: 140, hold: 8, hole: "vulva", bonus: 0, where: "the spider queen's web", eggs: true },
+      stud: { sire: -64, name: "the spider queen", type: "ovipositor", loads: 1, ml: 140, hold: 8, hole: "vulva", bonus: 0, where: "the spider queen's web", eggs: true },
       needs: (mn) => limitBlocks(mn, "eggs") ? "their limits rule it out" : null,
       lines: {
         beats: [
@@ -44095,6 +44255,9 @@ GOOD TO KNOW
       });
     }
     function reinsHeld(mn) {
+      return heldElsewhere(mn) || !!farmBusy(mn);
+    }
+    function heldElsewhere(mn) {
       const r = rec(mn) || {}, p = prodOf(mn) || {}, now = Date.now();
       return !!(heldByTrap(mn) || r.penned && r.penned.until > now || r.stocked && r.stocked.until > now || r.benched && r.benched.until > now || p.stall && p.stall.until || p.tieUntil > now || hitchedNow(mn));
     }
@@ -64435,21 +64598,29 @@ GOOD TO KNOW
       if (!r || !wildFor(mn)) return false;
       if (now - (r.trapAt || 0) < CFG.WILD.GRACE_S * 1e3 || heldByTrap(mn) || state.trapRuns && state.trapRuns.has(mn)) return false;
       const Z = CFG.WILD.ZONES[w.g], spot = Z ? "trap-theme-" + Z.theme : "";
-      let pool = [];
+      let odd = null;
       try {
-        const sp = spot ? seasonPick(mn, spot) : null;
-        if (sp && Array.isArray(sp.kinds)) pool = sp.kinds.filter((k) => TRAP_KINDS[k] && !trapWhyNot(mn, k));
+        if (!huntOn()) odd = wildOdd(mn, w);
       } catch (e) {
-        warn("wild trap season:", e);
+        warn("wild trap odd:", e);
       }
-      if (!pool.length && spot) pool = themePool(mn, spot);
-      if (!pool.length) pool = Object.keys(TRAP_KINDS).filter((k) => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
-      if (!pool.length) return false;
-      const kind = trapWeighted(mn, pool).kind;
+      let pool = [];
+      if (!odd) {
+        try {
+          const sp = spot ? seasonPick(mn, spot) : null;
+          if (sp && Array.isArray(sp.kinds)) pool = sp.kinds.filter((k) => TRAP_KINDS[k] && !trapWhyNot(mn, k));
+        } catch (e) {
+          warn("wild trap season:", e);
+        }
+        if (!pool.length && spot) pool = themePool(mn, spot);
+        if (!pool.length) pool = Object.keys(TRAP_KINDS).filter((k) => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
+        if (!pool.length) return false;
+      }
+      const kind = odd ? odd.kind : trapWeighted(mn, pool).kind;
       state.wildRun = state.wildRun || /* @__PURE__ */ new Map();
       state.wildRun.set(mn, now + 30 * 6e4);
       state.wildArea = state.wildArea || /* @__PURE__ */ new Map();
-      state.wildArea.set(mn, huntOn() ? "hunt" : w.g || "barn");
+      state.wildArea.set(mn, odd ? odd.area : huntOn() ? "hunt" : w.g || "barn");
       emote("\u{1F573}\uFE0F " + tFill(pickFor(mn, "wild:open", WILD_OPEN), mn), mn);
       const why = springTrap(mn, kind, spot);
       if (why) {
@@ -64832,6 +65003,353 @@ GOOD TO KNOW
         WILD_KIT_PIECE.cowbell
       ]
     });
+    if (!CFG.SPIDERS) CFG.SPIDERS = { CHANCE: { barn: 0.2, pasture: 0.3, receiving: 0.1 }, LAB_CHANCE: 0.35 };
+    if (!CFG.SILK) CFG.SILK = { YARDS: [6, 14], PER_RIBBON: 3 };
+    const SPIDER_LIMIT = /\b(spiders?|insects?|bugs?|eggs?|ovipos\w*|webs?|clutch\w*|arachn\w*)\b/i;
+    const SPIDER_AT = { barn: ["weaver", "trapdoor"], pasture: ["drider", "trapdoor"], receiving: ["trapdoor"] };
+    const wildOnly = (mn) => wildOn(mn) || state.wildPick === mn ? null : "only the wild ones hide it";
+    const spiderNeeds = (mn) => wildOnly(mn) || (limitBlocks(mn, "eggs") ? "their limits rule it out" : null);
+    Object.assign(TRAP_KINDS, {
+      trapdoor: { icon: "\u{1F577}\uFE0F", what: "a trapdoor spider's burrow: down through the floor, wrapped in silk, and laid in", limit: SPIDER_LIMIT },
+      drider: { icon: "\u{1F577}\uFE0F", what: "the drider in the trees: snatched up into the branches, cocooned and laid in", limit: SPIDER_LIMIT },
+      weaver: { icon: "\u{1F578}\uFE0F", what: "the weaver in the barn rafters: woven into her web like lace, and laid in", limit: SPIDER_LIMIT },
+      labtest: { icon: "\u{1F9EA}", what: "the lab behind receivin': a mad scientist, a prototype, and you're the field trial", limit: /\b(experiment\w*|science|lab|medical|clinic\w*|doctor)\b/i }
+    });
+    for (const k of ["trapdoor", "drider", "weaver"]) TRAP_NEEDS[k] = spiderNeeds;
+    TRAP_NEEDS.labtest = wildOnly;
+    const SPIDER_STUD = (sire, name, where) => ({ sire, name, type: "ovipositor", loads: 1, ml: 120, hold: 8, hole: "vulva", bonus: 0, where, eggs: true, after: (mn) => silkPay(mn, name) });
+    ANTHRO.trapdoor = SPIDER_STUD(-90, "the trapdoor spider", "the trapdoor spider's burrow");
+    ANTHRO.drider = SPIDER_STUD(-91, "the drider in the trees", "the drider's branch");
+    ANTHRO.weaver = SPIDER_STUD(-92, "the weaver in the rafters", "the weaver's web");
+    for (const k of ["trapdoor", "drider", "weaver"]) {
+      TRAP_SOUND[k] = "ropelong";
+      TRAP_SOUND_END[k] = "rope";
+      TRAP_GEAR[k] = [{ when: "hold", slot: "arms", label: "Spider Silk", items: ["Web"], opt: "Wrapped", color: "#F4F4F4", desc: "Fine white silk wound round and round, soft as cotton and impossible to pull apart." }];
+    }
+    TRAP_THEME_SW.spiders = { off: "spider traps", icon: "\u{1F577}\uFE0F", label: "Spiders", desc: "The trapdoor spider, the drider in the trees, the weaver in the rafters and the Halloween spider queen: webs, cocoons and eggs laid in you. Off for the arachnophobic." };
+    for (const k of ["trapdoor", "drider", "weaver", "spider"]) for (const t of ["spiders", "monsters", "pregnancy"]) if (!(TRAP_TAGS[k] = TRAP_TAGS[k] || []).includes(t)) TRAP_TAGS[k].push(t);
+    THEME_SW_WORDS.spider = "spiders";
+    THEME_SW_WORDS.arachnids = "spiders";
+    THEME_SW_WORDS.arachnophobia = "spiders";
+    THEME_SW_WORDS.webs = "spiders";
+    Object.assign(ANTHRO_LINES, {
+      trapdoor: {
+        beats: [
+          [
+            "The ground under %n gives like a lid, because it IS a lid: a round trapdoor of silk and dirt, and it swings open under them.",
+            "%n steps on a patch of straw that's a little too smooth, and it tips: a silk-hinged trapdoor, and the dark under it.",
+            "There's a click under %n's foot, soft as a latch, and the floor opens like a mouth."
+          ],
+          [
+            "Long legs come up out of the burrow faster than anythin' that big should move, wrap round %n's waist, and pull them down into the dark.",
+            "Somethin' takes %n by the ankles from below, eight hooked legs and a hungry little chitter, and down they go.",
+            "%n drops into a burrow lined with silk, soft as a feather bed, and she's waitin' at the bottom: half a woman, half a big glossy spider, and all of her smilin'."
+          ],
+          [
+            "She spins while she holds them, round and round, silk over their arms and down their legs, till %n's bundled tight and only the parts she wants are bare.",
+            "Her spinnerets work at %n like a loom, and in a minute they're wrapped snug from the shoulders to the knees, hung in the dark of her burrow.",
+            "She turns %n over and over in her legs, wrappin' as she goes, till they're a neat silk parcel she can do as she likes with."
+          ]
+        ],
+        in: [
+          [
+            "Her ovipositor slides out of her, slick and ridged and long, and she feeds it into %n's %h an inch at a time, down there in the dark where nobody can hear.",
+            "She settles her weight over the bundle that's %n, and her ovipositor finds their %h, pushes in, and keeps goin', deeper than anythin' has a right to."
+          ],
+          [
+            "Then the eggs: a swell at the root, a slow push, a pop, and one's in. Then another. %n's belly rounds out in the silk with every one she lays.",
+            "She lays slow and careful, an egg at a time, each one a fat round pressure squeezin' into %n's %h and settlin' deep, and she hums to them while she does it."
+          ]
+        ],
+        over: [[
+          "She doesn't lay. She keeps %n wrapped in her burrow and strokes them with soft, feathery legs, teasin' every bare inch till they're squirmin' in the silk.",
+          "She hangs %n in the dark of her burrow and leaves them there a while, wrapped and helpless, checkin' on them now and then with one long leg."
+        ]],
+        end: [
+          "The trapdoor swings open again and she pushes %n up into the light, cocooned and dazed, belly round with %x of her eggs and slick drippin' from their %h.",
+          "%n's left on the floor beside the trapdoor, wrapped in silk, %x eggs heavy in their belly. The lid settles shut. You'd never know it was there."
+        ],
+        endOver: ["She pushes %n back up through the trapdoor, wrapped in silk and tinglin' all over, and the lid closes like it was never there."]
+      },
+      drider: {
+        beats: [
+          [
+            "The branches over the pasture path rustle, and %n looks up a second too late.",
+            "%n walks under the big oak, and somethin' up in the leaves goes very still.",
+            "A line of silk drifts down in front of %n's face, glitterin', and somethin' comes down after it."
+          ],
+          [
+            "She drops out of the canopy on a single thread, upside down: a woman to the hips, pale and pretty, and below that a spider's body as big as a pony.",
+            "Eight legs land round %n like the bars of a cage, and the drider they belong to smiles down, hair hangin', every one of her eyes on them.",
+            "She takes %n from above, legs closin' round them, and the ground falls away as she climbs back up into the leaves."
+          ],
+          [
+            "Up in the branches she spins %n into a hammock of silk, wrists to the bough, legs spread and tied, swayin' in the breeze.",
+            "She wraps %n tight and hangs them from a high branch like a lantern, slowly spinnin', bare where she wants them bare.",
+            "The silk goes round and round, and when she's done %n's a cocoon hung in the oak, with a gap just where she means to use them."
+          ]
+        ],
+        in: [
+          [
+            "She hangs upside down in front of %n, and her ovipositor curls up and finds their %h, slick and ridged, and slides in while the whole tree sways.",
+            "She braces on the branch, belly to %n's, and her ovipositor pushes into their %h, long and slow, while the leaves rustle all round."
+          ],
+          [
+            "She lays in time with the wind in the branches: swell, push, pop, and another egg settles in %n, then another, till they've stopped countin'.",
+            "One by one the eggs go in, each a round, warm weight passin' into %n's %h, and the cocoon creaks with how full they're gettin'."
+          ]
+        ],
+        over: [[
+          "She doesn't lay. She leaves %n hangin' in the oak, cocooned, and strokes them with the soft tips of her legs every time the wind swings them close.",
+          "She keeps %n up in the branches a while, swingin' gently in her silk, and tickles them every time she passes."
+        ]],
+        end: [
+          "She lets %n down on a long thread, cocoon and all, into the grass at the foot of the oak: %x eggs heavy in their belly, slick runnin' from their %h.",
+          "%n is lowered into the pasture grass, wrapped like a parcel and full of %x eggs, and the drider goes back up into the leaves."
+        ],
+        endOver: ["She lowers %n into the grass, still wrapped, still tinglin', and climbs back up the oak without a sound."]
+      },
+      weaver: {
+        beats: [
+          [
+            "%n walks into a strand of silk across the barn aisle. Then another. Then they can't walk any more, because the whole aisle is web.",
+            "There's a web strung between the barn beams that wasn't there this mornin', and %n's in it before they see it.",
+            "The lantern light catches silk all through the rafters, and %n hears somethin' big shift on the beam above."
+          ],
+          [
+            "The weaver comes down the web hand over hand, leg over leg: a spider woman, long and black and glossy, with a seamstress's careful smile.",
+            "Eight legs pick their way down the strands, and the woman on top of them tuts at %n like they're a dropped stitch.",
+            `She lowers herself from the beam right in front of %n's face, upside down, and says, "Hold still, dear. I'm makin' you somethin'."`
+          ],
+          [
+            "She weaves %n into the web itself, arms up and spread, legs apart, silk crisscrossed over them so neat it looks like lace.",
+            "Her legs fly, and the web closes round %n in a pattern, tight and pretty, until they're part of it, hung at the height she likes.",
+            "She ties %n into the web strand by strand, like she's mendin' a sail, and leaves every bit of them she wants to use bare."
+          ]
+        ],
+        in: [
+          [
+            "She climbs over %n in the web, and her ovipositor finds their %h, slick and ridged, and pushes in, and the whole web shivers with it.",
+            "She settles onto %n where they hang, and her ovipositor slides into their %h, long and slow, while she hums a little sewin' song."
+          ],
+          [
+            "She lays like she sews: neat and even, one egg, then the next, each one pressed into %n's %h and patted into place on their swellin' belly.",
+            "The eggs come in a steady rhythm, each one a fat, round push into %n's %h, and the web creaks with the weight of them."
+          ]
+        ],
+        over: [[
+          "She doesn't lay. She embroiders %n instead, silk stitched in pretty loops over every bare inch, until they're shakin' and beggin' in the web.",
+          "She leaves %n hung in the web like a sampler on the wall, and comes back to admire her work every few minutes."
+        ]],
+        end: [
+          "She cuts %n out of the web and sets them down in the straw, still wrapped in her lace, belly round with %x eggs and slick drippin' from their %h.",
+          "%n is lowered from the rafters on a thread, a lace-wrapped parcel with %x eggs inside, and the weaver goes back to her mendin'."
+        ],
+        endOver: ["She snips %n loose and lowers them into the straw, still trimmed in her silk lace and tinglin' all over."]
+      }
+    });
+    const SPIDER_SCENE = [
+      [
+        "Somethin' small and many-legged runs along the silk to see what's happenin', and runs away again.",
+        "The silk hums when %n moves, and every hum tells her exactly where they are.",
+        "Her eyes, all eight of them, follow every twitch %n makes.",
+        "She tests the silk round %n with one leg, plucks it like a harp string, and smiles at the sound."
+      ],
+      [
+        "{t}Two soft legs stroke %n's tits through the silk, round and round, slow and tickly.",
+        "{c}She leaves a gap in the silk for %n's cock and teases it with the tip of one leg, just the tip, over and over.",
+        "{v}She strokes between %n's legs with a leg as soft as a feather duster, and it's maddenin'.",
+        "She kisses %n, upside down, from the strand above, and her lips taste of honey."
+      ]
+    ];
+    for (const k of ["trapdoor", "drider", "weaver"]) trapScene(k, ...SPIDER_SCENE);
+    INTENSITY_BY_TRAP.trapdoor = {
+      tender: ["She tucks the silk soft round %n's shoulders, like a blanket, and strokes their hair down there in the dark.", "She hums to %n the whole time, low and kind, and never pulls a strand too tight.", "She lets %n rest against her belly after, warm and wrapped, till they've stopped shakin'."],
+      filthy: ["Down in her burrow %n's nothin' but a warm, wrapped hole for her to fill, and she fills it.", "She stuffs %n with eggs till their belly bulges against the silk, and chitters at every noise they make.", "%n's drippin' slick and silk in the dark and beggin' for more eggs, and she gives them more."]
+    };
+    INTENSITY_BY_TRAP.drider = {
+      tender: ["She cradles %n against her as the branch sways, careful as anythin', and croons to them.", "She brushes the hair off %n's face with one soft leg and tells them they're doin' so well.", "She lowers them so slow, after, that they barely feel the grass."],
+      filthy: ["Hung up in the oak like a fly, %n's just a swingin' hole for her ovipositor, and the whole pasture can see.", "She packs %n full and lets the wind swing them, belly bulgin', slick runnin' down the cocoon.", "%n's moanin' for her eggs up in the branches, loud enough for the cows to hear, and she laughs and lays more."]
+    };
+    INTENSITY_BY_TRAP.weaver = {
+      tender: ["She smooths every strand round %n flat and neat, and checks they can breathe easy.", "She tells %n how pretty they look in her lace, and means it.", "She takes her time, and every stitch is gentle."],
+      filthy: ["She weaves %n spread wide in the web like a display, every hole on show, and fills the one she likes.", "She lays in %n neat as embroidery, egg after egg, till they're a stuffed, drippin' sampler on the barn wall.", "%n hangs in her lace beggin' to be laid in again, and she obliges, humming."]
+    };
+    INTENSITY_BY_TRAP.labtest = {
+      tender: ["The doc warms every instrument in their hands first, and apologises for the cold ones.", `"You're doin' marvellously," the doc says, and pats %n's hand between readings.`, "The doc checks the straps twice, so nothin' pinches."],
+      filthy: ["The doc measures how wet %n gets on a little brass gauge, and writes the number down with obvious delight.", '"Squirm all you like, it improves the data," the doc says, and turns the dial up.', "To the doc, %n's just a needy specimen on a table, and they take very thorough notes."]
+    };
+    function silkPay(mn, by) {
+      const r = rec(mn);
+      if (!r) return 0;
+      const [a, b] = CFG.SILK.YARDS, yards = a + Math.floor(Math.random() * (b - a + 1)), n = Math.max(1, Math.ceil(yards / CFG.SILK.PER_RIBBON));
+      r.silk = (r.silk || 0) + yards;
+      saveLedger();
+      later(() => {
+        const got = earnRibbons(mn, n, yards + " yards of spider silk, sold at market");
+        try {
+          leaderShare(mn, got);
+        } catch (e) {
+        }
+        emote("\u{1F578}\uFE0F The farm girl unwinds " + yards + " yards of good white silk off " + plainName(mn) + " and pays them for it on the spot: " + n + " ribbon" + (n === 1 ? "" : "s") + '. "Spider silk fetches a fine price, sugar."', mn);
+      }, 3e3);
+      return yards;
+    }
+    const SILK_PIECE = {
+      gag: { slot: "gag", label: "Silk Gag", items: ["WebGag"], color: "#F4F4F4", desc: "A wad of sticky silk stuffed in their mouth and wound round their head." },
+      blind: { slot: "blind", label: "Silk Blindfold", items: ["WebBlindfold"], color: "#F4F4F4", desc: "Silk spun over their eyes, thick as gauze." },
+      ears: { slot: "earplugs", label: "Silk Plugs", items: ["HeavyDutyEarPlugs"], color: "#F4F4F4", desc: "Silk packed in both ears. All they hear is their own heart, and the web creakin'." },
+      hobble: { slot: "feet", label: "Silk Hobble", items: ["HempRope"], color: "#F4F4F4", desc: "Their ankles wound together in silk. Small steps, or none." }
+    };
+    const LAB_PIECE = {
+      cuffs: { slot: "arms", label: "Lab Restraints", items: ["LeatherCuffs"], opt: "Wrist", desc: "Padded cuffs locked behind them, so nobody fiddles with the settings." },
+      blind: { slot: "blind", label: "Lab Blinders", items: ["LeatherBlindfold"], desc: "Blinders, so the results aren't swayed by what the subject sees." },
+      ears: { slot: "earplugs", label: "Lab Earmuffs", items: ["HeavyDutyEarPlugs"], desc: "Plugs in both ears, so the subject isn't swayed by what they hear either." }
+    };
+    WILD_KITS.spider = [
+      {
+        name: "Cocooned",
+        tell: "%n is left cocooned: wrapped in silk from the shoulders down, a wad of it in their mouth, more over their eyes and in their ears, ankles wound together, a parcel waitin' to be found.",
+        pieces: [
+          { slot: "arms", label: "Spider's Cocoon", items: ["Web"], opt: "Cocooned", color: "#F4F4F4", laced: "Venom in the silk, a drip of sedative.", desc: "Silk wound round and round from the shoulders to the knees, tight as a chrysalis." },
+          SILK_PIECE.gag,
+          SILK_PIECE.blind,
+          SILK_PIECE.ears,
+          SILK_PIECE.hobble
+        ]
+      },
+      {
+        name: "Hung Up for Later",
+        tell: "%n is left hogtied in silk, wrists to ankles, gagged and blinded with it, one of her eggs plugged in to keep warm, a spider's supper set aside for later.",
+        pieces: [
+          { slot: "arms", label: "Spider's Hogtie", items: ["Web"], opt: "Hogtied", color: "#F4F4F4", laced: "Venom in the silk, a drip of needy nectar.", desc: "Wrists and ankles wound together behind them in silk, tight and sticky." },
+          SILK_PIECE.gag,
+          SILK_PIECE.blind,
+          SILK_PIECE.ears,
+          { slot: "plug", label: "Spider's Egg Plug", items: ["EggVibePlugXXL", "TailButtPlug"], color: "#F4F4F4", desc: "A smooth silk-wrapped egg pushed in deep behind, to keep her clutch company." }
+        ]
+      },
+      {
+        name: "Wrapped Like Lace",
+        tell: "%n is left wrapped in a spider's lace: arms bound in silk, eyes and ears covered, ankles hobbled, a silk gag tied neat, a pretty parcel nobody's opened yet.",
+        pieces: [
+          { slot: "arms", label: "Spider's Lace", items: ["Web"], opt: "Wrapped", color: "#F4F4F4", laced: "Venom in the silk, a drip of haze drops.", desc: "Silk lace wound neat and tight round their arms and body." },
+          SILK_PIECE.gag,
+          SILK_PIECE.blind,
+          SILK_PIECE.ears,
+          SILK_PIECE.hobble
+        ]
+      }
+    ];
+    const LAB_LINES = {
+      beats: [
+        [
+          "The door at the back of receivin' that's always locked isn't, and %n's through it before they think better of it: a lab, all glass and copper and bubblin' flasks.",
+          `A hand in a rubber glove closes on %n's wrist from a doorway they never noticed. "Ah. A volunteer," says a voice, delighted.`,
+          "%n trips over a cable, and the cable runs back to a door marked TESTING, and the door opens."
+        ],
+        [
+          'The doc is tall and thin in a stained white coat, goggles pushed up in wild hair, and they look %n over like a page of notes. "Perfect. Exactly the build I needed."',
+          `"Don't mind the straps," the doc says, buckling %n down to a padded table. "They're for the equipment's safety, not yours."`,
+          `The doc circles %n with a clipboard, measurin' with their eyes and tappin' a pencil on their teeth. "Yes. You'll do nicely for trial eleven."`
+        ],
+        [
+          "Out of a crate full of straw comes the prototype, all brass fittings and rubber and a little blinkin' light, and the doc fits it to %n with tender, careful hands.",
+          '"Hold still, this is the delicate part," the doc murmurs, and the prototype goes on with a hiss and a click, and starts to hum.',
+          `The doc reads the settings off a card, adjusts three dials, and fits the thing to %n. "Let's see what it does," they say, and flips the switch.`
+        ]
+      ],
+      end: [
+        `The doc makes a last note, unstraps %n from the table and shoos them out. "Field trial! Keep it on. Somebody'll be along to take readings."`,
+        `"Fascinatin'," the doc says, scribblin'. "Let's see how it does out in the barn." And %n's out the door, prototype and all.`,
+        `"Trial eleven: promisin'," the doc mutters, and pushes %n out through the door. "Don't take it off. Don't let anybody take it off. Notes, I need notes."`
+      ]
+    };
+    trapScene(
+      "labtest",
+      [
+        "A centrifuge whines up to speed somewhere behind %n, and the doc hums along with it.",
+        "The doc presses a cold stethoscope to %n's belly and listens, nodding, and writes somethin' down.",
+        "Somethin' in a jar on the shelf opens its eyes and watches."
+      ],
+      [
+        `{t}The doc squeezes each of %n's tits in turn, like testin' fruit, and makes a note: "Responsive."`,
+        "The doc takes a reading between %n's legs with a little brass instrument, and it beeps, and the doc looks very pleased.",
+        `"Climbin' nicely," the doc murmurs, watchin' a needle swing higher on a dial wired between %n's thighs.`
+      ]
+    );
+    TRAP_SOUND.labtest = "machine";
+    MORE_TRAPS.labtest = (mn, spot) => {
+      trapHold(mn, 6, "the lab");
+      trapRun(mn, "labtest", LAB_LINES.beats, () => {
+        emote("\u{1F9EA} " + tFill(pickFor(mn, "trap:labtest:end", LAB_LINES.end), mn), mn);
+        face(mn, "edged", 90);
+        arouse(mn, 30);
+      }, {});
+    };
+    WILD_KITS.lab = [
+      {
+        name: "Trial Eleven: the Milker Mk II",
+        tell: "%n is sent off with trial eleven still latched on: a brass milker that won't switch off, a harness of sensors that zaps them every time they're touched, blinders, earmuffs, and cuffs so they can't fiddle with the settings.",
+        pieces: [
+          { slot: "cups", label: "Milker Mk II", items: ["LactationPump"], laced: "Auto-injector: let-down tonic, needy nectar, hair trigger, every 15 minutes.", desc: "Brass milker: lactation drive, no off switch." },
+          { slot: "torso", label: "Test Harness", items: ["LeatherHarness"], laced: "Moo juice and hair trigger when touched; heat mist on climax.", desc: "Sensor straps and copper leads, takin' readings." },
+          LAB_PIECE.cuffs,
+          LAB_PIECE.blind,
+          LAB_PIECE.ears
+        ]
+      },
+      {
+        name: "Trial Twelve: the Breedin' Stimulator",
+        tell: "%n is sent off with trial twelve buzzin' inside them, a numbered collar drippin' rut and need into them, blinders, earmuffs and the lab's cuffs.",
+        pieces: [
+          { slot: "dildo", label: "Stimulator Plug", items: ["InflatableVibeDildo", "VibratingDildo"], laced: "Hungry. Heat mist and sure-catch serum on climax.", desc: "Copper-coil plug: fertility, virility and capacity stretching." },
+          { slot: "collar", label: "Trial Twelve Collar", items: ["LeatherCollar"], laced: "A drip of rut serum and needy nectar.", desc: "A collar with a brass tag stamped TRIAL 12." },
+          LAB_PIECE.cuffs,
+          LAB_PIECE.blind,
+          LAB_PIECE.ears
+        ]
+      },
+      {
+        name: "Trial Thirteen: the Silk Gland Graft",
+        tell: "%n is sent off with trial thirteen strapped low on their belly: a pulsin' silk gland for egg layin' that swells their belly, a ridged trainer plug to get them used to bein' laid in, blinders, earmuffs and the lab's cuffs.",
+        pieces: [
+          { slot: "torso", label: "Silk Gland Graft", items: ["LeatherHarness"], laced: "A drip of needy nectar and fill-out, belly.", desc: "A pulsin' gland strapped low: egg laying, a clutch from any stud." },
+          { slot: "plug", label: "Ovipositor Trainer", items: ["TailButtPlug", "InflVibeButtPlug"], laced: "Auto-injector of tender drops, ass, and hair trigger.", desc: "A ridged plug for gettin' used to bein' laid in." },
+          LAB_PIECE.cuffs,
+          LAB_PIECE.blind,
+          LAB_PIECE.ears
+        ]
+      },
+      {
+        name: "Trial Fourteen: the Obedience Collar",
+        tell: "%n is sent off in trial fourteen: a steel collar with a blinkin' light that makes them docile and dim and moo when they're spanked, the lab's mitts and cuffs, blinders and earmuffs.",
+        pieces: [
+          { slot: "collar", label: "Obedience Collar v0.3", items: ["SlaveCollar", "LeatherCollar"], laced: "Moo serum when spanked; a drip of airhead elixir and sedative.", desc: "Steel collar, blinkin' light: obedience conditioning." },
+          { slot: "hands", label: "Lab Mitts", items: ["PaddedLeatherMittens"], desc: "Padded mitts, so the subject can't reach the collar's dials." },
+          LAB_PIECE.cuffs,
+          LAB_PIECE.blind,
+          LAB_PIECE.ears
+        ]
+      }
+    ];
+    function wildOdd(mn, w) {
+      const g = w && w.g || "barn", r = rec(mn);
+      if (!r) return null;
+      state.wildPick = mn;
+      try {
+        const odd = [];
+        if (g === "receiving" && Math.random() < CFG.SPIDERS.LAB_CHANCE && !trapWhyNot(mn, "labtest")) odd.push({ kind: "labtest", area: "lab" });
+        if (!odd.length && Math.random() < (CFG.SPIDERS.CHANCE[g] || 0)) {
+          const ks = (SPIDER_AT[g] || ["trapdoor"]).filter((k) => !trapWhyNot(mn, k));
+          if (ks.length) odd.push({ kind: ks[Math.floor(Math.random() * ks.length)], area: "spider" });
+        }
+        return odd[0] || null;
+      } finally {
+        state.wildPick = 0;
+      }
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __wildOdd: (mn, w) => wildOdd(mn, w), __silkPay: (mn) => silkPay(mn, "test") });
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);
@@ -65392,6 +65910,8 @@ THE TYPES
   feline \xB7 barbed, every vulva fill rolls like heat
   draconic \xB7 ridged, stretches and trains throats faster
   double \xB7 ?cum <who> vulva+butt fills two at once
+  ovipositor \xB7 lays a clutch of eggs every time, in anybody who's
+    said ?eggs on, and its seed never catches
   Dogs, wolves and foxes start canine, horses equine, cats feline.
 
 KNOTS \xB7 any type can carry one
@@ -65514,6 +66034,10 @@ TRAPS (your own switch)
     faint of heart: a whole kit kept on you till somebody else
     frees you \xB7 ?traps wild limbs on \xB7 ?traps wild laced on
     All three off till you say so; off, a wild tile's an ordinary trap
+    Spiders hide in the wild ones too: a trapdoor in the floor, a drider
+    in the pasture trees, a weaver in the barn rafters. Cocooned, laid
+    in, and paid for the silk. ?traps theme spiders off if they're not
+    for you. And behind receivin', the doc's lab: a prototype to test.
   ?free <who> \xB7 get a caught subject out \xB7 ?goad <who> \xB7 or don't
   ?lay \xB7 on the nest, if you're carryin' eggs \xB7 ?hunt \xB7 ?pack
   Your limits still rule, and your safeword stops a trap cold
@@ -66055,6 +66579,8 @@ Say ?keys to see what you're holdin', hon.`;
 \u{1F573}\uFE0F GLORYHOLES \u2014 installed in the pens, left for whoever wanders past
 
 \u{1F37C} Bred, you carry the SIRE's kind: his litter, his days, his young. A dog's leaves pups in three days, a stallion's one big foal in eight, whatever you are. ?species list shows every kind.
+
+\u{1F9EA} ?species picks your kind the first time, free. After that, changin' what you are takes a morphin' draught from the store: ?buy morph <animal>. Half an hour of ears, tail, hooves or paws and then the voice, and you're that kind for good, farm outfit and all, till the next one.
 
 And if you're somethin' we ain't listed, say so anyhow, sugar. We've taken in stranger!`;
     TEXT.luxury = `\u{1F3E1} THE CABIN \u2014 LUXURY STAY \u{1F3E1}
@@ -67812,7 +68338,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "penis":
         case "cock": {
           const types = Object.keys(CFG.PENIS_TYPES);
-          const help = "Types: " + types.map((k) => CFG.PENIS_TYPES[k].label === k ? k : k + " (" + CFG.PENIS_TYPES[k].label + ")").join(", ") + `. Set yours with ?cock <type>, like ?cock equine. Any of 'em can carry a knot: a crafted shot with "knotting" gives one (canine comes knotted). Shots with canine, equine, feline (or barbed), draconic, double cock or humanizer change the type.`;
+          const help = "Types: " + types.map((k) => CFG.PENIS_TYPES[k].label === k ? k : k + " (" + CFG.PENIS_TYPES[k].label + ")").join(", ") + `. Set yours with ?cock <type>, like ?cock equine. Any of 'em can carry a knot: a crafted shot with "knotting" gives one (canine comes knotted). Shots with canine, equine, feline (or barbed), draconic, double cock, ovipositor cock or humanizer change the type.`;
           let t = sender, a = args.slice();
           if (a.length > 1 || a.length === 1 && !types.includes(a[0].toLowerCase()) && !/^(types|list)$/i.test(a[0])) {
             const w = resolveTarget(a[0]);
@@ -67889,6 +68415,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           if (!rec(who)) {
             R("You need to be on the books first, sugar. Say ?apply!");
             break;
+          }
+          if (who === sender && !isStaff(sender)) {
+            const no = morphNeeded(sender, animal);
+            if (no) {
+              R(no);
+              break;
+            }
           }
           rec(who).species = animal.toLowerCase().trim().slice(0, 40);
           saveLedger();
@@ -71047,6 +71580,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           strapTick();
         } catch (e) {
           warn("strap-on:", e);
+        }
+        try {
+          morphTick();
+        } catch (e) {
+          warn("morph:", e);
         }
         try {
           nurseryTick();

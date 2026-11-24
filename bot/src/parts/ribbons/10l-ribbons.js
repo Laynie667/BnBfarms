@@ -105,6 +105,7 @@
     { id: "skipchore", name: "Skip a chore",          price: 4,  desc: "Your chore comes off the board. Nobody needs to know." },
     { id: "purity",    name: "A Purity Tonic",        price: CFG.PURITY_PRICE, desc: "Bitter, cold and clean. Takes 20 off your corruption and lifts the newest thing it changed in you (and any latex it left). Once a week." },
     { id: "roampass",  name: "A roam pass",           price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
+    { id: "morph",     name: "A morphin' draught",   price: CFG.MORPH ? CFG.MORPH.PRICE : 25, desc: "Turns you into another kind, for good, till your next one: ears, tail, hooves or paws, then your voice, over half an hour. Your farm outfit follows. ?buy morph <animal>" },
     { id: "grace",     name: "Quota grace",           price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
     { id: "greeting",  name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
     { id: "tag",       name: "A ribbon tag",          price: 5,  desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
@@ -222,6 +223,7 @@
         done("🛁 Your luxury day starts now, sugar: 24 hours. ("+ribbonsOf(sender)+" ribbons left)");
         return;
       }
+      case "morph": morphBuy(sender, text, price, R, done); return;   // (10l4-morph.js: it takes the ribbons itself, Nov 24)
       case "skipchore": {
         if (!r.chore){ R("You haven't got a chore right now, sugar, so keep your ribbons."); return; }
         spendRibbons(sender, price, it.name); const was = r.chore.text; r.chore = null;

@@ -11,6 +11,7 @@
 import { BOT_MEMBER } from "./config.js";
 import { commitLook } from "./look.js";
 import { BODY_BITS } from "./marks.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 const BACKUP_KEY = "fhc-outfit-backup";
 // lock details are never saved or copied: the farm puts its own locks on
 const LOCK_FIELDS = ["LockedBy", "LockMemberNumber", "LockMemberName", "LockMessage", "CombinationNumber", "Password", "Hint", "LockSet",
@@ -87,7 +88,7 @@ export function wearOutfit(data, keys) {
     next.push(b); worn++;
     if (isItem(g)) added.push(it.Group);
   }
-  try { window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added })); } catch (e) { /* no storage: no change-back */ }
+  try { LS.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added })); } catch (e) { /* no storage: no change-back */ }
   commit(next);
   return { ok: true, worn, locks, skipped };
 }
@@ -122,7 +123,7 @@ export function topUpOutfit(data, keys, groups) {
 // farm put on, under the farm's own padlock, come off too. Nothin' anybody else locked is ever touched.
 export function changeBack(opts) {
   let bk = null;
-  try { bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY)); } catch (e) { /* none */ }
+  try { bk = JSON.parse(LS.getItem(BACKUP_KEY)); } catch (e) { /* none */ }
   if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
   const stuck = lockedGroups();
   if (opts && opts.farmLocks) for (const it of P().Appearance) {
@@ -143,7 +144,7 @@ export function changeBack(opts) {
     if (isClothes(g) || (isItem(g) && (bk.added || []).includes(b.Group))) next.push(b);
   }
   commit(next);
-  try { window.localStorage.removeItem(BACKUP_KEY); } catch (e) { /* fine */ }
+  try { LS.removeItem(BACKUP_KEY); } catch (e) { /* fine */ }
   return { ok: true, stillLocked: stuck.size };
 }
-export const hasBackup = () => { try { return !!window.localStorage.getItem(BACKUP_KEY); } catch (e) { return false; } };
+export const hasBackup = () => { try { return !!LS.getItem(BACKUP_KEY); } catch (e) { return false; } };

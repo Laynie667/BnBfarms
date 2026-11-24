@@ -103,6 +103,7 @@
     /* ── ROAM ── passes off the farm for summonable contracts, and fetchin' them home (10uk-roam.js) */
     ROAM_ON: true,
     ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },   // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
+    MORPH: { PRICE: 25, MINS: 30 },   // the morphin' draught: ribbons, and how long the change takes (10l4-morph.js, Nov 24)
     ROAM_PASS_PRICE: 30,         // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
     ROAM_PASS_HOLD: 3,           // most passes they can carry
     ROAM_PASS_MIN: 60,
@@ -238,12 +239,16 @@
       equine:  { label:"flared equine",   loadX:1.5, stretchX:2, throatX:1 },
       feline:  { label:"barbed feline",   loadX:1,   stretchX:1, throatX:1, heat:true },   // every vulva fill rolls like they're in heat
       draconic:{ label:"ridged draconic", loadX:1.2, stretchX:2, throatX:2 },
-      double:  { label:"double",          loadX:1,   stretchX:1, throatX:1, double:true }  // ?cum <who> vulva+butt
+      double:  { label:"double",          loadX:1,   stretchX:1, throatX:1, double:true },  // ?cum <who> vulva+butt
+      // (Nov 24, the suggestion box's #65; Laynie: "ovipositer as cock type"): it pumps a clutch of eggs into whoever's
+      // said ?eggs on, every time, and seed that never catches. Thick, slick and long: it stretches like an equine.
+      ovipositor:{ label:"ovipositor",    loadX:0.7, stretchX:1.5, throatX:1.5, eggs:true }
     },
     SPECIES_PENIS: { dog:"canine", pup:"canine", wolf:"canine", fox:"canine", horse:"equine", pony:"equine", cat:"feline", kitt:"feline" },
     // crafted shot words that change the type for good (spaces, hyphens and capitals don't matter)
     PENIS_TYPE_TAGS: { canine:["canine"], equine:["equine"], feline:["feline","barbed"], draconic:["draconic"],
-                       double:["double cock","double penis","hemipenes","twin cock"], human:["humanizer","human cock"] },
+                       double:["double cock","double penis","hemipenes","twin cock"], human:["humanizer","human cock"],
+                       ovipositor:["ovipositor cock","ovipositor shot","ovipositor serum","egg-laying cock"] },
     KNOT_ADD_TAGS: ["knotting","add knot","knot shot"],
     KNOT_REMOVE_TAGS: ["knot remover","unknotting"],
     TIE_MIN_M: 5, TIE_MAX_M: 30,  // a knot ties the pair this long (random), and leashes them together

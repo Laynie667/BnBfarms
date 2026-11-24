@@ -40,6 +40,7 @@ import { bcrOverBreast } from "./bcr.js";
 import FARM_LOOK from "../../shared/farm-look.json";   // the farm's look, built in (tools/farm-look-bake.mjs, Oct 26)
 import { BOT_MEMBER } from "./config.js";
 import { warnSome } from "./warn.js";
+import { LS, onAccount } from "./acct.js";   // each account its own (Nov 24)
 
 const W = window;
 const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see", FARM_KEY = "farmhand-drawn-body-farm";
@@ -57,10 +58,10 @@ const others = new Map();                          // member number → { S, E, 
 if (W.__FARMHAND_TEST__) W.__drawnBody = { mine, others };   // (for the tests)
 
 function load() {
-  try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
-  try { seeOthers = W.localStorage.getItem(SEE_KEY) !== "0"; } catch (e) { /* on */ }
+  try { const d = JSON.parse(LS.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
+  try { seeOthers = LS.getItem(SEE_KEY) !== "0"; } catch (e) { /* on */ }
   { const b = clean(FARM_LOOK && FARM_LOOK.body); if (b) farm = { at: String(FARM_LOOK.id || "built-in"), body: b }; }
-  try { W.localStorage.removeItem(FARM_KEY); } catch (e) { /* fine */ }   // (the copy the bot used to send)
+  try { LS.removeItem(FARM_KEY); } catch (e) { /* fine */ }   // (the copy the bot used to send)
   mine.S = S;
 }
 // What you're drawn with: your own studio's settings if you brought them, otherwise the farm's look (plain settings till
@@ -156,7 +157,7 @@ export function drawnBodyFarmState(d) {
   if (!S.on) return;
   if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
 }
-function save() { try { W.localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: fine */ } }
+function save() { try { LS.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: fine */ } }
 
 // ── handing drawings to the game by name ──
 const made = new WeakMap();            // canvas → { src, dx, dy }
@@ -474,6 +475,8 @@ function hook() {
 
 export function initDrawnBody(mod) {
   sdk = mod; load();
+  // (each account its own drawn body, Nov 24: its own settings, and nothin' of the last account's farm sizes)
+  onAccount(() => { load(); farmMe = null; mine.E = null; try { if (S.on) redraw(300); } catch (e) { /* not up yet */ } });
   setInterval(prune, 20000);
   setInterval(saveLearned, 30000);   // (what each body's learned about its pieces, saved for next time)
   if (typeof W.requestAnimationFrame === "function") { framesOk = true; frameTick(); }   // (the frames, counted: one at a time, above)
@@ -525,7 +528,7 @@ export function drawnBodySet(on, say) {
   }
 }
 export function drawnBodySeeOthers(on, say) {
-  seeOthers = !!on; try { W.localStorage.setItem(SEE_KEY, on ? "1" : "0"); } catch (e) { /* fine */ }
+  seeOthers = !!on; try { LS.setItem(SEE_KEY, on ? "1" : "0"); } catch (e) { /* fine */ }
   for (const mn of others.keys()) redrawMn(mn, 60);
   if (on) { hook(); ask(); }
   if (say) say(on ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");

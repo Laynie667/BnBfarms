@@ -40,11 +40,11 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
 
   // 2. one the farm put on: off, once, with a note
   let notes = [];
-  ls['fhc-marks'] = JSON.stringify({ treatise: true, writeGroup: 'BodyMarkings' });
+  ls['fhc-marks@221397'] = JSON.stringify({ treatise: true, writeGroup: 'BodyMarkings' });
   me([item('HairFront', 'Hair1'), item('BodyMarkings2_Luzi', '身体论文', { TypeRecord: { l: 1 }, Text34: 'USED 3X TODAY' })]);
   let r = M.treatiseCleanup((t) => notes.push(t));
   ok(r.did[0] === 'off' && !has('BodyMarkings2_Luzi') && !!has('HairFront'), 'one the farm put on comes off when the Companion starts, and nothin\' else does');
-  ok(notes.length === 1 && /offline/.test(notes[0]) && !JSON.parse(ls['fhc-marks']).treatise && JSON.parse(ls['fhc-marks']).writeGroup === 'BodyMarkings', '...you\'re told why, and the farm forgets it (the rest of what it remembers stays)');
+  ok(notes.length === 1 && /offline/.test(notes[0]) && !JSON.parse(ls['fhc-marks@221397']).treatise && JSON.parse(ls['fhc-marks@221397']).writeGroup === 'BodyMarkings', '...you\'re told why, and the farm forgets it (the rest of what it remembers stays)');
 
   // 3. your own: a heads-up, once a week
   notes = [];
@@ -53,12 +53,12 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ok(r.did[0] === 'told' && !!has('BodyMarkings2_Luzi') && notes.length === 1 && /wardrobe/.test(notes[0]), 'one of your own stays on, with a heads-up: what it can do, and where to take it off');
   r = M.treatiseCleanup((t) => notes.push(t));
   ok(!r.did.length && notes.length === 1, '...and not again on the next load');
-  ls['fhc-treatise-note'] = String(Date.now() - 8 * 86400000);
+  ls['fhc-treatise-note@221397'] = String(Date.now() - 8 * 86400000);
   r = M.treatiseCleanup((t) => notes.push(t));
   ok(r.did[0] === 'told' && notes.length === 2, '...but again a week on, if it\'s still on');
 
   // 4. a locked one stays (the farm never pulls a lock)
-  ls['fhc-marks'] = JSON.stringify({ treatise: true });
+  ls['fhc-marks@221397'] = JSON.stringify({ treatise: true });
   me([item('BodyMarkings2_Luzi', '身体论文', { LockedBy: 'MetalPadlock' })]);
   r = M.treatiseCleanup(() => {});
   ok(!!has('BodyMarkings2_Luzi'), 'a locked one stays on: the farm never pulls a lock');
@@ -66,6 +66,6 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   // 5. none on: nothin' happens, nothin' is sent
   const s0 = sends; me([item('HairFront', 'Hair1')]);
   r = M.treatiseCleanup(() => notes.push('x'));
-  ok(r.ok && !r.did.length && sends === s0 && !JSON.parse(ls['fhc-marks']).treatise, 'no Treatise on: nothin\' happens and nothin\' is sent');
+  ok(r.ok && !r.did.length && sends === s0 && !JSON.parse(ls['fhc-marks@221397']).treatise, 'no Treatise on: nothin\' happens and nothin\' is sent');
   out(fails ? 'FAIL ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })();

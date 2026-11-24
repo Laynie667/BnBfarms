@@ -456,7 +456,7 @@
       inHeat(p) && "🔥 In heat · "+hrsLeft(p.heat.until)+" left",
       isRipe(mn) && "🌸 Ripe today: every load takes twice as easy",   // (Nov 19, 10ur3-breed-anywhere.js)
       r.broodWomb && "🤰 Brood Womb: carryin', every load takes and adds to your litter",
-      p.preg && "🍼 Bred by "+p.preg.sires.map(plainName).join(" & ")+" · due "+new Date(p.preg.due).toLocaleDateString()+" ("+Math.ceil((p.preg.due-now)/86400000)+" day(s))",
+      p.preg && "🍼 Bred by "+p.preg.sires.map(plainName).join(" & ")+" · carryin' "+carryWord(mn)+" · due "+new Date(p.preg.due).toLocaleDateString()+" ("+Math.ceil((p.preg.due-now)/86400000)+" day(s))",
       r.rights && r.rights.until > now && "🔏 Breedin' rights: "+plainName(r.rights.stud)+((r.rights.allow||[]).length ? " (also "+r.rights.allow.map(plainName).join(", ")+")" : "")+" till "+new Date(r.rights.until).toLocaleDateString(),
       p.offspring.litters && "👶 Litters: "+p.offspring.litters+" · "+p.offspring.male+" male, "+p.offspring.female+" female, "+p.offspring.futa+" futa",
       p.labour && "🍼 In labour right now!",

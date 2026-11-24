@@ -8,6 +8,8 @@
      card (ready for custom belly art).
    • Cravings while showing and heavy, every 2–4 hours they're here, privately.
    • Baby kicks once they're heavy, every 20–40 minutes they're here, seen by whoever's nearby.
+   • (Nov 23) The stages, the cravings and the kicks follow what they're CARRYIN', the sire's kind (carrying.js): a cow
+     carryin' pups craves meat and feels a litter squirm; carryin' a dragon's, her belly runs hot.
    • Midwives (midwife.js, Nov 10): staff and anybody trusted with it. ?checkup <who> feels how far along and how
      many; ?midwife <who> sees them through labour, hurries it along, turns a stuck one, and tends them after;
      ?induce <who> brings it on once they're nestin', if they say yes. An Expectin' card for staff and midwives.
@@ -23,6 +25,7 @@
 import { connect, pick, between, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
 import { MORE } from "./more-lines.js";
 import { MORE2 } from "./more-lines-2.js";
+import { mixKind } from "./carrying.js";   // lines by what they're carryin', the sire's kind (Nov 23)
 import { pairsSetup, pairsBred, pairsCommands, pairsCards, PAIRS_GUIDE } from "./pairs.js";
 import { midwifeSetup, midwifeCommands, midwifeLabour, midwifeStuck, midwifeBirth, midwifeTick, midwifeCard, MIDWIFE_GUIDE } from "./midwife.js";   // checkups, labour, aftercare (Nov 10)   // call a stud, mates for the day
 
@@ -77,11 +80,14 @@ const RUTTY = [
   "%name% can't stop lookin' toward the scent of heat nearby. Their breathing's gone heavy.",
 ];
 
-// words for a line about somebody expectin': their kind's young, and how many (Oct 15: a cow carries a calf, not a litter)
+// words for a line about somebody expectin': their young, and how many (Oct 15: a cow carries a calf, not a litter). The
+// young are the SIRE's kind now (Nov 23, bot 10y2c-sired.js): a cow bred by a dog is carryin' "the pups". %sire%: who bred them.
 function words(mn, extra) {
-  const an = animalOf(api, mn), p = api.prod(mn), n = (p && p.preg && p.preg.count) || 1, young = an.young || ["little one", "little ones"];
-  const litter = "the " + (n > 1 ? young[1] : young[0]);
-  return Object.assign({ name: api.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0] }, extra || {});
+  const an = animalOf(api, mn), p = api.prod(mn), n = (p && p.preg && p.preg.count) || 1;
+  let young = an.young || ["little one", "little ones"];
+  try { const y = api.labour && typeof api.labour.young === "function" ? api.labour.young(mn) : null; if (Array.isArray(y) && y[0]) young = y; } catch (e) { /* their own kind's */ }
+  const litter = "the " + (n > 1 ? young[1] : young[0]), s0 = p && p.preg && p.preg.sires && p.preg.sires[0];
+  return Object.assign({ name: api.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0], sire: s0 ? api.name(s0) : "their sire" }, extra || {});
 }
 // a line about them from a pool, picked to fit their body (and fresh), with the words filled in
 const lineAbout = (mn, pool, key, extra) => fill(lineFor(api, mn, pool, key), words(mn, extra));
@@ -106,15 +112,15 @@ function tick() {
     if (st.key !== x.stage && STAGE_LINES[st.key]) {
       x.stage = st.key;
       api.notice(mn, lineAbout(mn, [STAGE_LINES[st.key].you].concat(MORE2.STAGE_YOU[st.key] || []), "you:" + st.key));
-      if (api.onMap(mn)) api.emote("🤰 " + lineAbout(mn, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || []), "room:" + st.key), mn);
+      if (api.onMap(mn)) api.emote("🤰 " + lineAbout(mn, mixKind(api, mn, st.key, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || [])), "room:" + st.key), mn);
       api.save();
     }
     if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
-      if (x.craveAt) api.notice(mn, "🤰 " + lineAbout(mn, CRAVINGS, "crave"));
+      if (x.craveAt) api.notice(mn, "🤰 " + lineAbout(mn, mixKind(api, mn, "crave", CRAVINGS), "crave"));
       x.craveAt = now + between(120, 240) * 60000;
     }
     if ((st.key === "heavy" || st.key === "nesting") && api.onMap(mn) && now >= (x.kickAt || 0)) {
-      if (x.kickAt) api.emote("🤰 " + lineAbout(mn, KICKS, "kick"), mn);
+      if (x.kickAt) api.emote("🤰 " + lineAbout(mn, mixKind(api, mn, "kick", KICKS), "kick"), mn);
       x.kickAt = now + between(20, 40) * 60000;
     }
   }

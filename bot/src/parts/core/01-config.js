@@ -378,20 +378,23 @@
     NURSE_SECONDS: 15,            // ...a little at a time over this many seconds
     NURSE_COOLDOWN_S: 90,
     BLOCK_CHECK: true,            // ?cum checks the hole (and the stud's penis) isn't locked, plugged or gagged
-    // matched against the species on file; litter = [fewest, most]
+    // matched against the species on file; litter = [fewest, most]; days = how long a pregnancy of their kind runs.
+    // (Nov 23, Laynie: pregnancy "by species impregnated by". The SIRE's kind sets the litter and the days, and what's
+    // born: a cow bred by a dog carries pups, quick, and a bunny bred by a stallion carries one foal, long. A sire with
+    // no kind on file, a human, leaves it to the mother's own kind, as before. 10y2c-sired.js)
     SPECIES: {
-      cow:{milk:2, fert:1.0, litter:[1,1]},  bull:{milk:1, fert:1.0, litter:[1,1]},
-      pony:{milk:1, fert:0.8, litter:[1,1]}, horse:{milk:1, fert:0.8, litter:[1,1]},
-      deer:{milk:1, fert:0.9, litter:[1,1]}, pig:{milk:1, fert:1.3, litter:[4,10]},
-      pup:{milk:1, fert:1.2, litter:[3,8]},  dog:{milk:1, fert:1.2, litter:[3,8]},
-      kitt:{milk:1, fert:1.2, litter:[2,6]}, cat:{milk:1, fert:1.2, litter:[2,6]},
-      goblin:{milk:1, fert:1.6, litter:[2,5]},
-      bunny:{milk:1, fert:1.5, litter:[4,8]}, rabbit:{milk:1, fert:1.5, litter:[4,8]},
-      fox:{milk:1, fert:1.1, litter:[2,5]},   wolf:{milk:1, fert:1.1, litter:[3,6]},
-      goat:{milk:1.5, fert:1.1, litter:[1,3]}, sheep:{milk:1, fert:1.0, litter:[1,2]},
-      rat:{milk:1, fert:1.7, litter:[6,12]},   // (Oct 26: the ratsluts)
-      dragon:{milk:1, fert:0.8, litter:[1,3]},  // (Oct 29: the dragons; their own seed leaves clutches anyway)
-      default:{milk:1, fert:1.0, litter:[1,2]}
+      cow:{milk:2, fert:1.0, litter:[1,1], days:7},  bull:{milk:1, fert:1.0, litter:[1,1], days:7},
+      pony:{milk:1, fert:0.8, litter:[1,1], days:8}, horse:{milk:1, fert:0.8, litter:[1,1], days:8},
+      deer:{milk:1, fert:0.9, litter:[1,1], days:6}, pig:{milk:1, fert:1.3, litter:[4,10], days:4},
+      pup:{milk:1, fert:1.2, litter:[3,8], days:3},  dog:{milk:1, fert:1.2, litter:[3,8], days:3},
+      kitt:{milk:1, fert:1.2, litter:[2,6], days:3}, cat:{milk:1, fert:1.2, litter:[2,6], days:3},
+      goblin:{milk:1, fert:1.6, litter:[2,5], days:2},
+      bunny:{milk:1, fert:1.5, litter:[4,8], days:2}, rabbit:{milk:1, fert:1.5, litter:[4,8], days:2},
+      fox:{milk:1, fert:1.1, litter:[2,5], days:3},   wolf:{milk:1, fert:1.1, litter:[3,6], days:3},
+      goat:{milk:1.5, fert:1.1, litter:[1,3], days:5}, sheep:{milk:1, fert:1.0, litter:[1,2], days:5},
+      rat:{milk:1, fert:1.7, litter:[6,12], days:2},   // (Oct 26: the ratsluts)
+      dragon:{milk:1, fert:0.8, litter:[1,3], days:6},  // (Oct 29: the dragons; their own seed leaves clutches anyway)
+      default:{milk:1, fert:1.0, litter:[1,2], days:5}
     },
     // keywords in a crafted item's name or description (worn, or on an injector)
     TAG_WORDS: {

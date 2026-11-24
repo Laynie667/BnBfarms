@@ -119,6 +119,12 @@ const near=(mn)=>{ const a=chars[0].MapData.Pos, b=chars.find(c=>c.MemberNumber=
   for (let i=0;i<60;i++){ await wait(250); if(!(W.__st().trapRuns&&W.__st().trapRuns.has(800))) break; }
   await wait(9500);
   ok(hyp(n,800).some(m=>m.type==='session-attempt'), 'the lantern reaches for their ECHS when it lets go');
+  // (Nov 23, #57, Crystal: the trance's "led along" fought the farm holdin' her in place, too full to move: teleportin' back and forth)
+  const pr=W.__prodOf(700); chars[4].MapData.Pos={X:30,Y:30}; pr.pin={X:30,Y:30,since:Date.now()};
+  P(700).hypno=true; const echsMap=W.__st().echs; if (echsMap) echsMap.delete(700);
+  await say(700,'?hypnotize me',700); n=sent.length; echs(700,{phase:'AttemptMade'}); await wait(400);
+  ok(!sent.slice(n).some(([e,d])=>d&&d.Target===700&&(/MapViewTeleport/.test(d.Content||'')||(d.Dictionary&&/lead/.test(JSON.stringify(d.Dictionary))))), 'too full to move: the trance leaves them where the farm\'s holdin\' them, no bein\' led off and put back');
+  ok(near(700), '...and the farm girl steps over to them for it instead');
   ok(!warns.some(w=>/echs|condition/i.test(w)), 'no errors: '+warns.filter(w=>/echs|condition/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);
 })();

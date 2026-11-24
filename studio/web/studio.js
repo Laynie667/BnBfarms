@@ -89,7 +89,12 @@
   }
   if (window.__studioLive) setInterval(() => { const old = Date.now() - 30000; for (const [src, t] of used) if (t < old) { used.delete(src); try { if (window.GLDrawImageCache) GLDrawImageCache.delete(src); if (window.DrawImageCache) DrawImageCache.delete(src); const gl = window.GLDrawCanvas && GLDrawCanvas.GL, tc = gl && gl.textureCache, t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ } } }, 20000);
   // (nipOpen: how open her nipples are drawn, 0 to 3, for lookin' at the Dispensary's opened nipples here: S.nipOpen)
-  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined, nipOpen: () => S.nipOpen || 0 });
+  // (?savefits: the studio saves its fits too, the Companion's way, fit-store.js; for checkin' a reload here. Off otherwise,
+  // so what's tried in the studio is always fitted fresh.)
+  const fitsHere = /[?&]savefits\b/.test(location.search) && typeof window.FarmFitStore === "function" ? window.FarmFitStore({ stamp: "studio|" + (window.GameVersion || "") }) : null;
+  window.__studioFits = fitsHere;
+  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined, nipOpen: () => S.nipOpen || 0, store: fitsHere || undefined });
+  if (fitsHere) fitsHere.whenReady(() => { const o = fitsHere.learnedFor("studio"); if (o && E.learn(o)) bellyDraw(); setInterval(() => { try { const sig = E.learnedSig(); if (sig !== window.__studioLearned) { window.__studioLearned = sig; fitsHere.saveLearned("studio", E.learned()); } } catch (e) { /* fine */ } }, 5000); });
   window.__studioEngine = E;   // (for looking in from the console: how much it keeps, E.keptBytes())
   const { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
     BREAST, BREAST_SLIDERS, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN } = E;

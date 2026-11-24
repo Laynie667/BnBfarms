@@ -183,10 +183,24 @@ window.FarmBodyEngine = function (host) {
     if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
     return span;
   }
-  // a grown drawing's own number (Nov 20): a fitted piece made from it is kept under this, not under the whole body's
+  // a grown drawing's own name (Nov 20): a fitted piece made from it is kept under this, not under the whole body's
   // MOULD.ver (see dressDraw). false: nothing of it grown; null: not ready yet.
+  // (Nov 23, #44: it was a count, 1, 2, 3 in the order this page happened to grow them, so a name meant nothin' after a
+  // reload. It's what the drawing is made from now, the key it's kept under, so the same drawing has the same name in any
+  // session, and a fitted piece saved last time can be found again. See THE FITS, SAVED.)
   let mouldN = 0;
-  const mouldId = (v) => (v && typeof v === "object" ? (v.__mid || (v.__mid = ++mouldN)) : v === false ? "f" : "n");
+  const mouldId = (v) => (v && typeof v === "object" ? (v.__mkey || v.__mid || (v.__mid = "c" + (++mouldN))) : v === false ? "f" : "n");
+  // a short, steady name for a long one (53 bits; the full key is kept with a saved drawing and checked too)
+  const hashKey = (s) => { let h1 = 0xdeadbeef, h2 = 0x41c6ce57; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36); };
+  // how far a piece reaches, as a name: what's in it, not how many times it grew (that was span.v, a count, Nov 23)
+  function spanSig(span) {
+    if (span.sigV === span.v && span.sig) return span.sig;
+    let h = 2166136261; const mix = (n) => { h = Math.imul(h ^ (n & 0xffff), 16777619); h = Math.imul(h ^ ((n >>> 16) & 0xffff), 16777619); };
+    for (let y = 0; y < 2600; y++) { if (span.L[y] > 1e8) continue; mix(y); mix(Math.round(span.L[y] * 2)); mix(Math.round(span.R[y] * 2)); }
+    span.sig = (h >>> 0).toString(36); span.sigV = span.v; return span.sig;
+  }
   // THE BUMP UNDER CLOTHES. A piece that covers the belly and is as wide as it already (a long dress, a catsuit's legs,
   // jeans) isn't grown, and lay over her flat, as if there were no belly under it (catalogue with the belly, Oct 14). Two
   // tries at shading it on were taken back: her belly's own light laid on cloth made a pale window, and shading only the
@@ -279,8 +293,8 @@ window.FarmBodyEngine = function (host) {
     if (p) { let t = -1, e = -1; for (let j = 0; j < p.h; j++) if (p.L[j] >= 0) { if (t < 0) t = j; e = j; }
       if (t >= 0) { const T = Math.round(y) + t, B = Math.round(y) + e; if (!ext || T < ext.top || B > ext.bottom) { ext = { top: ext ? Math.min(ext.top, T) : T, bottom: ext ? Math.max(ext.bottom, B) : B }; MOULD.ext.set(piece, ext); clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); } } }
     const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx.sig;
-    if (MOULD.out.has(key)) return MOULD.out.get(key);
-    const keep = (res) => { keepIn(MOULD.out, key, res); return res; };
+    { const had = keptOf(MOULD.out, key); if (had !== undefined) return had; }
+    const keep = (res) => { if (res) res.__mkey = hashKey(key); keepIn(MOULD.out, key, res); return res; };
     if (mode === "under") {
       const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h; const g = c.getContext("2d");
       g.drawImage(im, M, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(ctx.belly.cv, ctx.belly.dx - x + M, ctx.belly.dy - y);
@@ -337,7 +351,7 @@ window.FarmBodyEngine = function (host) {
       const p0 = longSrc ? edges(im, w, h) : edgesOf(src); let grew = false;
       if (p0) for (let j = 0; j < p0.h; j++) { const yy = Math.round(y) + j; if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue; if (x + p0.L[j] < span.L[yy]) { span.L[yy] = x + p0.L[j]; grew = true; } if (x + p0.R[j] > span.R[yy]) { span.R[yy] = x + p0.R[j]; grew = true; } }
       if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
-      const key2 = key + "|span" + span.v; if (MOULD.out.has(key2)) return MOULD.out.get(key2);
+      const key2 = key + "|span" + spanSig(span); { const had = keptOf(MOULD.out, key2); if (had !== undefined) return had; }
       const rowOf = (yy) => { if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null; const j = yy - Math.round(b.dy); if (j < 0 || j >= bp.h || bp.L[j] < 0) return null; const gl = span.L[yy], gr = span.R[yy], bl = b.dx + bp.L[j], br2 = b.dx + bp.R[j]; if (gl > cxs || gr < cxs) return null; return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2), bw: br2 - bl }; };
       const strappy = bellyCover(src, x, y, ctx) < 0.35;   /* cloth (a swimsuit) is grown over the belly row by row as before, its narrow crotch too */
       for (let j = 0; j < h; j++) {
@@ -351,7 +365,7 @@ window.FarmBodyEngine = function (host) {
         g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);
         g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
       }
-      const res2 = changed ? c : false; keepIn(MOULD.out, key2, res2); return res2;
+      const res2 = changed ? c : false; if (res2) res2.__mkey = hashKey(key2); keepIn(MOULD.out, key2, res2); return res2;
     }
     for (let j = 0; j < h; j++) {
       const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
@@ -404,7 +418,8 @@ window.FarmBodyEngine = function (host) {
         first = false;
         const [c, map, key] = toTrim.shift();
         if (map && map.get(key) !== c) continue;   // (gone from the keepings already: nothing to cut)
-        try { const t = shrink(c); if (map === BREAST.out && t !== c) map.set(key, t); }   // (only handed over: the cut copy is what's kept)
+        try { const t = shrink(c); if (map === BREAST.out && t !== c) map.set(key, t);   // (only handed over: the cut copy is what's kept)
+          if (ST && map && key != null) saveFit(map, key, c, t); }   // (and saved for next time, THE FITS, SAVED)
         catch (e) { TRIMMED.set(c, c); warnSome("[body] trimming a drawing:", e); }   // (that one stays whole; the rest carry on)
       }
     } finally { trimAsked = false; if (toTrim.length) { trimAsked = true; idle(trimSome); } }
@@ -434,7 +449,7 @@ window.FarmBodyEngine = function (host) {
   }
   // THE DRAWING'S OWN CLOCK (Nov 20): how long each drawing took, how many drawings it had to make fresh, and the slowest
   // pieces of the last quarter hour. The Companion's /farmmem shows them, so a slow phone can say what's slow on it.
-  const PERF = { made: 0, last: null, slow: new Map() };
+  const PERF = { made: 0, saved: 0, last: null, slow: new Map() };   // (saved: drawings found in the store instead of fitted, Nov 23)
   function noteSlow(label, ms, made) {
     const e = PERF.slow.get(label), t = Date.now();
     if (!e || ms > e.ms || t - e.at > 600000) { PERF.slow.delete(label); PERF.slow.set(label, { ms, at: t, made }); }
@@ -444,12 +459,84 @@ window.FarmBodyEngine = function (host) {
     const cut = Date.now() - 900000, slow = [];
     for (const [label, e] of PERF.slow) if (e.at > cut) slow.push({ label, ms: Math.round(e.ms), made: e.made });
     slow.sort((a, b) => b.ms - a.ms);
-    return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6) };
+    return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6), saved: PERF.saved, stored: !!ST };
   }
   function keepIn(map, key, v) {   // (not "put": draw() has its own put, the brush, and inside it that one wins)
     map.delete(key); map.set(key, v);
     if (v && typeof v.getContext === "function") { PERF.made++; trimSoon(v, map, key); }   // (cut to what's on it, just after)
+    else if (v === false && ST && map === MOULD.out) { try { ST.keep(storeKey(map, key), false); } catch (e) { /* not saved, that's all */ } }   // (nothin' to grow: saved too, so it isn't worked out again)
     return v;
+  }
+  /* THE FITS, SAVED (Nov 23, the suggestion box's #44; Laynie: "fitting in background, and keeping saved might help alot").
+     Every fitted piece was fitted again after every reload, every relog, every time the page was opened: the freeze
+     came back each time. Now, when the host gives a store (the Companion's: fit-store.js, the browser's own saved
+     space), each fitted drawing goes into it once it's been cut (trimSome), under the very name it's kept by here, and a
+     drawing that isn't kept here is looked for there first (keptOf). The names are what a drawing is made from (the
+     piece's picture and where it's drawn, her shape, the belly, how far the piece reaches), never a count from this page,
+     so the same fit has the same name next week. The store stamps them with this drawing code's own version and the
+     game's, so a change to how things are fitted, or a game update, starts them fresh: nothin' is ever drawn from an
+     old fit.
+     What's been worked out about the pieces she wears (how far each reaches, which lie on her belly, which hold her
+     breasts) is saved too (learned / learn), so the very first drawing after a reload asks for the same names. */
+  const ST = host && host.store && typeof host.store.take === "function" && typeof host.store.keep === "function" ? host.store : null;
+  const storeKey = (map, key) => (map === MOULD.out ? "M|" : "B|") + key;
+  function keptOf(map, key) {
+    let v = map.get(key); if (v !== undefined || !ST) return v;
+    let r; try { r = ST.take(storeKey(map, key)); } catch (e) { r = undefined; }
+    if (r === undefined || r === null) return undefined;
+    if (r === false) { if (map === MOULD.out) { map.set(key, false); PERF.saved++; return false; } return undefined; }
+    const t = r.cv; if (!t || !t.width || !t.height) return undefined;
+    t.TX = r.tx || 0; t.TY = r.ty || 0; if (r.mx != null) { t.MX = r.mx; t.MY = r.my; } t.TRIM = true;
+    if (map === MOULD.out) {   // (read again, by the belly's shade and the hands: put back whole, and its cut copy is what's handed over)
+      const c = document.createElement("canvas"); c.width = r.ww || t.width; c.height = r.wh || t.height; c.getContext("2d").drawImage(t, t.TX, t.TY);
+      if (t.MX != null) { c.MX = t.MX; c.MY = t.MY; } c.__mkey = hashKey(key); TRIMMED.set(c, t); v = c;
+    } else v = t;
+    map.set(key, v); PERF.saved++; return v;
+  }
+  function saveFit(map, key, c, t) {
+    if (map !== BREAST.out && map !== MOULD.out) return;
+    if (!t || typeof t.getContext !== "function" || !c || typeof c.getContext !== "function") return;
+    try { ST.keep(storeKey(map, key), t, { tx: t === c ? 0 : (t.TX || 0), ty: t === c ? 0 : (t.TY || 0), mx: c.MX, my: c.MY, ww: c.width, wh: c.height }); } catch (e) { /* not saved, that's all */ }
+  }
+  // what's been learned about the pieces she wears, to save and to bring back (only into a body that hasn't learned its own yet)
+  function learnedSig() { let e = 0; for (const x of MOULD.ext.values()) e += x.top * 3 + x.bottom; return [MOULD.ver, MOULD.span.size, e, MOULD.lies.size, BREAST.holdSig, Object.keys(BREAST.band).length, BREAST.handsBehind ? 1 : 0, BREAST.cover.size, MOULD.cover.size, MOULD.prof.size, BELLY.skin.size, BREAST.halves.size].join("|"); }
+  function learned() {
+    const spans = [];
+    for (const [k, s] of MOULD.span) { let y0 = -1, y1 = -1; for (let y = 0; y < 2600; y++) if (s.L[y] < 1e8) { if (y0 < 0) y0 = y; y1 = y; } if (y0 < 0) continue; spans.push([k, y0, s.L.slice(y0, y1 + 1), s.R.slice(y0, y1 + 1), s.bottom == null ? -1 : s.bottom]); }
+    // (and what was measured off each picture: its outline row by row, how much of the belly or the breasts it covers, the
+    // skin's colour. Reading a picture's every pixel is most of what's left of the first drawing once the fits are saved.)
+    const num = (v) => typeof v === "number" || (Array.isArray(v) && v.every((n) => n === null || typeof n === "number" || (Array.isArray(n) && n.every((m) => typeof m === "number"))));
+    return { v: 1, spans: spans.slice(-240), ext: [...MOULD.ext].slice(-240), lies: [...MOULD.lies].slice(-240), holds: BREAST.holds || {}, holdSig: BREAST.holdSig || "", band: Object.assign({}, BREAST.band), hands: BREAST.handsBehind === undefined ? null : !!BREAST.handsBehind,
+      cover: [...BREAST.cover].filter(([, v]) => num(v)).slice(-1500), mcover: [...MOULD.cover].filter(([, v]) => typeof v === "number").slice(-400),
+      prof: [...MOULD.prof].slice(-300).map(([src, p]) => [src, p.L, p.R, p.w, p.h]), skin: [...BELLY.skin].filter(([, v]) => Array.isArray(v)).slice(-60), halves: [...BREAST.halves].filter(([, v]) => num(v)).slice(-200) };
+  }
+  const listy = (a) => Array.isArray(a) || ArrayBuffer.isView(a);
+  function learn(o) {
+    if (!o || o.v !== 1) return false;
+    try {
+      for (const [k, w] of o.cover || []) if (typeof k === "string" && !BREAST.cover.has(k)) BREAST.cover.set(k, w);
+      for (const [k, w] of o.mcover || []) if (typeof k === "string" && typeof w === "number" && !MOULD.cover.has(k)) MOULD.cover.set(k, w);
+      for (const [src, L, R, w, h] of o.prof || []) if (typeof src === "string" && !MOULD.prof.has(src) && ArrayBuffer.isView(L) && ArrayBuffer.isView(R) && L.length === h && R.length === h) MOULD.prof.set(src, { L: Int16Array.from(L), R: Int16Array.from(R), w, h });
+      for (const [k, w] of o.skin || []) if (typeof k === "string" && Array.isArray(w) && !Array.isArray(BELLY.skin.get(k))) BELLY.skin.set(k, w);
+      for (const [k, w] of o.halves || []) if (typeof k === "string" && !BREAST.halves.has(k)) BREAST.halves.set(k, w);
+      for (const [k, y0, Ls, Rs, bottom] of o.spans || []) {
+        if (typeof k !== "string" || !listy(Ls) || !listy(Rs)) continue;
+        const s = MOULD.span.get(k) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
+        for (let i = 0; i < Ls.length; i++) { const y = y0 + i; if (y < 0 || y >= 2600) continue; if (Ls[i] < s.L[y]) s.L[y] = Ls[i]; if (Rs[i] > s.R[y]) s.R[y] = Rs[i]; }
+        if (typeof bottom === "number" && bottom > (s.bottom == null ? -1 : s.bottom)) s.bottom = bottom;
+        s.v = (s.v || 0) + 1; MOULD.span.set(k, s);
+      }
+      for (const [k, x] of o.ext || []) { if (typeof k !== "string" || !x) continue; const e = MOULD.ext.get(k); MOULD.ext.set(k, e ? { top: Math.min(e.top, x.top), bottom: Math.max(e.bottom, x.bottom) } : { top: x.top, bottom: x.bottom }); }
+      for (const k of o.lies || []) if (typeof k === "string") MOULD.lies.add(k);
+      Object.assign(BREAST.band, o.band || {});
+      if (!BREAST.holdSig && o.holdSig && o.holds && typeof o.holds === "object") {
+        BREAST.holds = o.holds; BREAST.on = {}; BREAST.solid = {};
+        for (const k of Object.keys(o.holds)) { if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; }
+        BREAST.holdSig = o.holdSig;
+      }
+      if (BREAST.handsBehind === undefined && o.hands != null) BREAST.handsBehind = !!o.hands;
+      MOULD.ver++; return true;
+    } catch (e) { warnSome("[body] what was learned:", e); return false; }
   }
   function trim() {
     const maps = [BREAST.out, MOULD.out]; let total = 0;
@@ -563,7 +650,7 @@ window.FarmBodyEngine = function (host) {
   // redraw any moulded piece to the new outline
   // game(cb): the game's own drawing, with whatever set of brushes it's handed
   function draw(C, cb, game) {
-    const t0 = nowMs(), m0 = PERF.made;   // (the drawing's own clock)
+    const t0 = nowMs(), m0 = PERF.made, s0 = PERF.saved;   // (the drawing's own clock)
     trim();   // (the kept drawings, back under the budget: only here, between drawings)
     {
       let finish = null, seenNow = null, handFNow = null, painted = 0;
@@ -684,7 +771,7 @@ window.FarmBodyEngine = function (host) {
             let bv = null; try { bv = ctx.belly && !fit.behind && LOWER_GROUPS.test(groupOf(src)) ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
             const base = bv || im, ox = bv ? MOULD.M : 0;
             const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx.belly ? "|s" + ctx.sig : "");   // (its own grown drawing, not the whole body's count: see dressDraw, Nov 20)
-            let c = BREAST.out.get(key);
+            let c = keptOf(BREAST.out, key);
             if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
               /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
               if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { warnSome("[body] belly form:", e); } }
@@ -751,7 +838,7 @@ window.FarmBodyEngine = function (host) {
           const frameDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;   /* (Flat to D is the game's own chest: its own picture) */
             const fm = frameMeasure(src, im, x, y, B); if (!fm) return false;
-            const key = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let c = BREAST.out.get(key);
+            const key = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let c = keptOf(BREAST.out, key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight; c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d"); g.drawImage(im, MX, MY);
@@ -806,7 +893,7 @@ window.FarmBodyEngine = function (host) {
           // of the game's breasts, lifted out and set along HER underside, widened to her.
           const bandDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = mouldImg(src); if (!B || !im) return false;
-            const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let c = BREAST.out.get(key);
+            const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let c = keptOf(BREAST.out, key);
             if (!c) {
               const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY; const g = c.getContext("2d");
@@ -892,7 +979,7 @@ window.FarmBodyEngine = function (host) {
             const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
             const span = pieceSpan(pk, src, x, y);
             const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind ? ctx.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");   // (the belly's shade goes on with auto off too, so its shape is in the name either way: a new belly no longer empties every kept drawing, Nov 16)
-            let c = BREAST.out.get(key);
+            let c = keptOf(BREAST.out, key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
@@ -1216,7 +1303,7 @@ window.FarmBodyEngine = function (host) {
             if (!strapBase[piece.key]) strapBase[piece.key] = src;
             const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted = !!(o && o.HexColor);
             const key = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted ? 1 : 0);
-            let c = BREAST.out.get(key);
+            let c = keptOf(BREAST.out, key);
             if (!c) {
               const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
@@ -1259,7 +1346,7 @@ window.FarmBodyEngine = function (host) {
           const pumpDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im || im.naturalHeight < 900) return false;
             const key = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-            let c = BREAST.out.get(key);
+            let c = keptOf(BREAST.out, key);
             if (!c) {
               const MX = 320, MY = 200, w = im.naturalWidth, h = im.naturalHeight;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
@@ -1280,7 +1367,7 @@ window.FarmBodyEngine = function (host) {
             const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split); if (!own) return false;
             if (!ctx.native && groupOf(src) === "Nipples") ctx.native = own.map((p) => p && [x + p[0], y + p[1]]);   // where the game has the nipples
             const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.native ? "n" : "o");
-            let c = BREAST.out.get(key);
+            let c = keptOf(BREAST.out, key);
             if (!c) {
               const MX = 320, MY = 460, w = im.naturalWidth, h = im.naturalHeight, kN = B.kN;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
@@ -1366,12 +1453,12 @@ window.FarmBodyEngine = function (host) {
       if (finish) { try { finish(); } catch (e) { warnSome("[studio] belly:", e); } }
       if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.45;   /* (Laynie, Oct 13: "hands should be hidden once breasts exceed a certain size". Hidden means all of them, with what's on them: never part.) */ if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; againFromSeen(); } }
       if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; againFromSeen(); } }
-      PERF.last = { ms: Math.round(nowMs() - t0), made: PERF.made - m0, at: Date.now() };
+      PERF.last = { ms: Math.round(nowMs() - t0), made: PERF.made - m0, saved: PERF.saved - s0, at: Date.now() };
       return out;
     }
   }
 
   return { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
-    BREAST, BREAST_SLIDERS, keptBytes, perf, shrink, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, rigidSrc, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
+    BREAST, BREAST_SLIDERS, keptBytes, perf, shrink, learned, learn, learnedSig, keptOf, hashKey, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, rigidSrc, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN, draw };
 };
 })();

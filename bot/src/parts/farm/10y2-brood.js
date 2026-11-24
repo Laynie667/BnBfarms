@@ -73,8 +73,8 @@
   }
   // ── farrowin': the young come, in beats, in their kind's own way (10y2b-birthing.js) ──
   // kids: { male, female, futa }. A single gets its own crown and end (never "the first of the litter")
-  function farrowScene(mn, count, kids, sires){
-    const x = { count, kids, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
+  function farrowScene(mn, count, kids, sires, young){   // young: the kind born (the sire's, 10y2c-sired.js)
+    const x = { count, kids, young, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
     const mids = count <= 2 ? 0 : count <= 5 ? 1 : count <= 10 ? 2 : 3;
     const beats = [birthBeat(mn, "push", x, "labour"), birthBeat(mn, count === 1 ? "crownOne" : "crownMany", x, "crown")];
     for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? birthBeat(mn, "huge", x) : birthBeat(mn, "mid", x));

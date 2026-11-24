@@ -1085,6 +1085,8 @@ Say ?keys to see what you're holdin', hon.`;
 🎎 DOLLS — posed, displayed, kept behind gold
 🕳️ GLORYHOLES — installed in the pens, left for whoever wanders past
 
+🍼 Bred, you carry the SIRE's kind: his litter, his days, his young. A dog's leaves pups in three days, a stallion's one big foal in eight, whatever you are. ?species list shows every kind.
+
 And if you're somethin' we ain't listed, say so anyhow, sugar. We've taken in stranger!`;
 
   TEXT.luxury = `🏡 THE CABIN — LUXURY STAY 🏡

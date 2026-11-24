@@ -170,9 +170,11 @@
       studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
       // labour (10y2b-birthing.js): start(mn) brings it on now (a midwife's doin', asked first) · help(mn, mins) takes
       // minutes off, → minutes left or null · unstick(mn, by) turns a stuck one · place(mn) where their kind births ·
-      // young(mn) → [one, many] · sound(mn) a noise their kind makes birthin'
+      // young(mn) → [one, many] · kind(mn) → { young, kind, mother, cross }: what they're carryin', the sire's kind (Nov 23) ·
+      // sound(mn) a noise their kind makes birthin'
       labour: Object.freeze({ start: (mn) => startLabour(mn, "induced"), help: (mn, mins) => helpLabour(mn, mins == null ? CFG.MIDWIFE_HELP_MIN : mins),
         unstick: (mn, by) => unstickLabour(mn, by), place: (mn) => birthWords(mn).place, young: (mn) => { const w = birthWords(mn); return [w.one, w.many]; },
+        kind: (mn) => { const w = birthWords(mn); return { young: w.young, kind: BIRTH_KIND_OF[w.young] || "default", mother: w.kind, cross: w.cross }; },   // what they're carryin' (the sire's kind, Nov 23)
         sound: (mn) => { const w = birthWords(mn); return w.sounds[Math.floor(Math.random()*w.sounds.length)]; } }),
       clockedIn, isMandated, hoursThisWeek: (mn) => { const r = rec(mn); return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 3600000 : 0; }, inHeat, startHeat, rollConception, canCatchIn, mpregOn, gearOf, funnelOn,
       // the map

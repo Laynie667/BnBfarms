@@ -52,12 +52,25 @@
   // (Oct 24, a watch showed her sittin' beside a pet for a whole half-hour trance: "the bot is still teleporting from its
   // home spot". Now SHE never moves: the one goin' under is brought to her side instead, led on foot by their Companion
   // or teleported, once a session.)
+  // (Nov 23, the suggestion box's #57, Crystal: "The hypno 'led along' and the big boobs locking you in place effects seem
+  // to conflict resulting in a lot of teleporting around". Somebody the farm's holdin' where they are, too full to move,
+  // in the stocks or a pen, on the bench, strapped in the stall, knotted, hitched or in a trap, was led to me for the
+  // trance and put straight back by the hold, over and over. Now they're left where they're held, and I step over to
+  // them for it instead, and back to my spot after: echsHome.)
+  function echsHeld(mn){ try { return reinsHeld(mn) || !!(prodOf(mn) || {}).pin; } catch(e){ return false; } }
   function echsBeside(mn){
     if (!mapRoom()) return;
     const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
     if (!a || !b || b.X < 0 || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 1) return;
     const v = echsOf(mn); if (v && v.broughtAt && Date.now() - v.broughtAt < 60000) return;
     if (v) v.broughtAt = Date.now();
+    if (echsHeld(mn)){
+      const to = spotBeside(mn); if (!to) return;
+      if (!state.echsFrom) state.echsFrom = { X: a.X, Y: a.Y };
+      state.echsBusyUntil = Date.now() + 90000;
+      me.MapData.Pos = { X: to.X, Y: to.Y }; send("ChatRoomCharacterMapDataUpdate", me.MapData);
+      return;
+    }
     const to = spotBeside(CFG.BOT_MEMBER); if (!to) return;
     try { teleport(mn, to, false); } catch(e){ warn("echs bring:", e); }
   }

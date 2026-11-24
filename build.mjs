@@ -3,8 +3,15 @@
 import * as esbuild from "esbuild";
 import { readFileSync, readdirSync, mkdirSync, existsSync } from "node:fs";
 import { resolve, basename } from "node:path";
+import { createHash } from "node:crypto";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+
+// THE DRAWING'S FINGERPRINT (Nov 23, #44): the Companion saves fitted pieces in each player's browser, stamped with this.
+// It's taken from the drawing code itself, so any change to how a piece is fitted (or how the fits are saved) throws the
+// old ones away and they're fitted fresh, and a Companion update that doesn't touch the drawing keeps them.
+const DRAWING_FILES = ["studio/web/body-engine.js", "studio/web/breasts-drawing.js", "studio/web/cock-drawing.js", "studio/web/fit-store.js", "extension/src/belly.js"];
+const drawingHash = createHash("sha1").update(DRAWING_FILES.map((f) => readFileSync(f, "utf8").replace(/\r\n/g, "\n")).join("\n\u0000\n")).digest("hex").slice(0, 12);
 
 // The bot lives in bot/src/parts/, in folders by topic (core, farm, traps …), one piece per file. They're pieces of
 // one big function, so they're joined back together in FILE-NAME order (00-open.js … 18-boot.js), whatever folder
@@ -72,7 +79,7 @@ for (const t of targets) {
     charset: "ascii",   // emoji and accents written as \u escapes: the scripts read right whatever encoding the browser guesses at install
     legalComments: "none",
     banner: { js: header },
-    define: Object.assign({ __FARMHAND_VERSION__: JSON.stringify(t.version), __COMPANION_VERSION__: JSON.stringify(pkg.versions.companion) }, t.define || {}),   // (the bot knows which Companion came out with it)
+    define: Object.assign({ __FARMHAND_VERSION__: JSON.stringify(t.version), __COMPANION_VERSION__: JSON.stringify(pkg.versions.companion), __DRAWING_HASH__: JSON.stringify(drawingHash) }, t.define || {}),   // (the bot knows which Companion came out with it)
     outfile: t.out,
     plugins: t.plugins || [],
     logLevel: "info",

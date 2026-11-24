@@ -370,8 +370,8 @@
   }
   function seedCaught(mn, sire, caught, late){
     const s = sireName(sire), t = plainName(mn);
-    let line = caught === "new" ? (late ? "🍼 Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days."
-                                        : "🍼 It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days.")
+    let line = caught === "new" ? (late ? "🍼 Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s " + carryWord(mn) + " now. " + dueWords(mn)
+                                        : "🍼 It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s " + carryWord(mn) + " now. " + dueWords(mn))
              : caught === "extra" ? "🍼 " + s + "'s seed got one in too! " + t + " is carryin' for two sires now."
              : caught === "more" ? sureLine(mn, sire) : "";
     if (!line) return;

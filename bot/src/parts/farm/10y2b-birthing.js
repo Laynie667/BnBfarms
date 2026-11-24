@@ -229,9 +229,12 @@
   const sharedBirth = (key) => BIRTH_SHARED[key] || (BIRTH_FROM_BROOD[key] && BROOD_LINES[BIRTH_FROM_BROOD[key]]) || [];
 
   function birthKind(mn){ return BIRTH_KIND_OF[speciesKey(mn)] || "default"; }
-  function birthWords(mn){
-    const k = speciesKey(mn), kind = birthKind(mn), y = BIRTH_YOUNG[k] || BIRTH_YOUNG.default;
-    return { kind, one: y[0], many: y[1], place: BIRTH_PLACE[kind] || BIRTH_PLACE.default, sounds: BIRTH_SOUNDS[k] || BIRTH_SOUNDS.default };
+  // young: the kind they're carryin' (the sire's, 10y2c-sired.js), when it isn't the one on their pregnancy now (a birth
+  // just booked has no pregnancy left). Their place and their sounds stay their own kind's; the young are the sire's.
+  function birthWords(mn, young){
+    const k = speciesKey(mn), kind = birthKind(mn), yk = young || youngKindOf(mn), y = BIRTH_YOUNG[yk] || BIRTH_YOUNG[k] || BIRTH_YOUNG.default;
+    return { kind, young: yk, cross: (BIRTH_KIND_OF[yk] || "default") !== kind, mine: kind === "default" ? "" : (BIRTH_YOUNG[k] || BIRTH_YOUNG.default)[0],
+      one: y[0], many: y[1], place: BIRTH_PLACE[kind] || BIRTH_PLACE.default, sounds: BIRTH_SOUNDS[k] || BIRTH_SOUNDS.default };
   }
   // "2 male and 1 female" · "a little female"
   function birthSexes(kids){
@@ -239,31 +242,33 @@
     return parts.length > 1 ? parts.slice(0, -1).join(", ")+" and "+parts[parts.length - 1] : (parts[0] || "");
   }
   const birthSexOne = (kids) => kids.male ? "a little male" : kids.futa ? "a little futa" : "a little female";
-  function birthKids(mn, n){ const w = birthWords(mn); return n === 1 ? "a "+w.one : n+" "+w.many; }
+  function birthKids(mn, n, young){ const w = birthWords(mn, young); return n === 1 ? "a "+w.one : n+" "+w.many; }
   // their kind's words into a line (before the names: %c and %n are filled after, by tFill)
   function birthFill(t, mn, x){
-    const w = birthWords(mn), p = prodOf(mn), n = (x && x.count) || (p && p.preg && p.preg.count) || 1, kids = (x && x.kids) || null;
+    const yk = x && x.young, w = birthWords(mn, yk), p = prodOf(mn), n = (x && x.count) || (p && p.preg && p.preg.count) || 1, kids = (x && x.kids) || null;
     return String(t).replace(/%place/g, w.place).replace(/%brood/g, n === 1 ? w.one : w.many)
       .replace(/%sexone/g, kids ? birthSexOne(kids) : "a little one").replace(/%sexes/g, kids ? birthSexes(kids) : "")
-      .replace(/%kids/g, birthKids(mn, n)).replace(/%many/g, w.many).replace(/%one/g, w.one)
+      .replace(/%kids/g, birthKids(mn, n, yk)).replace(/%many/g, w.many).replace(/%one/g, w.one).replace(/%mine/g, w.mine || "little one of their own")
       .replace(/%sound/g, () => w.sounds[Math.floor(Math.random()*w.sounds.length)]);
   }
-  // their kind's own lines first, mostly; the farm's shared ones mixed in for variety
-  function birthPool(mn, key, ownKey){
-    const own = (BIRTH_KIND_LINES[birthKind(mn)] || {})[ownKey || key] || [], shared = sharedBirth(key);
+  // their kind's own lines first, mostly; the farm's shared ones mixed in for variety. Young of another kind (the sire's,
+  // 10y2c-sired.js) are crowned and tended in lines of their own, not her kind's (a pup has no hooves to show first).
+  function birthPool(mn, key, ownKey, young){
+    const k = ownKey || key, w = birthWords(mn, young), shared = sharedBirth(key);
+    const own = w.cross && CROSS_KEYS.has(k) ? BIRTH_CROSS[k].filter(l => w.mine || !/%mine/.test(l)) : (BIRTH_KIND_LINES[birthKind(mn)] || {})[k] || [];
     return own.length && (!shared.length || Math.random() < 0.6) ? own : own.concat(shared);
   }
   function birthVars(mn, x){
     const p = prodOf(mn), g = (p && p.preg) || {};
-    return Object.assign({ count: (x && x.count) || g.count || 1 }, x || {}, { v: Object.assign({ c: (g.sires || []).map(plainName).join(" & "), x: String((x && x.count) || g.count || 1) }, (x && x.v) || {}) });
+    return Object.assign({ count: (x && x.count) || g.count || 1, young: (x && x.young) || g.kind }, x || {}, { v: Object.assign({ c: (g.sires || []).map(plainName).join(" & "), x: String((x && x.count) || g.count || 1) }, (x && x.v) || {}) });
   }
   function birthLine(key, mn, x, ownKey){
-    const pool = birthPool(mn, key, ownKey); if (!pool.length) return "";
+    const pool = birthPool(mn, key, ownKey, x && x.young); if (!pool.length) return "";
     const vx = birthVars(mn, x);
     return tFill(birthFill(pickFor(mn, "birth:"+key, pool), mn, vx), mn, vx.v);
   }
   // a pool with their kind's words already in, for a scene (sceneRun fills the names)
-  function birthBeat(mn, key, x, ownKey){ return birthPool(mn, key, ownKey).map(l => birthFill(l, mn, x)); }
+  function birthBeat(mn, key, x, ownKey){ return birthPool(mn, key, ownKey, x && x.young).map(l => birthFill(l, mn, x)); }
 
   if (W.__FARMHAND_TEST__) Object.assign(W, { __birthLine: (k, mn, x, own) => birthLine(k, mn, x, own), __birthWords: (mn) => birthWords(mn),
     __labourMins: (mn) => labourMinutes(mn), __birthKinds: () => BIRTH_KIND_LINES, __birthShared: (k) => sharedBirth(k) });

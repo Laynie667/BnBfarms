@@ -748,9 +748,9 @@
         // ?species → what we keep · ?species list → the litter table · ?species <animal> → set yours
         // · ?species <who> <animal> → staff set someone else's
         const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default");
-        const row = k => { const S = CFG.SPECIES[k]; return k+": milk x"+S.milk+", fertility x"+S.fert+", litters of "+(S.litter[0]===S.litter[1] ? S.litter[0] : S.litter[0]+"-"+S.litter[1]); };
+        const row = k => { const S = CFG.SPECIES[k]; return k+": milk x"+S.milk+", fertility x"+S.fert+", litters of "+(S.litter[0]===S.litter[1] ? S.litter[0] : S.litter[0]+"-"+S.litter[1])+", carried "+(S.days || CFG.PROD.PREG_DAYS)+" days"; };
         if (!args.length){ R(TEXT.species); break; }
-        if (/^(list|all|table)$/i.test(args[0])){ R("🐾 SPECIES & LITTERS\n"+kinds.map(row).join("\n")+"\nAnything else counts as: "+row("default").replace(/^default: /,"")+". Set yours with ?species <animal>, like ?species bunny."); break; }
+        if (/^(list|all|table)$/i.test(args[0])){ R("🐾 SPECIES & LITTERS\n"+kinds.map(row).join("\n")+"\nAnything else counts as: "+row("default").replace(/^default: /,"")+".\nWhat's born is the SIRE's kind: how many, how long it's carried, and what comes out. A sire with no kind on file leaves it to the mother's.\nSet yours with ?species <animal>, like ?species bunny."); break; }
         let who = sender, animal = args.join(" ");
         if (args.length > 1){
           const t = resolveTarget(args[0]);

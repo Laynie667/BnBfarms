@@ -3,7 +3,7 @@
 // game's pictures and what's on the graphics card, the drawn body's and the messes' keepings, and who's in the room.
 // It keeps the last hour of it (in this browser only). After a crash, reload and type /farmmem: it shows how things
 // grew, and copies the whole log so it can be pasted to whoever's looking into it.
-import { drawnBodyMemory, drawnBodyPerfText, drawnBodyPerfTick } from "./drawnbody.js";
+import { drawnBodyMemory, drawnBodyPerfText, drawnBodyPerfTick, fitStoreStats, fitStoreClear } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
 import { trimStats, cacheSize, leftLoaded } from "./trimpics.js";
 import { VERSION } from "./version.js";
@@ -105,6 +105,13 @@ export function initMemlog() {
       try { W.navigator.clipboard.writeText((drawing ? drawing + "\n" : "") + JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
       if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 120000);
       else console.log(text);
+    } }, { Tag: "farmfits", Description: ": the drawn body's saved fits on this computer (/farmfits clear starts them over)", Action: (args) => {
+      // (Nov 23, #44: fitted pieces are saved in this browser so they're ready after a reload; this says how many, and clears them)
+      const say = (t) => { if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal(t, 30000); else console.log(t); };
+      if (/^\s*clear\b/i.test(String(args || ""))) { fitStoreClear().then(() => say("Saved fits cleared. Everything gets fitted fresh, and saved again as it goes.")); return; }
+      const f = fitStoreStats();
+      say(f.on ? "Saved fits on this computer: " + f.count + ", " + f.mb + " MB. Used " + f.taken + " since the page opened, saved " + f.kept + " new." + (f.waiting ? " " + f.waiting + " waiting to save." : "") + " /farmfits clear starts them over."
+        : "Saved fits are off on this computer" + (f.why ? ": " + f.why : "") + ". The drawn body still works, it just fits everything fresh after a reload.");
     } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
       let text = ""; try { text = messDiag(); } catch (e) { text = "couldn't check: " + e.message; }
       text = "Companion v" + VERSION + "\n" + text;

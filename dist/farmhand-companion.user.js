@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.77.0
+// @version      0.78.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.77.0";
+  var VERSION = "0.78.0";
 
   // shared/species.js
   var WORDS = {
@@ -9550,7 +9550,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return span;
       }
       let mouldN = 0;
-      const mouldId = (v) => v && typeof v === "object" ? v.__mid || (v.__mid = ++mouldN) : v === false ? "f" : "n";
+      const mouldId = (v) => v && typeof v === "object" ? v.__mkey || v.__mid || (v.__mid = "c" + ++mouldN) : v === false ? "f" : "n";
+      const hashKey = (s) => {
+        let h1 = 3735928559, h2 = 1103547991;
+        for (let i = 0; i < s.length; i++) {
+          const c = s.charCodeAt(i);
+          h1 = Math.imul(h1 ^ c, 2654435761);
+          h2 = Math.imul(h2 ^ c, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
+        h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
+        return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+      };
+      function spanSig(span) {
+        if (span.sigV === span.v && span.sig) return span.sig;
+        let h2 = 2166136261;
+        const mix = (n) => {
+          h2 = Math.imul(h2 ^ n & 65535, 16777619);
+          h2 = Math.imul(h2 ^ n >>> 16 & 65535, 16777619);
+        };
+        for (let y = 0; y < 2600; y++) {
+          if (span.L[y] > 1e8) continue;
+          mix(y);
+          mix(Math.round(span.L[y] * 2));
+          mix(Math.round(span.R[y] * 2));
+        }
+        span.sig = (h2 >>> 0).toString(36);
+        span.sigV = span.v;
+        return span.sig;
+      }
       function bellyForm(cv) {
         if (cv.formF !== void 0) return cv.formF;
         const w = cv.width, h2 = cv.height;
@@ -9750,8 +9778,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
         }
         const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
-        if (MOULD.out.has(key3)) return MOULD.out.get(key3);
+        {
+          const had = keptOf(MOULD.out, key3);
+          if (had !== void 0) return had;
+        }
         const keep3 = (res) => {
+          if (res) res.__mkey = hashKey(key3);
           keepIn(MOULD.out, key3, res);
           return res;
         };
@@ -9840,8 +9872,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             clearTimeout(MOULD.t);
             MOULD.t = setTimeout(bellyDraw, 60);
           }
-          const key22 = key3 + "|span" + span.v;
-          if (MOULD.out.has(key22)) return MOULD.out.get(key22);
+          const key22 = key3 + "|span" + spanSig(span);
+          {
+            const had = keptOf(MOULD.out, key22);
+            if (had !== void 0) return had;
+          }
           const rowOf = (yy) => {
             if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null;
             const j = yy - Math.round(b.dy);
@@ -9879,6 +9914,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
           }
           const res2 = changed2 ? c : false;
+          if (res2) res2.__mkey = hashKey(key22);
           keepIn(MOULD.out, key22, res2);
           return res2;
         }
@@ -9937,6 +9973,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             try {
               const t = shrink2(c);
               if (map === BREAST.out && t !== c) map.set(key3, t);
+              if (ST && map && key3 != null) saveFit(map, key3, c, t);
             } catch (e) {
               TRIMMED.set(c, c);
               warnSome2("[body] trimming a drawing:", e);
@@ -10020,7 +10057,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         TRIMMED.set(c, t);
         return t;
       }
-      const PERF = { made: 0, last: null, slow: /* @__PURE__ */ new Map() };
+      const PERF = { made: 0, saved: 0, last: null, slow: /* @__PURE__ */ new Map() };
       function noteSlow(label, ms, made3) {
         const e = PERF.slow.get(label), t = Date.now();
         if (!e || ms > e.ms || t - e.at > 6e5) {
@@ -10033,7 +10070,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const cut2 = Date.now() - 9e5, slow = [];
         for (const [label, e] of PERF.slow) if (e.at > cut2) slow.push({ label, ms: Math.round(e.ms), made: e.made });
         slow.sort((a, b) => b.ms - a.ms);
-        return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6) };
+        return { last: PERF.last, slow: slow.slice(0, 6), keptMB: Math.round(keptBytes() / 1e6), saved: PERF.saved, stored: !!ST };
       }
       function keepIn(map, key3, v) {
         map.delete(key3);
@@ -10041,8 +10078,147 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (v && typeof v.getContext === "function") {
           PERF.made++;
           trimSoon(v, map, key3);
+        } else if (v === false && ST && map === MOULD.out) {
+          try {
+            ST.keep(storeKey(map, key3), false);
+          } catch (e) {
+          }
         }
         return v;
+      }
+      const ST = host && host.store && typeof host.store.take === "function" && typeof host.store.keep === "function" ? host.store : null;
+      const storeKey = (map, key3) => (map === MOULD.out ? "M|" : "B|") + key3;
+      function keptOf(map, key3) {
+        let v = map.get(key3);
+        if (v !== void 0 || !ST) return v;
+        let r;
+        try {
+          r = ST.take(storeKey(map, key3));
+        } catch (e) {
+          r = void 0;
+        }
+        if (r === void 0 || r === null) return void 0;
+        if (r === false) {
+          if (map === MOULD.out) {
+            map.set(key3, false);
+            PERF.saved++;
+            return false;
+          }
+          return void 0;
+        }
+        const t = r.cv;
+        if (!t || !t.width || !t.height) return void 0;
+        t.TX = r.tx || 0;
+        t.TY = r.ty || 0;
+        if (r.mx != null) {
+          t.MX = r.mx;
+          t.MY = r.my;
+        }
+        t.TRIM = true;
+        if (map === MOULD.out) {
+          const c = document.createElement("canvas");
+          c.width = r.ww || t.width;
+          c.height = r.wh || t.height;
+          c.getContext("2d").drawImage(t, t.TX, t.TY);
+          if (t.MX != null) {
+            c.MX = t.MX;
+            c.MY = t.MY;
+          }
+          c.__mkey = hashKey(key3);
+          TRIMMED.set(c, t);
+          v = c;
+        } else v = t;
+        map.set(key3, v);
+        PERF.saved++;
+        return v;
+      }
+      function saveFit(map, key3, c, t) {
+        if (map !== BREAST.out && map !== MOULD.out) return;
+        if (!t || typeof t.getContext !== "function" || !c || typeof c.getContext !== "function") return;
+        try {
+          ST.keep(storeKey(map, key3), t, { tx: t === c ? 0 : t.TX || 0, ty: t === c ? 0 : t.TY || 0, mx: c.MX, my: c.MY, ww: c.width, wh: c.height });
+        } catch (e) {
+        }
+      }
+      function learnedSig() {
+        let e = 0;
+        for (const x of MOULD.ext.values()) e += x.top * 3 + x.bottom;
+        return [MOULD.ver, MOULD.span.size, e, MOULD.lies.size, BREAST.holdSig, Object.keys(BREAST.band).length, BREAST.handsBehind ? 1 : 0, BREAST.cover.size, MOULD.cover.size, MOULD.prof.size, BELLY.skin.size, BREAST.halves.size].join("|");
+      }
+      function learned() {
+        const spans = [];
+        for (const [k, s] of MOULD.span) {
+          let y0 = -1, y1 = -1;
+          for (let y = 0; y < 2600; y++) if (s.L[y] < 1e8) {
+            if (y0 < 0) y0 = y;
+            y1 = y;
+          }
+          if (y0 < 0) continue;
+          spans.push([k, y0, s.L.slice(y0, y1 + 1), s.R.slice(y0, y1 + 1), s.bottom == null ? -1 : s.bottom]);
+        }
+        const num = (v) => typeof v === "number" || Array.isArray(v) && v.every((n) => n === null || typeof n === "number" || Array.isArray(n) && n.every((m) => typeof m === "number"));
+        return {
+          v: 1,
+          spans: spans.slice(-240),
+          ext: [...MOULD.ext].slice(-240),
+          lies: [...MOULD.lies].slice(-240),
+          holds: BREAST.holds || {},
+          holdSig: BREAST.holdSig || "",
+          band: Object.assign({}, BREAST.band),
+          hands: BREAST.handsBehind === void 0 ? null : !!BREAST.handsBehind,
+          cover: [...BREAST.cover].filter(([, v]) => num(v)).slice(-1500),
+          mcover: [...MOULD.cover].filter(([, v]) => typeof v === "number").slice(-400),
+          prof: [...MOULD.prof].slice(-300).map(([src, p]) => [src, p.L, p.R, p.w, p.h]),
+          skin: [...BELLY.skin].filter(([, v]) => Array.isArray(v)).slice(-60),
+          halves: [...BREAST.halves].filter(([, v]) => num(v)).slice(-200)
+        };
+      }
+      const listy = (a) => Array.isArray(a) || ArrayBuffer.isView(a);
+      function learn(o) {
+        if (!o || o.v !== 1) return false;
+        try {
+          for (const [k, w] of o.cover || []) if (typeof k === "string" && !BREAST.cover.has(k)) BREAST.cover.set(k, w);
+          for (const [k, w] of o.mcover || []) if (typeof k === "string" && typeof w === "number" && !MOULD.cover.has(k)) MOULD.cover.set(k, w);
+          for (const [src, L, R, w, h2] of o.prof || []) if (typeof src === "string" && !MOULD.prof.has(src) && ArrayBuffer.isView(L) && ArrayBuffer.isView(R) && L.length === h2 && R.length === h2) MOULD.prof.set(src, { L: Int16Array.from(L), R: Int16Array.from(R), w, h: h2 });
+          for (const [k, w] of o.skin || []) if (typeof k === "string" && Array.isArray(w) && !Array.isArray(BELLY.skin.get(k))) BELLY.skin.set(k, w);
+          for (const [k, w] of o.halves || []) if (typeof k === "string" && !BREAST.halves.has(k)) BREAST.halves.set(k, w);
+          for (const [k, y0, Ls, Rs, bottom] of o.spans || []) {
+            if (typeof k !== "string" || !listy(Ls) || !listy(Rs)) continue;
+            const s = MOULD.span.get(k) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
+            for (let i = 0; i < Ls.length; i++) {
+              const y = y0 + i;
+              if (y < 0 || y >= 2600) continue;
+              if (Ls[i] < s.L[y]) s.L[y] = Ls[i];
+              if (Rs[i] > s.R[y]) s.R[y] = Rs[i];
+            }
+            if (typeof bottom === "number" && bottom > (s.bottom == null ? -1 : s.bottom)) s.bottom = bottom;
+            s.v = (s.v || 0) + 1;
+            MOULD.span.set(k, s);
+          }
+          for (const [k, x] of o.ext || []) {
+            if (typeof k !== "string" || !x) continue;
+            const e = MOULD.ext.get(k);
+            MOULD.ext.set(k, e ? { top: Math.min(e.top, x.top), bottom: Math.max(e.bottom, x.bottom) } : { top: x.top, bottom: x.bottom });
+          }
+          for (const k of o.lies || []) if (typeof k === "string") MOULD.lies.add(k);
+          Object.assign(BREAST.band, o.band || {});
+          if (!BREAST.holdSig && o.holdSig && o.holds && typeof o.holds === "object") {
+            BREAST.holds = o.holds;
+            BREAST.on = {};
+            BREAST.solid = {};
+            for (const k of Object.keys(o.holds)) {
+              if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true;
+              if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true;
+            }
+            BREAST.holdSig = o.holdSig;
+          }
+          if (BREAST.handsBehind === void 0 && o.hands != null) BREAST.handsBehind = !!o.hands;
+          MOULD.ver++;
+          return true;
+        } catch (e) {
+          warnSome2("[body] what was learned:", e);
+          return false;
+        }
       }
       function trim2() {
         const maps = [BREAST.out, MOULD.out];
@@ -10194,7 +10370,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return c;
       }
       function draw3(C2, cb, game) {
-        const t0 = nowMs2(), m0 = PERF.made;
+        const t0 = nowMs2(), m0 = PERF.made, s0 = PERF.saved;
         trim2();
         {
           let finish = null, seenNow = null, handFNow = null, painted = 0;
@@ -10439,7 +10615,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
                 const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   c = document.createElement("canvas");
                   c.width = base.naturalWidth || base.width;
@@ -10615,7 +10791,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const fm = frameMeasure(src, im, x, y, B);
                 if (!fm) return false;
                 const key3 = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -10728,7 +10904,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const B = ctx3.breast, im = mouldImg(src);
                 if (!B || !im) return false;
                 const key3 = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -10862,7 +11038,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const overBelly = bellyAuto(src, x, y, ctx3, fit.behind, pk);
                 const span = pieceSpan(pk, src, x, y);
                 const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind ? ctx3.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
                   c = document.createElement("canvas");
@@ -11445,7 +11621,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!strapBase[piece.key]) strapBase[piece.key] = src;
                 const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted2 = !!(o && o.HexColor);
                 const key3 = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted2 ? 1 : 0);
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 220, MY = 420, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
                   c = document.createElement("canvas");
@@ -11572,7 +11748,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im || im.naturalHeight < 900) return false;
                 const key3 = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 320, MY = 200, w = im.naturalWidth, h2 = im.naturalHeight;
                   c = document.createElement("canvas");
@@ -11619,7 +11795,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (!own) return false;
                 if (!ctx3.native && groupOf4(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
                 const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
-                let c = BREAST.out.get(key3);
+                let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
                   c = document.createElement("canvas");
@@ -11838,7 +12014,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               againFromSeen();
             }
           }
-          PERF.last = { ms: Math.round(nowMs2() - t0), made: PERF.made - m0, at: Date.now() };
+          PERF.last = { ms: Math.round(nowMs2() - t0), made: PERF.made - m0, saved: PERF.saved - s0, at: Date.now() };
           return out;
         }
       }
@@ -11864,6 +12040,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         keptBytes,
         perf,
         shrink: shrink2,
+        learned,
+        learn,
+        learnedSig,
+        keptOf,
+        hashKey,
         NIP_GROUPS,
         HAND_GROUPS,
         NIP_PIECES,
@@ -12379,6 +12560,297 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     window.FarmCock = { KINDS: KINDS2, PX_PER_INCH, ballR, canvas, loadStamps, hasStamps, STAMP_FILES, get ver() {
       return ver;
     } };
+  })();
+
+  // studio/web/fit-store.js
+  (() => {
+    "use strict";
+    const DB_NAME = "farmhand-fits", DB_VER = 1;
+    const hashKey = (s) => {
+      let h1 = 3735928559, h2 = 1103547991;
+      for (let i = 0; i < s.length; i++) {
+        const c = s.charCodeAt(i);
+        h1 = Math.imul(h1 ^ c, 2654435761);
+        h2 = Math.imul(h2 ^ c, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
+      h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
+      return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+    };
+    const idle = (f) => {
+      try {
+        if (typeof window.requestIdleCallback === "function") {
+          window.requestIdleCallback(f, { timeout: 3e3 });
+          return;
+        }
+      } catch (e) {
+      }
+      setTimeout(f, 200);
+    };
+    const req = (r) => new Promise((ok2, no) => {
+      r.onsuccess = () => ok2(r.result);
+      r.onerror = () => no(r.error);
+    });
+    const done = (tx) => new Promise((ok2, no) => {
+      tx.oncomplete = () => ok2();
+      tx.onerror = () => no(tx.error);
+      tx.onabort = () => no(tx.error);
+    });
+    window.FarmFitStore = function(opts) {
+      const o = Object.assign({ stamp: "", maxMB: 160, preloadMB: 48, days: 21 }, opts || {});
+      const S3 = {
+        db: null,
+        ready: false,
+        off: false,
+        mem: /* @__PURE__ */ new Map(),
+        learned: /* @__PURE__ */ new Map(),
+        queue: [],
+        busy: false,
+        bytes: 0,
+        count: 0,
+        taken: 0,
+        kept: 0,
+        waiting: [],
+        touched: /* @__PURE__ */ new Set(),
+        why: ""
+      };
+      const offWith = (why) => {
+        S3.off = true;
+        S3.why = String(why && (why.name && why.name !== "Error" ? why.name : why.message) || why || "off").slice(0, 80);
+        S3.queue.length = 0;
+      };
+      const whenReady = (f) => {
+        if (S3.ready) {
+          try {
+            f();
+          } catch (e) {
+          }
+        } else S3.waiting.push(f);
+      };
+      const nowReady = () => {
+        S3.ready = true;
+        for (const f of S3.waiting.splice(0)) {
+          try {
+            f();
+          } catch (e) {
+          }
+        }
+      };
+      (async () => {
+        try {
+          const idb = window.indexedDB;
+          if (!idb) throw new Error("no saved space in this browser");
+          const open2 = idb.open(DB_NAME, DB_VER);
+          open2.onupgradeneeded = () => {
+            const db2 = open2.result;
+            if (!db2.objectStoreNames.contains("fits")) db2.createObjectStore("fits", { keyPath: "h" }).createIndex("at", "at");
+            if (!db2.objectStoreNames.contains("learned")) db2.createObjectStore("learned", { keyPath: "id" });
+          };
+          S3.db = await req(open2);
+          S3.db.onversionchange = () => {
+            try {
+              S3.db.close();
+            } catch (e) {
+            }
+            offWith("closed");
+          };
+          const tx = S3.db.transaction(["fits", "learned"], "readonly"), all = await req(tx.objectStore("fits").getAll()), lr = await req(tx.objectStore("learned").getAll());
+          const cut2 = Date.now() - o.days * 864e5, stale = [], fresh2 = [];
+          for (const r of all) (r && r.stamp === o.stamp && r.at > cut2 ? fresh2 : stale).push(r);
+          for (const r of lr) if (r && r.stamp === o.stamp && r.o) S3.learned.set(r.id, r.o);
+          fresh2.sort((a, b) => b.at - a.at);
+          let open22 = 0;
+          for (const r of fresh2) {
+            S3.count++;
+            S3.bytes += r.bytes || 0;
+            if (r.f) {
+              S3.mem.set(r.h, { k: r.k, f: true });
+              continue;
+            }
+            if (!r.blob || open22 + r.w * r.ht * 4 > o.preloadMB * 1e6) continue;
+            try {
+              const bmp = await createImageBitmap(r.blob);
+              open22 += bmp.width * bmp.height * 4;
+              S3.mem.set(r.h, { k: r.k, bmp, tx: r.tx, ty: r.ty, mx: r.mx, my: r.my, ww: r.ww, wh: r.wh });
+            } catch (e) {
+              stale.push(r);
+            }
+          }
+          if (stale.length) {
+            const wt = S3.db.transaction("fits", "readwrite"), st2 = wt.objectStore("fits");
+            for (const r of stale) st2.delete(r.h);
+            await done(wt).catch(() => {
+            });
+          }
+          setTimeout(() => {
+            for (const [h2, e] of S3.mem) if (e.bmp) {
+              try {
+                e.bmp.close();
+              } catch (er) {
+              }
+              S3.mem.delete(h2);
+            }
+          }, 6e5);
+          nowReady();
+        } catch (e) {
+          offWith(e);
+          nowReady();
+        }
+      })();
+      function take2(k) {
+        if (!S3.ready || typeof k !== "string") return void 0;
+        const h2 = hashKey(k), e = S3.mem.get(h2);
+        if (!e || e.k !== k) return void 0;
+        S3.mem.delete(h2);
+        S3.touched.add(h2);
+        S3.taken++;
+        touchSoon();
+        if (e.f) return false;
+        const c = document.createElement("canvas");
+        c.width = e.bmp.width;
+        c.height = e.bmp.height;
+        try {
+          c.getContext("2d").drawImage(e.bmp, 0, 0);
+        } catch (er) {
+          return void 0;
+        } finally {
+          try {
+            e.bmp.close();
+          } catch (er) {
+          }
+        }
+        return { cv: c, tx: e.tx, ty: e.ty, mx: e.mx, my: e.my, ww: e.ww, wh: e.wh };
+      }
+      function keep3(k, cv, where) {
+        if (S3.off || typeof k !== "string") return;
+        if (S3.queue.length >= 400) return;
+        S3.queue.push([k, cv, where || {}]);
+        if (!S3.busy) {
+          S3.busy = true;
+          idle(next);
+        }
+      }
+      async function next() {
+        try {
+          while (S3.queue.length && !S3.off) {
+            if (!S3.db) {
+              if (!S3.ready) {
+                await new Promise((r) => whenReady(r));
+                continue;
+              }
+              break;
+            }
+            const [k, cv, w] = S3.queue.shift(), h2 = hashKey(k), at = Date.now();
+            let rec;
+            if (cv === false) rec = { h: h2, k, stamp: o.stamp, at, f: true, bytes: 0 };
+            else {
+              const blob = await new Promise((ok2) => {
+                try {
+                  cv.toBlob((b) => ok2(b), "image/png");
+                } catch (e) {
+                  ok2(null);
+                }
+              });
+              if (!blob) continue;
+              rec = { h: h2, k, stamp: o.stamp, at, f: false, tx: w.tx || 0, ty: w.ty || 0, mx: w.mx, my: w.my, ww: w.ww || cv.width, wh: w.wh || cv.height, w: cv.width, ht: cv.height, bytes: blob.size, blob };
+            }
+            const tx = S3.db.transaction("fits", "readwrite");
+            tx.objectStore("fits").put(rec);
+            await done(tx);
+            S3.kept++;
+            S3.count++;
+            S3.bytes += rec.bytes;
+            if (S3.bytes > o.maxMB * 1e6) await prune2();
+            await new Promise((r) => idle(r));
+          }
+        } catch (e) {
+          if (e && e.name === "QuotaExceededError") offWith(e);
+        } finally {
+          S3.busy = false;
+          if (S3.queue.length && !S3.off) {
+            S3.busy = true;
+            idle(next);
+          }
+        }
+      }
+      async function prune2() {
+        const tx = S3.db.transaction("fits", "readwrite"), st2 = tx.objectStore("fits"), cur = st2.index("at").openCursor();
+        const goal = o.maxMB * 1e6 * 0.75;
+        await new Promise((ok2) => {
+          cur.onsuccess = () => {
+            const c = cur.result;
+            if (!c || S3.bytes <= goal) return ok2();
+            S3.bytes -= c.value.bytes || 0;
+            S3.count--;
+            c.delete();
+            c.continue();
+          };
+          cur.onerror = () => ok2();
+        });
+        await done(tx).catch(() => {
+        });
+      }
+      let touchT = null;
+      function touchSoon() {
+        if (touchT || S3.off) return;
+        touchT = setTimeout(async () => {
+          touchT = null;
+          const hs = [...S3.touched];
+          S3.touched.clear();
+          if (!S3.db || !hs.length) return;
+          try {
+            const tx = S3.db.transaction("fits", "readwrite"), st2 = tx.objectStore("fits");
+            for (const h2 of hs) {
+              const g = st2.get(h2);
+              g.onsuccess = () => {
+                const r = g.result;
+                if (r) {
+                  r.at = Date.now();
+                  st2.put(r);
+                }
+              };
+            }
+            await done(tx);
+          } catch (e) {
+          }
+        }, 3e4);
+      }
+      const learnedFor = (id) => S3.learned.get(String(id)) || null;
+      async function saveLearned2(id, obj) {
+        if (S3.off || !S3.db || !obj) return;
+        S3.learned.set(String(id), obj);
+        try {
+          const tx = S3.db.transaction("learned", "readwrite");
+          tx.objectStore("learned").put({ id: String(id), stamp: o.stamp, at: Date.now(), o: obj });
+          await done(tx);
+        } catch (e) {
+          if (e && e.name === "QuotaExceededError") offWith(e);
+        }
+      }
+      const stats = () => ({ on: !S3.off && !!S3.db, ready: S3.ready, why: S3.why, count: S3.count, mb: Math.round(S3.bytes / 1e5) / 10, open: S3.mem.size, taken: S3.taken, kept: S3.kept, waiting: S3.queue.length });
+      async function clear() {
+        for (const e of S3.mem.values()) if (e.bmp) {
+          try {
+            e.bmp.close();
+          } catch (er) {
+          }
+        }
+        S3.mem.clear();
+        S3.learned.clear();
+        S3.queue.length = 0;
+        S3.bytes = 0;
+        S3.count = 0;
+        if (!S3.db) return;
+        try {
+          const tx = S3.db.transaction(["fits", "learned"], "readwrite");
+          tx.objectStore("fits").clear();
+          tx.objectStore("learned").clear();
+          await done(tx);
+        } catch (e) {
+        }
+      }
+      return { take: take2, keep: keep3, learnedFor, saveLearned: saveLearned2, whenReady, ready: () => S3.ready, stats, clear, hashKey };
+    };
   })();
 
   // extension/src/warn.js
@@ -13149,12 +13621,66 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var redraw = (soon) => {
     if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
   };
+  var DRAWING_STAMP = true ? "f54a41a17a35" : "dev";
+  var fits = null;
+  function fitStore() {
+    if (fits !== null) return fits || null;
+    if (!W4.GameVersion) return null;
+    try {
+      fits = typeof W4.FarmFitStore === "function" && W4.indexedDB ? W4.FarmFitStore({ stamp: DRAWING_STAMP + "|" + W4.GameVersion }) : false;
+    } catch (e) {
+      fits = false;
+    }
+    return fits || null;
+  }
+  var learnedAt = /* @__PURE__ */ new WeakMap();
+  function bodyId(mn) {
+    const m = mn == null ? W4.Player && W4.Player.MemberNumber : mn;
+    return m ? "m" + m : "";
+  }
+  function learnInto(E, mn) {
+    const st2 = fitStore(), id = bodyId(mn);
+    if (!st2 || !E || !id) return;
+    st2.whenReady(() => {
+      try {
+        const o = st2.learnedFor(id);
+        if (o && E.learn(o)) mn == null ? redraw(80) : redrawMn(mn, 80);
+        learnedAt.set(E, E.learnedSig());
+      } catch (e) {
+        warnSome("[Farmhand Companion] saved fits:", e);
+      }
+    });
+  }
+  function saveLearned() {
+    const st2 = fitStore();
+    if (!st2 || !st2.ready()) return;
+    const each = [[null, mine2.E], ...Array.from(others.entries()).map(([mn, o]) => [mn, o.E])];
+    for (const [mn, E] of each) {
+      if (!E || typeof E.learnedSig !== "function") continue;
+      try {
+        const sig2 = E.learnedSig(), id = bodyId(mn);
+        if (!id || learnedAt.get(E) === sig2) continue;
+        learnedAt.set(E, sig2);
+        st2.saveLearned(id, E.learned());
+      } catch (e) {
+        warnSome("[Farmhand Companion] saved fits:", e);
+      }
+    }
+  }
+  function fitStoreStats() {
+    const st2 = fitStore();
+    return st2 ? st2.stats() : { on: false, why: fits === false ? "none in this browser" : "not started" };
+  }
+  function fitStoreClear() {
+    const st2 = fitStore();
+    return st2 ? st2.clear() : Promise.resolve();
+  }
   function makeEngine(mn) {
     if (!W4.FarmBelly) W4.FarmBelly = bellyDrawing;
     if (typeof W4.FarmBodyEngine !== "function" || !W4.FarmBreasts) return null;
     loadCock();
     const who2 = mn == null ? () => W4.Player || null : () => charOf(mn);
-    return W4.FarmBodyEngine({
+    const E = W4.FarmBodyEngine({
       S: { get C() {
         return who2();
       } },
@@ -13175,9 +13701,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           return 0;
         }
       },
-      budget: mn == null ? 192e6 : 96e6
+      budget: mn == null ? 192e6 : 96e6,
       // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
+      store: fitStore() || void 0
+      // fitted pieces saved for next time, and found again (THE FITS, SAVED, above)
     });
+    learnInto(E, mn);
+    return E;
   }
   function engine() {
     if (!mine2.E && W4.Player) mine2.E = makeEngine(null);
@@ -13200,11 +13730,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       B.cvKey = "";
       B.holdSig = "";
     }
-    const fits = s.belly && typeof s.belly === "object" ? s.belly : null;
+    const fits2 = s.belly && typeof s.belly === "object" ? s.belly : null;
     for (const k of Object.keys(E.BELLY.fits)) {
       const f = E.BELLY.fits[k];
       Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 });
-      if (fits && fits[k]) Object.assign(f, fits[k]);
+      if (fits2 && fits2[k]) Object.assign(f, fits2[k]);
     }
     E.BELLY.auto = s.auto !== false;
     B.tuck = s.tuck !== false;
@@ -13391,15 +13921,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function noteBuild(C2, ms, since2) {
     const E = engineOf(C2);
     let made3 = 0, drawn = false;
+    let saved = 0;
     try {
       const p = E && E.perf ? E.perf().last : null;
       if (p && p.at >= since2) {
         drawn = true;
         made3 = p.made;
+        saved = p.saved || 0;
       }
     } catch (e) {
     }
-    builds.push({ who: nameOf(C2), ms: Math.round(ms), made: made3, drawn, at: Date.now() });
+    builds.push({ who: nameOf(C2), ms: Math.round(ms), made: made3, saved, drawn, at: Date.now() });
     if (builds.length > 40) builds.shift();
   }
   function drawnBodyPerf() {
@@ -13418,12 +13950,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return { recent: recent2.slice(-8), worst: recent2.slice().sort((a, b) => b.ms - a.ms).slice(0, 3), slow: slow.slice(0, 6), putOff, kept: kept2 };
   }
   function drawnBodyPerfText() {
-    const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made ? " (" + x.made + " drawn fresh)" : "");
+    const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made || x.saved ? " (" + [x.made ? x.made + " drawn fresh" : "", x.saved ? x.saved + " from saved" : ""].filter(Boolean).join(", ") + ")" : "");
     const lines = ["Drawin' people (the last quarter hour):"];
     lines.push("  the last few: " + (p.recent.length ? p.recent.map(b).join(" \xB7 ") : "none yet"));
     if (p.worst.length) lines.push("  the slowest: " + p.worst.map(b).join(" \xB7 "));
     if (p.slow.length) lines.push("  the slowest pieces: " + p.slow.map((s) => s.label + " on " + s.who + " " + s.ms + " ms" + (s.made ? ", drawn fresh" : "")).join(" \xB7 "));
     lines.push("  waited a frame: " + p.putOff + " times" + (p.kept.length ? " \xB7 keepin': " + p.kept.map(([who2, mb]) => who2 + " " + mb + " MB").join(", ") : ""));
+    const fs = fitStoreStats();
+    lines.push("  saved fits: " + (fs.on ? fs.count + " saved (" + fs.mb + " MB), " + fs.taken + " used this time, " + fs.kept + " saved this time" + (fs.waiting ? ", " + fs.waiting + " waitin' to save" : "") : "off" + (fs.why ? ", " + fs.why : "")) + " \xB7 /farmfits clear starts them over");
     return lines.join("\n");
   }
   var perfSeen = 0;
@@ -13519,10 +14053,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     sdk2 = mod3;
     load();
     setInterval(prune, 2e4);
+    setInterval(saveLearned, 3e4);
     if (typeof W4.requestAnimationFrame === "function") {
       framesOk = true;
       frameTick();
     }
+    const openFits = (n) => {
+      if (fitStore() || fits === false || n > 40) return;
+      setTimeout(() => openFits(n + 1), 500);
+    };
+    openFits(0);
     setTimeout(() => {
       if (S.on && engine()) {
         W4.__farmDrawnBody = true;
@@ -15815,6 +16355,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         if (typeof W12.ChatRoomSendLocal === "function") W12.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text3, 12e4);
         else console.log(text3);
+      } }, { Tag: "farmfits", Description: ": the drawn body's saved fits on this computer (/farmfits clear starts them over)", Action: (args) => {
+        const say3 = (t) => {
+          if (typeof W12.ChatRoomSendLocal === "function") W12.ChatRoomSendLocal(t, 3e4);
+          else console.log(t);
+        };
+        if (/^\s*clear\b/i.test(String(args || ""))) {
+          fitStoreClear().then(() => say3("Saved fits cleared. Everything gets fitted fresh, and saved again as it goes."));
+          return;
+        }
+        const f = fitStoreStats();
+        say3(f.on ? "Saved fits on this computer: " + f.count + ", " + f.mb + " MB. Used " + f.taken + " since the page opened, saved " + f.kept + " new." + (f.waiting ? " " + f.waiting + " waiting to save." : "") + " /farmfits clear starts them over." : "Saved fits are off on this computer" + (f.why ? ": " + f.why : "") + ". The drawn body still works, it just fits everything fresh after a reload.");
       } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
         let text3 = "";
         try {

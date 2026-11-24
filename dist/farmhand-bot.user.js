@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.96.0
+// @version      0.97.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3131,8 +3131,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.96.0";
-  var COMPANION_VERSION = "0.77.0";
+  var VERSION = "0.97.0";
+  var COMPANION_VERSION = "0.78.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3955,30 +3955,33 @@
       NURSE_COOLDOWN_S: 90,
       BLOCK_CHECK: true,
       // ?cum checks the hole (and the stud's penis) isn't locked, plugged or gagged
-      // matched against the species on file; litter = [fewest, most]
+      // matched against the species on file; litter = [fewest, most]; days = how long a pregnancy of their kind runs.
+      // (Nov 23, Laynie: pregnancy "by species impregnated by". The SIRE's kind sets the litter and the days, and what's
+      // born: a cow bred by a dog carries pups, quick, and a bunny bred by a stallion carries one foal, long. A sire with
+      // no kind on file, a human, leaves it to the mother's own kind, as before. 10y2c-sired.js)
       SPECIES: {
-        cow: { milk: 2, fert: 1, litter: [1, 1] },
-        bull: { milk: 1, fert: 1, litter: [1, 1] },
-        pony: { milk: 1, fert: 0.8, litter: [1, 1] },
-        horse: { milk: 1, fert: 0.8, litter: [1, 1] },
-        deer: { milk: 1, fert: 0.9, litter: [1, 1] },
-        pig: { milk: 1, fert: 1.3, litter: [4, 10] },
-        pup: { milk: 1, fert: 1.2, litter: [3, 8] },
-        dog: { milk: 1, fert: 1.2, litter: [3, 8] },
-        kitt: { milk: 1, fert: 1.2, litter: [2, 6] },
-        cat: { milk: 1, fert: 1.2, litter: [2, 6] },
-        goblin: { milk: 1, fert: 1.6, litter: [2, 5] },
-        bunny: { milk: 1, fert: 1.5, litter: [4, 8] },
-        rabbit: { milk: 1, fert: 1.5, litter: [4, 8] },
-        fox: { milk: 1, fert: 1.1, litter: [2, 5] },
-        wolf: { milk: 1, fert: 1.1, litter: [3, 6] },
-        goat: { milk: 1.5, fert: 1.1, litter: [1, 3] },
-        sheep: { milk: 1, fert: 1, litter: [1, 2] },
-        rat: { milk: 1, fert: 1.7, litter: [6, 12] },
+        cow: { milk: 2, fert: 1, litter: [1, 1], days: 7 },
+        bull: { milk: 1, fert: 1, litter: [1, 1], days: 7 },
+        pony: { milk: 1, fert: 0.8, litter: [1, 1], days: 8 },
+        horse: { milk: 1, fert: 0.8, litter: [1, 1], days: 8 },
+        deer: { milk: 1, fert: 0.9, litter: [1, 1], days: 6 },
+        pig: { milk: 1, fert: 1.3, litter: [4, 10], days: 4 },
+        pup: { milk: 1, fert: 1.2, litter: [3, 8], days: 3 },
+        dog: { milk: 1, fert: 1.2, litter: [3, 8], days: 3 },
+        kitt: { milk: 1, fert: 1.2, litter: [2, 6], days: 3 },
+        cat: { milk: 1, fert: 1.2, litter: [2, 6], days: 3 },
+        goblin: { milk: 1, fert: 1.6, litter: [2, 5], days: 2 },
+        bunny: { milk: 1, fert: 1.5, litter: [4, 8], days: 2 },
+        rabbit: { milk: 1, fert: 1.5, litter: [4, 8], days: 2 },
+        fox: { milk: 1, fert: 1.1, litter: [2, 5], days: 3 },
+        wolf: { milk: 1, fert: 1.1, litter: [3, 6], days: 3 },
+        goat: { milk: 1.5, fert: 1.1, litter: [1, 3], days: 5 },
+        sheep: { milk: 1, fert: 1, litter: [1, 2], days: 5 },
+        rat: { milk: 1, fert: 1.7, litter: [6, 12], days: 2 },
         // (Oct 26: the ratsluts)
-        dragon: { milk: 1, fert: 0.8, litter: [1, 3] },
+        dragon: { milk: 1, fert: 0.8, litter: [1, 3], days: 6 },
         // (Oct 29: the dragons; their own seed leaves clutches anyway)
-        default: { milk: 1, fert: 1, litter: [1, 2] }
+        default: { milk: 1, fert: 1, litter: [1, 2], days: 5 }
       },
       // keywords in a crafted item's name or description (worn, or on an injector)
       TAG_WORDS: {
@@ -7735,7 +7738,7 @@
         p.preg.sires.push(stud);
         return "extra";
       }
-      const [lo, hi] = speciesInfo(mother).litter;
+      const kind = pregKindFor(mother, stud), [lo, hi] = (CFG.SPECIES[kind] || speciesInfo(mother)).litter;
       let count = lo + Math.floor(Math.random() * (hi - lo + 1));
       if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE + perkTwins(mother)) count = 2;
       if (wornTags(mother).has("hyper") || boosted(p, "hyper")) {
@@ -7746,7 +7749,7 @@
         count = Math.min(CFG.HYPER_MAX, count * (1 + (p.boostX && p.boostX.twins || 1)));
         delete p.boosts.twins;
       }
-      p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5 * perkPregX(mother), sires: [stud], count, warned: false };
+      p.preg = { since: now, due: now + pregDays(kind) * 864e5 * perkPregX(mother), sires: [stud], count, warned: false, kind };
       try {
         bredBack(mother);
       } catch (e) {
@@ -7780,7 +7783,7 @@
         if (sp) sp.totals.sired += 1;
       }
       if (!L2.studbook) L2.studbook = [];
-      L2.studbook.push({ t: Date.now(), dam: mn, sires: g.sires.slice(), kids });
+      L2.studbook.push(Object.assign({ t: Date.now(), dam: mn, sires: g.sires.slice(), kids }, g.kind ? { kind: g.kind } : {}));
       if (L2.studbook.length > 1e3) L2.studbook = L2.studbook.slice(-1e3);
       const sires = g.sires.slice();
       p.preg = null;
@@ -7789,18 +7792,18 @@
       saveLedger();
       audit(CFG.BOT_MEMBER, "BIRTH", mn + " " + JSON.stringify(kids));
       later(() => addonsEmit("birth", mn, kids, sires, info), 1500);
-      const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, v: { c: siresTxt, x: String(g.count) } };
-      const what = birthKids(mn, g.count) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
+      const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, young: g.kind, v: { c: siresTxt, x: String(g.count) } };
+      const what = birthKids(mn, g.count, g.kind) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
       const mw = info.midwife && info.midwife !== CFG.BOT_MEMBER ? info.midwife : 0;
       const msg = "\u{1F37C} Oh, y'all! " + plainName(mn) + " just delivered " + what + ", sired by " + siresTxt + (mw ? ", with " + plainName(mw) + " as midwife" : "") + ". Milk's comin' in strong now!";
       try {
-        albumAdd(mn, "\u{1F37C}", g.count === 1 ? "A " + birthWords(mn).one + " delivered" : "A litter delivered", what + ", sired by " + siresTxt + (mw ? ". Midwife: " + plainName(mw) : "") + ".");
+        albumAdd(mn, "\u{1F37C}", g.count === 1 ? "A " + birthWords(mn, g.kind).one + " delivered" : "A litter delivered", what + ", sired by " + siresTxt + (mw ? ". Midwife: " + plainName(mw) : "") + ".");
       } catch (e) {
       }
       if (info.away) {
         tell(mn, "\u{1F37C} Your litter's on the books, sugar: " + what + ", sired by " + siresTxt + (mw ? ", with " + plainName(mw) + " as midwife" : "") + ". Milk's comin' in strong.");
         if (onMap(mn)) emote("\u{1F37C} The farm girl writes " + plainName(mn) + "'s litter into the stud book: " + what + ", sired by " + siresTxt + ", born away from the farm. Welcome home, mama.", mn);
-      } else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);
+      } else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires, g.kind);
       else if (onMap(mn)) emote("\u{1F37C} " + birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
       else beep(mn, msg);
       try {
@@ -8456,7 +8459,7 @@
         emote("\u{1F388} " + plainName(t) + "'s belly is stretched round, tight and sloshin' with " + plainName(stud) + "'s seed, " + ((rec(t) || {}).pinMe === true ? "way too swollen to waddle off. They're stuck right where they are till it drains." : "so swollen they can barely waddle, slow and sloshin' with every step."));
       else if (fullNow > 1 && fullBefore <= 1)
         emote("\u{1F388} " + plainName(t) + "'s belly starts to round out, warm and heavy with " + plainName(stud) + "'s load.");
-      if (caught === "new") emote("\u{1F37C} It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(stud) + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days.");
+      if (caught === "new") emote("\u{1F37C} It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(stud) + "'s " + carryWord(t) + " now. " + dueWords(t));
       if (caught === "new" && !makesMilk(t) && !limitBlocks(t, "milk"))
         tell(t, "\u{1F37C} You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
       if (caught === "extra") emote("\u{1F37C} " + plainName(stud) + " got one in too! " + plainName(t) + " is carryin' for two sires now.");
@@ -9707,7 +9710,7 @@
         isRipe(mn) && "\u{1F338} Ripe today: every load takes twice as easy",
         // (Nov 19, 10ur3-breed-anywhere.js)
         r.broodWomb && "\u{1F930} Brood Womb: carryin', every load takes and adds to your litter",
-        p.preg && "\u{1F37C} Bred by " + p.preg.sires.map(plainName).join(" & ") + " \xB7 due " + new Date(p.preg.due).toLocaleDateString() + " (" + Math.ceil((p.preg.due - now) / 864e5) + " day(s))",
+        p.preg && "\u{1F37C} Bred by " + p.preg.sires.map(plainName).join(" & ") + " \xB7 carryin' " + carryWord(mn) + " \xB7 due " + new Date(p.preg.due).toLocaleDateString() + " (" + Math.ceil((p.preg.due - now) / 864e5) + " day(s))",
         r.rights && r.rights.until > now && "\u{1F50F} Breedin' rights: " + plainName(r.rights.stud) + ((r.rights.allow || []).length ? " (also " + r.rights.allow.map(plainName).join(", ") + ")" : "") + " till " + new Date(r.rights.until).toLocaleDateString(),
         p.offspring.litters && "\u{1F476} Litters: " + p.offspring.litters + " \xB7 " + p.offspring.male + " male, " + p.offspring.female + " female, " + p.offspring.futa + " futa",
         p.labour && "\u{1F37C} In labour right now!",
@@ -10803,7 +10806,8 @@
         studbook: () => JSON.parse(JSON.stringify(L2.studbook || [])),
         // labour (10y2b-birthing.js): start(mn) brings it on now (a midwife's doin', asked first) · help(mn, mins) takes
         // minutes off, → minutes left or null · unstick(mn, by) turns a stuck one · place(mn) where their kind births ·
-        // young(mn) → [one, many] · sound(mn) a noise their kind makes birthin'
+        // young(mn) → [one, many] · kind(mn) → { young, kind, mother, cross }: what they're carryin', the sire's kind (Nov 23) ·
+        // sound(mn) a noise their kind makes birthin'
         labour: Object.freeze({
           start: (mn) => startLabour(mn, "induced"),
           help: (mn, mins) => helpLabour(mn, mins == null ? CFG.MIDWIFE_HELP_MIN : mins),
@@ -10813,6 +10817,11 @@
             const w = birthWords(mn);
             return [w.one, w.many];
           },
+          kind: (mn) => {
+            const w = birthWords(mn);
+            return { young: w.young, kind: BIRTH_KIND_OF[w.young] || "default", mother: w.kind, cross: w.cross };
+          },
+          // what they're carryin' (the sire's kind, Nov 23)
           sound: (mn) => {
             const w = birthWords(mn);
             return w.sounds[Math.floor(Math.random() * w.sounds.length)];
@@ -23691,6 +23700,13 @@
     function echsSend(mn, message) {
       send("ChatRoomChat", { Content: ECHS_TAG, Type: "Hidden", Target: mn, Dictionary: [{ message }] });
     }
+    function echsHeld(mn) {
+      try {
+        return reinsHeld(mn) || !!(prodOf(mn) || {}).pin;
+      } catch (e) {
+        return false;
+      }
+    }
     function echsBeside(mn) {
       if (!mapRoom()) return;
       const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
@@ -23698,6 +23714,15 @@
       const v = echsOf(mn);
       if (v && v.broughtAt && Date.now() - v.broughtAt < 6e4) return;
       if (v) v.broughtAt = Date.now();
+      if (echsHeld(mn)) {
+        const to2 = spotBeside(mn);
+        if (!to2) return;
+        if (!state.echsFrom) state.echsFrom = { X: a.X, Y: a.Y };
+        state.echsBusyUntil = Date.now() + 9e4;
+        me.MapData.Pos = { X: to2.X, Y: to2.Y };
+        send("ChatRoomCharacterMapDataUpdate", me.MapData);
+        return;
+      }
       const to = spotBeside(CFG.BOT_MEMBER);
       if (!to) return;
       try {
@@ -27783,7 +27808,7 @@
     }
     function seedCaught(mn, sire, caught, late) {
       const s = sireName(sire), t = plainName(mn);
-      let line = caught === "new" ? late ? "\u{1F37C} Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days." : "\u{1F37C} It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s young now. Due in " + CFG.PROD.PREG_DAYS + " days." : caught === "extra" ? "\u{1F37C} " + s + "'s seed got one in too! " + t + " is carryin' for two sires now." : caught === "more" ? sureLine(mn, sire) : "";
+      let line = caught === "new" ? late ? "\u{1F37C} Somethin' took: the seed " + s + " left in " + t + " earlier has caught. They're carryin' " + s + "'s " + carryWord(mn) + " now. " + dueWords(mn) : "\u{1F37C} It took! A soft, warm glow settles over " + t + ": they're carryin' " + s + "'s " + carryWord(mn) + " now. " + dueWords(mn) : caught === "extra" ? "\u{1F37C} " + s + "'s seed got one in too! " + t + " is carryin' for two sires now." : caught === "more" ? sureLine(mn, sire) : "";
       if (!line) return;
       line = line.split("#" + sire).join(s);
       if (onMap(mn)) emote(line, mn);
@@ -32762,8 +32787,8 @@
         arouse(mn, 30);
       }, v);
     }
-    function farrowScene(mn, count, kids, sires) {
-      const x = { count, kids, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
+    function farrowScene(mn, count, kids, sires, young) {
+      const x = { count, kids, young, v: { x: String(count), c: sires.map(plainName).join(" & ") } };
       const mids = count <= 2 ? 0 : count <= 5 ? 1 : count <= 10 ? 2 : 3;
       const beats = [birthBeat(mn, "push", x, "labour"), birthBeat(mn, count === 1 ? "crownOne" : "crownMany", x, "crown")];
       for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? birthBeat(mn, "huge", x) : birthBeat(mn, "mid", x));
@@ -33553,9 +33578,18 @@
     function birthKind(mn) {
       return BIRTH_KIND_OF[speciesKey(mn)] || "default";
     }
-    function birthWords(mn) {
-      const k = speciesKey(mn), kind = birthKind(mn), y = BIRTH_YOUNG[k] || BIRTH_YOUNG.default;
-      return { kind, one: y[0], many: y[1], place: BIRTH_PLACE[kind] || BIRTH_PLACE.default, sounds: BIRTH_SOUNDS[k] || BIRTH_SOUNDS.default };
+    function birthWords(mn, young) {
+      const k = speciesKey(mn), kind = birthKind(mn), yk = young || youngKindOf(mn), y = BIRTH_YOUNG[yk] || BIRTH_YOUNG[k] || BIRTH_YOUNG.default;
+      return {
+        kind,
+        young: yk,
+        cross: (BIRTH_KIND_OF[yk] || "default") !== kind,
+        mine: kind === "default" ? "" : (BIRTH_YOUNG[k] || BIRTH_YOUNG.default)[0],
+        one: y[0],
+        many: y[1],
+        place: BIRTH_PLACE[kind] || BIRTH_PLACE.default,
+        sounds: BIRTH_SOUNDS[k] || BIRTH_SOUNDS.default
+      };
     }
     function birthSexes(kids) {
       const parts = [];
@@ -33565,30 +33599,31 @@
       return parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0] || "";
     }
     const birthSexOne = (kids) => kids.male ? "a little male" : kids.futa ? "a little futa" : "a little female";
-    function birthKids(mn, n) {
-      const w = birthWords(mn);
+    function birthKids(mn, n, young) {
+      const w = birthWords(mn, young);
       return n === 1 ? "a " + w.one : n + " " + w.many;
     }
     function birthFill(t, mn, x) {
-      const w = birthWords(mn), p = prodOf(mn), n = x && x.count || p && p.preg && p.preg.count || 1, kids = x && x.kids || null;
-      return String(t).replace(/%place/g, w.place).replace(/%brood/g, n === 1 ? w.one : w.many).replace(/%sexone/g, kids ? birthSexOne(kids) : "a little one").replace(/%sexes/g, kids ? birthSexes(kids) : "").replace(/%kids/g, birthKids(mn, n)).replace(/%many/g, w.many).replace(/%one/g, w.one).replace(/%sound/g, () => w.sounds[Math.floor(Math.random() * w.sounds.length)]);
+      const yk = x && x.young, w = birthWords(mn, yk), p = prodOf(mn), n = x && x.count || p && p.preg && p.preg.count || 1, kids = x && x.kids || null;
+      return String(t).replace(/%place/g, w.place).replace(/%brood/g, n === 1 ? w.one : w.many).replace(/%sexone/g, kids ? birthSexOne(kids) : "a little one").replace(/%sexes/g, kids ? birthSexes(kids) : "").replace(/%kids/g, birthKids(mn, n, yk)).replace(/%many/g, w.many).replace(/%one/g, w.one).replace(/%mine/g, w.mine || "little one of their own").replace(/%sound/g, () => w.sounds[Math.floor(Math.random() * w.sounds.length)]);
     }
-    function birthPool(mn, key, ownKey) {
-      const own = (BIRTH_KIND_LINES[birthKind(mn)] || {})[ownKey || key] || [], shared = sharedBirth(key);
+    function birthPool(mn, key, ownKey, young) {
+      const k = ownKey || key, w = birthWords(mn, young), shared = sharedBirth(key);
+      const own = w.cross && CROSS_KEYS.has(k) ? BIRTH_CROSS[k].filter((l) => w.mine || !/%mine/.test(l)) : (BIRTH_KIND_LINES[birthKind(mn)] || {})[k] || [];
       return own.length && (!shared.length || Math.random() < 0.6) ? own : own.concat(shared);
     }
     function birthVars(mn, x) {
       const p = prodOf(mn), g = p && p.preg || {};
-      return Object.assign({ count: x && x.count || g.count || 1 }, x || {}, { v: Object.assign({ c: (g.sires || []).map(plainName).join(" & "), x: String(x && x.count || g.count || 1) }, x && x.v || {}) });
+      return Object.assign({ count: x && x.count || g.count || 1, young: x && x.young || g.kind }, x || {}, { v: Object.assign({ c: (g.sires || []).map(plainName).join(" & "), x: String(x && x.count || g.count || 1) }, x && x.v || {}) });
     }
     function birthLine(key, mn, x, ownKey) {
-      const pool = birthPool(mn, key, ownKey);
+      const pool = birthPool(mn, key, ownKey, x && x.young);
       if (!pool.length) return "";
       const vx = birthVars(mn, x);
       return tFill(birthFill(pickFor(mn, "birth:" + key, pool), mn, vx), mn, vx.v);
     }
     function birthBeat(mn, key, x, ownKey) {
-      return birthPool(mn, key, ownKey).map((l) => birthFill(l, mn, x));
+      return birthPool(mn, key, ownKey, x && x.young).map((l) => birthFill(l, mn, x));
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, {
       __birthLine: (k, mn, x, own) => birthLine(k, mn, x, own),
@@ -33668,6 +33703,91 @@
       saveLedger();
       return Math.max(1, Math.ceil((lb.until - now) / 6e4));
     }
+    const TRAP_SIRE_KIND = {
+      [-10]: "wolf",
+      [-11]: "horse",
+      [-12]: "bull",
+      [-13]: "rabbit",
+      [-14]: "pig",
+      [-15]: "cat",
+      [-16]: "dragon",
+      [-18]: "dog",
+      [-20]: "goat",
+      [-21]: "pig",
+      [-22]: "horse",
+      [-30]: "dog",
+      [-33]: "deer",
+      [-40]: "goblin",
+      [-41]: "goblin",
+      [-43]: "bull",
+      [-44]: "wolf",
+      [-45]: "fox",
+      [-46]: "cat",
+      [-47]: "sheep",
+      [-62]: "dog",
+      [-74]: "rabbit"
+    };
+    function sireKind(stud) {
+      const n = Number(stud);
+      if (!isFinite(n) || !n) return null;
+      if (n < 0) {
+        const k2 = TRAP_SIRE_KIND[n];
+        return k2 && CFG.SPECIES[k2] ? k2 : null;
+      }
+      if (!rec(n)) return null;
+      const k = speciesKey(n);
+      return k && k !== "default" ? k : null;
+    }
+    const pregKindFor = (mother, stud) => sireKind(stud) || speciesKey(mother);
+    const pregDays = (kind) => {
+      const S = CFG.SPECIES[kind];
+      return S && S.days > 0 ? S.days : CFG.PROD.PREG_DAYS;
+    };
+    function youngKindOf(mn) {
+      const p = prodOf(mn);
+      return p && p.preg && p.preg.kind || speciesKey(mn);
+    }
+    function carryWord(mn) {
+      const k = youngKindOf(mn), S = CFG.SPECIES[k] || CFG.SPECIES.default, w = birthWords(mn);
+      return S.litter[1] > 1 ? w.many : w.one;
+    }
+    function dueWords(mn) {
+      const p = prodOf(mn), g = p && p.preg;
+      if (!g) return "";
+      const d = Math.max(1, Math.round((g.due - Date.now()) / 864e5));
+      return d === 1 ? "Due tomorrow." : "Due in " + d + " days.";
+    }
+    const BIRTH_CROSS = {
+      crown: [
+        "%n bears down with %sound, and what slides out into %place is no %mine: it's a slick, squirmin' %one, %c's through and through.",
+        "One long push and a wet %one comes squallin' into the straw. There's not a bit of %n's kind in its looks. It's all %c's.",
+        "The farm girl catches it as it comes: a damp little %one, its sire's kind, out of a body that was made for a %mine. She grins and lays it by %n.",
+        "%n pants and pushes, and opens round a %one that was never meant for their kind. It comes slick and quick, %c's breed stamped all over it.",
+        "%n lets out %sound, and out comes a %one, wet and blinkin'. %n stares at it, dazed: bred to another kind, and here's the proof.",
+        "A last hard push and a %one slips free, %c's kind from its nose to its tail, and %n sags in %place with a shaky laugh."
+      ],
+      endOne: [
+        "%n curls round their one %one, %sexone, and it's %c's kind, not theirs. It roots for a teat all the same, and their milk comes in for it.",
+        "It's done. One %one, %sexone, sired by %c, with nothin' of %n's kind in it. They nurse it anyway, dazed and drippin'.",
+        "%n stares down at the %one on their chest, %sexone and %c's spittin' image, latched on and suckin' hard.",
+        "%n lies back in %place with a %one tucked against them, %sexone, every inch its sire's breed. No %mine for this one. They were bred to %c's kind, and they've birthed it."
+      ],
+      endMany: [
+        "When it's over, %n lies in %place with %kids squirmin' at their teats, %sexes, every one of them %c's kind and not a %mine among them.",
+        "%kids, %sexes, all %c's, and %n's body made every one. They lie in a heap against their mama nursin', and %n's milk lets down hard.",
+        "The farm girl counts them off: %kids, %sexes, %c's breed through and through. %n just lies there, emptied out and leakin', bred proper to another kind.",
+        "%n's belly's soft and empty and %kids are piled against them, %sexes, all %c's kind. %n strokes the nearest one and can't stop shakin'.",
+        "It's done: %kids, %sexes, sired by %c and lookin' like it. %n gathers them in, a mama to a breed that isn't theirs."
+      ]
+    };
+    const CROSS_KEYS = new Set(Object.keys(BIRTH_CROSS));
+    if (W.__FARMHAND_TEST__) Object.assign(W, {
+      __sireKind: (s) => sireKind(s),
+      __pregKindFor: (m, s) => pregKindFor(m, s),
+      __pregDays: (k) => pregDays(k),
+      __youngKindOf: (mn) => youngKindOf(mn),
+      __birthCross: () => BIRTH_CROSS
+    });
     const SUBJECT_RANKS = [{ at: 0, name: "Bait" }, { at: 10, name: "Trap Fodder" }, { at: 25, name: "Brood Sow" }, { at: 60, name: "Broodmother" }];
     function rankOfSubject(mn) {
       const n = (rec(mn) || {}).trapN || 0;
@@ -65814,6 +65934,8 @@ Say ?keys to see what you're holdin', hon.`;
 \u{1F38E} DOLLS \u2014 posed, displayed, kept behind gold
 \u{1F573}\uFE0F GLORYHOLES \u2014 installed in the pens, left for whoever wanders past
 
+\u{1F37C} Bred, you carry the SIRE's kind: his litter, his days, his young. A dog's leaves pups in three days, a stallion's one big foal in eight, whatever you are. ?species list shows every kind.
+
 And if you're somethin' we ain't listed, say so anyhow, sugar. We've taken in stranger!`;
     TEXT.luxury = `\u{1F3E1} THE CABIN \u2014 LUXURY STAY \u{1F3E1}
 Real bed. Real door. Real quiet. Ooh, it's lovely, %name%.
@@ -67622,14 +67744,14 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           const kinds = Object.keys(CFG.SPECIES).filter((k2) => k2 !== "default");
           const row = (k2) => {
             const S = CFG.SPECIES[k2];
-            return k2 + ": milk x" + S.milk + ", fertility x" + S.fert + ", litters of " + (S.litter[0] === S.litter[1] ? S.litter[0] : S.litter[0] + "-" + S.litter[1]);
+            return k2 + ": milk x" + S.milk + ", fertility x" + S.fert + ", litters of " + (S.litter[0] === S.litter[1] ? S.litter[0] : S.litter[0] + "-" + S.litter[1]) + ", carried " + (S.days || CFG.PROD.PREG_DAYS) + " days";
           };
           if (!args.length) {
             R(TEXT.species);
             break;
           }
           if (/^(list|all|table)$/i.test(args[0])) {
-            R("\u{1F43E} SPECIES & LITTERS\n" + kinds.map(row).join("\n") + "\nAnything else counts as: " + row("default").replace(/^default: /, "") + ". Set yours with ?species <animal>, like ?species bunny.");
+            R("\u{1F43E} SPECIES & LITTERS\n" + kinds.map(row).join("\n") + "\nAnything else counts as: " + row("default").replace(/^default: /, "") + ".\nWhat's born is the SIRE's kind: how many, how long it's carried, and what comes out. A sire with no kind on file leaves it to the mother's.\nSet yours with ?species <animal>, like ?species bunny.");
             break;
           }
           let who = sender, animal = args.join(" ");

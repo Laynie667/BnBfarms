@@ -1,19 +1,19 @@
 # What to install (current versions)
 
-Updated 2026-11-23. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-24. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.96.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.97.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.3.0** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.3** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.77.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.78.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.97.0 + Companion 0.78.0 + Breeding 1.4.0: bred to his kind, fitted clothes saved for next time, and a trance that leaves a held cow be** From the suggestion box, Laynie, Nov 23: "#60 ... the pregnancy by species impregnated by, and pregnancy lines", "#44 ... go ahead" (fitting in the background, "and keeping saved might help alot").
+  - **Bred to his kind** (#60, bot 10y2c-sired.js). The SIRE's kind decides the pregnancy now: how many (his kind's litter), how long (his kind's days: bunnies, rats and goblins 2; pups, kittens and kits 3; piglets 4; lambs and kids 5; fawns and hatchlings 6; calves 7; foals 8), and what's born (his young). The labour stays the mother's own: her place, her sounds, her way. When the young aren't her kind, the crownin' and the after are lines of their own: a cow strains in the calvin' pen and out comes "no calf: a slick, squirmin' pup, Rex's through and through". A sire with no kind on file (a human, a glory-stall stranger) leaves it to the mother's kind, as before; the farm's own trap studs are their kinds (the wolf pack wolves, the stallion stud a horse, the buck rabbits rabbits). A pregnancy from before today goes on as it was. "It took!" says what they're carryin' and when it's really due, ?stats says what's in there, ?species list shows every kind's days, the stud book writes down what was born, and add-ons can ask with api.labour.kind.
+  - **Pregnancy lines by what's in there** (#60, Breeding 1.4.0, carrying.js). The stage lines, cravings and kicks follow the kind they're carryin', for all 13 kinds: carryin' pups they crave meat and growl at anybody near their nest, piglets they'd eat the trough, kits they pull fur for a nest, a dragon's and their belly runs hot and they hoard shiny things, goblin brats pinch from the inside. Mixed with the farm's shared lines.
+  - **Fitted clothes saved for next time** (#44, Companion; studio/web/fit-store.js). Every fitted piece was fitted again after every reload, every relog: that's the freeze each time the page opened. Now the fits are saved in the player's own browser (nothin' leaves their computer) under names made from what they're made of, and found there next time, along with what's been learned about each piece (how far it reaches, which lie on the breasts and belly, each picture's outline). Checked in the studio with a heavy look, reloaded: without them 29 to 34 pieces fitted fresh, about 0.9 to 1.1 s of drawing and freezes up to 346 ms; with them all but 1 to 3 from saved, about 0.4 s and the worst freeze about 100 ms, and the picture pixel for pixel the same. They're stamped with a fingerprint of the drawing code and the game's version, so a change to how things are fitted, or a game update, starts them fresh. /farmmem shows how many were used; /farmfits says how many are saved and /farmfits clear starts them over. The studio saves its own too with ?savefits.
+  - **A trance leaves a held cow be** (Crystal's #57: "the hypno 'led along' and the big boobs locking you in place effects seem to conflict resulting in a lot of teleporting around"). Somebody the farm's holdin' where they are (too full to move, stocks, a pen, the bench, the stall, knotted, hitched, a trap) isn't led to the farm girl for an ECHS trance any more, to be put straight back by the hold over and over; she steps over to them for it, and back to her spot after.
+  - Tests: preg-by-sire, saved-fits, echs (the held one), dispensary-seed-farm (the new "It took!" words).
 
 - **Bot 0.96.0 + Companion 0.77.0: strapped into the milkin' stall, a way to the nest, and a futa's cock layered over the clothes** From the suggestion box, Laynie, Nov 23: "#10 true, that should be on a toggle with equipment, like a stand, symbian, and lactation pump. so those wanting immersion can toggle it on. removed after", "#30 ... add a "Move to nest" command or button", "#55 interesting".
   - **?stallgear** (Nikto's #10; off to start, Toggles → Milk). A milkin' session puts the stall's own gear on: the lactation pump on their teats when it's milkin' them, and under them the stall's Sybian (with a pussy to ride it) or the spreadin' stand (without). Steppin' off the stall mid-session puts them straight back on it. It all comes off when the session's done, and their safeword lets them loose, gear and all, for half an hour. The switch is their say-so for the gear, so it doesn't need "Farm can put real gear on me".

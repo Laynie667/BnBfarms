@@ -597,7 +597,8 @@
     if (!sure && p.boosts && p.boosts.ripe) delete p.boosts.ripe;
     if (p.preg && brood) return sureMore(mother, stud);   // already carryin': it adds to the litter (10ur2-dispensary.js)
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
-    const [lo,hi] = speciesInfo(mother).litter;
+    // bred to HIS kind (Nov 23, #60): the sire's litter, the sire's days, the sire's young (10y2c-sired.js)
+    const kind = pregKindFor(mother, stud), [lo,hi] = (CFG.SPECIES[kind] || speciesInfo(mother)).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
     if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE + perkTwins(mother)) count = 2;   // twins first, so a hyper litter is never cut back down to two
     // hyper pregnancy: a worn "hyper" item, a hyper shot, or a Broodmare Tonic
@@ -607,7 +608,7 @@
     }
     // a twins shot: double, a triple dose triples (10ur-shots-more.js)
     if (boosted(p, "twins")){ count = Math.min(CFG.HYPER_MAX, count * (1 + ((p.boostX && p.boostX.twins) || 1))); delete p.boosts.twins; }
-    p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000*perkPregX(mother), sires:[stud], count, warned:false };
+    p.preg = { since:now, due: now + pregDays(kind)*86400000*perkPregX(mother), sires:[stud], count, warned:false, kind };
     try { bredBack(mother); } catch(e){ warn("bred back:", e); }
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
     try { oneSireAfter(mother, stud, "new"); } catch(e){ warn("one sire:", e); }
@@ -626,23 +627,24 @@
     p.offspring.litters++;
     for (const s of g.sires){ const sp = prodOf(s); if (sp) sp.totals.sired += 1; }
     if (!L.studbook) L.studbook = [];
-    L.studbook.push({ t:Date.now(), dam:mn, sires:g.sires.slice(), kids });
+    L.studbook.push(Object.assign({ t:Date.now(), dam:mn, sires:g.sires.slice(), kids }, g.kind ? { kind: g.kind } : {}));
     if (L.studbook.length > 1000) L.studbook = L.studbook.slice(-1000);
     const sires = g.sires.slice();
     p.preg = null; p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS*86400000; openedUp(mn);
     saveLedger(); audit(CFG.BOT_MEMBER,"BIRTH",mn+" "+JSON.stringify(kids));
     later(() => addonsEmit("birth", mn, kids, sires, info), 1500);   // midwives, pregnancy add-on
     // in their kind's words (10y2b-birthing.js): "3 pups, 2 male and 1 female" · "a calf, a little female"
-    const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, v: { c: siresTxt, x: String(g.count) } };
-    const what = birthKids(mn, g.count) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
+    // (the sire's young, Nov 23: the pregnancy's gone from them by now, so its kind is handed along)
+    const siresTxt = sires.map(plainName).join(" & "), x = { count: g.count, kids, young: g.kind, v: { c: siresTxt, x: String(g.count) } };
+    const what = birthKids(mn, g.count, g.kind) + ", " + (g.count === 1 ? birthSexOne(kids) : birthSexes(kids));
     const mw = info.midwife && info.midwife !== CFG.BOT_MEMBER ? info.midwife : 0;
     const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+what+", sired by "+siresTxt+(mw ? ", with "+plainName(mw)+" as midwife" : "")+". Milk's comin' in strong now!";
-    try { albumAdd(mn, "🍼", g.count === 1 ? "A "+birthWords(mn).one+" delivered" : "A litter delivered", what+", sired by "+siresTxt+(mw ? ". Midwife: "+plainName(mw) : "")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
+    try { albumAdd(mn, "🍼", g.count === 1 ? "A "+birthWords(mn, g.kind).one+" delivered" : "A litter delivered", what+", sired by "+siresTxt+(mw ? ". Midwife: "+plainName(mw) : "")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
     if (info.away){   // (Nov 19) born away from the farm, in whatever room they were in: their Dispensary told it there
       tell(mn, "🍼 Your litter's on the books, sugar: "+what+", sired by "+siresTxt+(mw ? ", with "+plainName(mw)+" as midwife" : "")+". Milk's comin' in strong.");
       if (onMap(mn)) emote("🍼 The farm girl writes "+plainName(mn)+"'s litter into the stud book: "+what+", sired by "+siresTxt+", born away from the farm. Welcome home, mama.", mn);
     }
-    else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires);   // the birth, in beats (10y2-brood.js)
+    else if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, kids, sires, g.kind);   // the birth, in beats (10y2-brood.js)
     else if (onMap(mn)) emote("🍼 "+birthLine(g.count === 1 ? "endOne" : "endMany", mn, x), mn);
     else beep(mn, msg);
     try { const split = revealSplit(mn, sires, g.count); if (split) L.studbook[L.studbook.length - 1].split = split; } catch(e){ warn("split:", e); }   // whose they were (10y7-udders.js)
@@ -1217,7 +1219,7 @@
         : "so swollen they can barely waddle, slow and sloshin' with every step."));   // (stuck only with ?pinme on)
     else if (fullNow > 1 && fullBefore <= 1)
       emote("🎈 "+plainName(t)+"'s belly starts to round out, warm and heavy with "+plainName(stud)+"'s load.");
-    if (caught === "new") emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(stud)+"'s young now. Due in "+CFG.PROD.PREG_DAYS+" days.");
+    if (caught === "new") emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(stud)+"'s "+carryWord(t)+" now. "+dueWords(t));
     if (caught === "new" && !makesMilk(t) && !limitBlocks(t,"milk"))
       tell(t, "🍼 You're carryin' now, sugar. Want your milk to come in with the litter? Say ?milkable on and you'll start fillin' up. Leave it, and you'll stay dry.");
     if (caught === "extra") emote("🍼 "+plainName(stud)+" got one in too! "+plainName(t)+" is carryin' for two sires now.");

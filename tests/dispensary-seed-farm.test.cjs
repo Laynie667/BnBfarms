@@ -87,7 +87,7 @@ const seal=(group,by,name)=>({Asset:{Name:'BlackButtPlug',Group:{Name:group},Des
   W.__st().seedGap && W.__st().seedGap.delete('600:610');
   await hid(600,'dispSeed',{ep:'seedbook',id:5,loads:[{h:'vulva',ml:3000,by:610,at:Date.now(),here:1}],held:{}});
   ok(Math.round(p.held.vulva)===3050, "its maker's opens it, and every drop stays: 3 L in a belly that holds "+Math.round(cap)+" ("+Math.round(p.held.vulva)+")");
-  ok(p.preg && p.preg.sires[0]===610 && /It took!.*Bo's young/.test(roomText(n)), "...and Bo's catches: she's carryin' his ("+(p.preg&&p.preg.sires)+")");
+  ok(p.preg && p.preg.sires[0]===610 && /It took!.*Bo's \w+ now/.test(roomText(n)), "...and Bo's catches: she's carryin' his ("+(p.preg&&p.preg.sires)+")");
   // it holds through the farm's drainin'
   p.last=Date.now()-6*3600000; W.__pt();
   ok(p.held.vulva>3000, "six hours on, sealed: not a drop's gone ("+Math.round(p.held.vulva)+")");

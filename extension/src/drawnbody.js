@@ -33,6 +33,7 @@
 import "../../studio/web/breasts-drawing.js";   // window.FarmBreasts: the breasts themselves
 import "../../studio/web/body-engine.js";       // window.FarmBodyEngine: the studio's drawing
 import "../../studio/web/cock-drawing.js";      // window.FarmCock: the drawn cock and balls (Nov 18)
+import "../../studio/web/fit-store.js";      // window.FarmFitStore: fitted pieces saved for next time (Nov 23, #44)
 import { bellyDrawing, bellyTrial } from "./belly.js";
 import { makeMsg } from "../../shared/protocol.js";
 import { bcrOverBreast } from "./bcr.js";
@@ -218,6 +219,38 @@ function redrawMn(mn, soon) {
 }
 const redraw = (soon) => { if (W.Player) redrawMn(W.Player.MemberNumber, soon); };
 
+// ── THE FITS, SAVED (Nov 23, the suggestion box's #44; Laynie: "keeping saved might help alot") ──
+// Every fitted piece used to be fitted again after every reload: that's the freeze, every time the page opened. Now
+// they're saved in this browser's own space (fit-store.js; nothin' leaves the computer) and the engines find them there.
+// The stamp is a fingerprint of the drawing code itself (built in, build.mjs) and the game's version: when either
+// changes, what was saved is thrown away and fitted fresh, so nothin' is ever drawn from an old fit.
+// eslint-disable-next-line no-undef
+const DRAWING_STAMP = typeof __DRAWING_HASH__ !== "undefined" ? __DRAWING_HASH__ : "dev";
+let fits = null;   // the store (null: not made yet; false: none in this browser)
+function fitStore() {
+  if (fits !== null) return fits || null;
+  if (!W.GameVersion) return null;   // (not yet: the game's version is part of the stamp)
+  try { fits = typeof W.FarmFitStore === "function" && W.indexedDB ? W.FarmFitStore({ stamp: DRAWING_STAMP + "|" + W.GameVersion }) : false; } catch (e) { fits = false; }
+  return fits || null;
+}
+// what each body's engine has learned about its pieces, saved now and then (and brought back into a new engine)
+const learnedAt = new WeakMap();
+function bodyId(mn) { const m = mn == null ? (W.Player && W.Player.MemberNumber) : mn; return m ? "m" + m : ""; }
+function learnInto(E, mn) {
+  const st = fitStore(), id = bodyId(mn); if (!st || !E || !id) return;
+  st.whenReady(() => { try { const o = st.learnedFor(id); if (o && E.learn(o)) (mn == null ? redraw(80) : redrawMn(mn, 80)); learnedAt.set(E, E.learnedSig()); } catch (e) { warnSome("[Farmhand Companion] saved fits:", e); } });
+}
+function saveLearned() {
+  const st = fitStore(); if (!st || !st.ready()) return;
+  const each = [[null, mine.E], ...Array.from(others.entries()).map(([mn, o]) => [mn, o.E])];
+  for (const [mn, E] of each) {
+    if (!E || typeof E.learnedSig !== "function") continue;
+    try { const sig = E.learnedSig(), id = bodyId(mn); if (!id || learnedAt.get(E) === sig) continue; learnedAt.set(E, sig); st.saveLearned(id, E.learned()); } catch (e) { warnSome("[Farmhand Companion] saved fits:", e); }
+  }
+}
+export function fitStoreStats() { const st = fitStore(); return st ? st.stats() : { on: false, why: fits === false ? "none in this browser" : "not started" }; }
+export function fitStoreClear() { const st = fitStore(); return st ? st.clear() : Promise.resolve(); }
+
 // ── an engine per body, set up from its settings ──
 // (yours follows the game's Player itself: it was made by member number, and made before the game knew yours, so it
 // looked for nobody and never drew you, while everyone else's worked. Laynie, Oct 14: "i can see changes on others,
@@ -227,7 +260,7 @@ function makeEngine(mn) {
   if (typeof W.FarmBodyEngine !== "function" || !W.FarmBreasts) return null;
   loadCock();   // (the cock's pictures, the first time anybody's drawn)
   const who = mn == null ? () => W.Player || null : () => charOf(mn);
-  return W.FarmBodyEngine({
+  const E = W.FarmBodyEngine({
     S: { get C() { return who(); } },
     bodyItem: (g) => itemOf(who(), g),
     setBody: () => {},          // never: their body items are theirs
@@ -237,7 +270,10 @@ function makeEngine(mn) {
     // how open their nipples are (The Farmhand's Dispensary: the Nipple Dilator, its leeches, a trained stretch; Nov 18)
     nipOpen: () => { try { const D = W.FarmhandDispensary; return D && typeof D.nipples === "function" ? D.nipples(mn == null ? (W.Player && W.Player.MemberNumber) : mn) : 0; } catch (e) { return 0; } },
     budget: mn == null ? 192e6 : 96e6,   // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
+    store: fitStore() || undefined,      // fitted pieces saved for next time, and found again (THE FITS, SAVED, above)
   });
+  learnInto(E, mn);
+  return E;
 }
 function engine() { if (!mine.E && W.Player) mine.E = makeEngine(null); if (mine.E) apply(mine.E, eff()); return mine.E; }
 // What an engine's kept drawings were fitted to, besides the belly. A new belly alone keeps them (Nov 16): every fitted
@@ -370,8 +406,9 @@ const nameOf = (C) => (C === W.Player ? "you" : String((C && (C.Nickname || C.Na
 function engineOf(C) { if (C === W.Player) return mine.E; const o = C && typeof C.MemberNumber === "number" ? others.get(C.MemberNumber) : null; return o ? o.E : null; }
 function noteBuild(C, ms, since) {
   const E = engineOf(C); let made = 0, drawn = false;
-  try { const p = E && E.perf ? E.perf().last : null; if (p && p.at >= since) { drawn = true; made = p.made; } } catch (e) { /* fine */ }
-  builds.push({ who: nameOf(C), ms: Math.round(ms), made, drawn, at: Date.now() }); if (builds.length > 40) builds.shift();
+  let saved = 0;
+  try { const p = E && E.perf ? E.perf().last : null; if (p && p.at >= since) { drawn = true; made = p.made; saved = p.saved || 0; } } catch (e) { /* fine */ }
+  builds.push({ who: nameOf(C), ms: Math.round(ms), made, saved, drawn, at: Date.now() }); if (builds.length > 40) builds.shift();
 }
 // what /farmmem shows (memlog.js): the last drawings, the slowest pieces, how often somebody waited a frame
 export function drawnBodyPerf() {
@@ -383,12 +420,14 @@ export function drawnBodyPerf() {
   return { recent: recent.slice(-8), worst: recent.slice().sort((a, b) => b.ms - a.ms).slice(0, 3), slow: slow.slice(0, 6), putOff, kept };
 }
 export function drawnBodyPerfText() {
-  const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made ? " (" + x.made + " drawn fresh)" : "");
+  const p = drawnBodyPerf(), b = (x) => x.who + " " + x.ms + " ms" + (x.made || x.saved ? " (" + [x.made ? x.made + " drawn fresh" : "", x.saved ? x.saved + " from saved" : ""].filter(Boolean).join(", ") + ")" : "");
   const lines = ["Drawin' people (the last quarter hour):"];
   lines.push("  the last few: " + (p.recent.length ? p.recent.map(b).join(" · ") : "none yet"));
   if (p.worst.length) lines.push("  the slowest: " + p.worst.map(b).join(" · "));
   if (p.slow.length) lines.push("  the slowest pieces: " + p.slow.map((s) => s.label + " on " + s.who + " " + s.ms + " ms" + (s.made ? ", drawn fresh" : "")).join(" · "));
   lines.push("  waited a frame: " + p.putOff + " times" + (p.kept.length ? " · keepin': " + p.kept.map(([who, mb]) => who + " " + mb + " MB").join(", ") : ""));
+  const fs = fitStoreStats();
+  lines.push("  saved fits: " + (fs.on ? fs.count + " saved (" + fs.mb + " MB), " + fs.taken + " used this time, " + fs.kept + " saved this time" + (fs.waiting ? ", " + fs.waiting + " waitin' to save" : "") : "off" + (fs.why ? ", " + fs.why : "")) + " · /farmfits clear starts them over");
   return lines.join("\n");
 }
 // for the memory log's half-minute line: the slowest drawing since the last one, and how many
@@ -436,7 +475,10 @@ function hook() {
 export function initDrawnBody(mod) {
   sdk = mod; load();
   setInterval(prune, 20000);
+  setInterval(saveLearned, 30000);   // (what each body's learned about its pieces, saved for next time)
   if (typeof W.requestAnimationFrame === "function") { framesOk = true; frameTick(); }   // (the frames, counted: one at a time, above)
+  // the saved fits, opened as soon as the game says which version it is, so they're ready before anybody's drawn
+  const openFits = (n) => { if (fitStore() || fits === false || n > 40) return; setTimeout(() => openFits(n + 1), 500); }; openFits(0);
   setTimeout(() => {
     if (S.on && engine()) { W.__farmDrawnBody = true; redraw(500); }   // (switched on last time: back on once the game is up)
     hook(); if (S.on) tell(true); if (seeOthers) ask();

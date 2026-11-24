@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.25.0
+// @version      0.26.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.25.0";
+  var VERSION = "0.26.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -16792,6 +16792,107 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
 
+  // shared/farm-shots.js
+  var FARM_SHOTS = `\u{1F489} SHOTS & TAGGED ITEMS \u{1F489}
+
+I read words in a crafted item's name or description, like LSCG does.
+
+INJECTORS \xB7 use Inject on someone
+  Production
+    lactation \xB7 milk doubles for a day
+    virility \xB7 cum doubles for a day
+    fertility \xB7 catchin' doubles for a day
+    contraceptive \xB7 no catchin' for two days
+    egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
+    hyper pregnancy (or brood) \xB7 huge litters, 2 to 4 times as many
+    mpreg (or anal pregnancy) \xB7 a load in the ass can take, a week
+      (or just say ?mpreg on: your own switch, no item needed)
+      a shot, or for as long as you wear it. With hyper too: a
+      hyper one. A second stud the same day adds a second sire.
+    A plug or dildo with hollow, tunnel or fuckable in its name or
+      description lets a cock through: it does not close the hole.
+    (worn, those two work for as long as you wear the item)
+    heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
+  Feelin's and more
+    aphrodisiac (or horny) \xB7 achin' and needy (Needy Nectar)
+    hair trigger (or sensitizer) \xB7 an hour where every touch nearly sets you off
+    denial serum \xB7 held at the edge, no cummin', two hours
+    cum flood (or gusher) \xB7 your next loads come out enormous
+    sedative \xB7 drowsy, heavy and slow for an hour
+    obedience (or mind control) \xB7 a step deeper under
+    moo serum \xB7 Moo Juice from the needle
+    futa serum \xB7 a cock and all that comes with it, for a day
+    twins (or triplets) \xB7 the next litter that takes comes double
+    ripening (or ovulation) \xB7 heat, and the next load that can take, takes
+    strawberry milk (chocolate, honey, vanilla, banana, caramel) \xB7
+      flavoured milk for a day
+    purge serum (or antidote) \xB7 every shot in you flushed out
+    temporary, with a size \xB7 the growth or shrinkin' lasts an hour
+    (LSCG reads sedative, aphrodisiac, antidote and mind control
+     too: one needle does both.)
+  Stackin'
+    Doses stack. A second dose of the same while the first is still
+      workin' makes it triple, a third four times, up to five deep.
+    Put x2 to x5 on the needle for that many doses in one go:
+      "lactation x3", "udder growth x2", "hyper pregnancy x2".
+    Potions stack too: another bottle of the same is stronger
+      (where it can be) and runs longer, up to three deep.
+
+TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
+    auto-injector \xB7 the item doses you every half hour with the
+      other words on it: "auto-injector lactation x2". Piercings
+      work too: a nipple or clit piercing crafted as one does
+      every shot there is.
+    triggered \xB7 "when bred", "on climax", "when milked",
+      "when denied" or "on trap" on it: it doses you when that
+      happens instead of on a clock
+    roulette (or mystery dose) \xB7 a random shot every dose
+    iv drip (or drip line) \xB7 holds every effect on it full,
+      constantly, while it's in; it fades ten minutes after
+    Descriptions count, in plain words: "an IV that drips
+      lactation into her", "injects the wearer with sedative",
+      "whenever she's bred it makes her more fertile"
+    ?myshots \xB7 what's in you right now, and for how long
+    ?fix \xB7 with The Farmhand's Dispensary and its cravings
+      switched on: when you're itchin' for another, I'll see to it
+    ?kryptonite \xB7 the barn's rumours about the proprietors'
+      weaknesses. Find the word, put it on a needle\u2026
+    ovipositor \xB7 on a gag, belt, plug or dildo: it lays a clutch in
+      you now and then (needs ?eggs on, or your traps on)
+    auto-feed \xB7 on a funnel gag: a bellyful poured down you every
+      ten minutes. Add "piss" and say ?watersports on for that.
+    breeding, seeding or breeder \xB7 on a strap-on: when whoever's
+      wearin' it hits the edge, it pumps its crafter's seed into
+      whoever it's in, crafter there or not, every 2 minutes held
+      at the edge. Their breedin' switches say if it can take.
+      Say how much on it: "300 ml".
+    a cock type (canine, equine, feline, draconic), knotted, or a
+      size word (huge, hyper, monster) on a dildo, machine or belt:
+      the farm treats it as that cock, and big ones stretch you.
+  Capacity
+    stretching / capacity \xB7 +250 mL for good (up to 50 L)
+    shrinking \xB7 \u2212500 mL, spills the extra (a Reducing Serum takes a size off instead)
+  Sizes \xB7 a part plus a grow or shrink word, either order
+    parts: breasts (tits, udder) \xB7 balls \xB7 cock (penis) \xB7 knot \xB7
+      pussy \xB7 ass (anal) \xB7 throat
+    grow: grow, growth, enlarger, swell, gape, stretch, trainer\u2026
+    shrink: shrink, reducer, tightener, restorer\u2026
+    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
+    "Pussy Stretching Shot". Each one is a step, with a room emote.
+  Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
+    humanizer, knotting, knot remover \xB7 see ?help cocks
+
+WORN ITEMS
+  \u2022 lactation, virility, fertility \xB7 smaller boosts while worn
+  \u2022 capacity or stretching \xB7 +100 mL while worn
+  \u2022 stretcher, stretching, gaper, dilator or trainer in the vulva,
+    butt or mouth slot \xB7 opens that hole a level right away, and
+    trains it looser for good every 12 hours worn
+
+GOOD TO KNOW
+  \u2022 Shots are the only way into \u2728hyper sizes.
+  \u2022 ?shotlog (staff) shows what I read off recent shots.`;
+
   // dispensary/src/guides.js
   var GUIDES = [
     {
@@ -17154,6 +17255,75 @@ One of mods you are using is using an old version of SDK. It will work for now b
       see: ["start", "holes"]
     },
     {
+      id: "words",
+      icon: "\u{1F4DC}",
+      title: "Every word",
+      intro: "Every word that does somethin' on a crafted item, all in one place: the Dispensary's doses and gear, and the farm's own shots and toys.",
+      steps: [
+        "Put the words in the item's name or its description. The name holds 30 letters, so a long recipe goes in the description.",
+        "Write the words however you like: spaces, hyphens, underscores or nothin' between them all work. Denial Serum, denial-serum and DenialSerum are the same dose.",
+        "Mix them: a dose word, a gear word and a strength on one item all count. A Drip Gag that says denial serum x2 keeps them denied, twice as hard, as long as it's buckled in.",
+        "The farm's words at the bottom work on the farm, where the farm girl reads them. With the Dispensary runnin', a dose both of them know is the Dispensary's, so nothin' happens twice."
+      ],
+      doses: true,
+      // (page.js: every dose in the book, its words, and whether the farm girl reads it too)
+      lists: [
+        { head: "How strong, and when", rows: [
+          { what: "Stronger", words: ["x2", "x3", "x4", "x5", "double", "triple"], does: "that many doses' worth in one go", check: "strength" },
+          { what: "Later", words: ["time-release", "slow-release", "delayed", "capsule"], does: "goes off on its own a while after, not straight away", check: "later" }
+        ] },
+        { head: "Doses that pick", rows: [
+          { what: "Fill-Out", words: ["belly", "ass"], does: "swells that instead of your tits", check: "pick:fillout:fill-out" },
+          { what: "Tender", words: ["nipples", "clit", "pussy", "ass", "neck", "ears", "lips", "belly", "thighs", "feet"], does: "makes that spot the tender one", check: "pick:tender:tender drops" },
+          { what: "Statue Serum", words: ["porcelain", "gold", "latex", "marble", "bronze"], does: "what you're turned into, stone otherwise", check: "pick:statue:statue serum" },
+          { what: "Animal Tongue", words: ["puppy", "kitty", "pony", "cow", "bunny", "fox", "goat", "lamb", "piggy", "wolf", "dragon", "rat"], does: "whose tongue you talk with: puppy tongue, kitty tongue", check: "pick:tongue:{w} tongue" },
+          { what: "Reducing Serum", words: ["cock", "balls", "booty"], does: "what shrinks a size, tits otherwise", check: "pick:reducing:reducing serum" },
+          { what: "Tightening Balm", words: ["pussy", "ass", "throat"], does: "what it closes back up, your nipples otherwise; virgin balm does them all", check: "pick:balm:tightening balm" }
+        ] },
+        { head: "Gear that doses", rows: [
+          { what: "Drip", words: ["drip", "IV", "laced", "coated", "soaked", "infused", "seeping"], does: "keeps the dose in them the whole time it's worn", check: "drip" },
+          { what: "Injector", words: ["injector", "auto-inject", "dosing", "dispenser", "pump"], does: "a fresh dose every 30 minutes; every 10 minutes, or any number, sets its own", check: "inject" },
+          { what: "On climax", words: ["on climax", "when she cums", "whenever they orgasm"], does: "a dose every time they cum", check: "trig:climax" },
+          { what: "When kissed", words: ["when kissed"], does: "a dose every kiss", check: "trig:kissed" },
+          { what: "When touched", words: ["when touched", "when groped", "when caressed", "when fondled"], does: "a dose every touch", check: "trig:touched" },
+          { what: "When spanked", words: ["when spanked", "when slapped", "when paddled"], does: "a dose every smack", check: "trig:spanked" },
+          { what: "Roulette", words: ["roulette", "mystery dose", "mystery shot", "mystery drink", "surprise dose"], does: "a different dose every time, from the ones they allow", check: "roulette" },
+          { what: "Lip gloss", words: ["lip gloss", "lipstick", "lip balm", "lip stain"], does: "worn by you: whoever you kiss gets the dose on it", check: "gloss" }
+        ] },
+        { head: "Horny gear", rows: [
+          { what: "Horny", words: ["horny", "hungry"], does: "uses whoever wears it, every six to ten minutes", check: "horny" },
+          { what: "Busier", words: ["insatiable", "ravenous"], does: "every two to four minutes, and rougher", check: "horny" },
+          { what: "Breedin'", words: ["breeding", "seeding", "breeder"], does: "on horny gear: when they cum, it cums too and fills them with your seed", check: "breeds" }
+        ] },
+        { head: "Seed", rows: [
+          { what: "More seed words", words: ["breeding baster", "cum cocktail", "filled with my seed"], does: "your own seed, like the Seed dose", check: "dose:seed" },
+          { what: "How much", words: ["500 ml", "1 L", "2 gallons"], does: "how much goes in; with no amount, a good thick load", check: "amount" },
+          { what: "Where", words: ["pussy", "ass", "mouth", "nipples", "every hole", "both holes"], does: "which hole it fills", check: "hole" },
+          { what: "Breeder's Seal", words: ["breeder's seal", "breeding seal", "sire's seal", "seed lock", "seed keeper", "cum stopper"], does: "worn in or over a hole: keeps every drop in, and only its maker's loads catch", check: "seal" },
+          { what: "Seeded strap-on, on the farm", words: ["breeding", "seeding", "breeder"], does: "on a strap-on: when whoever wears it hits the edge, it pumps the crafter's seed into whoever it's in, crafter there or not. Their breedin' switches say if it can take; 300 ml on it says how much" }
+        ] },
+        { head: "Toys in a hole", rows: [
+          { what: "Bigger", words: ["big", "thick", "huge", "XL", "massive", "enormous", "monster", "giant", "horse", "dragon", "colossal", "hyper"], does: "counts as a bigger toy, so it stretches them more", check: "bigger" },
+          { what: "Smaller", words: ["tiny", "small", "little", "petite", "slim", "thin", "mini"], does: "a size smaller", check: "smaller" },
+          { what: "Trainer", words: ["stretching", "gaper", "dilator", "expander", "spreader", "trainer", "widener", "loosener"], does: "trains the hole looser while it's in", check: "trainer" },
+          { what: "Cruel", words: ["cruel", "sadistic", "merciless", "vicious", "punishing", "brutal"], does: "trains faster, and hurts with it", check: "cruel" }
+        ] },
+        { head: "Parasites", rows: [
+          { what: "Parasite lips", words: ["parasite", "parasite lips"], does: "a mouth that kisses and feeds on them", check: "para:lips" },
+          { what: "Livin' latex", words: ["living latex", "living rubber", "latex symbiote"], does: "a second skin with a mind of its own", check: "para:latex" },
+          { what: "Milk moss", words: ["milk moss"], does: "grows on their tits and drinks", check: "para:moss" },
+          { what: "The nestling", words: ["nestling"], does: "settles in and grows in stages", check: "para:nestling" },
+          { what: "The brood mother", words: ["brood mother", "brood queen"], does: "lays in them", check: "para:brood" },
+          { what: "The leash vine", words: ["leash vine", "vine leash"], does: "worn: keeps them close", check: "para:vine" },
+          { what: "The mouthpiece", words: ["mouthpiece"], does: "worn: says what its crafter tells it to", check: "para:mouth" },
+          { what: "Nipple leeches", words: ["nipple leech", "teat leech", "nipple worm", "nipple tick"], does: "hold their nipples open, wider once fed", check: "para:nips" }
+        ] }
+      ],
+      farm: FARM_SHOTS,
+      // (the farm girl's own ?help shots: the same text, shared/farm-shots.js)
+      see: ["craft", "gear", "farm"]
+    },
+    {
       id: "commands",
       icon: "\u2328\uFE0F",
       title: "Every command",
@@ -17241,7 +17411,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keyholders: "hardcore",
       lscg: "farm",
       help: "start",
-      command: "commands"
+      command: "commands",
+      every: "commands",
+      word: "words",
+      words: "words",
+      tags: "words",
+      tag: "words",
+      wordlist: "words",
+      glossary: "words",
+      shots: "words",
+      strapon: "words",
+      strap: "words"
     };
     if (ALIAS[w]) return GUIDE_BY[ALIAS[w]];
     return GUIDES.find((g) => g.title.toLowerCase().includes(w)) || null;
@@ -17281,6 +17461,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
 #fd-page .fd-guide h4{margin:0;flex:1;font-size:16px;color:#f0d6f8;font-family:Bitter,Georgia,serif}
 #fd-page .fd-guide ol,#fd-page .fd-guide ul{margin:6px 0 6px;padding-left:22px}
 #fd-page .fd-guide li{margin:3px 0}
+#fd-page .fd-words{margin:8px 0;padding:6px 8px;border-left:3px solid #8e6aa0;background:#281f2d;border-radius:4px}
+#fd-page .fd-wrow{margin:5px 0;line-height:1.35}
+#fd-page .fd-wrow code{white-space:normal;word-break:break-word}
+#fd-page .fd-words summary{cursor:pointer;font-weight:bold}
+#fd-page .fd-farmtext{white-space:pre-wrap;word-break:break-word;font-size:12px;margin:6px 0 0;max-height:420px;overflow:auto}
 #fd-page .fd-try{background:#1e1822;border:1px dashed #6e5a78;border-radius:7px;padding:6px 10px;margin:6px 0}
 #fd-page .fd-try code{font:13px/1.4 ui-monospace,Consolas,monospace;color:#ffd9a8;background:#0000;word-break:break-word}
 #fd-page .fd-try button{font-size:11.5px;min-height:22px;padding:0 7px;margin-left:6px}
@@ -17536,6 +17721,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } }, "Close")),
       h("div", { style: { marginTop: "4px" } }, G.intro),
       h("ol", null, G.steps.map((s) => h("li", null, s))),
+      // (Every word, Nov 24: the doses straight from the book, so a new dose is on the list the day it's made)
+      G.doses ? h(
+        "div",
+        { class: "fd-words" },
+        h("div", { class: "fd-muted" }, "The doses: any one of a dose's words on the item"),
+        doseIds().map((id) => {
+          const B = BOOK[id], ws = B.keywords && B.keywords.length ? B.keywords : [id === "kit" ? "kit, and the kit's own name" : B.label.toLowerCase()];
+          return h("div", { class: "fd-wrow" }, h("b", null, (B.icon || "") + " " + B.label), " ", h("code", null, ws.join(" \xB7 ")), B.farm ? h("span", { class: "fd-muted" }, " \xB7 the farm girl reads it too") : null);
+        })
+      ) : null,
+      (G.lists || []).map((L) => h(
+        "div",
+        { class: "fd-words" },
+        h("div", { class: "fd-muted" }, L.head),
+        L.rows.map((r) => h("div", { class: "fd-wrow" }, h("b", null, r.what), " ", h("code", null, r.words.join(" \xB7 ")), h("div", { class: "fd-muted" }, "\u2192 " + r.does)))
+      )),
+      G.farm ? h("details", { class: "fd-words" }, h("summary", null, "\u{1F404} On the farm: the farm girl's own list, as ?help shots gives it"), h("pre", { class: "fd-farmtext" }, G.farm)) : null,
       G.craft && G.craft.length ? h(
         "div",
         { class: "fd-try" },
@@ -18594,7 +18796,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     dosesIn: (t) => dosesIn(t),
     farmHas: (id, p) => farmHas(id, p),
     book: () => Object.fromEntries(Object.entries(BOOK).map(([id, B]) => [id, { farm: !!B.farm, lscg: B.lscg || "", lscgOnly: !!B.lscgOnly, keywords: (B.keywords || []).slice() }])),
-    phrases: { gloss: (t) => GLOSS_WORDS.test(plainWords(t)), later: (t) => isLater(plainWords(t)), horny: (t) => hornyOf(plainWords(t)), para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t))) },
+    phrases: {
+      drip: (t) => DRIP_WORDS.test(plainWords(t)),
+      inject: (t) => INJECT_WORDS.test(plainWords(t)),
+      roulette: (t) => ROULETTE_WORDS.test(plainWords(t)),
+      breeds: (t) => BREEDS.test(plainWords(t)),
+      trig: (t) => Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(plainWords(t))),
+      // (Every word, Nov 24: the test tries every gear word it lists)
+      gloss: (t) => GLOSS_WORDS.test(plainWords(t)),
+      later: (t) => isLater(plainWords(t)),
+      horny: (t) => hornyOf(plainWords(t)),
+      para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t)))
+    },
     give: (...a) => give(...a),
     tick: () => {
       tick();

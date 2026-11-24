@@ -146,6 +146,7 @@
     if (v.phase === "AttemptMade" && was !== "AttemptMade") echsBeside(sender);   // their box is up: bring them to my side for the induction
     if (v.phase === "InductionInProgress" && was !== "InductionInProgress") echsPatter(sender, v);
     else if (v.phase === "Hypnotized" && was !== "Hypnotized"){
+      v.underAt = Date.now();
       if (r) r.echs = Object.assign(r.echs || {}, { underAt: Date.now(), n: ((r.echs && r.echs.n) || 0) + 1 });
       toBy("🌀 "+plainName(sender)+" went under for me: "+(v.band || "under")+".");
       addonsEmit("echsUnder", sender, { by: v.by === CFG.BOT_MEMBER ? sender : v.by, why: v.why, band: v.band });
@@ -166,9 +167,29 @@
     const lines = ECHS_PATTER.slice().sort(() => Math.random() - 0.5).slice(0, 5);
     lines.forEach((l, i) => later(() => { const v2 = echsOf(mn); if (v2 === v && v.phase === "InductionInProgress") { v.patter++; echsSay(mn, l); } }, 2500 + i * 11000));
   }
+  // NOBODY LEFT UNDER WITH NOTHIN' GOIN' ON (Nov 24, the suggestion box's #58, Crystal: "hypno is a little odd. It says it
+  // will fade in a few minutes, but the trance doesn't fade"). Their ECHS says that when they come back from a reload or a
+  // greyscreen mid-trance: it'll fade if their hypnotist isn't back. I never leave the room, so it counted me as back and
+  // kept them under, up to its own half hour, and the wake I'd sent at the end of their session had gone out while they
+  // were gone. Now, once they're here again:
+  //   • a wake of mine that didn't take goes again, every 2 minutes, a few times
+  //   • a trance no session of the farm's took is woken after ECHS_IDLE_WAKE_MIN
+  //   • No human left is meant to run out on its own (Conditioning marks it): that one's left be
+  function echsLeftUnder(now){
+    for (const [mn, v] of state.echs || new Map()){
+      if (v.phase !== "Hypnotized" || v.nhl || !charFor(mn)) continue;
+      if (v.wakeSent){
+        if (now - v.wakeSent >= 120000 && (v.rewoke || 0) < 5){ v.rewoke = (v.rewoke || 0) + 1; echsWake(mn, true); log("ECHS: woke "+mn+" again (still under after my wake)"); }
+        continue;
+      }
+      if (!v.taken && now - (v.underAt || v.at || now) >= (CFG.ECHS_IDLE_WAKE_MIN || 5) * 60000){ echsWake(mn); log("ECHS: woke "+mn+" (under with nothin' runnin')"); }
+    }
+  }
+  if (W.__FARMHAND_TEST__) W.__echsLeftUnder = (t) => echsLeftUnder(t || Date.now());
   // ?hypno on folk who are around and idle get asked now and then
   function echsTick(){
     echsHome();
+    try { echsLeftUnder(Date.now()); } catch(e){ warn("echs left under:", e); }
     if (!CFG.ECHS_ON || !CFG.ECHS_OFFER_EVERY_MIN) return;
     const now = Date.now();
     if (now - (state.echsTickAt || 0) < 60000) return; state.echsTickAt = now;

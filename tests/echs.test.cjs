@@ -125,6 +125,20 @@ const near=(mn)=>{ const a=chars[0].MapData.Pos, b=chars.find(c=>c.MemberNumber=
   await say(700,'?hypnotize me',700); n=sent.length; echs(700,{phase:'AttemptMade'}); await wait(400);
   ok(!sent.slice(n).some(([e,d])=>d&&d.Target===700&&(/MapViewTeleport/.test(d.Content||'')||(d.Dictionary&&/lead/.test(JSON.stringify(d.Dictionary))))), 'too full to move: the trance leaves them where the farm\'s holdin\' them, no bein\' led off and put back');
   ok(near(700), '...and the farm girl steps over to them for it instead');
+  // (Nov 24, #58, Crystal: "It says it will fade in a few minutes, but the trance doesn't fade": nobody left under with nothin' goin' on)
+  const E58=W.__st().echs;
+  E58.set(600,{phase:'Hypnotized',at:Date.now(),by:260239,underAt:Date.now()-6*60000});
+  n=sent.length; W.__echsLeftUnder(); await wait(600);
+  ok(hyp(n,600).some(m=>m.type==='session-wake'), 'under with the farm girl five minutes and nothin\' runnin\': woken');
+  E58.get(600).wakeSent=Date.now()-3*60000; n=sent.length; W.__echsLeftUnder(); await wait(600);
+  ok(hyp(n,600).some(m=>m.type==='session-wake'), '...a wake that went out while they were gone goes again once they\'re back and still under');
+  E58.set(600,{phase:'Hypnotized',at:Date.now(),by:260239,underAt:Date.now()-20*60000,taken:'conditioning',nhl:true});
+  n=sent.length; W.__echsLeftUnder(); await wait(600);
+  ok(!hyp(n,600).some(m=>m.type==='session-wake'), '...but No human left is left to run out on its own');
+  E58.set(600,{phase:'Hypnotized',at:Date.now(),by:260239,underAt:Date.now()-20*60000,taken:'conditioning'});
+  n=sent.length; W.__echsLeftUnder(); await wait(600);
+  ok(!hyp(n,600).some(m=>m.type==='session-wake'), '...and a session that\'s still runnin\' is never cut short');
+  E58.delete(600);
   ok(!warns.some(w=>/echs|condition/i.test(w)), 'no errors: '+warns.filter(w=>/echs|condition/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);
 })();

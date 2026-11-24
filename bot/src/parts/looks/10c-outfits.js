@@ -97,6 +97,42 @@
     const err = offerOutfit(mn, o.slot, "It goes with your new contract", true);
     if (err){ r.outfitOwed = null; saveLedger(); notifyStaff("👗 Couldn't dress "+plainName(mn)+" for their contract: "+err, false); }
   }
+  // BOUND ON SIGNING, IN THEIR OWN CLOTHES (Nov 24, the suggestion box's #66, Kitty Sera: "the farm should still bind new
+  // livestock on contract signing, even if their clothing remains with 'keep outfit'"; Laynie: "livestock should be bound
+  // upon signing… for those with the keep outfit option, they need comparable restraints… by contract level"). Somebody on
+  // ?ownoutfit keeps their own clothes, and the restraints of their kind's farm outfit go on over them, padlocked, as many
+  // as the contract's level calls for:
+  //   fun   the collar and what hangs off it, and the nose ring: marked as stock, nothin' that binds
+  //   deep  that, and the harness, cuffs, mittens, the petsuit's paws, rope, boots, clamps and the leash
+  //   nhl   every restraint the outfit has: the gag and chastity too
+  // Only into EMPTY spots (outfits.js topUpOutfit): an owner's collar, or anythin' else already on them, is never swapped out.
+  const BIND_GROUPS = {
+    fun: ["ItemNeck", "ItemNeckAccessories", "ItemNose"],
+    deep: ["ItemNeck", "ItemNeckAccessories", "ItemNose", "ItemNipples", "ItemTorso", "ItemArms", "ItemHands", "ItemLegs", "ItemFeet", "ItemBoots", "ItemNeckRestraints"],
+    nhl: null,   // (every Item spot in the outfit)
+  };
+  function bindGroupsFor(level, items){
+    const all = [...new Set((items || []).map(it => it && it.Group).filter(g => /^Item/.test(String(g || ""))))];
+    const want = Object.prototype.hasOwnProperty.call(BIND_GROUPS, level) ? BIND_GROUPS[level] : BIND_GROUPS.deep;
+    return want ? all.filter(g => want.includes(g)) : all;
+  }
+  function contractBindNow(mn){
+    const r = rec(mn), o = r && r.bindOwed; if (!o) return;
+    if (!r.ownOutfit || Date.now() - o.at > 7*24*3600000){ r.bindOwed = null; saveLedger(); return; }   // (dressed whole after all, or a week on: let it go)
+    if (!hasCompanion(mn)){
+      if (!o.told){ o.told = true; saveLedger(); tell(mn, "🔗 Your new contract binds you, sugar, over your own clothes. Turn on the Companion and the farm's tack goes on you the moment it's back, or staff can bind you by hand."); }
+      return;
+    }
+    if (o.sentAt && Date.now() - o.sentAt < 60000) return;   // already on its way
+    if ((o.sends||0) >= 3){ r.bindOwed = null; saveLedger(); return; }
+    outfitsLedger();
+    const oo = o.slot && (L.outfits[o.slot] || farmOutfit(o.slot)); if (!oo || !oo.data){ r.bindOwed = null; saveLedger(); return; }
+    let items = []; try { items = (JSON.parse(W.LZString.decompressFromBase64(String(oo.data))) || {}).items || []; } catch(e){ r.bindOwed = null; saveLedger(); return; }
+    const groups = bindGroupsFor(o.level, items); if (!groups.length){ r.bindOwed = null; saveLedger(); return; }
+    o.sentAt = Date.now(); o.sends = (o.sends||0) + 1; saveLedger();
+    enqueue(makeMsg("outfit", { slot: o.slot, label: slotLabel(o.slot), data: oo.data, keys: outfitKeysFor(mn), auto: true, topup: groups, bind: o.level, id: ++companionSeq }, mn));
+    audit(CFG.BOT_MEMBER, "CONTRACT_BIND_SENT", mn+" "+o.level+" "+groups.length);
+  }
   // BACK ON THE FARM, DRESSED AGAIN (Nov 23; Laynie: "also reapplying their farm outfits upon them returning, if contracted
   // and anything is missing"). Somebody under a contract, dressed for it once (contractDressedAt), comes back to the farm:
   // any piece of their farm outfit whose spot is EMPTY on them goes back on (padlocked like the first time). A spot with
@@ -131,6 +167,12 @@
   // their Companion tells me what happened, so staff and the room know
   function outfitAnswer(mn, m){
     try { tempOutfitAnswer(mn, m); } catch(e){ warn("temp outfit:", e); }   // the outfit wheel, the Wrong Barn (10un-outfit-wheel.js)
+    if (m.answer === "topped" && m.bind){   // bound on signing, in their own clothes (contractBindNow above)
+      const r = rec(mn); if (r){ r.bindOwed = null; r.contractBoundAt = Date.now(); saveLedger(); }
+      audit(mn, "CONTRACT_BOUND", String(m.bind)+" "+(m.worn|0));
+      if (onMap(mn) && (m.worn|0) > 0) emote("🔗 "+plainName(mn)+" keeps their own clothes, but the contract's signed, and the farm girl buckles the farm's tack on over them: "+(m.worn|0)+" piece"+((m.worn|0) === 1 ? "" : "s")+(m.locks ? ", every one padlocked" : "")+". Stock's stock, whatever it wears.");
+      return;
+    }
     if (m.answer === "topped"){   // a top-up on their return: only what was missin' (outfitTopUp below)
       audit(mn, "OUTFIT_TOPUP", String(m.slot||"")+" "+(m.worn|0));
       if (onMap(mn) && (m.worn|0) > 0) emote("👗 The farm girl tuts and puts "+plainName(mn)+" back in their farm outfit: "+(m.worn|0)+" piece"+((m.worn|0) === 1 ? "" : "s")+" they'd come home without"+(m.locks ? ", padlocked back on" : "")+".");
@@ -161,7 +203,8 @@
     R(r.ownOutfit ? "👗 Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no."
                   : "👗 Bring your own outfit: off. "+(r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
   }
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m), __outfitTopUp: (m) => outfitTopUp(m) });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m), __outfitTopUp: (m) => outfitTopUp(m),
+    __contractBind: (m) => contractBindNow(m), __bindGroups: (lv, items) => bindGroupsFor(lv, items) });
 
   // its commands, written in the command book (01b-commands.js); the big switch no longer lists them
   addCommand("ownoutfit myoutfit",       { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });   // bring your own outfit

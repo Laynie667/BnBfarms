@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.78.0
+// @version      0.79.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.78.0";
+  var VERSION = "0.79.0";
 
   // shared/species.js
   var WORDS = {
@@ -18624,6 +18624,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         title("\u26D3 On your character"),
         muted("All of these are off until you switch them on. Your safeword takes everything off."),
         pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
+        pref(ctx3, "gearAside", "Traps can set my own things aside", "When a trap's gear needs a spot your own clothes or gear are in, they come off for the scene and go straight back on after, so you see what's done to you. Off, only your farm outfit's pieces step aside. Nothin' anybody else has locked on you is ever moved."),
         pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
         pref(ctx3, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. The marks a trap sears on (the pond's, the pack's, the boar's) go in slots of the farm's own instead, and ?wash scrubs them off unless they're on for good (?marks). Switch this off and the farm's ink comes off.", () => {
           ctx3.api.inkSync && ctx3.api.inkSync();
@@ -20826,6 +20827,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
   var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
   var lockedGroups = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var FARM_GIRL = 260239;
+  var farmOutfitPiece = (b) => {
+    const p = b && b.Property;
+    if (!p || p.LockedBy !== "HighSecurityPadlock" || p.LockMemberNumber !== P2().MemberNumber) return false;
+    return String(p.MemberNumberListKeys || "").split(",").map(Number).includes(FARM_GIRL);
+  };
   var commit = (next) => commitLook(next);
   var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
   function markBody(m, prefs2) {
@@ -21446,7 +21453,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return null;
     }
   }
-  function syncFarmGear(list, allow) {
+  function syncFarmGear(list, allow, opts) {
+    const aside = !!(opts && opts.aside);
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
     const lg = letGo2(), now = Date.now();
     let pruned = false;
@@ -21495,6 +21503,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (group) {
           was = next.find((b) => b.Group === group);
           next = next.filter((b) => b !== was);
+        }
+      }
+      if (!group) {
+        const homes = [];
+        for (const n0 of Array.isArray(g.items) ? g.items.map(String) : []) {
+          if (!nameOk(n0)) continue;
+          const n = itemName(n0), all = Array.isArray(window.Asset) ? window.Asset : [];
+          for (const a of all) if (a && a.Name === n && a.Group && a.Group.Family === P2().AssetFamily && slot.groups.includes(a.Group.Name) && !homes.includes(a.Group.Name)) homes.push(a.Group.Name);
+        }
+        for (const x of slot.groups) if (!homes.includes(x)) homes.push(x);
+        group = homes.find((x) => {
+          if (!groupOf(x)) return false;
+          const b = next.find((y) => y.Group === x);
+          if (!b || gearNameOf(b, mem)) return false;
+          return farmOutfitPiece(b) || aside && !stuck.has(x);
+        }) || null;
+        if (group) {
+          was = next.find((b) => b.Group === group);
+          next = next.filter((b) => b !== was);
+          (did.aside = did.aside || []).push(was.Name);
         }
       }
       if (!group) continue;
@@ -23660,7 +23688,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       let list = Array.isArray(s.farmGear) ? s.farmGear : [];
       if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
         list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
-      const did = syncFarmGear(list, !!st.panel.prefs.gear);
+      const did = syncFarmGear(list, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });
       if (botHere2()) gearFreedTell(null);
       try {
         syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape);
@@ -23669,6 +23697,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
       for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
+      if ((did.aside || []).length) toChat("Set aside for it, and back on you after: " + did.aside.length + " piece" + (did.aside.length === 1 ? "" : "s") + " in its way.", "#c9a35b", true);
       for (const n of did.stuck || []) toChat("The farm's " + n + " keeps comin' off you, so it's left off for ten minutes.", "#c9a35b", true);
     } catch (e) {
       console.warn("[Farmhand Companion] farm gear:", e);
@@ -23862,8 +23891,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           } catch (e) {
             r = { ok: false, why: e.message };
           }
-          if (r.ok && r.worn) st.panel.add("\u{1F457} Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
-          toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0 });
+          if (r.ok && r.worn) st.panel.add(m.bind ? "\u{1F517} Contract signed. Your clothes stay yours, and the farm's tack goes on over them: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + (r.locks ? ", padlocked on" : "") + "." : "\u{1F457} Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
+          toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0, bind: m.bind ? String(m.bind) : void 0 });
           break;
         }
         if (m.auto) {

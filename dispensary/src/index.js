@@ -11,12 +11,12 @@ import { VERSION } from "./version.js";
 import { load, st, save } from "./store.js";
 import { initDoses, tick, active, leftMs, doseIds, BOOK, give, setClock, end, moment, grown, dosesIn, farmHas } from "./doses.js";
 import { laterTick, craving, craveSoon, isLater } from "./later.js";
-import { initWorn, wornTick, wornGear, trigger, wornReset, GLOSS_WORDS } from "./worn.js";
+import { initWorn, wornTick, wornGear, trigger, wornReset, GLOSS_WORDS, DRIP_WORDS, INJECT_WORDS, TRIGGERS, ROULETTE_WORDS } from "./worn.js";
 import { initParasites, paraTick, paraClimax, mine as paraMine, latch, sayAsked, mouthSend, KINDS, paraSuckled } from "./parasites.js";
 import { initNipples, nipsInfo, nipsTell, nipsOpen, openOf, nipsState, nipsAddOwn, nipsUsed, nipsOnSuckle, nipsTrainTick, nipsClose, nipsOnFarmLoad, nipLoads, nipsCream, nipsClimax, trainedLevel, lastPopped, nipsToyUsed, nipsForce, nipsForceSend, NIP_WORDS } from "./nipples.js";
 import { initToys } from "./toys.js";
 import { initKits, kitTick, kitNow, kitSave, kitDelete, kitNames, kitLookup, kitEnd, SPEEDS, SPEED_NAMES } from "./kits.js";
-import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset, hornyOf } from "./horny.js";
+import { initHorny, hornyTick, hornyParaTick, hornyGear, hornyBeat, hornyClimax, hornyReset, hornyOf, BREEDS } from "./horny.js";
 import { mineToy, toyOf, toyLocked } from "./toys-list.js";
 import { holesOnLoad } from "./holes.js";
 import { initHoles, holesTick, holesNow, holesUsed, holesClimaxOf, holesBalm, holesSet, holesReset, holesState, holesDrips, sendNow as holesSend, sendGoal, sendClear, setGoal, clearGoal, HOLE_OF_WORD, dueWords, toysNow } from "./holes.js";
@@ -283,7 +283,9 @@ const plainWords = (t) => String(t || "").toLowerCase().replace(/_+/g, " ");
 if (W.__FARMHAND_TEST__) W.__disp = { st: () => st(), dosesIn: (t) => dosesIn(t),
   farmHas: (id, p) => farmHas(id, p),
   book: () => Object.fromEntries(Object.entries(BOOK).map(([id, B]) => [id, { farm: !!B.farm, lscg: B.lscg || "", lscgOnly: !!B.lscgOnly, keywords: (B.keywords || []).slice() }])),
-  phrases: { gloss: (t) => GLOSS_WORDS.test(plainWords(t)), later: (t) => isLater(plainWords(t)), horny: (t) => hornyOf(plainWords(t)), para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t))) }, give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
+  phrases: { drip: (t) => DRIP_WORDS.test(plainWords(t)), inject: (t) => INJECT_WORDS.test(plainWords(t)), roulette: (t) => ROULETTE_WORDS.test(plainWords(t)), breeds: (t) => BREEDS.test(plainWords(t)),
+    trig: (t) => Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].test(plainWords(t))),   // (Every word, Nov 24: the test tries every gear word it lists)
+    gloss: (t) => GLOSS_WORDS.test(plainWords(t)), later: (t) => isLater(plainWords(t)), horny: (t) => hornyOf(plainWords(t)), para: (t) => Object.keys(KINDS).filter((k) => KINDS[k].words.test(plainWords(t))) }, give: (...a) => give(...a), tick: () => { tick(); laterTick(); tickHard(); }, setClock: (m) => setClock(m), active, leftMs, allowed: (mn) => allowed(mn), started: () => started,
   lock: (d) => lock(d), hardOn: () => hardOn(), keyholders: () => keyholders(), dueAt: () => dueAt(),
   speech: (t) => dosedSpeech(t), screen: () => screenTick(),
   end: (id) => end(id, "quiet"), moment: (id) => moment(id), craving: () => craving(), craveNow: () => { craveSoon(); laterTick(); },

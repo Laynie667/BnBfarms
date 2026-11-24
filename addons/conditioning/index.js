@@ -294,10 +294,11 @@ connect({
     echsUnder: (mn, info) => {
       const r = api.rec(mn); if (!r || !r.hypno) return;
       api.echs.take(mn);
-      if (running.has(mn)) { running.get(mn).echs = true; return; }
+      if (running.has(mn)) { running.get(mn).echs = true; api.echs.take(mn, running.get(mn).level); return; }
       const w = waitingEchs.get(mn); waitingEchs.delete(mn);
       const by = (w && w.by) || (info && info.by) || mn;
       start(by, mn, w ? w.level : me(mn).max, w ? w.own : null, true);
+      if (running.has(mn)) api.echs.take(mn, running.get(mn).level);   // (No human left: the farm leaves that trance to run out by itself, Nov 24)
       if (by !== mn) api.notice(by, "🌀 " + api.name(mn) + " is under with the farm: the " + LEVEL_NAME[running.get(mn).level] + " session's started through their ECHS.");
     },
     // they came up on their own (their /echs safeword): the farm's session stops too. ECHS's half hour: it carries on in the farm's voice

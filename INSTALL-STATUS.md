@@ -5,16 +5,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.97.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.98.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.3** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.2.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.78.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.25.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.79.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.26.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.98.0 + Companion 0.79.0 + Dispensary 0.26.0 + Conditioning 1.2.0: every crafting word in one place, bound on signing in your own clothes, a trap's gear you can see, and nobody left under** From the suggestion box, Laynie, Nov 24: "#58, echs", "#66 … livestock should be bound upon signing… for those with the keep outfit option, they need comparable restraints… by contract level", "#70 … farm pieces only, plus the opt-in switch for your own gear" ("yup"), and "full list in dispensary of all craft and dose tags, and the strap on".
+  - **Every word** (Dispensary, Guides → 📜 Every word; /dispensary guide words). Every word that does somethin' on a crafted item, in one place: all 43 doses with their words (straight from the dose book, so a new dose is listed the day it's made), strength and time-release, the doses that pick, gear that doses (drip, injector, triggers, roulette, lip gloss), horny and breedin' gear, seed amounts and holes, the Breeder's Seal, the seeded strap-on, toys in a hole, and the parasites. At the bottom, the farm's own list exactly as the farm girl gives it for ?help shots: the two are one text now (shared/farm-shots.js), and the seeded strap-on is on the farm's list too. A test tries every listed word against the real thing (152 of them) and checks every tag the farm girl reads is on her list.
+  - **Bound on signing, in your own clothes** (Kitty Sera's #66). With ?ownoutfit on, signing a contract used to leave you exactly as you came. Your clothes still stay yours, but your kind's farm restraints go on over them, padlocked, by the contract's level: fun, the collar and what hangs off it and the nose ring; deep, the harness, cuffs, mittens, petsuit paws, rope, boots, clamps and leash too; no human left, every restraint the outfit has, gag and chastity included. Only into empty spots: an owner's collar or anythin' already on you is never swapped out. No Companion when you sign: it goes on when it's back.
+  - **A trap's gear you can see** (Kitty Sera's #70: "can be disconnecting to be told 'you are tied in ropes' and see nothing"). When every spot a trap's piece could go in is full, a piece of your farm outfit there is set aside, padlock and all, and goes straight back on, locked as it was, when the trap's done. New switch, Settings → Gear and marks → **Traps can set my own things aside**: your own clothes and gear step aside too. Nothin' somebody else has locked on you is ever moved.
+  - **Nobody left under** (Crystal's #58: "It says it will fade in a few minutes, but the trance doesn't fade"). That's ECHS's own words after a reload or greyscreen mid-trance: it fades if the hypnotist isn't back, and the farm girl never leaves, so it kept them under for its full half hour; the wake she'd sent at the end of their session had gone out while they were gone. Now a wake that didn't take goes again once they're back, and a trance no session of the farm's is running gets woken after 5 minutes. No human left is still left to run out on its own (Conditioning tells the farm which level a trance is).
+  - Tests: dispensary-words, gear-aside, contracts-bot (bound in your own clothes), echs (nobody left under), dispensary-guides.
 
 - **Bot 0.97.0 + Companion 0.78.0 + Breeding 1.4.0: bred to his kind, fitted clothes saved for next time, and a trance that leaves a held cow be** From the suggestion box, Laynie, Nov 23: "#60 ... the pregnancy by species impregnated by, and pregnancy lines", "#44 ... go ahead" (fitting in the background, "and keeping saved might help alot").
   - **Bred to his kind** (#60, bot 10y2c-sired.js). The SIRE's kind decides the pregnancy now: how many (his kind's litter), how long (his kind's days: bunnies, rats and goblins 2; pups, kittens and kits 3; piglets 4; lambs and kids 5; fawns and hatchlings 6; calves 7; foals 8), and what's born (his young). The labour stays the mother's own: her place, her sounds, her way. When the young aren't her kind, the crownin' and the after are lines of their own: a cow strains in the calvin' pen and out comes "no calf: a slick, squirmin' pup, Rex's through and through". A sire with no kind on file (a human, a glory-stall stranger) leaves it to the mother's kind, as before; the farm's own trap studs are their kinds (the wolf pack wolves, the stallion stud a horse, the buck rabbits rabbits). A pregnancy from before today goes on as it was. "It took!" says what they're carryin' and when it's really due, ?stats says what's in there, ?species list shows every kind's days, the stud book writes down what was born, and add-ons can ask with api.labour.kind.

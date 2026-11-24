@@ -184,8 +184,8 @@
       penisType: (mn) => { try { return penisType(mn); } catch(e){ return "human"; } },
       cockInches: (mn) => { try { return sizeOf(mn, "penis"); } catch(e){ return 7; } },
       // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
-      // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn): a session's yours
-      echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn) => { const v = echsOf(mn); if (v) v.taken = a.name; } },
+      // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn, level): a session's yours (level "nhl": it runs out on its own, so I never wake it)
+      echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => { const v = echsOf(mn); if (v){ v.taken = a.name; v.nhl = level === "nhl"; } } },   // (level "nhl": left to run out on its own, Nov 24)
       face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level), arouse: (mn, n, cap) => arouse(mn, n, cap),   // (stir them up, for add-ons: Conditioning's deeper sessions)
       // time
       later, dayKey, weekKey,

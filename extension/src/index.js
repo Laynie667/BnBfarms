@@ -243,11 +243,12 @@ function parasiteSync() {
     // an older farm girl only says "parasite": that's still a piece of gear
     if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
       list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
-    const did = syncFarmGear(list, !!st.panel.prefs.gear);
+    const did = syncFarmGear(list, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });   // (gearAside: a trap may set your own things aside too, Nov 24)
     if (botHere()) gearFreedTell(null);   // (any freein' she hasn't heard about yet)
     try { syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape); } catch (e2) { console.warn("[Farmhand Companion] body shape:", e2); }   // chest and hips that show the farm's sizes (marks.js)
     for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
     for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
+    if ((did.aside || []).length) toChat("Set aside for it, and back on you after: " + did.aside.length + " piece" + (did.aside.length === 1 ? "" : "s") + " in its way.", "#c9a35b", true);
     for (const n of (did.stuck || [])) toChat("The farm's " + n + " keeps comin' off you, so it's left off for ten minutes.", "#c9a35b", true);
   } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }
 }
@@ -346,8 +347,10 @@ function onFarmMsg(m) {
       // back on the farm under a contract: only what's missin' goes back on (outfits.js topUpOutfit, Nov 23)
       if (m.auto && Array.isArray(m.topup)) {
         let r; try { r = topUpOutfit(String(m.data || ""), Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], m.topup.map(String)); } catch (e) { r = { ok: false, why: e.message }; }
-        if (r.ok && r.worn) st.panel.add("👗 Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
-        toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0 });
+        // (m.bind: a contract just signed, in your own clothes: the farm's tack over them, Nov 24)
+        if (r.ok && r.worn) st.panel.add(m.bind ? "🔗 Contract signed. Your clothes stay yours, and the farm's tack goes on over them: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + (r.locks ? ", padlocked on" : "") + "."
+          : "👗 Back on the farm, and back in your farm outfit: " + r.worn + " piece" + (r.worn === 1 ? "" : "s") + " you'd come home without" + (r.locks ? ", padlocked on" : "") + ".", "notice");
+        toBot("outfitAnswer", { answer: "topped", slot: String(m.slot || ""), worn: r.ok ? r.worn : 0, locks: r.ok ? r.locks : 0, bind: m.bind ? String(m.bind) : undefined });
         break;
       }
       // with a contract they've just signed: on at once, no second askin' (they can still change back from the panel)

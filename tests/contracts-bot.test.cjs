@@ -110,7 +110,16 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   n=sent.length; await sign();
   out('6 ...and a later contract leaves what staff changed alone ->', outfitTo(500,n).length===0);
   delete L().people[500].contractDressedAt; n=sent.length; await B(500,'ownoutfit on'); await sign();
-  out('6 bring your own outfit: they keep their look ->', L().people[500].ownOutfit===true, outfitTo(500,n).length===0, sent.slice(n).some(([e,d])=>d&&/brought your own outfit/.test(JSON.stringify(d))));
+  const own6=outfitTo(500,n);
+  out('6 bring your own outfit: they keep their look ->', L().people[500].ownOutfit===true, own6.every(d=>Array.isArray(d.topup)&&!!d.bind), sent.slice(n).some(([e,d])=>d&&/brought your own outfit/.test(JSON.stringify(d))));
+  // Nov 24, #66 (Kitty Sera: "the farm should still bind new livestock on contract signing, even if their clothing remains with keep outfit"; Laynie: "by contract level")
+  const b6=own6[0]||{};
+  out("6 ...but bound all the same, over their own clothes: a fun contract, the collar and what hangs off it, nothin' that binds ->", b6.bind==='fun', Array.isArray(b6.topup)&&b6.topup.length>0&&b6.topup.every(g=>['ItemNeck','ItemNeckAccessories','ItemNose'].includes(g)), b6.auto===true);
+  const its=[{Group:'Cloth',Name:'A'},{Group:'ItemNeck',Name:'B'},{Group:'ItemArms',Name:'C'},{Group:'ItemMouth',Name:'D'},{Group:'ItemVulva',Name:'E'},{Group:'ItemTorso',Name:'F'}];
+  const gf=W.__bindGroups('fun',its), gd=W.__bindGroups('deep',its), gn=W.__bindGroups('nhl',its);
+  out('6 ...deep: the harness and cuffs too; no human left: the gag and chastity as well; never their clothes ->', JSON.stringify(gf)==='["ItemNeck"]', gd.includes('ItemArms')&&gd.includes('ItemTorso')&&!gd.includes('ItemMouth'), gn.includes('ItemMouth')&&gn.includes('ItemVulva')&&!gn.includes('Cloth'));
+  n=sent.length; handlers.ChatRoomMessage({Sender:500,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'outfitAnswer',answer:'topped',slot:b6.slot,worn:2,locks:2,bind:'fun'}}); await wait(600);
+  out("6 ...and when their Companion says the tack is on, they're marked bound, and nothin's owed ->", !!L().people[500].contractBoundAt, !L().people[500].bindOwed);
   // 7. Oct 23: every contract keeps them in the room and in their restraints through a relog; no orgasm control for a cock unless registered male or nonbinary
   const R7=(g,futa)=>{ const r=L().people[500]; r.gender=g; r.futa=!!futa; return (W.__buildContract('deep',500,'1w')||{}).rules||{}; };
   const fem=R7('female'), fut=R7('futa',true), mal=R7('male'), nb=R7('nonbinary'), fun=(L().people[500].gender='female', (W.__buildContract('fun',500,'1w')||{}).rules||{});

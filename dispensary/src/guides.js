@@ -3,7 +3,12 @@
    Dispensary, on its own page: what it is, how to do it step by step, crafts to try word for word, and the things worth
    knowin'. Each section on its pages has a 📖 button that opens its guide; /dispensary guide <topic> does too.
    Every "Try it" craft is checked by a test (dispensary-guides.test.cjs): the words on it really are the doses it says.
+   EVERY WORD (Nov 24; Laynie: "full list in dispensary of all craft and dose tags, and the strap on"): every word read off a
+   crafted item, in one place. The doses come straight from the dose book (page.js), the farm's from the farm girl's own
+   ?help shots (shared/farm-shots.js), and every gear word listed here is tried against the real thing by a test
+   (dispensary-words.test.cjs), so the list can't say a word works that doesn't.
 */
+import { FARM_SHOTS } from "../../shared/farm-shots.js";
 export const GUIDES = [
   {
     id: "start", icon: "📖", title: "Getting started",
@@ -335,6 +340,71 @@ export const GUIDES = [
     see: ["start", "holes"],
   },
   {
+    id: "words", icon: "📜", title: "Every word",
+    intro: "Every word that does somethin' on a crafted item, all in one place: the Dispensary's doses and gear, and the farm's own shots and toys.",
+    steps: [
+      "Put the words in the item's name or its description. The name holds 30 letters, so a long recipe goes in the description.",
+      "Write the words however you like: spaces, hyphens, underscores or nothin' between them all work. Denial Serum, denial-serum and DenialSerum are the same dose.",
+      "Mix them: a dose word, a gear word and a strength on one item all count. A Drip Gag that says denial serum x2 keeps them denied, twice as hard, as long as it's buckled in.",
+      "The farm's words at the bottom work on the farm, where the farm girl reads them. With the Dispensary runnin', a dose both of them know is the Dispensary's, so nothin' happens twice.",
+    ],
+    doses: true,   // (page.js: every dose in the book, its words, and whether the farm girl reads it too)
+    lists: [
+      { head: "How strong, and when", rows: [
+        { what: "Stronger", words: ["x2", "x3", "x4", "x5", "double", "triple"], does: "that many doses' worth in one go", check: "strength" },
+        { what: "Later", words: ["time-release", "slow-release", "delayed", "capsule"], does: "goes off on its own a while after, not straight away", check: "later" },
+      ] },
+      { head: "Doses that pick", rows: [
+        { what: "Fill-Out", words: ["belly", "ass"], does: "swells that instead of your tits", check: "pick:fillout:fill-out" },
+        { what: "Tender", words: ["nipples", "clit", "pussy", "ass", "neck", "ears", "lips", "belly", "thighs", "feet"], does: "makes that spot the tender one", check: "pick:tender:tender drops" },
+        { what: "Statue Serum", words: ["porcelain", "gold", "latex", "marble", "bronze"], does: "what you're turned into, stone otherwise", check: "pick:statue:statue serum" },
+        { what: "Animal Tongue", words: ["puppy", "kitty", "pony", "cow", "bunny", "fox", "goat", "lamb", "piggy", "wolf", "dragon", "rat"], does: "whose tongue you talk with: puppy tongue, kitty tongue", check: "pick:tongue:{w} tongue" },
+        { what: "Reducing Serum", words: ["cock", "balls", "booty"], does: "what shrinks a size, tits otherwise", check: "pick:reducing:reducing serum" },
+        { what: "Tightening Balm", words: ["pussy", "ass", "throat"], does: "what it closes back up, your nipples otherwise; virgin balm does them all", check: "pick:balm:tightening balm" },
+      ] },
+      { head: "Gear that doses", rows: [
+        { what: "Drip", words: ["drip", "IV", "laced", "coated", "soaked", "infused", "seeping"], does: "keeps the dose in them the whole time it's worn", check: "drip" },
+        { what: "Injector", words: ["injector", "auto-inject", "dosing", "dispenser", "pump"], does: "a fresh dose every 30 minutes; every 10 minutes, or any number, sets its own", check: "inject" },
+        { what: "On climax", words: ["on climax", "when she cums", "whenever they orgasm"], does: "a dose every time they cum", check: "trig:climax" },
+        { what: "When kissed", words: ["when kissed"], does: "a dose every kiss", check: "trig:kissed" },
+        { what: "When touched", words: ["when touched", "when groped", "when caressed", "when fondled"], does: "a dose every touch", check: "trig:touched" },
+        { what: "When spanked", words: ["when spanked", "when slapped", "when paddled"], does: "a dose every smack", check: "trig:spanked" },
+        { what: "Roulette", words: ["roulette", "mystery dose", "mystery shot", "mystery drink", "surprise dose"], does: "a different dose every time, from the ones they allow", check: "roulette" },
+        { what: "Lip gloss", words: ["lip gloss", "lipstick", "lip balm", "lip stain"], does: "worn by you: whoever you kiss gets the dose on it", check: "gloss" },
+      ] },
+      { head: "Horny gear", rows: [
+        { what: "Horny", words: ["horny", "hungry"], does: "uses whoever wears it, every six to ten minutes", check: "horny" },
+        { what: "Busier", words: ["insatiable", "ravenous"], does: "every two to four minutes, and rougher", check: "horny" },
+        { what: "Breedin'", words: ["breeding", "seeding", "breeder"], does: "on horny gear: when they cum, it cums too and fills them with your seed", check: "breeds" },
+      ] },
+      { head: "Seed", rows: [
+        { what: "More seed words", words: ["breeding baster", "cum cocktail", "filled with my seed"], does: "your own seed, like the Seed dose", check: "dose:seed" },
+        { what: "How much", words: ["500 ml", "1 L", "2 gallons"], does: "how much goes in; with no amount, a good thick load", check: "amount" },
+        { what: "Where", words: ["pussy", "ass", "mouth", "nipples", "every hole", "both holes"], does: "which hole it fills", check: "hole" },
+        { what: "Breeder's Seal", words: ["breeder's seal", "breeding seal", "sire's seal", "seed lock", "seed keeper", "cum stopper"], does: "worn in or over a hole: keeps every drop in, and only its maker's loads catch", check: "seal" },
+        { what: "Seeded strap-on, on the farm", words: ["breeding", "seeding", "breeder"], does: "on a strap-on: when whoever wears it hits the edge, it pumps the crafter's seed into whoever it's in, crafter there or not. Their breedin' switches say if it can take; 300 ml on it says how much" },
+      ] },
+      { head: "Toys in a hole", rows: [
+        { what: "Bigger", words: ["big", "thick", "huge", "XL", "massive", "enormous", "monster", "giant", "horse", "dragon", "colossal", "hyper"], does: "counts as a bigger toy, so it stretches them more", check: "bigger" },
+        { what: "Smaller", words: ["tiny", "small", "little", "petite", "slim", "thin", "mini"], does: "a size smaller", check: "smaller" },
+        { what: "Trainer", words: ["stretching", "gaper", "dilator", "expander", "spreader", "trainer", "widener", "loosener"], does: "trains the hole looser while it's in", check: "trainer" },
+        { what: "Cruel", words: ["cruel", "sadistic", "merciless", "vicious", "punishing", "brutal"], does: "trains faster, and hurts with it", check: "cruel" },
+      ] },
+      { head: "Parasites", rows: [
+        { what: "Parasite lips", words: ["parasite", "parasite lips"], does: "a mouth that kisses and feeds on them", check: "para:lips" },
+        { what: "Livin' latex", words: ["living latex", "living rubber", "latex symbiote"], does: "a second skin with a mind of its own", check: "para:latex" },
+        { what: "Milk moss", words: ["milk moss"], does: "grows on their tits and drinks", check: "para:moss" },
+        { what: "The nestling", words: ["nestling"], does: "settles in and grows in stages", check: "para:nestling" },
+        { what: "The brood mother", words: ["brood mother", "brood queen"], does: "lays in them", check: "para:brood" },
+        { what: "The leash vine", words: ["leash vine", "vine leash"], does: "worn: keeps them close", check: "para:vine" },
+        { what: "The mouthpiece", words: ["mouthpiece"], does: "worn: says what its crafter tells it to", check: "para:mouth" },
+        { what: "Nipple leeches", words: ["nipple leech", "teat leech", "nipple worm", "nipple tick"], does: "hold their nipples open, wider once fed", check: "para:nips" },
+      ] },
+    ],
+    farm: FARM_SHOTS,   // (the farm girl's own ?help shots: the same text, shared/farm-shots.js)
+    see: ["craft", "gear", "farm"],
+  },
+  {
     id: "commands", icon: "⌨️", title: "Every command",
     intro: "Everythin' you can type, in chat. Most of it's on this page too.",
     steps: [
@@ -362,7 +432,8 @@ export function guideFor(word) {
     capsule: "timing", tolerance: "timing", cravings: "timing", craving: "timing", statue: "pick", tongue: "pick", fillout: "pick", tender: "pick", balm: "pick", growth: "pick",
     kit: "kits", outfit: "kits", hungry: "horny", seed: "breeding", cum: "breeding", labour: "breeding", labor: "breeding", birth: "breeding", heat: "breeding", ripe: "breeding", knot: "breeding", scan: "breeding", quicken: "breeding", pregnant: "breeding", eggs: "breeding", insemination: "breeding", inseminate: "breeding", seal: "breeding", breed: "breeding", breeder: "breeding", load: "breeding", loads: "breeding", nips: "nipples", nipple: "nipples", hole: "holes", train: "holes", training: "holes", ass: "holes", pussy: "holes", throat: "holes",
     parasite: "parasites", leeches: "parasites", mouthpiece: "parasites", vine: "parasites", safeword: "safety", ladder: "safety", clock: "safety", list: "safety",
-    keyholder: "hardcore", keyholders: "hardcore", lscg: "farm", help: "start", command: "commands" };
+    keyholder: "hardcore", keyholders: "hardcore", lscg: "farm", help: "start", command: "commands",
+    every: "commands", word: "words", words: "words", tags: "words", tag: "words", wordlist: "words", glossary: "words", shots: "words", strapon: "words", strap: "words" };
   if (ALIAS[w]) return GUIDE_BY[ALIAS[w]];
   return GUIDES.find((g) => g.title.toLowerCase().includes(w)) || null;
 }

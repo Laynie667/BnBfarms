@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      1.1.3
+// @version      1.2.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -530,7 +530,7 @@
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "1.1.3",
+    version: "1.2.0",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
     setup(a) {
@@ -557,12 +557,14 @@
         api.echs.take(mn);
         if (running.has(mn)) {
           running.get(mn).echs = true;
+          api.echs.take(mn, running.get(mn).level);
           return;
         }
         const w = waitingEchs.get(mn);
         waitingEchs.delete(mn);
         const by = w && w.by || info && info.by || mn;
         start(by, mn, w ? w.level : me(mn).max, w ? w.own : null, true);
+        if (running.has(mn)) api.echs.take(mn, running.get(mn).level);
         if (by !== mn) api.notice(by, "\u{1F300} " + api.name(mn) + " is under with the farm: the " + LEVEL_NAME[running.get(mn).level] + " session's started through their ECHS.");
       },
       // they came up on their own (their /echs safeword): the farm's session stops too. ECHS's half hour: it carries on in the farm's voice

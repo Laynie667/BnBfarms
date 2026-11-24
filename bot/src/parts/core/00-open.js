@@ -6,6 +6,7 @@ import { FARM_MSG, PROTOCOL, makeMsg, readMsg } from "../../shared/protocol.js";
 import * as BCPLUS from "../../shared/bcplus.js";
 import * as FARM_OUTFITS from "../../shared/farm-outfits.js";
 import { speciesKeyOf } from "../../shared/species.js";
+import { FARM_SHOTS } from "../../shared/farm-shots.js";
 import { POTION_VOICE } from "../../shared/potion-voice.js";
 import { DOSE_WORDS, FARM_DOSES, everyOf } from "../../shared/dose-words.js";
 import { sealsOn as sealsOnGear, SEED_GAP_MS, seedAmounts, SEED_DEFAULT_ML } from "../../shared/seed.js";

@@ -61,6 +61,11 @@ const CSS = `
 #fd-page .fd-guide h4{margin:0;flex:1;font-size:16px;color:#f0d6f8;font-family:Bitter,Georgia,serif}
 #fd-page .fd-guide ol,#fd-page .fd-guide ul{margin:6px 0 6px;padding-left:22px}
 #fd-page .fd-guide li{margin:3px 0}
+#fd-page .fd-words{margin:8px 0;padding:6px 8px;border-left:3px solid #8e6aa0;background:#281f2d;border-radius:4px}
+#fd-page .fd-wrow{margin:5px 0;line-height:1.35}
+#fd-page .fd-wrow code{white-space:normal;word-break:break-word}
+#fd-page .fd-words summary{cursor:pointer;font-weight:bold}
+#fd-page .fd-farmtext{white-space:pre-wrap;word-break:break-word;font-size:12px;margin:6px 0 0;max-height:420px;overflow:auto}
 #fd-page .fd-try{background:#1e1822;border:1px dashed #6e5a78;border-radius:7px;padding:6px 10px;margin:6px 0}
 #fd-page .fd-try code{font:13px/1.4 ui-monospace,Consolas,monospace;color:#ffd9a8;background:#0000;word-break:break-word}
 #fd-page .fd-try button{font-size:11.5px;min-height:22px;padding:0 7px;margin-left:6px}
@@ -205,6 +210,13 @@ function guideView(G) {
     h("div", { class: "fd-row" }, h("h4", null, G.icon + " " + G.title), h("button", { class: "fd-how", style: { marginTop: 0 }, onclick: () => { guide = ""; draw(); } }, "Close")),
     h("div", { style: { marginTop: "4px" } }, G.intro),
     h("ol", null, G.steps.map((s) => h("li", null, s))),
+    // (Every word, Nov 24: the doses straight from the book, so a new dose is on the list the day it's made)
+    G.doses ? h("div", { class: "fd-words" }, h("div", { class: "fd-muted" }, "The doses: any one of a dose's words on the item"),
+      doseIds().map((id) => { const B = BOOK[id], ws = B.keywords && B.keywords.length ? B.keywords : [id === "kit" ? "kit, and the kit's own name" : B.label.toLowerCase()];
+        return h("div", { class: "fd-wrow" }, h("b", null, (B.icon || "") + " " + B.label), " ", h("code", null, ws.join(" · ")), B.farm ? h("span", { class: "fd-muted" }, " · the farm girl reads it too") : null); })) : null,
+    (G.lists || []).map((L) => h("div", { class: "fd-words" }, h("div", { class: "fd-muted" }, L.head),
+      L.rows.map((r) => h("div", { class: "fd-wrow" }, h("b", null, r.what), " ", h("code", null, r.words.join(" · ")), h("div", { class: "fd-muted" }, "→ " + r.does))))),
+    G.farm ? h("details", { class: "fd-words" }, h("summary", null, "🐄 On the farm: the farm girl's own list, as ?help shots gives it"), h("pre", { class: "fd-farmtext" }, G.farm)) : null,
     G.craft && G.craft.length ? h("div", { class: "fd-try" }, h("div", { class: "fd-muted" }, "Try it: craft one of these, word for word"),
       G.craft.map((c) => h("div", { style: { margin: "6px 0" } },
         h("div", null, "Name: ", h("code", null, c.name), copyBtn(c.name)),

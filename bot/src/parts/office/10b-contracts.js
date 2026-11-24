@@ -156,7 +156,13 @@
       // "sometimes the outfit doesnt apply on contract signing").
       const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "auto";
       const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
-      if (slot && r && r.ownOutfit) later(() => tell(mn, "👗 You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3000);
+      // (Nov 24, #66: their own clothes stay theirs, but they're bound like any stock, as deep as the contract: 10c-outfits.js contractBindNow)
+      if (slot && r && r.ownOutfit){
+        const level = (x && ["fun", "deep", "nhl"].includes(x.depth)) ? x.depth : x ? "deep" : "fun";
+        r.bindOwed = { slot, level, at: Date.now() }; saveLedger();
+        later(() => tell(mn, "👗 You brought your own outfit, sugar, so your clothes stay yours. The farm's tack goes on over them all the same: "+(level === "fun" ? "your collar and its bell, marked as stock" : level === "nhl" ? "every restraint stock of your kind wears, gag and all" : "collar, harness, cuffs and the rest of your kind's tack")+". Anythin' already in a spot stays put. (?ownoutfit off and the farm dresses you whole for your next contract.)"), 3000);
+        later(() => contractBindNow(mn), 3500);
+      }
       else if (slot && r && !r.contractDressedAt){ r.outfitOwed = { slot, at: Date.now() }; saveLedger(); later(() => contractOutfitNow(mn), 3000); }
       else if (!slot && r && !r.contractDressedAt && !r.ownOutfit) notifyStaff("👗 "+plainName(mn)+" signed a contract but I have no outfit for their kind ("+(r.species||"no species")+", "+genderOf(mn)+"). ?outfit offer "+plainName(mn)+" <slot> to dress 'em by hand.", false);
       later(() => enqueue(BCPLUS.queryMsg(mn)), 2000);   // fetch BC+'s id for it, so we can release it later

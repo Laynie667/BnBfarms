@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.97.0
+// @version      0.98.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2758,6 +2758,107 @@
     return [...by.values()];
   }
 
+  // shared/farm-shots.js
+  var FARM_SHOTS = `\u{1F489} SHOTS & TAGGED ITEMS \u{1F489}
+
+I read words in a crafted item's name or description, like LSCG does.
+
+INJECTORS \xB7 use Inject on someone
+  Production
+    lactation \xB7 milk doubles for a day
+    virility \xB7 cum doubles for a day
+    fertility \xB7 catchin' doubles for a day
+    contraceptive \xB7 no catchin' for two days
+    egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
+    hyper pregnancy (or brood) \xB7 huge litters, 2 to 4 times as many
+    mpreg (or anal pregnancy) \xB7 a load in the ass can take, a week
+      (or just say ?mpreg on: your own switch, no item needed)
+      a shot, or for as long as you wear it. With hyper too: a
+      hyper one. A second stud the same day adds a second sire.
+    A plug or dildo with hollow, tunnel or fuckable in its name or
+      description lets a cock through: it does not close the hole.
+    (worn, those two work for as long as you wear the item)
+    heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
+  Feelin's and more
+    aphrodisiac (or horny) \xB7 achin' and needy (Needy Nectar)
+    hair trigger (or sensitizer) \xB7 an hour where every touch nearly sets you off
+    denial serum \xB7 held at the edge, no cummin', two hours
+    cum flood (or gusher) \xB7 your next loads come out enormous
+    sedative \xB7 drowsy, heavy and slow for an hour
+    obedience (or mind control) \xB7 a step deeper under
+    moo serum \xB7 Moo Juice from the needle
+    futa serum \xB7 a cock and all that comes with it, for a day
+    twins (or triplets) \xB7 the next litter that takes comes double
+    ripening (or ovulation) \xB7 heat, and the next load that can take, takes
+    strawberry milk (chocolate, honey, vanilla, banana, caramel) \xB7
+      flavoured milk for a day
+    purge serum (or antidote) \xB7 every shot in you flushed out
+    temporary, with a size \xB7 the growth or shrinkin' lasts an hour
+    (LSCG reads sedative, aphrodisiac, antidote and mind control
+     too: one needle does both.)
+  Stackin'
+    Doses stack. A second dose of the same while the first is still
+      workin' makes it triple, a third four times, up to five deep.
+    Put x2 to x5 on the needle for that many doses in one go:
+      "lactation x3", "udder growth x2", "hyper pregnancy x2".
+    Potions stack too: another bottle of the same is stronger
+      (where it can be) and runs longer, up to three deep.
+
+TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
+    auto-injector \xB7 the item doses you every half hour with the
+      other words on it: "auto-injector lactation x2". Piercings
+      work too: a nipple or clit piercing crafted as one does
+      every shot there is.
+    triggered \xB7 "when bred", "on climax", "when milked",
+      "when denied" or "on trap" on it: it doses you when that
+      happens instead of on a clock
+    roulette (or mystery dose) \xB7 a random shot every dose
+    iv drip (or drip line) \xB7 holds every effect on it full,
+      constantly, while it's in; it fades ten minutes after
+    Descriptions count, in plain words: "an IV that drips
+      lactation into her", "injects the wearer with sedative",
+      "whenever she's bred it makes her more fertile"
+    ?myshots \xB7 what's in you right now, and for how long
+    ?fix \xB7 with The Farmhand's Dispensary and its cravings
+      switched on: when you're itchin' for another, I'll see to it
+    ?kryptonite \xB7 the barn's rumours about the proprietors'
+      weaknesses. Find the word, put it on a needle\u2026
+    ovipositor \xB7 on a gag, belt, plug or dildo: it lays a clutch in
+      you now and then (needs ?eggs on, or your traps on)
+    auto-feed \xB7 on a funnel gag: a bellyful poured down you every
+      ten minutes. Add "piss" and say ?watersports on for that.
+    breeding, seeding or breeder \xB7 on a strap-on: when whoever's
+      wearin' it hits the edge, it pumps its crafter's seed into
+      whoever it's in, crafter there or not, every 2 minutes held
+      at the edge. Their breedin' switches say if it can take.
+      Say how much on it: "300 ml".
+    a cock type (canine, equine, feline, draconic), knotted, or a
+      size word (huge, hyper, monster) on a dildo, machine or belt:
+      the farm treats it as that cock, and big ones stretch you.
+  Capacity
+    stretching / capacity \xB7 +250 mL for good (up to 50 L)
+    shrinking \xB7 \u2212500 mL, spills the extra (a Reducing Serum takes a size off instead)
+  Sizes \xB7 a part plus a grow or shrink word, either order
+    parts: breasts (tits, udder) \xB7 balls \xB7 cock (penis) \xB7 knot \xB7
+      pussy \xB7 ass (anal) \xB7 throat
+    grow: grow, growth, enlarger, swell, gape, stretch, trainer\u2026
+    shrink: shrink, reducer, tightener, restorer\u2026
+    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
+    "Pussy Stretching Shot". Each one is a step, with a room emote.
+  Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
+    humanizer, knotting, knot remover \xB7 see ?help cocks
+
+WORN ITEMS
+  \u2022 lactation, virility, fertility \xB7 smaller boosts while worn
+  \u2022 capacity or stretching \xB7 +100 mL while worn
+  \u2022 stretcher, stretching, gaper, dilator or trainer in the vulva,
+    butt or mouth slot \xB7 opens that hole a level right away, and
+    trains it looser for good every 12 hours worn
+
+GOOD TO KNOW
+  \u2022 Shots are the only way into \u2728hyper sizes.
+  \u2022 ?shotlog (staff) shows what I read off recent shots.`;
+
   // shared/potion-voice.js
   var POTION_VOICE = {
     needy: {
@@ -3131,8 +3232,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.97.0";
-  var COMPANION_VERSION = "0.78.0";
+  var VERSION = "0.98.0";
+  var COMPANION_VERSION = "0.79.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6296,6 +6397,7 @@
         {
           const r = rec(mn);
           if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500);
+          if (r && r.bindOwed) later(() => contractBindNow(mn), 3e3);
           if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2e3);
           else if (r && !r.outfitOwed && !r.tempOutfit && state.topUp && state.topUp.has(mn)) {
             state.topUp.delete(mn);
@@ -10078,8 +10180,13 @@
         notifyStaff("\u{1F4DC} " + plainName(mn) + ' signed the farm contract "' + m[1] + '".', true);
         const tpl = x && contractTemplate(x.tpl), dress = tpl ? tpl.outfit === void 0 ? "auto" : tpl.outfit : "auto";
         const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
-        if (slot && r && r.ownOutfit) later(() => tell(mn, "\u{1F457} You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3e3);
-        else if (slot && r && !r.contractDressedAt) {
+        if (slot && r && r.ownOutfit) {
+          const level = x && ["fun", "deep", "nhl"].includes(x.depth) ? x.depth : x ? "deep" : "fun";
+          r.bindOwed = { slot, level, at: Date.now() };
+          saveLedger();
+          later(() => tell(mn, "\u{1F457} You brought your own outfit, sugar, so your clothes stay yours. The farm's tack goes on over them all the same: " + (level === "fun" ? "your collar and its bell, marked as stock" : level === "nhl" ? "every restraint stock of your kind wears, gag and all" : "collar, harness, cuffs and the rest of your kind's tack") + ". Anythin' already in a spot stays put. (?ownoutfit off and the farm dresses you whole for your next contract.)"), 3e3);
+          later(() => contractBindNow(mn), 3500);
+        } else if (slot && r && !r.contractDressedAt) {
           r.outfitOwed = { slot, at: Date.now() };
           saveLedger();
           later(() => contractOutfitNow(mn), 3e3);
@@ -10273,6 +10380,66 @@
         notifyStaff("\u{1F457} Couldn't dress " + plainName(mn) + " for their contract: " + err, false);
       }
     }
+    const BIND_GROUPS = {
+      fun: ["ItemNeck", "ItemNeckAccessories", "ItemNose"],
+      deep: ["ItemNeck", "ItemNeckAccessories", "ItemNose", "ItemNipples", "ItemTorso", "ItemArms", "ItemHands", "ItemLegs", "ItemFeet", "ItemBoots", "ItemNeckRestraints"],
+      nhl: null
+      // (every Item spot in the outfit)
+    };
+    function bindGroupsFor(level, items) {
+      const all = [...new Set((items || []).map((it) => it && it.Group).filter((g) => /^Item/.test(String(g || ""))))];
+      const want = Object.prototype.hasOwnProperty.call(BIND_GROUPS, level) ? BIND_GROUPS[level] : BIND_GROUPS.deep;
+      return want ? all.filter((g) => want.includes(g)) : all;
+    }
+    function contractBindNow(mn) {
+      const r = rec(mn), o = r && r.bindOwed;
+      if (!o) return;
+      if (!r.ownOutfit || Date.now() - o.at > 7 * 24 * 36e5) {
+        r.bindOwed = null;
+        saveLedger();
+        return;
+      }
+      if (!hasCompanion(mn)) {
+        if (!o.told) {
+          o.told = true;
+          saveLedger();
+          tell(mn, "\u{1F517} Your new contract binds you, sugar, over your own clothes. Turn on the Companion and the farm's tack goes on you the moment it's back, or staff can bind you by hand.");
+        }
+        return;
+      }
+      if (o.sentAt && Date.now() - o.sentAt < 6e4) return;
+      if ((o.sends || 0) >= 3) {
+        r.bindOwed = null;
+        saveLedger();
+        return;
+      }
+      outfitsLedger();
+      const oo = o.slot && (L2.outfits[o.slot] || farmOutfit(o.slot));
+      if (!oo || !oo.data) {
+        r.bindOwed = null;
+        saveLedger();
+        return;
+      }
+      let items = [];
+      try {
+        items = (JSON.parse(W.LZString.decompressFromBase64(String(oo.data))) || {}).items || [];
+      } catch (e) {
+        r.bindOwed = null;
+        saveLedger();
+        return;
+      }
+      const groups = bindGroupsFor(o.level, items);
+      if (!groups.length) {
+        r.bindOwed = null;
+        saveLedger();
+        return;
+      }
+      o.sentAt = Date.now();
+      o.sends = (o.sends || 0) + 1;
+      saveLedger();
+      enqueue(makeMsg("outfit", { slot: o.slot, label: slotLabel(o.slot), data: oo.data, keys: outfitKeysFor(mn), auto: true, topup: groups, bind: o.level, id: ++companionSeq }, mn));
+      audit(CFG.BOT_MEMBER, "CONTRACT_BIND_SENT", mn + " " + o.level + " " + groups.length);
+    }
     function outfitTopUp(mn) {
       const r = rec(mn);
       if (!r || r.ownOutfit || !r.contractDressedAt || r.tempOutfit || !hasCompanion(mn)) return false;
@@ -10323,6 +10490,17 @@
       } catch (e) {
         warn("temp outfit:", e);
       }
+      if (m.answer === "topped" && m.bind) {
+        const r = rec(mn);
+        if (r) {
+          r.bindOwed = null;
+          r.contractBoundAt = Date.now();
+          saveLedger();
+        }
+        audit(mn, "CONTRACT_BOUND", String(m.bind) + " " + (m.worn | 0));
+        if (onMap(mn) && (m.worn | 0) > 0) emote("\u{1F517} " + plainName(mn) + " keeps their own clothes, but the contract's signed, and the farm girl buckles the farm's tack on over them: " + (m.worn | 0) + " piece" + ((m.worn | 0) === 1 ? "" : "s") + (m.locks ? ", every one padlocked" : "") + ". Stock's stock, whatever it wears.");
+        return;
+      }
       if (m.answer === "topped") {
         audit(mn, "OUTFIT_TOPUP", String(m.slot || "") + " " + (m.worn | 0));
         if (onMap(mn) && (m.worn | 0) > 0) emote("\u{1F457} The farm girl tuts and puts " + plainName(mn) + " back in their farm outfit: " + (m.worn | 0) + " piece" + ((m.worn | 0) === 1 ? "" : "s") + " they'd come home without" + (m.locks ? ", padlocked back on" : "") + ".");
@@ -10370,7 +10548,13 @@
       syncCompanions(true);
       R(r.ownOutfit ? "\u{1F457} Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no." : "\u{1F457} Bring your own outfit: off. " + (r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
     }
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m), __outfitTopUp: (m) => outfitTopUp(m) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, {
+      __outfitSlot: (m) => outfitSlotFor(m),
+      __contractOutfit: (m) => contractOutfitNow(m),
+      __outfitTopUp: (m) => outfitTopUp(m),
+      __contractBind: (m) => contractBindNow(m),
+      __bindGroups: (lv, items) => bindGroupsFor(lv, items)
+    });
     addCommand("ownoutfit myoutfit", { topic: "outfits", run: (c) => ownOutfitCommand(c.sender, c.args, c.R) });
     function zonesLedger() {
       L2.zones = L2.zones || {};
@@ -10870,11 +11054,15 @@
           }
         },
         // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
-        // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn): a session's yours
-        echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn) => {
+        // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn, level): a session's yours (level "nhl": it runs out on its own, so I never wake it)
+        echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => {
           const v = echsOf(mn);
-          if (v) v.taken = a.name;
+          if (v) {
+            v.taken = a.name;
+            v.nhl = level === "nhl";
+          }
         } },
+        // (level "nhl": left to run out on its own, Nov 24)
         face: (mn, mood, secs) => face(mn, mood, secs),
         sound: (mn, name) => sound(mn, name),
         trance: (mn, level) => trance(mn, level),
@@ -23817,6 +24005,7 @@
       if (v.phase === "AttemptMade" && was !== "AttemptMade") echsBeside(sender);
       if (v.phase === "InductionInProgress" && was !== "InductionInProgress") echsPatter(sender, v);
       else if (v.phase === "Hypnotized" && was !== "Hypnotized") {
+        v.underAt = Date.now();
         if (r) r.echs = Object.assign(r.echs || {}, { underAt: Date.now(), n: (r.echs && r.echs.n || 0) + 1 });
         toBy("\u{1F300} " + plainName(sender) + " went under for me: " + (v.band || "under") + ".");
         addonsEmit("echsUnder", sender, { by: v.by === CFG.BOT_MEMBER ? sender : v.by, why: v.why, band: v.band });
@@ -23843,8 +24032,31 @@
         }
       }, 2500 + i * 11e3));
     }
+    function echsLeftUnder(now) {
+      for (const [mn, v] of state.echs || /* @__PURE__ */ new Map()) {
+        if (v.phase !== "Hypnotized" || v.nhl || !charFor(mn)) continue;
+        if (v.wakeSent) {
+          if (now - v.wakeSent >= 12e4 && (v.rewoke || 0) < 5) {
+            v.rewoke = (v.rewoke || 0) + 1;
+            echsWake(mn, true);
+            log("ECHS: woke " + mn + " again (still under after my wake)");
+          }
+          continue;
+        }
+        if (!v.taken && now - (v.underAt || v.at || now) >= (CFG.ECHS_IDLE_WAKE_MIN || 5) * 6e4) {
+          echsWake(mn);
+          log("ECHS: woke " + mn + " (under with nothin' runnin')");
+        }
+      }
+    }
+    if (W.__FARMHAND_TEST__) W.__echsLeftUnder = (t) => echsLeftUnder(t || Date.now());
     function echsTick() {
       echsHome();
+      try {
+        echsLeftUnder(Date.now());
+      } catch (e) {
+        warn("echs left under:", e);
+      }
       if (!CFG.ECHS_ON || !CFG.ECHS_OFFER_EVERY_MIN) return;
       const now = Date.now();
       if (now - (state.echsTickAt || 0) < 6e4) return;
@@ -65134,100 +65346,8 @@ WHILE YOU'RE IN HEAT \xB7 12 hours
 HOW IT ENDS
   \u2022 On its own, a suppressant shot, or staff break it.
   \u2022 Hard limits that rule it out stop it cold.`,
-      shots: `\u{1F489} SHOTS & TAGGED ITEMS \u{1F489}
-
-I read words in a crafted item's name or description, like LSCG does.
-
-INJECTORS \xB7 use Inject on someone
-  Production
-    lactation \xB7 milk doubles for a day
-    virility \xB7 cum doubles for a day
-    fertility \xB7 catchin' doubles for a day
-    contraceptive \xB7 no catchin' for two days
-    egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
-    hyper pregnancy (or brood) \xB7 huge litters, 2 to 4 times as many
-    mpreg (or anal pregnancy) \xB7 a load in the ass can take, a week
-      (or just say ?mpreg on: your own switch, no item needed)
-      a shot, or for as long as you wear it. With hyper too: a
-      hyper one. A second stud the same day adds a second sire.
-    A plug or dildo with hollow, tunnel or fuckable in its name or
-      description lets a cock through: it does not close the hole.
-    (worn, those two work for as long as you wear the item)
-    heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
-  Feelin's and more
-    aphrodisiac (or horny) \xB7 achin' and needy (Needy Nectar)
-    hair trigger (or sensitizer) \xB7 an hour where every touch nearly sets you off
-    denial serum \xB7 held at the edge, no cummin', two hours
-    cum flood (or gusher) \xB7 your next loads come out enormous
-    sedative \xB7 drowsy, heavy and slow for an hour
-    obedience (or mind control) \xB7 a step deeper under
-    moo serum \xB7 Moo Juice from the needle
-    futa serum \xB7 a cock and all that comes with it, for a day
-    twins (or triplets) \xB7 the next litter that takes comes double
-    ripening (or ovulation) \xB7 heat, and the next load that can take, takes
-    strawberry milk (chocolate, honey, vanilla, banana, caramel) \xB7
-      flavoured milk for a day
-    purge serum (or antidote) \xB7 every shot in you flushed out
-    temporary, with a size \xB7 the growth or shrinkin' lasts an hour
-    (LSCG reads sedative, aphrodisiac, antidote and mind control
-     too: one needle does both.)
-  Stackin'
-    Doses stack. A second dose of the same while the first is still
-      workin' makes it triple, a third four times, up to five deep.
-    Put x2 to x5 on the needle for that many doses in one go:
-      "lactation x3", "udder growth x2", "hyper pregnancy x2".
-    Potions stack too: another bottle of the same is stronger
-      (where it can be) and runs longer, up to three deep.
-
-TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
-    auto-injector \xB7 the item doses you every half hour with the
-      other words on it: "auto-injector lactation x2". Piercings
-      work too: a nipple or clit piercing crafted as one does
-      every shot there is.
-    triggered \xB7 "when bred", "on climax", "when milked",
-      "when denied" or "on trap" on it: it doses you when that
-      happens instead of on a clock
-    roulette (or mystery dose) \xB7 a random shot every dose
-    iv drip (or drip line) \xB7 holds every effect on it full,
-      constantly, while it's in; it fades ten minutes after
-    Descriptions count, in plain words: "an IV that drips
-      lactation into her", "injects the wearer with sedative",
-      "whenever she's bred it makes her more fertile"
-    ?myshots \xB7 what's in you right now, and for how long
-    ?fix \xB7 with The Farmhand's Dispensary and its cravings
-      switched on: when you're itchin' for another, I'll see to it
-    ?kryptonite \xB7 the barn's rumours about the proprietors'
-      weaknesses. Find the word, put it on a needle\u2026
-    ovipositor \xB7 on a gag, belt, plug or dildo: it lays a clutch in
-      you now and then (needs ?eggs on, or your traps on)
-    auto-feed \xB7 on a funnel gag: a bellyful poured down you every
-      ten minutes. Add "piss" and say ?watersports on for that.
-    a cock type (canine, equine, feline, draconic), knotted, or a
-      size word (huge, hyper, monster) on a dildo, machine or belt:
-      the farm treats it as that cock, and big ones stretch you.
-  Capacity
-    stretching / capacity \xB7 +250 mL for good (up to 50 L)
-    shrinking \xB7 \u2212500 mL, spills the extra (a Reducing Serum takes a size off instead)
-  Sizes \xB7 a part plus a grow or shrink word, either order
-    parts: breasts (tits, udder) \xB7 balls \xB7 cock (penis) \xB7 knot \xB7
-      pussy \xB7 ass (anal) \xB7 throat
-    grow: grow, growth, enlarger, swell, gape, stretch, trainer\u2026
-    shrink: shrink, reducer, tightener, restorer\u2026
-    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
-    "Pussy Stretching Shot". Each one is a step, with a room emote.
-  Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
-    humanizer, knotting, knot remover \xB7 see ?help cocks
-
-WORN ITEMS
-  \u2022 lactation, virility, fertility \xB7 smaller boosts while worn
-  \u2022 capacity or stretching \xB7 +100 mL while worn
-  \u2022 stretcher, stretching, gaper, dilator or trainer in the vulva,
-    butt or mouth slot \xB7 opens that hole a level right away, and
-    trains it looser for good every 12 hours worn
-
-GOOD TO KNOW
-  \u2022 Shots are the only way into \u2728hyper sizes.
-  \u2022 ?shotlog (staff) shows what I read off recent shots.`,
+      shots: FARM_SHOTS,
+      // (shared/farm-shots.js: the Dispensary shows the same text, Nov 24)
       body: `\u{1F4CF} BODY SIZES \u{1F4CF}
 
 COMMANDS

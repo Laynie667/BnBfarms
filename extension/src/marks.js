@@ -27,6 +27,11 @@ const save = (v) => { try { window.localStorage.setItem(KEY, JSON.stringify(v));
 const groupOf = (name) => (typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null);
 const bundle = () => window.ServerAppearanceBundle(P().Appearance);
 const lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+// a piece of their FARM OUTFIT (outfits.js wearOutfit): under the farm's own high security padlock, on them, with the
+// farm girl among its keyholders. The farm can lift that and put it back; nobody else's lock is ever touched.
+const FARM_GIRL = 260239;
+const farmOutfitPiece = (b) => { const p = b && b.Property; if (!p || p.LockedBy !== "HighSecurityPadlock" || p.LockMemberNumber !== P().MemberNumber) return false;
+  return String(p.MemberNumberListKeys || "").split(",").map(Number).includes(FARM_GIRL); };
 // on you at once; the room hears only the spots that changed, gathered with anything else in the same moment (look.js)
 const commit = (next) => commitLook(next);
 // game text boxes take letters, numbers, spaces and a little punctuation, 20 characters a line
@@ -302,8 +307,16 @@ export function farmPieceIn(group) {
   try { const b = (P() && P().Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === group); if (!b) return null;
     const mem = gearMem(); return gearNameOf({ Group: group, Name: b.Asset.Name, Craft: b.Craft }, mem); } catch (e) { return null; }
 }
-// list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
-export function syncFarmGear(list, allow) {
+// list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on · opts.aside: their own things may be set
+// aside too (Traps can set my own things aside). Returns what it did.
+// SET ASIDE FOR THE SCENE (Nov 24, the suggestion box's #70, Kitty Sera: "temporarily removing an outfit for trap scenes if
+// they are applying different restraints (can be disconnecting to be told 'you are tied in ropes' and see nothing…)";
+// Laynie: "farm pieces only, plus the opt-in switch for your own gear"). A trap's piece whose spot was taken just didn't
+// go on. Now, when every spot it could go in is full: a piece of their farm outfit there is set aside (padlock and all)
+// and the trap's goes on in its place; when the trap's comes off, the outfit's piece goes straight back, locked as it was.
+// Their own things are only set aside with their switch on, and never anythin' somebody else has locked.
+export function syncFarmGear(list, allow, opts) {
+  const aside = !!(opts && opts.aside);
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
   const lg = letGo(), now = Date.now();
   // (let go of what the farm's stopped listin' for a while, or a month on)
@@ -345,6 +358,15 @@ export function syncFarmGear(list, allow) {
     if (!group && slot.takeover) {
       group = slot.groups.find((x) => groupOf(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
       if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); }
+    }
+    if (!group) {   // (#70: every spot full. The piece's own item's spot first, then the slot's: a farm outfit piece steps aside, or with their switch on, their own)
+      const homes = [];
+      for (const n0 of (Array.isArray(g.items) ? g.items.map(String) : [])) { if (!nameOk(n0)) continue; const n = itemName(n0), all = Array.isArray(window.Asset) ? window.Asset : [];
+        for (const a of all) if (a && a.Name === n && a.Group && a.Group.Family === P().AssetFamily && slot.groups.includes(a.Group.Name) && !homes.includes(a.Group.Name)) homes.push(a.Group.Name); }
+      for (const x of slot.groups) if (!homes.includes(x)) homes.push(x);
+      group = homes.find((x) => { if (!groupOf(x)) return false; const b = next.find((y) => y.Group === x); if (!b || gearNameOf(b, mem)) return false;
+        return farmOutfitPiece(b) || (aside && !stuck.has(x)); }) || null;
+      if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); (did.aside = did.aside || []).push(was.Name); }
     }
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
     if (!item) item = gearAsset(group, slot, g.items, !!g.only);

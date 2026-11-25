@@ -559,8 +559,10 @@
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off"].includes(v)){ R("?hypno on lets your herd leader or a proprietor run Conditioning's trance sessions on you · ?hypno off stops them. ?depth fun|deep|nhl sets how deep."); break; }
         r.hypno = v ? v === "on" : !r.hypno; saveLedger(); audit(sender, "HYPNO", r.hypno ? "on" : "off");
-        R(r.hypno ? "🌀 Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "")
-                  : "🌀 Hypno: off. No trance sessions for you.");
+        R(r.hypno ? "🌀 Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." +
+                    " Got LSCG? Let the farm in (LSCG settings → Extensions → B&B Farm: Hypnosis and States) and tick Allow suggestions, and you go under LSCG's own trance. ?lowpose kneel|fours: how a trigger puts you down." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "")
+                  : "🌀 Hypno: off. No trance sessions for you, and the farm's own triggers rest till it's back on.");
+        try { addonsEmit("hypnoSwitch", sender, !!r.hypno); } catch(e){}   // (Conditioning: the triggers it keeps for you rest or wake)
         if (r.hypno && CFG.ECHS_ON) later(() => { try { echsAsk(sender, sender, "hypno on"); } catch(e){ warn("echs:", e); } }, 4000);   // their ECHS asks them (10uj-echs.js)
         if (!r.hypno) try { echsWake(sender, true); } catch(e){}
         break;

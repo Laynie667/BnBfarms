@@ -1,19 +1,19 @@
 # What to install (current versions)
 
-Updated 2026-11-24. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-25. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.99.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.100.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.2.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.0.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.80.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.81.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.27.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.100.0 + Companion 0.81.0 + Conditioning 2.0.0: the farm's trance on LSCG, a library of blocks, the trance editor, triggers planted as LSCG suggestions, beats and the look** Laynie, Nov 24-25: "Leaning more on lscg, and how it handles suggestions, but with echs flair"; "with lscg, the farms version"; "a session editor so I can add real hypnotic scripts, set the pacing, and choose a range for the binaurals, like theta and delta"; "focus on lscgs default suggestion inputs on the first rendition". Part 1 of 3 (compulsions, hang-ons and hijacked speech come later).
+  - **The farm's trance runs on LSCG** (Conditioning 2.0; Companion trance.js). With LSCG's hypnosis on and the farm let in (LSCG settings → Extensions → B&B Farm: Hypnosis and States), a session puts you under LSCG's own trance in the farm's name, keeps it up the whole session (LSCG's own trance time would cut it short), and wakes you at the end (No human left is left to run out). Snapped out of it, booped, or your wake word: the session ends and you and your herd leader are told. Without LSCG, or with its hypnosis off: the farm's own trance.
+  - **Triggers, planted as LSCG suggestions.** A session's trigger blocks go into your LSCG as its own suggestions, with the farm as the one who planted them, made only of LSCG's own instructions (strip, pose, say, cum, deny, needy, follow, touch, forget; never Serve). You fight them off like any LSCG suggestion, block any instruction in LSCG, and anybody LSCG lets say the phrase sets one off (one cow's forced words can set off the next cow's). Needs Allow suggestions ticked in LSCG; the farm waits and plants them next session. Without LSCG the farm keeps them and your Companion carries them out, with Give in or Fight it. ?planted shows what's planted; ?planted remove <name> takes one out (a herd leader or proprietor can for their stock); ?hypno off rests the farm's own.
+  - **Down low, your way** ("I prefer they have the ability to swap to kneeling or to all fours, whatever is more comfortable"): ?lowpose kneel|fours, or the buttons on the Conditioning card and the trance card. Whichever's comfier is the pose a trigger puts you in, and the lines say it. Milking stalls are shared: the lines say "a free stall", never "yours".
+  - **The trance library** (shared/trance-script.js). Sessions are put together from labelled blocks: inductions, deepeners, convincers, suggestions, triggers and wakes, and session recipes that pick them ("deepener: any · suggestion: any 2 · trigger: all"). Each block says which levels and kinds of stock it's for, what gear, its pace, how many of its lines to use, its beats, its look, and how much deeper it takes them. The starter library is Conditioning's own lines, with less "your handler" ("unless they have a set herd leader": {herd} is their herd leader or the farm).
+  - **The trance editor** (the studio on the bot's PC: localhost:4780/trance). A form for each block beside the library's text: write it either way, or paste a script in. Mistakes are named by line. Try it plans the session the bot would run for somebody (their level, kind, body and low pose) and plays it sped up with its look and beats. Save keeps it on the PC (the last 30 saves kept); Push to the bot, and the bot has it within a minute (or ?trancelib pull). ?trancelib says what's loaded; ?trancelib starter goes back to the starter. Never on GitHub.
+  - **Beats by band.** Each block can slide the beat from one rate to another over a while, by band (delta 1-4, theta 4-8, alpha 8-12, beta 12-30 Hz, a fresh rate inside the band every run) or by number. With LSCG they're LSCG's own binaural beats, only if you turned them on there and never louder than your setting. Without LSCG: the farm's own, if you switch them on (Companion settings → The farm's trance; headphones; 10 to 40%).
+  - **The look** (HSC-style): a lilac haze at the edges that thickens as you sink, a slow turnin' spiral (LSCG's own when it's drawin' one), soft rings at breathin' pace, the farm's words driftin' up your screen, names blurrin', a warm glow when you cum. Nothin' ever flashes. Switches: Trance look, Calm trance look.
+  - Bot: an add-on command that has to wait for somethin' (asking the studio) answers when it's done, without a "Done." first.
+  - Tests: trance-script, trance-bot, trance-companion, trance-studio; conditioning still passes.
 
 - **Bot 0.99.0 + Companion 0.80.0 + Dispensary 0.27.0: every account its own, one thing at a time, spiders in the wild traps, the doc's lab, the ovipositor, and the morphin' draught** From players, Laynie, Nov 24: "per account config, users are reporting their alt characters receiving the sizes of their farm character, and marks on other accounts. also trap suppression when being led by the farm, like to start a hypno session, to avoid players being grabbed by more than one thing that will leash or tether them and result in a tug of war". From the suggestion box: spiders "as a wild trap, like a trap door spider, or a sneak attack from the trees. could be a few varients. and maybe a few mad science test events with gear with unique tag combos. Silk should pay out ribbons, just slightly more than eggs", "ovipositer as cock type", and the morph "until next morph, buy for self", "25 ribbons".
   - **Every account its own** (Companion; acct.js). What the Companion remembers was kept per browser, so an alt on the same browser got the main's drawn body and its farm sizes, the marks and messes, the farm's gear, the whistle home and the toggles, and a tab that switched accounts kept the first one's farm in memory. Now each account keeps its own (the computer's own things, the memory and chat logs, folded sections and the store's shelf, stay shared), and a different account logging in on the tab starts clean till the farm girl says what that one's are. What was saved before goes to the first account that opens after the update, most likely your main. The Dispensary was already per account.

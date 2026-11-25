@@ -14,6 +14,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mapRoutes } from "./map/routes.mjs";
+import { tranceRoutes } from "./trance-routes.mjs";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 // where reference/ and scratch-previews/ live: two folders up, as it always was, unless studio/local.json says
@@ -89,12 +90,16 @@ async function send(res, file) {
 // The game's own sites: the Companion there may READ what the studio has saved (its "Get my studio's settings" button).
 // Nothing else is shared, and only the studio's own page may save. (Any web page can send this computer a request;
 // without this, one could have written into the studio's saved fits.)
+// THE TRANCE EDITOR (Nov 25): its page, the shared format, the library and what's pushed to the bot (trance-routes.mjs).
+// studio/trance/ holds the library (never on GitHub); a test studio can keep its own: node server.mjs live 4787 <folder>
+const TRANCE = process.argv[4] ? resolve(process.argv[4]) : join(HERE, "trance");
 const GAME_ORIGIN = new RegExp("^https://([a-z0-9-]+[.])*(bondageprojects[.]elementfx[.]com|bondage-europe[.]com|bondageprojects[.]com|bondage-asia[.]com|bondageeurope[.]com)$");
 const OWN_ORIGIN = new RegExp("^http://(localhost|127[.]0[.]0[.]1)(:[0-9]+)?$");
 createServer(async (req, res) => {
   try {
     const path = new URL(req.url, "http://localhost").pathname, origin = String(req.headers.origin || "");
     if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && origin && !OWN_ORIGIN.test(origin)) { res.writeHead(403).end("not from here"); return; }
+    if (await tranceRoutes(req, res, path, origin, { dir: TRANCE, shared: join(HERE, "../shared"), web: WEB, send, GAME_ORIGIN, OWN_ORIGIN })) return;   // the trance editor (Nov 25)
     if (path.startsWith("/__studio/fits/") && GAME_ORIGIN.test(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin); res.setHeader("Vary", "Origin");
       if (req.method === "OPTIONS") { res.writeHead(204, { "Access-Control-Allow-Methods": "GET", "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600" }).end(); return; }
@@ -179,4 +184,4 @@ createServer(async (req, res) => {
     if (f) return send(res, f);
     res.writeHead(404, { "Content-Type": "text/plain" }).end("not found");
   } catch (e) { res.writeHead(500, { "Content-Type": "text/plain" }).end(String(e && e.message || e)); }
-}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nB&B map studio:    http://localhost:" + PORT + "/map\nGame files from: " + (LIVE ? "the live game, " + LIVE.ver + " (" + LIVE.base + "), kept in " + LIVE.dir : GAME) + "\nThis computer only. Ctrl+C stops it."));
+}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nB&B map studio:    http://localhost:" + PORT + "/map\nB&B trance editor: http://localhost:" + PORT + "/trance\nGame files from: " + (LIVE ? "the live game, " + LIVE.ver + " (" + LIVE.base + "), kept in " + LIVE.dir : GAME) + "\nThis computer only. Ctrl+C stops it."));

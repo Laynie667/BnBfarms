@@ -35,6 +35,10 @@
 //   bot  -> ext        nursery  { do: change | offer, gear, label, from }   the nursery: a change (ABCL), a stuffie offered
 //   ext  -> bot        nurseryStats { abcl, wet, diaper, leak, mommy, carers }   a little's padding and Littlish Club grown-ups
 //   ext  -> room       mess     { list } / messAsk {}         a Companion's own messes (what landed where), Companion to Companion
+//   bot  -> ext        hypno    { do: under|keep|wake|cue|depth|check|suggestions|clear, … }   the farm's trance (Conditioning 2.0,
+//                                                             extension/src/trance.js): LSCG's trance in the farm's name, beats, the look
+//   ext  -> bot        hypnoState { lscg, ver, on, sugg, mins, beats, scopes, under, ours, farmBeats, planted }   their LSCG as it is
+//   ext  -> bot        hypnoEvent { ev: under|awake|safeword|checked|resolved|fired, … }   what happened in their trance
 //
 // Older Companions ignore the v2 types, and older bots never send them, so either side can update first.
 

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      1.2.0
+// @version      2.0.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
-// @description  Guided trance sessions per species and level (fun, deep, no human left) for people with ?hypno on, run by their herd leader; tiers and nicknames grow with sessions. Runs on the farm bot's computer, next to the Farmhand Bot script.
+// @description  Guided trance sessions from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes; written in the studio's trance editor), per species and level (fun, deep, no human left), for people with ?hypno on. With LSCG: its own trance in the farm's name, its beats, and triggers planted as LSCG suggestions. Tiers and nicknames grow with sessions. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
 // @match        *://bondageprojects.elementfx.com/*
@@ -49,7 +49,7 @@
       }, 1e4);
     }
   }
-  var pick = (list) => list[Math.floor(Math.random() * list.length)];
+  var pick = (list2) => list2[Math.floor(Math.random() * list2.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
   var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}/g;
@@ -86,11 +86,11 @@
     if (b.g === "male" && GIRL_W.test(s)) return false;
     return true;
   }
-  function fitting(list, b) {
-    const ok = list.filter((l) => fits(l, b));
+  function fitting(list2, b) {
+    const ok = list2.filter((l) => fits(l, b));
     if (ok.length) return ok;
-    const plain = list.filter((l) => !TAG_LEAD.test(l));
-    return plain.length ? plain : list;
+    const plain = list2.filter((l) => !TAG_LEAD.test(l));
+    return plain.length ? plain : list2;
   }
 
   // addons/conditioning/more-lines.js
@@ -266,6 +266,904 @@
     ]
   };
 
+  // shared/trance-script.js
+  var KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "session"];
+  var SPOKEN = KINDS.filter((k) => k !== "session");
+  var LEVELS = ["fun", "deep", "nhl"];
+  var BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], beta: [13, 20] };
+  var HZ_MIN = 1;
+  var HZ_MAX = 30;
+  var MAX_DOES = 3;
+  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "trigger", "does", "waits"];
+  var LSCG = {
+    cum: "Orgasm",
+    deny: "Denial",
+    needy: "Insatiable",
+    touch: "Perform Activity",
+    strip: "Strip",
+    pose: "Assume Pose",
+    follow: "Follow",
+    say: "Speak Phrase",
+    forget: "Forget"
+  };
+  var POSES = {
+    kneel: { lower: "Kneel" },
+    "kneel spread": { lower: "KneelingSpread" },
+    "kneeling spread": { lower: "KneelingSpread" },
+    "all fours": { full: "AllFours" },
+    fours: { full: "AllFours" },
+    stand: { upper: "BaseUpper", lower: "BaseLower" },
+    "legs closed": { lower: "LegsClosed" },
+    "legs spread": { lower: "Spread" },
+    "hands behind": { upper: "BackBoxTie" },
+    "hands behind back": { upper: "BackBoxTie" },
+    "elbows behind": { upper: "BackElbowTouch" },
+    "hands up": { upper: "OverTheHead" },
+    "arms up": { upper: "OverTheHead" },
+    yoked: { upper: "Yoked" }
+  };
+  var STRIP = {
+    top: ["ClothOuter", "Cloth", "Suit", "Bra", "Corset"],
+    bottoms: ["ClothLower", "SuitLower", "Panties", "Garters"],
+    bottom: ["ClothLower", "SuitLower", "Panties", "Garters"],
+    underwear: ["Bra", "Panties"],
+    feet: ["Shoes", "Socks", "SocksLeft", "SocksRight"],
+    shoes: ["Shoes"],
+    gloves: ["Gloves"],
+    hat: ["Hat"]
+  };
+  var ZONES = {
+    head: "ItemHead",
+    hair: "ItemHead",
+    ears: "ItemEars",
+    nose: "ItemNose",
+    mouth: "ItemMouth",
+    lips: "ItemMouth",
+    neck: "ItemNeck",
+    arms: "ItemArms",
+    hands: "ItemHands",
+    tits: "ItemBreast",
+    breasts: "ItemBreast",
+    chest: "ItemBreast",
+    udders: "ItemBreast",
+    nipples: "ItemNipples",
+    belly: "ItemTorso",
+    torso: "ItemTorso",
+    hips: "ItemPelvis",
+    pelvis: "ItemPelvis",
+    pussy: "ItemVulva",
+    vulva: "ItemVulva",
+    clit: "ItemVulvaPiercings",
+    cock: "ItemPenis",
+    butt: "ItemButt",
+    ass: "ItemButt",
+    legs: "ItemLegs",
+    thighs: "ItemLegs",
+    feet: "ItemBoots"
+  };
+  var FORGET = { deny: "Denial", denial: "Denial", needy: "Insatiable", insatiable: "Insatiable", follow: "Follow", say: "Speak Phrase" };
+  var clean = (s) => String(s == null ? "" : s).trim();
+  var lc = (s) => clean(s).toLowerCase();
+  var list = (s) => clean(s).split(/\s*,\s*/).map(clean).filter(Boolean);
+  var slug = (s) => lc(s).replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "block";
+  function seconds(s) {
+    s = lc(s);
+    if (!s) return null;
+    if (/^\d+(\.\d+)?$/.test(s)) return Number(s);
+    const m = /^(?:(\d+(?:\.\d+)?)\s*m(?:in)?s?)?\s*(?:(\d+(?:\.\d+)?)\s*s(?:ec)?s?)?$/.exec(s);
+    if (!m || !m[1] && !m[2]) return null;
+    return Math.round((Number(m[1] || 0) * 60 + Number(m[2] || 0)) * 10) / 10;
+  }
+  function parsePace(s) {
+    s = lc(s);
+    const m = /^(\d+(?:\.\d+)?)\s*(?:s|sec|secs)?\s*(?:-|to|–)\s*(\d+(?:\.\d+)?\s*(?:s|sec|secs|m|min)?)$/.exec(s);
+    if (m) {
+      const a = seconds(m[1]), b = seconds(/[a-z]/.test(m[2]) ? m[2] : m[2] + "s");
+      return a != null && b != null && a > 0 && b >= a ? { min: a, max: b } : null;
+    }
+    const one = seconds(s);
+    return one != null && one > 0 ? { min: one, max: one } : null;
+  }
+  function rate(s) {
+    s = lc(s).replace(/hz$/, "").trim();
+    if (!s) return null;
+    if (/^\d+(\.\d+)?$/.test(s)) {
+      const n = Number(s);
+      return n >= HZ_MIN && n <= HZ_MAX ? { hz: n } : null;
+    }
+    const m = /^(?:deep\s+)?(delta|theta|alpha|beta)(?:\s+(\d+(?:\.\d+)?))?$/.exec(s);
+    if (!m) return null;
+    if (m[2]) {
+      const n = Number(m[2]);
+      return n >= HZ_MIN && n <= HZ_MAX ? { hz: n, band: m[1] } : null;
+    }
+    return { band: m[1] };
+  }
+  function parseBeats(s) {
+    s = lc(s);
+    if (!s) return null;
+    if (/^(off|none|stop|silent)$/.test(s)) return { off: true };
+    let over = null;
+    const o = /\s+over\s+(.+)$/.exec(s);
+    if (o) {
+      over = seconds(o[1]);
+      if (over == null) return null;
+      s = s.slice(0, o.index);
+    }
+    const parts = s.split(/\s*(?:→|->|=>|\bto\b)\s*/);
+    if (parts.length > 2) return null;
+    const from = parts[0] ? rate(parts[0]) : null, to = parts.length === 2 ? rate(parts[1]) : null;
+    if (parts[0] && !from) return null;
+    if (parts.length === 2 && !to) return null;
+    if (!from && !to) return null;
+    return { from: from || null, to: to || null, over: over != null ? Math.min(3600, Math.max(0, over)) : null };
+  }
+  function hzOf(r, rng) {
+    if (!r) return null;
+    if (r.hz != null) return r.hz;
+    const b = BANDS[r.band];
+    if (!b) return null;
+    return Math.round((b[0] + (rng || Math.random)() * (b[1] - b[0])) * 10) / 10;
+  }
+  function parseLook(s) {
+    const out = {}, bad = [];
+    for (const part of list(lc(s))) {
+      let m;
+      if (part === "clear" || part === "off" || part === "none") {
+        Object.assign(out, { haze: 0, spiral: "off", rings: false, words: false, names: false });
+        continue;
+      }
+      if (m = /^haze\s+(\d{1,3})\s*%?$/.exec(part)) {
+        out.haze = Math.min(100, Number(m[1]));
+        continue;
+      }
+      if (/^haze\s+(off|none)$/.test(part)) {
+        out.haze = 0;
+        continue;
+      }
+      if (m = /^spiral(?:\s+(off|slow|on|fast))?$/.exec(part)) {
+        out.spiral = m[1] === "fast" ? "on" : m[1] || "slow";
+        continue;
+      }
+      if (m = /^rings(?:\s+(on|off))?$/.exec(part)) {
+        out.rings = m[1] !== "off";
+        continue;
+      }
+      if (m = /^words(?:\s+(drift|on|off))?$/.exec(part)) {
+        out.words = m[1] !== "off";
+        continue;
+      }
+      if (m = /^names(?:\s+(blur|blurred|on|clear|off))?$/.exec(part)) {
+        out.names = !(m[1] === "clear" || m[1] === "off");
+        continue;
+      }
+      bad.push(part);
+    }
+    return { look: out, bad };
+  }
+  function steps(s) {
+    const out = [];
+    let cur = "", q = null;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (q) {
+        cur += c;
+        if (c === q) q = null;
+        continue;
+      }
+      if (c === '"' || c === "\u201C") {
+        q = c === "\u201C" ? "\u201D" : '"';
+        cur += c;
+        continue;
+      }
+      if (c === "\u2192" || c === ";") {
+        out.push(cur);
+        cur = "";
+        continue;
+      }
+      if ((c === "-" || c === "=") && s[i + 1] === ">") {
+        out.push(cur);
+        cur = "";
+        i++;
+        continue;
+      }
+      cur += c;
+    }
+    out.push(cur);
+    return out.map(clean).filter(Boolean);
+  }
+  var unquote = (s) => clean(s).replace(/^["“](.*)["”]$/, "$1").trim();
+  function parseStep(s, ctx) {
+    ctx = ctx || {};
+    const t = clean(s), l = t.toLowerCase();
+    let m;
+    if (/^(cum|orgasm|come)$/.test(l)) return { type: LSCG.cum, arguments: {} };
+    if (/^(deny|denial|denied|edge)$/.test(l)) return { type: LSCG.deny, arguments: {} };
+    if (/^(needy|insatiable|horny)$/.test(l)) return { type: LSCG.needy, arguments: {} };
+    if (m = /^strip(?:\s+(.+))?$/i.exec(t)) {
+      const what = list((m[1] || "all").replace(/\s+and\s+/gi, ","));
+      if (what.some((w) => /^(all|everything)$/i.test(w))) return { type: LSCG.strip, arguments: { selection: { all: true, random: false, groups: [] } } };
+      if (what.some((w) => /^(random|one|something)$/i.test(w))) return { type: LSCG.strip, arguments: { selection: { all: false, random: true, groups: [] } } };
+      const groups = [];
+      for (const w of what) {
+        if (STRIP[w.toLowerCase()]) groups.push(...STRIP[w.toLowerCase()]);
+        else if (/^[A-Z][A-Za-z]+$/.test(w)) groups.push(w);
+        else return { error: 'strip what? "' + w + '" (top, bottoms, underwear, feet, all, random, or a slot like ClothLower)' };
+      }
+      return { type: LSCG.strip, arguments: { selection: { all: false, random: false, groups: Array.from(new Set(groups)) } } };
+    }
+    if (m = /^pose\s+(.+)$/i.exec(t)) {
+      let p = clean(m[1]).toLowerCase();
+      if (p === "{low}" || p === "low") p = ctx.low === "fours" ? "all fours" : "kneel";
+      const raw = /^(upper|lower|full)\s+([A-Za-z]+)$/i.exec(clean(m[1]));
+      const sel = raw ? { [raw[1].toLowerCase()]: raw[2] } : POSES[p];
+      if (!sel) return { error: 'pose what? "' + m[1] + `" ({low}, kneel, kneel spread, all fours, stand, hands behind, hands up, or upper/lower/full <the game's pose>)` };
+      return { type: LSCG.pose, arguments: { selection: Object.assign({ upper: "", lower: "", full: "" }, sel) } };
+    }
+    if (m = /^say(?:\s*:)?(?:\s+(.+))?$/i.exec(t)) {
+      const words2 = m[1] ? unquote(m[1]) : "";
+      if (/[()]/.test(words2) || /^[*!/.]/.test(words2)) return { error: "what they say can't start with * ! / . or have round brackets" };
+      return { type: LSCG.say, arguments: words2 ? { config: words2.slice(0, 200) } : {} };
+    }
+    if (/^follow(\s+(me|speaker|them))?$/i.test(t)) return { type: LSCG.follow, arguments: { speakerOnly: true } };
+    if (m = /^(?:touch|do|activity)\s+([A-Za-z]+)\s+(?:on\s+)?(?:(?:their|your|the|my)\s+)?([A-Za-z]+)(?:\s+(self|own|speaker|me|them|named))?$/i.exec(t)) {
+      const act = m[1][0].toUpperCase() + m[1].slice(1), zw = m[2].toLowerCase(), zone = ZONES[zw] || (/^Item[A-Z][A-Za-z]+$/.test(m[2]) ? m[2] : null);
+      if (!zone) return { error: 'touch where? "' + m[2] + `" (head, mouth, neck, tits, nipples, belly, pussy, cock, butt, hands, feet, or the game's Item\u2026 name)` };
+      const who = (m[3] || "").toLowerCase(), a = { selection: { name: act, group: zone } };
+      if (who === "self" || who === "own") a.self = true;
+      else if (who === "speaker" || who === "me") a.speakerOnly = true;
+      return { type: LSCG.touch, arguments: a };
+    }
+    if (m = /^forget(?:\s+(.+))?$/i.exec(t)) {
+      const what = list((m[1] || "all").replace(/\s+and\s+/gi, ","));
+      if (what.some((w) => /^(all|everything)$/i.test(w))) return { type: LSCG.forget, arguments: { selection: { all: true, instructions: [] } } };
+      const ins = [];
+      for (const w of what) {
+        const f = FORGET[w.toLowerCase()];
+        if (!f) return { error: 'forget what? "' + w + '" (all, deny, needy, follow, say)' };
+        ins.push(f);
+      }
+      return { type: LSCG.forget, arguments: { selection: { all: false, instructions: Array.from(new Set(ins)) } } };
+    }
+    return { error: `I don't know "` + t + '" (cum, deny, needy, strip \u2026, pose \u2026, say "\u2026", follow, touch <Activity> <zone>, forget \u2026)' };
+  }
+  function parseDoes(does, waits, ctx) {
+    const parts = steps(clean(does));
+    if (!parts.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget)" };
+    if (parts.length > MAX_DOES) return { error: "at most " + MAX_DOES + " things (LSCG's limit), not " + parts.length };
+    const w = list(waits || "").map(seconds), out = [];
+    for (let i = 0; i < parts.length; i++) {
+      const r = parseStep(parts[i], ctx);
+      if (r.error) return { error: r.error };
+      if (i > 0 && w[i - 1] != null) {
+        if (w[i - 1] < 1 || w[i - 1] > 30) return { error: "a wait is 1 to 30 seconds" };
+        r.delay = Math.round(w[i - 1] * 1e3);
+      }
+      out.push(r);
+    }
+    return { ok: true, instructions: out };
+  }
+  var CUE = /\[([^\]]*)\]/g;
+  function readCue(c) {
+    const s = lc(c);
+    let m;
+    if (m = /^(?:wait|pause)\s+(.+)$/.exec(s)) {
+      const v = seconds(m[1]);
+      return v != null && v >= 0 && v <= 600 ? { wait: v } : { bad: c };
+    }
+    if (m = /^deeper\s*\+?\s*(-?\d+)$/.exec(s)) return { deeper: Math.max(-100, Math.min(100, Number(m[1]))) };
+    if (m = /^beats\s+(.+)$/.exec(s)) {
+      const b = parseBeats(m[1]);
+      return b ? { beats: b } : { bad: c };
+    }
+    if (m = /^look\s+(.+)$/.exec(s)) {
+      const L = parseLook(m[1]);
+      return L.bad.length ? { bad: c } : { look: L.look };
+    }
+    return { bad: c };
+  }
+  function parseLibrary(text) {
+    const blocks = [], errors = [], warnings = [];
+    const rows = String(text == null ? "" : text).replace(/\r\n?/g, "\n").split("\n");
+    let b = null, inLabels = false;
+    const err = (n, msg) => {
+      errors.push({ line: n, block: b ? b.kind + ": " + b.name : "", msg });
+      if (b) b.bad = true;
+    };
+    const warn = (n, msg) => warnings.push({ line: n, block: b ? b.kind + ": " + b.name : "", msg });
+    const close = () => {
+      if (b) {
+        finish(b, err, warn);
+        blocks.push(b);
+      }
+      b = null;
+    };
+    rows.forEach((raw, i) => {
+      const n = i + 1, line = raw.replace(/\s+$/, "");
+      const head = /^===\s*([A-Za-z]+)\s*:\s*(.*?)\s*=*\s*$/.exec(line);
+      if (head) {
+        close();
+        const kind = head[1].toLowerCase(), name = clean(head[2]);
+        b = { kind, name, labels: {}, raw: {}, lines: [], at: n };
+        inLabels = true;
+        if (!KINDS.includes(kind)) err(n, 'no such kind "' + head[1] + '" (' + KINDS.join(", ") + ")");
+        if (!name) err(n, "a block needs a name: === " + kind + ": Its Name");
+        return;
+      }
+      if (/^\s*(#|\/\/)/.test(line)) return;
+      if (!b) {
+        if (clean(line)) warn(n, "this is outside any block, so it's skipped (start one with === kind: Name)");
+        return;
+      }
+      if (!clean(line)) {
+        if (b.lines.length || Object.keys(b.raw).length) inLabels = false;
+        return;
+      }
+      const lab = /^\s*([A-Za-z]+)\s*:\s*(.*)$/.exec(line);
+      const key = lab && lab[1].toLowerCase();
+      if (inLabels && lab && (LABELS.includes(key) || b.kind === "session" && SPOKEN.includes(key))) {
+        if (b.kind === "session" && SPOKEN.includes(key)) (b.raw.picks = b.raw.picks || []).push([key, lab[2], n]);
+        else b.raw[key] = [lab[2], n];
+        return;
+      }
+      inLabels = false;
+      if (b.kind === "session") {
+        warn(n, "a session only lists blocks (like deepener: any); this line is skipped");
+        return;
+      }
+      let text2 = line.trim();
+      const cues = [];
+      text2 = text2.replace(CUE, (all, c) => {
+        const r = readCue(c);
+        if (r.bad != null) warn(n, "I don't know the cue [" + c + "] (wait, deeper, beats, look)");
+        else cues.push(r);
+        return " ";
+      });
+      if (/[()]/.test(text2)) {
+        warn(n, "round brackets taken out: hypno add-ons skip anything after one");
+        text2 = text2.replace(/[()]/g, "");
+      }
+      text2 = text2.replace(/\s{2,}/g, " ").trim();
+      if (text2 || cues.length) b.lines.push({ text: text2, cues, at: n });
+    });
+    close();
+    const seen = /* @__PURE__ */ new Map();
+    for (const x of blocks) {
+      const k = x.kind + ":" + lc(x.name);
+      if (seen.has(k)) {
+        errors.push({ line: x.at, block: x.kind + ": " + x.name, msg: "two " + x.kind + "s are called " + x.name + " (line " + seen.get(k) + ")" });
+        x.bad = true;
+      } else seen.set(k, x.at);
+    }
+    for (const x of blocks.filter((y) => y.kind === "session" && !y.bad)) {
+      for (const p of x.labels.picks || []) for (const it of p.items) if (it.name && !blocks.some((y) => y.kind === p.kind && lc(y.name) === lc(it.name))) {
+        errors.push({ line: p.at, block: "session: " + x.name, msg: "there's no " + p.kind + " called " + it.name });
+        x.bad = true;
+      }
+    }
+    return { blocks, errors, warnings };
+  }
+  function finish(b, err, warn) {
+    const r = b.raw, L = b.labels;
+    const get = (k) => r[k] ? r[k] : null;
+    if (get("level")) {
+      const v = list(lc(r.level[0])).map((x) => x === "no human left" ? "nhl" : x);
+      const bad = v.filter((x) => !LEVELS.includes(x) && x !== "any" && x !== "all");
+      if (bad.length) err(r.level[1], "level is fun, deep or nhl, not " + bad.join(", "));
+      L.level = v.includes("any") || v.includes("all") ? LEVELS.slice() : v.filter((x) => LEVELS.includes(x));
+    }
+    if (get("for")) {
+      const v = list(lc(r.for[0]));
+      L.for = v.includes("any") || v.includes("all") ? null : v;
+    }
+    if (get("wears")) L.wears = list(lc(r.wears[0]));
+    if (get("pace")) {
+      const p = parsePace(r.pace[0]);
+      if (!p) err(r.pace[1], 'pace is like 30s or 20-40s, not "' + r.pace[0] + '"');
+      else L.pace = p;
+    }
+    if (get("pick")) {
+      const p = Number(clean(r.pick[0]));
+      if (!(p >= 1 && p <= 99 && Math.floor(p) === p)) err(r.pick[1], "pick is a number of lines, like 3");
+      else L.pick = p;
+    }
+    if (get("beats")) {
+      const v = parseBeats(r.beats[0]);
+      if (!v) err(r.beats[1], 'beats like "theta", "6", "alpha 10 \u2192 theta 6 over 3m" or "off" (1 to 30 Hz), not "' + r.beats[0] + '"');
+      else L.beats = v;
+    }
+    if (get("volume")) {
+      const m = /^(\d{1,3})\s*%?$/.exec(clean(r.volume[0]));
+      if (!m || Number(m[1]) > 100) err(r.volume[1], "volume is 0% to 100% of their own");
+      else L.volume = Number(m[1]);
+    }
+    if (get("look")) {
+      const v = parseLook(r.look[0]);
+      if (v.bad.length) err(r.look[1], "I don't know the look " + v.bad.join(", ") + " (haze N%, spiral slow|on|off, rings on|off, words drift|off, names blur|clear, clear)");
+      else L.look = v.look;
+    }
+    if (get("deeper")) {
+      const m = /^\+?\s*(-?\d+)$/.exec(clean(r.deeper[0]));
+      if (!m) err(r.deeper[1], "deeper is a number, like +10");
+      else L.deeper = Math.max(-100, Math.min(100, Number(m[1])));
+    }
+    if (b.kind === "trigger") {
+      if (!get("trigger") || clean(r.trigger[0]).length < 4) err(get("trigger") ? r.trigger[1] : b.at, "a trigger needs its phrase, 4 letters or more: trigger: milkin' time");
+      else {
+        L.trigger = clean(r.trigger[0]).replace(/[()]/g, "").slice(0, 80);
+        if (/^[*!/.]/.test(L.trigger)) err(r.trigger[1], "a trigger can't start with * ! / .");
+      }
+      if (!get("does")) err(b.at, 'a trigger needs what it does: does: pose {low} \u2192 say "Moo"');
+      else {
+        const d = parseDoes(r.does[0], get("waits") ? r.waits[0] : "", { low: "kneel" });
+        if (d.error) err(r.does[1], d.error);
+        else {
+          L.does = clean(r.does[0]);
+          L.waits = get("waits") ? clean(r.waits[0]) : "";
+        }
+      }
+    } else for (const k of ["trigger", "does", "waits"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a trigger block, so it's skipped here");
+    if (b.kind === "session") {
+      L.picks = (r.picks || []).map(([kind, v, n]) => ({ kind, at: n, items: list(v).map((it) => {
+        const m = /^any(?:\s+(\d+))?$/i.exec(it);
+        if (m) return { any: Number(m[1] || 1) };
+        if (/^all$/i.test(it)) return { all: true };
+        return { name: it };
+      }) }));
+      if (!L.picks.length) err(b.at, "a session lists its blocks in order, like: induction: any");
+    } else if (!b.lines.length && b.kind !== "trigger") warn(b.at, "this " + b.kind + " has no lines");
+    if (L.pick && L.pick > b.lines.length && b.lines.length) warn(r.pick[1], "pick " + L.pick + " but there are only " + b.lines.length + " lines");
+    delete b.raw;
+  }
+  function fits2(b, who) {
+    const L = b.labels || {};
+    who = who || {};
+    if (b.bad) return false;
+    if (who.level && L.level && L.level.length && !L.level.includes(who.level)) return false;
+    if (L.for && L.for.length && !L.for.includes(lc(who.species))) return false;
+    if (L.wears && L.wears.length && !L.wears.some((w) => (who.wears || []).includes(w))) return false;
+    return true;
+  }
+  var shuffle = (a, rng) => {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor((rng || Math.random)() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  function planSession(blocks, who, opts) {
+    opts = opts || {};
+    const rng = opts.rng || Math.random;
+    const good = blocks.filter((b) => !b.bad);
+    const sessions = good.filter((b) => b.kind === "session" && fits2(b, who));
+    let recipe = opts.name ? sessions.find((b) => lc(b.name) === lc(opts.name)) : null;
+    if (!recipe && sessions.length) recipe = sessions[Math.floor(rng() * sessions.length)];
+    const picks = recipe ? recipe.labels.picks : [
+      { kind: "induction", items: [{ any: 1 }] },
+      { kind: "deepener", items: [{ any: 1 }] },
+      { kind: "suggestion", items: [{ any: 2 }] },
+      { kind: "trigger", items: [{ any: 1 }] },
+      { kind: "wake", items: [{ any: 1 }] }
+    ];
+    const used = /* @__PURE__ */ new Set(), out = [];
+    for (const p of picks) {
+      const pool = good.filter((b) => b.kind === p.kind && fits2(b, who));
+      for (const it of p.items) {
+        if (it.name) {
+          const b = good.find((x) => x.kind === p.kind && lc(x.name) === lc(it.name));
+          if (b && !used.has(b)) {
+            out.push(b);
+            used.add(b);
+          }
+          continue;
+        }
+        const free = shuffle(pool.filter((b) => !used.has(b)), rng);
+        const take = it.all ? free : free.slice(0, it.any || 1);
+        for (const b of take) {
+          out.push(b);
+          used.add(b);
+        }
+      }
+    }
+    return { name: recipe ? recipe.name : "", recipe: recipe || null, blocks: out };
+  }
+  function sessionSteps(plan, opts) {
+    opts = opts || {};
+    const rng = opts.rng || Math.random, keep = opts.keep || (() => true);
+    const out = [];
+    for (const b of plan.blocks) {
+      const L = b.labels || {};
+      let lines = b.lines.filter((l) => !l.text || keep(l.text));
+      if (L.pick && lines.length > L.pick) {
+        const idx = shuffle(lines.map((x, i) => i), rng).slice(0, L.pick).sort((a, c) => a - c);
+        lines = idx.map((i) => lines[i]);
+      }
+      const pace = L.pace || { min: 30, max: 30 };
+      const gap = () => Math.round((pace.min + rng() * (pace.max - pace.min)) * 10) / 10;
+      const first = { kind: b.kind, block: b.name, start: true };
+      if (L.beats) first.beats = beatsNow(L.beats, rng);
+      if (L.volume != null) first.volume = L.volume;
+      if (L.look) first.look = L.look;
+      if (!lines.length) {
+        out.push(Object.assign(first, { text: "", gap: 0 }));
+      }
+      lines.forEach((l, i) => {
+        const s = i === 0 ? first : { kind: b.kind, block: b.name };
+        s.text = l.text;
+        s.gap = gap();
+        for (const c of l.cues || []) {
+          if (c.wait != null) s.gap = c.wait;
+          if (c.deeper != null) s.deeper = (s.deeper || 0) + c.deeper;
+          if (c.beats) s.beats = beatsNow(c.beats, rng);
+          if (c.look) s.look = Object.assign({}, s.look || {}, c.look);
+        }
+        out.push(s);
+      });
+      const last = out[out.length - 1];
+      if (L.deeper) last.deeper = (last.deeper || 0) + L.deeper;
+      if (b.kind === "trigger") last.plant = b;
+    }
+    return out;
+  }
+  function beatsNow(v, rng) {
+    if (!v) return null;
+    if (v.off) return { off: true };
+    return { from: hzOf(v.from, rng), to: hzOf(v.to, rng), over: v.over };
+  }
+  function fillIn(text, words2) {
+    return String(text == null ? "" : text).replace(/\{([a-z]+)\}/gi, (all, k) => words2 && words2[k.toLowerCase()] != null ? String(words2[k.toLowerCase()]) : all);
+  }
+  var SUGG_PREFIX = "bnbfarm-";
+  function lscgSuggestion(b, opts) {
+    opts = opts || {};
+    const words2 = opts.words || {};
+    const L = b.labels, d = parseDoes(fillIn(L.does, Object.assign({}, words2, { low: "{low}" })), L.waits, { low: opts.low });
+    if (d.error) return { error: d.error };
+    return {
+      id: SUGG_PREFIX + slug(b.name),
+      name: "B&B " + b.name,
+      trigger: fillIn(L.trigger, words2).replace(/[()]/g, "").slice(0, 80),
+      installedBy: opts.by || -1,
+      installedByName: opts.byName || "The farm",
+      installedAt: opts.now || Date.now(),
+      exclusive: false,
+      instructions: d.instructions.map((x) => {
+        const o = { type: x.type, arguments: x.arguments };
+        if (x.delay != null) o.delay = x.delay;
+        return o;
+      })
+    };
+  }
+
+  // shared/trance-starter.js
+  var STARTER = `# The farm's starter trance library. The studio's trance editor opens this when you start fresh.
+# Every block: === kind: Name, then labels, then the lines. A session is a recipe of blocks.
+
+=== induction: Settling In
+pace: 35-45s
+pick: 4
+beats: alpha 10 \u2192 theta 6 over 3m
+look: haze 20%, spiral slow
+
+Hear my voice, {name}. Just my voice. Let everything else in the barn go quiet.
+Listen, {name}. Just listen. The barn is warm, the straw is soft, and my voice is the only thing that matters.
+Breathe in slow. Breathe out slower. Every breath out lets your shoulders drop a little more.
+In through your nose, slow. Out through your mouth, slower. Again. Good.
+Let your hands go loose. Let your jaw go loose. Let everything that's holding on just let go.
+You don't have to think right now, {name}. Thinking is work, and you're not working. You're listening.
+Somewhere a cow lows and a gate creaks, and every sound just makes you sleepier.
+Feel how heavy your eyelids are getting. It's alright to let them close.
+Your body is getting heavy, {name}, heavy and warm, sinking into the straw.
+You've worked hard. You've been good. Now you get to stop, and just hear me.
+Feel the weight of your own head. Let it tip. Let it rest.
+There's nothing you need to do right now, {name}. Nothing at all but listen.
+
+=== deepener: Soft Straw
+level: fun
+pace: 35-45s
+pick: 3
+beats: theta 6
+look: haze 35%
+deeper: +15
+
+Down a little now. Soft and easy, like sinking into warm straw.
+Every word I say makes it easier to drift. Easier to just be a {pet}.
+Good. You're drifting, and it feels so nice to let go.
+Sinking softly now, like a calf curling up in the hay.
+Each breath out, a little further down. Nice and easy. Nothing to it.
+It's so pleasant down here, {name}. Warm and simple and quiet.
+Drifting, drifting, and every drift feels better than the last.
+You're a good {animal} now, and being a good {animal} feels so easy.
+
+=== deepener: Dark and Warm
+level: deep
+pace: 35-45s
+pick: 4
+beats: theta \u2192 delta 3.5 over 4m
+look: haze 50%, rings on, words drift
+deeper: +25
+
+Deeper now. Each time you breathe out, you sink twice as far.
+There's nothing above you but my voice, and nothing below you but more quiet. Keep sinking.
+Your thoughts are getting slow and simple. Simple is good. Simple is right for a {animal}.
+So deep now. You don't need words down here. You just need to listen.
+Down past the busy part of your mind, down where it's dark and warm and slow.
+Every word I say pushes you a little deeper, and you don't want me to stop.
+Your thoughts are coming slower now, one at a time, and then not at all.
+Deeper. You can't feel where your body ends and the straw begins.
+So deep. So good. A good {animal} sinks when they're told.
+
+=== deepener: Past the Words
+level: nhl
+pace: 35-45s
+pick: 4
+beats: delta 3 \u2192 2 over 4m
+look: haze 65%, rings on, words drift, names blur
+deeper: +35
+
+Deeper. Past where the words are. Past where your name lives.
+Let the person part of you drift away like a dream you're forgetting. There's only the {animal} left.
+Nothing up there to hold on to. No worries, no choices, no human things. Just a {animal}.
+Deeper than you've ever been. And every time we do this, you'll go deeper still.
+Deeper than thought. Deeper than words. Down where only the {animal} lives.
+Your name is getting far away, {name}. Let it go. You won't need it down here.
+Every breath out takes a little more of the person with it. Let it go.
+There's no up from here unless I bring you, and I'm in no hurry.
+Lower and lower, until you're nothing but warm and obedient and {animal}.
+
+=== convincer: Heavy Hands
+level: deep, nhl
+pace: 30-40s
+pick: 2
+
+Your hands are so heavy, {name}. Too heavy to lift. Try, and feel how they just stay where they are.
+Your eyelids are sealed now, warm and soft. The harder you try to open them, the deeper you sink.
+Your {paws} are resting where they fell. Nothin' in you wants to move them.
+
+=== suggestion: Good Animal
+level: fun
+pace: 35-45s
+pick: 3
+
+When you come up, your body remembers how a good {animal} waits: {low}.
+Your hands stay away from yourself. Good {animal}s don't touch. They wait to be touched.
+Every time someone calls you {pet}, you'll feel a warm little glow of pride.
+Being a good {animal} is easy. You just {act}, and everything feels right.
+Every time you hear the milking bell, you'll feel a little flutter of good {animal} pride.
+When someone pats your head, you'll lean into it. You won't even notice you're doing it.
+Every time you {sound}, you'll feel a little warm rush. Good {animal}s make their noises.
+When someone says {pet}, you'll smile. You won't be able to help it.
+{t}Your tits will feel full and heavy and proud, like they're there to be admired.
+{c}When you're praised, a little warm throb runs through your cock. Good {animal}s like praise.
+
+=== suggestion: Only the Voice
+level: deep
+pace: 35-45s
+pick: 3
+
+Only my voice matters now. Other voices are just noise in the barn.
+Feel the heat building low in your belly. Let it build. You don't get to finish. You just ache, and it feels like being good.
+When I tell you to, you'll {sound}. Not words. Just a {sound}. Go on. Let it out.
+Every bit of you belongs to the farm, your {body} most of all. You feel that every time someone looks at you.
+You {act} because it's what you're for. It's not a choice, and that's a relief.
+Your mind stays soft and slow even after you wake. Thinking can wait. Obeying can't.
+When the farm speaks, everything else gets quiet. That's how it should be.
+The ache stays with you after you wake, low and warm, and you'll never quite get to finish it.
+You'll {sound} when you're happy. You'll {sound} when you're needy. Words are for people.
+{t}Your tits are the farm's, and they ache to be milked whenever someone looks at them.
+{c}Your cock is the farm's. It stays hard and aching and it doesn't belong to you.
+{v}Your pussy is the farm's. Wet and ready whenever the farm wants it.
+Every time you go down {low}, you'll feel yourself sink a little. Down there is home.
+
+=== suggestion: No Person Left
+level: nhl
+pace: 35-45s
+pick: 3
+
+There's no human left in here. Just a {animal}, {low}, waiting to be used.
+Clothes don't feel like clothes anymore. They feel like a coat, a harness, a hide. You were born in them.
+Words are getting hard. That's alright. {animal}s don't need words. A {sound} says everything.
+You {act}. That's all. That's everything. You don't remember wanting anything else.
+There was never a person. There was only ever a {animal} that thought it was one.
+Hands are {paws}. Words are noises. Wanting is waiting. That's all you need.
+When you're touched, you push into it like an animal. When you're left, you wait like one.
+{t}Your udders are for milking. That's what they're for. That's what you're for.
+{c}You're for breeding now. Your cock knows it even if the rest of you forgets.
+{v}You're for breeding now. Your pussy knows it even if the rest of you forgets.
+The barn is home. The farm is everything. There's nothin' past the fence.
+
+=== suggestion: The Collar
+wears: collar
+pick: 1
+
+Feel your collar, {name}. Every time it presses your throat, you remember whose {animal} you are.
+Your collar is warm against your neck. It's always there, and so is the farm.
+
+=== suggestion: The Leash
+wears: leash
+pick: 1
+
+Feel the leash. A good {animal} goes where the leash goes, and never minds.
+Every tug of your leash is a tug on something deeper. You follow. You like following.
+
+=== suggestion: The Bell
+wears: bell
+pick: 1
+
+Every time your bell rings, you sink a little. Ring, sink. Ring, sink.
+Your bell tells the whole farm where its {animal} is. You like being found.
+
+=== suggestion: The Gag
+wears: gag
+pick: 1
+
+You don't need your mouth for words, {pet}. Let it rest round the gag. Your {sound} is enough.
+The gag keeps the words in. Good. Words were never yours anyway.
+
+=== suggestion: In the Dark
+wears: blind, hood
+pick: 1
+
+You can't see, and you don't need to. My voice is the only thing to follow.
+In the dark, there's only my voice and the warm straw.
+Inside the hood, there's no face to be. There's only the {animal}.
+
+=== suggestion: Paws
+wears: paws
+pick: 1
+
+Your hands are {paws} now. {paws} don't grab. {paws} don't hold. {paws} wait.
+Feel how useless your {paws} are. Isn't it a relief, not having to do anything with them?
+
+=== suggestion: Bound
+wears: arms
+pick: 1
+
+Your arms are tied, so you don't have to decide anything with them. Let them rest.
+Bound, you're free of choices. Just a {animal}, held still, listening.
+
+=== suggestion: Caged
+wears: cage
+pick: 1
+
+{c}Your cage keeps you good. You don't need to touch. You don't even want to.
+{c}Every throb against your cage is the farm reminding you who it belongs to.
+
+=== suggestion: Clamped
+wears: nipples
+pick: 1
+
+That little bite at your nipples is the farm's hand on you. Feel it, and sink.
+Your clamped nipples throb in time with my voice. Every throb, a little deeper.
+
+=== suggestion: Hide and Tack
+wears: latex, harness
+pick: 1
+
+Your latex is your hide now. Smooth, shining, nothing human under it.
+Feel how the rubber holds you. Tight. Close. Like it's keeping the {animal} in.
+Your harness holds you like a farm holds its stock. Snug, and safe, and owned.
+Feel every strap of your harness. Each one says: tack, not clothes.
+
+=== suggestion: Ears and Tail
+wears: ears, tail
+pick: 1
+
+Feel your ears. They twitch at my voice, don't they. {animal}s' ears always do.
+Feel your tail. It moves when you're happy, and you're happy now.
+
+=== suggestion: Hooves
+wears: hooves
+pick: 1
+
+Your hooves keep you up on your toes, the way a good {animal} should stand.
+Feel the weight of your hooves. You weren't made for walking like a person.
+
+=== suggestion: Nose Ring
+wears: noseRing
+pick: 1
+
+Your nose ring is where the farm leads a good {animal}. You'll follow it anywhere.
+Feel the ring in your nose. One tug, and you'll come.
+
+=== trigger: Good Animal
+trigger: good {animal}
+does: say "{sound}~"
+
+And now somethin' to keep. Whenever anyone calls you a good {animal}, a happy little {sound} bubbles right up out of you, and nothin' else will come out till it has.
+
+=== trigger: Low and Still
+trigger: low and still
+does: pose {low}
+
+And somethin' to keep. When you hear the words low and still, your body goes down {low} before you've thought about it at all.
+
+=== trigger: Milking Time
+level: deep, nhl
+trigger: milking time
+does: strip top \u2192 pose {low} \u2192 say "{sound}\u2026 milk me, please."
+waits: 3s, 3s
+
+And somethin' to keep, deep down where you can't reach it. When anyone says it's milking time, your top comes off, you go down {low}, and you ask for it.
+
+=== trigger: Needy Thing
+level: deep, nhl
+trigger: such a needy {animal}
+does: needy \u2192 deny
+waits: 2s
+
+And this one stays with you. When anyone calls you such a needy {animal}, the heat comes up in you, and it won't let you finish.
+
+=== trigger: Let Go
+level: deep, nhl
+trigger: let go for the farm
+does: forget all \u2192 cum
+waits: 2s
+
+And this one's a kindness. When you hear let go for the farm, everything held back comes undone at once.
+
+=== wake: Count Up
+level: fun
+pace: 15s
+pick: 1
+beats: theta \u2192 alpha 11 over 1m
+look: clear
+
+Now I'm going to count you up. Three: feeling your body again. Two: lighter. One: eyes open, {name}. Good {animal}.
+Coming up now. Three, two, one, and you're back in the barn, {name}, smiling for no reason at all. Good {animal}.
+Up you come, slow and easy. Wiggle your fingers. Open your eyes. Welcome back, {pet}.
+
+=== wake: Not All the Way
+level: deep
+pace: 15s
+pick: 1
+beats: \u2192 alpha 10 over 1m
+look: haze 15%, rings off, words off
+
+Counting up slowly. Five, four: the barn coming back. Three, two: your name, your hands. One: awake, {name}. But part of you is still listening.
+I'll bring you up now, {name}, but not all the way. Part of you stays down there, listening. Three, two, one.
+Up, slowly. Your name comes back first, then your hands. But the quiet stays, and so does the farm's voice.
+
+=== wake: The Animal Stays
+level: nhl
+pace: 15s
+pick: 1
+beats: \u2192 theta 6 over 1m
+look: haze 30%, rings off, words off
+
+I won't count you all the way up, {pet}. You'll open your eyes, but the {animal} stays. It's yours now.
+Open your eyes. Look around the barn. Nothing in there but a {animal}. Good.
+No counting up, {pet}. Just open your eyes. The {animal} can look around now.
+The session's over. The {animal} isn't. Stay as you are.
+
+=== session: Fun in the Straw
+level: fun
+induction: any
+deepener: any
+suggestion: any 2
+trigger: any
+wake: any
+
+=== session: Deep in the Barn
+level: deep
+induction: any
+deepener: any
+convincer: any
+suggestion: any 3
+trigger: any 2
+wake: any
+
+=== session: No Human Left
+level: nhl
+induction: any
+deepener: any
+convincer: any
+suggestion: any 3
+trigger: any 2
+wake: any
+`;
+
   // addons/conditioning/index.js
   var SPECIES = {
     cow: { a: "cow", s: "moo", p: "heavy udders", act: "give milk", pose: "on all fours, head low", names: ["sweet cow", "dairy cow", "milk cow", "dumb milk cow"] },
@@ -282,7 +1180,7 @@
     default: { a: "animal", s: "low animal sound", p: "body", act: "obey", pose: "kneeling, hands on your thighs", names: ["good animal", "farm animal", "livestock", "dumb livestock"] }
   };
   Object.assign(SPECIES, SPECIES_MORE);
-  var LEVELS = ["fun", "deep", "nhl"];
+  var LEVELS2 = ["fun", "deep", "nhl"];
   var LEVEL_NAME = { fun: "Fun", deep: "Deep", nhl: "No human left" };
   var MILESTONES = [3, 7, 15, 30];
   var SCRIPT = {
@@ -377,8 +1275,8 @@
     const w = words(mn);
     return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/\{paws\}/g, w.paws || "paws").replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
   }
-  var handful = (list, n, b) => {
-    const pool = fitting(list, b).slice();
+  var handful = (list2, n, b) => {
+    const pool = fitting(list2, b).slice();
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -404,8 +1302,161 @@
     lines.cut = [settle.length, deeper.length, suggest.length];
     return lines;
   }
-  function start(by, mn, level, own, echs) {
-    running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: !!echs });
+  var STUDIO = "http://localhost:4780/__studio/trance/";
+  var LIB = null;
+  var pullFails = 0;
+  var nextPull = 0;
+  function lib() {
+    if (LIB) return LIB;
+    const d = D(), own = d.lib && typeof d.lib.text === "string" ? d.lib : null;
+    let p = own ? parseLibrary(own.text) : null;
+    if (!p || !p.blocks.some((b) => !b.bad && b.kind !== "session" && b.lines.length)) p = parseLibrary(STARTER);
+    LIB = Object.assign(p, { from: own ? "studio" : "starter", stamp: own ? own.stamp : "", at: own ? own.at : 0 });
+    return LIB;
+  }
+  function setLib(text, stamp) {
+    if (text == null) delete D().lib;
+    else D().lib = { text: String(text).slice(0, 4e5), stamp: String(stamp || "").slice(0, 60), at: Date.now() };
+    LIB = null;
+    api.save();
+    return lib();
+  }
+  async function pull(force) {
+    const W2 = typeof window !== "undefined" ? window : null;
+    if (!W2 || typeof W2.fetch !== "function") return { fail: "no way to reach the studio from here" };
+    if (!force && Date.now() < nextPull) return null;
+    try {
+      const r = await W2.fetch(STUDIO + "published.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("the studio answered " + r.status);
+      const pub = await r.json();
+      pullFails = 0;
+      nextPull = Date.now() + 6e4;
+      if (!pub || !pub.stamp) return { none: true };
+      if (!force && D().lib && D().lib.stamp === pub.stamp) return { same: true };
+      const t = await W2.fetch(STUDIO + "published.txt", { cache: "no-store" });
+      if (!t.ok) throw new Error("the studio answered " + t.status);
+      const L = setLib(await t.text(), pub.stamp);
+      api.log("trance library from the studio (" + pub.stamp + "): " + L.blocks.length + " blocks, " + L.errors.length + " mistakes");
+      return { got: L };
+    } catch (e) {
+      pullFails++;
+      nextPull = Date.now() + Math.min(10, pullFails) * 6e4;
+      return { fail: String(e && e.message || e) };
+    }
+  }
+  function libText() {
+    const L = lib(), n = (k) => L.blocks.filter((b) => b.kind === k && !b.bad).length;
+    return "\u{1F300} Trance library: " + (L.from === "studio" ? "pushed from the studio " + new Date(L.at).toISOString().slice(0, 16).replace("T", " ") : "the starter one") + " \xB7 " + n("session") + " sessions, " + n("induction") + " inductions, " + n("deepener") + " deepeners, " + n("convincer") + " convincers, " + n("suggestion") + " suggestions, " + n("trigger") + " triggers, " + n("wake") + " wakes" + (L.errors.length ? " \xB7 " + L.errors.length + " mistakes (those blocks are skipped): " + L.errors.slice(0, 3).map((e) => "line " + e.line + " " + e.msg).join("; ") : "");
+  }
+  function speciesKey(mn) {
+    const s = String(api.species(mn) || "").toLowerCase(), r = String((api.rec(mn) || {}).species || "").toLowerCase();
+    return SPECIES[s] ? s : SPECIES[r] ? r : s || r || "default";
+  }
+  var wearsOf = (mn) => {
+    const g = gearOf(api, mn);
+    return Object.keys(g).filter((k) => g[k]);
+  };
+  var lowOf = (mn) => me(mn).low === "fours" ? "fours" : "kneel";
+  function wordsFor(mn) {
+    const w = words(mn), lead = api.herdLeaderOf ? api.herdLeaderOf(mn) : null;
+    return {
+      name: api.name(mn),
+      animal: w.a,
+      sound: w.s,
+      body: w.p,
+      pet: petName(mn),
+      act: w.act,
+      pose: w.pose,
+      paws: w.paws || "paws",
+      low: lowOf(mn) === "fours" ? "on all fours" : "on your knees",
+      herd: lead && lead !== mn ? api.name(lead) : "the farm",
+      a: w.a,
+      s: w.s,
+      p: w.p
+    };
+  }
+  var sayLib = (mn, line) => fillIn(untag(line), wordsFor(mn)).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+  function tellOnce(mn, key, text) {
+    const x = me(mn), day = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+    x.told = x.told || {};
+    if (x.told[key] === day) return;
+    x.told[key] = day;
+    api.save();
+    api.notice(mn, text);
+  }
+  var plantedOf = (mn) => {
+    const x = me(mn);
+    return x.sugg = x.sugg || {};
+  };
+  var lscgOn = (hs) => !!(hs && hs.lscg && hs.on);
+  function plant(mn, run, b) {
+    if (!api.hasCompanion || !api.hasCompanion(mn)) {
+      api.log("trigger " + b.name + " not planted in " + mn + ": no Companion");
+      return;
+    }
+    const sg = lscgSuggestion(b, { words: wordsFor(mn), low: lowOf(mn), by: api.cfg.BOT_MEMBER, byName: api.name(api.cfg.BOT_MEMBER) || "The farm", now: Date.now() });
+    if (sg.error) {
+      api.log("trigger " + b.name + " can't be planted: " + sg.error);
+      return;
+    }
+    const hs = api.hypnoState(mn), all = plantedOf(mn), was = all[sg.id];
+    all[sg.id] = { s: sg, block: b.name, level: run.level, at: Date.now(), via: lscgOn(hs) ? "lscg" : "farm", ok: false, fired: was ? was.fired || 0 : 0, fought: was ? was.fought || 0 : 0 };
+    api.save();
+    if (lscgOn(hs)) plantLscg(mn);
+    else sendFarm(mn);
+  }
+  function plantLscg(mn, quiet) {
+    const hs = api.hypnoState(mn) || {}, want = Object.values(plantedOf(mn)).filter((x) => x.via === "lscg" && !x.ok);
+    if (!want.length) return false;
+    const miss = [];
+    if (!hs.sugg) miss.push("tick Allow suggestions in LSCG's Hypnosis settings");
+    if (!hs.ours) miss.push((hs.scopes || []).includes("states") ? "be under in the farm's name (it plants them next session)" : "let the farm in: LSCG settings \u2192 Extensions \u2192 B&B Farm, Hypnosis and States");
+    if (miss.length) {
+      if (!quiet) tellOnce(mn, "plant", "\u{1F300} The farm has " + want.length + " trigger" + (want.length === 1 ? "" : "s") + " waitin' to go into your LSCG. First " + miss.join(", and ") + ".");
+      return false;
+    }
+    const now = Date.now(), go = want.filter((x) => !x.tried || now - x.tried > 3e4);
+    if (!go.length) return false;
+    for (const x of go) x.tried = now;
+    api.lscgPlant(mn, go.map((x) => x.s), [], hs.ver);
+    api.later(() => api.hypno(mn, { do: "check", ids: go.map((x) => x.s.id) }), 4e3);
+    return true;
+  }
+  function sendFarm(mn) {
+    const on = !!(api.rec(mn) || {}).hypno;
+    const list2 = on ? Object.values(plantedOf(mn)).filter((x) => x.via === "farm").map((x) => x.s) : [];
+    api.hypno(mn, { do: "suggestions", list: list2 });
+  }
+  function plantedText(mn, forMe) {
+    const all = Object.values(plantedOf(mn));
+    if (!all.length) return "\u{1F300} " + (forMe ? "Nothin's" : api.name(mn) + " has nothin'") + " planted by the farm" + (forMe ? " in you." : ".");
+    return "\u{1F300} Planted by the farm" + (forMe ? " in you" : " in " + api.name(mn)) + ":\n" + all.map((x) => "\u2022 " + x.block + ': "' + x.s.trigger + '" \u2192 ' + x.s.instructions.map((i) => i.type).join(", ") + " \xB7 " + (x.via === "farm" ? "the farm's own" : x.ok ? "in their LSCG" : "waitin' for LSCG") + (x.fired ? " \xB7 fired " + x.fired + (x.fought ? ", fought off " + x.fought : "") : "")).join("\n") + (forMe ? "\n?planted remove <name> takes one out (all: every one)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
+  }
+  function start(by, mn, level, own, echs, opts) {
+    opts = opts || {};
+    if (echs) {
+      running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: true });
+      step(mn);
+      return;
+    }
+    const plan = planSession(lib().blocks, { level, species: speciesKey(mn), wears: wearsOf(mn) }, { name: opts.session });
+    if (!plan.blocks.some((b2) => b2.lines.length)) {
+      running.set(mn, { by, level, lines: scriptFor(level, mn, own, false), i: 0, echs: false });
+      step(mn);
+      return;
+    }
+    const b = bodyOf(api, mn), steps2 = sessionSteps(plan, { keep: (t) => fits(t, b) });
+    if (own) {
+      const i = steps2.findIndex((s) => s.kind === "suggestion" || s.kind === "trigger" || s.kind === "convincer");
+      steps2.splice(i >= 0 ? i : Math.max(1, steps2.length - 1), 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
+      const w = steps2.findIndex((s) => s.kind === "wake");
+      steps2.splice(w >= 0 ? w : steps2.length, 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
+    }
+    const ms = steps2.reduce((n, s) => n + (s.gap || 0) * 1e3, 0);
+    const run = { by, level, steps: steps2, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms };
+    running.set(mn, run);
+    api.hypno(mn, { do: "under", by: api.cfg.BOT_MEMBER, ms: Math.round(ms + 3e5), level, session: plan.name });
+    api.face(mn, "trance", Math.round(ms / 1e3) + 120);
     step(mn);
   }
   function step(mn) {
@@ -415,9 +1466,10 @@
       running.delete(mn);
       return;
     }
+    if (run.lib) return stepLib(mn, run);
     const line = run.lines[run.i];
     if (!line) {
-      finish(mn, run);
+      finish2(mn, run);
       return;
     }
     const [s, d, g] = run.lines.cut;
@@ -433,10 +1485,53 @@
     run.i++;
     api.later(() => step(mn), between(35, 50) * 1e3);
   }
-  function finish(mn, run) {
+  function stepLib(mn, run) {
+    const s = run.steps[run.i];
+    if (!s) {
+      finish2(mn, run);
+      return;
+    }
+    if (s.start || s.beats || s.look || s.volume != null) {
+      const cue = { do: "cue", kind: s.kind, block: s.block };
+      if (s.beats) cue.beats = s.beats;
+      if (s.volume != null) cue.volume = s.volume;
+      if (s.look) cue.look = s.look;
+      api.hypno(mn, cue);
+    }
+    if (s.deeper) {
+      run.depth = Math.max(0, Math.min(100, run.depth + s.deeper));
+      api.hypno(mn, { do: "depth", depth: run.depth });
+    }
+    if (s.text) api.voice(mn, sayLib(mn, s.text));
+    if (s.plant) {
+      try {
+        plant(mn, run, s.plant);
+      } catch (e) {
+        api.log("plant: " + (e && e.message || e));
+      }
+    }
+    if (run.level !== "fun" && s.text && s.kind !== "induction" && s.kind !== "wake" && api.arouse) api.arouse(mn, run.level === "nhl" ? 7 : 5, run.level === "nhl" ? 92 : 85);
+    run.i++;
+    api.later(() => step(mn), Math.max(1, s.gap || 0) * 1e3);
+  }
+  function finish2(mn, run) {
     running.delete(mn);
     if (run.echs && run.level !== "nhl" && api.echs) api.later(() => api.echs.wake(mn), 4e3);
-    api.later(() => {
+    if (run.lib) {
+      if (run.level === "nhl") api.hypno(mn, { do: "linger", secs: 120 });
+      else {
+        run.waking = true;
+        api.later(() => {
+          if (!running.has(mn)) {
+            api.hypno(mn, { do: "wake" });
+            api.face(mn, "clear", 1);
+          }
+        }, 4e3);
+      }
+      if (run.level === "nhl") api.later(() => {
+        if (!running.has(mn)) api.face(mn, "clear", 1);
+      }, 12e4);
+    } else api.later(() => {
       if (!running.has(mn)) {
         api.trance(mn, 0);
         api.face(mn, "clear", 1);
@@ -462,6 +1557,7 @@
     const run = running.get(mn);
     running.delete(mn);
     if (run.echs && api.echs) api.echs.wake(mn);
+    if (run.lib) api.hypno(mn, { do: "wake", quiet: !why });
     api.trance(mn, 0);
     api.face(mn, "clear", 1);
     if (why) api.voice(mn, why);
@@ -482,8 +1578,8 @@
     if (!A.rec(t).hypno) return c.reply(A.name(t) + " hasn't said ?hypno on, so no sessions, hon.");
     if (!A.char(t)) return c.reply(A.name(t) + " needs to be here on the farm for a session.");
     if (running.has(t)) return c.reply(A.name(t) + " is already in a session.");
-    const want = LEVELS.includes(String(args[1] || "").toLowerCase()) ? String(args[1]).toLowerCase() : me(t).max;
-    if (LEVELS.indexOf(want) > LEVELS.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
+    const want = LEVELS2.includes(String(args[1] || "").toLowerCase()) ? String(args[1]).toLowerCase() : me(t).max;
+    if (LEVELS2.indexOf(want) > LEVELS2.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
     const si = args.findIndex((a) => /^say$/i.test(a));
     const own = !self && si >= 0 ? args.slice(si + 1).join(" ").replace(/[()]/g, "").trim().slice(0, 160) : "";
     if (args.slice(1, si >= 0 ? si : void 0).some((a) => /^echs$/i.test(a))) {
@@ -493,13 +1589,16 @@
       waitingEchs.set(t, { by: sender, level: want, own: own || null, at: Date.now() });
       return c.reply("\u{1F300} Reachin' for " + A.name(t) + " through their ECHS. When they go under, a " + LEVEL_NAME[want] + " session starts through it.");
     }
-    start(sender, t, want, own || null);
-    c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(((running.get(t) || {}).lines || []).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
+    const ss = args.findIndex((a) => /^session$/i.test(a));
+    const session = ss >= 0 ? args.slice(ss + 1, si > ss ? si : void 0).join(" ").trim() : "";
+    start(sender, t, want, own || null, false, { session });
+    const run = running.get(t) || {};
+    c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + (run.plan ? " (" + run.plan + ")" : "") + ", about " + Math.max(1, Math.round(run.lib ? run.ms / 6e4 : (run.lines || []).length * 42 / 60)) + " minutes. ?hyp stop " + A.name(t) + " ends it.");
   }
   function cmdLevel(c) {
     const { sender, args, api: A } = c, v = String(args[0] || "").toLowerCase();
     if (!A.rec(sender)) return c.reply("That's just for folks on the books, sugar.");
-    if (!LEVELS.includes(v)) return c.reply("\u{1F300} You allow " + LEVEL_NAME[me(sender).max] + " sessions. ?depth fun, deep or nhl (No human left) sets the deepest you'll go.");
+    if (!LEVELS2.includes(v)) return c.reply("\u{1F300} You allow " + LEVEL_NAME[me(sender).max] + " sessions. ?depth fun, deep or nhl (No human left) sets the deepest you'll go.");
     me(sender).max = v;
     A.save();
     c.reply("\u{1F300} The deepest a session can take you is now " + LEVEL_NAME[v] + "." + (A.rec(sender).hypno ? "" : " (Sessions also need ?hypno on.)"));
@@ -511,33 +1610,106 @@
   function companion(mn) {
     const r = api.rec(mn);
     if (!r) return null;
-    const x = me(mn), next = MILESTONES.find((m) => x.total < m), cards = [];
+    const x = me(mn), next = MILESTONES.find((m) => x.total < m), cards = [], planted = Object.values(plantedOf(mn));
     cards.push({
       title: "Conditioning",
       text: r.hypno ? void 0 : "Sessions need ?hypno on (in your Toggles).",
-      lines: [["Tier", x.tier + " \xB7 " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]]],
+      lines: [
+        ["Tier", x.tier + " \xB7 " + petName(mn)],
+        ["Sessions", x.total],
+        ["Deepest allowed", LEVEL_NAME[x.max]],
+        ["Down low", lowOf(mn) === "fours" ? "on all fours" : "kneelin'"],
+        ["Trance", lscgLine(mn)],
+        ["Planted", planted.length ? planted.length + " trigger" + (planted.length === 1 ? "" : "s") : "none"]
+      ],
       bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: x.total / next * 100 }] : void 0,
-      buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : [])
+      buttons: LEVELS2.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat([{ label: "Kneel", cmd: "lowpose kneel", accent: lowOf(mn) === "kneel" }, { label: "All fours", cmd: "lowpose fours", accent: lowOf(mn) === "fours" }]).concat(planted.length ? [{ label: "What's planted", cmd: "planted" }] : []).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : [])
     });
     if (api.isStaff(mn)) cards.push({
       staff: true,
       title: "Run a session",
       input: { placeholder: "Bessie deep", label: "Start (who, level)", cmd: "hyp" },
-      note: "Only for your own herd (proprietors: anyone). Never deeper than they allow."
+      note: "Only for your own herd (proprietors: anyone). Never deeper than they allow. Add: session <name> to pick one of the library's."
     });
     return { cards };
+  }
+  function lscgLine(mn) {
+    const hs = api.hypnoState(mn);
+    if (!hs) return "the farm's own (no word from your Companion yet)";
+    if (!hs.lscg) return "the farm's own (no LSCG)";
+    if (!hs.on) return "the farm's own (LSCG's hypnosis is off)";
+    const need = [];
+    if (!(hs.scopes || []).includes("states") || !(hs.scopes || []).includes("hypno")) need.push("let the farm in: LSCG settings \u2192 Extensions \u2192 B&B Farm, Hypnosis and States");
+    if (!hs.sugg) need.push("tick Allow suggestions");
+    return need.length ? "LSCG, once you " + need.join(", and ") : "LSCG's own, in the farm's name";
+  }
+  function cmdPlanted(c) {
+    const { sender, args, api: A } = c, verb = String(args[0] || "").toLowerCase();
+    if (verb === "remove" || verb === "clear") {
+      let rest = args.slice(1), t2 = sender;
+      if (rest.length > 1) {
+        const who = A.find(rest[rest.length - 1]);
+        if (who && who !== sender && A.rec(who)) {
+          t2 = who;
+          rest = rest.slice(0, -1);
+        }
+      }
+      if (t2 !== sender && !(A.isProprietor(sender) || A.herdLeaderOf(t2) === sender)) return c.reply("Only their herd leader or a proprietor takes out what's planted in " + A.name(t2) + ", sugar.");
+      const all = plantedOf(t2), name = verb === "clear" ? "all" : rest.join(" ").trim().toLowerCase().replace(/^b&b\s+/, "");
+      const hit = Object.keys(all).filter((id) => name === "all" || all[id].block.toLowerCase() === name || all[id].s.trigger.toLowerCase() === name);
+      if (!hit.length) return c.reply("\u{1F300} Nothin' planted by that name. ?planted" + (t2 === sender ? "" : " " + A.name(t2)) + " shows the list.");
+      const lscgOnes = hit.filter((id) => all[id].via === "lscg" && all[id].ok).map((id) => all[id].s.name);
+      for (const id of hit) delete all[id];
+      A.save();
+      sendFarm(t2);
+      c.reply("\u{1F300} Taken out: " + hit.length + "." + (lscgOnes.length ? " " + (t2 === sender ? "In your LSCG, take " + (lscgOnes.length === 1 ? "it" : "them") + " out with LSCG's own: " : A.name(t2) + " takes the LSCG copies out with ") + lscgOnes.map((n) => "/lscg remove-suggestion " + n).join(" \xB7 ") + " (the farm won't plant " + (lscgOnes.length === 1 ? "it" : "them") + " again)." : ""));
+      if (t2 !== sender) A.notice(t2, "\u{1F300} " + A.name(sender) + " took out " + hit.length + " of the farm's triggers in you." + (lscgOnes.length ? " Your LSCG still has " + (lscgOnes.length === 1 ? "one" : lscgOnes.length) + ": /lscg remove-suggestion " + lscgOnes.join(" \xB7 ") : ""));
+      return;
+    }
+    const t = args[0] ? A.find(args.join(" ")) : sender;
+    if (!t || !A.rec(t)) return c.reply("Whose, sugar? ?planted [who]");
+    if (t !== sender && !(A.isProprietor(sender) || A.herdLeaderOf(t) === sender || A.isStaff(sender))) return c.reply("Only staff look at what's planted in somebody else, hon.");
+    c.reply(plantedText(t, t === sender));
   }
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "1.2.0",
+    version: "2.0.0",
     // (its addon.json's, put in by the build)
-    guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
+    guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once.",
     setup(a) {
       api = a;
       D();
+      const tick = () => {
+        pull(false).catch(() => {
+        });
+        api.later(tick, 6e4);
+      };
+      api.later(tick, 15e3);
     },
     commands: {
+      planted: { usage: "planted [who] | planted remove <name|all> [who]", private: true, run: cmdPlanted },
+      lowpose: { usage: "lowpose kneel|fours", aliases: ["low"], private: true, run: (c) => {
+        const v = String(c.args[0] || "").toLowerCase(), A = c.api;
+        if (!A.rec(c.sender)) return c.reply("That's just for folks on the books, sugar.");
+        if (!/^(kneel|kneeling|knees|fours|allfours|all)$/.test(v)) return c.reply("\u{1F300} When a trigger puts you down low, you go " + (lowOf(c.sender) === "fours" ? "on all fours" : "to your knees") + ". ?lowpose kneel or ?lowpose fours, whichever's comfier.");
+        me(c.sender).low = /^(fours|allfours|all)$/.test(v) ? "fours" : "kneel";
+        A.save();
+        c.reply("\u{1F300} Down low means " + (lowOf(c.sender) === "fours" ? "on all fours" : "on your knees") + " for you now. Triggers planted from here on use it" + (Object.keys(plantedOf(c.sender)).length ? " (ones already planted keep theirs till the next session plants them again)" : "") + ".");
+      } },
+      trancelib: { usage: "trancelib [pull|starter]", private: true, run: async (c) => {
+        if (!c.api.isProprietor(c.sender)) return c.reply("That's the proprietors', sugar.");
+        const v = String(c.args[0] || "").toLowerCase();
+        if (v === "starter") {
+          setLib(null);
+          return c.reply("\u{1F300} Back to the starter library.\n" + libText());
+        }
+        if (v === "pull") {
+          const r = await pull(true);
+          return c.reply(r && r.got ? "\u{1F300} Pulled from the studio.\n" + libText() : r && r.none ? "\u{1F300} The studio's open, but nothin's been pushed yet." : "\u{1F300} Couldn't reach the studio on this PC (" + (r && r.fail || "?") + "). It needs to be running: Start the studio.bat.");
+        }
+        c.reply(libText());
+      } },
       hyp: { usage: "hyp <who|me> [fun|deep|nhl] [say <words>]", aliases: ["condition"], private: true, run: cmdCondition },
       depth: { usage: "depth fun|deep|nhl", aliases: ["hypnolevel"], private: true, run: cmdLevel },
       wake: { usage: "wake", private: true, run: (c) => c.reply(stop(c.sender, "Coming up now. Eyes open, " + c.api.name(c.sender) + ". You're alright.") ? "\u{1F300} Session ended." : "You're not in a session, sugar.") },
@@ -548,8 +1720,73 @@
       } }
     },
     on: {
-      safe: (mn) => stop(mn, null),
+      safe: (mn) => {
+        stop(mn, null);
+        api.hypno(mn, { do: "clear" });
+      },
       leave: (mn) => stop(mn, null),
+      hypnoSwitch: (mn, on) => {
+        if (!on) stop(mn, null);
+        if (Object.keys(plantedOf(mn)).length) sendFarm(mn);
+      },
+      // their Companion on their LSCG (trance.js): anything waitin' to be planted goes in when it can; LSCG come or gone,
+      // the triggers move with it (the farm's own carried out by their Companion, LSCG's own by their LSCG)
+      hypnoState: (mn, hs) => {
+        const all = plantedOf(mn), list2 = Object.values(all);
+        if (!list2.length) return;
+        if (lscgOn(hs)) {
+          const moved = list2.filter((x) => x.via === "farm");
+          for (const x of moved) {
+            x.via = "lscg";
+            x.ok = false;
+          }
+          if (moved.length) {
+            api.save();
+            sendFarm(mn);
+          }
+          if (hs.planted && hs.planted.length) {
+            for (const x of list2) if (x.via === "lscg" && hs.planted.includes(x.s.id)) x.ok = true;
+          }
+          plantLscg(mn, true);
+        } else {
+          const moved = list2.filter((x) => x.via === "lscg");
+          for (const x of moved) {
+            x.via = "farm";
+            x.ok = false;
+          }
+          if (moved.length) api.save();
+          sendFarm(mn);
+        }
+      },
+      hypnoEvent: (mn, e) => {
+        const run = running.get(mn), all = plantedOf(mn);
+        if (e.ev === "checked") {
+          for (const id of e.ids) if (all[id]) all[id].ok = e.found.includes(id);
+          api.save();
+          const missed = e.ids.filter((id) => all[id] && !all[id].ok);
+          if (missed.length) api.log("LSCG didn't take " + missed.join(", ") + " for " + mn + " (their item permission, or they weren't under in the farm's name)");
+          return;
+        }
+        if (e.ev === "safeword") {
+          stop(mn, null);
+          return;
+        }
+        if (e.ev === "awake" && run && run.lib && !run.waking && e.method && e.method !== "farm") {
+          stop(mn, null);
+          api.notice(mn, "\u{1F300} You came up out of it" + (e.method === "snap" ? " at a snap of fingers" : e.method === "boop" ? " with a boop" : e.method === "word" ? " at your wake word" : e.method === "timeout" ? " when LSCG's trance time ran out" : "") + ", so that session's over. ?hyp me takes you back down.");
+          if (run.by !== mn) api.notice(run.by, "\u{1F300} " + api.name(mn) + " came up out of the session early.");
+          return;
+        }
+        if (e.ev === "resolved" || e.ev === "fired") {
+          const x = all[e.id] || Object.values(all).find((y) => y.s.name === e.name);
+          if (x) {
+            x.fired = (x.fired || 0) + 1;
+            if (e.resisted) x.fought = (x.fought || 0) + 1;
+            x.last = Date.now();
+            api.save();
+          }
+        }
+      },
       // under with the farm girl through ECHS: the session runs through it (asked for with ?hyp … echs, or not)
       echsUnder: (mn, info) => {
         const r = api.rec(mn);

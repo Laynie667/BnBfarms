@@ -520,6 +520,8 @@
     if (m.type === "logAsk"){ chatlogAsk(mn, m); return; }
     if (m.type === "sight"){ onSight(mn, m); return; }
     if (m.type === "leadOk" || m.type === "leadNo"){ leadAnswer(mn, m); return; }
+    if (m.type === "hypnoState"){ try { hypnoStateFrom(mn, m); } catch(e){ warn("hypno state:", e); } return; }   // their LSCG and trance (10f-addons.js)
+    if (m.type === "hypnoEvent"){ try { hypnoEventFrom(mn, m); } catch(e){ warn("hypno event:", e); } return; }
     if (m.type === "hello"){
       // LAG (Laynie, Oct 27: "limit how much has to be sent via my connection"): every hello used to wipe what I knew
       // about that panel, so the half-hourly hello, the ping and every switch flipped sent the whole panel and the whole

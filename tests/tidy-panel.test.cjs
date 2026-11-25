@@ -89,7 +89,7 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], tier: "Trained
   const OLD = ["Hypno", "Tease me", "Breedable", "Fertile", "Mpreg", "Jar breedin'", "Free use", "Futa", "Milkable", "Milk my seed", "Natural heat", "Praise", "Degrade",
     "Tally marks", "Potions", "Dares", "Watersports", "Parasite", "Symbiotes", "Traps", "Bring my own outfit", "Traps: no cooldown", "Use bench",
     "Farm messages in chat too", "Compact cards", "Chime on notices", "Open on new notice", "Pin the 🌾 button", "Farm emotes about me come from me",
-    "Lead me instead of teleportin'", "Farm can set my face", "Farm sounds", "Trance haze", "Private feelings", "Carryin' slows me down",
+    "Lead me instead of teleportin'", "Farm can set my face", "Farm sounds", "Trance look", "Calm trance look", "Farm beats (headphones)", "Private feelings", "Carryin' slows me down",
     "Farm can stir me up", "Farm can put real gear on me", "Farm can change my body shape", "Farm can mark my body", "Farm can strip me",
     "Show my drawn body", "See other people's drawn bodies", "Send a record of what I see", "Farmhand Companion on"];
   const found = new Set();

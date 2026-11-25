@@ -117,6 +117,31 @@
     if (s.search(ANY_TAG) >= 0 || !(mn && typeof mn === "number" && mn > 0)) return untag(s);
     return bodyWords(mn, s);
   };
+  // THE FARM'S TRANCE (Nov 25, Conditioning 2.0; Laynie: LSCG's hypnosis at the core, with ECHS's feel).
+  // LSCG's own player-to-player command, sent the way an LSCG player's game sends it (LSCG utils.ts sendLSCGCommandBeep):
+  // a hidden beep of the "Leash" kind, so it isn't held to friends only. Their LSCG checks it like any other: the farm has
+  // to be in the room with item permission, and for suggestions, be the one who put them under. (The bot runs no LSCG;
+  // its extension API has no "plant a suggestion" yet, and Laynie will ask Little Sera for one.)
+  function lscgCommand(mn, name, args, ver){
+    if (!(mn > 0) || mn === CFG.BOT_MEMBER || !charFor(mn)) return false;
+    send("AccountBeep", { MemberNumber: mn, BeepType: "Leash", IsSecret: true, Message: { IsLSCG: true, type: "command", reply: false, settings: null, target: mn,
+      version: String(ver || "0.9.9").slice(0, 16), command: { name: String(name), args: JSON.parse(JSON.stringify(args || [])) } } });
+    return true;
+  }
+  // what their Companion says about their LSCG and the farm's trance (extension/src/trance.js): told to the add-ons
+  const strs = (v, n, len) => (Array.isArray(v) ? v.filter(x => typeof x === "string").slice(0, n).map(x => x.slice(0, len)) : []);
+  function hypnoStateFrom(mn, m){
+    const s = { at: Date.now(), lscg: m.lscg === true, ver: String(m.ver || "").slice(0, 16), on: m.on === true, sugg: m.sugg === true, needHyp: m.needHyp !== false,
+      mins: Math.max(0, Math.min(1440, Number(m.mins) || 0)), beats: m.beats === true, scopes: strs(m.scopes, 8, 20), under: m.under === true, ours: m.ours === true,
+      farmBeats: m.farmBeats === true, planted: strs(m.planted, 100, 60) };
+    (state.hypnoState = state.hypnoState || new Map()).set(mn, s);
+    addonsEmit("hypnoState", mn, Object.assign({}, s));
+  }
+  function hypnoEventFrom(mn, m){
+    const ev = String(m.ev || "").slice(0, 20); if (!ev) return;
+    addonsEmit("hypnoEvent", mn, { ev, method: String(m.method || "").slice(0, 12), by: Number(m.by) || 0, ids: strs(m.ids, 100, 60), found: strs(m.found, 100, 60),
+      name: String(m.name || "").slice(0, 80), id: String(m.id || "").slice(0, 60), resisted: m.resisted === true, via: String(m.via || "").slice(0, 10), why: String(m.why || "").slice(0, 160) });
+  }
   function addonApi(a){
     return Object.freeze({
       version: VERSION, cfg: CFG,   // (api.name is the name lookup below, not the add-on's name)
@@ -185,6 +210,11 @@
       cockInches: (mn) => { try { return sizeOf(mn, "penis"); } catch(e){ return 7; } },
       // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
       // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn, level): a session's yours (level "nhl": it runs out on its own, so I never wake it)
+      // the farm's trance (Nov 25): a cue for their Companion's trance side (under, keep, wake, cue, depth, check,
+      // suggestions), what their Companion last said about their LSCG, and plantin' LSCG suggestions
+      hypno: (mn, payload) => { if (!hasCompanion(mn)) return false; enqueue(makeMsg("hypno", JSON.parse(JSON.stringify(payload || {})), mn)); return true; },
+      hypnoState: (mn) => { const s = state.hypnoState && state.hypnoState.get(mn); return s ? Object.assign({}, s) : null; },
+      lscgPlant: (mn, list, removed, ver) => lscgCommand(mn, "set-suggestions", [{ name: "suggestions", value: list || [] }, { name: "removed", value: removed || [] }], ver),
       echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => { const v = echsOf(mn); if (v){ v.taken = a.name; v.nhl = level === "nhl"; } } },   // (level "nhl": left to run out on its own, Nov 24)
       face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level), arouse: (mn, n, cap) => arouse(mn, n, cap),   // (stir them up, for add-ons: Conditioning's deeper sessions)
       // time
@@ -236,7 +266,14 @@
     let answered = false;
     const ctx = { sender, args, rest, channel, api: a.api, reply: (t) => { answered = true; R(t); } };
     const errs = a.errors || 0;
-    addonCall(a, "?"+Object.keys(a.commands).find(w => a.commands[w] === def), def.run, ctx);
+    const ret = addonCall(a, "?"+Object.keys(a.commands).find(w => a.commands[w] === def), def.run, ctx);
+    // a command that has to wait for somethin' (Conditioning's ?trancelib pull asks the studio): its answer comes later
+    if (ret && typeof ret.then === "function"){
+      ret.then(() => { if (!answered && channel !== "chat") R("👍 Done."); },
+        (e) => { a.errors = (a.errors||0) + 1; a.lastError = String(e && e.message || e).slice(0,200); warn("add-on "+a.name+":", e);
+                 R("Oops, sugar, that one hit a snag in the "+a.label+" add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff."); });
+      return;
+    }
     if ((a.errors || 0) > errs){   // it broke: say so, never "Done"
       audit(sender, "ADDON_ERROR", a.name+" · "+(a.lastError||""));
       R("Oops, sugar, that one hit a snag in the "+a.label+" add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff.");

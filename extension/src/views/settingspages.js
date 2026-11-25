@@ -18,6 +18,7 @@ import { BOT_MEMBER } from "../config.js";
 import { redrawRoom } from "../botscreen.js";
 import { voice } from "./staffdata.js";
 import { workCard } from "./staff.js";
+import { lscgTodo } from "../trance.js";
 
 // the farm switches by what they're about (the commands and words are SWITCH_INFO's, livestock.js)
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
@@ -88,10 +89,20 @@ function gearPage(ctx) {
       prefNot(ctx, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
       prefNot(ctx, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare… for a little while"),
       prefNot(ctx, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
-      prefNot(ctx, "noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"),
+      prefNot(ctx, "noTrance", "Trance look", "During a session: a haze at the edges of your screen, a slow spiral, soft rings, the farm's words driftin' up, names blurrin'. Nothin' ever flashes"),
       prefNot(ctx, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
       ctx.s.staff ? prefNot(ctx, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null),
+    tranceCard(ctx),
   ];
+}
+// the farm's trance (trance.js, Nov 25): what your LSCG needs for it, the pose a trigger puts you in, the look and the beats
+function tranceCard(ctx) {
+  const t = lscgTodo(), vol = Number(ctx.prefs.farmBeatsVol) || 15;
+  return card(title("🌀 The farm's trance"), muted(t.text),
+    ctx.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx.send("lowpose kneel")), btn("All fours", () => ctx.send("lowpose fours"))) : null,
+    pref(ctx, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
+    pref(ctx, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
+    ctx.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx.setPref("farmBeatsVol", v) }, v + "%"))) : null);
 }
 
 function messagesPage(ctx) {

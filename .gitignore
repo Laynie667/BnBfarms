@@ -20,6 +20,9 @@ tests/out/
 # the map studio's layouts, their old versions and its stamps (Nov 14): a layout knows where every trap is, never on GitHub
 studio/maps/
 
+# the trance editor's library (Nov 25): Laynie's own scripts, what she pushed to the bot, and old saves. Never on GitHub
+studio/trance/
+
 # the outfit studio's copy of the live game's files (fetched from its site as they're needed)
 studio/game-cache/
 

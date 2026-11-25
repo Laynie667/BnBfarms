@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.99.0
+// @version      0.100.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.99.0";
-  var COMPANION_VERSION = "0.80.0";
+  var VERSION = "0.100.0";
+  var COMPANION_VERSION = "0.81.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6375,6 +6375,22 @@ GOOD TO KNOW
       }
       if (m.type === "leadOk" || m.type === "leadNo") {
         leadAnswer(mn, m);
+        return;
+      }
+      if (m.type === "hypnoState") {
+        try {
+          hypnoStateFrom(mn, m);
+        } catch (e) {
+          warn("hypno state:", e);
+        }
+        return;
+      }
+      if (m.type === "hypnoEvent") {
+        try {
+          hypnoEventFrom(mn, m);
+        } catch (e) {
+          warn("hypno event:", e);
+        }
         return;
       }
       if (m.type === "hello") {
@@ -10880,6 +10896,55 @@ GOOD TO KNOW
       if (s.search(ANY_TAG) >= 0 || !(mn && typeof mn === "number" && mn > 0)) return untag(s);
       return bodyWords(mn, s);
     };
+    function lscgCommand(mn, name, args, ver) {
+      if (!(mn > 0) || mn === CFG.BOT_MEMBER || !charFor(mn)) return false;
+      send("AccountBeep", { MemberNumber: mn, BeepType: "Leash", IsSecret: true, Message: {
+        IsLSCG: true,
+        type: "command",
+        reply: false,
+        settings: null,
+        target: mn,
+        version: String(ver || "0.9.9").slice(0, 16),
+        command: { name: String(name), args: JSON.parse(JSON.stringify(args || [])) }
+      } });
+      return true;
+    }
+    const strs = (v, n, len) => Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, n).map((x) => x.slice(0, len)) : [];
+    function hypnoStateFrom(mn, m) {
+      const s = {
+        at: Date.now(),
+        lscg: m.lscg === true,
+        ver: String(m.ver || "").slice(0, 16),
+        on: m.on === true,
+        sugg: m.sugg === true,
+        needHyp: m.needHyp !== false,
+        mins: Math.max(0, Math.min(1440, Number(m.mins) || 0)),
+        beats: m.beats === true,
+        scopes: strs(m.scopes, 8, 20),
+        under: m.under === true,
+        ours: m.ours === true,
+        farmBeats: m.farmBeats === true,
+        planted: strs(m.planted, 100, 60)
+      };
+      (state.hypnoState = state.hypnoState || /* @__PURE__ */ new Map()).set(mn, s);
+      addonsEmit("hypnoState", mn, Object.assign({}, s));
+    }
+    function hypnoEventFrom(mn, m) {
+      const ev = String(m.ev || "").slice(0, 20);
+      if (!ev) return;
+      addonsEmit("hypnoEvent", mn, {
+        ev,
+        method: String(m.method || "").slice(0, 12),
+        by: Number(m.by) || 0,
+        ids: strs(m.ids, 100, 60),
+        found: strs(m.found, 100, 60),
+        name: String(m.name || "").slice(0, 80),
+        id: String(m.id || "").slice(0, 60),
+        resisted: m.resisted === true,
+        via: String(m.via || "").slice(0, 10),
+        why: String(m.why || "").slice(0, 160)
+      });
+    }
     function addonApi(a) {
       return Object.freeze({
         version: VERSION,
@@ -11063,6 +11128,18 @@ GOOD TO KNOW
         },
         // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
         // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn, level): a session's yours (level "nhl": it runs out on its own, so I never wake it)
+        // the farm's trance (Nov 25): a cue for their Companion's trance side (under, keep, wake, cue, depth, check,
+        // suggestions), what their Companion last said about their LSCG, and plantin' LSCG suggestions
+        hypno: (mn, payload) => {
+          if (!hasCompanion(mn)) return false;
+          enqueue(makeMsg("hypno", JSON.parse(JSON.stringify(payload || {})), mn));
+          return true;
+        },
+        hypnoState: (mn) => {
+          const s = state.hypnoState && state.hypnoState.get(mn);
+          return s ? Object.assign({}, s) : null;
+        },
+        lscgPlant: (mn, list2, removed, ver) => lscgCommand(mn, "set-suggestions", [{ name: "suggestions", value: list2 || [] }, { name: "removed", value: removed || [] }], ver),
         echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => {
           const v = echsOf(mn);
           if (v) {
@@ -11155,7 +11232,21 @@ GOOD TO KNOW
         R(t);
       } };
       const errs = a.errors || 0;
-      addonCall(a, "?" + Object.keys(a.commands).find((w) => a.commands[w] === def), def.run, ctx);
+      const ret = addonCall(a, "?" + Object.keys(a.commands).find((w) => a.commands[w] === def), def.run, ctx);
+      if (ret && typeof ret.then === "function") {
+        ret.then(
+          () => {
+            if (!answered && channel !== "chat") R("\u{1F44D} Done.");
+          },
+          (e) => {
+            a.errors = (a.errors || 0) + 1;
+            a.lastError = String(e && e.message || e).slice(0, 200);
+            warn("add-on " + a.name + ":", e);
+            R("Oops, sugar, that one hit a snag in the " + a.label + " add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff.");
+          }
+        );
+        return;
+      }
       if ((a.errors || 0) > errs) {
         audit(sender, "ADDON_ERROR", a.name + " \xB7 " + (a.lastError || ""));
         R("Oops, sugar, that one hit a snag in the " + a.label + " add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff.");
@@ -68081,7 +68172,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           r.hypno = v ? v === "on" : !r.hypno;
           saveLedger();
           audit(sender, "HYPNO", r.hypno ? "on" : "off");
-          R(r.hypno ? "\u{1F300} Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "") : "\u{1F300} Hypno: off. No trance sessions for you.");
+          R(r.hypno ? "\u{1F300} Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them. Got LSCG? Let the farm in (LSCG settings \u2192 Extensions \u2192 B&B Farm: Hypnosis and States) and tick Allow suggestions, and you go under LSCG's own trance. ?lowpose kneel|fours: how a trigger puts you down." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "") : "\u{1F300} Hypno: off. No trance sessions for you, and the farm's own triggers rest till it's back on.");
+          try {
+            addonsEmit("hypnoSwitch", sender, !!r.hypno);
+          } catch (e) {
+          }
           if (r.hypno && CFG.ECHS_ON) later(() => {
             try {
               echsAsk(sender, sender, "hypno on");

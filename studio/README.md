@@ -12,6 +12,15 @@ An offline dressing room for Bondage Club, for our own use. It runs on this comp
 > they know where every trap is. The code is TypeScript in `studio/map/src` (built by the server when the page asks),
 > the first piece made the new way from docs/DIRECTION.md.
 
+> **The trance editor (Nov 25, 2026)**: open `http://localhost:4780/trance` while the studio runs (on the bot's PC).
+> The farm's trance library: labelled blocks (inductions, deepeners, convincers, suggestions, triggers, wakes) and the
+> session recipes that put them together, with each block's levels, pace, beats (by band: delta, theta, alpha) and the
+> look on the player's screen. A form for each block and the library's text side by side: write it either way, or paste
+> a script in. **Try it** plans the session the bot would run for somebody and plays it sped up, with its look and beats.
+> **Save** keeps it in `studio/trance/library.txt` (the last 30 saves in `studio/trance/old/`); **Push to the bot**
+> makes it what the bot runs: its tab looks every minute, or say `?trancelib pull`. `studio/trance/` never goes on
+> GitHub. The format is in `shared/trance-script.js`; the starter library in `shared/trance-starter.js`.
+
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the
 way it looks in the game.

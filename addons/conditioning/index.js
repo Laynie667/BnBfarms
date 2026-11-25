@@ -28,9 +28,24 @@
    • Every session takes a fresh handful of lines from each part, in order (more-lines.js has the extra ones), so no
      two read the same. The words fit them: a male cow is a bull, a stallion not a mare; udders only for somebody with
      tits; and a line or two is about what they're wearin' (a collar, a bell, paws, a gag, latex…).
+   • 2.0, Nov 25 (Laynie: LSCG's hypnosis at the core with ECHS's feel, a session editor for "real hypnotic scripts",
+     beats by band, HSC-style looks; "focus on lscgs default suggestion inputs on the first rendition"):
+       - Sessions come from the TRANCE LIBRARY (shared/trance-script.js): labelled blocks (inductions, deepeners, convincers,
+         suggestions, triggers, wakes) put together by session recipes. Laynie writes them in the studio's trance editor on
+         the bot's PC and pushes; the bot picks the push up from there (studio/server.mjs) and keeps it in its books. Until
+         then, the starter library (shared/trance-starter.js: these same lines).
+       - With LSCG (its hypnosis on, the farm allowed in its Extensions settings): their Companion puts them under LSCG's own
+         trance in the farm's name, keeps it up for the session, plays the session's beats if they turned beats on, and
+         wakes them. A trigger block is then planted as LSCG's own suggestion, with LSCG's own instructions (strip, pose,
+         say, cum, deny…), the way any LSCG hypnotist plants one; their LSCG checks it and lets them fight it as usual.
+       - Without LSCG: the farm's own trance on their screen, and the triggers kept by the farm and carried out by their
+         Companion, with a give-in-or-fight choice like LSCG's.
+       - ?lowpose kneel|fours: whichever is comfier is the pose a trigger puts them in. ?planted: what the farm planted.
 */
-import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf } from "../_lib/connect.js";
+import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf, fits as fitsBody } from "../_lib/connect.js";
 import { SPECIES_MORE, MALE, UDDER_KINDS, SCRIPT_MORE, GEAR_SUGGEST } from "./more-lines.js";
+import { parseLibrary, planSession, sessionSteps, lscgSuggestion, fillIn, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
+import { STARTER } from "../../shared/trance-starter.js";
 
 // words for each species; anything unknown uses "default"
 const SPECIES = {
@@ -164,13 +179,138 @@ function scriptFor(level, mn, own, echs) {
   return lines;
 }
 
-function start(by, mn, level, own, echs) {
-  running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: !!echs });
+// ── the trance library (2.0, Nov 25) ───────────────────────
+// The studio on the bot's PC (studio/server.mjs) holds what Laynie last pushed; the bot looks every minute or so (less
+// often while the studio isn't open) and keeps a copy in its books, so a restart doesn't lose it.
+const STUDIO = "http://localhost:4780/__studio/trance/";
+let LIB = null, pullFails = 0, nextPull = 0;
+function lib() {
+  if (LIB) return LIB;
+  const d = D(), own = d.lib && typeof d.lib.text === "string" ? d.lib : null;
+  let p = own ? parseLibrary(own.text) : null;
+  // a push with nothin' usable in it never leaves the farm with no sessions
+  if (!p || !p.blocks.some((b) => !b.bad && b.kind !== "session" && b.lines.length)) p = parseLibrary(STARTER);
+  LIB = Object.assign(p, { from: own ? "studio" : "starter", stamp: own ? own.stamp : "", at: own ? own.at : 0 });
+  return LIB;
+}
+function setLib(text, stamp) { if (text == null) delete D().lib; else D().lib = { text: String(text).slice(0, 400000), stamp: String(stamp || "").slice(0, 60), at: Date.now() }; LIB = null; api.save(); return lib(); }
+async function pull(force) {
+  const W = typeof window !== "undefined" ? window : null;
+  if (!W || typeof W.fetch !== "function") return { fail: "no way to reach the studio from here" };
+  if (!force && Date.now() < nextPull) return null;
+  try {
+    const r = await W.fetch(STUDIO + "published.json", { cache: "no-store" });
+    if (!r.ok) throw new Error("the studio answered " + r.status);
+    const pub = await r.json();
+    pullFails = 0; nextPull = Date.now() + 60000;
+    if (!pub || !pub.stamp) return { none: true };
+    if (!force && D().lib && D().lib.stamp === pub.stamp) return { same: true };
+    const t = await W.fetch(STUDIO + "published.txt", { cache: "no-store" });
+    if (!t.ok) throw new Error("the studio answered " + t.status);
+    const L = setLib(await t.text(), pub.stamp);
+    api.log("trance library from the studio (" + pub.stamp + "): " + L.blocks.length + " blocks, " + L.errors.length + " mistakes");
+    return { got: L };
+  } catch (e) { pullFails++; nextPull = Date.now() + Math.min(10, pullFails) * 60000; return { fail: String((e && e.message) || e) }; }
+}
+function libText() {
+  const L = lib(), n = (k) => L.blocks.filter((b) => b.kind === k && !b.bad).length;
+  return "🌀 Trance library: " + (L.from === "studio" ? "pushed from the studio " + new Date(L.at).toISOString().slice(0, 16).replace("T", " ") : "the starter one") + " · " +
+    n("session") + " sessions, " + n("induction") + " inductions, " + n("deepener") + " deepeners, " + n("convincer") + " convincers, " + n("suggestion") + " suggestions, " +
+    n("trigger") + " triggers, " + n("wake") + " wakes" + (L.errors.length ? " · " + L.errors.length + " mistakes (those blocks are skipped): " + L.errors.slice(0, 3).map((e) => "line " + e.line + " " + e.msg).join("; ") : "");
+}
+
+// what kind they are, for a block's "for:" (the same key the words come from)
+function speciesKey(mn) {
+  const s = String(api.species(mn) || "").toLowerCase(), r = String((api.rec(mn) || {}).species || "").toLowerCase();
+  return SPECIES[s] ? s : SPECIES[r] ? r : s || r || "default";
+}
+const wearsOf = (mn) => { const g = gearOf(api, mn); return Object.keys(g).filter((k) => g[k]); };
+const lowOf = (mn) => (me(mn).low === "fours" ? "fours" : "kneel");
+// the fill-ins a library line can use
+function wordsFor(mn) {
+  const w = words(mn), lead = api.herdLeaderOf ? api.herdLeaderOf(mn) : null;
+  return { name: api.name(mn), animal: w.a, sound: w.s, body: w.p, pet: petName(mn), act: w.act, pose: w.pose, paws: w.paws || "paws",
+    low: lowOf(mn) === "fours" ? "on all fours" : "on your knees", herd: lead && lead !== mn ? api.name(lead) : "the farm", a: w.a, s: w.s, p: w.p };
+}
+const sayLib = (mn, line) => fillIn(untag(line), wordsFor(mn)).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+function tellOnce(mn, key, text) {
+  const x = me(mn), day = new Date().toISOString().slice(0, 10); x.told = x.told || {};
+  if (x.told[key] === day) return; x.told[key] = day; api.save(); api.notice(mn, text);
+}
+
+// ── the triggers the farm planted ──────────────────────────
+// me(mn).sugg[id] = { s: LSCG's suggestion, block, level, at, via: "lscg" | "farm", ok: planted and seen, fired, fought }
+const plantedOf = (mn) => { const x = me(mn); return (x.sugg = x.sugg || {}); };
+const lscgOn = (hs) => !!(hs && hs.lscg && hs.on);
+function plant(mn, run, b) {
+  if (!api.hasCompanion || !api.hasCompanion(mn)) { api.log("trigger " + b.name + " not planted in " + mn + ": no Companion"); return; }
+  const sg = lscgSuggestion(b, { words: wordsFor(mn), low: lowOf(mn), by: api.cfg.BOT_MEMBER, byName: api.name(api.cfg.BOT_MEMBER) || "The farm", now: Date.now() });
+  if (sg.error) { api.log("trigger " + b.name + " can't be planted: " + sg.error); return; }
+  const hs = api.hypnoState(mn), all = plantedOf(mn), was = all[sg.id];
+  all[sg.id] = { s: sg, block: b.name, level: run.level, at: Date.now(), via: lscgOn(hs) ? "lscg" : "farm", ok: false, fired: was ? was.fired || 0 : 0, fought: was ? was.fought || 0 : 0 };
+  api.save();
+  if (lscgOn(hs)) plantLscg(mn); else sendFarm(mn);
+}
+// everything waitin' to go into their LSCG: only while they're under in the farm's name, with suggestions allowed
+function plantLscg(mn, quiet) {
+  const hs = api.hypnoState(mn) || {}, want = Object.values(plantedOf(mn)).filter((x) => x.via === "lscg" && !x.ok);
+  if (!want.length) return false;
+  const miss = [];
+  if (!hs.sugg) miss.push("tick Allow suggestions in LSCG's Hypnosis settings");
+  if (!hs.ours) miss.push((hs.scopes || []).includes("states") ? "be under in the farm's name (it plants them next session)" : "let the farm in: LSCG settings → Extensions → B&B Farm, Hypnosis and States");
+  if (miss.length) {
+    if (!quiet) tellOnce(mn, "plant", "🌀 The farm has " + want.length + " trigger" + (want.length === 1 ? "" : "s") + " waitin' to go into your LSCG. First " + miss.join(", and ") + ".");
+    return false;
+  }
+  const now = Date.now(), go = want.filter((x) => !x.tried || now - x.tried > 30000);
+  if (!go.length) return false;
+  for (const x of go) x.tried = now;
+  api.lscgPlant(mn, go.map((x) => x.s), [], hs.ver);
+  api.later(() => api.hypno(mn, { do: "check", ids: go.map((x) => x.s.id) }), 4000);
+  return true;
+}
+// the farm's own (no LSCG): their Companion keeps and carries them out
+function sendFarm(mn) {
+  // (?hypno off: they rest, kept, till it's back on)
+  const on = !!(api.rec(mn) || {}).hypno;
+  const list = on ? Object.values(plantedOf(mn)).filter((x) => x.via === "farm").map((x) => x.s) : [];
+  api.hypno(mn, { do: "suggestions", list });
+}
+function plantedText(mn, forMe) {
+  const all = Object.values(plantedOf(mn));
+  if (!all.length) return "🌀 " + (forMe ? "Nothin's" : api.name(mn) + " has nothin'") + " planted by the farm" + (forMe ? " in you." : ".");
+  return "🌀 Planted by the farm" + (forMe ? " in you" : " in " + api.name(mn)) + ":\n" + all.map((x) =>
+    "• " + x.block + ": \"" + x.s.trigger + "\" → " + x.s.instructions.map((i) => i.type).join(", ") + " · " +
+    (x.via === "farm" ? "the farm's own" : x.ok ? "in their LSCG" : "waitin' for LSCG") + (x.fired ? " · fired " + x.fired + (x.fought ? ", fought off " + x.fought : "") : "")).join("\n") +
+    (forMe ? "\n?planted remove <name> takes one out (all: every one)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
+}
+
+function start(by, mn, level, own, echs, opts) {
+  opts = opts || {};
+  if (echs) { running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: true }); step(mn); return; }   // through ECHS: as before
+  const plan = planSession(lib().blocks, { level, species: speciesKey(mn), wears: wearsOf(mn) }, { name: opts.session });
+  if (!plan.blocks.some((b) => b.lines.length)) { running.set(mn, { by, level, lines: scriptFor(level, mn, own, false), i: 0, echs: false }); step(mn); return; }
+  const b = bodyOf(api, mn), steps = sessionSteps(plan, { keep: (t) => fitsBody(t, b) });
+  // the handler's own words: after the first suggestion, and again just before the wake
+  if (own) {
+    const i = steps.findIndex((s) => s.kind === "suggestion" || s.kind === "trigger" || s.kind === "convincer");
+    steps.splice(i >= 0 ? i : Math.max(1, steps.length - 1), 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
+    const w = steps.findIndex((s) => s.kind === "wake");
+    steps.splice(w >= 0 ? w : steps.length, 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
+  }
+  const ms = steps.reduce((n, s) => n + (s.gap || 0) * 1000, 0);
+  const run = { by, level, steps, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms };
+  running.set(mn, run);
+  // under: their LSCG's own trance in the farm's name if they have it (and let the farm in), the farm's own if not; their
+  // Companion keeps it up till the session's done (trance.js)
+  api.hypno(mn, { do: "under", by: api.cfg.BOT_MEMBER, ms: Math.round(ms + 300000), level, session: plan.name });
+  api.face(mn, "trance", Math.round(ms / 1000) + 120);
   step(mn);
 }
 function step(mn) {
   const run = running.get(mn); if (!run) return;
   if (!api.char(mn)) { running.delete(mn); return; }          // they left
+  if (run.lib) return stepLib(mn, run);
   const line = run.lines[run.i];
   if (!line) { finish(mn, run); return; }
   // the haze on their screen follows the session: settle 1, deeper 2 (3 for No human left), then lifts
@@ -184,11 +324,35 @@ function step(mn) {
   run.i++;
   api.later(() => step(mn), between(35, 50) * 1000);
 }
+// a library session, a line at a time: the block's beats and look as it starts, the line in the farm's voice, deeper
+// when it says, and a trigger planted once its words are said
+function stepLib(mn, run) {
+  const s = run.steps[run.i];
+  if (!s) { finish(mn, run); return; }
+  if (s.start || s.beats || s.look || s.volume != null) {
+    const cue = { do: "cue", kind: s.kind, block: s.block };
+    if (s.beats) cue.beats = s.beats; if (s.volume != null) cue.volume = s.volume; if (s.look) cue.look = s.look;
+    api.hypno(mn, cue);
+  }
+  if (s.deeper) { run.depth = Math.max(0, Math.min(100, run.depth + s.deeper)); api.hypno(mn, { do: "depth", depth: run.depth }); }
+  if (s.text) api.voice(mn, sayLib(mn, s.text));
+  if (s.plant) { try { plant(mn, run, s.plant); } catch (e) { api.log("plant: " + ((e && e.message) || e)); } }
+  // deeper sessions keep them warm on the way down: a little more with every line past the settling, never all the way
+  if (run.level !== "fun" && s.text && s.kind !== "induction" && s.kind !== "wake" && api.arouse) api.arouse(mn, run.level === "nhl" ? 7 : 5, run.level === "nhl" ? 92 : 85);
+  run.i++;
+  api.later(() => step(mn), Math.max(1, s.gap || 0) * 1000);
+}
 function finish(mn, run) {
   running.delete(mn);
   if (run.echs && run.level !== "nhl" && api.echs) api.later(() => api.echs.wake(mn), 4000);   // No human left: the trance runs out on its own
+  if (run.lib) {
+    // fun and deep: woken (out of LSCG's trance too); No human left: the trance is left to run out, the look lifts in a couple of minutes
+    if (run.level === "nhl") api.hypno(mn, { do: "linger", secs: 120 });
+    else { run.waking = true; api.later(() => { if (!running.has(mn)) { api.hypno(mn, { do: "wake" }); api.face(mn, "clear", 1); } }, 4000); }
+    if (run.level === "nhl") api.later(() => { if (!running.has(mn)) api.face(mn, "clear", 1); }, 120000);
+  }
   // No human left lingers a couple of minutes, then clears
-  api.later(() => { if (!running.has(mn)) { api.trance(mn, 0); api.face(mn, "clear", 1); } }, run.level === "nhl" ? 120000 : 3000);
+  else api.later(() => { if (!running.has(mn)) { api.trance(mn, 0); api.face(mn, "clear", 1); } }, run.level === "nhl" ? 120000 : 3000);
   const x = me(mn);
   x.sessions[run.level] = (x.sessions[run.level] || 0) + 1; x.total++;
   const tier = MILESTONES.filter((m) => x.total >= m).length;
@@ -210,6 +374,7 @@ function stop(mn, why) {
   const run = running.get(mn);
   running.delete(mn);
   if (run.echs && api.echs) api.echs.wake(mn);
+  if (run.lib) api.hypno(mn, { do: "wake", quiet: !why });
   api.trance(mn, 0); api.face(mn, "clear", 1);
   if (why) api.voice(mn, why);
   return true;
@@ -244,8 +409,13 @@ function cmdCondition(c) {
     waitingEchs.set(t, { by: sender, level: want, own: own || null, at: Date.now() });
     return c.reply("🌀 Reachin' for " + A.name(t) + " through their ECHS. When they go under, a " + LEVEL_NAME[want] + " session starts through it.");
   }
-  start(sender, t, want, own || null);
-  c.reply("🌀 " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(((running.get(t) || {}).lines || []).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
+  // ?hyp Bessie deep session Deep in the Barn: one of the library's sessions by name (else one that suits them)
+  const ss = args.findIndex((a) => /^session$/i.test(a));
+  const session = ss >= 0 ? args.slice(ss + 1, si > ss ? si : undefined).join(" ").trim() : "";
+  start(sender, t, want, own || null, false, { session });
+  const run = running.get(t) || {};
+  c.reply("🌀 " + LEVEL_NAME[want] + " session started for " + A.name(t) + (run.plan ? " (" + run.plan + ")" : "") + ", about " +
+    Math.max(1, Math.round(run.lib ? run.ms / 60000 : (run.lines || []).length * 42 / 60)) + " minutes. ?hyp stop " + A.name(t) + " ends it.");
 }
 function cmdLevel(c) {
   const { sender, args, api: A } = c, v = String(args[0] || "").toLowerCase();
@@ -262,24 +432,84 @@ const progressText = (mn) => {
 
 function companion(mn) {
   const r = api.rec(mn); if (!r) return null;
-  const x = me(mn), next = MILESTONES.find((m) => x.total < m), cards = [];
+  const x = me(mn), next = MILESTONES.find((m) => x.total < m), cards = [], planted = Object.values(plantedOf(mn));
   cards.push({ title: "Conditioning", text: r.hypno ? undefined : "Sessions need ?hypno on (in your Toggles).",
-    lines: [["Tier", x.tier + " · " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]]],
+    lines: [["Tier", x.tier + " · " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]], ["Down low", lowOf(mn) === "fours" ? "on all fours" : "kneelin'"],
+      ["Trance", lscgLine(mn)], ["Planted", planted.length ? planted.length + " trigger" + (planted.length === 1 ? "" : "s") : "none"]],
     bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: (x.total / next) * 100 }] : undefined,
-    buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : []) });
+    buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max }))
+      .concat([{ label: "Kneel", cmd: "lowpose kneel", accent: lowOf(mn) === "kneel" }, { label: "All fours", cmd: "lowpose fours", accent: lowOf(mn) === "fours" }])
+      .concat(planted.length ? [{ label: "What's planted", cmd: "planted" }] : [])
+      .concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : []) });
   if (api.isStaff(mn)) cards.push({ staff: true, title: "Run a session", input: { placeholder: "Bessie deep", label: "Start (who, level)", cmd: "hyp" },
-    note: "Only for your own herd (proprietors: anyone). Never deeper than they allow." });
+    note: "Only for your own herd (proprietors: anyone). Never deeper than they allow. Add: session <name> to pick one of the library's." });
   return { cards };
+}
+// how their trance works, from what their Companion says about their LSCG
+function lscgLine(mn) {
+  const hs = api.hypnoState(mn);
+  if (!hs) return "the farm's own (no word from your Companion yet)";
+  if (!hs.lscg) return "the farm's own (no LSCG)";
+  if (!hs.on) return "the farm's own (LSCG's hypnosis is off)";
+  const need = [];
+  if (!(hs.scopes || []).includes("states") || !(hs.scopes || []).includes("hypno")) need.push("let the farm in: LSCG settings → Extensions → B&B Farm, Hypnosis and States");
+  if (!hs.sugg) need.push("tick Allow suggestions");
+  return need.length ? "LSCG, once you " + need.join(", and ") : "LSCG's own, in the farm's name";
+}
+
+function cmdPlanted(c) {
+  const { sender, args, api: A } = c, verb = String(args[0] || "").toLowerCase();
+  if (verb === "remove" || verb === "clear") {
+    // ?planted remove <name|all> [who]   (yours, or your herd's if you lead it, or anybody's for a proprietor)
+    let rest = args.slice(1), t = sender;
+    if (rest.length > 1) { const who = A.find(rest[rest.length - 1]); if (who && who !== sender && A.rec(who)) { t = who; rest = rest.slice(0, -1); } }
+    if (t !== sender && !(A.isProprietor(sender) || A.herdLeaderOf(t) === sender)) return c.reply("Only their herd leader or a proprietor takes out what's planted in " + A.name(t) + ", sugar.");
+    const all = plantedOf(t), name = verb === "clear" ? "all" : rest.join(" ").trim().toLowerCase().replace(/^b&b\s+/, "");
+    const hit = Object.keys(all).filter((id) => name === "all" || all[id].block.toLowerCase() === name || all[id].s.trigger.toLowerCase() === name);
+    if (!hit.length) return c.reply("🌀 Nothin' planted by that name. ?planted" + (t === sender ? "" : " " + A.name(t)) + " shows the list.");
+    const lscgOnes = hit.filter((id) => all[id].via === "lscg" && all[id].ok).map((id) => all[id].s.name);
+    for (const id of hit) delete all[id];
+    A.save(); sendFarm(t);
+    c.reply("🌀 Taken out: " + hit.length + "." + (lscgOnes.length ? " " + (t === sender ? "In your LSCG, take " + (lscgOnes.length === 1 ? "it" : "them") + " out with LSCG's own: " : A.name(t) + " takes the LSCG copies out with ") + lscgOnes.map((n) => "/lscg remove-suggestion " + n).join(" · ") + " (the farm won't plant " + (lscgOnes.length === 1 ? "it" : "them") + " again)." : ""));
+    if (t !== sender) A.notice(t, "🌀 " + A.name(sender) + " took out " + hit.length + " of the farm's triggers in you." + (lscgOnes.length ? " Your LSCG still has " + (lscgOnes.length === 1 ? "one" : lscgOnes.length) + ": /lscg remove-suggestion " + lscgOnes.join(" · ") : ""));
+    return;
+  }
+  const t = args[0] ? A.find(args.join(" ")) : sender;
+  if (!t || !A.rec(t)) return c.reply("Whose, sugar? ?planted [who]");
+  if (t !== sender && !(A.isProprietor(sender) || A.herdLeaderOf(t) === sender || A.isStaff(sender))) return c.reply("Only staff look at what's planted in somebody else, hon.");
+  c.reply(plantedText(t, t === sender));
 }
 
 connect({
   name: "conditioning",
   label: "Conditioning",
   version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
-  guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. " +
-    "Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
-  setup(a) { api = a; D(); },
+  guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. " +
+    "Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. " +
+    "With LSCG (its hypnosis on, and the farm let in under LSCG settings → Extensions → B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. " +
+    "?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once.",
+  setup(a) {
+    api = a; D();
+    // the studio on the bot's PC: anything Laynie pushed, picked up every minute or so
+    const tick = () => { pull(false).catch(() => {}); api.later(tick, 60000); };
+    api.later(tick, 15000);
+  },
   commands: {
+    planted: { usage: "planted [who] | planted remove <name|all> [who]", private: true, run: cmdPlanted },
+    lowpose: { usage: "lowpose kneel|fours", aliases: ["low"], private: true, run: (c) => {
+      const v = String(c.args[0] || "").toLowerCase(), A = c.api;
+      if (!A.rec(c.sender)) return c.reply("That's just for folks on the books, sugar.");
+      if (!/^(kneel|kneeling|knees|fours|allfours|all)$/.test(v)) return c.reply("🌀 When a trigger puts you down low, you go " + (lowOf(c.sender) === "fours" ? "on all fours" : "to your knees") + ". ?lowpose kneel or ?lowpose fours, whichever's comfier.");
+      me(c.sender).low = /^(fours|allfours|all)$/.test(v) ? "fours" : "kneel"; A.save();
+      c.reply("🌀 Down low means " + (lowOf(c.sender) === "fours" ? "on all fours" : "on your knees") + " for you now. Triggers planted from here on use it" + (Object.keys(plantedOf(c.sender)).length ? " (ones already planted keep theirs till the next session plants them again)" : "") + ".");
+    } },
+    trancelib: { usage: "trancelib [pull|starter]", private: true, run: async (c) => {
+      if (!c.api.isProprietor(c.sender)) return c.reply("That's the proprietors', sugar.");
+      const v = String(c.args[0] || "").toLowerCase();
+      if (v === "starter") { setLib(null); return c.reply("🌀 Back to the starter library.\n" + libText()); }
+      if (v === "pull") { const r = await pull(true); return c.reply(r && r.got ? "🌀 Pulled from the studio.\n" + libText() : r && r.none ? "🌀 The studio's open, but nothin's been pushed yet." : "🌀 Couldn't reach the studio on this PC (" + ((r && r.fail) || "?") + "). It needs to be running: Start the studio.bat."); }
+      c.reply(libText());
+    } },
     hyp: { usage: "hyp <who|me> [fun|deep|nhl] [say <words>]", aliases: ["condition"], private: true, run: cmdCondition },
     depth: { usage: "depth fun|deep|nhl", aliases: ["hypnolevel"], private: true, run: cmdLevel },
     wake: { usage: "wake", private: true, run: (c) => c.reply(stop(c.sender, "Coming up now. Eyes open, " + c.api.name(c.sender) + ". You're alright.") ? "🌀 Session ended." : "You're not in a session, sugar.") },
@@ -289,7 +519,48 @@ connect({
       c.reply(t ? progressText(t) : "Who's that, hon?");
     } },
   },
-  on: { safe: (mn) => stop(mn, null), leave: (mn) => stop(mn, null),
+  on: { safe: (mn) => { stop(mn, null); api.hypno(mn, { do: "clear" }); }, leave: (mn) => stop(mn, null),
+    hypnoSwitch: (mn, on) => { if (!on) stop(mn, null); if (Object.keys(plantedOf(mn)).length) sendFarm(mn); },
+    // their Companion on their LSCG (trance.js): anything waitin' to be planted goes in when it can; LSCG come or gone,
+    // the triggers move with it (the farm's own carried out by their Companion, LSCG's own by their LSCG)
+    hypnoState: (mn, hs) => {
+      const all = plantedOf(mn), list = Object.values(all);
+      if (!list.length) return;
+      if (lscgOn(hs)) {
+        const moved = list.filter((x) => x.via === "farm");
+        for (const x of moved) { x.via = "lscg"; x.ok = false; }
+        if (moved.length) { api.save(); sendFarm(mn); }
+        if (hs.planted && hs.planted.length) for (const x of list) if (x.via === "lscg" && hs.planted.includes(x.s.id)) x.ok = true;
+        plantLscg(mn, true);
+      } else {
+        const moved = list.filter((x) => x.via === "lscg");
+        for (const x of moved) { x.via = "farm"; x.ok = false; }
+        if (moved.length) api.save();
+        sendFarm(mn);
+      }
+    },
+    hypnoEvent: (mn, e) => {
+      const run = running.get(mn), all = plantedOf(mn);
+      if (e.ev === "checked") {
+        for (const id of e.ids) if (all[id]) all[id].ok = e.found.includes(id);
+        api.save();
+        const missed = e.ids.filter((id) => all[id] && !all[id].ok);
+        if (missed.length) api.log("LSCG didn't take " + missed.join(", ") + " for " + mn + " (their item permission, or they weren't under in the farm's name)");
+        return;
+      }
+      if (e.ev === "safeword") { stop(mn, null); return; }
+      // brought up out of it mid-session by somebody else (a snap, a boop, their wake word) or by their own LSCG timing out
+      if (e.ev === "awake" && run && run.lib && !run.waking && e.method && e.method !== "farm") {
+        stop(mn, null);
+        api.notice(mn, "🌀 You came up out of it" + (e.method === "snap" ? " at a snap of fingers" : e.method === "boop" ? " with a boop" : e.method === "word" ? " at your wake word" : e.method === "timeout" ? " when LSCG's trance time ran out" : "") + ", so that session's over. ?hyp me takes you back down.");
+        if (run.by !== mn) api.notice(run.by, "🌀 " + api.name(mn) + " came up out of the session early.");
+        return;
+      }
+      if (e.ev === "resolved" || e.ev === "fired") {
+        const x = all[e.id] || Object.values(all).find((y) => y.s.name === e.name);
+        if (x) { x.fired = (x.fired || 0) + 1; if (e.resisted) x.fought = (x.fought || 0) + 1; x.last = Date.now(); api.save(); }
+      }
+    },
     // under with the farm girl through ECHS: the session runs through it (asked for with ?hyp … echs, or not)
     echsUnder: (mn, info) => {
       const r = api.rec(mn); if (!r || !r.hypno) return;

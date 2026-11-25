@@ -38,6 +38,7 @@ import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick,
 import { trophyNews, trophyNext, trophyAnswered, trophyWear, trophyOff, trophyWorn } from "./trophies.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
 import { LS, onAccount, initAcct } from "./acct.js";   // each account its own (Nov 24)
+import { initTrance, onHypno, tranceHello, tranceVoice } from "./trance.js";   // the farm's trance (Nov 25)
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -278,6 +279,7 @@ function onFarmMsg(m) {
     case "welcome":
       st.welcomed = true;
       try { const at = onBotAccount() ? null : farmLookWanted(m.look); if (at != null) toBot("bodyFarmAsk", { at }); } catch (e) { /* the drawn body isn't loaded */ }   // the farm's look for the drawn body (drawnbody.js)
+      if (!onBotAccount()) setTimeout(() => { try { tranceHello(); } catch (e) { /* fine */ } }, 1500);   // what the farm needs to know about your LSCG (trance.js)
       st.panel.setWelcome(m);
       if (!m.proto || m.proto < 2) {
         // an older bot never sends the panel your roles, so Staff and Dashboard can't show: say so
@@ -397,10 +399,12 @@ function onFarmMsg(m) {
     case "arouse": arouse(m); break;   // a trap or a toy stirs you up, if you let the farm do that (cues.js)
     case "sound": sound(m); break;
     case "trance": trance(m); break;
+    case "hypno": try { onHypno(m); } catch (e) { console.warn("[Farmhand Companion] trance:", e); } break;   // the farm's trance (trance.js)
     case "voice": {
       // only you see it, like a thought; nothin' goes to the room
       const line = String(m.text || "").slice(0, 300);
       if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
+      tranceVoice(line);   // (driftin' up the screen, when the session's look says so)
       break;
     }
     case "roomlines":   // the same line for several people at once, sent to the whole room once: only the ones it names show it (Oct 27)
@@ -519,6 +523,8 @@ function start() {
   if (st.panel.prefs.off) { st.panel.show(false); console.log("[Farmhand Companion] v" + VERSION + " is switched off (Preferences → Extensions → Farmhand Companion)"); return; }
   st.panel.setStatus("waitin' for the farm girl");
   initCues({ toBot, panel: st.panel, local: toChat });
+  // the farm's trance (trance.js, Nov 25): LSCG's own in the farm's name, its beats, the look, the farm's own triggers
+  try { initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere, mod, arouse: (add, cap) => arouse({ add, cap }), lead }); } catch (e) { console.warn("[Farmhand Companion] trance:", e); }
   setInterval(parasiteSync, 60000);
   setInterval(() => { nurseryPowderTick(); nurseryStatsSend(false); }, 30000);   // a little's paddin' (ABCL) for the nursery, and the baby powder brushin' off
   initBelly(mod);  // the drawn-belly test (belly.js)

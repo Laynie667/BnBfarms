@@ -34,7 +34,7 @@ import { initIcons, iconsTell, iconsFor, iconsReset, iconsDosed } from "./icons.
 import "./lines-para.js";
 import { initNeedle } from "./needle.js";
 import { initFarm, hello, tellNipLoad } from "./farm.js";
-import { initLscg } from "./lscg.js";
+import { initLscg, takeByName } from "./lscg.js";
 import { initSafeword, safeword } from "./safeword.js";
 import { initHardcore, tickHard, hardOn, dueAt, onHardChange, lock, keyholders } from "./hardcore.js";
 import { initSpeech, dosedSpeech } from "./speech.js";
@@ -309,6 +309,9 @@ W.FarmhandDispensary = Object.freeze({
   // one dose, if it's in you: how strong, its part or spot (Fill-Out: cup, belly, ass · Tender: the spot), time left.
   // The Companion's drawn body reads Fill-Out from here.
   dose: (id) => { const d = st().doses[String(id)]; return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null; },
+  // the farm's trance (Nov 25): one of its triggers fired in you without LSCG, and it says "take a dose". By its name,
+  // whole | half | double, and only from somebody on your list. → { ok, id, why }
+  take: (name, strength, by) => { const r = takeByName(String(name || ""), String(strength || "whole"), Number(by) || 0); if (!r.ok) local("🌀 Somethin' in you reaches for a dose, and doesn't get one."); return { ok: !!r.ok, id: r.id || "", why: r.why || "" }; },
   who: () => st().who,
   // hardcore, for the Companion (its own settings lock while yours is on)
   // growth off the farm (Nov 18): { cup, ass, cock, balls } sizes up (or down) from your own. The Companion's drawn body reads it.

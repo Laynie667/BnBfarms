@@ -5,16 +5,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.100.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.101.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.0.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.1.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.81.1** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.27.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.82.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.28.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -25,6 +25,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.101.0 + Companion 0.82.0 + Dispensary 0.28.0 + Conditioning 2.1.0: the farm's trance, part 2: the farm's pull through the day, hijacked speech, hearin' narrowed, and the farm's own instructions in LSCG**
+- **Bot 0.101.0 + Companion 0.82.0 + Conditioning 2.1.0 + Dispensary 0.28.0: the farm's trance, part 2: the farm's pull through the day, hijacked speech, hearin' narrowed, and the farm's own instructions in LSCG** Laynie, Nov 25: "build part 2"; hijacked speech "i love it"; the daily build-up "yes" for anyone registered with ?hypno on; hearin' narrowed "only ... in trance or for a duration when triggered"; farm instructions for everyone registered, staff too.
+  - **The farm's own instructions in LSCG's suggestion editor** (under "From extensions"): Make their animal sound (1 to 3 times), Go to a free milking stall (the farm walks them to the nearest stall nobody's standin' in, and the stall milks them), Beg to be milked (their words or the farm's, in their sound, then off to a free stall). The Dispensary adds Take a dose (by its name, half, whole or double, only from somebody on their list; LSCG's own doses go through LSCG). Anybody can put them in a suggestion. In the trance library's triggers: `moo`, `stall`, `beg "…"`, `dose <name>`. The starter library has a new trigger made of them, To the Stalls.
+  - **The farm's pull through the day**, for anybody on the books with ?hypno on and the Companion. Every 4 to 9 minutes a nudge: a breath of haze, a whisper in the farm's voice, one chat line gone blurry, or a slow turn of spiral (nothin' flashes). Each one builds it; triggers that land, sessions and milkin's feed it; time away from the farm (or away from the keys) drains it, ten an hour. From 60 their speech starts slippin'. At 100 they drop under on their own, and the farm takes them down: a session at the deepest they allow, and the pull starts again from 20. Never while a trap, a scene or ?quiet has them. ?hypno off or the safeword lets go of it. `?trance` and the Conditioning card show it; staff see a purple **T** over anybody at 60 or more (map markers).
+  - **Hijacked speech**: with the pull at 60 or more, a while after a session (Fun 5 minutes, Deep 15, No human left 30), or under the farm's own trance, now and then somethin' they say out loud gets taken. A thought tryin' to form, then it comes out late, wrong (one of the library's slips), not at all, or turns into squirmin'. They see what they meant to say. Never twice in 45 seconds; commands, whispers, emotes and out-of-character lines always go through.
+  - **Hearin' narrowed**: while under, or for three minutes after one of the farm's triggers lands, everybody's chat goes faint and blurred but the farm's, their own, their herd leader's and whoever set them off. Out-of-character lines (anythin' with a bracket) always stay clear. Part of "Trance look".
+  - **Two new kinds in the trance library and the studio's editor**: slip (what comes out of them in place of their own words) and nudge (the farm's whispers through the day), each with `pull:` for how built up the pull has to be first. The starter library has five slips and three nudges.
+  - **Switches** in the Companion's trance settings: "The farm's pull through the day" and "Hijacked speech", both on unless switched off.
+  - **No more ECHS offers for anybody with LSCG set up for the farm** (Laynie: with LSCG, LSCG; and the bot was steppin' off her spot for them). The pull does the askin' now. People without LSCG still get the occasional ECHS offer, and ?hypnotize me still works for anybody.
 - **Bot 0.100.1 + Companion 0.81.1: the farm's trance holds for the whole session, and trap lines don't snap anybody awake** Laynie, Nov 25: "it seems to be working for me, but Alexia keeps getting kicked out of trance for some reason."
   - **Kept under the whole session.** LSCG brings you up its own trance time after the trance started (5 minutes unless you changed it), and puttin' someone under who's already under does nothin' in LSCG, so the farm askin' again every half minute never held. Anybody on LSCG's 5 minutes came up partway through every session; a longer trance time (Laynie's) hid it. Now the farm moves the start of its own trance up as it goes, and LSCG still ends it when the session would. Only the farm's own trance: a snap, a boop, your wake word or your safeword still bring you up, and a trance somebody else put you in stays theirs (the farm neither holds it nor ends it). Letting the farm in on States alone (not Hypnosis) holds too.
   - **"Snaps" in farm lines.** LSCG wakes anybody it has under at any emote with the word "snaps" (somebody snappin' their fingers), and plenty of the farm's lines have a trap or a rein that snaps on. The farm's room emotes, and the ones your Companion posts for you, now carry an invisible joiner in that word: it reads the same, and LSCG no longer hears a snap.

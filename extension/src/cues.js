@@ -286,6 +286,7 @@ export function drawMarkers() {
       if (x.heat) tags.push(["H", "#d9534f"]);
       if (x.preg) tags.push(["B", "#8fbf6a"]);
       if (x.denied) tags.push(["X", "#c9a35b"]);
+      if (x.pull != null && x.pull >= 60) tags.push(["T", "#b58ad9"]);   // the farm's pull, close to takin' them under (Conditioning)
       if (!tags.length) continue;
       const sx = (C.MapData.Pos.X - me.X + R) * tile, sy = (C.MapData.Pos.Y - me.Y) * tile + R * tile;
       if (sx < 0 || sy < 0 || sx > 1000 || sy > 1000) continue;

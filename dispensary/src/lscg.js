@@ -20,6 +20,7 @@ import { allowed } from "./ladder.js";
 import { st } from "./store.js";
 import { hardOn, askOut } from "./hardcore.js";
 import { nipsLscg } from "./nipples.js";
+import { local } from "./say.js";
 
 const W = window;
 let api = null, caps = null, syncing = null;
@@ -89,6 +90,17 @@ function setUp(L) {
   }
   // the nipple actions, as LSCG extension activities (nipples.js)
   try { nipsLscg(api, caps); } catch (e) { console.warn("[Dispensary] LSCG nipple actions:", e); }
+  // "Take a dose", one of the farm's own instructions in LSCG's suggestion editor (the farm's trance, part 2, Nov 25)
+  if (api.hypno && typeof api.hypno.registerInstruction === "function" && (!caps.size || caps.has("hypno.instructions"))) {
+    try {
+      api.hypno.registerInstruction({ name: "dose", label: "Take a dose",
+        description: "The Farmhand's Dispensary: they take one of its doses (or LSCG's own), as if it was given to them. Only from somebody they'd take a dose from: whoever said the trigger, or whoever planted it.",
+        options: [{ type: "text", key: "dose", label: "Which dose", maxLength: 40, description: "Its name, like Moo, Needy Nectar, Heat or Sedative." },
+          { type: "select", key: "strength", label: "How strong", choices: [{ value: "whole", label: "A whole dose" }, { value: "half", label: "Half a dose" }, { value: "double", label: "A double dose" }] }],
+        perform: (c) => { const r = takeByName(c.options.dose, c.options.strength, c.sender, c.installedBy); if (!r.ok) local("🌀 Somethin' in you reaches for a dose, and doesn't get one: " + (WHY_NOT[r.why] || "it didn't take") + "."); },
+      });
+    } catch (e) { console.warn("[Dispensary] LSCG wouldn't take the dose instruction:", e); }
+  }
   if (caps.has("events")) {
     try { api.events.on("safeword", () => { if (hardOn()) askOut(); else clearAll("safeword"); }); } catch (e) { /* fine */ }
     try {
@@ -102,6 +114,23 @@ function setUp(L) {
       });
     } catch (e) { /* fine */ }
   }
+}
+
+// a dose by its name, the farm's trance's way (its "dose" instruction, LSCG's or the farm's own triggers): its id, its label
+// or one of its words; whole, half or double; only from somebody on their list (whoever said the trigger, or planted it)
+const WHY_NOT = { none: "no dose was named", unknown: "the Dispensary has no dose by that name", who: "not from them, they're not on your list", off: "you've got that one switched off", lscg: "LSCG's own wouldn't take", nolscg: "that one needs LSCG" };
+export function takeByName(name, strength, by, also) {
+  const q = String(name || "").toLowerCase().replace(/[^a-z' -]/g, "").trim();
+  if (!q) return { ok: false, why: "none" };
+  const ids = Object.keys(BOOK), lab = (k) => String(BOOK[k].label || "").toLowerCase();
+  const id = ids.find((k) => k === q.replace(/[\s'-]+/g, "")) || ids.find((k) => lab(k) === q) ||
+    ids.find((k) => (BOOK[k].keywords || []).some((w) => String(w).toLowerCase() === q)) || ids.find((k) => lab(k).includes(q));
+  if (!id) return { ok: false, why: "unknown" };
+  const from = [by, also].map(Number).filter((m) => m > 0), giver = from.find((m) => allowed(m));
+  if (!giver) return { ok: false, why: "who" };
+  const B = BOOK[id], s = String(strength || "whole");
+  if (B.lscg && lscgPresent()) return lscgDose(B.lscg, { by: giver, x: s === "double" ? 2 : s === "half" ? 0.5 : 1 }) ? { ok: true, id } : { ok: false, why: "lscg" };
+  return Object.assign({ id }, give(id, { by: giver, x: s === "double" ? 2 : 1, mins: s === "half" ? Math.max(1, Math.round(B.mins / 2)) : undefined }));
 }
 
 export function initLscg() {

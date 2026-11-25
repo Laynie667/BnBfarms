@@ -133,9 +133,15 @@
   function hypnoStateFrom(mn, m){
     const s = { at: Date.now(), lscg: m.lscg === true, ver: String(m.ver || "").slice(0, 16), on: m.on === true, sugg: m.sugg === true, needHyp: m.needHyp !== false,
       mins: Math.max(0, Math.min(1440, Number(m.mins) || 0)), beats: m.beats === true, scopes: strs(m.scopes, 8, 20), under: m.under === true, ours: m.ours === true,
-      farmBeats: m.farmBeats === true, planted: strs(m.planted, 100, 60) };
+      farmBeats: m.farmBeats === true, planted: strs(m.planted, 100, 60), pullOff: m.pullOff === true, slipsOff: m.slipsOff === true };
     (state.hypnoState = state.hypnoState || new Map()).set(mn, s);
     addonsEmit("hypnoState", mn, Object.assign({}, s));
+  }
+  // one of the farm's own LSCG instructions (part 2) their game is carryin' out that needs the farm: "stall" walks them to
+  // a free milkin' stall. Told to the add-ons (Conditioning does it).
+  function hypnoDoFrom(mn, m){
+    const what = String(m.what || "").slice(0, 20); if (!/^(stall)$/.test(what)) return;
+    addonsEmit("hypnoDo", mn, { what, by: Number(m.by) || 0 });
   }
   function hypnoEventFrom(mn, m){
     const ev = String(m.ev || "").slice(0, 20); if (!ev) return;
@@ -215,6 +221,10 @@
       hypno: (mn, payload) => { if (!hasCompanion(mn)) return false; enqueue(makeMsg("hypno", JSON.parse(JSON.stringify(payload || {})), mn)); return true; },
       hypnoState: (mn) => { const s = state.hypnoState && state.hypnoState.get(mn); return s ? Object.assign({}, s) : null; },
       lscgPlant: (mn, list, removed, ver) => lscgCommand(mn, "set-suggestions", [{ name: "suggestions", value: list || [] }, { name: "removed", value: removed || [] }], ver),
+      // part 2 (the farm's pull): minutes since they last said or did anything here, and whether somethin' has them
+      // right now (a trap, a scene, ?quiet), so nothin' new starts on them
+      idleMin: (mn) => (Date.now() - ((state.lastSpoke && state.lastSpoke.get(mn)) || 0)) / 60000,
+      busy: (mn) => { try { return !!(heldByTrap(mn) || (state.sceneRun && state.sceneRun.has(mn)) || quietNow(mn)); } catch(e){ return false; } },
       echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => { const v = echsOf(mn); if (v){ v.taken = a.name; v.nhl = level === "nhl"; } } },   // (level "nhl": left to run out on its own, Nov 24)
       face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level), arouse: (mn, n, cap) => arouse(mn, n, cap),   // (stir them up, for add-ons: Conditioning's deeper sessions)
       // time

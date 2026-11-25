@@ -41,10 +41,18 @@
        - Without LSCG: the farm's own trance on their screen, and the triggers kept by the farm and carried out by their
          Companion, with a give-in-or-fight choice like LSCG's.
        - ?lowpose kneel|fours: whichever is comfier is the pose a trigger puts them in. ?planted: what the farm planted.
+   • 2.1, part 2 (Nov 25, Laynie: "build part 2"; the daily build-up "yes", hijacked speech "i love it"):
+       - THE FARM'S PULL through the day, for anybody on the books with ?hypno on and the Companion, staff too: every few
+         minutes a nudge (a breath of haze, a whisper in the farm's voice, a blurred line, a slow turn of spiral), and it
+         builds. Triggers that land, sessions and milkin's feed it; time away drains it. From 60 their speech starts slippin'
+         (their Companion), and at 100 they drop under on their own and the farm takes them down. Never while a trap, a
+         scene or ?quiet has them, or they're away from the keyboard. Their Companion has a switch for it.
+       - The library's slip blocks (what comes out of them instead) and nudge blocks (the whispers) go to their Companion.
+       - The farm's own LSCG instructions: "go to a free milkin' stall" lands here (the nearest free one; the stall milks them).
 */
 import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf, fits as fitsBody } from "../_lib/connect.js";
 import { SPECIES_MORE, MALE, UDDER_KINDS, SCRIPT_MORE, GEAR_SUGGEST } from "./more-lines.js";
-import { parseLibrary, planSession, sessionSteps, lscgSuggestion, fillIn, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
+import { parseLibrary, planSession, sessionSteps, lscgSuggestion, fillIn, fits as blockFits, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
 import { STARTER } from "../../shared/trance-starter.js";
 
 // words for each species; anything unknown uses "default"
@@ -193,7 +201,13 @@ function lib() {
   LIB = Object.assign(p, { from: own ? "studio" : "starter", stamp: own ? own.stamp : "", at: own ? own.at : 0 });
   return LIB;
 }
-function setLib(text, stamp) { if (text == null) delete D().lib; else D().lib = { text: String(text).slice(0, 400000), stamp: String(stamp || "").slice(0, 60), at: Date.now() }; LIB = null; api.save(); return lib(); }
+function setLib(text, stamp) {
+  if (text == null) delete D().lib; else D().lib = { text: String(text).slice(0, 400000), stamp: String(stamp || "").slice(0, 60), at: Date.now() };
+  LIB = null; api.save();
+  const L = lib();
+  for (const m of api.here()) if (told.has(m)) sendPull(m);   // (new slips for everybody's Companion)
+  return L;
+}
 async function pull(force) {
   const W = typeof window !== "undefined" ? window : null;
   if (!W || typeof W.fetch !== "function") return { fail: "no way to reach the studio from here" };
@@ -285,6 +299,110 @@ function plantedText(mn, forMe) {
     (forMe ? "\n?planted remove <name> takes one out (all: every one)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
 }
 
+// ── the farm's pull through the day (2.1, part 2) ──────────
+const PULL = { NUDGE_MIN: [4, 9], STEP: [2, 4], TRIGGER: 5, SESSION: 8, SESSION_CAP: 90, MILKED: 3, AFTER_COLLECT: 20, AWAY_PER_H: 10, IDLE_MIN: 20 };
+const pullOf = (mn) => { const x = me(mn); return (x.pull = x.pull || { n: 0, at: Date.now(), next: 0 }); };
+// on the books, ?hypno on, a Companion to show it, and they haven't switched it off there
+function pullOn(mn) { const r = api.rec(mn), hs = api.hypnoState(mn); return !!(r && r.hypno && api.hasCompanion && api.hasCompanion(mn) && !(hs && hs.pullOff)); }
+const idle = (mn) => !!(api.idleMin && api.idleMin(mn) > PULL.IDLE_MIN);
+const held = (mn) => !!(api.busy && api.busy(mn));
+// free for a nudge, or for the farm to take them down: here, not in a session, nothin' has them, not away from the keys
+const pullFree = (mn) => pullOn(mn) && !!api.char(mn) && !running.has(mn) && !held(mn) && !idle(mn);
+// the library's slips or nudges that suit them (their deepest level, their kind, their gear, their body), as far as the
+// pull is built up (n; null: all of them, each with how far it needs, for their Companion to choose from)
+function asideLines(mn, kind, n) {
+  const who = { level: me(mn).max, species: speciesKey(mn), wears: wearsOf(mn) }, b = bodyOf(api, mn), out = [];
+  for (const blk of lib().blocks) {
+    if (blk.kind !== kind || !blockFits(blk, who)) continue;
+    const need = blk.labels.pull || 0;
+    if (n != null && need > n) continue;
+    for (const l of blk.lines) if (l.text && fitsBody(l.text, b)) out.push({ t: sayLib(mn, l.text).slice(0, 160), p: need });
+  }
+  return out;
+}
+// what their Companion keeps: how far the pull is, their sound and kind (the farm's instructions use them), their herd
+// leader (they're still heard through narrowed hearing), and the slips (sent again when the library or their level changes)
+const told = new Map();
+function sendPull(mn, slips) {
+  if (!api.hasCompanion || !api.hasCompanion(mn)) return;
+  const L = lib(), w = wordsFor(mn), key = L.from + ":" + (L.stamp || "") + ":" + me(mn).max + ":" + speciesKey(mn);
+  const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: (api.herdLeaderOf && api.herdLeaderOf(mn)) || 0 };
+  if (slips || told.get(mn) !== key) { msg.slips = asideLines(mn, "slip", null).slice(0, 60); told.set(mn, key); }
+  api.hypno(mn, msg);
+}
+function pullAdd(mn, add) {
+  if (!pullOn(mn)) return;
+  const p = pullOf(mn), was = p.n;
+  p.n = Math.max(0, Math.min(100, p.n + add)); p.at = Date.now();
+  api.save();
+  if (Math.floor(was / 10) !== Math.floor(p.n / 10)) sendPull(mn);
+  if (p.n >= 100) collect(mn);
+}
+function pullTick() {
+  const now = Date.now(), here = new Set(api.here());
+  // away from the farm, away from the keys, or switched off: it ebbs, ten an hour
+  for (const [k, x] of Object.entries(D().people)) {
+    const mn = Number(k), p = x.pull;
+    if (!p || p.n <= 0 || (here.has(mn) && pullOn(mn) && !idle(mn))) continue;
+    const h = (now - (p.at || now)) / 3600000;
+    if (h >= 0.1) { p.n = Math.max(0, p.n - h * PULL.AWAY_PER_H); p.at = now; }
+  }
+  const gap = () => between(PULL.NUDGE_MIN[0] * 60, PULL.NUDGE_MIN[1] * 60) * 1000;
+  for (const mn of here) {
+    if (!pullFree(mn)) continue;
+    const p = pullOf(mn);
+    if (p.n >= 100) { collect(mn); continue; }   // (it waited at the top till nothin' had them)
+    if (!p.next || p.next - now > PULL.NUDGE_MIN[1] * 60000) { p.next = now + gap(); continue; }
+    if (now < p.next) continue;
+    p.next = now + gap();
+    nudge(mn);
+  }
+  api.save();
+}
+// a little nudge on their screen, and the pull builds
+const NUDGES = ["haze", "voice", "voice", "blur", "spiral"];
+function nudge(mn) {
+  const p = pullOf(mn);
+  p.n = Math.min(100, p.n + between(PULL.STEP[0], PULL.STEP[1])); p.at = Date.now();
+  let fx = pick(NUDGES.filter((f) => (f !== "blur" || p.n >= 20) && (f !== "spiral" || p.n >= 40))), text = "";
+  if (fx === "voice") {
+    // the more built up, the more it leans on the lines meant for it (drowsy at 30, nearly there at 60)
+    const ls = asideLines(mn, "nudge", p.n);
+    if (ls.length) { const top = Math.max(...ls.map((x) => x.p)); text = pick(ls.filter((x) => x.p >= top - 30)).t; } else fx = "haze";
+  }
+  api.hypno(mn, { do: "nudge", fx, text, n: Math.round(p.n) });
+  api.save();
+  if (p.n >= 100) collect(mn);
+}
+// the top: they drop under on their own, and the farm takes them down (a session at the deepest they allow)
+function collect(mn) {
+  if (!pullFree(mn)) return;
+  const p = pullOf(mn), now = Date.now();
+  if (p.collectedAt && now - p.collectedAt < 10 * 60000) return;
+  p.collectedAt = now; api.save();
+  api.notice(mn, "🌀 It's been fillin' you up all day, a little at a time, and now there's no room left. You drop right where you are, and the farm comes for you.");
+  const lead = api.herdLeaderOf && api.herdLeaderOf(mn);
+  if (lead && lead !== mn && api.char(lead)) api.notice(lead, "🌀 " + api.name(mn) + " dropped under on their own. The farm's takin' them down.");
+  start(api.cfg.BOT_MEMBER, mn, me(mn).max, null, false, { collected: true });
+}
+// the farm's own LSCG instruction "go to a free milkin' stall": the nearest stall nobody's standin' in. The stalls are
+// shared (Laynie, Nov 25): nobody's own. The stall does the milkin' if there's anythin' to take.
+const stallAsked = new Map();
+function toStall(mn) {
+  if (!api.char(mn) || !api.rec(mn)) return;
+  const now = Date.now(); if (now - (stallAsked.get(mn) || 0) < 20000) return; stallAsked.set(mn, now);
+  if (held(mn)) { api.notice(mn, "🌀 Your feet want the milkin' stalls, but somethin's holdin' you right where you are."); return; }
+  const stalls = Object.entries(api.spots()).filter(([n, s]) => n.startsWith("milking") && s && s.X >= 0 && s.Y >= 0).map(([, s]) => s);
+  if (!stalls.length) { api.notice(mn, "🌀 You go lookin' for a milkin' stall, but the farm hasn't set one out."); return; }
+  const at = api.pos(mn) || { X: 0, Y: 0 }, others = api.here().filter((m) => m !== mn).map((m) => api.pos(m)).filter(Boolean);
+  const far = (s) => Math.max(Math.abs(s.X - at.X), Math.abs(s.Y - at.Y));
+  const free = stalls.filter((s) => !others.some((o) => o.X === s.X && o.Y === s.Y)).sort((a, b) => far(a) - far(b));
+  if (!free.length) { api.notice(mn, "🌀 Every milkin' stall's taken. You hover close by, achin' for a turn."); return; }
+  if (far(free[0]) === 0) return;   // already standin' in one
+  api.teleport(mn, { X: free[0].X, Y: free[0].Y });
+}
+if (typeof window !== "undefined" && window.__FARMHAND_TEST__) window.__condPull = { tick: () => pullTick(), PULL, nudge: (mn) => nudge(mn), add: (mn, n) => pullAdd(mn, n), of: (mn) => pullOf(mn) };
+
 function start(by, mn, level, own, echs, opts) {
   opts = opts || {};
   if (echs) { running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: true }); step(mn); return; }   // through ECHS: as before
@@ -299,7 +417,7 @@ function start(by, mn, level, own, echs, opts) {
     steps.splice(w >= 0 ? w : steps.length, 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
   }
   const ms = steps.reduce((n, s) => n + (s.gap || 0) * 1000, 0);
-  const run = { by, level, steps, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms };
+  const run = { by, level, steps, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms, collected: !!opts.collected };
   running.set(mn, run);
   // under: their LSCG's own trance in the farm's name if they have it (and let the farm in), the farm's own if not; their
   // Companion keeps it up till the session's done (trance.js)
@@ -355,6 +473,8 @@ function finish(mn, run) {
   else api.later(() => { if (!running.has(mn)) { api.trance(mn, 0); api.face(mn, "clear", 1); } }, run.level === "nhl" ? 120000 : 3000);
   const x = me(mn);
   x.sessions[run.level] = (x.sessions[run.level] || 0) + 1; x.total++;
+  // the farm's pull: a session feeds it (never right up to the top); the one it took them down for empties it out
+  if (pullOn(mn)) { const p = pullOf(mn); p.n = run.collected ? PULL.AFTER_COLLECT : Math.min(PULL.SESSION_CAP, Math.max(p.n, p.n + PULL.SESSION)); p.at = Date.now(); sendPull(mn); }
   const tier = MILESTONES.filter((m) => x.total >= m).length;
   if (tier > x.tier) {
     x.tier = tier;
@@ -427,7 +547,7 @@ function cmdLevel(c) {
 const progressText = (mn) => {
   const x = me(mn), next = MILESTONES.find((m) => x.total < m);
   return "🌀 Conditioning: tier " + x.tier + " (" + petName(mn) + ") · " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" +
-    (next ? " · next tier at " + next : " · top tier") + " · allows " + LEVEL_NAME[x.max];
+    (next ? " · next tier at " + next : " · top tier") + " · allows " + LEVEL_NAME[x.max] + (pullOn(mn) ? " · the farm's pull " + Math.round(pullOf(mn).n) + "%" : "");
 };
 
 function companion(mn) {
@@ -436,7 +556,8 @@ function companion(mn) {
   cards.push({ title: "Conditioning", text: r.hypno ? undefined : "Sessions need ?hypno on (in your Toggles).",
     lines: [["Tier", x.tier + " · " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]], ["Down low", lowOf(mn) === "fours" ? "on all fours" : "kneelin'"],
       ["Trance", lscgLine(mn)], ["Planted", planted.length ? planted.length + " trigger" + (planted.length === 1 ? "" : "s") : "none"]],
-    bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: (x.total / next) * 100 }] : undefined,
+    bars: [].concat(next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: (x.total / next) * 100 }] : [],
+      pullOn(mn) ? [{ label: "The farm's pull", value: Math.round(pullOf(mn).n) + "%", pct: pullOf(mn).n }] : []),
     buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max }))
       .concat([{ label: "Kneel", cmd: "lowpose kneel", accent: lowOf(mn) === "kneel" }, { label: "All fours", cmd: "lowpose fours", accent: lowOf(mn) === "fours" }])
       .concat(planted.length ? [{ label: "What's planted", cmd: "planted" }] : [])
@@ -487,12 +608,17 @@ connect({
   guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. " +
     "Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. " +
     "With LSCG (its hypnosis on, and the farm let in under LSCG settings → Extensions → B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. " +
-    "?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once.",
+    "?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. " +
+    "The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. " +
+    "LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
   setup(a) {
     api = a; D();
     // the studio on the bot's PC: anything Laynie pushed, picked up every minute or so
     const tick = () => { pull(false).catch(() => {}); api.later(tick, 60000); };
     api.later(tick, 15000);
+    // the farm's pull through the day (part 2): a look every minute at who's here
+    const ptick = () => { try { pullTick(); } catch (e) { api.log("pull: " + ((e && e.message) || e)); } api.later(ptick, 60000); };
+    api.later(ptick, 20000);
   },
   commands: {
     planted: { usage: "planted [who] | planted remove <name|all> [who]", private: true, run: cmdPlanted },
@@ -519,11 +645,19 @@ connect({
       c.reply(t ? progressText(t) : "Who's that, hon?");
     } },
   },
-  on: { safe: (mn) => { stop(mn, null); api.hypno(mn, { do: "clear" }); }, leave: (mn) => stop(mn, null),
-    hypnoSwitch: (mn, on) => { if (!on) stop(mn, null); if (Object.keys(plantedOf(mn)).length) sendFarm(mn); },
+  on: { safe: (mn) => { stop(mn, null); api.hypno(mn, { do: "clear" }); const p = pullOf(mn); p.n = 0; p.at = Date.now(); api.save(); sendPull(mn); }, leave: (mn) => { stop(mn, null); told.delete(mn); },
+    hypnoSwitch: (mn, on) => {
+      if (!on) { stop(mn, null); const p = pullOf(mn); p.n = 0; p.at = Date.now(); api.save(); }   // ?hypno off: the pull lets go of them too
+      sendPull(mn, true);
+      if (Object.keys(plantedOf(mn)).length) sendFarm(mn);
+    },
+    // a milkin' (the stall's, or staff's ?milk) feeds the pull; the farm's "go to a free stall" instruction lands here
+    milked: (mn) => pullAdd(mn, PULL.MILKED),
+    hypnoDo: (mn, d) => { if (d && d.what === "stall") toStall(mn); },
     // their Companion on their LSCG (trance.js): anything waitin' to be planted goes in when it can; LSCG come or gone,
     // the triggers move with it (the farm's own carried out by their Companion, LSCG's own by their LSCG)
     hypnoState: (mn, hs) => {
+      if (!told.has(mn) && api.rec(mn)) sendPull(mn, true);   // (a Companion just come: how far the pull is, and the slips)
       const all = plantedOf(mn), list = Object.values(all);
       if (!list.length) return;
       if (lscgOn(hs)) {
@@ -559,6 +693,7 @@ connect({
       if (e.ev === "resolved" || e.ev === "fired") {
         const x = all[e.id] || Object.values(all).find((y) => y.s.name === e.name);
         if (x) { x.fired = (x.fired || 0) + 1; if (e.resisted) x.fought = (x.fought || 0) + 1; x.last = Date.now(); api.save(); }
+        if (!e.resisted) pullAdd(mn, PULL.TRIGGER);   // a trigger that lands feeds the pull
       }
     },
     // under with the farm girl through ECHS: the session runs through it (asked for with ?hyp … echs, or not)

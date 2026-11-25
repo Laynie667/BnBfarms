@@ -15,7 +15,10 @@
      Good {animal}. Nothin' left to think about. [deeper +10]
 
    KINDS: induction · deepener · convincer · suggestion (spoken) · trigger (spoken, then planted as an LSCG suggestion) ·
-          wake · session (a recipe: which blocks, in what order)
+          wake · session (a recipe: which blocks, in what order) ·
+          slip (part 2: what comes out of their mouth in place of their own words, when their speech is hijacked) ·
+          nudge (part 2: the farm's whispers through the day, as its pull builds up in them)
+          Slips and nudges are said outside sessions, so a session never lists them.
    LABELS (any block):
      level   fun, deep, nhl           which depths it's for (none = all three)
      for     any | cow, pony, …       which kinds of stock (none = any)
@@ -27,6 +30,7 @@
      volume  60%                      of their own beats volume (never louder than theirs)
      look    haze 40%, spiral slow|on|off, rings on|off, words drift|off, names blur|clear, clear
      deeper  +10                      how much deeper they are once the block's done
+     pull    60                       slips and nudges only: used once the farm's pull in them is built up this far (0-100)
    TRIGGER BLOCKS also have:
      trigger milkin' time             the phrase that sets it off
      does    strip top → pose {low} → say "Moo… milk me please."   (LSCG's own instructions, at most three)
@@ -40,20 +44,30 @@
      cum · deny · needy · strip top|bottoms|underwear|feet|all|random|<slot> · pose {low}|kneel|kneel spread|all fours|stand|
      hands behind|hands up|upper <Pose>|lower <Pose>|full <Pose> · say "words" (or say: whatever follows the trigger) ·
      follow · touch <Activity> <zone> [self|speaker] · forget [all|deny|needy|follow|say]
+   and the farm's own (part 2, LSCG extension instructions: "From extensions" in LSCG's suggestion editor):
+     moo [1-3] (their own animal's sound, out loud) · stall (walk to a free milkin' stall, which milks them) ·
+     beg ["words"] (beg out loud to be milked, then head for a free stall) · dose <name> [half|double] (a Dispensary dose)
 */
 
-export const KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "session"];
+export const KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "slip", "nudge", "session"];
 export const SPOKEN = KINDS.filter((k) => k !== "session");
+// what a session is made of; slips and nudges are said outside sessions (the farm's pull, part 2)
+export const SESSION_KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake"];
+export const ASIDE = ["slip", "nudge"];
 export const LEVELS = ["fun", "deep", "nhl"];
 export const BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], beta: [13, 20] };
 export const BAND_RANGE = { delta: "1-4 Hz", theta: "4-8 Hz", alpha: "8-12 Hz", beta: "12-30 Hz" };
 export const HZ_MIN = 1, HZ_MAX = 30;
 export const MAX_DOES = 3;
-const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "trigger", "does", "waits"];
+const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits"];
 
 // LSCG's own instruction names (Settings/Models/hypno.ts, LSCGHypnoInstruction)
 export const LSCG = { cum: "Orgasm", deny: "Denial", needy: "Insatiable", touch: "Perform Activity", strip: "Strip", pose: "Assume Pose",
   follow: "Follow", say: "Speak Phrase", forget: "Forget" };
+// the farm's own (part 2): LSCG extension instructions, "<extension id>.<name>". The Companion registers bnbfarm's; the
+// Dispensary registers its dose.
+export const FARM = { sound: "bnbfarm.sound", stall: "bnbfarm.stall", beg: "bnbfarm.beg", dose: "farmhand-dispensary.dose" };
+export const FARM_TYPES = Object.values(FARM);
 // a few names for the game's poses (the game's own names work too: upper/lower/full <Name>)
 export const POSES = {
   kneel: { lower: "Kneel" }, "kneel spread": { lower: "KneelingSpread" }, "kneeling spread": { lower: "KneelingSpread" },
@@ -209,12 +223,25 @@ export function parseStep(s, ctx) {
     const ins = []; for (const w of what) { const f = FORGET[w.toLowerCase()]; if (!f) return { error: 'forget what? "' + w + '" (all, deny, needy, follow, say)' }; ins.push(f); }
     return { type: LSCG.forget, arguments: { selection: { all: false, instructions: Array.from(new Set(ins)) } } };
   }
-  return { error: 'I don\'t know "' + t + '" (cum, deny, needy, strip …, pose …, say "…", follow, touch <Activity> <zone>, forget …)' };
+  // the farm's own (part 2): its options go in arguments.options, the way LSCG keeps an extension instruction's
+  if ((m = /^(?:moo|sound|noise|make (?:their|your|a) (?:sound|noise))(?:\s+(\d+))?$/i.exec(t))) {
+    const n = Number(m[1] || 1);
+    if (!(n >= 1 && n <= 3)) return { error: "moo once, twice or three times (moo, moo 2, moo 3)" };
+    return { type: FARM.sound, arguments: { options: { times: n } } };
+  }
+  if (/^(?:stall|to (?:a |the )?stalls?|go to (?:a |the )?(?:free )?(?:milk(?:in'?g?)? )?stall)$/i.test(t)) return { type: FARM.stall, arguments: { options: {} } };
+  if ((m = /^beg(?:\s+to be milked|\s+for it)?(?:\s*:)?(?:\s+(.+))?$/i.exec(t))) {
+    const words = m[1] ? unquote(m[1]) : "";
+    if (/[()]/.test(words) || /^[*!/.]/.test(words)) return { error: "what they beg can't start with * ! / . or have round brackets" };
+    return { type: FARM.beg, arguments: { options: words ? { words: words.slice(0, 120) } : {} } };
+  }
+  if ((m = /^dose\s+(.+?)(?:\s+(half|whole|double))?$/i.exec(t))) return { type: FARM.dose, arguments: { options: { dose: lc(m[1]).slice(0, 40), strength: lc(m[2] || "whole") } } };
+  return { error: 'I don\'t know "' + t + '" (cum, deny, needy, strip …, pose …, say "…", follow, touch <Activity> <zone>, forget …, or the farm\'s: moo, stall, beg "…", dose <name>)' };
 }
 // "strip top → pose {low} → say "Moo"" with "2s, 2s" → { ok, instructions } (LSCG's shape, delay in ms) or { error }
 export function parseDoes(does, waits, ctx) {
   const parts = steps(clean(does));
-  if (!parts.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget)" };
+  if (!parts.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget, moo, stall, beg, dose)" };
   if (parts.length > MAX_DOES) return { error: "at most " + MAX_DOES + " things (LSCG's limit), not " + parts.length };
   const w = list(waits || "").map(seconds), out = [];
   for (let i = 0; i < parts.length; i++) {
@@ -261,8 +288,8 @@ export function parseLibrary(text) {
     if (!clean(line)) { if (b.lines.length || Object.keys(b.raw).length) inLabels = false; return; }
     const lab = /^\s*([A-Za-z]+)\s*:\s*(.*)$/.exec(line);
     const key = lab && lab[1].toLowerCase();
-    if (inLabels && lab && (LABELS.includes(key) || (b.kind === "session" && SPOKEN.includes(key)))) {
-      if (b.kind === "session" && SPOKEN.includes(key)) (b.raw.picks = b.raw.picks || []).push([key, lab[2], n]);
+    if (inLabels && lab && (LABELS.includes(key) || (b.kind === "session" && SESSION_KINDS.includes(key)))) {
+      if (b.kind === "session" && SESSION_KINDS.includes(key)) (b.raw.picks = b.raw.picks || []).push([key, lab[2], n]);
       else b.raw[key] = [lab[2], n];
       return;
     }
@@ -298,6 +325,12 @@ function finish(b, err, warn) {
   if (get("volume")) { const m = /^(\d{1,3})\s*%?$/.exec(clean(r.volume[0])); if (!m || Number(m[1]) > 100) err(r.volume[1], "volume is 0% to 100% of their own"); else L.volume = Number(m[1]); }
   if (get("look")) { const v = parseLook(r.look[0]); if (v.bad.length) err(r.look[1], "I don't know the look " + v.bad.join(", ") + " (haze N%, spiral slow|on|off, rings on|off, words drift|off, names blur|clear, clear)"); else L.look = v.look; }
   if (get("deeper")) { const m = /^\+?\s*(-?\d+)$/.exec(clean(r.deeper[0])); if (!m) err(r.deeper[1], "deeper is a number, like +10"); else L.deeper = Math.max(-100, Math.min(100, Number(m[1]))); }
+  if (get("pull")) {
+    const m = /^(\d{1,3})\s*%?\s*\+?$/.exec(clean(r.pull[0]));
+    if (!ASIDE.includes(b.kind)) warn(r.pull[1], "pull only means somethin' on a slip or a nudge, so it's skipped here");
+    else if (!m || Number(m[1]) > 100) err(r.pull[1], "pull is how far the farm's pull has to be built up first, 0 to 100, like: pull: 60");
+    else L.pull = Number(m[1]);
+  }
   if (b.kind === "trigger") {
     if (!get("trigger") || clean(r.trigger[0]).length < 4) err(get("trigger") ? r.trigger[1] : b.at, "a trigger needs its phrase, 4 letters or more: trigger: milkin' time");
     else { L.trigger = clean(r.trigger[0]).replace(/[()]/g, "").slice(0, 80); if (/^[*!/.]/.test(L.trigger)) err(r.trigger[1], "a trigger can't start with * ! / ."); }
@@ -347,6 +380,7 @@ export function formatBlock(b) {
   if (L.volume != null) out.push("volume: " + L.volume + "%");
   if (L.look && formatLook(L.look)) out.push("look: " + formatLook(L.look));
   if (L.deeper) out.push("deeper: " + (L.deeper > 0 ? "+" : "") + L.deeper);
+  if (L.pull && ASIDE.includes(b.kind)) out.push("pull: " + L.pull);
   if (b.kind === "trigger") { if (L.trigger) out.push("trigger: " + L.trigger); if (L.does) out.push("does: " + L.does); if (L.waits) out.push("waits: " + L.waits); }
   if (b.kind === "session") for (const p of L.picks || []) out.push(p.kind + ": " + p.items.map((it) => (it.all ? "all" : it.any ? (it.any > 1 ? "any " + it.any : "any") : it.name)).join(", "));
   if (b.lines && b.lines.length) {

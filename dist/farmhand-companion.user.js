@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.81.1
+// @version      0.82.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.81.1";
+  var VERSION = "0.82.0";
 
   // shared/species.js
   var WORDS = {
@@ -18621,7 +18621,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var LSCG_ID = "bnbfarm";
   var SUGG_PREFIX = "bnbfarm-";
   var FARM_KEY2 = "fhc-farm-sugg";
-  var INSTR = ["Orgasm", "Denial", "Insatiable", "Perform Activity", "Strip", "Assume Pose", "Follow", "Speak Phrase", "Forget"];
+  var FARM_I = { sound: LSCG_ID + ".sound", stall: LSCG_ID + ".stall", beg: LSCG_ID + ".beg", dose: "farmhand-dispensary.dose" };
+  var INSTR = ["Orgasm", "Denial", "Insatiable", "Perform Activity", "Strip", "Assume Pose", "Follow", "Speak Phrase", "Forget"].concat(Object.values(FARM_I));
   var MAX_MS2 = 3 * 36e5;
   var ctx = null;
   var LA = null;
@@ -18640,7 +18641,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     keptAt: 0,
     waking: false,
     lastReport: "",
-    glide: null
+    glide: null,
+    // part 2: the farm's pull (0-100, the bot keeps it), your sound and kind, your herd leader, the library's slips;
+    // a while after a session (afterUntil, afterLevel); hearin' narrowed after a trigger (narrowUntil, narrowBy)
+    pullN: 0,
+    me: { sound: "", animal: "", herd: 0 },
+    slips: [],
+    afterUntil: 0,
+    afterLevel: "",
+    narrowUntil: 0,
+    narrowBy: 0,
+    narrowKey: "",
+    hijackAt: 0,
+    speaking: false
   };
   function initTrance(c) {
     ctx = c;
@@ -18652,7 +18665,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       endAll(true);
       loadFarm();
       T.lastReport = "";
+      T.pullN = 0;
+      T.slips = [];
+      T.me = { sound: "", animal: "", herd: 0 };
     });
+    watchChat();
     setInterval(tick2, 5e3);
   }
   var H = () => {
@@ -18736,8 +18753,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         endAll();
       });
       on3("hypno.suggestionResolved", (p) => {
-        if (Number(p.installedBy) === BOT_MEMBER) event({ ev: "resolved", name: String(p.suggestion || "").slice(0, 80), resisted: !!p.resisted });
+        if (Number(p.installedBy) !== BOT_MEMBER) return;
+        event({ ev: "resolved", name: String(p.suggestion || "").slice(0, 80), resisted: !!p.resisted });
+        if (!p.resisted) narrowFor(Number(p.sender) || 0);
       });
+      try {
+        if (LA.hypno && typeof LA.hypno.registerInstruction === "function" && (!Lg.capabilities || !Lg.capabilities.has || Lg.capabilities.has("hypno.instructions"))) farmInstructions();
+      } catch (e) {
+        console.warn("[Farmhand Companion] farm instructions:", e);
+      }
       on3("hypno.triggered", () => report());
       on3("settings.saved", () => report());
       try {
@@ -18797,6 +18821,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       case "clear":
         endAll();
         break;
+      case "pull":
+        setPull(m);
+        break;
+      // part 2: how far the farm's pull is, your sound, your herd leader, the slips
+      case "nudge":
+        nudge(m);
+        break;
     }
   }
   var clampMs = (ms) => Math.max(6e4, Math.min(MAX_MS2, Number(ms) || 18e5));
@@ -18826,11 +18857,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     look({ haze: 20 }, true);
     event({ ev: "under", via: T.session.via });
     report(true);
+    drawNarrow();
   }
   function wake() {
     const s = T.session;
     T.session = null;
     T.lingerUntil = 0;
+    if (s && !s.ended) afterglow(s.level, 0);
     if (s && s.via === "lscg" && s.ours && !s.ended && hypnotized()) {
       const h2 = hypState();
       if (h2) {
@@ -18846,11 +18879,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     farmBeatsStop(2);
     clearLook();
     report(true);
+    drawNarrow();
   }
   function linger(secs) {
-    if (T.session) T.session.keepOff = true;
+    if (T.session) {
+      T.session.keepOff = true;
+      afterglow(T.session.level, Math.max(10, Math.min(600, secs)) * 1e3);
+    }
     T.lingerUntil = Date.now() + Math.max(10, Math.min(600, secs)) * 1e3;
     report(true);
+  }
+  var AFTER_MIN = { fun: 5, deep: 15, nhl: 30 };
+  function afterglow(level, from) {
+    T.afterLevel = AFTER_MIN[level] ? level : "fun";
+    T.afterUntil = Date.now() + (from || 0) + AFTER_MIN[T.afterLevel] * 6e4;
   }
   function endAll(quiet) {
     const had = !!(T.session || lingering() || T.pending || T.phrase || T.denyUntil > Date.now() || T.needyUntil > Date.now());
@@ -18859,6 +18901,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     T.phrase = null;
     T.denyUntil = 0;
     T.needyUntil = 0;
+    T.afterUntil = 0;
+    T.narrowUntil = 0;
+    T.pullN = 0;
+    drawNarrow();
     const el2 = W14.document && W14.document.querySelectorAll ? W14.document.querySelectorAll(".fhc-sg-ask") : [];
     for (const x of el2) x.remove();
     if (had && !quiet && ctx) ctx.toChat("\u{1F300} All of it lets go of you.", "#a67fd4", true);
@@ -18890,7 +18936,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       under: !!(T.session || hypnotized()),
       ours: !!(T.session && T.session.via === "lscg" && T.session.ours && !T.session.ended && hypnotized()),
       farmBeats: !!(ctx && ctx.prefs().farmBeats),
-      planted: h2 && Array.isArray(h2.suggestions) ? h2.suggestions.filter((s) => s && typeof s.id === "string" && s.id.indexOf(SUGG_PREFIX) === 0).map((s) => s.id) : []
+      planted: h2 && Array.isArray(h2.suggestions) ? h2.suggestions.filter((s) => s && typeof s.id === "string" && s.id.indexOf(SUGG_PREFIX) === 0).map((s) => s.id) : [],
+      pullOff: !!(ctx && ctx.prefs().noPull),
+      slipsOff: !!(ctx && ctx.prefs().noSlips)
     };
   }
   function tranceHello() {
@@ -19051,12 +19099,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!d || !d.body) return null;
     let el2 = d.getElementById("fhc-hyp");
     if (el2) return el2;
-    if (!d.getElementById("fhc-hyp-css")) {
-      const s = d.createElement("style");
-      s.id = "fhc-hyp-css";
-      s.textContent = "#fhc-hyp{position:fixed;inset:0;pointer-events:none;z-index:9997;overflow:hidden}#fhc-hyp>div{position:absolute;transition:opacity 4s}#fhc-hyp .haze{inset:0;animation:fhcBreathe 8s ease-in-out infinite}#fhc-hyp.calm .haze{animation:none}#fhc-hyp .spiral{left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:0;animation:fhcSpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%);mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%)}#fhc-hyp .spiral.on{animation-duration:35s}#fhc-hyp.calm .spiral{animation:none}#fhc-hyp .ring{left:50%;top:50%;width:30vmin;height:30vmin;margin:-15vmin 0 0 -15vmin;border-radius:50%;border:2px solid rgba(205,160,235,.35);opacity:0;animation:fhcRing 9s ease-out infinite}#fhc-hyp .word{left:0;top:72%;max-width:42vw;font:italic 1.15rem Georgia,serif;color:rgba(232,200,250,.8);text-shadow:0 0 6px rgba(120,40,160,.8);opacity:0;animation:fhcDrift 16s linear forwards}#fhc-hyp .glow{inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,225,245,.55),rgba(240,150,210,.25) 55%,transparent 80%);animation:fhcGlow 3.4s ease-out forwards}@keyframes fhcBreathe{0%,100%{opacity:.85}50%{opacity:1}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcRing{0%{transform:scale(.4);opacity:0}30%{opacity:.35}100%{transform:scale(3.4);opacity:0}}@keyframes fhcDrift{0%{transform:translateY(0);opacity:0}15%{opacity:.85}80%{opacity:.6}100%{transform:translateY(-48vh);opacity:0}}@keyframes fhcGlow{0%{opacity:0}25%{opacity:1}100%{opacity:0}}@keyframes fhcShudder{0%,100%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}";
-      d.head.appendChild(s);
-    }
+    css();
     el2 = d.createElement("div");
     el2.id = "fhc-hyp";
     const haze = d.createElement("div");
@@ -19075,6 +19118,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     d.body.appendChild(el2);
     return el2;
+  }
+  function css() {
+    const d = W14.document;
+    if (!d.getElementById("fhc-hyp-css")) {
+      const s = d.createElement("style");
+      s.id = "fhc-hyp-css";
+      s.textContent = "#fhc-hyp{position:fixed;inset:0;pointer-events:none;z-index:9997;overflow:hidden}#fhc-hyp>div{position:absolute;transition:opacity 4s}#fhc-hyp .haze{inset:0;animation:fhcBreathe 8s ease-in-out infinite}#fhc-hyp.calm .haze{animation:none}#fhc-hyp .spiral{left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:0;animation:fhcSpin 70s linear infinite;-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%);mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%)}#fhc-hyp .spiral.on{animation-duration:35s}#fhc-hyp.calm .spiral{animation:none}#fhc-hyp .ring{left:50%;top:50%;width:30vmin;height:30vmin;margin:-15vmin 0 0 -15vmin;border-radius:50%;border:2px solid rgba(205,160,235,.35);opacity:0;animation:fhcRing 9s ease-out infinite}#fhc-hyp .word{left:0;top:72%;max-width:42vw;font:italic 1.15rem Georgia,serif;color:rgba(232,200,250,.8);text-shadow:0 0 6px rgba(120,40,160,.8);opacity:0;animation:fhcDrift 16s linear forwards}#fhc-hyp .glow{inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,225,245,.55),rgba(240,150,210,.25) 55%,transparent 80%);animation:fhcGlow 3.4s ease-out forwards}@keyframes fhcBreathe{0%,100%{opacity:.85}50%{opacity:1}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcRing{0%{transform:scale(.4);opacity:0}30%{opacity:.35}100%{transform:scale(3.4);opacity:0}}@keyframes fhcDrift{0%{transform:translateY(0);opacity:0}15%{opacity:.85}80%{opacity:.6}100%{transform:translateY(-48vh);opacity:0}}@keyframes fhcGlow{0%{opacity:0}25%{opacity:1}100%{opacity:0}}@keyframes fhcShudder{0%,100%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}#fhc-nudge{position:fixed;inset:0;pointer-events:none;z-index:9996;overflow:hidden}#fhc-nudge .breath{position:absolute;inset:0;opacity:0;animation:fhcBreath 9s ease-in-out forwards}#fhc-nudge .turn{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:0;animation:fhcBreath 11s ease-in-out forwards;-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%);mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%)}#fhc-nudge .turn>div{position:absolute;inset:0;animation:fhcSpin 70s linear infinite}#fhc-nudge.calm .turn>div{animation:none}@keyframes fhcBreath{0%{opacity:0}40%{opacity:1}100%{opacity:0}}";
+      d.head.appendChild(s);
+    }
   }
   var SPIRAL = "";
   function spiralSvg() {
@@ -19187,7 +19239,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       mod3.hookFunction("ServerSend", 10, (args, next) => {
         try {
           const d = args[1];
-          if (T.phrase && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
+          if (!T.phrase && !T.speaking && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && d.Content.trim() && !/^\s*[(\[?!./\-*]/.test(d.Content) && Math.random() < hijackChance()) {
+            hijack(d.Content);
+            return;
+          }
+          if (T.phrase && !T.speaking && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
             if (d.Content.trim().toLowerCase().replace(/[.!~]+$/, "") === T.phrase.toLowerCase().replace(/[.!~]+$/, "")) T.phrase = null;
             else {
               ctx.toChat("\u{1F300} Nothin' will come out but: " + T.phrase, "#a67fd4", true);
@@ -19322,7 +19378,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     T.pull[p.s.id] = Math.max(5, Math.min(95, pull + (resisted ? -3 : 4)));
     saveFarm();
     event({ ev: "fired", id: p.s.id, name: p.s.name, resisted });
-    if (!resisted) perform(p);
+    if (!resisted) {
+      narrowFor(p.by);
+      perform(p);
+    }
   }
   function perform(p) {
     let wait2 = 0;
@@ -19397,6 +19456,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (has("Insatiable")) T.needyUntil = 0;
         if (has("Speak Phrase")) T.phrase = null;
         emote(me5 + " blinks, a little lighter, somethin' let go of.");
+        break;
+      }
+      // the farm's own (part 2)
+      case FARM_I.sound:
+        farmSound((a.options || {}).times);
+        break;
+      case FARM_I.stall:
+        farmStall(p.by);
+        break;
+      case FARM_I.beg:
+        farmBeg((a.options || {}).words, (a.options || {}).stall, p.by);
+        break;
+      case FARM_I.dose: {
+        const D = W14.FarmhandDispensary, o = a.options || {};
+        if (D && typeof D.take === "function") D.take(String(o.dose || ""), String(o.strength || "whole"), p.by);
+        else ctx.toChat("\u{1F300} Somethin' in you reaches for a dose, but there's no Dispensary here to give it.", "#a67fd4", true);
         break;
       }
     }
@@ -19474,6 +19549,267 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!it) return fail("not somethin' that can be done there right now");
     W14.ActivityRun(P5, target2, group, { Activity: it.Activity, Group: group.Name, Item: it.Item }, true);
   }
+  function farmInstructions() {
+    const reg = (d) => {
+      try {
+        LA.hypno.registerInstruction(d);
+      } catch (e) {
+        console.warn("[Farmhand Companion] LSCG wouldn't take " + d.name + ":", e);
+      }
+    };
+    reg({
+      name: "sound",
+      label: "Make their animal sound",
+      description: "B&B Farm: they make their own animal's sound out loud (a cow moos, a pony whinnies), once or a few times.",
+      options: [{ type: "number", key: "times", label: "How many times", min: 1, max: 3, default: 1 }],
+      perform: (c) => farmSound(c.options.times)
+    });
+    reg({
+      name: "stall",
+      label: "Go to a free milking stall",
+      unrepeatable: true,
+      description: "B&B Farm: on the farm, they walk to the nearest free milking stall, and the stall milks them if there's anythin' to take.",
+      perform: (c) => farmStall(c.sender)
+    });
+    reg({
+      name: "beg",
+      label: "Beg to be milked",
+      unrepeatable: true,
+      description: "B&B Farm: they beg out loud to be milked (in their own animal's sound, unless you give the words), then head for a free milking stall on the farm.",
+      options: [
+        { type: "text", key: "words", label: "What they beg", maxLength: 120, description: "Leave empty for the farm's own words. {sound} and {animal} fill in." },
+        { type: "toggle", key: "stall", label: "Then go to a free stall", default: true }
+      ],
+      perform: (c) => farmBeg(c.options.words, c.options.stall, c.sender)
+    });
+  }
+  var cap = (s) => String(s || "").replace(/^./, (c) => c.toUpperCase());
+  var pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+  var soundWord = () => {
+    const s = String(T.me.sound || "moo").trim().toLowerCase();
+    return !s || /\s/.test(s) ? "mmh" : s;
+  };
+  var stretch = (w) => w.replace(/([aeiou])(?=[^aeiou]*$)/i, "$1$1$1");
+  function sayOut(text3) {
+    try {
+      if (typeof W14.ServerSend !== "function") return;
+      T.speaking = true;
+      W14.ServerSend("ChatRoomChat", { Type: "Chat", Content: String(text3).replace(/[()]/g, "").slice(0, 300) });
+    } catch (e) {
+    } finally {
+      T.speaking = false;
+    }
+  }
+  function farmSound(times) {
+    const n = Math.max(1, Math.min(3, Math.round(Number(times) || 1))), s = soundWord(), out = [];
+    for (let i = 0; i < n; i++) out.push(i === n - 1 ? stretch(s) + "~" : s);
+    sayOut(cap(out.join("\u2026 ")));
+  }
+  function farmStall(by) {
+    if (!ctx.botHere()) {
+      ctx.toChat("\u{1F300} Your feet want a milkin' stall, but there's no farm here to find one in.", "#a67fd4", true);
+      return;
+    }
+    emote(myName() + "'s eyes go soft, and their feet start for the milkin' stalls.");
+    ctx.toBot("hypnoDo", { what: "stall", by: Number(by) || 0 });
+  }
+  var BEGS = ["{Sound}\u2026 please, milk me\u2026", "Milk me\u2026 please, I'm so full\u2026", "{Sound}\u2026 need milked\u2026 please\u2026", "Please\u2026 the stall\u2026 milk me\u2026"];
+  function farmBeg(words, stall, by) {
+    const s = soundWord(), fillW = (t) => String(t).replace(/\{Sound\}/g, cap(s)).replace(/\{sound\}/g, s).replace(/\{animal\}/gi, T.me.animal || "animal");
+    const own = String(words || "").trim();
+    sayOut(fillW(own && !/^[*!/.]/.test(own) ? own : pickOf(BEGS)));
+    if (stall !== false) setTimeout(() => farmStall(by), 2e3);
+  }
+  function setPull(m) {
+    T.pullN = Math.max(0, Math.min(100, Number(m.n) || 0));
+    if (typeof m.sound === "string") T.me.sound = m.sound.slice(0, 30);
+    if (typeof m.animal === "string") T.me.animal = m.animal.slice(0, 30);
+    if (m.herd != null) {
+      T.me.herd = Number(m.herd) || 0;
+      drawNarrow();
+    }
+    if (Array.isArray(m.slips)) T.slips = m.slips.filter((x) => x && typeof x.t === "string" && x.t.trim()).slice(0, 60).map((x) => ({ t: x.t.replace(/[()]/g, "").slice(0, 160), p: Math.max(0, Math.min(100, Number(x.p) || 0)) }));
+  }
+  var pullOn = () => !!ctx && !ctx.prefs().noPull && !isBot();
+  function nudge(m) {
+    if (!pullOn()) return;
+    T.pullN = Math.max(0, Math.min(100, Number(m.n) || T.pullN));
+    const fx = String(m.fx || "");
+    if (fx === "voice" && m.text) ctx.toChat("[Voice] " + String(m.text).replace(/[()]/g, "").slice(0, 200), "#a67fd4", true);
+    if (!lookOn() || T.session) return;
+    if (fx === "blur" && blurLine()) return;
+    if (fx === "spiral") {
+      turnOfSpiral();
+      return;
+    }
+    breath(fx === "voice" ? 0.5 : 1);
+  }
+  function nudgeRoot() {
+    const d = W14.document;
+    if (!d || !d.body) return null;
+    css();
+    let el2 = d.getElementById("fhc-nudge");
+    if (!el2) {
+      el2 = d.createElement("div");
+      el2.id = "fhc-nudge";
+      d.body.appendChild(el2);
+    }
+    el2.classList.toggle("calm", calm());
+    return el2;
+  }
+  function breath(k) {
+    const el2 = nudgeRoot();
+    if (!el2) return;
+    const b = W14.document.createElement("div");
+    b.className = "breath";
+    const haze = Math.round(30 + 25 * Math.min(1, T.pullN / 100)) * (k || 1);
+    b.style.background = "radial-gradient(ellipse at center, transparent " + Math.max(25, 62 - haze * 0.4) + "%, rgba(88,28,118," + (haze / 100 * 0.78).toFixed(3) + ") 100%)";
+    el2.appendChild(b);
+    setTimeout(() => b.remove(), 9500);
+  }
+  function blurLine() {
+    const d = W14.document, me5 = W14.Player && W14.Player.MemberNumber;
+    const lines = Array.from(d.querySelectorAll("#TextAreaChatLog .ChatMessageChat[data-sender]")).filter((e) => Number(e.getAttribute("data-sender")) !== me5 && !e.classList.contains("fhc-ooc"));
+    const el2 = lines[lines.length - 1];
+    if (!el2) return false;
+    el2.style.transition = "filter 3s, opacity 3s";
+    el2.style.filter = "blur(2px)";
+    el2.style.opacity = "0.5";
+    setTimeout(() => {
+      el2.style.filter = "";
+      el2.style.opacity = "";
+    }, 2e4);
+    return true;
+  }
+  function turnOfSpiral() {
+    const el2 = nudgeRoot();
+    if (!el2) return;
+    const t = W14.document.createElement("div");
+    t.className = "turn";
+    t.style.opacity = "0";
+    const inner = W14.document.createElement("div");
+    inner.style.background = 'center/contain no-repeat url("' + spiralSvg() + '")';
+    inner.style.opacity = calm() ? "0.05" : "0.1";
+    t.appendChild(inner);
+    el2.appendChild(t);
+    setTimeout(() => t.remove(), 11500);
+  }
+  function hijackChance() {
+    if (!ctx || ctx.prefs().noSlips || isBot()) return 0;
+    const now = Date.now();
+    if (now - T.hijackAt < 45e3) return 0;
+    let c = 0;
+    if (pullOn() && T.pullN >= 60) c = (T.pullN - 50) / 200;
+    if (T.afterUntil > now) c = Math.max(c, { fun: 0.08, deep: 0.18, nhl: 0.3 }[T.afterLevel] || 0.08);
+    if (T.session && T.session.via === "farm" && !T.session.ended) c = Math.max(c, 0.35);
+    return Math.min(0.4, c);
+  }
+  function hijackDepth() {
+    const now = Date.now();
+    let d = pullOn() ? T.pullN / 100 : 0;
+    if (T.afterUntil > now) d = Math.max(d, { fun: 0.4, deep: 0.7, nhl: 0.95 }[T.afterLevel] || 0.4);
+    if (T.session && !T.session.ended) d = Math.max(d, 0.8);
+    return Math.min(1, d);
+  }
+  var THINKING = ["'s lips part\u2026 a thought tryin' to form\u2026", " opens their mouth, and the words go slow and far away\u2026", " starts to speak, and stalls there, eyes driftin'\u2026"];
+  function hijack(text3, way) {
+    T.hijackAt = Date.now();
+    const me5 = myName(), deep = hijackDepth();
+    emote(me5 + pickOf(THINKING));
+    ctx.toChat("\u{1F300} You tried to say: " + String(text3).slice(0, 200), "#a67fd4", true);
+    if (!way) {
+      const ways = [["blank", 0.25], ["late", Math.max(0.05, 0.35 * (1 - deep))], ["wrong", 0.25 + 0.3 * deep], ["squirm", 0.08 + 0.17 * deep]];
+      let r = Math.random() * ways.reduce((n, w) => n + w[1], 0);
+      way = "wrong";
+      for (const [w, x] of ways) {
+        if ((r -= x) < 0) {
+          way = w;
+          break;
+        }
+      }
+    }
+    setTimeout(() => {
+      try {
+        if (way === "blank") emote(me5 + " stares, mouth open\u2026 nothin' comes.");
+        else if (way === "late") setTimeout(() => sayOut(slowly(text3)), 2500 + Math.random() * 2500);
+        else if (way === "wrong") sayOut(slipLine());
+        else {
+          emote(me5 + " loses the words altogether, hands driftin' down, squirmin' where they stand.");
+          if (ctx.arouse) ctx.arouse(8, 90);
+        }
+      } catch (e) {
+      }
+    }, 2e3);
+    return way;
+  }
+  function slowly(text3) {
+    const w = String(text3).trim().split(/\s+/);
+    return w.map((x, i) => i > 0 && Math.random() < 0.3 ? "\u2026 " + x : x).join(" ").replace(/[.!?~…]*$/, "\u2026");
+  }
+  function slipLine() {
+    const depth = Math.round(hijackDepth() * 100), ok2 = T.slips.filter((x) => x.p <= depth);
+    const list = ok2.length ? ok2 : T.slips.filter((x) => x.p === 0);
+    if (list.length) {
+      const top = Math.max(...list.map((x) => x.p));
+      return pickOf(list.filter((x) => x.p >= top - 30)).t;
+    }
+    return cap(stretch(soundWord())) + "~";
+  }
+  function narrowFor(by) {
+    T.narrowUntil = Date.now() + 3 * 6e4;
+    T.narrowBy = Number(by) || 0;
+    drawNarrow();
+  }
+  var narrowed = () => !!ctx && !isBot() && lookOn() && (T.session && !T.session.ended || T.narrowUntil > Date.now());
+  function drawNarrow() {
+    const d = W14.document;
+    if (!d || !d.head) return;
+    let s = d.getElementById("fhc-hyp-hear");
+    if (!narrowed()) {
+      if (s) s.remove();
+      T.narrowKey = "";
+      return;
+    }
+    const keep3 = [W14.Player && W14.Player.MemberNumber, BOT_MEMBER, T.me.herd, T.narrowBy, T.session && T.session.by].map(Number).filter((x) => x > 0);
+    const key3 = Array.from(new Set(keep3)).join(",");
+    if (s && T.narrowKey === key3) return;
+    T.narrowKey = key3;
+    const not = key3.split(",").map((m) => ':not([data-sender="' + m + '"])').join("") + ":not(.fhc-ooc)";
+    if (!s) {
+      s = d.createElement("style");
+      s.id = "fhc-hyp-hear";
+      d.head.appendChild(s);
+    }
+    s.textContent = "#TextAreaChatLog .ChatMessageChat[data-sender]" + not + ",#TextAreaChatLog .ChatMessageWhisper[data-sender]" + not + "{filter:blur(1.4px);opacity:.45;transition:filter 2s,opacity 2s}";
+  }
+  function oocOf(el2) {
+    const names2 = el2.querySelectorAll ? el2.querySelectorAll(".ChatMessageName") : [], nm = names2[names2.length - 1];
+    let body2 = "";
+    for (let n = nm && nm.nextSibling; n; n = n.nextSibling) body2 += n.textContent || "";
+    return (nm ? body2 : String(el2.textContent || "")).includes("(");
+  }
+  function watchChat() {
+    const d = W14.document;
+    if (!d || typeof W14.MutationObserver !== "function") return;
+    let log2 = null;
+    const mark = (el2) => {
+      try {
+        if (el2 && el2.classList && /\bChatMessage(Chat|Whisper)\b/.test(el2.className) && oocOf(el2)) el2.classList.add("fhc-ooc");
+      } catch (e) {
+      }
+    };
+    const hook4 = () => {
+      const l = d.getElementById("TextAreaChatLog");
+      if (!l || l === log2) return;
+      log2 = l;
+      for (const el2 of l.children) mark(el2);
+      new W14.MutationObserver((ms) => {
+        for (const m of ms) for (const n of m.addedNodes) mark(n);
+      }).observe(l, { childList: true });
+    };
+    hook4();
+    setInterval(hook4, 3e3);
+  }
   function tick2() {
     try {
       const now = Date.now(), s = T.session;
@@ -19503,6 +19839,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         T.needyAt = now;
         ctx.arouse(6, 92);
       }
+      drawNarrow();
       report(false);
     } catch (e) {
     }
@@ -19613,7 +19950,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         prefNot(ctx4, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
         prefNot(ctx4, "noTrance", "Trance look", "During a session: a haze at the edges of your screen, a slow spiral, soft rings, the farm's words driftin' up, names blurrin'. Nothin' ever flashes"),
         prefNot(ctx4, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
-        ctx4.s.staff ? prefNot(ctx4, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null
+        ctx4.s.staff ? prefNot(ctx4, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped, T the farm's pull close to takin' them under") : null
       ),
       tranceCard(ctx4)
     ];
@@ -19625,6 +19962,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       muted(t.text),
       ctx4.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx4.send("lowpose kneel")), btn("All fours", () => ctx4.send("lowpose fours"))) : null,
       pref(ctx4, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
+      prefNot(ctx4, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
+      prefNot(ctx4, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
       pref(ctx4, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
       ctx4.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx4.setPref("farmBeatsVol", v) }, v + "%"))) : null
     );
@@ -24327,6 +24666,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (x.heat) tags.push(["H", "#d9534f"]);
         if (x.preg) tags.push(["B", "#8fbf6a"]);
         if (x.denied) tags.push(["X", "#c9a35b"]);
+        if (x.pull != null && x.pull >= 60) tags.push(["T", "#b58ad9"]);
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me5.X + R) * tile, sy = (C2.MapData.Pos.Y - me5.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
@@ -24349,8 +24689,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       if (!stirOn() || !W21.Player || !W21.Player.ArousalSettings || typeof W21.ActivitySetArousal !== "function") return;
       if (W21.Player.ArousalSettings.Active === "Inactive" || W21.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W21.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
-      const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
+      const cur = Number(W21.Player.ArousalSettings.Progress) || 0, cap2 = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      const next = Math.max(0, Math.min(cap2, cur + (Number(m.add) || 0)));
       if (next > cur || m.add < 0) W21.ActivitySetArousal(W21.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
@@ -25213,7 +25553,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
     try {
-      initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere: botHere2, mod: mod2, arouse: (add3, cap) => arouse({ add: add3, cap }), lead });
+      initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere: botHere2, mod: mod2, arouse: (add3, cap2) => arouse({ add: add3, cap: cap2 }), lead });
     } catch (e) {
       console.warn("[Farmhand Companion] trance:", e);
     }

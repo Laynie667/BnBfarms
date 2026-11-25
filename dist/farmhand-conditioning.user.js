@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      2.0.0
+// @version      2.1.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
-// @description  Guided trance sessions from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes; written in the studio's trance editor), per species and level (fun, deep, no human left), for people with ?hypno on. With LSCG: its own trance in the farm's name, its beats, and triggers planted as LSCG suggestions. Tiers and nicknames grow with sessions. Runs on the farm bot's computer, next to the Farmhand Bot script.
+// @description  Guided trance sessions from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes; written in the studio's trance editor), per species and level (fun, deep, no human left), for people with ?hypno on. With LSCG: its own trance in the farm's name, its beats, and triggers planted as LSCG suggestions. The farm's pull builds through the day (nudges, slippin' words, and at the top the farm takes them down). Tiers and nicknames grow with sessions. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
 // @match        *://bondageprojects.elementfx.com/*
@@ -267,14 +267,16 @@
   };
 
   // shared/trance-script.js
-  var KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "session"];
+  var KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "slip", "nudge", "session"];
   var SPOKEN = KINDS.filter((k) => k !== "session");
+  var SESSION_KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake"];
+  var ASIDE = ["slip", "nudge"];
   var LEVELS = ["fun", "deep", "nhl"];
   var BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], beta: [13, 20] };
   var HZ_MIN = 1;
   var HZ_MAX = 30;
   var MAX_DOES = 3;
-  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "trigger", "does", "waits"];
+  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits"];
   var LSCG = {
     cum: "Orgasm",
     deny: "Denial",
@@ -286,6 +288,8 @@
     say: "Speak Phrase",
     forget: "Forget"
   };
+  var FARM = { sound: "bnbfarm.sound", stall: "bnbfarm.stall", beg: "bnbfarm.beg", dose: "farmhand-dispensary.dose" };
+  var FARM_TYPES = Object.values(FARM);
   var POSES = {
     kneel: { lower: "Kneel" },
     "kneel spread": { lower: "KneelingSpread" },
@@ -525,11 +529,23 @@
       }
       return { type: LSCG.forget, arguments: { selection: { all: false, instructions: Array.from(new Set(ins)) } } };
     }
-    return { error: `I don't know "` + t + '" (cum, deny, needy, strip \u2026, pose \u2026, say "\u2026", follow, touch <Activity> <zone>, forget \u2026)' };
+    if (m = /^(?:moo|sound|noise|make (?:their|your|a) (?:sound|noise))(?:\s+(\d+))?$/i.exec(t)) {
+      const n = Number(m[1] || 1);
+      if (!(n >= 1 && n <= 3)) return { error: "moo once, twice or three times (moo, moo 2, moo 3)" };
+      return { type: FARM.sound, arguments: { options: { times: n } } };
+    }
+    if (/^(?:stall|to (?:a |the )?stalls?|go to (?:a |the )?(?:free )?(?:milk(?:in'?g?)? )?stall)$/i.test(t)) return { type: FARM.stall, arguments: { options: {} } };
+    if (m = /^beg(?:\s+to be milked|\s+for it)?(?:\s*:)?(?:\s+(.+))?$/i.exec(t)) {
+      const words2 = m[1] ? unquote(m[1]) : "";
+      if (/[()]/.test(words2) || /^[*!/.]/.test(words2)) return { error: "what they beg can't start with * ! / . or have round brackets" };
+      return { type: FARM.beg, arguments: { options: words2 ? { words: words2.slice(0, 120) } : {} } };
+    }
+    if (m = /^dose\s+(.+?)(?:\s+(half|whole|double))?$/i.exec(t)) return { type: FARM.dose, arguments: { options: { dose: lc(m[1]).slice(0, 40), strength: lc(m[2] || "whole") } } };
+    return { error: `I don't know "` + t + `" (cum, deny, needy, strip \u2026, pose \u2026, say "\u2026", follow, touch <Activity> <zone>, forget \u2026, or the farm's: moo, stall, beg "\u2026", dose <name>)` };
   }
   function parseDoes(does, waits, ctx) {
     const parts = steps(clean(does));
-    if (!parts.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget)" };
+    if (!parts.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget, moo, stall, beg, dose)" };
     if (parts.length > MAX_DOES) return { error: "at most " + MAX_DOES + " things (LSCG's limit), not " + parts.length };
     const w = list(waits || "").map(seconds), out = [];
     for (let i = 0; i < parts.length; i++) {
@@ -601,8 +617,8 @@
       }
       const lab = /^\s*([A-Za-z]+)\s*:\s*(.*)$/.exec(line);
       const key = lab && lab[1].toLowerCase();
-      if (inLabels && lab && (LABELS.includes(key) || b.kind === "session" && SPOKEN.includes(key))) {
-        if (b.kind === "session" && SPOKEN.includes(key)) (b.raw.picks = b.raw.picks || []).push([key, lab[2], n]);
+      if (inLabels && lab && (LABELS.includes(key) || b.kind === "session" && SESSION_KINDS.includes(key))) {
+        if (b.kind === "session" && SESSION_KINDS.includes(key)) (b.raw.picks = b.raw.picks || []).push([key, lab[2], n]);
         else b.raw[key] = [lab[2], n];
         return;
       }
@@ -686,6 +702,12 @@
       const m = /^\+?\s*(-?\d+)$/.exec(clean(r.deeper[0]));
       if (!m) err(r.deeper[1], "deeper is a number, like +10");
       else L.deeper = Math.max(-100, Math.min(100, Number(m[1])));
+    }
+    if (get("pull")) {
+      const m = /^(\d{1,3})\s*%?\s*\+?$/.exec(clean(r.pull[0]));
+      if (!ASIDE.includes(b.kind)) warn(r.pull[1], "pull only means somethin' on a slip or a nudge, so it's skipped here");
+      else if (!m || Number(m[1]) > 100) err(r.pull[1], "pull is how far the farm's pull has to be built up first, 0 to 100, like: pull: 60");
+      else L.pull = Number(m[1]);
     }
     if (b.kind === "trigger") {
       if (!get("trigger") || clean(r.trigger[0]).length < 4) err(get("trigger") ? r.trigger[1] : b.at, "a trigger needs its phrase, 4 letters or more: trigger: milkin' time");
@@ -1103,6 +1125,87 @@ waits: 2s
 
 And this one's a kindness. When you hear let go for the farm, everything held back comes undone at once.
 
+=== trigger: To the Stalls
+level: deep, nhl
+trigger: to the stalls
+does: moo \u2192 beg
+waits: 2s
+
+And somethin' for the barn to keep. When anyone sends you to the stalls, the {sound} comes up out of you first, then the beggin', and your feet find their own way to a free stall.
+
+# \u2500\u2500 part 2: the farm's pull through the day \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+# slip: what comes out of their mouth in place of their own words, when their speech gets hijacked (said out loud, as them)
+# nudge: the farm's whispers through the day, only to them. pull: how built up the pull has to be first (0-100)
+
+=== slip: Simple Sounds
+
+{sound}.
+{sound}~
+Mm\u2026 {sound}\u2026
+{sound}? {sound}.
+Mmh\u2026 what was I\u2026
+
+=== slip: Good Animal Words
+pull: 20
+
+Good {animal}s don't need words.
+Good {animal}s just listen.
+The farm knows best.
+So quiet in here\u2026
+Mm\u2026 so warm\u2026
+
+=== slip: Full and Achin'
+pull: 40
+
+{t}So full\u2026 need milked\u2026
+{t}Milk me\u2026 please\u2026
+{c}Need\u2026 drained\u2026
+Need the stall\u2026 need it\u2026
+
+=== slip: Empty
+level: deep, nhl
+pull: 60
+
+Empty and happy.
+No thoughts. Just {sound}.
+This {animal} belongs to the barn.
+Good {animal}s give milk.
+Nothin' up here but straw\u2026
+
+=== slip: No Human Left
+level: nhl
+pull: 80
+
+There's no person in here.
+Just a {animal}. Just a {animal}.
+{sound}\u2026 {sound}\u2026 {sound}\u2026
+
+=== nudge: Little Whispers
+
+Good {animal}s don't need to think, {name}.
+Breathe out, {name}. That's it.
+The barn's so warm today.
+Somethin' in you is always listening, {name}.
+Easy, {pet}. Nothin' to hurry for.
+
+=== nudge: Drowsy
+pull: 30
+
+So heavy, {name}. Your eyes want to close.
+You could just let go, right here.
+Doesn't the straw look soft, {pet}?
+Every breath out, a little further down.
+Thinkin's gettin' harder, isn't it?
+
+=== nudge: Nearly There
+pull: 60
+
+Soon, {name}. You can feel it comin', can't you?
+Your words are slippin'. That's alright.
+The farm's waitin' for you, {pet}.
+Just a little more and you're ours again.
+Let it fill you right up.
+
 === wake: Count Up
 level: fun
 pace: 15s
@@ -1319,7 +1422,9 @@ wake: any
     else D().lib = { text: String(text).slice(0, 4e5), stamp: String(stamp || "").slice(0, 60), at: Date.now() };
     LIB = null;
     api.save();
-    return lib();
+    const L = lib();
+    for (const m of api.here()) if (told.has(m)) sendPull(m);
+    return L;
   }
   async function pull(force) {
     const W2 = typeof window !== "undefined" ? window : null;
@@ -1432,6 +1537,131 @@ wake: any
     if (!all.length) return "\u{1F300} " + (forMe ? "Nothin's" : api.name(mn) + " has nothin'") + " planted by the farm" + (forMe ? " in you." : ".");
     return "\u{1F300} Planted by the farm" + (forMe ? " in you" : " in " + api.name(mn)) + ":\n" + all.map((x) => "\u2022 " + x.block + ': "' + x.s.trigger + '" \u2192 ' + x.s.instructions.map((i) => i.type).join(", ") + " \xB7 " + (x.via === "farm" ? "the farm's own" : x.ok ? "in their LSCG" : "waitin' for LSCG") + (x.fired ? " \xB7 fired " + x.fired + (x.fought ? ", fought off " + x.fought : "") : "")).join("\n") + (forMe ? "\n?planted remove <name> takes one out (all: every one)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
   }
+  var PULL = { NUDGE_MIN: [4, 9], STEP: [2, 4], TRIGGER: 5, SESSION: 8, SESSION_CAP: 90, MILKED: 3, AFTER_COLLECT: 20, AWAY_PER_H: 10, IDLE_MIN: 20 };
+  var pullOf = (mn) => {
+    const x = me(mn);
+    return x.pull = x.pull || { n: 0, at: Date.now(), next: 0 };
+  };
+  function pullOn(mn) {
+    const r = api.rec(mn), hs = api.hypnoState(mn);
+    return !!(r && r.hypno && api.hasCompanion && api.hasCompanion(mn) && !(hs && hs.pullOff));
+  }
+  var idle = (mn) => !!(api.idleMin && api.idleMin(mn) > PULL.IDLE_MIN);
+  var held = (mn) => !!(api.busy && api.busy(mn));
+  var pullFree = (mn) => pullOn(mn) && !!api.char(mn) && !running.has(mn) && !held(mn) && !idle(mn);
+  function asideLines(mn, kind, n) {
+    const who = { level: me(mn).max, species: speciesKey(mn), wears: wearsOf(mn) }, b = bodyOf(api, mn), out = [];
+    for (const blk of lib().blocks) {
+      if (blk.kind !== kind || !fits2(blk, who)) continue;
+      const need = blk.labels.pull || 0;
+      if (n != null && need > n) continue;
+      for (const l of blk.lines) if (l.text && fits(l.text, b)) out.push({ t: sayLib(mn, l.text).slice(0, 160), p: need });
+    }
+    return out;
+  }
+  var told = /* @__PURE__ */ new Map();
+  function sendPull(mn, slips) {
+    if (!api.hasCompanion || !api.hasCompanion(mn)) return;
+    const L = lib(), w = wordsFor(mn), key = L.from + ":" + (L.stamp || "") + ":" + me(mn).max + ":" + speciesKey(mn);
+    const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: api.herdLeaderOf && api.herdLeaderOf(mn) || 0 };
+    if (slips || told.get(mn) !== key) {
+      msg.slips = asideLines(mn, "slip", null).slice(0, 60);
+      told.set(mn, key);
+    }
+    api.hypno(mn, msg);
+  }
+  function pullAdd(mn, add) {
+    if (!pullOn(mn)) return;
+    const p = pullOf(mn), was = p.n;
+    p.n = Math.max(0, Math.min(100, p.n + add));
+    p.at = Date.now();
+    api.save();
+    if (Math.floor(was / 10) !== Math.floor(p.n / 10)) sendPull(mn);
+    if (p.n >= 100) collect(mn);
+  }
+  function pullTick() {
+    const now = Date.now(), here = new Set(api.here());
+    for (const [k, x] of Object.entries(D().people)) {
+      const mn = Number(k), p = x.pull;
+      if (!p || p.n <= 0 || here.has(mn) && pullOn(mn) && !idle(mn)) continue;
+      const h = (now - (p.at || now)) / 36e5;
+      if (h >= 0.1) {
+        p.n = Math.max(0, p.n - h * PULL.AWAY_PER_H);
+        p.at = now;
+      }
+    }
+    const gap = () => between(PULL.NUDGE_MIN[0] * 60, PULL.NUDGE_MIN[1] * 60) * 1e3;
+    for (const mn of here) {
+      if (!pullFree(mn)) continue;
+      const p = pullOf(mn);
+      if (p.n >= 100) {
+        collect(mn);
+        continue;
+      }
+      if (!p.next || p.next - now > PULL.NUDGE_MIN[1] * 6e4) {
+        p.next = now + gap();
+        continue;
+      }
+      if (now < p.next) continue;
+      p.next = now + gap();
+      nudge(mn);
+    }
+    api.save();
+  }
+  var NUDGES = ["haze", "voice", "voice", "blur", "spiral"];
+  function nudge(mn) {
+    const p = pullOf(mn);
+    p.n = Math.min(100, p.n + between(PULL.STEP[0], PULL.STEP[1]));
+    p.at = Date.now();
+    let fx = pick(NUDGES.filter((f) => (f !== "blur" || p.n >= 20) && (f !== "spiral" || p.n >= 40))), text = "";
+    if (fx === "voice") {
+      const ls = asideLines(mn, "nudge", p.n);
+      if (ls.length) {
+        const top = Math.max(...ls.map((x) => x.p));
+        text = pick(ls.filter((x) => x.p >= top - 30)).t;
+      } else fx = "haze";
+    }
+    api.hypno(mn, { do: "nudge", fx, text, n: Math.round(p.n) });
+    api.save();
+    if (p.n >= 100) collect(mn);
+  }
+  function collect(mn) {
+    if (!pullFree(mn)) return;
+    const p = pullOf(mn), now = Date.now();
+    if (p.collectedAt && now - p.collectedAt < 10 * 6e4) return;
+    p.collectedAt = now;
+    api.save();
+    api.notice(mn, "\u{1F300} It's been fillin' you up all day, a little at a time, and now there's no room left. You drop right where you are, and the farm comes for you.");
+    const lead = api.herdLeaderOf && api.herdLeaderOf(mn);
+    if (lead && lead !== mn && api.char(lead)) api.notice(lead, "\u{1F300} " + api.name(mn) + " dropped under on their own. The farm's takin' them down.");
+    start(api.cfg.BOT_MEMBER, mn, me(mn).max, null, false, { collected: true });
+  }
+  var stallAsked = /* @__PURE__ */ new Map();
+  function toStall(mn) {
+    if (!api.char(mn) || !api.rec(mn)) return;
+    const now = Date.now();
+    if (now - (stallAsked.get(mn) || 0) < 2e4) return;
+    stallAsked.set(mn, now);
+    if (held(mn)) {
+      api.notice(mn, "\u{1F300} Your feet want the milkin' stalls, but somethin's holdin' you right where you are.");
+      return;
+    }
+    const stalls = Object.entries(api.spots()).filter(([n, s]) => n.startsWith("milking") && s && s.X >= 0 && s.Y >= 0).map(([, s]) => s);
+    if (!stalls.length) {
+      api.notice(mn, "\u{1F300} You go lookin' for a milkin' stall, but the farm hasn't set one out.");
+      return;
+    }
+    const at = api.pos(mn) || { X: 0, Y: 0 }, others = api.here().filter((m) => m !== mn).map((m) => api.pos(m)).filter(Boolean);
+    const far = (s) => Math.max(Math.abs(s.X - at.X), Math.abs(s.Y - at.Y));
+    const free = stalls.filter((s) => !others.some((o) => o.X === s.X && o.Y === s.Y)).sort((a, b) => far(a) - far(b));
+    if (!free.length) {
+      api.notice(mn, "\u{1F300} Every milkin' stall's taken. You hover close by, achin' for a turn.");
+      return;
+    }
+    if (far(free[0]) === 0) return;
+    api.teleport(mn, { X: free[0].X, Y: free[0].Y });
+  }
+  if (typeof window !== "undefined" && window.__FARMHAND_TEST__) window.__condPull = { tick: () => pullTick(), PULL, nudge: (mn) => nudge(mn), add: (mn, n) => pullAdd(mn, n), of: (mn) => pullOf(mn) };
   function start(by, mn, level, own, echs, opts) {
     opts = opts || {};
     if (echs) {
@@ -1453,7 +1683,7 @@ wake: any
       steps2.splice(w >= 0 ? w : steps2.length, 0, { kind: "suggestion", block: "own", text: own, gap: 40 });
     }
     const ms = steps2.reduce((n, s) => n + (s.gap || 0) * 1e3, 0);
-    const run = { by, level, steps: steps2, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms };
+    const run = { by, level, steps: steps2, i: 0, lib: true, plan: plan.name, depth: 0, started: Date.now(), ms, collected: !!opts.collected };
     running.set(mn, run);
     api.hypno(mn, { do: "under", by: api.cfg.BOT_MEMBER, ms: Math.round(ms + 3e5), level, session: plan.name });
     api.face(mn, "trance", Math.round(ms / 1e3) + 120);
@@ -1540,6 +1770,12 @@ wake: any
     const x = me(mn);
     x.sessions[run.level] = (x.sessions[run.level] || 0) + 1;
     x.total++;
+    if (pullOn(mn)) {
+      const p = pullOf(mn);
+      p.n = run.collected ? PULL.AFTER_COLLECT : Math.min(PULL.SESSION_CAP, Math.max(p.n, p.n + PULL.SESSION));
+      p.at = Date.now();
+      sendPull(mn);
+    }
     const tier = MILESTONES.filter((m) => x.total >= m).length;
     if (tier > x.tier) {
       x.tier = tier;
@@ -1605,7 +1841,7 @@ wake: any
   }
   var progressText = (mn) => {
     const x = me(mn), next = MILESTONES.find((m) => x.total < m);
-    return "\u{1F300} Conditioning: tier " + x.tier + " (" + petName(mn) + ") \xB7 " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " \xB7 next tier at " + next : " \xB7 top tier") + " \xB7 allows " + LEVEL_NAME[x.max];
+    return "\u{1F300} Conditioning: tier " + x.tier + " (" + petName(mn) + ") \xB7 " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " \xB7 next tier at " + next : " \xB7 top tier") + " \xB7 allows " + LEVEL_NAME[x.max] + (pullOn(mn) ? " \xB7 the farm's pull " + Math.round(pullOf(mn).n) + "%" : "");
   };
   function companion(mn) {
     const r = api.rec(mn);
@@ -1622,7 +1858,10 @@ wake: any
         ["Trance", lscgLine(mn)],
         ["Planted", planted.length ? planted.length + " trigger" + (planted.length === 1 ? "" : "s") : "none"]
       ],
-      bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: x.total / next * 100 }] : void 0,
+      bars: [].concat(
+        next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: x.total / next * 100 }] : [],
+        pullOn(mn) ? [{ label: "The farm's pull", value: Math.round(pullOf(mn).n) + "%", pct: pullOf(mn).n }] : []
+      ),
       buttons: LEVELS2.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat([{ label: "Kneel", cmd: "lowpose kneel", accent: lowOf(mn) === "kneel" }, { label: "All fours", cmd: "lowpose fours", accent: lowOf(mn) === "fours" }]).concat(planted.length ? [{ label: "What's planted", cmd: "planted" }] : []).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : [])
     });
     if (api.isStaff(mn)) cards.push({
@@ -1674,9 +1913,9 @@ wake: any
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "2.0.0",
+    version: "2.1.0",
     // (its addon.json's, put in by the build)
-    guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once.",
+    guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
     setup(a) {
       api = a;
       D();
@@ -1686,6 +1925,15 @@ wake: any
         api.later(tick, 6e4);
       };
       api.later(tick, 15e3);
+      const ptick = () => {
+        try {
+          pullTick();
+        } catch (e) {
+          api.log("pull: " + (e && e.message || e));
+        }
+        api.later(ptick, 6e4);
+      };
+      api.later(ptick, 2e4);
     },
     commands: {
       planted: { usage: "planted [who] | planted remove <name|all> [who]", private: true, run: cmdPlanted },
@@ -1723,15 +1971,36 @@ wake: any
       safe: (mn) => {
         stop(mn, null);
         api.hypno(mn, { do: "clear" });
+        const p = pullOf(mn);
+        p.n = 0;
+        p.at = Date.now();
+        api.save();
+        sendPull(mn);
       },
-      leave: (mn) => stop(mn, null),
+      leave: (mn) => {
+        stop(mn, null);
+        told.delete(mn);
+      },
       hypnoSwitch: (mn, on) => {
-        if (!on) stop(mn, null);
+        if (!on) {
+          stop(mn, null);
+          const p = pullOf(mn);
+          p.n = 0;
+          p.at = Date.now();
+          api.save();
+        }
+        sendPull(mn, true);
         if (Object.keys(plantedOf(mn)).length) sendFarm(mn);
+      },
+      // a milkin' (the stall's, or staff's ?milk) feeds the pull; the farm's "go to a free stall" instruction lands here
+      milked: (mn) => pullAdd(mn, PULL.MILKED),
+      hypnoDo: (mn, d) => {
+        if (d && d.what === "stall") toStall(mn);
       },
       // their Companion on their LSCG (trance.js): anything waitin' to be planted goes in when it can; LSCG come or gone,
       // the triggers move with it (the farm's own carried out by their Companion, LSCG's own by their LSCG)
       hypnoState: (mn, hs) => {
+        if (!told.has(mn) && api.rec(mn)) sendPull(mn, true);
         const all = plantedOf(mn), list2 = Object.values(all);
         if (!list2.length) return;
         if (lscgOn(hs)) {
@@ -1785,6 +2054,7 @@ wake: any
             x.last = Date.now();
             api.save();
           }
+          if (!e.resisted) pullAdd(mn, PULL.TRIGGER);
         }
       },
       // under with the farm girl through ECHS: the session runs through it (asked for with ?hyp … echs, or not)

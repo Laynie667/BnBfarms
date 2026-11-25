@@ -4,6 +4,8 @@
    and the studio has somethin' to open. Less "your handler" than before (Laynie, Nov 25: "Less focus on them subbing to
    handlers, unless they have a set herd leader"): {herd} is their herd leader's name if they have one, else "the farm".
    A line starting {t} is only for somebody with tits, {c} a cock, {v} a pussy.
+   Part 2 (Nov 25): a trigger made of the farm's own instructions (To the Stalls), and the slips and nudges for the farm's
+   pull through the day.
 */
 export const STARTER = `# The farm's starter trance library. The studio's trance editor opens this when you start fresh.
 # Every block: === kind: Name, then labels, then the lines. A session is a recipe of blocks.
@@ -270,6 +272,87 @@ does: forget all → cum
 waits: 2s
 
 And this one's a kindness. When you hear let go for the farm, everything held back comes undone at once.
+
+=== trigger: To the Stalls
+level: deep, nhl
+trigger: to the stalls
+does: moo → beg
+waits: 2s
+
+And somethin' for the barn to keep. When anyone sends you to the stalls, the {sound} comes up out of you first, then the beggin', and your feet find their own way to a free stall.
+
+# ── part 2: the farm's pull through the day ──────────────────
+# slip: what comes out of their mouth in place of their own words, when their speech gets hijacked (said out loud, as them)
+# nudge: the farm's whispers through the day, only to them. pull: how built up the pull has to be first (0-100)
+
+=== slip: Simple Sounds
+
+{sound}.
+{sound}~
+Mm… {sound}…
+{sound}? {sound}.
+Mmh… what was I…
+
+=== slip: Good Animal Words
+pull: 20
+
+Good {animal}s don't need words.
+Good {animal}s just listen.
+The farm knows best.
+So quiet in here…
+Mm… so warm…
+
+=== slip: Full and Achin'
+pull: 40
+
+{t}So full… need milked…
+{t}Milk me… please…
+{c}Need… drained…
+Need the stall… need it…
+
+=== slip: Empty
+level: deep, nhl
+pull: 60
+
+Empty and happy.
+No thoughts. Just {sound}.
+This {animal} belongs to the barn.
+Good {animal}s give milk.
+Nothin' up here but straw…
+
+=== slip: No Human Left
+level: nhl
+pull: 80
+
+There's no person in here.
+Just a {animal}. Just a {animal}.
+{sound}… {sound}… {sound}…
+
+=== nudge: Little Whispers
+
+Good {animal}s don't need to think, {name}.
+Breathe out, {name}. That's it.
+The barn's so warm today.
+Somethin' in you is always listening, {name}.
+Easy, {pet}. Nothin' to hurry for.
+
+=== nudge: Drowsy
+pull: 30
+
+So heavy, {name}. Your eyes want to close.
+You could just let go, right here.
+Doesn't the straw look soft, {pet}?
+Every breath out, a little further down.
+Thinkin's gettin' harder, isn't it?
+
+=== nudge: Nearly There
+pull: 60
+
+Soon, {name}. You can feel it comin', can't you?
+Your words are slippin'. That's alright.
+The farm's waitin' for you, {pet}.
+Just a little more and you're ours again.
+Let it fill you right up.
 
 === wake: Count Up
 level: fun

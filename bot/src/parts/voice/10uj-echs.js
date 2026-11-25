@@ -196,6 +196,10 @@
     for (const C of (W.ChatRoomCharacter || [])){
       const mn = C.MemberNumber, r = rec(mn);
       if (!r || !r.hypno || mn === CFG.BOT_MEMBER || echsOf(mn)) continue;
+      // LSCG set up for the farm (its hypnosis on, the farm let in): LSCG's theirs, and the farm's pull through the day does
+      // the askin' now (Laynie, Nov 25: with LSCG, LSCG; and no more steppin' off her spot for it)
+      const hs = state.hypnoState && state.hypnoState.get(mn);
+      if (hs && hs.lscg && hs.on && (hs.scopes || []).includes("states")) continue;
       if (now - Math.max((r.echs && r.echs.askedAt) || 0, (r.echs && r.echs.underAt) || 0) < CFG.ECHS_OFFER_EVERY_MIN * 60000) continue;
       if (now - (state.lastSpoke.get(mn) || 0) > 20 * 60000) continue;   // away from the keyboard
       if (heldByTrap(mn) || (state.sceneRun && state.sceneRun.has(mn))) continue;

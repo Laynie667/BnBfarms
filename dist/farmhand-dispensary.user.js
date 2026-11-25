@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.27.0
+// @version      0.28.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.27.0";
+  var VERSION = "0.28.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -13999,6 +13999,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
       console.warn("[Dispensary] LSCG nipple actions:", e);
     }
+    if (api2.hypno && typeof api2.hypno.registerInstruction === "function" && (!caps.size || caps.has("hypno.instructions"))) {
+      try {
+        api2.hypno.registerInstruction({
+          name: "dose",
+          label: "Take a dose",
+          description: "The Farmhand's Dispensary: they take one of its doses (or LSCG's own), as if it was given to them. Only from somebody they'd take a dose from: whoever said the trigger, or whoever planted it.",
+          options: [
+            { type: "text", key: "dose", label: "Which dose", maxLength: 40, description: "Its name, like Moo, Needy Nectar, Heat or Sedative." },
+            { type: "select", key: "strength", label: "How strong", choices: [{ value: "whole", label: "A whole dose" }, { value: "half", label: "Half a dose" }, { value: "double", label: "A double dose" }] }
+          ],
+          perform: (c) => {
+            const r = takeByName(c.options.dose, c.options.strength, c.sender, c.installedBy);
+            if (!r.ok) local("\u{1F300} Somethin' in you reaches for a dose, and doesn't get one: " + (WHY_NOT[r.why] || "it didn't take") + ".");
+          }
+        });
+      } catch (e) {
+        console.warn("[Dispensary] LSCG wouldn't take the dose instruction:", e);
+      }
+    }
     if (caps.has("events")) {
       try {
         api2.events.on("safeword", () => {
@@ -14019,6 +14038,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     }
+  }
+  var WHY_NOT = { none: "no dose was named", unknown: "the Dispensary has no dose by that name", who: "not from them, they're not on your list", off: "you've got that one switched off", lscg: "LSCG's own wouldn't take", nolscg: "that one needs LSCG" };
+  function takeByName(name, strength, by, also) {
+    const q = String(name || "").toLowerCase().replace(/[^a-z' -]/g, "").trim();
+    if (!q) return { ok: false, why: "none" };
+    const ids = Object.keys(BOOK), lab = (k) => String(BOOK[k].label || "").toLowerCase();
+    const id = ids.find((k) => k === q.replace(/[\s'-]+/g, "")) || ids.find((k) => lab(k) === q) || ids.find((k) => (BOOK[k].keywords || []).some((w) => String(w).toLowerCase() === q)) || ids.find((k) => lab(k).includes(q));
+    if (!id) return { ok: false, why: "unknown" };
+    const from = [by, also].map(Number).filter((m) => m > 0), giver = from.find((m) => allowed(m));
+    if (!giver) return { ok: false, why: "who" };
+    const B = BOOK[id], s = String(strength || "whole");
+    if (B.lscg && lscgPresent()) return lscgDose(B.lscg, { by: giver, x: s === "double" ? 2 : s === "half" ? 0.5 : 1 }) ? { ok: true, id } : { ok: false, why: "lscg" };
+    return Object.assign({ id }, give(id, { by: giver, x: s === "double" ? 2 : 1, mins: s === "half" ? Math.max(1, Math.round(B.mins / 2)) : void 0 }));
   }
   function initLscg() {
     const q = W16.LSCG_OnLoad = W16.LSCG_OnLoad || [];
@@ -17521,7 +17553,7 @@ GOOD TO KNOW
     return "Hardcore. Until it ends, you can't change your Dispensary settings, and your safeword won't lift your doses: it asks your keyholders (" + keys.map(keyName).join(", ") + ") to let you out instead.\n\nIt ends " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "when a keyholder ends it, or after " + CHECK_DAYS + " days with no keyholder checkin' in (bein' in a room with you counts)") + ". Your keyholders can change your settings, let you out, or end it whenever they like.\n\nLock yourself in?";
   }
   var keyInput = "";
-  var WHY_NOT = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
+  var WHY_NOT2 = { number: "That isn't a member number.", self: "You can't hold your own key.", already: "They already hold your key.", full: "That's ten keyholders: remove one first.", locked: "Not while you're locked in." };
   function keyholdersCard() {
     const S3 = st(), locked = hardOn(), P = W23.Player || {}, own = P.Ownership && P.Ownership.MemberNumber, rows = [];
     if (typeof own === "number" && own > 0) rows.push(h("div", null, "\u{1F5DD}\uFE0F " + keyName(own) + ": always, as your owner"));
@@ -17553,7 +17585,7 @@ GOOD TO KNOW
         input,
         h("button", { onclick: () => {
           const n = Number(String(keyInput).trim()), r = addKey(n);
-          note3 = r.ok ? "\u{1F5DD}\uFE0F " + keyName(n) + " holds your key now." : WHY_NOT[r.why] || "Couldn't add them.";
+          note3 = r.ok ? "\u{1F5DD}\uFE0F " + keyName(n) + " holds your key now." : WHY_NOT2[r.why] || "Couldn't add them.";
           if (r.ok) keyInput = "";
           draw2();
         } }, "Add")
@@ -18924,6 +18956,13 @@ GOOD TO KNOW
     dose: (id) => {
       const d = st().doses[String(id)];
       return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null;
+    },
+    // the farm's trance (Nov 25): one of its triggers fired in you without LSCG, and it says "take a dose". By its name,
+    // whole | half | double, and only from somebody on your list. → { ok, id, why }
+    take: (name, strength, by) => {
+      const r = takeByName(String(name || ""), String(strength || "whole"), Number(by) || 0);
+      if (!r.ok) local("\u{1F300} Somethin' in you reaches for a dose, and doesn't get one.");
+      return { ok: !!r.ok, id: r.id || "", why: r.why || "" };
     },
     who: () => st().who,
     // hardcore, for the Companion (its own settings lock while yours is on)

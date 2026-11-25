@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.100.1
+// @version      0.101.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.100.1";
-  var COMPANION_VERSION = "0.81.1";
+  var VERSION = "0.101.0";
+  var COMPANION_VERSION = "0.82.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6394,6 +6394,14 @@ GOOD TO KNOW
         }
         return;
       }
+      if (m.type === "hypnoDo") {
+        try {
+          hypnoDoFrom(mn, m);
+        } catch (e) {
+          warn("hypno do:", e);
+        }
+        return;
+      }
       if (m.type === "hello") {
         const ver = String(m.ver || "?"), old = state.companions.get(mn);
         const keep = !!(old && !m.again && m.seq && old.seq === m.seq && old.ver === ver);
@@ -7000,11 +7008,13 @@ GOOD TO KNOW
       const out = {}, here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && rec(m) && rec(m).roles.length);
       out.herd = here.slice(0, 40).map((m) => {
         const r2 = rec(m), p = prodOf(m);
+        const pl = r2.hypno ? ((((L2.mods || {}).conditioning || {}).people || {})[m] || {}).pull : null;
         return {
           mn: m,
           name: plainName(m),
           role: (r2.roles[0] || "").toLowerCase(),
           where: whereName(m) || "",
+          pull: pl && pl.n >= 1 ? Math.round(pl.n) : null,
           milk: makesMilk(m) ? Math.round(100 * p.milk / Math.max(1, milkCap(m))) : null,
           heat: inHeat(p) && !p.heat.quiet,
           preg: !!p.preg,
@@ -8354,6 +8364,13 @@ GOOD TO KNOW
           }
           sound(mn, "unlatch");
           if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3e3);
+          if (st.got.m + st.got.s > 0) {
+            try {
+              addonsEmit("milked", mn, st.got.m + st.got.s);
+            } catch (e) {
+              warn("milked:", e);
+            }
+          }
           const R = CFG.PROD.STALL_REST_MIN;
           p.stallRest = now + (R[0] + Math.random() * (R[1] - R[0])) * 6e4;
           if (st.got.m + st.got.s > 0) {
@@ -10925,10 +10942,17 @@ GOOD TO KNOW
         under: m.under === true,
         ours: m.ours === true,
         farmBeats: m.farmBeats === true,
-        planted: strs(m.planted, 100, 60)
+        planted: strs(m.planted, 100, 60),
+        pullOff: m.pullOff === true,
+        slipsOff: m.slipsOff === true
       };
       (state.hypnoState = state.hypnoState || /* @__PURE__ */ new Map()).set(mn, s);
       addonsEmit("hypnoState", mn, Object.assign({}, s));
+    }
+    function hypnoDoFrom(mn, m) {
+      const what = String(m.what || "").slice(0, 20);
+      if (!/^(stall)$/.test(what)) return;
+      addonsEmit("hypnoDo", mn, { what, by: Number(m.by) || 0 });
     }
     function hypnoEventFrom(mn, m) {
       const ev = String(m.ev || "").slice(0, 20);
@@ -11141,6 +11165,16 @@ GOOD TO KNOW
           return s ? Object.assign({}, s) : null;
         },
         lscgPlant: (mn, list2, removed, ver) => lscgCommand(mn, "set-suggestions", [{ name: "suggestions", value: list2 || [] }, { name: "removed", value: removed || [] }], ver),
+        // part 2 (the farm's pull): minutes since they last said or did anything here, and whether somethin' has them
+        // right now (a trap, a scene, ?quiet), so nothin' new starts on them
+        idleMin: (mn) => (Date.now() - (state.lastSpoke && state.lastSpoke.get(mn) || 0)) / 6e4,
+        busy: (mn) => {
+          try {
+            return !!(heldByTrap(mn) || state.sceneRun && state.sceneRun.has(mn) || quietNow(mn));
+          } catch (e) {
+            return false;
+          }
+        },
         echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn, level) => {
           const v = echsOf(mn);
           if (v) {
@@ -24316,6 +24350,8 @@ GOOD TO KNOW
       for (const C2 of W.ChatRoomCharacter || []) {
         const mn = C2.MemberNumber, r = rec(mn);
         if (!r || !r.hypno || mn === CFG.BOT_MEMBER || echsOf(mn)) continue;
+        const hs = state.hypnoState && state.hypnoState.get(mn);
+        if (hs && hs.lscg && hs.on && (hs.scopes || []).includes("states")) continue;
         if (now - Math.max(r.echs && r.echs.askedAt || 0, r.echs && r.echs.underAt || 0) < CFG.ECHS_OFFER_EVERY_MIN * 6e4) continue;
         if (now - (state.lastSpoke.get(mn) || 0) > 20 * 6e4) continue;
         if (heldByTrap(mn) || state.sceneRun && state.sceneRun.has(mn)) continue;
@@ -70666,6 +70702,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (got < 1) {
             R(plainName(t) + " is dry right now, sugar. Give 'em a while to fill back up.");
             break;
+          }
+          try {
+            addonsEmit("milked", t, got);
+          } catch (e) {
+            warn("milked:", e);
           }
           if (cmd === "collect") {
             L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);

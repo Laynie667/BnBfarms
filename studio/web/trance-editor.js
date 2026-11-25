@@ -69,6 +69,8 @@ function addBlock(kind) {
     suggestion: "pace: 35s\npick: 2\n\nEvery time you {sound}, you feel a little warm rush.",
     trigger: "level: deep, nhl\ntrigger: good {animal}\ndoes: say \"{sound}~\"\n\nAnd somethin' to keep: whenever anyone calls you a good {animal}…",
     wake: "pace: 15s\nbeats: → alpha 10 over 1m\nlook: clear\n\nCountin' up now. Three, two, one, eyes open, {name}.",
+    slip: "pull: 40\n\n{sound}~\nGood {animal}s don't need words.",
+    nudge: "pull: 30\n\nSo heavy, {name}. Your eyes want to close.",
     session: "level: deep\ninduction: any\ndeepener: any\nsuggestion: any 2\ntrigger: any\nwake: any",
   }[kind];
   setText(S.text.replace(/\s*$/, "") + "\n\n=== " + kind + ": New " + kind + (n > 1 ? " " + n : "") + "\n" + tpl + "\n", { keepForm: true });
@@ -112,7 +114,10 @@ async function pubStatus() {
 
 // ── the list ─────────────────────────────────────────────────
 const KIND_HINT = { induction: "takes them down", deepener: "further down", convincer: "a little test (too heavy to lift…)", suggestion: "spoken, for while they're under",
-  trigger: "spoken, then planted as an LSCG suggestion", wake: "brings them up (or doesn't)", session: "a recipe: which blocks, in what order" };
+  trigger: "spoken, then planted as an LSCG suggestion", wake: "brings them up (or doesn't)",
+  slip: "what comes out of their mouth instead, when their speech gets hijacked (said out loud, as them)",
+  nudge: "the farm's whispers through the day, as its pull builds up in them (only to them)",
+  session: "a recipe: which blocks, in what order" };
 function renderList() {
   const box = $("#kinds"); box.textContent = "";
   for (const k of T.KINDS) {
@@ -156,6 +161,11 @@ const VERBS = {
   follow: { hint: "" },
   touch: { hint: "Activity zone [self|speaker], like: Caress tits self" },
   forget: { hint: "all, or: deny, needy, follow, say" },
+  // the farm's own (part 2): LSCG extension instructions, run by their Companion (the dose by their Dispensary)
+  moo: { hint: "how many times: 1, 2 or 3 (their own animal's sound)" },
+  stall: { hint: "" },
+  beg: { hint: "the words, or leave empty: the farm's own in their sound (then off to a free stall)" },
+  dose: { hint: "the Dispensary dose's name, then half or double if you like: moo · needy nectar double" },
 };
 function renderForm() {
   const box = $("#form"); box.textContent = "";
@@ -184,7 +194,13 @@ function renderForm() {
     h("input", { value: (L.wears || []).join(", "), placeholder: "collar, bell, gag…", size: 18, title: "Only for somebody wearin' one of these: collar, leash, bell, gag, blind, hood, paws, arms, cage, nipples, latex, harness, ears, tail, hooves, noseRing",
       onchange: (e) => edit((x) => { const v = e.target.value.split(",").map((s) => s.trim()).filter(Boolean); x.labels.wears = v.length ? v : undefined; }) })));
 
-  if (b.kind !== "session") {
+  if (T.ASIDE.includes(b.kind)) {
+    // slips and nudges: said outside sessions, once the farm's pull is built up this far
+    box.appendChild(h("div", { class: "row" }, h("label", { class: "lab" }, "Pull"),
+      h("input", { type: "range", min: 0, max: 100, step: 5, value: L.pull || 0, oninput: (e) => { e.target.nextSibling.textContent = e.target.value + "%"; }, onchange: (e) => edit((x) => { const v = Number(e.target.value); x.labels.pull = v || undefined; }) }),
+      h("span", { class: "hint" }, (L.pull || 0) + "%"),
+      h("span", { class: "hint" }, b.kind === "slip" ? "how built up the farm's pull (or how fresh out of a session) before these come out of them" : "how built up the farm's pull before the farm whispers these")));
+  } else if (b.kind !== "session") {
     // pace and how many lines
     box.appendChild(h("div", { class: "row" }, h("label", { class: "lab" }, "Pace"),
       h("input", { type: "number", min: 1, max: 600, step: 1, value: L.pace ? L.pace.min : "", placeholder: "30", onchange: (e) => edit((x) => { const a = Number(e.target.value); const was = x.labels.pace || { min: 30, max: 30 }; x.labels.pace = a > 0 ? { min: a, max: Math.max(a, was.max) } : undefined; }) }),
@@ -244,7 +260,7 @@ function triggerForm(L) {
   while (rows.length < 3) rows.push({ verb: "", arg: "" });
   const write = (form) => edit((x) => {
     const used = rows.filter((r) => r.verb);
-    x.labels.does = used.map((r) => r.verb + (r.arg ? " " + (r.verb === "say" && !/^".*"$/.test(r.arg) ? "\"" + r.arg + "\"" : r.arg) : "")).join(" → ");
+    x.labels.does = used.map((r) => r.verb + (r.arg ? " " + ((r.verb === "say" || r.verb === "beg") && !/^".*"$/.test(r.arg) ? "\"" + r.arg + "\"" : r.arg) : "")).join(" → ");
     const w = used.slice(1).map((r, i) => waits[rows.indexOf(r) - 1] || "");
     x.labels.waits = w.some(Boolean) ? w.map((s) => s || "1s").join(", ") : "";
   }, { form });
@@ -255,8 +271,8 @@ function triggerForm(L) {
     rows.map((r, i) => h("div", { class: "row" }, h("label", { class: "lab" }, i === 0 ? "Does" : "then"),
       i > 0 ? [h("input", { type: "number", min: 1, max: 30, value: (waits[i - 1] || "").replace(/s$/, ""), placeholder: "1", title: "seconds before this one", onchange: (e) => { waits[i - 1] = e.target.value ? e.target.value + "s" : ""; write(); } }), h("span", { class: "hint" }, "s later:")] : null,
       h("select", { onchange: (e) => { r.verb = e.target.value; if (!e.target.value) r.arg = ""; write(true); } }, h("option", { value: "" }, "—"), Object.keys(VERBS).map((v) => h("option", { value: v, selected: v === r.verb || null }, v))),
-      r.verb && VERBS[r.verb] && VERBS[r.verb].hint ? h("input", { value: r.verb === "say" ? r.arg.replace(/^"(.*)"$/, "$1") : r.arg, size: 30, placeholder: VERBS[r.verb].hint, title: VERBS[r.verb].hint, onchange: (e) => { r.arg = e.target.value.trim(); write(); } }) : null)),
-    h("p", { class: "hint" }, test.error ? "✖ " + test.error : "LSCG's own instructions: " + test.instructions.map((x) => x.type).join(" → ") + ". They can fight it off like any LSCG suggestion, and block any instruction in their LSCG."));
+      r.verb && VERBS[r.verb] && VERBS[r.verb].hint ? h("input", { value: r.verb === "say" || r.verb === "beg" ? r.arg.replace(/^"(.*)"$/, "$1") : r.arg, size: 30, placeholder: VERBS[r.verb].hint, title: VERBS[r.verb].hint, onchange: (e) => { r.arg = e.target.value.trim(); write(); } }) : null)),
+    h("p", { class: "hint" }, test.error ? "✖ " + test.error : "As LSCG instructions: " + test.instructions.map((x) => x.type).join(" → ") + ". They can fight it off like any LSCG suggestion, and block any instruction in their LSCG. The farm's own (moo, stall, beg) run through their Companion; dose needs their Dispensary."));
 }
 function sessionForm(L) {
   const picks = (L.picks || []).map((p) => ({ kind: p.kind, items: p.items.map((it) => (it.all ? "all" : it.any ? (it.any > 1 ? "any " + it.any : "any") : it.name)).join(", ") }));
@@ -268,7 +284,7 @@ function sessionForm(L) {
   const names = (k) => S.lib.blocks.filter((b) => b.kind === k).map((b) => b.name);
   return h("fieldset", null, h("legend", null, "In this order"),
     picks.map((p, i) => h("div", { class: "row" },
-      h("select", { onchange: (e) => { p.kind = e.target.value; write(true); } }, T.SPOKEN.map((k) => h("option", { value: k, selected: k === p.kind || null }, k))),
+      h("select", { onchange: (e) => { p.kind = e.target.value; write(true); } }, T.SESSION_KINDS.map((k) => h("option", { value: k, selected: k === p.kind || null }, k))),
       h("input", { value: p.items, size: 30, list: "dl-" + p.kind, placeholder: "any, any 2, all, or names", onchange: (e) => { p.items = e.target.value; write(); } }),
       h("datalist", { id: "dl-" + p.kind }, ["any", "any 2", "all"].concat(names(p.kind)).map((n) => h("option", { value: n }))),
       h("button", { class: "small", onclick: () => { picks.splice(i, 1); write(true); } }, "✕"),
@@ -283,7 +299,7 @@ function linesForm(b) {
       const p = T.parseLibrary("=== induction: x\n\n" + e.target.value);
       x.lines = p.blocks[0] ? p.blocks[0].lines : [];
     }) }),
-    h("p", { class: "hint" }, "One line each, said in the farm's voice. Fill-ins: {name} {animal} {sound} {body} {pet} {paws} {low} {herd}. Cues: [wait 20s] [deeper +10] [beats theta 5] [look haze 60%]. A line starting {t} is only for tits, {c} a cock, {v} a pussy. Round brackets are taken out."));
+    h("p", { class: "hint" }, (b.kind === "slip" ? "One line each, said out loud as them, in place of what they meant to say." : b.kind === "nudge" ? "One line each, whispered to them alone in the farm's voice." : "One line each, said in the farm's voice.") + " Fill-ins: {name} {animal} {sound} {body} {pet} {paws} {low} {herd}. Cues: [wait 20s] [deeper +10] [beats theta 5] [look haze 60%]. A line starting {t} is only for tits, {c} a cock, {v} a pussy. Round brackets are taken out."));
 }
 
 // ── try it: the session the bot would run, sped up ───────────

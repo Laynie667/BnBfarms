@@ -157,7 +157,9 @@
     const out = {}, here = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && rec(m) && rec(m).roles.length);
     out.herd = here.slice(0, 40).map(m => {
       const r = rec(m), p = prodOf(m);
-      return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "",
+      // the farm's pull in them (Conditioning's part 2): staff see a T over anyone close to droppin' under on their own
+      const pl = r.hypno ? ((((L.mods || {}).conditioning || {}).people || {})[m] || {}).pull : null;
+      return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "", pull: pl && pl.n >= 1 ? Math.round(pl.n) : null,
                milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p) && !p.heat.quiet, preg: !!p.preg,
                denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false, reins: !!(r.reins && r.reins.by === mn && r.reins.until > Date.now()) };
     });

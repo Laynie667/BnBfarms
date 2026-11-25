@@ -20,6 +20,9 @@ An offline dressing room for Bondage Club, for our own use. It runs on this comp
 > **Save** keeps it in `studio/trance/library.txt` (the last 30 saves in `studio/trance/old/`); **Push to the bot**
 > makes it what the bot runs: its tab looks every minute, or say `?trancelib pull`. `studio/trance/` never goes on
 > GitHub. The format is in `shared/trance-script.js`; the starter library in `shared/trance-starter.js`.
+> Part 2 (Nov 25): two more kinds, **slip** (what comes out of a player's mouth in place of their own words when their
+> speech gets hijacked) and **nudge** (the farm's whispers through the day), each with a **Pull** slider for how built
+> up the farm's pull has to be first. Triggers can use the farm's own steps too: moo, stall, beg, dose.
 
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the

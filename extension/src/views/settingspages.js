@@ -91,7 +91,7 @@ function gearPage(ctx) {
       prefNot(ctx, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
       prefNot(ctx, "noTrance", "Trance look", "During a session: a haze at the edges of your screen, a slow spiral, soft rings, the farm's words driftin' up, names blurrin'. Nothin' ever flashes"),
       prefNot(ctx, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
-      ctx.s.staff ? prefNot(ctx, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null),
+      ctx.s.staff ? prefNot(ctx, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped, T the farm's pull close to takin' them under") : null),
     tranceCard(ctx),
   ];
 }
@@ -101,6 +101,8 @@ function tranceCard(ctx) {
   return card(title("🌀 The farm's trance"), muted(t.text),
     ctx.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx.send("lowpose kneel")), btn("All fours", () => ctx.send("lowpose fours"))) : null,
     pref(ctx, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
+    prefNot(ctx, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
+    prefNot(ctx, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
     pref(ctx, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
     ctx.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx.setPref("farmBeatsVol", v) }, v + "%"))) : null);
 }

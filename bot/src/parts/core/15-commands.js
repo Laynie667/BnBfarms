@@ -2258,6 +2258,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const got = cmd === "milk" ? drainMilk(t, amt) : drainSemen(t, amt);
         saveLedger(); audit(sender, cmd.toUpperCase(), t+" "+Math.round(got));
         if (got < 1){ R(plainName(t)+" is dry right now, sugar. Give 'em a while to fill back up."); break; }
+        try { addonsEmit("milked", t, got); } catch(e){ warn("milked:", e); }   // (Conditioning: a milkin' feeds the farm's pull)
         if (cmd === "collect"){
           L.jars = (L.jars||[]).filter(j => Date.now() - j.t < CFG.JAR_DAYS*86400000);
           L.nextJar = (L.nextJar||0) + 1;

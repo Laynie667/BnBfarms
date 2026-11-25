@@ -212,5 +212,22 @@ function page(opts) {
   page({ lscg: L }); await wait(1300);
   ok(["letdown", "fillout", "airhead", "babble", "deepthroat", "rut", "tender"].every((id) => reg[id] && reg[id].soakKeywords && reg[id].soakKeywords.length), "LSCG's list: every new dose, with its soak words (a rut-soaked gag, a babble-laced bit)");
 
+  // the farm's trance, part 2 (Nov 25): "Take a dose", one of the farm's own instructions in LSCG's suggestion editor
+  const ins = {}, lscgDosed = [];
+  const L2 = { getModApi: () => ({ drugs: { register: () => () => {}, dose: (t, o) => { lscgDosed.push([t, o && o.sender]); return true; } }, events: { on() {}, before() {} },
+    hypno: { registerInstruction: (d) => { ins[d.name] = d; return () => {}; } } }), capabilities: new Set(["core", "events", "drugs", "hypno.instructions"]) };
+  const t2 = page({ lscg: L2 }); await wait(1300);
+  const T2 = t2.D();
+  ok(ins.dose && ins.dose.label === "Take a dose" && ins.dose.options.some((o) => o.key === "dose" && o.type === "text") && ins.dose.options.some((o) => o.key === "strength"), "LSCG's suggestion editor gets \"Take a dose\": which one, by name, and how strong");
+  ins.dose.perform({ options: { dose: "Moo", strength: "half" }, sender: OWNER, installedBy: BOT });
+  ok(T2.active("moo"), "a suggestion fires in them with it: the dose goes in, from whoever said the trigger (their owner here)");
+  ins.dose.perform({ options: { dose: "needy nectar", strength: "whole" }, sender: OWNER, installedBy: BOT });
+  ok(lscgDosed.some(([t, by]) => t === "horny" && by === OWNER), "...one of LSCG's own (Needy Nectar is LSCG's aphrodisiac) goes through LSCG's front door");
+  const n2 = t2.local.length; ins.dose.perform({ options: { dose: "heat", strength: "whole" }, sender: BLACK, installedBy: BLACK });
+  ok(!T2.active("heat") && /doesn't get one/.test(t2.local.slice(n2).join(" ")) && /not on your list/.test(t2.local.slice(n2).join(" ")), "from somebody they wouldn't take a dose from: nothin', and they're told why");
+  ins.dose.perform({ options: { dose: "fairy dust", strength: "whole" }, sender: OWNER, installedBy: OWNER });
+  ok(/no dose by that name/.test(t2.local.join(" ")), "a name the Dispensary hasn't got: said so");
+  ok(t2.w.FarmhandDispensary.take("Heat", "whole", OWNER).ok && T2.active("heat"), "the farm's own triggers (no LSCG) take one the same way, through the Companion");
+
   out(fails ? fails + " FAILED" : "ALL PASSED"); process.exit(fails ? 1 : 0);
 })();

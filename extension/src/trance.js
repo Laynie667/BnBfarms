@@ -14,6 +14,18 @@
      haze at the edges, a slow turning spiral (LSCG's own when it's drawin' one), soft rings, the farm's words driftin' up
      the screen, blurred names, a warm glow when you cum. "Calm trance look" keeps it still. "Trance look" off: none of it.
    • Your safeword ends it all. Nothin' here reaches past what your LSCG allows.
+   PART 2 (Nov 25, Laynie: "build part 2"):
+   • THE FARM'S OWN INSTRUCTIONS in LSCG's suggestion editor ("From extensions"): make their animal sound, go to a free
+     milkin' stall (the farm walks them there; the stall milks them), beg to be milked. Anybody can put them in a
+     suggestion; the farm's triggers use them too. Without LSCG, the farm's own triggers carry them out here.
+   • THE FARM'S PULL through the day (the bot keeps it): the nudges land here (a breath of haze, a whisper in the farm's
+     voice, one chat line gone blurry, a slow turn of spiral; nothin' flashes). Switch: "The farm's pull through the day".
+   • HIJACKED SPEECH: with the pull at 60 or more, a while after a session, or under the farm's own trance, now and then
+     what you say out loud gets taken: a thought tryin' to form, then it comes out late, wrong (a line from the library's
+     slips), not at all, or turns into squirmin'. You see what you meant to say. Commands, whispers, emotes and
+     out-of-character lines always go through. Switch: "Hijacked speech".
+   • HEARIN' NARROWED (Laynie: only in trance, or for a while after a trigger): everybody's chat goes faint and blurred but
+     the farm's, yours, your herd leader's and whoever set you off. Out-of-character lines always stay clear.
 */
 import { LS, onAccount } from "./acct.js";
 import { VERSION } from "./version.js";
@@ -23,13 +35,19 @@ const W = window;
 const LSCG_ID = "bnbfarm";
 const SUGG_PREFIX = "bnbfarm-";
 const FARM_KEY = "fhc-farm-sugg";
-const INSTR = ["Orgasm", "Denial", "Insatiable", "Perform Activity", "Strip", "Assume Pose", "Follow", "Speak Phrase", "Forget"];
+// the farm's own LSCG instructions (part 2; shared/trance-script.js FARM): ours, and the Dispensary's dose
+const FARM_I = { sound: LSCG_ID + ".sound", stall: LSCG_ID + ".stall", beg: LSCG_ID + ".beg", dose: "farmhand-dispensary.dose" };
+const INSTR = ["Orgasm", "Denial", "Insatiable", "Perform Activity", "Strip", "Assume Pose", "Follow", "Speak Phrase", "Forget"].concat(Object.values(FARM_I));
 const MAX_MS = 3 * 3600000;
 let ctx = null;   // { toBot, toChat, prefs(), botHere(), mod, arouse(add, cap), lead(m), relayOk() }
 let LA = null;    // our handle on LSCG's extension API
 // the trance as it is: the session (who put you under, till when, LSCG's or the farm's), the look, the farm's triggers
 const T = { session: null, lingerUntil: 0, look: {}, depth: 0, farm: [], pull: {}, pending: null, phrase: null, denyUntil: 0, needyUntil: 0, needyAt: 0,
-  keptAt: 0, waking: false, lastReport: "", glide: null };
+  keptAt: 0, waking: false, lastReport: "", glide: null,
+  // part 2: the farm's pull (0-100, the bot keeps it), your sound and kind, your herd leader, the library's slips;
+  // a while after a session (afterUntil, afterLevel); hearin' narrowed after a trigger (narrowUntil, narrowBy)
+  pullN: 0, me: { sound: "", animal: "", herd: 0 }, slips: [], afterUntil: 0, afterLevel: "", narrowUntil: 0, narrowBy: 0, narrowKey: "",
+  hijackAt: 0, speaking: false };
 export const tranceState = T;   // (tests)
 
 export function initTrance(c) {
@@ -38,7 +56,8 @@ export function initTrance(c) {
   hookLscg();
   hookChat();
   hookGame();
-  onAccount(() => { endAll(true); loadFarm(); T.lastReport = ""; });
+  onAccount(() => { endAll(true); loadFarm(); T.lastReport = ""; T.pullN = 0; T.slips = []; T.me = { sound: "", animal: "", herd: 0 }; });
+  watchChat();
   setInterval(tick, 5000);
 }
 
@@ -79,7 +98,14 @@ function hookLscg() {
     on("hypno.awakened", (p) => brought(p.method || "other"));
     on("state.recovered", (p) => { if (p.type === "hypnotized") brought(p.reason === "expired" ? "timeout" : p.reason === "safeword" ? "safeword" : p.reason === "dispel" ? "dispel" : "other"); });
     on("safeword", () => { event({ ev: "safeword" }); endAll(); });
-    on("hypno.suggestionResolved", (p) => { if (Number(p.installedBy) === BOT_MEMBER) event({ ev: "resolved", name: String(p.suggestion || "").slice(0, 80), resisted: !!p.resisted }); });
+    on("hypno.suggestionResolved", (p) => {
+      if (Number(p.installedBy) !== BOT_MEMBER) return;
+      event({ ev: "resolved", name: String(p.suggestion || "").slice(0, 80), resisted: !!p.resisted });
+      if (!p.resisted) narrowFor(Number(p.sender) || 0);   // one of the farm's landed: only a few voices get through for a while
+    });
+    // the farm's own instructions in LSCG's suggestion editor (part 2)
+    try { if (LA.hypno && typeof LA.hypno.registerInstruction === "function" && (!Lg.capabilities || !Lg.capabilities.has || Lg.capabilities.has("hypno.instructions"))) farmInstructions(); }
+    catch (e) { console.warn("[Farmhand Companion] farm instructions:", e); }
     on("hypno.triggered", () => report());
     on("settings.saved", () => report());
     try { LA.operations.onChange(() => report(true)); } catch (e) { /* fine */ }
@@ -109,6 +135,8 @@ export function onHypno(m) {
     case "check": check(m.ids); break;
     case "suggestions": setFarm(m.list); break;
     case "clear": endAll(); break;
+    case "pull": setPull(m); break;      // part 2: how far the farm's pull is, your sound, your herd leader, the slips
+    case "nudge": nudge(m); break;       // part 2: a little nudge through the day
   }
 }
 const clampMs = (ms) => Math.max(60000, Math.min(MAX_MS, Number(ms) || 1800000));
@@ -130,26 +158,32 @@ function under(m) {
   look({ haze: 20 }, true);
   event({ ev: "under", via: T.session.via });
   report(true);
+  drawNarrow();
 }
 function wake() {
   const s = T.session;
   T.session = null; T.lingerUntil = 0;
+  if (s && !s.ended) afterglow(s.level, 0);   // woken by the farm: the words stay a little slippery for a while
   if (s && s.via === "lscg" && s.ours && !s.ended && hypnotized()) {
     const h = hypState();
     if (h) { T.waking = true; try { h.recover(); } catch (e) { /* fine */ } T.waking = false; }
   }
-  glideStop(); farmBeatsStop(2); clearLook(); report(true);
+  glideStop(); farmBeatsStop(2); clearLook(); report(true); drawNarrow();
 }
 // No human left: the trance runs out on its own (LSCG's time, or its length), the look lifts after a while
 function linger(secs) {
-  if (T.session) T.session.keepOff = true;
+  if (T.session) { T.session.keepOff = true; afterglow(T.session.level, Math.max(10, Math.min(600, secs)) * 1000); }
   T.lingerUntil = Date.now() + Math.max(10, Math.min(600, secs)) * 1000;
   report(true);
 }
+// after a session the words stay slippery a while: Fun 5 minutes, Deep 15, No human left 30
+const AFTER_MIN = { fun: 5, deep: 15, nhl: 30 };
+function afterglow(level, from) { T.afterLevel = AFTER_MIN[level] ? level : "fun"; T.afterUntil = Date.now() + (from || 0) + AFTER_MIN[T.afterLevel] * 60000; }
 function endAll(quiet) {
   const had = !!(T.session || lingering() || T.pending || T.phrase || T.denyUntil > Date.now() || T.needyUntil > Date.now());
   wake();
   T.pending = null; T.phrase = null; T.denyUntil = 0; T.needyUntil = 0;
+  T.afterUntil = 0; T.narrowUntil = 0; T.pullN = 0; drawNarrow();   // (the safeword: nothin' slips, everybody's heard again)
   const el = W.document && W.document.querySelectorAll ? W.document.querySelectorAll(".fhc-sg-ask") : [];
   for (const x of el) x.remove();
   if (had && !quiet && ctx) ctx.toChat("🌀 All of it lets go of you.", "#a67fd4", true);
@@ -170,7 +204,8 @@ export function tranceStatus() {
   return { lscg: !!LA, ver: LA && W.LSCG ? String(W.LSCG.version || "") : "", on: lscgHypnoOn(), sugg: !!(h && h.allowSuggestions), needHyp: !h || h.suggestionRequireHypnotizer !== false,
     mins: h ? Number(h.triggerTime) || 0 : 0, beats: !!(h && h.enableBinaural), scopes, under: !!(T.session || hypnotized()),
     ours: !!(T.session && T.session.via === "lscg" && T.session.ours && !T.session.ended && hypnotized()), farmBeats: !!(ctx && ctx.prefs().farmBeats),
-    planted: h && Array.isArray(h.suggestions) ? h.suggestions.filter((s) => s && typeof s.id === "string" && s.id.indexOf(SUGG_PREFIX) === 0).map((s) => s.id) : [] };
+    planted: h && Array.isArray(h.suggestions) ? h.suggestions.filter((s) => s && typeof s.id === "string" && s.id.indexOf(SUGG_PREFIX) === 0).map((s) => s.id) : [],
+    pullOff: !!(ctx && ctx.prefs().noPull), slipsOff: !!(ctx && ctx.prefs().noSlips) };
 }
 export function tranceHello() { T.lastReport = ""; report(true); }
 function report(force) {
@@ -278,6 +313,16 @@ function root() {
   const d = W.document; if (!d || !d.body) return null;
   let el = d.getElementById("fhc-hyp");
   if (el) return el;
+  css();
+  el = d.createElement("div"); el.id = "fhc-hyp";
+  const haze = d.createElement("div"); haze.className = "haze"; el.appendChild(haze);
+  const sp = d.createElement("div"); sp.className = "spiral"; sp.style.background = "center/contain no-repeat url(\"" + spiralSvg() + "\")"; el.appendChild(sp);
+  for (let i = 0; i < 3; i++) { const r = d.createElement("div"); r.className = "ring"; r.style.animationDelay = i * 3 + "s"; r.style.display = "none"; el.appendChild(r); }
+  d.body.appendChild(el);
+  return el;
+}
+function css() {
+  const d = W.document;
   if (!d.getElementById("fhc-hyp-css")) {
     const s = d.createElement("style"); s.id = "fhc-hyp-css";
     s.textContent = "#fhc-hyp{position:fixed;inset:0;pointer-events:none;z-index:9997;overflow:hidden}" +
@@ -294,15 +339,16 @@ function root() {
       "@keyframes fhcRing{0%{transform:scale(.4);opacity:0}30%{opacity:.35}100%{transform:scale(3.4);opacity:0}}" +
       "@keyframes fhcDrift{0%{transform:translateY(0);opacity:0}15%{opacity:.85}80%{opacity:.6}100%{transform:translateY(-48vh);opacity:0}}" +
       "@keyframes fhcGlow{0%{opacity:0}25%{opacity:1}100%{opacity:0}}" +
-      "@keyframes fhcShudder{0%,100%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}";
+      "@keyframes fhcShudder{0%,100%{transform:translate(0,0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(1px,-1px)}}" +
+      // part 2's nudges: a breath of haze, a slow turn of spiral, each up and gone over seconds (never a flash)
+      "#fhc-nudge{position:fixed;inset:0;pointer-events:none;z-index:9996;overflow:hidden}" +
+      "#fhc-nudge .breath{position:absolute;inset:0;opacity:0;animation:fhcBreath 9s ease-in-out forwards}" +
+      "#fhc-nudge .turn{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:0;animation:fhcBreath 11s ease-in-out forwards;" +
+      "-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%);mask-image:radial-gradient(circle,rgba(0,0,0,.9) 0%,rgba(0,0,0,0) 38%)}" +
+      "#fhc-nudge .turn>div{position:absolute;inset:0;animation:fhcSpin 70s linear infinite}#fhc-nudge.calm .turn>div{animation:none}" +
+      "@keyframes fhcBreath{0%{opacity:0}40%{opacity:1}100%{opacity:0}}";
     d.head.appendChild(s);
   }
-  el = d.createElement("div"); el.id = "fhc-hyp";
-  const haze = d.createElement("div"); haze.className = "haze"; el.appendChild(haze);
-  const sp = d.createElement("div"); sp.className = "spiral"; sp.style.background = "center/contain no-repeat url(\"" + spiralSvg() + "\")"; el.appendChild(sp);
-  for (let i = 0; i < 3; i++) { const r = d.createElement("div"); r.className = "ring"; r.style.animationDelay = i * 3 + "s"; r.style.display = "none"; el.appendChild(r); }
-  d.body.appendChild(el);
-  return el;
 }
 // a two-armed spiral, drawn once
 let SPIRAL = "";
@@ -383,7 +429,11 @@ function hookGame() {
     mod.hookFunction("ServerSend", 10, (args, next) => {
       try {
         const d = args[1];
-        if (T.phrase && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
+        // hijacked speech (part 2): somethin' you say out loud gets taken now and then (never a command, a whisper, an
+        // emote or an out-of-character line, and never the farm's own words comin' out of you)
+        if (!T.phrase && !T.speaking && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && d.Content.trim() &&
+            !/^\s*[(\[?!./\-*]/.test(d.Content) && Math.random() < hijackChance()) { hijack(d.Content); return; }
+        if (T.phrase && !T.speaking && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
           if (d.Content.trim().toLowerCase().replace(/[.!~]+$/, "") === T.phrase.toLowerCase().replace(/[.!~]+$/, "")) T.phrase = null;
           else {
             ctx.toChat("🌀 Nothin' will come out but: " + T.phrase, "#a67fd4", true);
@@ -475,7 +525,7 @@ export function answer(fight) {
   T.pull[p.s.id] = Math.max(5, Math.min(95, pull + (resisted ? -3 : 4)));
   saveFarm();
   event({ ev: "fired", id: p.s.id, name: p.s.name, resisted });
-  if (!resisted) perform(p);
+  if (!resisted) { narrowFor(p.by); perform(p); }
 }
 function perform(p) {
   let wait = 0;
@@ -515,6 +565,16 @@ function doOne(ins, p) {
       const sel = a.selection || { all: true }, has = (x) => sel.all || (sel.instructions || []).includes(x);
       if (has("Denial")) T.denyUntil = 0; if (has("Insatiable")) T.needyUntil = 0; if (has("Speak Phrase")) T.phrase = null;
       emote(me + " blinks, a little lighter, somethin' let go of.");
+      break;
+    }
+    // the farm's own (part 2)
+    case FARM_I.sound: farmSound((a.options || {}).times); break;
+    case FARM_I.stall: farmStall(p.by); break;
+    case FARM_I.beg: farmBeg((a.options || {}).words, (a.options || {}).stall, p.by); break;
+    case FARM_I.dose: {
+      const D = W.FarmhandDispensary, o = a.options || {};
+      if (D && typeof D.take === "function") D.take(String(o.dose || ""), String(o.strength || "whole"), p.by);
+      else ctx.toChat("🌀 Somethin' in you reaches for a dose, but there's no Dispensary here to give it.", "#a67fd4", true);
       break;
     }
   }
@@ -560,6 +620,199 @@ function activity(a, p) {
   W.ActivityRun(P, target, group, { Activity: it.Activity, Group: group.Name, Item: it.Item }, true);
 }
 
+// ── part 2: the farm's own LSCG instructions ────────────────
+// In LSCG's suggestion editor under "From extensions", for anybody to put in a suggestion. They run on the game of
+// whoever the suggestion fires in (here), only once they've given in to it, and only what their LSCG lets through.
+function farmInstructions() {
+  const reg = (d) => { try { LA.hypno.registerInstruction(d); } catch (e) { console.warn("[Farmhand Companion] LSCG wouldn't take " + d.name + ":", e); } };
+  reg({ name: "sound", label: "Make their animal sound",
+    description: "B&B Farm: they make their own animal's sound out loud (a cow moos, a pony whinnies), once or a few times.",
+    options: [{ type: "number", key: "times", label: "How many times", min: 1, max: 3, default: 1 }],
+    perform: (c) => farmSound(c.options.times) });
+  reg({ name: "stall", label: "Go to a free milking stall", unrepeatable: true,
+    description: "B&B Farm: on the farm, they walk to the nearest free milking stall, and the stall milks them if there's anythin' to take.",
+    perform: (c) => farmStall(c.sender) });
+  reg({ name: "beg", label: "Beg to be milked", unrepeatable: true,
+    description: "B&B Farm: they beg out loud to be milked (in their own animal's sound, unless you give the words), then head for a free milking stall on the farm.",
+    options: [{ type: "text", key: "words", label: "What they beg", maxLength: 120, description: "Leave empty for the farm's own words. {sound} and {animal} fill in." },
+      { type: "toggle", key: "stall", label: "Then go to a free stall", default: true }],
+    perform: (c) => farmBeg(c.options.words, c.options.stall, c.sender) });
+}
+const cap = (s) => String(s || "").replace(/^./, (c) => c.toUpperCase());
+const pickOf = (a) => a[Math.floor(Math.random() * a.length)];
+const soundWord = () => { const s = String(T.me.sound || "moo").trim().toLowerCase(); return !s || /\s/.test(s) ? "mmh" : s; };
+const stretch = (w) => w.replace(/([aeiou])(?=[^aeiou]*$)/i, "$1$1$1");   // (moo → moooo, whinny → whiiinny)
+// out loud, as them: the farm's instruction (or their own words, late) comin' out. Never taken by hijacked speech, never
+// held back by a phrase they owe.
+function sayOut(text) {
+  try {
+    if (typeof W.ServerSend !== "function") return;
+    T.speaking = true;
+    W.ServerSend("ChatRoomChat", { Type: "Chat", Content: String(text).replace(/[()]/g, "").slice(0, 300) });
+  } catch (e) { /* fine */ } finally { T.speaking = false; }
+}
+function farmSound(times) {
+  const n = Math.max(1, Math.min(3, Math.round(Number(times) || 1))), s = soundWord(), out = [];
+  for (let i = 0; i < n; i++) out.push(i === n - 1 ? stretch(s) + "~" : s);
+  sayOut(cap(out.join("… ")));
+}
+function farmStall(by) {
+  if (!ctx.botHere()) { ctx.toChat("🌀 Your feet want a milkin' stall, but there's no farm here to find one in.", "#a67fd4", true); return; }
+  emote(myName() + "'s eyes go soft, and their feet start for the milkin' stalls.");
+  ctx.toBot("hypnoDo", { what: "stall", by: Number(by) || 0 });
+}
+const BEGS = ["{Sound}… please, milk me…", "Milk me… please, I'm so full…", "{Sound}… need milked… please…", "Please… the stall… milk me…"];
+function farmBeg(words, stall, by) {
+  const s = soundWord(), fillW = (t) => String(t).replace(/\{Sound\}/g, cap(s)).replace(/\{sound\}/g, s).replace(/\{animal\}/gi, T.me.animal || "animal");
+  const own = String(words || "").trim();
+  sayOut(fillW(own && !/^[*!/.]/.test(own) ? own : pickOf(BEGS)));
+  if (stall !== false) setTimeout(() => farmStall(by), 2000);
+}
+
+// ── part 2: the farm's pull through the day ─────────────────
+// (the bot keeps how far it is and decides when; this shows it, and lets your words slip once it's built up)
+function setPull(m) {
+  T.pullN = Math.max(0, Math.min(100, Number(m.n) || 0));
+  if (typeof m.sound === "string") T.me.sound = m.sound.slice(0, 30);
+  if (typeof m.animal === "string") T.me.animal = m.animal.slice(0, 30);
+  if (m.herd != null) { T.me.herd = Number(m.herd) || 0; drawNarrow(); }
+  if (Array.isArray(m.slips)) T.slips = m.slips.filter((x) => x && typeof x.t === "string" && x.t.trim()).slice(0, 60)
+    .map((x) => ({ t: x.t.replace(/[()]/g, "").slice(0, 160), p: Math.max(0, Math.min(100, Number(x.p) || 0)) }));
+}
+const pullOn = () => !!ctx && !ctx.prefs().noPull && !isBot();
+function nudge(m) {
+  if (!pullOn()) return;
+  T.pullN = Math.max(0, Math.min(100, Number(m.n) || T.pullN));
+  const fx = String(m.fx || "");
+  if (fx === "voice" && m.text) ctx.toChat("[Voice] " + String(m.text).replace(/[()]/g, "").slice(0, 200), "#a67fd4", true);
+  if (!lookOn() || T.session) return;   // (the look's yours to switch off; in a session its own look is already up)
+  if (fx === "blur" && blurLine()) return;
+  if (fx === "spiral") { turnOfSpiral(); return; }
+  breath(fx === "voice" ? 0.5 : 1);
+}
+function nudgeRoot() {
+  const d = W.document; if (!d || !d.body) return null;
+  css();
+  let el = d.getElementById("fhc-nudge");
+  if (!el) { el = d.createElement("div"); el.id = "fhc-nudge"; d.body.appendChild(el); }
+  el.classList.toggle("calm", calm());
+  return el;
+}
+// a breath of haze at the edges of the screen, in and gone over nine seconds
+function breath(k) {
+  const el = nudgeRoot(); if (!el) return;
+  const b = W.document.createElement("div"); b.className = "breath";
+  const haze = Math.round(30 + 25 * Math.min(1, T.pullN / 100)) * (k || 1);
+  b.style.background = "radial-gradient(ellipse at center, transparent " + Math.max(25, 62 - haze * 0.4) + "%, rgba(88,28,118," + (haze / 100 * 0.78).toFixed(3) + ") 100%)";
+  el.appendChild(b); setTimeout(() => b.remove(), 9500);
+}
+// one line somebody else said goes soft and blurry for a while
+function blurLine() {
+  const d = W.document, me = W.Player && W.Player.MemberNumber;
+  const lines = Array.from(d.querySelectorAll("#TextAreaChatLog .ChatMessageChat[data-sender]")).filter((e) => Number(e.getAttribute("data-sender")) !== me && !e.classList.contains("fhc-ooc"));
+  const el = lines[lines.length - 1]; if (!el) return false;
+  el.style.transition = "filter 3s, opacity 3s"; el.style.filter = "blur(2px)"; el.style.opacity = "0.5";
+  setTimeout(() => { el.style.filter = ""; el.style.opacity = ""; }, 20000);
+  return true;
+}
+// a slow turn of the spiral, faint, up and gone again
+function turnOfSpiral() {
+  const el = nudgeRoot(); if (!el) return;
+  const t = W.document.createElement("div"); t.className = "turn"; t.style.opacity = "0";
+  const inner = W.document.createElement("div"); inner.style.background = "center/contain no-repeat url(\"" + spiralSvg() + "\")"; inner.style.opacity = calm() ? "0.05" : "0.1";
+  t.appendChild(inner); el.appendChild(t); setTimeout(() => t.remove(), 11500);
+}
+
+// ── part 2: hijacked speech ─────────────────────────────────
+// how likely somethin' you say out loud gets taken: the pull from 60 (5%, up to 25% at the top), a while after a session
+// (Fun a little, No human left a lot), or under the farm's own trance (LSCG keeps you quiet itself). Never twice in 45 s.
+export function hijackChance() {
+  if (!ctx || ctx.prefs().noSlips || isBot()) return 0;
+  const now = Date.now(); if (now - T.hijackAt < 45000) return 0;
+  let c = 0;
+  if (pullOn() && T.pullN >= 60) c = (T.pullN - 50) / 200;
+  if (T.afterUntil > now) c = Math.max(c, { fun: 0.08, deep: 0.18, nhl: 0.3 }[T.afterLevel] || 0.08);
+  if (T.session && T.session.via === "farm" && !T.session.ended) c = Math.max(c, 0.35);
+  return Math.min(0.4, c);
+}
+// how deep it's got you, 0 to 1: the deeper, the more often it comes out wrong, or turns into squirmin'
+function hijackDepth() {
+  const now = Date.now(); let d = pullOn() ? T.pullN / 100 : 0;
+  if (T.afterUntil > now) d = Math.max(d, { fun: 0.4, deep: 0.7, nhl: 0.95 }[T.afterLevel] || 0.4);
+  if (T.session && !T.session.ended) d = Math.max(d, 0.8);
+  return Math.min(1, d);
+}
+const THINKING = ["'s lips part… a thought tryin' to form…", " opens their mouth, and the words go slow and far away…", " starts to speak, and stalls there, eyes driftin'…"];
+export function hijack(text, way) {
+  T.hijackAt = Date.now();
+  const me = myName(), deep = hijackDepth();
+  emote(me + pickOf(THINKING));
+  ctx.toChat("🌀 You tried to say: " + String(text).slice(0, 200), "#a67fd4", true);
+  if (!way) {
+    const ways = [["blank", 0.25], ["late", Math.max(0.05, 0.35 * (1 - deep))], ["wrong", 0.25 + 0.3 * deep], ["squirm", 0.08 + 0.17 * deep]];
+    let r = Math.random() * ways.reduce((n, w) => n + w[1], 0); way = "wrong";
+    for (const [w, x] of ways) { if ((r -= x) < 0) { way = w; break; } }
+  }
+  setTimeout(() => {
+    try {
+      if (way === "blank") emote(me + " stares, mouth open… nothin' comes.");
+      else if (way === "late") setTimeout(() => sayOut(slowly(text)), 2500 + Math.random() * 2500);
+      else if (way === "wrong") sayOut(slipLine());
+      else { emote(me + " loses the words altogether, hands driftin' down, squirmin' where they stand."); if (ctx.arouse) ctx.arouse(8, 90); }
+    } catch (e) { /* fine */ }
+  }, 2000);
+  return way;
+}
+// it comes out late: slow, trailin' off
+function slowly(text) {
+  const w = String(text).trim().split(/\s+/);
+  return w.map((x, i) => (i > 0 && Math.random() < 0.3 ? "… " + x : x)).join(" ").replace(/[.!?~…]*$/, "…");
+}
+// it comes out wrong: one of the library's slips, as deep as it's got you
+function slipLine() {
+  const depth = Math.round(hijackDepth() * 100), ok = T.slips.filter((x) => x.p <= depth);
+  const list = ok.length ? ok : T.slips.filter((x) => x.p === 0);
+  if (list.length) { const top = Math.max(...list.map((x) => x.p)); return pickOf(list.filter((x) => x.p >= top - 30)).t; }
+  return cap(stretch(soundWord())) + "~";
+}
+
+// ── part 2: hearin' narrowed ────────────────────────────────
+// Laynie, Nov 25: only while under, or for a while after a trigger. Everybody's chat goes faint and blurred but the farm's,
+// yours, your herd leader's and whoever set you off. Out-of-character lines (anythin' with a bracket) always stay clear.
+// Part of the trance look: switch that off and nobody's blurred.
+function narrowFor(by) { T.narrowUntil = Date.now() + 3 * 60000; T.narrowBy = Number(by) || 0; drawNarrow(); }
+const narrowed = () => !!ctx && !isBot() && lookOn() && ((T.session && !T.session.ended) || T.narrowUntil > Date.now());
+export function drawNarrow() {
+  const d = W.document; if (!d || !d.head) return;
+  let s = d.getElementById("fhc-hyp-hear");
+  if (!narrowed()) { if (s) s.remove(); T.narrowKey = ""; return; }
+  const keep = [W.Player && W.Player.MemberNumber, BOT_MEMBER, T.me.herd, T.narrowBy, T.session && T.session.by].map(Number).filter((x) => x > 0);
+  const key = Array.from(new Set(keep)).join(",");
+  if (s && T.narrowKey === key) return;
+  T.narrowKey = key;
+  const not = key.split(",").map((m) => ':not([data-sender="' + m + '"])').join("") + ":not(.fhc-ooc)";
+  if (!s) { s = d.createElement("style"); s.id = "fhc-hyp-hear"; d.head.appendChild(s); }
+  s.textContent = "#TextAreaChatLog .ChatMessageChat[data-sender]" + not + ",#TextAreaChatLog .ChatMessageWhisper[data-sender]" + not + "{filter:blur(1.4px);opacity:.45;transition:filter 2s,opacity 2s}";
+}
+// out-of-character lines get marked as they come in, so they're never blurred
+export function oocOf(el) {
+  const names = el.querySelectorAll ? el.querySelectorAll(".ChatMessageName") : [], nm = names[names.length - 1];
+  let body = ""; for (let n = nm && nm.nextSibling; n; n = n.nextSibling) body += n.textContent || "";
+  return (nm ? body : String(el.textContent || "")).includes("(");
+}
+function watchChat() {
+  const d = W.document; if (!d || typeof W.MutationObserver !== "function") return;
+  let log = null;
+  const mark = (el) => { try { if (el && el.classList && /\bChatMessage(Chat|Whisper)\b/.test(el.className) && oocOf(el)) el.classList.add("fhc-ooc"); } catch (e) { /* fine */ } };
+  const hook = () => {
+    const l = d.getElementById("TextAreaChatLog");
+    if (!l || l === log) return;
+    log = l; for (const el of l.children) mark(el);
+    new W.MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) mark(n); }).observe(l, { childList: true });
+  };
+  hook(); setInterval(hook, 3000);
+}
+
 // ── every few seconds ───────────────────────────────────────
 function tick() {
   try {
@@ -573,6 +826,7 @@ function tick() {
     if (s && s.keepOff && !lingering()) { T.session = null; glideStop(); farmBeatsStop(3); clearLook(); }
     if (!s && T.lingerUntil && now > T.lingerUntil) { T.lingerUntil = 0; glideStop(); farmBeatsStop(3); clearLook(); }
     if (T.needyUntil > now && now - T.needyAt > 30000 && ctx.arouse) { T.needyAt = now; ctx.arouse(6, 92); }
+    drawNarrow();   // (on as a session starts, off once it's over or the trigger's while is up)
     report(false);
   } catch (e) { /* next time */ }
 }

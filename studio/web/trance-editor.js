@@ -69,6 +69,8 @@ function addBlock(kind) {
     suggestion: "pace: 35s\npick: 2\n\nEvery time you {sound}, you feel a little warm rush.",
     trigger: "level: deep, nhl\ntrigger: good {animal}\ndoes: say \"{sound}~\"\n\nAnd somethin' to keep: whenever anyone calls you a good {animal}…",
     wake: "pace: 15s\nbeats: → alpha 10 over 1m\nlook: clear\n\nCountin' up now. Three, two, one, eyes open, {name}.",
+    compulsion: "level: deep, nhl\nwhen: pat\ndoes: pose {low} → moo\nwaits: 2s\nchance: 10%\n\nA pat on your head, and sometimes you just melt, right down {low}.",
+    hangon: "level: deep, nhl\neffect: mootalk\nlasts: 30m\n\nFor a while after you come up, your {sound} keeps slippin' out between your words.",
     slip: "pull: 40\n\n{sound}~\nGood {animal}s don't need words.",
     nudge: "pull: 30\n\nSo heavy, {name}. Your eyes want to close.",
     session: "level: deep\ninduction: any\ndeepener: any\nsuggestion: any 2\ntrigger: any\nwake: any",
@@ -115,6 +117,8 @@ async function pubStatus() {
 // ── the list ─────────────────────────────────────────────────
 const KIND_HINT = { induction: "takes them down", deepener: "further down", convincer: "a little test (too heavy to lift…)", suggestion: "spoken, for while they're under",
   trigger: "spoken, then planted as an LSCG suggestion", wake: "brings them up (or doesn't)",
+  compulsion: "spoken, then kept: somethin' happenin' sets it off now and then (their herd leader walks in, a pat, the stall's cups…)",
+  hangon: "spoken, then it stays with them a while after they come up",
   slip: "what comes out of their mouth instead, when their speech gets hijacked (said out loud, as them)",
   nudge: "the farm's whispers through the day, as its pull builds up in them (only to them)",
   session: "a recipe: which blocks, in what order" };
@@ -216,7 +220,8 @@ function renderForm() {
       h("label", { class: "lab" }, "Volume"), h("input", { type: "number", min: 0, max: 100, value: L.volume != null ? L.volume : "", placeholder: "theirs", onchange: (e) => edit((x) => { const v = e.target.value === "" ? undefined : Math.max(0, Math.min(100, Math.round(Number(e.target.value)))); x.labels.volume = v; }) }),
       h("span", { class: "hint" }, "% of their own beats")));
   }
-  if (b.kind === "trigger") box.appendChild(triggerForm(L));
+  if (b.kind === "trigger" || b.kind === "compulsion") box.appendChild(triggerForm(L, b.kind));
+  if (b.kind === "hangon") box.appendChild(hangonForm(L));
   if (b.kind === "session") box.appendChild(sessionForm(L));
   else box.appendChild(linesForm(b));
 }
@@ -254,7 +259,18 @@ function lookForm(v) {
       h("span", { class: "hint" }, "Names"), opt("names", [["blur", "blurred", true], ["clear", "clear", false]], v.names == null ? undefined : v.names ? "blur" : "clear")),
     h("p", { class: "hint" }, "Slow and soft, never flashing. People can switch it off, or keep it still, in their Companion."));
 }
-function triggerForm(L) {
+// part 3: what a hang-on does after they come up, and for how long (the session's level caps it: Fun 20 minutes, Deep an
+// hour, No human left 4 hours)
+function hangonForm(L) {
+  return h("fieldset", null, h("legend", null, "Stays with them after"),
+    h("div", { class: "row" }, h("label", { class: "lab" }, "Effect"),
+      h("select", { onchange: (e) => edit((x) => { x.labels.effect = e.target.value || undefined; }, { form: true }) }, h("option", { value: "" }, "—"),
+        Object.entries(T.EFFECTS).map(([k, t]) => h("option", { value: k, selected: k === L.effect || null }, k + ": " + t)))),
+    h("div", { class: "row" }, h("label", { class: "lab" }, "Lasts"),
+      h("input", { type: "number", min: 1, max: 240, value: L.lasts ? Math.round(L.lasts / 60) : "", placeholder: "30", onchange: (e) => edit((x) => { const m = Math.round(Number(e.target.value)); x.labels.lasts = m >= 1 && m <= 240 ? m * 60 : undefined; }) }),
+      h("span", { class: "hint" }, "minutes (Fun sessions cap it at 20, Deep at 60, No human left at 240). Their safeword ends it.")));
+}
+function triggerForm(L, kind) {
   const rows = T.splitDoes(L.does || "").map((s) => { const m = /^(\S+)\s*(.*)$/.exec(s); return { verb: m ? m[1].toLowerCase() : "", arg: m ? m[2] : "" }; });
   const waits = String(L.waits || "").split(",").map((s) => s.trim());
   while (rows.length < 3) rows.push({ verb: "", arg: "" });
@@ -265,14 +281,23 @@ function triggerForm(L) {
     x.labels.waits = w.some(Boolean) ? w.map((s) => s || "1s").join(", ") : "";
   }, { form });
   const test = T.parseDoes(L.does || "", L.waits || "", { low: "kneel" });
-  return h("fieldset", null, h("legend", null, "Planted as an LSCG suggestion"),
-    h("div", { class: "row" }, h("label", { class: "lab" }, "Trigger"), h("input", { value: L.trigger || "", size: 30, placeholder: "milking time", onchange: (e) => edit((x) => { x.labels.trigger = e.target.value.trim(); }) }),
+  const comp = kind === "compulsion";
+  return h("fieldset", null, h("legend", null, comp ? "Kept by the farm, set off by somethin' happenin'" : "Planted as an LSCG suggestion"),
+    comp ? h("div", { class: "row" }, h("label", { class: "lab" }, "When"),
+      h("select", { onchange: (e) => edit((x) => { x.labels.when = e.target.value || undefined; }) }, h("option", { value: "" }, "—"),
+        Object.entries(T.WHEN).map(([k, t]) => h("option", { value: k, selected: k === L.when || null }, t))),
+      h("label", { class: "lab" }, "Chance"),
+      h("input", { type: "number", min: 1, max: 50, value: L.chance || "", placeholder: "10", onchange: (e) => edit((x) => { const c = Number(e.target.value); x.labels.chance = c >= 1 && c <= 50 ? c : undefined; }) }),
+      h("span", { class: "hint" }, "% each time (small; never the same one twice in ten minutes)"))
+    : h("div", { class: "row" }, h("label", { class: "lab" }, "Trigger"), h("input", { value: L.trigger || "", size: 30, placeholder: "milking time", onchange: (e) => edit((x) => { x.labels.trigger = e.target.value.trim(); }) }),
       h("span", { class: "hint" }, "said by anyone LSCG lets set it off ({animal} and the rest fill in)")),
     rows.map((r, i) => h("div", { class: "row" }, h("label", { class: "lab" }, i === 0 ? "Does" : "then"),
       i > 0 ? [h("input", { type: "number", min: 1, max: 30, value: (waits[i - 1] || "").replace(/s$/, ""), placeholder: "1", title: "seconds before this one", onchange: (e) => { waits[i - 1] = e.target.value ? e.target.value + "s" : ""; write(); } }), h("span", { class: "hint" }, "s later:")] : null,
       h("select", { onchange: (e) => { r.verb = e.target.value; if (!e.target.value) r.arg = ""; write(true); } }, h("option", { value: "" }, "—"), Object.keys(VERBS).map((v) => h("option", { value: v, selected: v === r.verb || null }, v))),
       r.verb && VERBS[r.verb] && VERBS[r.verb].hint ? h("input", { value: r.verb === "say" || r.verb === "beg" ? r.arg.replace(/^"(.*)"$/, "$1") : r.arg, size: 30, placeholder: VERBS[r.verb].hint, title: VERBS[r.verb].hint, onchange: (e) => { r.arg = e.target.value.trim(); write(); } }) : null)),
-    h("p", { class: "hint" }, test.error ? "✖ " + test.error : "As LSCG instructions: " + test.instructions.map((x) => x.type).join(" → ") + ". They can fight it off like any LSCG suggestion, and block any instruction in their LSCG. The farm's own (moo, stall, beg) run through their Companion; dose needs their Dispensary."));
+    h("p", { class: "hint" }, test.error ? "✖ " + test.error : comp
+      ? "Does: " + test.instructions.map((x) => T.stepName(x.type)).join(" → ") + ". Their Companion carries it out, give in or fight it. From a Fun session it fires once and fades in a day; Deep, a week (renewed when it lands); No human left, set for good."
+      : "As LSCG instructions: " + test.instructions.map((x) => T.stepName(x.type)).join(" → ") + ". They can fight it off like any LSCG suggestion, and block any instruction in their LSCG. The farm's own (moo, stall, beg) run through their Companion; dose needs their Dispensary."));
 }
 function sessionForm(L) {
   const picks = (L.picks || []).map((p) => ({ kind: p.kind, items: p.items.map((it) => (it.all ? "all" : it.any ? (it.any > 1 ? "any " + it.any : "any") : it.name)).join(", ") }));

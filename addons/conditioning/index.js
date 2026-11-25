@@ -52,7 +52,7 @@
 */
 import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf, fits as fitsBody } from "../_lib/connect.js";
 import { SPECIES_MORE, MALE, UDDER_KINDS, SCRIPT_MORE, GEAR_SUGGEST } from "./more-lines.js";
-import { parseLibrary, planSession, sessionSteps, lscgSuggestion, fillIn, fits as blockFits, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
+import { parseLibrary, planSession, sessionSteps, lscgSuggestion, farmCompulsion, fillIn, slug, stepName, fits as blockFits, WHEN, KEEP_MS, HANG_CAP_S, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
 import { STARTER } from "../../shared/trance-starter.js";
 
 // words for each species; anything unknown uses "default"
@@ -252,52 +252,125 @@ function tellOnce(mn, key, text) {
   if (x.told[key] === day) return; x.told[key] = day; api.save(); api.notice(mn, text);
 }
 
-// ── the triggers the farm planted ──────────────────────────
-// me(mn).sugg[id] = { s: LSCG's suggestion, block, level, at, via: "lscg" | "farm", ok: planted and seen, fired, fought }
+// ── the triggers (and part 3's compulsions) the farm planted ──
+// me(mn).sugg[id] = { s: LSCG's suggestion, kind: "trigger" | "compulsion", block, level, at, via: "lscg" | "farm",
+//   ok: planted and seen, fired, fought, until: when it fades (null: set for good), perm: set for good (No human left),
+//   compulsions also: when, chance, once (from a Fun session: fires once) }
 const plantedOf = (mn) => { const x = me(mn); return (x.sugg = x.sugg || {}); };
 const lscgOn = (hs) => !!(hs && hs.lscg && hs.on);
+const isComp = (x) => x && x.kind === "compulsion";
+// "the deeper, the more permanent" (Laynie, Nov 24): Fun a day, Deep a week, No human left for good. A deeper session's
+// planting never makes one already there fade sooner.
+function keepUntil(level, was) {
+  if (level === "nhl" || (was && was.perm)) return { until: null, perm: true };
+  const ms = KEEP_MS[level] || KEEP_MS.fun, until = Date.now() + ms;
+  return { until: was && was.until ? Math.max(was.until, until) : until, perm: false };
+}
 function plant(mn, run, b) {
-  if (!api.hasCompanion || !api.hasCompanion(mn)) { api.log("trigger " + b.name + " not planted in " + mn + ": no Companion"); return; }
+  if (!api.hasCompanion || !api.hasCompanion(mn)) { api.log(b.kind + " " + b.name + " not planted in " + mn + ": no Companion"); return; }
+  if (b.kind === "hangon") return plantHangon(mn, run, b);
+  if (b.kind === "compulsion") return plantCompulsion(mn, run, b);
   const sg = lscgSuggestion(b, { words: wordsFor(mn), low: lowOf(mn), by: api.cfg.BOT_MEMBER, byName: api.name(api.cfg.BOT_MEMBER) || "The farm", now: Date.now() });
   if (sg.error) { api.log("trigger " + b.name + " can't be planted: " + sg.error); return; }
   const hs = api.hypnoState(mn), all = plantedOf(mn), was = all[sg.id];
-  all[sg.id] = { s: sg, block: b.name, level: run.level, at: Date.now(), via: lscgOn(hs) ? "lscg" : "farm", ok: false, fired: was ? was.fired || 0 : 0, fought: was ? was.fought || 0 : 0 };
+  all[sg.id] = Object.assign({ kind: "trigger", s: sg, block: b.name, level: run.level, at: Date.now(), via: lscgOn(hs) ? "lscg" : "farm", ok: false, fired: was ? was.fired || 0 : 0, fought: was ? was.fought || 0 : 0 }, keepUntil(run.level, was));
   api.save();
   if (lscgOn(hs)) plantLscg(mn); else sendFarm(mn);
 }
-// everything waitin' to go into their LSCG: only while they're under in the farm's name, with suggestions allowed
+// part 3: a compulsion is kept by the farm (somethin' happenin' sets it off, not a word), and carried out by their Companion
+function plantCompulsion(mn, run, b) {
+  const c = farmCompulsion(b, { words: wordsFor(mn), low: lowOf(mn) });
+  if (c.error) { api.log("compulsion " + b.name + " can't be planted: " + c.error); return; }
+  const all = plantedOf(mn), was = all[c.id];
+  all[c.id] = Object.assign({ kind: "compulsion", s: { id: c.id, name: c.name, trigger: "", instructions: c.instructions }, when: c.when, chance: c.chance, once: run.level === "fun" && !(was && !was.once),
+    block: b.name, level: run.level, at: Date.now(), via: "farm", ok: true, fired: was ? was.fired || 0 : 0, fought: was ? was.fought || 0 : 0 }, keepUntil(run.level, was));
+  api.save();
+}
+// part 3: a hang-on stays with them a while after they come up (their Companion does it, and the safeword ends it)
+function plantHangon(mn, run, b) {
+  const secs = Math.min(HANG_CAP_S[run.level] || HANG_CAP_S.fun, b.labels.lasts || 1800);
+  api.hypno(mn, { do: "hangon", id: slug(b.name), name: b.name, effect: b.labels.effect, until: Date.now() + secs * 1000, low: lowOf(mn) });
+}
+// everything waitin' to go into their LSCG (and anythin' faded, to come out): only while they're under in the farm's
+// name, with suggestions allowed
 function plantLscg(mn, quiet) {
-  const hs = api.hypnoState(mn) || {}, want = Object.values(plantedOf(mn)).filter((x) => x.via === "lscg" && !x.ok);
-  if (!want.length) return false;
+  const hs = api.hypnoState(mn) || {}, want = Object.values(plantedOf(mn)).filter((x) => x.via === "lscg" && !x.ok), out = me(mn).unplant || [];
+  if (!want.length && !out.length) return false;
   const miss = [];
   if (!hs.sugg) miss.push("tick Allow suggestions in LSCG's Hypnosis settings");
   if (!hs.ours) miss.push((hs.scopes || []).includes("states") ? "be under in the farm's name (it plants them next session)" : "let the farm in: LSCG settings → Extensions → B&B Farm, Hypnosis and States");
   if (miss.length) {
-    if (!quiet) tellOnce(mn, "plant", "🌀 The farm has " + want.length + " trigger" + (want.length === 1 ? "" : "s") + " waitin' to go into your LSCG. First " + miss.join(", and ") + ".");
+    if (!quiet && want.length) tellOnce(mn, "plant", "🌀 The farm has " + want.length + " trigger" + (want.length === 1 ? "" : "s") + " waitin' to go into your LSCG. First " + miss.join(", and ") + ".");
     return false;
   }
   const now = Date.now(), go = want.filter((x) => !x.tried || now - x.tried > 30000);
-  if (!go.length) return false;
+  if (!go.length && !out.length) return false;
   for (const x of go) x.tried = now;
-  api.lscgPlant(mn, go.map((x) => x.s), [], hs.ver);
-  api.later(() => api.hypno(mn, { do: "check", ids: go.map((x) => x.s.id) }), 4000);
+  api.lscgPlant(mn, go.map((x) => x.s), out, hs.ver);
+  me(mn).unplant = []; api.save();
+  if (go.length) api.later(() => api.hypno(mn, { do: "check", ids: go.map((x) => x.s.id) }), 4000);
   return true;
 }
-// the farm's own (no LSCG): their Companion keeps and carries them out
+// the farm's own triggers (no LSCG): their Companion keeps and carries them out
 function sendFarm(mn) {
   // (?hypno off: they rest, kept, till it's back on)
   const on = !!(api.rec(mn) || {}).hypno;
-  const list = on ? Object.values(plantedOf(mn)).filter((x) => x.via === "farm").map((x) => x.s) : [];
+  const list = on ? Object.values(plantedOf(mn)).filter((x) => x.via === "farm" && !isComp(x)).map((x) => x.s) : [];
   api.hypno(mn, { do: "suggestions", list });
 }
+// what's faded (part 3): gone from the farm's books, and from their LSCG the next time they're under in the farm's name
+function fadeTick() {
+  const now = Date.now();
+  for (const [k, x] of Object.entries(D().people)) {
+    const all = x.sugg; if (!all) continue;
+    let farm = false;
+    for (const [id, p] of Object.entries(all)) {
+      if (!p.until || p.until > now) continue;
+      delete all[id];
+      if (p.via === "lscg" && p.ok) (x.unplant = x.unplant || []).push(p.s);
+      if (p.via === "farm" && !isComp(p)) farm = true;
+    }
+    if (farm && api.char(Number(k))) sendFarm(Number(k));
+  }
+}
+const fadeText = (x) => (x.perm ? "set for good" : x.until ? "fades " + (x.until - Date.now() > 36 * 3600000 ? "in " + Math.round((x.until - Date.now()) / 86400000) + " days" : "in " + Math.max(1, Math.round((x.until - Date.now()) / 3600000)) + " hours") + (x.once ? ", fires once" : "") : "");
 function plantedText(mn, forMe) {
   const all = Object.values(plantedOf(mn));
   if (!all.length) return "🌀 " + (forMe ? "Nothin's" : api.name(mn) + " has nothin'") + " planted by the farm" + (forMe ? " in you." : ".");
   return "🌀 Planted by the farm" + (forMe ? " in you" : " in " + api.name(mn)) + ":\n" + all.map((x) =>
-    "• " + x.block + ": \"" + x.s.trigger + "\" → " + x.s.instructions.map((i) => i.type).join(", ") + " · " +
-    (x.via === "farm" ? "the farm's own" : x.ok ? "in their LSCG" : "waitin' for LSCG") + (x.fired ? " · fired " + x.fired + (x.fought ? ", fought off " + x.fought : "") : "")).join("\n") +
-    (forMe ? "\n?planted remove <name> takes one out (all: every one)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
+    "• " + x.block + ": " + (isComp(x) ? "when " + (WHEN[x.when] || x.when) + ", " + Math.round((x.chance || 0.1) * 100) + "% of the time" : "\"" + x.s.trigger + "\"") + " → " + x.s.instructions.map((i) => stepName(i.type)).join(", ") + " · " +
+    (isComp(x) ? "a compulsion" : x.via === "farm" ? "the farm's own" : x.ok ? "in their LSCG" : "waitin' for LSCG") + (x.fired ? " · fired " + x.fired + (x.fought ? ", fought off " + x.fought : "") : "") +
+    (fadeText(x) ? " · " + fadeText(x) : "")).join("\n") +
+    (forMe ? "\n?planted remove <name> takes one out (all: every one; ones set for good only your herd leader or a proprietor can)." + (all.some((x) => x.via === "lscg" && x.ok) ? " Ones in your LSCG also go with LSCG's own: /lscg remove-suggestion B&B <name>." : "") : "");
 }
+// part 3: somethin' happened that one of their compulsions answers to. A small chance each time (the block's, 10% if it
+// didn't say; Laynie: "a small, random chance of them triggering"), never the same one twice in ten minutes, and never
+// while somethin' else has them, they're in a session, or they're away from the keys. Their Companion asks: give in or
+// fight it.
+function compel(mn, when, by) {
+  const r = api.rec(mn);
+  // (comin' up, or cummin', says they're right there: a session keeps them quiet, so no chat lately doesn't count then)
+  if (!r || !r.hypno || !api.char(mn) || !api.hasCompanion || !api.hasCompanion(mn) || running.has(mn) || held(mn) || (when !== "wake" && when !== "cum" && idle(mn))) return false;
+  const now = Date.now(), list = Object.values(plantedOf(mn)).filter((x) => isComp(x) && x.when === when && (!x.until || x.until > now));
+  let fired = false;
+  for (const x of list) {
+    if (now - (x.rolled || 0) < 10 * 60000) continue;
+    x.rolled = now;
+    if (Math.random() >= (x.chance || 0.1)) continue;
+    const who = by && by !== mn ? by : api.cfg.BOT_MEMBER;
+    api.hypno(mn, { do: "compel", id: x.s.id, name: x.s.name, when, by: who, byName: api.name(who) || "The farm", instructions: x.s.instructions });
+    fired = true; break;
+  }
+  api.save();
+  return fired;
+}
+// a compulsion or trigger that landed: renewed for as long again (Fun's compulsions fire once, then they're spent)
+function landed(mn, x) {
+  if (!x) return;
+  if (isComp(x) && x.once) { delete plantedOf(mn)[x.s.id]; return; }
+  if (x.until) x.until = Math.max(x.until, Date.now() + (KEEP_MS[x.level] || KEEP_MS.fun));
+}
+const herdOf = (lead) => api.here().filter((m) => m !== lead && api.herdLeaderOf && api.herdLeaderOf(m) === lead);
 
 // ── the farm's pull through the day (2.1, part 2) ──────────
 const PULL = { NUDGE_MIN: [4, 9], STEP: [2, 4], TRIGGER: 5, SESSION: 8, SESSION_CAP: 90, MILKED: 3, AFTER_COLLECT: 20, AWAY_PER_H: 10, IDLE_MIN: 20 };
@@ -326,7 +399,7 @@ const told = new Map();
 function sendPull(mn, slips) {
   if (!api.hasCompanion || !api.hasCompanion(mn)) return;
   const L = lib(), w = wordsFor(mn), key = L.from + ":" + (L.stamp || "") + ":" + me(mn).max + ":" + speciesKey(mn);
-  const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: (api.herdLeaderOf && api.herdLeaderOf(mn)) || 0 };
+  const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: (api.herdLeaderOf && api.herdLeaderOf(mn)) || 0, low: lowOf(mn) };
   if (slips || told.get(mn) !== key) { msg.slips = asideLines(mn, "slip", null).slice(0, 60); told.set(mn, key); }
   api.hypno(mn, msg);
 }
@@ -339,7 +412,13 @@ function pullAdd(mn, add) {
   if (p.n >= 100) collect(mn);
 }
 function pullTick() {
+  fadeTick();   // (part 3: what's planted fades by its level)
   const now = Date.now(), here = new Set(api.here());
+  // part 3: near full (80%) is somethin' a compulsion can answer to
+  for (const mn of here) {
+    if (!Object.values(plantedOf(mn)).some((x) => isComp(x) && x.when === "full")) continue;
+    try { const p = api.prod(mn); if (p && api.makesMilk(mn) && p.milk >= api.milkCap(mn) * 0.8) compel(mn, "full"); } catch (e) { /* no milk to speak of */ }
+  }
   // away from the farm, away from the keys, or switched off: it ebbs, ten an hour
   for (const [k, x] of Object.entries(D().people)) {
     const mn = Number(k), p = x.pull;
@@ -401,7 +480,8 @@ function toStall(mn) {
   if (far(free[0]) === 0) return;   // already standin' in one
   api.teleport(mn, { X: free[0].X, Y: free[0].Y });
 }
-if (typeof window !== "undefined" && window.__FARMHAND_TEST__) window.__condPull = { tick: () => pullTick(), PULL, nudge: (mn) => nudge(mn), add: (mn, n) => pullAdd(mn, n), of: (mn) => pullOf(mn) };
+if (typeof window !== "undefined" && window.__FARMHAND_TEST__) window.__condPull = { tick: () => pullTick(), PULL, nudge: (mn) => nudge(mn), add: (mn, n) => pullAdd(mn, n), of: (mn) => pullOf(mn),
+  compel: (mn, when, by) => compel(mn, when, by), fade: () => fadeTick(), planted: (mn) => plantedOf(mn) };
 
 function start(by, mn, level, own, echs, opts) {
   opts = opts || {};
@@ -468,6 +548,8 @@ function finish(mn, run) {
     if (run.level === "nhl") api.hypno(mn, { do: "linger", secs: 120 });
     else { run.waking = true; api.later(() => { if (!running.has(mn)) { api.hypno(mn, { do: "wake" }); api.face(mn, "clear", 1); } }, 4000); }
     if (run.level === "nhl") api.later(() => { if (!running.has(mn)) api.face(mn, "clear", 1); }, 120000);
+    // part 3: comin' up out of it is somethin' a compulsion can answer to (No human left: once its trance runs out)
+    api.later(() => { if (!running.has(mn)) compel(mn, "wake"); }, run.level === "nhl" ? 125000 : 8000);
   }
   // No human left lingers a couple of minutes, then clears
   else api.later(() => { if (!running.has(mn)) { api.trance(mn, 0); api.face(mn, "clear", 1); } }, run.level === "nhl" ? 120000 : 3000);
@@ -586,13 +668,19 @@ function cmdPlanted(c) {
     if (rest.length > 1) { const who = A.find(rest[rest.length - 1]); if (who && who !== sender && A.rec(who)) { t = who; rest = rest.slice(0, -1); } }
     if (t !== sender && !(A.isProprietor(sender) || A.herdLeaderOf(t) === sender)) return c.reply("Only their herd leader or a proprietor takes out what's planted in " + A.name(t) + ", sugar.");
     const all = plantedOf(t), name = verb === "clear" ? "all" : rest.join(" ").trim().toLowerCase().replace(/^b&b\s+/, "");
-    const hit = Object.keys(all).filter((id) => name === "all" || all[id].block.toLowerCase() === name || all[id].s.trigger.toLowerCase() === name);
-    if (!hit.length) return c.reply("🌀 Nothin' planted by that name. ?planted" + (t === sender ? "" : " " + A.name(t)) + " shows the list.");
+    const found = Object.keys(all).filter((id) => name === "all" || all[id].block.toLowerCase() === name || (all[id].s.trigger && all[id].s.trigger.toLowerCase() === name));
+    if (!found.length) return c.reply("🌀 Nothin' planted by that name. ?planted" + (t === sender ? "" : " " + A.name(t)) + " shows the list.");
+    // part 3: what No human left set for good, only their herd leader or a proprietor takes out (Laynie, Nov 24: "handler
+    // or proprieter"). ?hypno off still rests all of it, and the safeword ends whatever's runnin'.
+    const locked = t === sender && !A.isProprietor(sender) ? found.filter((id) => all[id].perm) : [];
+    const hit = found.filter((id) => !locked.includes(id));
+    if (!hit.length) return c.reply("🌀 " + (locked.length === 1 ? "That one's" : "Those are") + " set for good, sugar. Only your herd leader or a proprietor takes " + (locked.length === 1 ? "it" : "them") + " out. (?hypno off rests everything the farm planted in you.)");
     const lscgOnes = hit.filter((id) => all[id].via === "lscg" && all[id].ok).map((id) => all[id].s.name);
-    for (const id of hit) delete all[id];
+    // (ones in their LSCG come out of it too, the next time they're under in the farm's name)
+    for (const id of hit) { if (all[id].via === "lscg" && all[id].ok) (me(t).unplant = me(t).unplant || []).push(all[id].s); delete all[id]; }
     A.save(); sendFarm(t);
-    c.reply("🌀 Taken out: " + hit.length + "." + (lscgOnes.length ? " " + (t === sender ? "In your LSCG, take " + (lscgOnes.length === 1 ? "it" : "them") + " out with LSCG's own: " : A.name(t) + " takes the LSCG copies out with ") + lscgOnes.map((n) => "/lscg remove-suggestion " + n).join(" · ") + " (the farm won't plant " + (lscgOnes.length === 1 ? "it" : "them") + " again)." : ""));
-    if (t !== sender) A.notice(t, "🌀 " + A.name(sender) + " took out " + hit.length + " of the farm's triggers in you." + (lscgOnes.length ? " Your LSCG still has " + (lscgOnes.length === 1 ? "one" : lscgOnes.length) + ": /lscg remove-suggestion " + lscgOnes.join(" · ") : ""));
+    c.reply("🌀 Taken out: " + hit.length + "." + (locked.length ? " (" + locked.length + " set for good stay" + (locked.length === 1 ? "s" : "") + ": only your herd leader or a proprietor takes those out.)" : "") + (lscgOnes.length ? " The farm takes " + (lscgOnes.length === 1 ? "the LSCG copy" : "the LSCG copies") + " out the next time " + (t === sender ? "you're" : A.name(t) + " is") + " under in its name, or " + (t === sender ? "you can now" : "they can now") + " with LSCG's own: " + lscgOnes.map((n) => "/lscg remove-suggestion " + n).join(" · ") + "." : ""));
+    if (t !== sender) A.notice(t, "🌀 " + A.name(sender) + " took out " + hit.length + " of the farm's triggers in you." + (lscgOnes.length ? " Your LSCG still has " + (lscgOnes.length === 1 ? "one" : lscgOnes.length) + " till the farm takes it out next session, or now: /lscg remove-suggestion " + lscgOnes.join(" · ") : ""));
     return;
   }
   const t = args[0] ? A.find(args.join(" ")) : sender;
@@ -626,7 +714,7 @@ connect({
       const v = String(c.args[0] || "").toLowerCase(), A = c.api;
       if (!A.rec(c.sender)) return c.reply("That's just for folks on the books, sugar.");
       if (!/^(kneel|kneeling|knees|fours|allfours|all)$/.test(v)) return c.reply("🌀 When a trigger puts you down low, you go " + (lowOf(c.sender) === "fours" ? "on all fours" : "to your knees") + ". ?lowpose kneel or ?lowpose fours, whichever's comfier.");
-      me(c.sender).low = /^(fours|allfours|all)$/.test(v) ? "fours" : "kneel"; A.save();
+      me(c.sender).low = /^(fours|allfours|all)$/.test(v) ? "fours" : "kneel"; A.save(); sendPull(c.sender);   // (a hang-on keepin' them down low uses it too)
       c.reply("🌀 Down low means " + (lowOf(c.sender) === "fours" ? "on all fours" : "on your knees") + " for you now. Triggers planted from here on use it" + (Object.keys(plantedOf(c.sender)).length ? " (ones already planted keep theirs till the next session plants them again)" : "") + ".");
     } },
     trancelib: { usage: "trancelib [pull|starter]", private: true, run: async (c) => {
@@ -654,6 +742,18 @@ connect({
     // a milkin' (the stall's, or staff's ?milk) feeds the pull; the farm's "go to a free stall" instruction lands here
     milked: (mn) => pullAdd(mn, PULL.MILKED),
     hypnoDo: (mn, d) => { if (d && d.what === "stall") toStall(mn); },
+    // part 3: farm moments a compulsion can answer to
+    join: (mn) => { for (const m of herdOf(mn)) compel(m, "leader", mn); },                                   // their herd leader walks in
+    roleplay: (mn, text, type) => { if (type === "Chat" && !/^\s*\(/.test(String(text))) for (const m of herdOf(mn)) compel(m, "leader talks", mn); },
+    stall: (mn) => compel(mn, "stall"),
+    fed: (mn) => compel(mn, "fed"),
+    climax: (mn, content) => { if (/^Orgasm\d/.test(String(content || ""))) compel(mn, "cum"); },
+    activity: (data) => {
+      const a = api.activityInfo ? api.activityInfo(data) : null;
+      if (!a || !a.tgt || a.src === a.tgt) return;
+      if (a.focus === "ItemHead" && /^(Pet|Pat|Caress|Stroke|Ruffle)/i.test(a.act)) compel(a.tgt, "pat", a.src);
+      else if (a.focus === "ItemBreast" && /^(Grope|Squeeze|Pinch|Caress|Fondle|MassageHands|Massage)/i.test(a.act)) compel(a.tgt, "squeeze", a.src);
+    },
     // their Companion on their LSCG (trance.js): anything waitin' to be planted goes in when it can; LSCG come or gone,
     // the triggers move with it (the farm's own carried out by their Companion, LSCG's own by their LSCG)
     hypnoState: (mn, hs) => {
@@ -661,7 +761,7 @@ connect({
       const all = plantedOf(mn), list = Object.values(all);
       if (!list.length) return;
       if (lscgOn(hs)) {
-        const moved = list.filter((x) => x.via === "farm");
+        const moved = list.filter((x) => x.via === "farm" && !isComp(x));   // (compulsions are always the farm's own)
         for (const x of moved) { x.via = "lscg"; x.ok = false; }
         if (moved.length) { api.save(); sendFarm(mn); }
         if (hs.planted && hs.planted.length) for (const x of list) if (x.via === "lscg" && hs.planted.includes(x.s.id)) x.ok = true;
@@ -692,7 +792,7 @@ connect({
       }
       if (e.ev === "resolved" || e.ev === "fired") {
         const x = all[e.id] || Object.values(all).find((y) => y.s.name === e.name);
-        if (x) { x.fired = (x.fired || 0) + 1; if (e.resisted) x.fought = (x.fought || 0) + 1; x.last = Date.now(); api.save(); }
+        if (x) { x.fired = (x.fired || 0) + 1; if (e.resisted) x.fought = (x.fought || 0) + 1; x.last = Date.now(); if (!e.resisted) landed(mn, x); api.save(); }
         if (!e.resisted) pullAdd(mn, PULL.TRIGGER);   // a trigger that lands feeds the pull
       }
     },

@@ -23,6 +23,8 @@ An offline dressing room for Bondage Club, for our own use. It runs on this comp
 > Part 2 (Nov 25): two more kinds, **slip** (what comes out of a player's mouth in place of their own words when their
 > speech gets hijacked) and **nudge** (the farm's whispers through the day), each with a **Pull** slider for how built
 > up the farm's pull has to be first. Triggers can use the farm's own steps too: moo, stall, beg, dose.
+> Part 3 (Nov 25): **compulsion** blocks (what sets them off, how likely, and what they do) and **hangon** blocks (an
+> effect that stays a while after the session, and for how long).
 
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the

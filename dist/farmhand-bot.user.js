@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.101.0
+// @version      0.102.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.101.0";
-  var COMPANION_VERSION = "0.82.0";
+  var VERSION = "0.102.0";
+  var COMPANION_VERSION = "0.83.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8303,6 +8303,11 @@ GOOD TO KNOW
           sound(mn, "stall");
           if (rec(mn).stallGear) syncCompanions(true);
           tell(mn, "\u{1F95B} The stall latches on. About " + mins + " minutes to drain you down to a quarter, sugar. Stay put.");
+          try {
+            addonsEmit("stall", mn);
+          } catch (e) {
+            warn("stall event:", e);
+          }
         }
         if (!p.stall) continue;
         const st = p.stall;

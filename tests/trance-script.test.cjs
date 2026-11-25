@@ -41,7 +41,8 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   ok(!st.some((s) => /^\{c\}/.test(s.text)), 'a line for a body they haven\'t got is left out');
   ok(st.filter((s) => s.block === 'Dark and Warm').length === 4, 'pick 4: four lines of the deepener, fresh each time');
   const planted = st.filter((s) => s.plant);
-  ok(planted.length === 2 && planted.every((s) => s.plant.kind === 'trigger'), 'two triggers planted, each after its own words');
+  ok(planted.filter((s) => s.plant.kind === 'trigger').length === 2 && planted.filter((s) => s.plant.kind === 'compulsion').length === 1 && planted.filter((s) => s.plant.kind === 'hangon').length === 1 && planted.length === 4,
+    'two triggers, a compulsion and a hang-on planted (Deep in the Barn, part 3), each after its own words');
   ok(st.filter((s) => s.deeper).reduce((n, s) => n + s.deeper, 0) === 25, 'the deepener takes them 25 deeper');
 
   // ── the format, both ways ──

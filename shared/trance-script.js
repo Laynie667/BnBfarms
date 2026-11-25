@@ -17,8 +17,17 @@
    KINDS: induction · deepener · convincer · suggestion (spoken) · trigger (spoken, then planted as an LSCG suggestion) ·
           wake · session (a recipe: which blocks, in what order) ·
           slip (part 2: what comes out of their mouth in place of their own words, when their speech is hijacked) ·
-          nudge (part 2: the farm's whispers through the day, as its pull builds up in them)
+          nudge (part 2: the farm's whispers through the day, as its pull builds up in them) ·
+          compulsion (part 3: spoken, then kept: somethin' happenin' sets it off, now and then, no trigger word) ·
+          hangon (part 3: spoken, then it stays with them a while after they come up)
           Slips and nudges are said outside sessions, so a session never lists them.
+   COMPULSION BLOCKS have:  when  wake | leader | leader talks | stall | full | fed | pat | squeeze | cum
+                            does  (as a trigger's)   ·   waits   ·   chance 10%  (how likely each time, 1-50%; 10% if left out)
+   HANGON BLOCKS have:      effect  mootalk | cowtalk | yes | edge | needy | fours | handsoff | hearing | names | heel
+                            lasts   30m  (1 minute to 4 hours; never past what the session's level allows)
+   HOW LONG WHAT'S PLANTED STAYS (part 3, "the deeper, the more permanent"): from a Fun session a day, and a compulsion
+   fires once; from Deep a week; each time it lands it's renewed. From No human left it's set for good, and only their
+   herd leader or a proprietor takes it out. ?hypno off rests all of it; the safeword ends whatever's runnin'.
    LABELS (any block):
      level   fun, deep, nhl           which depths it's for (none = all three)
      for     any | cow, pony, …       which kinds of stock (none = any)
@@ -49,17 +58,29 @@
      beg ["words"] (beg out loud to be milked, then head for a free stall) · dose <name> [half|double] (a Dispensary dose)
 */
 
-export const KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake", "slip", "nudge", "session"];
+export const KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "compulsion", "hangon", "wake", "slip", "nudge", "session"];
 export const SPOKEN = KINDS.filter((k) => k !== "session");
 // what a session is made of; slips and nudges are said outside sessions (the farm's pull, part 2)
-export const SESSION_KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "wake"];
+export const SESSION_KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "compulsion", "hangon", "wake"];
 export const ASIDE = ["slip", "nudge"];
+// what's planted at the end of the block (part 1's triggers; part 3's compulsions and hang-ons)
+export const PLANTED = ["trigger", "compulsion", "hangon"];
+// part 3: what sets a compulsion off, and what a hang-on does
+export const WHEN = { wake: "they come up out of a session", leader: "their herd leader walks in", "leader talks": "their herd leader says somethin'",
+  stall: "a milkin' stall takes them", full: "they're near full (80%)", fed: "a feeder feeds them", pat: "somebody pats their head",
+  squeeze: "somebody gropes their tits", cum: "they cum" };
+export const EFFECTS = { mootalk: "their sound slips out between their words", cowtalk: "no I: just this {animal}", yes: "every no comes out yes",
+  edge: "kept right at the edge", needy: "kept warm and needy", fours: "they stay down low (kneelin' or all fours, their pick)",
+  handsoff: "their hands won't touch themselves", hearing: "only the farm's voice (and their herd leader's) comes through",
+  names: "everybody's names go fuzzy", heel: "drawn to their herd leader's side" };
+export const KEEP_MS = { fun: 86400000, deep: 7 * 86400000 };          // nhl: set for good
+export const HANG_CAP_S = { fun: 20 * 60, deep: 60 * 60, nhl: 4 * 3600 };
 export const LEVELS = ["fun", "deep", "nhl"];
 export const BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], beta: [13, 20] };
 export const BAND_RANGE = { delta: "1-4 Hz", theta: "4-8 Hz", alpha: "8-12 Hz", beta: "12-30 Hz" };
 export const HZ_MIN = 1, HZ_MAX = 30;
 export const MAX_DOES = 3;
-const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits"];
+const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts"];
 
 // LSCG's own instruction names (Settings/Models/hypno.ts, LSCGHypnoInstruction)
 export const LSCG = { cum: "Orgasm", deny: "Denial", needy: "Insatiable", touch: "Perform Activity", strip: "Strip", pose: "Assume Pose",
@@ -68,6 +89,9 @@ export const LSCG = { cum: "Orgasm", deny: "Denial", needy: "Insatiable", touch:
 // Dispensary registers its dose.
 export const FARM = { sound: "bnbfarm.sound", stall: "bnbfarm.stall", beg: "bnbfarm.beg", dose: "farmhand-dispensary.dose" };
 export const FARM_TYPES = Object.values(FARM);
+// how a step reads to people (LSCG's own read as LSCG names them)
+const STEP_NAMES = { [FARM.sound]: "Their Sound", [FARM.stall]: "To a Free Stall", [FARM.beg]: "Beg to Be Milked", [FARM.dose]: "Take a Dose" };
+export const stepName = (type) => STEP_NAMES[type] || String(type);
 // a few names for the game's poses (the game's own names work too: upper/lower/full <Name>)
 export const POSES = {
   kneel: { lower: "Kneel" }, "kneel spread": { lower: "KneelingSpread" }, "kneeling spread": { lower: "KneelingSpread" },
@@ -97,13 +121,13 @@ const list = (s) => clean(s).split(/\s*,\s*/).map(clean).filter(Boolean);
 export const slug = (s) => lc(s).replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "block";
 
 // ── small readers ─────────────────────────────────────────────
-// "20s", "1m", "1m30s", "90" → seconds (null if it isn't a time)
+// "20s", "1m", "1m30s", "1h", "1h30m", "90" → seconds (null if it isn't a time)
 export function seconds(s) {
   s = lc(s); if (!s) return null;
   if (/^\d+(\.\d+)?$/.test(s)) return Number(s);
-  const m = /^(?:(\d+(?:\.\d+)?)\s*m(?:in)?s?)?\s*(?:(\d+(?:\.\d+)?)\s*s(?:ec)?s?)?$/.exec(s);
-  if (!m || (!m[1] && !m[2])) return null;
-  return Math.round((Number(m[1] || 0) * 60 + Number(m[2] || 0)) * 10) / 10;
+  const m = /^(?:(\d+(?:\.\d+)?)\s*h(?:ours?|rs?)?)?\s*(?:(\d+(?:\.\d+)?)\s*m(?:in)?s?)?\s*(?:(\d+(?:\.\d+)?)\s*s(?:ec)?s?)?$/.exec(s);
+  if (!m || (!m[1] && !m[2] && !m[3])) return null;
+  return Math.round((Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Number(m[3] || 0)) * 10) / 10;
 }
 // "30s" or "20-40s" → { min, max } seconds
 export function parsePace(s) {
@@ -334,9 +358,27 @@ function finish(b, err, warn) {
   if (b.kind === "trigger") {
     if (!get("trigger") || clean(r.trigger[0]).length < 4) err(get("trigger") ? r.trigger[1] : b.at, "a trigger needs its phrase, 4 letters or more: trigger: milkin' time");
     else { L.trigger = clean(r.trigger[0]).replace(/[()]/g, "").slice(0, 80); if (/^[*!/.]/.test(L.trigger)) err(r.trigger[1], "a trigger can't start with * ! / ."); }
-    if (!get("does")) err(b.at, "a trigger needs what it does: does: pose {low} → say \"Moo\"");
+  } else if (get("trigger")) warn(r.trigger[1], "trigger only means somethin' on a trigger block, so it's skipped here");
+  if (b.kind === "trigger" || b.kind === "compulsion") {
+    if (!get("does")) err(b.at, "a " + b.kind + " needs what it does: does: pose {low} → say \"Moo\"");
     else { const d = parseDoes(r.does[0], get("waits") ? r.waits[0] : "", { low: "kneel" }); if (d.error) err(r.does[1], d.error); else { L.does = clean(r.does[0]); L.waits = get("waits") ? clean(r.waits[0]) : ""; } }
-  } else for (const k of ["trigger", "does", "waits"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a trigger block, so it's skipped here");
+  } else for (const k of ["does", "waits"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a trigger or a compulsion, so it's skipped here");
+  // part 3: what sets a compulsion off, and how likely
+  if (b.kind === "compulsion") {
+    const w = get("when") ? lc(r.when[0]).replace(/[-_]+/g, " ").replace(/\s+/g, " ") : "";
+    if (!w) err(b.at, "a compulsion needs what sets it off: when: " + Object.keys(WHEN).join(" | "));
+    else if (!WHEN[w]) err(r.when[1], 'when is one of ' + Object.keys(WHEN).join(", ") + ', not "' + r.when[0] + '"');
+    else L.when = w;
+    if (get("chance")) { const m = /^(\d{1,2}(?:\.\d+)?)\s*%?$/.exec(clean(r.chance[0])); if (!m || Number(m[1]) < 1 || Number(m[1]) > 50) err(r.chance[1], "chance is 1% to 50% (a small one: 10% if you leave it out)"); else L.chance = Number(m[1]); }
+  } else for (const k of ["when", "chance"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a compulsion, so it's skipped here");
+  // part 3: what a hang-on does, and for how long
+  if (b.kind === "hangon") {
+    const e = get("effect") ? lc(r.effect[0]).replace(/[\s'-]+/g, "") : "";
+    if (!e) err(b.at, "a hang-on needs its effect: effect: " + Object.keys(EFFECTS).join(" | "));
+    else if (!EFFECTS[e]) err(r.effect[1], 'effect is one of ' + Object.keys(EFFECTS).join(", ") + ', not "' + r.effect[0] + '"');
+    else L.effect = e;
+    if (get("lasts")) { const s = seconds(r.lasts[0]); if (s == null || s < 60 || s > 4 * 3600) err(r.lasts[1], "lasts is 1m to 4h, like: lasts: 30m"); else L.lasts = s; }
+  } else for (const k of ["effect", "lasts"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a hang-on, so it's skipped here");
   if (b.kind === "session") {
     L.picks = (r.picks || []).map(([kind, v, n]) => ({ kind, at: n, items: list(v).map((it) => {
       const m = /^any(?:\s+(\d+))?$/i.exec(it);
@@ -358,7 +400,11 @@ export function formatBeats(v) {
   const r = (x) => (!x ? "" : x.band && x.hz != null ? x.band + " " + x.hz : x.band ? x.band : String(x.hz));
   return (r(v.from) + (v.to ? (v.from ? " → " : "→ ") + r(v.to) : "") + (v.over != null ? " over " + fmtSecs(v.over) : "")).trim();
 }
-export function fmtSecs(s) { s = Number(s) || 0; if (s >= 60 && s % 60 === 0) return s / 60 + "m"; if (s > 60) return Math.floor(s / 60) + "m" + Math.round(s % 60) + "s"; return s + "s"; }
+export function fmtSecs(s) {
+  s = Number(s) || 0;
+  if (s >= 3600 && s % 60 === 0) { const h = Math.floor(s / 3600), m = (s % 3600) / 60; return h + "h" + (m ? m + "m" : ""); }
+  if (s >= 60 && s % 60 === 0) return s / 60 + "m"; if (s > 60) return Math.floor(s / 60) + "m" + Math.round(s % 60) + "s"; return s + "s";
+}
 export function formatLook(v) {
   if (!v) return "";
   const out = [];
@@ -381,7 +427,10 @@ export function formatBlock(b) {
   if (L.look && formatLook(L.look)) out.push("look: " + formatLook(L.look));
   if (L.deeper) out.push("deeper: " + (L.deeper > 0 ? "+" : "") + L.deeper);
   if (L.pull && ASIDE.includes(b.kind)) out.push("pull: " + L.pull);
-  if (b.kind === "trigger") { if (L.trigger) out.push("trigger: " + L.trigger); if (L.does) out.push("does: " + L.does); if (L.waits) out.push("waits: " + L.waits); }
+  if (b.kind === "trigger" && L.trigger) out.push("trigger: " + L.trigger);
+  if (b.kind === "compulsion") { if (L.when) out.push("when: " + L.when); if (L.chance) out.push("chance: " + L.chance + "%"); }
+  if (b.kind === "trigger" || b.kind === "compulsion") { if (L.does) out.push("does: " + L.does); if (L.waits) out.push("waits: " + L.waits); }
+  if (b.kind === "hangon") { if (L.effect) out.push("effect: " + L.effect); if (L.lasts) out.push("lasts: " + fmtSecs(L.lasts)); }
   if (b.kind === "session") for (const p of L.picks || []) out.push(p.kind + ": " + p.items.map((it) => (it.all ? "all" : it.any ? (it.any > 1 ? "any " + it.any : "any") : it.name)).join(", "));
   if (b.lines && b.lines.length) {
     out.push("");
@@ -462,7 +511,7 @@ export function sessionSteps(plan, opts) {
     });
     const last = out[out.length - 1];
     if (L.deeper) last.deeper = (last.deeper || 0) + L.deeper;
-    if (b.kind === "trigger") last.plant = b;
+    if (PLANTED.includes(b.kind)) last.plant = b;
   }
   return out;
 }
@@ -490,4 +539,13 @@ export function lscgSuggestion(b, opts) {
     installedBy: opts.by || -1, installedByName: opts.byName || "The farm", installedAt: opts.now || Date.now(), exclusive: false,
     instructions: d.instructions.map((x) => { const o = { type: x.type, arguments: x.arguments }; if (x.delay != null) o.delay = x.delay; return o; }),
   };
+}
+// part 3: a compulsion block as the farm keeps it (their Companion carries it out when it's set off): what sets it off,
+// how likely, and what it does (the same instructions a trigger's made of)
+export function farmCompulsion(b, opts) {
+  opts = opts || {}; const words = opts.words || {}, L = b.labels;
+  const d = parseDoes(fillIn(L.does, Object.assign({}, words, { low: "{low}" })), L.waits, { low: opts.low });
+  if (d.error) return { error: d.error };
+  return { id: SUGG_PREFIX + "c-" + slug(b.name), name: "B&B " + b.name, trigger: "", when: L.when, chance: Math.max(0.01, Math.min(0.5, (L.chance || 10) / 100)),
+    instructions: d.instructions.map((x) => { const o = { type: x.type, arguments: x.arguments }; if (x.delay != null) o.delay = x.delay; return o; }) };
 }

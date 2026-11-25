@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.101.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.102.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.1.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.2.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.82.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.83.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.28.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.102.0 + Companion 0.83.0 + Conditioning 2.2.0: the farm's trance, part 3: compulsions, hang-ons, and the deeper the more permanent** Laynie, Nov 24-25: compulsions "would be amazing", with "a small, random chance of them triggering"; hang-ons wanted; "The deeper they go, the more permanent some of it becomes"; permanent ones removed by the "handler or proprieter"; then "part three then".
+  - **Compulsions**: a session plants them like triggers, but no word sets them off. Somethin' happenin' does: comin' up out of a session, their herd leader walkin' in or talkin', a milkin' stall takin' them, bein' near full, a feeder feedin' them, a pat on the head, hands on their tits, cummin'. A small chance each time (10% unless the block says, at most 50%), never the same one twice in ten minutes, never while a trap, a scene or ?quiet has them, a session's runnin', or they're away from the keys. Their Companion reaches in like a trigger: give in or fight it. They're made of the same steps as a trigger (LSCG's and the farm's own).
+  - **Hang-ons**: they stay a while after the session: moo talk (their sound slips out between their words), no I just this animal, every no comes out yes, kept at the edge, kept needy, down low (their own pick, kneelin' or all fours), hands off themselves, only the farm's voice (hearin' narrowed), names gone fuzzy, drawn to their herd leader's side. They're told what and for how long; the Companion's trance card lists what's holdin' on; out-of-character lines, commands, whispers and emotes are never touched; the safeword ends them all.
+  - **The deeper, the more permanent**: from a Fun session, what's planted fades in a day and a compulsion fires once; from Deep, a week, renewed each time it lands; from No human left, set for good, and only their herd leader or a proprietor takes it out (?planted remove). Hang-ons last at most 20 minutes from Fun, an hour from Deep, four hours from No human left. Faded triggers come out of their LSCG the next time they're under in the farm's name, and so do ones a herd leader takes out. ?hypno off rests all of it.
+  - **The trance library and the studio's editor**: two more kinds, compulsion (when, chance, does) and hangon (effect, lasts). The starter library has seven compulsions and seven hang-ons, and its sessions use them (Fun: a hang-on; Deep: a compulsion and a hang-on; No human left: two of each). Times can be in hours now (1h, 1h30m), and ?planted and the editor call the farm's own steps by name.
 
 - **Bot 0.101.0 + Companion 0.82.0 + Dispensary 0.28.0 + Conditioning 2.1.0: the farm's trance, part 2: the farm's pull through the day, hijacked speech, hearin' narrowed, and the farm's own instructions in LSCG**
 - **Bot 0.101.0 + Companion 0.82.0 + Conditioning 2.1.0 + Dispensary 0.28.0: the farm's trance, part 2: the farm's pull through the day, hijacked speech, hearin' narrowed, and the farm's own instructions in LSCG** Laynie, Nov 25: "build part 2"; hijacked speech "i love it"; the daily build-up "yes" for anyone registered with ?hypno on; hearin' narrowed "only ... in trance or for a duration when triggered"; farm instructions for everyone registered, staff too.

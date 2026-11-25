@@ -26,6 +26,12 @@
      out-of-character lines always go through. Switch: "Hijacked speech".
    • HEARIN' NARROWED (Laynie: only in trance, or for a while after a trigger): everybody's chat goes faint and blurred but
      the farm's, yours, your herd leader's and whoever set you off. Out-of-character lines always stay clear.
+   PART 3 (Nov 25, the compulsions and hang-ons Laynie liked; "the deeper, the more permanent"):
+   • COMPULSIONS: the farm keeps them and says when somethin' sets one off (your herd leader walks in, a pat on your head,
+     the cups in the stall…), a small chance each time. It reaches in like a trigger: give in, or fight it.
+   • HANG-ONS: they stay a while after you come up (your sound slippin' out, no I just this animal, every no a yes, kept
+     at the edge or needy, down low, hands off yourself, only the farm's voice, names gone fuzzy, drawn to your herd
+     leader's side). Kept on this computer till they're up; the safeword ends them all.
 */
 import { LS, onAccount } from "./acct.js";
 import { VERSION } from "./version.js";
@@ -46,8 +52,11 @@ const T = { session: null, lingerUntil: 0, look: {}, depth: 0, farm: [], pull: {
   keptAt: 0, waking: false, lastReport: "", glide: null,
   // part 2: the farm's pull (0-100, the bot keeps it), your sound and kind, your herd leader, the library's slips;
   // a while after a session (afterUntil, afterLevel); hearin' narrowed after a trigger (narrowUntil, narrowBy)
-  pullN: 0, me: { sound: "", animal: "", herd: 0 }, slips: [], afterUntil: 0, afterLevel: "", narrowUntil: 0, narrowBy: 0, narrowKey: "",
-  hijackAt: 0, speaking: false };
+  pullN: 0, me: { sound: "", animal: "", herd: 0, low: "kneel" }, slips: [], afterUntil: 0, afterLevel: "", narrowUntil: 0, narrowBy: 0, narrowKey: "",
+  hijackAt: 0, speaking: false,
+  // part 3: the hang-ons runnin' on you [{ id, name, effect, until }]
+  hang: [], foursAt: 0, heelAt: 0 };
+const HANG_KEY = "fhc-hangons";
 export const tranceState = T;   // (tests)
 
 export function initTrance(c) {
@@ -56,7 +65,8 @@ export function initTrance(c) {
   hookLscg();
   hookChat();
   hookGame();
-  onAccount(() => { endAll(true); loadFarm(); T.lastReport = ""; T.pullN = 0; T.slips = []; T.me = { sound: "", animal: "", herd: 0 }; });
+  loadHang();
+  onAccount(() => { endAll(true); loadFarm(); loadHang(); T.lastReport = ""; T.pullN = 0; T.slips = []; T.me = { sound: "", animal: "", herd: 0, low: "kneel" }; });
   watchChat();
   setInterval(tick, 5000);
 }
@@ -137,6 +147,8 @@ export function onHypno(m) {
     case "clear": endAll(); break;
     case "pull": setPull(m); break;      // part 2: how far the farm's pull is, your sound, your herd leader, the slips
     case "nudge": nudge(m); break;       // part 2: a little nudge through the day
+    case "compel": compel(m); break;     // part 3: somethin' set off one of the farm's compulsions in you
+    case "hangon": hangon(m); break;     // part 3: somethin' that stays with you a while after
   }
 }
 const clampMs = (ms) => Math.max(60000, Math.min(MAX_MS, Number(ms) || 1800000));
@@ -180,10 +192,12 @@ function linger(secs) {
 const AFTER_MIN = { fun: 5, deep: 15, nhl: 30 };
 function afterglow(level, from) { T.afterLevel = AFTER_MIN[level] ? level : "fun"; T.afterUntil = Date.now() + (from || 0) + AFTER_MIN[T.afterLevel] * 60000; }
 function endAll(quiet) {
-  const had = !!(T.session || lingering() || T.pending || T.phrase || T.denyUntil > Date.now() || T.needyUntil > Date.now());
+  const had = !!(T.session || lingering() || T.pending || T.phrase || T.denyUntil > Date.now() || T.needyUntil > Date.now() || T.hang.some((h) => h.until > Date.now()));
   wake();
   T.pending = null; T.phrase = null; T.denyUntil = 0; T.needyUntil = 0;
-  T.afterUntil = 0; T.narrowUntil = 0; T.pullN = 0; drawNarrow();   // (the safeword: nothin' slips, everybody's heard again)
+  T.afterUntil = 0; T.narrowUntil = 0; T.pullN = 0;   // (the safeword: nothin' slips, everybody's heard again)
+  T.hang = []; saveHang(); hangNames();   // (and every hang-on ends)
+  drawNarrow();
   const el = W.document && W.document.querySelectorAll ? W.document.querySelectorAll(".fhc-sg-ask") : [];
   for (const x of el) x.remove();
   if (had && !quiet && ctx) ctx.toChat("🌀 All of it lets go of you.", "#a67fd4", true);
@@ -418,7 +432,7 @@ function hookGame() {
       try {
         const C = args[0];
         if (C && typeof C.IsPlayer === "function" && C.IsPlayer()) {
-          if (T.denyUntil > Date.now()) { W.ActivityOrgasmRuined = true; if (ctx) ctx.toChat("🌀 Right at the edge… and it won't let you.", "#a67fd4", true); }
+          if (T.denyUntil > Date.now() || hangOn("edge")) { W.ActivityOrgasmRuined = true; if (ctx) ctx.toChat("🌀 Right at the edge… and it won't let you.", "#a67fd4", true); }
           else glow();
         }
       } catch (e) { /* fine */ }
@@ -440,10 +454,29 @@ function hookGame() {
             return next(["ChatRoomChat", { Type: "Emote", Content: "*" + myName() + " opens their mouth, but nothin' comes out." }]);
           }
         }
+        // part 3's hang-ons in your mouth: your sound slippin' out, no I just this animal, every no a yes (never a
+        // command, a whisper, an emote or an out-of-character line)
+        if (!T.speaking && args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && !/^\s*[(\[?!./\-*]/.test(d.Content) && T.hang.length) {
+          const t = hangSpeech(d.Content);
+          if (t !== d.Content) return next([args[0], Object.assign({}, d, { Content: t })]);
+        }
       } catch (e) { /* say it plain, then */ }
       return next(args);
     });
   } catch (e) { console.warn("[Farmhand Companion] trance: can't hold a phrase:", e); }
+  // part 3: hands off yourself, while that hang-on runs (somebody else's hands are theirs to use)
+  try {
+    mod.hookFunction("ActivityRun", 10, (args, next) => {
+      try {
+        const [C, target] = args;
+        if (hangOn("handsoff") && C && target && typeof C.IsPlayer === "function" && C.IsPlayer() && typeof target.IsPlayer === "function" && target.IsPlayer()) {
+          ctx.toChat("🌀 Your hands stop short. Not yours to touch, not for a while yet.", "#a67fd4", true);
+          return;
+        }
+      } catch (e) { /* let it be */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] trance: can't keep hands off:", e); }
 }
 const myName = () => { const P = W.Player || {}; return String(P.Nickname || P.Name || "Someone"); };
 function emote(text) {
@@ -494,7 +527,7 @@ export function heard(data, sender) {
   askIt(s, sender, i >= 0 ? text.slice(i + s.trigger.length).replace(/^[\s,.:;!?-]+/, "").trim() : "");
 }
 // like LSCG's: their words pull at you; give in, or fight it (the harder it's pulled before, the harder to fight)
-function askIt(s, sender, after) {
+function askIt(s, sender, after, why) {
   const by = Number(sender.MemberNumber), byName = String(sender.Nickname || sender.Name || "Someone");
   const id = "fhc-sg-" + Date.now();
   T.pending = { s, by, byName, after, id, timer: setTimeout(() => answer(false), 30000) };
@@ -502,14 +535,14 @@ function askIt(s, sender, after) {
   const d = W.document, box = d.createElement("div");
   box.className = "ChatMessage ChatMessageChat fhc-sg-ask"; box.id = id;
   box.style.cssText = "color:#a67fd4;font-style:italic;margin:0.25em 0";
-  const t = d.createElement("span"); t.textContent = "🌀 " + byName + "'s words reach right down into you… ";
+  const t = d.createElement("span"); t.textContent = why ? "🌀 " + why + "… and somethin' the farm put in you stirs. " : "🌀 " + byName + "'s words reach right down into you… ";
   const yes = d.createElement("button"), no = d.createElement("button");
   yes.textContent = "Give in"; no.textContent = "Fight it";
   for (const [b, c] of [[yes, "#9be39b"], [no, "#e88"]]) b.style.cssText = "cursor:pointer;margin-left:5px;font-size:inherit;color:#3a1a35;background:" + c + ";border:0;border-radius:4px;padding:0 6px";
   yes.addEventListener("click", () => answer(false)); no.addEventListener("click", () => answer(true));
   box.appendChild(t); box.appendChild(yes); box.appendChild(no);
   if (typeof W.ChatRoomAppendChat === "function") W.ChatRoomAppendChat(box);
-  else if (ctx) ctx.toChat("🌀 " + byName + "'s words reach right down into you… (it takes hold in 30 seconds)", "#a67fd4", true);
+  else if (ctx) ctx.toChat((why ? "🌀 " + why + "… and somethin' the farm put in you stirs." : "🌀 " + byName + "'s words reach right down into you…") + " (it takes hold in 30 seconds)", "#a67fd4", true);
 }
 export function answer(fight) {
   const p = T.pending; if (!p) return;
@@ -579,7 +612,7 @@ function doOne(ins, p) {
     }
   }
 }
-function pose(sel) {
+function pose(sel, quiet) {
   const P = W.Player;
   if (!sel || typeof W.PoseSetActive !== "function") return;
   const can = (c) => typeof W.PoseCategoryAvailable !== "function" || W.PoseCategoryAvailable(P, c);
@@ -589,9 +622,10 @@ function pose(sel) {
     if (sel.lower) { if (can("BodyLower")) W.PoseSetActive(P, sel.lower); else blocked = true; }
     if (sel.upper) { if (can("BodyUpper")) W.PoseSetActive(P, sel.upper); else blocked = true; }
   }
-  if (blocked) { ctx.toChat("🌀 Your bonds won't let you all the way into it, so that part slides off you.", "#a67fd4", true); return; }
+  if (blocked) { if (!quiet) ctx.toChat("🌀 Your bonds won't let you all the way into it, so that part slides off you.", "#a67fd4", true); return false; }
   try { W.ServerSend("ChatRoomCharacterPoseUpdate", { Pose: P.ActivePose }); if (typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(P); } catch (e) { /* fine */ }
-  emote(myName() + " sinks into it without a thought.");
+  if (!quiet) emote(myName() + " sinks into it without a thought.");
+  return true;
 }
 function strip(sel) {
   const P = W.Player;
@@ -676,6 +710,7 @@ function setPull(m) {
   if (typeof m.sound === "string") T.me.sound = m.sound.slice(0, 30);
   if (typeof m.animal === "string") T.me.animal = m.animal.slice(0, 30);
   if (m.herd != null) { T.me.herd = Number(m.herd) || 0; drawNarrow(); }
+  if (m.low === "fours" || m.low === "kneel") T.me.low = m.low;
   if (Array.isArray(m.slips)) T.slips = m.slips.filter((x) => x && typeof x.t === "string" && x.t.trim()).slice(0, 60)
     .map((x) => ({ t: x.t.replace(/[()]/g, "").slice(0, 160), p: Math.max(0, Math.min(100, Number(x.p) || 0)) }));
 }
@@ -781,7 +816,7 @@ function slipLine() {
 // yours, your herd leader's and whoever set you off. Out-of-character lines (anythin' with a bracket) always stay clear.
 // Part of the trance look: switch that off and nobody's blurred.
 function narrowFor(by) { T.narrowUntil = Date.now() + 3 * 60000; T.narrowBy = Number(by) || 0; drawNarrow(); }
-const narrowed = () => !!ctx && !isBot() && lookOn() && ((T.session && !T.session.ended) || T.narrowUntil > Date.now());
+const narrowed = () => !!ctx && !isBot() && lookOn() && ((T.session && !T.session.ended) || T.narrowUntil > Date.now() || hangOn("hearing"));
 export function drawNarrow() {
   const d = W.document; if (!d || !d.head) return;
   let s = d.getElementById("fhc-hyp-hear");
@@ -813,6 +848,79 @@ function watchChat() {
   hook(); setInterval(hook, 3000);
 }
 
+// ── part 3: compulsions ─────────────────────────────────────
+// The farm says one of its compulsions was set off in you (the bot rolled its small chance); it reaches in like a
+// trigger, give in or fight it, and the farm hears which.
+const WHY = { wake: "Comin' up out of it", leader: "Your herd leader's here", "leader talks": "That voice", stall: "The cups take hold of you",
+  full: "So full and heavy", fed: "The feed in your belly", pat: "That pat on your head", squeeze: "Hands on you", cum: "As you finish" };
+function compel(m) {
+  if (T.pending || !m || !Array.isArray(m.instructions) || isBot()) return;
+  const ins = m.instructions.filter((i) => i && INSTR.includes(i.type)).slice(0, 3)
+    .map((i) => ({ type: i.type, arguments: i.arguments && typeof i.arguments === "object" ? JSON.parse(JSON.stringify(i.arguments)) : {}, delay: Number(i.delay) || 0 }));
+  if (!ins.length) return;
+  const s = { id: String(m.id || "").slice(0, 60), name: String(m.name || "").slice(0, 80), trigger: "", instructions: ins };
+  askIt(s, { MemberNumber: Number(m.by) || BOT_MEMBER, Nickname: String(m.byName || "The farm").slice(0, 40) }, "", WHY[m.when] || "Somethin' happens");
+}
+
+// ── part 3: hang-ons ────────────────────────────────────────
+const HANG_TEXT = { mootalk: "your {sound} keeps slippin' out between your words", cowtalk: "there's no I, just this {animal}", yes: "no won't come out of you, only yes",
+  edge: "you stay right at the edge", needy: "the heat stays up in you", fours: "your body stays down low", handsoff: "your hands stay off yourself",
+  hearing: "only the farm's voice comes through", names: "everybody's names go fuzzy", heel: "you're drawn to your herd leader's side" };
+function loadHang() { try { const v = JSON.parse(LS.getItem(HANG_KEY)); T.hang = Array.isArray(v) ? v.filter((h) => h && HANG_TEXT[h.effect] && h.until > Date.now()) : []; } catch (e) { T.hang = []; } hangNames(); }
+function saveHang() { try { LS.setItem(HANG_KEY, JSON.stringify(T.hang)); } catch (e) { /* fine */ } }
+export const hangOn = (e) => T.hang.some((h) => h.effect === e && h.until > Date.now());
+function hangon(m) {
+  if (!m || !HANG_TEXT[m.effect] || isBot()) return;
+  const until = Math.min(Date.now() + 4 * 3600000, Number(m.until) || 0);
+  if (until <= Date.now()) return;
+  if (m.low === "fours" || m.low === "kneel") T.me.low = m.low;
+  T.hang = T.hang.filter((h) => h.id !== m.id && h.until > Date.now()).concat({ id: String(m.id || m.effect).slice(0, 40), name: String(m.name || "").slice(0, 60), effect: m.effect, until }).slice(-10);
+  saveHang(); hangNames(); drawNarrow();
+  const mins = Math.round((until - Date.now()) / 60000);
+  ctx.toChat("🌀 Somethin' stays with you after: " + HANG_TEXT[m.effect].replace("{sound}", soundWord()).replace("{animal}", T.me.animal || "animal") + ", for " + (mins >= 90 ? Math.round(mins / 60) + " hours" : mins + " minutes") + ".", "#a67fd4", true);
+}
+export const hangons = () => T.hang.filter((h) => h.until > Date.now()).map((h) => ({ effect: h.effect, until: h.until }));
+// your words, the way the hang-ons have them
+export function hangSpeech(text) {
+  let t = String(text);
+  const s = soundWord(), a = T.me.animal || "animal";
+  if (hangOn("cowtalk")) {
+    t = t.replace(/\bI am\b/g, "this " + a + " is").replace(/\bI'm\b/gi, "this " + a + "'s").replace(/\bI\b/g, "this " + a)
+      .replace(/\bmyself\b/gi, "this " + a).replace(/\bmy\b/gi, "this " + a + "'s").replace(/\bme\b/gi, "this " + a)
+      .replace(/(^|[.!?…]\s+)this /g, (all, p) => p + "This ");
+  }
+  if (hangOn("yes")) t = t.replace(/\b(no|nope|nah|never)\b/gi, (w) => (w[0] === w[0].toUpperCase() ? "Yes" : "yes"));
+  if (hangOn("mootalk")) {
+    t = t.split(" ").map((w) => (w.length > 3 && /^[a-z]/i.test(w) && Math.random() < 0.12 ? s : w)).join(" ");
+    if (Math.random() < 0.7) t = t.replace(/\s*$/, "") + "… " + s + "~";
+  }
+  return t;
+}
+// names gone fuzzy (its own, so a session's look comin' and goin' doesn't take it away)
+function hangNames() {
+  const d = W.document; if (!d || !d.head) return;
+  let s = d.getElementById("fhc-hang-names");
+  if (!hangOn("names") || isBot()) { if (s) s.remove(); return; }
+  if (!s) { s = d.createElement("style"); s.id = "fhc-hang-names"; s.textContent = ".ChatMessageName{filter:blur(3px)}"; d.head.appendChild(s); }
+}
+// the ones that keep on at you: down low, drawn to your herd leader, the heat kept up; and the ones that have run out
+function hangTick(now) {
+  if (!T.hang.length) return;
+  const was = T.hang.length;
+  T.hang = T.hang.filter((h) => h.until > now);
+  if (T.hang.length !== was) { saveHang(); hangNames(); drawNarrow(); ctx.toChat("🌀 Somethin' that was holdin' on lets go of you.", "#a67fd4", true); }
+  if (hangOn("needy") && now - T.needyAt > 30000 && ctx.arouse) { T.needyAt = now; ctx.arouse(6, 92); }
+  if (hangOn("fours") && now - T.foursAt > 20000 && W.Player && typeof W.PoseSetActive === "function") {
+    const want = T.me.low === "fours" ? "AllFours" : "Kneel";
+    if (!(W.Player.ActivePose || []).includes(want)) { T.foursAt = now; pose(T.me.low === "fours" ? { full: "AllFours" } : { lower: "Kneel" }, true); }
+  }
+  if (hangOn("heel") && T.me.herd && ctx.lead && now - T.heelAt > 60000) {
+    T.heelAt = now;
+    const c = charOf(T.me.herd), at = c && c.MapData && c.MapData.Pos, me = W.Player && W.Player.MapData && W.Player.MapData.Pos;
+    if (at && me && Math.max(Math.abs(at.X - me.X), Math.abs(at.Y - me.Y)) > 3) ctx.lead({ X: at.X, Y: at.Y, id: 0, why: "to your herd leader's side" });
+  }
+}
+
 // ── every few seconds ───────────────────────────────────────
 function tick() {
   try {
@@ -826,6 +934,7 @@ function tick() {
     if (s && s.keepOff && !lingering()) { T.session = null; glideStop(); farmBeatsStop(3); clearLook(); }
     if (!s && T.lingerUntil && now > T.lingerUntil) { T.lingerUntil = 0; glideStop(); farmBeatsStop(3); clearLook(); }
     if (T.needyUntil > now && now - T.needyAt > 30000 && ctx.arouse) { T.needyAt = now; ctx.arouse(6, 92); }
+    hangTick(now);  // (part 3)
     drawNarrow();   // (on as a session starts, off once it's over or the trigger's while is up)
     report(false);
   } catch (e) { /* next time */ }

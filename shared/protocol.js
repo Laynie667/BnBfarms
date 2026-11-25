@@ -39,6 +39,8 @@
 //                                                             extension/src/trance.js): LSCG's trance in the farm's name, beats, the look
 //                                 part 2 (2.1): { do: "pull", n, sound, animal, herd, slips?: [{ t, p }] }   the farm's pull and the slips
 //                                               { do: "nudge", fx: haze|voice|blur|spiral, text, n }   a nudge through the day
+//                                 part 3 (2.2): { do: "compel", id, name, when, by, byName, instructions }   a compulsion set off
+//                                               { do: "hangon", id, name, effect, until, low }   somethin' that stays a while after
 //   ext  -> bot        hypnoState { lscg, ver, on, sugg, mins, beats, scopes, under, ours, farmBeats, planted, pullOff, slipsOff }   their LSCG as it is
 //   ext  -> bot        hypnoEvent { ev: under|awake|safeword|checked|resolved|fired, … }   what happened in their trance
 //   ext  -> bot        hypnoDo  { what: "stall", by }   one of the farm's LSCG instructions needs the farm (walk them to a free stall)

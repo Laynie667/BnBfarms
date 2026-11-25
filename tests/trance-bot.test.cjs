@@ -162,8 +162,11 @@ wake: any
   ok(/the farm's own/.test(words(k,221397)), 'their herd leader can see what\'s planted');
   k=sent.length; await beep(600,'planted remove milking time Moo');
   ok(/Only their herd leader or a proprietor/.test(words(k,600)), 'somebody else can\'t take it out of them');
+  // (part 3: the No human left session above set it for good, so it's their herd leader's to take out, not theirs)
   k=sent.length; await beep(500,'planted remove milking time');
-  ok(/Taken out: 1/.test(words(k,500)) && hyp(k,500,'suggestions').pop().list.length===0 && !Object.keys(L().mods.conditioning.people['500'].sugg).length, 'they take it out themselves: gone from the farm and their Companion');
+  ok(/set for good/.test(words(k,500)) && Object.keys(L().mods.conditioning.people['500'].sugg).length===1, 'set for good by No human left: they can\'t take it out themselves');
+  k=sent.length; await beep(221397,'planted remove milking time Moo');
+  ok(/Taken out: 1/.test(words(k,221397)) && hyp(k,500,'suggestions').pop().list.length===0 && !Object.keys(L().mods.conditioning.people['500'].sugg).length, 'their herd leader can: gone from the farm and their Companion');
   // a farm-only session for somebody without LSCG: the trigger goes straight to their Companion
   ext(600,'hypnoState',{lscg:false,on:false,sugg:false,scopes:[],under:false,ours:false,planted:[]});
   L().mods.conditioning.people['600']={max:'deep',sessions:{fun:0,deep:0,nhl:0},total:0,tier:0};

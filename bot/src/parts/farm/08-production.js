@@ -982,6 +982,7 @@
         sound(mn, "stall");
         if (rec(mn).stallGear) syncCompanions(true);   // strapped in: the stall's gear goes on (10k3-stall-gear.js)
         tell(mn, "🥛 The stall latches on. About "+mins+" minutes to drain you down to a quarter, sugar. Stay put.");
+        try { addonsEmit("stall", mn); } catch(e){ warn("stall event:", e); }   // (Conditioning: the stall takin' them is somethin' a compulsion can answer to)
       }
       if (!p.stall) continue;
       const st = p.stall;

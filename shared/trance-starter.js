@@ -281,6 +281,110 @@ waits: 2s
 
 And somethin' for the barn to keep. When anyone sends you to the stalls, the {sound} comes up out of you first, then the beggin', and your feet find their own way to a free stall.
 
+# ── part 3: compulsions (somethin' happenin' sets them off, now and then) and hang-ons (they stay a while after) ──
+# How long they stay: from a Fun session a day (a compulsion fires once), from Deep a week, renewed each time they land;
+# from No human left, set for good (only a herd leader or a proprietor takes them out).
+
+=== compulsion: First Sound
+when: wake
+does: moo
+chance: 15%
+
+And sometimes, when you come up, the first thing out of you won't be a word at all.
+
+=== compulsion: Knees for the Leader
+level: deep, nhl
+when: leader
+does: pose {low}
+
+When the one who leads your herd walks in, sometimes your knees just give, and down you go, {low}.
+
+=== compulsion: Melt at a Pat
+level: deep, nhl
+when: pat
+does: pose {low} → moo
+waits: 2s
+
+A pat on your head, and sometimes you just melt, right down {low}, with a happy little {sound}.
+
+=== compulsion: Beggin' in the Stall
+level: deep, nhl
+when: stall
+does: beg "{sound}… more… milk me more…"
+
+And when the cups take hold of you in the stall, sometimes you can't help beggin' for more.
+
+=== compulsion: So Full
+level: deep, nhl
+when: full
+does: needy → beg
+waits: 3s
+
+When you're full and heavy, sometimes it all turns to wantin', and you go lookin' for a stall.
+
+=== compulsion: Hands on You
+level: deep, nhl
+when: squeeze
+does: needy → moo
+waits: 2s
+
+When somebody's hands are on your {body}, sometimes the heat comes right up, and a {sound} with it.
+
+=== compulsion: Mooin' as You Come
+level: nhl
+when: cum
+does: moo 2
+
+And when you finish, sometimes it's the {animal} that comes out of you, not a word.
+
+=== hangon: Moo Talk
+effect: mootalk
+lasts: 30m
+
+For a while after you come up, your {sound} keeps slippin' out between your words.
+
+=== hangon: This Animal
+level: deep, nhl
+effect: cowtalk
+lasts: 1h
+
+And for a while after, there's no I. Just this {animal}.
+
+=== hangon: Down Low
+level: deep, nhl
+effect: fours
+lasts: 20m
+
+Your body stays down {low} a while after, where it's comfy.
+
+=== hangon: Hands Off
+level: deep, nhl
+effect: handsoff
+lasts: 30m
+
+Your hands stay off yourself a while after. That's not theirs to touch.
+
+=== hangon: On the Edge
+level: deep, nhl
+effect: edge
+lasts: 1h
+
+You'll stay right at the edge a while after, achin', and it won't let you over.
+
+=== hangon: Only the Farm's Voice
+level: deep, nhl
+effect: hearing
+lasts: 20m
+
+For a while after, the barn stays quiet but for the farm's voice.
+
+=== hangon: Can't Say No
+level: nhl
+effect: yes
+lasts: 1h
+
+And for a while after, no won't come out of you. Only yes.
+
 # ── part 2: the farm's pull through the day ──────────────────
 # slip: what comes out of their mouth in place of their own words, when their speech gets hijacked (said out loud, as them)
 # nudge: the farm's whispers through the day, only to them. pull: how built up the pull has to be first (0-100)
@@ -394,6 +498,7 @@ induction: any
 deepener: any
 suggestion: any 2
 trigger: any
+hangon: any
 wake: any
 
 === session: Deep in the Barn
@@ -403,6 +508,8 @@ deepener: any
 convincer: any
 suggestion: any 3
 trigger: any 2
+compulsion: any
+hangon: any
 wake: any
 
 === session: No Human Left
@@ -412,5 +519,7 @@ deepener: any
 convincer: any
 suggestion: any 3
 trigger: any 2
+compulsion: any 2
+hangon: any 2
 wake: any
 `;

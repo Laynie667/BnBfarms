@@ -167,7 +167,8 @@ function relay(m) {
   const ok = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
   if (!ok) { toBot("relayNo", { id: m.id }); return; }
   st.relayed.push(now);
-  window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
+  // (LSCG wakes anybody it has under at an emote sayin' "snaps": an invisible word joiner splits it, it reads the same)
+  window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text.replace(/\b(snap)(s)\b/gi, "$1⁠$2") });
 }
 
 function sendCommand(text, typed) {

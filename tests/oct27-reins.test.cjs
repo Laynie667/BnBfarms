@@ -46,7 +46,7 @@ const LEAK=/%[a-z]\b|\bundefined\b|\bNaN\b|\[object/;
   { let n=sent.length; await say(900,'?reins Fu',900); ok(/only take up the reins of your own herd/.test(all(n)), 'only a pet in your own herd');
     n=sent.length; await say(900,'?reins Moo 30',1200);
     ok(P(500).reins && P(500).reins.by===900 && P(500).reins.until-Date.now()>29*60000, '?reins Moo 30: on Hank\'s reins for half an hour');
-    ok(/🐴 Hank (clips|gathers|takes|snaps|loops)/.test(all(n)) && /You're on Hank's reins for 30 minutes/.test(all(n)), 'the room sees it, and Moo is told ('+all(n).slice(0,220)+')');
+    ok(/🐴 Hank (clips|gathers|takes|snap⁠?s|loops)/.test(all(n)) && /You're on Hank's reins for 30 minutes/.test(all(n)), 'the room sees it, and Moo is told ('+all(n).slice(0,220)+')');
     const s=W.__stateFor(500); ok(s.reins && s.reins.mn===900 && !s.reins.hold, 'Moo\'s Companion is told whose reins, to walk them');
     ok((s.now||[]).some(x=>x.icon==='🐴'&&/On Hank's reins/.test(x.text)), '...and a 🐴 chip for right now');
     ok((W.__stateFor(900).reinsMine||[]).some(x=>x.mn===500), 'Hank\'s Companion gets a Let go card');

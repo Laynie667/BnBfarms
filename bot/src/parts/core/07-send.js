@@ -169,8 +169,12 @@
   // every line the bot or an add-on says out loud. (Private whispers are different: those start with "("
   // on purpose, so they reach the person anywhere on the map.)
   const inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
+  // LSCG brings anybody it has under right up at any emote with the word "snaps" in it (somebody snappin' their fingers), so
+  // a trap that snaps shut woke whoever was in a trance nearby (Nov 25). An invisible word joiner splits the word for LSCG;
+  // it reads just the same.
+  const noSnap = (s) => String(s).replace(/\b(snap)(s)\b/gi, "$1⁠$2");
   function enqueue(m, urgent){
-    if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: inCharacter(m.Content) });
+    if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: m.Type === "Emote" ? noSnap(inCharacter(m.Content)) : inCharacter(m.Content) });
     send("ChatRoomChat", m, urgent);
   }
   // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about

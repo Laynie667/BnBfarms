@@ -31,7 +31,17 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     createChannelMerger() { return { connect() {} }; } createGain() { return { gain: new Param(1), connect() {} }; } close() { this.closed = true; } };
   // LSCG, played by hand
   const calls = [], evs = {}; let under = false, granted = new Set(), beat = { playing: false, beatHz: 0 };
-  const hstate = { type: 'hypnotized', get active() { return under; }, activate: (by, ms) => { calls.push(['activate', by, ms]); under = true; }, recover: () => { calls.push(['recover']); under = false; (evs['state.recovered'] || []).forEach((f) => f({ type: 'hypnotized', reason: 'manual' })); } };
+  // LSCG's own note of the trance (Player.LSCG.StateModule.states), and its HypnoState: puttin' someone under who's already
+  // under does nothin' at all, no new start and no new length (Nov 25: the farm's keep-alive leaned on that and Alexia came
+  // up every time her 5 minutes ran out)
+  const hcfg = { type: 'hypnotized', activatedAt: 0, activatedBy: -1, duration: undefined, recoveredAt: 0 };
+  Object.defineProperty(hcfg, 'active', { get: () => under, set: (v) => { under = v; }, enumerable: true });
+  W.Player.LSCG.StateModule = { enabled: true, states: [hcfg] };
+  const hstate = { type: 'hypnotized', get active() { return under; },
+    activate: (by, ms) => { calls.push(['activate', by, ms]); if (under) return; under = true; Object.assign(hcfg, { activatedAt: Date.now(), activatedBy: by == null ? -1 : by, duration: ms }); },
+    recover: () => { calls.push(['recover']); under = false; hcfg.recoveredAt = Date.now(); (evs['state.recovered'] || []).forEach((f) => f({ type: 'hypnotized', reason: 'manual' })); } };
+  // LSCG's own clock: brings them up its trance time after the trance started
+  const lscgWouldWake = () => under && W.Player.LSCG.HypnoModule.triggerTime > 0 && hcfg.activatedAt + W.Player.LSCG.HypnoModule.triggerTime * 60000 < Date.now();
   const guard = (s, f) => (...a) => { if (!granted.has(s)) throw new Error('not allowed: ' + s); return f(...a); };
   const api = {
     events: { on: (e, f) => { (evs[e] = evs[e] || []).push(f); return () => {}; } },
@@ -95,16 +105,22 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   ok([...el.querySelectorAll('.ring')].every((r) => r.style.display === 'none') && el.classList.contains('calm'), 'calm trance look: no rings, nothin\' turnin\'');
   prefs.calmLook = false;
 
-  // kept up for the session: LSCG's own trance time would end it
-  Tr.tranceState.keptAt = Date.now() - 31000;
+  // kept up for the session: LSCG's own trance time (5 minutes here) would end it partway
+  ok(hcfg.activatedBy === 260239 && hcfg.duration > 590000, 'LSCG notes the farm put them under, for the session\'s length');
+  hcfg.activatedAt = Date.now() - 280000;   // 4 min 40 s in
+  Tr.tranceState.keptAt = Date.now() - 16000;
   const before = calls.filter((c) => c[0] === 'activate').length;
   Tr.tranceTick();
-  ok(calls.filter((c) => c[0] === 'activate').length === before + 1, 'kept up: every half minute the farm\'s trance is renewed while they\'re under');
+  ok(Date.now() - hcfg.activatedAt < 2000 && !lscgWouldWake() && under, 'kept up: the trance\'s start moves up, so LSCG\'s 5 minutes never run out mid-session');
+  ok(Math.abs(hcfg.activatedAt + hcfg.duration - Tr.tranceState.session.until) < 2000, '...and LSCG still ends it when the session would');
+  hcfg.activatedAt = Date.now() - 280000; Tr.tranceState.keptAt = Date.now() - 16000; Tr.tranceTick();
+  ok(Date.now() - hcfg.activatedAt < 2000 && !lscgWouldWake(), '...again and again, as long as the session runs');
   // somebody snaps them out of it
   under = false; fire('hypno.awakened', { method: 'snap', by: 221397 });
   ok(evts().pop().ev === 'awake' && evts().pop().method === 'snap', 'snapped out of it: the farm hears how');
-  Tr.tranceState.keptAt = Date.now() - 31000; Tr.tranceTick();
-  ok(calls.filter((c) => c[0] === 'activate').length === before + 1, '...and never puts them back under on its own');
+  const at0 = hcfg.activatedAt;
+  Tr.tranceState.keptAt = Date.now() - 16000; Tr.tranceTick();
+  ok(calls.filter((c) => c[0] === 'activate').length === before && hcfg.activatedAt === at0 && !under, '...and never puts them back under on its own');
   Tr.onHypno({ do: 'wake' });
   ok(!calls.some((c) => c[0] === 'recover'), 'woken after they already came up: LSCG isn\'t touched again');
   await wait(4300);
@@ -122,6 +138,25 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(calls.filter((c) => c[0] === 'activate').length === n0 && under, 'No human left: not woken, and not kept up either; the trance runs out on its own');
   Tr.tranceState.lingerUntil = Date.now() - 1; Tr.tranceTick();
   ok(!Tr.tranceState.session, '...the look lifts after a while');
+  under = false;
+
+  // let in through States only (not Hypnosis): still kept up, still woken by the farm
+  granted = new Set(['states']);
+  Tr.onHypno({ do: 'under', by: 260239, ms: 600000, level: 'deep' });
+  hcfg.activatedAt = Date.now() - 280000; Tr.tranceState.keptAt = Date.now() - 16000; Tr.tranceTick();
+  ok(under && hcfg.activatedBy === 260239 && Date.now() - hcfg.activatedAt < 2000, 'let in through States only: still kept up for the session');
+  Tr.onHypno({ do: 'wake' });
+  ok(!under, '...and the farm still wakes them at the end');
+  granted = new Set(['hypno', 'states']);
+
+  // already under somebody else's trance when the session starts: LSCG keeps it theirs, so it's theirs
+  under = true; Object.assign(hcfg, { activatedBy: 221397, activatedAt: Date.now() - 60000, duration: undefined });
+  Tr.onHypno({ do: 'under', by: 260239, ms: 600000, level: 'deep' });
+  ok(hcfg.activatedBy === 221397 && Tr.tranceState.session.ours === false, 'already under somebody else\'s trance: it stays theirs');
+  const at1 = hcfg.activatedAt; Tr.tranceState.keptAt = Date.now() - 16000; Tr.tranceTick();
+  ok(hcfg.activatedAt === at1, '...the farm doesn\'t keep it up');
+  const r0 = calls.filter((c) => c[0] === 'recover').length; Tr.onHypno({ do: 'wake' });
+  ok(calls.filter((c) => c[0] === 'recover').length === r0 && under, '...and doesn\'t end it either');
   under = false;
 
   // plantin': the farm checks what LSCG took

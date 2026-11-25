@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.100.0
+// @version      0.100.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.100.0";
-  var COMPANION_VERSION = "0.81.0";
+  var VERSION = "0.100.1";
+  var COMPANION_VERSION = "0.81.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -5990,8 +5990,9 @@ GOOD TO KNOW
       }, CFG.SEND_INTERVAL_MS);
     }
     const inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
+    const noSnap = (s) => String(s).replace(/\b(snap)(s)\b/gi, "$1\u2060$2");
     function enqueue(m, urgent) {
-      if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: inCharacter(m.Content) });
+      if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: m.Type === "Emote" ? noSnap(inCharacter(m.Content)) : inCharacter(m.Content) });
       send("ChatRoomChat", m, urgent);
     }
     function waitPlaced(mn, go, last) {

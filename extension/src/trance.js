@@ -49,8 +49,27 @@ function lscgHypnoOn() {
   return !!(LA && h && h.enabled && !(P.GlobalModule && P.GlobalModule.enabled === false));
 }
 function granted(scope) { try { return !!(LA && LA.operations && LA.operations.isGranted(scope)); } catch (e) { return false; } }
-function hypnotized() { try { return granted("hypno") ? !!LA.operations.hypno.isHypnotized() : false; } catch (e) { return false; } }
 function hypState() { try { return granted("states") ? LA.operations.states.get("hypnotized") || null : null; } catch (e) { return null; } }
+// under LSCG's trance right now: through Hypnosis if they let the farm in there, through States if only that
+function hypnotized() {
+  try { if (granted("hypno")) return !!LA.operations.hypno.isHypnotized(); } catch (e) { /* try States */ }
+  try { const h = hypState(); return !!(h && h.active); } catch (e) { return false; }
+}
+// LSCG's own note of the trance (when it started, who put them under, how long), in their LSCG settings
+function hypCfg() {
+  const st = W.Player && W.Player.LSCG && W.Player.LSCG.StateModule, list = st && Array.isArray(st.states) ? st.states : null;
+  return (list && list.find((x) => x && x.type === "hypnotized")) || null;
+}
+// Kept under for the whole session. LSCG brings anybody up its own trance time after the trance started (5 minutes unless
+// they changed it), and puttin' someone under who's already under does nothin' in LSCG, so askin' again never kept it up
+// (Nov 25: Alexia came up partway through every session; Laynie's trance time is longer). So the farm moves the start of
+// its own trance up to now, and its length to what's left of the session. Only while LSCG still says the farm put them
+// under: a snap, a boop, their wake word or their safeword still bring them up, and then it's left alone.
+function keepUnder(s, now) {
+  const c = hypCfg();
+  if (c && c.active && Number(c.activatedBy) === s.by) { c.activatedAt = now; c.duration = Math.max(60000, s.until - now); return true; }
+  return false;
+}
 function hookLscg() {
   const q = (W.LSCG_OnLoad = W.LSCG_OnLoad || []);
   q.push((Lg) => {
@@ -102,6 +121,11 @@ function under(m) {
   if (lscgHypnoOn()) {
     const h = hypState();
     if (h) { try { h.activate(T.session.by, T.session.until - now); T.session.via = "lscg"; T.session.ours = true; T.keptAt = now; } catch (e) { console.warn("[Farmhand Companion] LSCG trance:", e); } }
+    // already under somebody else's trance when the session started: LSCG keeps it theirs, so the farm neither keeps it up
+    // nor ends it (and its suggestions won't take: LSCG only lets the one who put them under plant)
+    const c = hypCfg();
+    if (T.session.ours && c && c.active && Number(c.activatedBy) !== T.session.by) T.session.ours = false;
+    else if (T.session.ours) keepUnder(T.session, now);   // (still under the farm's from before: the time starts over)
   }
   look({ haze: 20 }, true);
   event({ ev: "under", via: T.session.via });
@@ -540,9 +564,10 @@ function activity(a, p) {
 function tick() {
   try {
     const now = Date.now(), s = T.session;
-    // LSCG's trance kept up for the session (its own trance time would end it); never put back once they've come up
-    if (s && s.via === "lscg" && s.ours && !s.ended && !s.keepOff && now < s.until && now - T.keptAt > 30000) {
-      if (hypnotized()) { const h = hypState(); if (h) { try { h.activate(s.by, s.until - now); } catch (e) { /* fine */ } } T.keptAt = now; }
+    // LSCG's trance kept up for the session (its own trance time would end it, keepUnder); never put back once they've come up
+    if (s && s.via === "lscg" && s.ours && !s.ended && !s.keepOff && now < s.until && now - T.keptAt > 15000) {
+      if (hypnotized()) keepUnder(s, now);
+      T.keptAt = now;
     }
     if (s && now > s.until + 60000) { T.session = null; glideStop(); farmBeatsStop(3); drawLook(); }   // the farm never said: it's over
     if (s && s.keepOff && !lingering()) { T.session = null; glideStop(); farmBeatsStop(3); clearLook(); }

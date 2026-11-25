@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.100.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.100.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.0.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.81.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.81.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.27.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.100.1 + Companion 0.81.1: the farm's trance holds for the whole session, and trap lines don't snap anybody awake** Laynie, Nov 25: "it seems to be working for me, but Alexia keeps getting kicked out of trance for some reason."
+  - **Kept under the whole session.** LSCG brings you up its own trance time after the trance started (5 minutes unless you changed it), and puttin' someone under who's already under does nothin' in LSCG, so the farm askin' again every half minute never held. Anybody on LSCG's 5 minutes came up partway through every session; a longer trance time (Laynie's) hid it. Now the farm moves the start of its own trance up as it goes, and LSCG still ends it when the session would. Only the farm's own trance: a snap, a boop, your wake word or your safeword still bring you up, and a trance somebody else put you in stays theirs (the farm neither holds it nor ends it). Letting the farm in on States alone (not Hypnosis) holds too.
+  - **"Snaps" in farm lines.** LSCG wakes anybody it has under at any emote with the word "snaps" (somebody snappin' their fingers), and plenty of the farm's lines have a trap or a rein that snaps on. The farm's room emotes, and the ones your Companion posts for you, now carry an invisible joiner in that word: it reads the same, and LSCG no longer hears a snap.
 
 - **Bot 0.100.0 + Companion 0.81.0 + Conditioning 2.0.0: the farm's trance on LSCG, a library of blocks, the trance editor, triggers planted as LSCG suggestions, beats and the look** Laynie, Nov 24-25: "Leaning more on lscg, and how it handles suggestions, but with echs flair"; "with lscg, the farms version"; "a session editor so I can add real hypnotic scripts, set the pacing, and choose a range for the binaurals, like theta and delta"; "focus on lscgs default suggestion inputs on the first rendition". Part 1 of 3 (compulsions, hang-ons and hijacked speech come later).
   - **The farm's trance runs on LSCG** (Conditioning 2.0; Companion trance.js). With LSCG's hypnosis on and the farm let in (LSCG settings → Extensions → B&B Farm: Hypnosis and States), a session puts you under LSCG's own trance in the farm's name, keeps it up the whole session (LSCG's own trance time would cut it short), and wakes you at the end (No human left is left to run out). Snapped out of it, booped, or your wake word: the session ends and you and your herd leader are told. Without LSCG, or with its hypnosis off: the farm's own trance.

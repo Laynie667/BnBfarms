@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.81.0
+// @version      0.81.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.81.0";
+  var VERSION = "0.81.1";
 
   // shared/species.js
   var WORDS = {
@@ -18670,19 +18670,37 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return false;
     }
   }
-  function hypnotized() {
-    try {
-      return granted("hypno") ? !!LA.operations.hypno.isHypnotized() : false;
-    } catch (e) {
-      return false;
-    }
-  }
   function hypState() {
     try {
       return granted("states") ? LA.operations.states.get("hypnotized") || null : null;
     } catch (e) {
       return null;
     }
+  }
+  function hypnotized() {
+    try {
+      if (granted("hypno")) return !!LA.operations.hypno.isHypnotized();
+    } catch (e) {
+    }
+    try {
+      const h2 = hypState();
+      return !!(h2 && h2.active);
+    } catch (e) {
+      return false;
+    }
+  }
+  function hypCfg() {
+    const st2 = W14.Player && W14.Player.LSCG && W14.Player.LSCG.StateModule, list = st2 && Array.isArray(st2.states) ? st2.states : null;
+    return list && list.find((x) => x && x.type === "hypnotized") || null;
+  }
+  function keepUnder(s, now) {
+    const c = hypCfg();
+    if (c && c.active && Number(c.activatedBy) === s.by) {
+      c.activatedAt = now;
+      c.duration = Math.max(6e4, s.until - now);
+      return true;
+    }
+    return false;
   }
   function hookLscg() {
     const q2 = W14.LSCG_OnLoad = W14.LSCG_OnLoad || [];
@@ -18801,6 +18819,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           console.warn("[Farmhand Companion] LSCG trance:", e);
         }
       }
+      const c = hypCfg();
+      if (T.session.ours && c && c.active && Number(c.activatedBy) !== T.session.by) T.session.ours = false;
+      else if (T.session.ours) keepUnder(T.session, now);
     }
     look({ haze: 20 }, true);
     event({ ev: "under", via: T.session.via });
@@ -19456,17 +19477,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function tick2() {
     try {
       const now = Date.now(), s = T.session;
-      if (s && s.via === "lscg" && s.ours && !s.ended && !s.keepOff && now < s.until && now - T.keptAt > 3e4) {
-        if (hypnotized()) {
-          const h2 = hypState();
-          if (h2) {
-            try {
-              h2.activate(s.by, s.until - now);
-            } catch (e) {
-            }
-          }
-          T.keptAt = now;
-        }
+      if (s && s.via === "lscg" && s.ours && !s.ended && !s.keepOff && now < s.until && now - T.keptAt > 15e3) {
+        if (hypnotized()) keepUnder(s, now);
+        T.keptAt = now;
       }
       if (s && now > s.until + 6e4) {
         T.session = null;
@@ -24592,7 +24605,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return;
     }
     st.relayed.push(now);
-    window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text3 });
+    window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text3.replace(/\b(snap)(s)\b/gi, "$1\u2060$2") });
   }
   function sendCommand(text3, typed) {
     text3 = String(text3 || "").trim();

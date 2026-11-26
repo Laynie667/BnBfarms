@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.4.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.4.1** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.85.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.85.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.85.1 + Conditioning 2.4.1: a visor takes any picture link** Laynie, Nov 25: "in game, the visor created with image links doesnt seem to work." Her links were Google image links (no .jpg on the end), and the visor only took links that ended in .png, .jpg, .gif or .webp, so it quietly left them all out and showed its own patterns. Now any https link to a picture counts (never http, never one that's plainly a web page, a script or a video, and never one with spaces, quotes or brackets; it's only ever shown as a picture). The Visor maker says how many links went in and why any were left out, and mentions when they're Google's little search thumbnails (blurry full screen). A visor whose pictures all fail to load shows the farm's own patterns instead of nothin'. The studio's picture sets take the same links.
 
 - **Companion 0.85.0 + Conditioning 2.4.0: a much bigger trance library, praise and degrade tones, and the farm's own visor pictures** Laynie, Nov 25: "bulk up the sessions content and hypno scripts, choose some pictures, and sexy ones, per species and gender"; "any species and gender", and ?degrade / ?praise followed: "yes".
   - **The starter library, bulked up** (shared/trance-more.js, about 90 new blocks; 126 in all): new inductions (The Glow, Countin' Down in the Straw, Head to Tail, The Milker's Rhythm), deepeners (The Cellar Stairs, The Warm Trough, Pasture Sunset, Up and Down Again, Deeper Every Time), convincers, suggestions for anybody (The Ache, Held on the Edge, Belongs to the Farm, Under Glass…), a pack for every kind of stock (cows and bulls, ponies and horses, pups, dogs, wolves and foxes, kitties, pigs, bunnies, goats, sheep, deer, rats, dragons, goblins) with lines for each body and gender, more triggers (Drop for the Farm, Present, Milk Letdown, Walk On, Who's a Good One, Here Kitty, Sooey), compulsions, hang-ons, wakes, slips and nudges, and eight new sessions, seven of them for visors (Under the Glow, Udder Worship, Stud Service, Pony Trainin', Good Pup, Kitty in Heat, Mud and Trough; Deep Barn Cellar for the farm). Not one clinical word in it (a test holds it to that).

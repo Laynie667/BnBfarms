@@ -20,7 +20,11 @@ export const VISOR_KINDS = ["induction", "deepener", "convincer", "suggestion", 
 
 const clamp = (v, lo, hi, d) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
 const str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
-export const okLink = (u) => typeof u === "string" && u.length <= 400 && /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+// a picture's own address: any https link (Nov 25: Laynie's were Google image links, with no .jpg on the end), only never
+// one that's plainly a page or a file of some other kind. It's only ever shown as a picture, so it can't run anythin'; one
+// that isn't a picture just doesn't show.
+export const okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) &&
+  !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
 
 // a tuning, every value checked and kept inside its limits (so nothin' a crafter or another Companion sends is unsafe)
 export function normTuning(t) {

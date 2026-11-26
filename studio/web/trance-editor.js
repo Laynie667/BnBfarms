@@ -10,6 +10,7 @@
 */
 import * as T from "/__shared/trance-script.js";
 import { STARTER } from "/__shared/trance-starter.js";
+import { okLink as visorLink } from "/__shared/visor.js";
 
 const $ = (s, el) => (el || document).querySelector(s);
 function h(tag, attrs, ...kids) {
@@ -449,7 +450,7 @@ function play() {
 
 // ── the visor list (Nov 25): picture sets, and publishin' what crafters can pick ──
 const VS = { sets: {} };
-const okLink = (u) => /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+const okLink = (u) => visorLink(u);   // (the same rule the visor uses, shared/visor.js)
 function vsRender(pick) {
   const sel = $("#vsSets"); sel.textContent = "";
   sel.appendChild(h("option", { value: "" }, "— a new set —"));
@@ -483,7 +484,7 @@ function vsWire() {
   $("#vsSave").onclick = () => {
     const n = $("#vsName").value.replace(/[()<>]/g, "").trim().slice(0, 40), links = $("#vsLinks").value.split(/\s+/).filter(Boolean), good = links.filter(okLink);
     if (!n) { $("#vsName").focus(); return; }
-    if (!good.length || good.length < links.length) { $("#vsStatus").textContent = good.length ? (links.length - good.length) + " link(s) aren't straight to a picture (https, ending .png .jpg .gif .webp), so they're left out" : "each link has to go straight to a picture: https, ending .png .jpg .gif or .webp"; if (!good.length) return; }
+    if (!good.length || good.length < links.length) { $("#vsStatus").textContent = good.length ? (links.length - good.length) + " link(s) aren't a picture's own address (https, and not a web page), so they're left out" : "each link has to be a picture's own address: https, not a web page (right-click the picture, Copy image address)"; if (!good.length) return; }
     const was = $("#vsSets").value; if (was && was !== n) delete VS.sets[was];
     VS.sets[n] = good.slice(0, 20); vsKeep(n);
   };

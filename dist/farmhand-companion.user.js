@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.85.0
+// @version      0.85.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.85.0";
+  var VERSION = "0.85.1";
 
   // shared/species.js
   var WORDS = {
@@ -21987,7 +21987,7 @@ wake: any
     return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
   };
   var str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
-  var okLink = (u) => typeof u === "string" && u.length <= 400 && /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+  var okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) && !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
   function normTuning(t) {
     t = t && typeof t === "object" ? t : {};
     const list2 = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
@@ -22356,17 +22356,24 @@ wake: any
     V.el = el2;
     place();
     icon();
-    const pics = t.pictures.length ? t.pictures : farmPatterns();
-    let i = 0, side = 0;
+    let pics = t.pictures.length ? t.pictures.slice() : farmPatterns();
+    let i = 0, side = 0, loaded = 0, failed = 0;
     const next = () => {
       if (!V.el) return;
       const imgs3 = V.el.querySelectorAll(".pic"), show2 = imgs3[side], hide = imgs3[1 - side];
       show2.onload = () => {
+        loaded++;
         show2.style.opacity = String(t.picOp);
         hide.style.opacity = "0";
       };
       show2.onerror = () => {
         show2.style.opacity = "0";
+        if (++failed >= pics.length && !loaded && t.pictures.length) {
+          pics = farmPatterns();
+          failed = 0;
+          i = 0;
+        }
+        if (!loaded) setTimeout(next, 400);
       };
       show2.src = pics[i++ % pics.length];
       side = 1 - side;
@@ -22578,7 +22585,9 @@ wake: any
     const list2 = visorSessions(), sets = Object.keys(V.sets);
     const result = h("div", { class: "fhc-muted" });
     const make = () => {
-      const pictures2 = M.set === "__own" ? String(M.own || "").split(/\s+/).filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+      const own = String(M.own || "").split(/\s+/).filter(Boolean);
+      const pictures2 = M.set === "__own" ? own.filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+      const skipped2 = M.set === "__own" ? own.length - pictures2.length : 0;
       const t = normTuning({ sessions: M.sessions, need: M.need, show: M.show, words: M.words, set: M.set === "__own" ? "" : M.set, pictures: pictures2, picOp: M.picOp, wordEvery: M.wordEvery, wordOp: M.wordOp, fit: M.fit });
       const code = tuningCode(t);
       remember(code, t);
@@ -22595,6 +22604,8 @@ wake: any
         } catch (e) {
         }
       }, true));
+      if (M.set === "__own") result.appendChild(h("div", null, pictures2.length + " of your links in it" + (skipped2 ? "; " + skipped2 + " left out (not a picture's own address: https, and not a web page)" : "") + (pictures2.length ? "" : ", so it shows the farm's own patterns") + "."));
+      if (pictures2.some((u) => /encrypted-tbn\d*\.gstatic\.com/i.test(u))) result.appendChild(h("div", null, "(Those are Google's little search thumbnails: they'll look blurry stretched across the screen. Open the picture itself and Copy image address for the full size.)"));
       result.appendChild(h("div", null, "Craft the visor (any visor, or anything worn over the eyes) and put this line in its description. These settings are locked in by that code: change any of them and you get a new line."));
     };
     const opt = (v, label, now) => h("option", { value: String(v), selected: String(v) === String(now) || null }, label);

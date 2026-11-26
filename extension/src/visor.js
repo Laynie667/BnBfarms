@@ -193,11 +193,13 @@ function build() {
   el.addEventListener("mousedown", (e) => e.stopPropagation()); el.addEventListener("click", (e) => { if (e.target === el || e.target === cv) e.stopPropagation(); });
   d.body.appendChild(el); V.el = el;
   place(); icon();
-  // pictures: crossfade, slowly
-  const pics = t.pictures.length ? t.pictures : farmPatterns();
-  let i = 0, side = 0;
+  // pictures: crossfade, slowly (if none of the crafter's will load, the farm's own patterns instead of nothin')
+  let pics = t.pictures.length ? t.pictures.slice() : farmPatterns();
+  let i = 0, side = 0, loaded = 0, failed = 0;
   const next = () => { if (!V.el) return; const imgs = V.el.querySelectorAll(".pic"), show = imgs[side], hide = imgs[1 - side];
-    show.onload = () => { show.style.opacity = String(t.picOp); hide.style.opacity = "0"; }; show.onerror = () => { show.style.opacity = "0"; }; show.src = pics[i++ % pics.length]; side = 1 - side; };
+    show.onload = () => { loaded++; show.style.opacity = String(t.picOp); hide.style.opacity = "0"; };
+    show.onerror = () => { show.style.opacity = "0"; if (++failed >= pics.length && !loaded && t.pictures.length) { pics = farmPatterns(); failed = 0; i = 0; } if (!loaded) setTimeout(next, 400); };
+    show.src = pics[i++ % pics.length]; side = 1 - side; };
   next(); V.picT = setInterval(() => { if (pics.length > 1) next(); }, t.picEvery * 1000);
   // subliminal words: one at a time, up and gone, never a strobe
   V.wordT = setInterval(() => { if (Math.random() < 0.85) word(); }, Math.max(2, t.wordEvery) * 1000);
@@ -318,7 +320,9 @@ export function visorMakerCards(pctx) {
   const list = visorSessions(), sets = Object.keys(V.sets);
   const result = h("div", { class: "fhc-muted" });
   const make = () => {
-    const pictures = M.set === "__own" ? String(M.own || "").split(/\s+/).filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+    const own = String(M.own || "").split(/\s+/).filter(Boolean);
+    const pictures = M.set === "__own" ? own.filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+    const skipped = M.set === "__own" ? own.length - pictures.length : 0;
     const t = normTuning({ sessions: M.sessions, need: M.need, show: M.show, words: M.words, set: M.set === "__own" ? "" : M.set, pictures, picOp: M.picOp, wordEvery: M.wordEvery, wordOp: M.wordOp, fit: M.fit });
     const code = tuningCode(t); remember(code, t);
     try { if (ctx.botHere()) ctx.toBot("visorKeep", { code, t }); } catch (e) { /* fine */ }
@@ -326,6 +330,9 @@ export function visorMakerCards(pctx) {
     result.textContent = "";
     result.appendChild(h("div", { style: { margin: "6px 0", padding: "6px 8px", border: "1px dashed #8a6aa0", borderRadius: "6px", userSelect: "all", fontFamily: "monospace" } }, line));
     result.appendChild(btn("Copy it", () => { try { W.navigator.clipboard.writeText(line); } catch (e) { /* select it by hand */ } }, true));
+    if (M.set === "__own") result.appendChild(h("div", null, pictures.length + " of your links in it" + (skipped ? "; " + skipped + " left out (not a picture's own address: https, and not a web page)" : "") +
+      (pictures.length ? "" : ", so it shows the farm's own patterns") + "."));
+    if (pictures.some((u) => /encrypted-tbn\d*\.gstatic\.com/i.test(u))) result.appendChild(h("div", null, "(Those are Google's little search thumbnails: they'll look blurry stretched across the screen. Open the picture itself and Copy image address for the full size.)"));
     result.appendChild(h("div", null, "Craft the visor (any visor, or anything worn over the eyes) and put this line in its description. These settings are locked in by that code: change any of them and you get a new line."));
   };
   const opt = (v, label, now) => h("option", { value: String(v), selected: String(v) === String(now) || null }, label);

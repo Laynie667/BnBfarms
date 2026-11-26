@@ -10,7 +10,7 @@
 */
 import * as T from "/__shared/trance-script.js";
 import { STARTER } from "/__shared/trance-starter.js";
-import { okLink as visorLink } from "/__shared/visor.js";
+import { okLink as visorLink, fixLink, isVideo } from "/__shared/visor.js";
 
 const $ = (s, el) => (el || document).querySelector(s);
 function h(tag, attrs, ...kids) {
@@ -471,7 +471,7 @@ async function vsPics() {
   if (!list.length) { box.appendChild(h("span", { class: "hint" }, "(none yet)")); return; }
   for (const p of list) {
     const inSet = () => $("#vsLinks").value.split(/\s+/).includes(p.url);
-    const img = h("img", { src: "/__studio/trance/pictures/" + encodeURIComponent(p.file), title: p.file + " · " + p.kb + " KB" + (p.kb > 1024 ? " (big: every wearer downloads it)" : ""), alt: p.file,
+    const img = h(isVideo(p.file) ? "video" : "img", { src: "/__studio/trance/pictures/" + encodeURIComponent(p.file), muted: true, loop: true, autoplay: true, playsinline: true, title: p.file + " · " + p.kb + " KB" + (p.kb > 1024 ? " (big: every wearer downloads it)" : ""), alt: p.file,
       style: "width:72px;height:72px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid " + (inSet() ? "var(--accent)" : "transparent"),
       onclick: (e) => { const ta = $("#vsLinks"); if (inSet()) ta.value = ta.value.split(/\s+/).filter((x) => x && x !== p.url).join("\n"); else ta.value = (ta.value.trim() ? ta.value.trim() + "\n" : "") + p.url; e.target.style.borderColor = inSet() ? "var(--accent)" : "transparent"; } });
     box.appendChild(img);
@@ -482,11 +482,14 @@ function vsWire() {
   $("#vsLinks").addEventListener("input", () => { for (const img of $("#vsPics").querySelectorAll("img")) { const u = (img.title || "").split(" · ")[0]; img.style.borderColor = $("#vsLinks").value.includes(encodeURIComponent(u)) ? "var(--accent)" : "transparent"; } });
   $("#vsSets").onchange = () => { const n = $("#vsSets").value; $("#vsName").value = n; $("#vsLinks").value = n ? VS.sets[n].join("\n") : ""; $("#vsDel").disabled = !n; $("#vsLinks").dispatchEvent(new Event("input")); };
   $("#vsSave").onclick = () => {
-    const n = $("#vsName").value.replace(/[()<>]/g, "").trim().slice(0, 40), links = $("#vsLinks").value.split(/\s+/).filter(Boolean), good = links.filter(okLink);
+    // (Nov 26) a GIF site's page link is made into the picture's own address where it can be (shared/visor.js fixLink)
+    const fx = $("#vsLinks").value.split(/\s+/).filter(Boolean).map((l) => Object.assign({ was: l }, fixLink(l))), notes = fx.filter((f) => f.note).map((f) => (f.url ? "fixed: " : "left out: ") + f.note);
+    if (fx.some((f) => f.url && f.url !== f.was)) $("#vsLinks").value = fx.map((f) => f.url || f.was).join("\n");
+    const n = $("#vsName").value.replace(/[()<>]/g, "").trim().slice(0, 40), links = fx.map((f) => f.url || f.was), good = fx.map((f) => f.url).filter(okLink);
     if (!n) { $("#vsName").focus(); return; }
     if (!good.length || good.length < links.length) { $("#vsStatus").textContent = good.length ? (links.length - good.length) + " link(s) aren't a picture's own address (https, and not a web page), so they're left out" : "each link has to be a picture's own address: https, not a web page (right-click the picture, Copy image address)"; if (!good.length) return; }
     const was = $("#vsSets").value; if (was && was !== n) delete VS.sets[was];
-    VS.sets[n] = good.slice(0, 20); vsKeep(n);
+    VS.sets[n] = good.slice(0, 20); vsKeep(n).then(() => { if (notes.length) $("#vsStatus").textContent += " · " + notes.slice(0, 3).join(" · "); });
   };
   $("#vsDel").onclick = () => { const n = $("#vsSets").value; if (!n || !confirm("Take out the picture set " + n + "?")) return; delete VS.sets[n]; $("#vsName").value = ""; $("#vsLinks").value = ""; vsKeep(""); };
   $("#vsPublish").onclick = async () => {

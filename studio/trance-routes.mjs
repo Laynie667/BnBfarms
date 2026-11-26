@@ -118,7 +118,7 @@ export async function tranceRoutes(req, res, path, origin, ctx) {
   res.writeHead(404).end("not found"); return true;
 }
 async function visorLib(ctx) { return import(pathToFileURL(join(ctx.shared, "visor.js")).href); }
-const PIC = /^[A-Za-z0-9 _.,'+-]{1,80}\.(png|jpe?g|gif|webp)$/i;
+const PIC = /^[A-Za-z0-9 _.,'+-]{1,80}\.(png|jpe?g|gif|webp|mp4|webm)$/i;   // (Nov 26: silent videos too)
 // { name: [links] }: up to 40 sets, each up to 20 links straight to a picture
 function cleanSets(v, V) {
   const out = {};

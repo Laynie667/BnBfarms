@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.87.1
+// @version      0.88.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.87.1";
+  var VERSION = "0.88.0";
 
   // shared/species.js
   var WORDS = {
@@ -21987,7 +21987,59 @@ wake: any
     return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
   };
   var str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
-  var okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) && !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
+  var okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) && !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
+  var isVideo = (u) => /\.(mp4|webm)([?#]|$)/i.test(String(u || ""));
+  function fixLink(raw) {
+    let u = String(raw || "").trim(), m;
+    if (!u) return { url: "", note: "" };
+    if (/^http:\/\//i.test(u)) u = "https://" + u.slice(7);
+    if (m = /^https:\/\/(?:www\.)?giphy\.com\/(?:gifs|stickers|embed)\/(?:[^/?#]*-)?([A-Za-z0-9]+)(?:[/?#].*)?$/i.exec(u)) return { url: "https://media.giphy.com/media/" + m[1] + "/giphy.gif", note: "a Giphy page, made into its GIF" };
+    if (m = /^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]+)\.gifv(?:[?#].*)?$/i.exec(u)) return { url: m[1] + ".mp4", note: "Imgur's .gifv is a page, made into its video" };
+    if (m = /^https:\/\/(?:www\.)?google\.[a-z.]+\/(?:imgres|url)\?(?:[^#]*?&)?(?:imgurl|url)=([^&#]+)/i.exec(u)) {
+      let inner = "";
+      try {
+        inner = decodeURIComponent(m[1]);
+      } catch (e) {
+        inner = "";
+      }
+      if (okLink(inner)) return { url: inner, note: "a Google link, made into the picture's own address" };
+      return { url: "", note: "a Google page: open the picture itself, right-click it, Copy image address" };
+    }
+    if (/^https:\/\/(?:www\.)?tenor\.com\/(?:[a-z-]+\/)?view\//i.test(u)) return { url: "", note: "a Tenor page: right-click the GIF, Copy image address (it starts media.tenor.com)" };
+    if (/^https:\/\/(?:www\.|v3\.)?redgifs\.com\/(?:watch|ifr)\//i.test(u)) return { url: "", note: "a RedGIFs page: right-click the video, Copy video address (an .mp4 link)" };
+    if (/^https:\/\/(?:www\.)?imgur\.com\/(?:a|gallery|t)\//i.test(u)) return { url: "", note: "an Imgur album page: open the picture, right-click it, Copy image address (it starts i.imgur.com)" };
+    if (/^https:\/\/(?:www\.|old\.|new\.)?reddit\.com\//i.test(u)) return { url: "", note: "a Reddit page: open the picture, right-click it, Copy image address (it starts i.redd.it)" };
+    if (/^https:\/\/v\.redd\.it\//i.test(u)) return { url: "", note: "Reddit's own videos can't be linked straight to; use a GIF or an .mp4 from somewhere else" };
+    if (!okLink(u)) return { url: "", note: "not a picture's own address (it has to be https, and not a web page)" };
+    if (/encrypted-tbn\d*\.gstatic\.com/i.test(u)) return { url: u, note: "Google's little search thumbnail: always a still picture, and blurry full-screen" };
+    if (/(?:cdn|media)\.discordapp\.(?:com|net)\/attachments\//i.test(u)) return { url: u, note: "a Discord link: those stop working after a day or so" };
+    return { url: u, note: "" };
+  }
+  function framesOf(b) {
+    if (!b || !b.length) return null;
+    const at = (i, s) => {
+      for (let k = 0; k < s.length; k++) if (b[i + k] !== s.charCodeAt(k)) return false;
+      return true;
+    };
+    if (at(0, "GIF8")) {
+      let n = 0;
+      for (let i = 0; i < b.length - 2 && n < 2; i++) if (b[i] === 33 && b[i + 1] === 249 && b[i + 2] === 4) n++;
+      return n >= 2;
+    }
+    if (at(0, "RIFF") && at(8, "WEBP")) {
+      for (let i = 12; i <= Math.min(b.length - 4, 4096); i++) if (at(i, "ANIM")) return true;
+      return false;
+    }
+    if (b[0] === 137 && at(1, "PNG")) {
+      for (let i = 8; i <= b.length - 4; i++) {
+        if (at(i, "acTL")) return true;
+        if (at(i, "IDAT")) return false;
+      }
+      return false;
+    }
+    if (b[0] === 255 && b[1] === 216) return false;
+    return null;
+  }
   var SPIRALS = ["classic", "pinwheel", "tight", "tunnel", "counter", "hearts", "paws", "bells", "words", "none"];
   var SPINS = ["slow", "slower", "still"];
   var PLACES = ["behind", "over", "both"];
@@ -22678,9 +22730,12 @@ wake: any
     } catch (e) {
     }
     if (V.el) {
+      for (const v of V.el.querySelectorAll("video")) letGo2(v);
       V.el.remove();
       V.el = null;
     }
+    V.slots = [];
+    V.kv = null;
   }
   var later2 = (f, ms) => {
     V.timers.push(setTimeout(() => {
@@ -22704,7 +22759,7 @@ wake: any
     if (d.getElementById("fhc-visor-css")) return;
     const s = d.createElement("style");
     s.id = "fhc-visor-css";
-    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}#fhc-visor-on:hover{opacity:.95}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
+    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei,#fhc-visor.warp>.kaleiC{filter:url(#fhc-warpf)}#fhc-visor .kaleiC{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 3s;animation:fhcSpin 40s linear infinite}#fhc-visor.calm .kaleiC{animation:none}#fhc-visor .kaleiC .wedge{position:absolute;left:50%;top:calc(50% - var(--R,700px) / 2);width:var(--R,700px);height:var(--R,700px);transform-origin:0 50%;overflow:hidden;clip-path:polygon(0 50%,86.6% 0,100% 0,100% 100%,86.6% 100%)}#fhc-visor .kaleiC .wedge img{display:block;width:100%;height:100%;object-fit:cover}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}#fhc-visor-on:hover{opacity:.95}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
     d.head.appendChild(s);
   }
   var WARP_SVG = "<svg width='0' height='0' style='position:absolute'><filter id='fhc-warpf'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.012' numOctaves='2' seed='3'><animate attributeName='baseFrequency' dur='24s' values='0.008 0.012;0.012 0.008;0.008 0.012' repeatCount='indefinite'/></feTurbulence><feDisplacementMap in='SourceGraphic' scale='14'/></filter></svg>";
@@ -22725,14 +22780,28 @@ wake: any
       return x;
     };
     if (L.fx.includes("warp")) el2.insertAdjacentHTML("beforeend", WARP_SVG);
-    for (let i2 = 0; i2 < 2; i2++) {
+    V.slots = [0, 1].map(() => {
       const p = add3("img", "pic");
       p.alt = "";
       p.style.objectFit = t.fit;
       p.referrerPolicy = "no-referrer";
       if (L.fx.includes("kalei")) p.style.visibility = "hidden";
+      return p;
+    });
+    if (L.fx.includes("kalei")) {
+      add3("canvas", "kalei");
+      const kc = add3("div", "kaleiC");
+      for (let k = 0; k < 6; k++) {
+        const w = d.createElement("div");
+        w.className = "wedge";
+        w.style.transform = "rotate(" + k * 60 + "deg)" + (k % 2 ? " scaleY(-1)" : "");
+        const im = d.createElement("img");
+        im.alt = "";
+        im.referrerPolicy = "no-referrer";
+        w.appendChild(im);
+        kc.appendChild(w);
+      }
     }
-    if (L.fx.includes("kalei")) add3("canvas", "kalei");
     if (L.spiral !== "none" && L.place !== "over") add3("canvas", "spin");
     const cv = add3("canvas", "body");
     if (L.fx.includes("aura")) cv.classList.add("aura");
@@ -22764,16 +22833,25 @@ wake: any
     icon();
     let pics = t.pictures.length ? t.pictures.slice() : farmPatterns();
     let i = 0, side = 0, loaded = 0, failed = 0;
+    const kaleid = L.fx.includes("kalei");
     const next = () => {
       if (!V.el) return;
-      const imgs3 = V.el.querySelectorAll(".pic"), show2 = imgs3[side], hide = imgs3[1 - side];
-      show2.onload = () => {
+      const url = pics[i++ % pics.length], other = V.slots[1 - side], m = mediaFor(url, t, kaleid);
+      letGo2(V.slots[side]);
+      V.slots[side].replaceWith(m);
+      V.slots[side] = m;
+      const shown = () => {
+        if (!V.el || !m.isConnected) return;
         loaded++;
-        show2.style.opacity = String(t.picOp);
-        hide.style.opacity = "0";
+        m.style.opacity = String(t.picOp);
+        other.style.opacity = "0";
+        kaleiShow(m, url);
+        setTimeout(() => {
+          if (other.style.opacity === "0") letGo2(other);
+        }, 5600);
       };
-      show2.onerror = () => {
-        show2.style.opacity = "0";
+      const bad = () => {
+        m.style.opacity = "0";
         if (++failed >= pics.length && !loaded && t.pictures.length) {
           pics = farmPatterns();
           failed = 0;
@@ -22781,7 +22859,20 @@ wake: any
         }
         if (!loaded) setTimeout(next, 400);
       };
-      show2.src = pics[i++ % pics.length];
+      m.onerror = bad;
+      if (m.tagName === "VIDEO") {
+        m.addEventListener("loadeddata", shown, { once: true });
+        m.src = url;
+        try {
+          const p = m.play();
+          if (p && p.catch) p.catch(() => {
+          });
+        } catch (e) {
+        }
+      } else {
+        m.onload = shown;
+        m.src = url;
+      }
       side = 1 - side;
     };
     next();
@@ -22819,6 +22910,7 @@ wake: any
     Object.assign(V.el.style, { left: r.left + "px", top: r.top + "px", width: w + "px", height: r.height + "px" });
     V.el.classList.toggle("calm", calmNow());
     const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1e3;
+    V.el.style.setProperty("--R", Math.ceil(Math.hypot(cw, ch) / 2) + "px");
     for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei")) if (cv.width !== cw || cv.height !== ch) {
       cv.width = cw;
       cv.height = ch;
@@ -23033,11 +23125,57 @@ wake: any
     }
     g.restore();
   }
+  function mediaFor(url, t, hidden) {
+    const vid = isVideo(url), m = W15.document.createElement(vid ? "video" : "img");
+    m.className = "pic";
+    m.style.objectFit = t.fit;
+    if (hidden) m.style.visibility = "hidden";
+    if (vid) {
+      m.muted = true;
+      m.defaultMuted = true;
+      m.loop = true;
+      m.autoplay = true;
+      m.playsInline = true;
+      m.setAttribute("muted", "");
+      m.setAttribute("playsinline", "");
+      m.disablePictureInPicture = true;
+      m.preload = "auto";
+    } else {
+      m.alt = "";
+      m.referrerPolicy = "no-referrer";
+    }
+    return m;
+  }
+  function letGo2(m) {
+    if (!m || m.tagName !== "VIDEO") return;
+    try {
+      m.pause();
+      m.removeAttribute("src");
+      m.load();
+    } catch (e) {
+    }
+  }
+  function kaleiShow(m, url) {
+    if (!V.el || !fxOn("kalei")) return;
+    const kc = V.el.querySelector(".kaleiC");
+    if (!kc) return;
+    if (m.tagName === "VIDEO") {
+      V.kv = m;
+      kc.style.opacity = "0";
+      return;
+    }
+    V.kv = null;
+    for (const im of kc.querySelectorAll("img")) {
+      im.style.objectFit = V.on.t.fit;
+      im.src = url;
+    }
+    kc.style.opacity = String(V.on.t.picOp);
+  }
   function kalei(t, calm2) {
     const kc = V.el.querySelector("canvas.kalei"), g = kc && kc.getContext ? kc.getContext("2d") : null;
     if (!g) return;
     g.clearRect(0, 0, kc.width, kc.height);
-    const img2 = Array.from(V.el.querySelectorAll("img.pic")).find((p) => Number(p.style.opacity) > 0 && p.complete && p.naturalWidth);
+    const img2 = V.kv && V.kv.isConnected && V.kv.readyState >= 2 ? V.kv : null;
     if (!img2) return;
     const R = Math.hypot(kc.width, kc.height) / 2, a = calm2 ? 0 : t * (2 * Math.PI / 40);
     g.save();
@@ -23619,6 +23757,72 @@ wake: any
     } catch (e) {
     }
   }
+  var shortLink = (u) => {
+    const s = String(u);
+    return s.length > 60 ? s.slice(0, 40) + "\u2026" + s.slice(-16) : s;
+  };
+  function testLinks(raw, out) {
+    out.textContent = "";
+    const links = String(raw || "").split(/\s+/).filter(Boolean).slice(0, 25);
+    if (!links.length) {
+      out.appendChild(h("div", null, "(no links of your own to test yet)"));
+      return Promise.resolve([]);
+    }
+    return Promise.all(links.map((l) => {
+      const f = fixLink(l), row = h("div", null, "\u2026 " + shortLink(l));
+      out.appendChild(row);
+      if (!f.url) {
+        row.textContent = "\u2718 " + shortLink(l) + ": " + f.note;
+        return Promise.resolve({ link: l, ok: false });
+      }
+      return tryLink(f.url).then((r) => {
+        row.textContent = r.icon + " " + shortLink(f.url) + ": " + r.text + (f.note ? " (" + f.note + ")" : "");
+        return Object.assign({ link: f.url }, r);
+      });
+    }));
+  }
+  function tryLink(url) {
+    return new Promise((done) => {
+      const vid = isVideo(url), m = W15.document.createElement(vid ? "video" : "img");
+      let over = false;
+      const finish3 = (r) => {
+        if (over) return;
+        over = true;
+        clearTimeout(tm);
+        if (vid) letGo2(m);
+        done(r);
+      };
+      const tm = setTimeout(() => finish3({ icon: "\u2718", text: "didn't load in 15 seconds", ok: false }), 15e3);
+      if (vid) {
+        m.muted = true;
+        m.preload = "metadata";
+        m.onloadedmetadata = () => finish3({ icon: "\u2714", text: "moves (a silent video" + (m.duration > 0 && m.duration < 3600 ? ", " + Math.max(1, Math.round(m.duration)) + " s loop" : "") + ")", ok: true, moves: true });
+        m.onerror = () => finish3({ icon: "\u2718", text: "didn't load (gone, or the site won't let other pages play it)", ok: false });
+        m.src = url;
+        return;
+      }
+      m.referrerPolicy = "no-referrer";
+      m.onload = () => {
+        movesOf(url).then((a) => finish3(a === true ? { icon: "\u2714", text: "moves", ok: true, moves: true } : a === false ? { icon: "\u25AB", text: "a still picture", ok: true, moves: false } : { icon: "\u2714", text: "shows (the site won't say whether it moves" + (/\.gif([?#]|$)/i.test(url) ? "; a .gif usually does" : "") + ")", ok: true }));
+      };
+      m.onerror = () => finish3({ icon: "\u2718", text: "didn't load (gone, or the site won't let other pages show it)", ok: false });
+      m.src = url;
+    });
+  }
+  async function movesOf(url) {
+    try {
+      if (typeof W15.fetch !== "function") return null;
+      const ac = typeof W15.AbortController === "function" ? new W15.AbortController() : null, t = setTimeout(() => {
+        if (ac) ac.abort();
+      }, 1e4);
+      const r = await W15.fetch(url, { mode: "cors", referrerPolicy: "no-referrer", signal: ac ? ac.signal : void 0 });
+      clearTimeout(t);
+      if (!r || !r.ok || typeof r.arrayBuffer !== "function") return null;
+      return framesOf(new Uint8Array(await r.arrayBuffer()));
+    } catch (e) {
+      return null;
+    }
+  }
   function visorMakerCards(pctx) {
     const M = Object.assign({ sessions: [], need: 1, show: "crafter", words: "", set: "", own: "", picOp: 0.35, wordEvery: 3, wordOp: 0.45, fit: "cover" }, JSON.parse(JSON.stringify(LOOK_DEFAULTS)), { linesNeed: 5 }, maker());
     const set2 = (k, v) => {
@@ -23638,10 +23842,21 @@ wake: any
     });
     const list2 = visorSessions(), sets = Object.keys(V.sets);
     const result = h("div", { class: "fhc-muted" });
+    const ownBox = h("textarea", { rows: 3, cols: 40, placeholder: "my own links, one per line: https://\u2026/spiral.gif, or a GIF site's .mp4", onchange: (e) => set2("own", e.target.value) }, M.own || "");
+    const tested = h("div", { class: "fhc-muted" });
+    const fixOwn = () => {
+      const raw = String(M.own || "").split(/\s+/).filter(Boolean), fx2 = raw.map((l) => Object.assign({ was: l }, fixLink(l)));
+      const fixed = fx2.filter((f) => f.url && f.url !== f.was);
+      if (fixed.length) {
+        set2("own", fx2.map((f) => f.url || f.was).join("\n"));
+        ownBox.value = M.own;
+      }
+      return { fx: fx2, fixed };
+    };
     const make = () => {
-      const own = String(M.own || "").split(/\s+/).filter(Boolean);
-      const pictures2 = M.set === "__own" ? own.filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
-      const skipped2 = M.set === "__own" ? own.length - pictures2.length : 0;
+      const { fx: fx2, fixed } = M.set === "__own" ? fixOwn() : { fx: [], fixed: [] };
+      const pictures2 = M.set === "__own" ? fx2.map((f) => f.url).filter(okLink).slice(0, MAX_PICS) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+      const left2 = fx2.filter((f) => !f.url), skipped2 = left2.length;
       const t = normTuning({
         sessions: M.sessions,
         need: M.need,
@@ -23682,7 +23897,10 @@ wake: any
         } catch (e) {
         }
       }, true));
-      if (M.set === "__own") result.appendChild(h("div", null, pictures2.length + " of your links in it" + (skipped2 ? "; " + skipped2 + " left out (not a picture's own address: https, and not a web page)" : "") + (pictures2.length ? "" : ", so it shows the farm's own patterns") + "."));
+      if (M.set === "__own") {
+        result.appendChild(h("div", null, pictures2.length + " of your links in it" + (pictures2.filter(isVideo).length ? " (" + pictures2.filter(isVideo).length + " of them silent videos)" : "") + (fixed.length ? "; " + fixed.length + " fixed (" + fixed[0].note + (fixed.length > 1 ? ", and more" : "") + ")" : "") + (skipped2 ? "; " + skipped2 + " left out" : "") + (pictures2.length ? "" : ", so it shows the farm's own patterns") + "."));
+        for (const f of left2.slice(0, 4)) result.appendChild(h("div", null, "\u2718 " + shortLink(f.was) + ": " + f.note));
+      }
       if (pictures2.some((u) => /encrypted-tbn\d*\.gstatic\.com/i.test(u))) result.appendChild(h("div", null, "(Those are Google's little search thumbnails: they'll look blurry stretched across the screen. Open the picture itself and Copy image address for the full size.)"));
       result.appendChild(h("div", null, "Craft the visor (any visor, or anything worn over the eyes) and put this line in its description. These settings are locked in by that code: change any of them and you get a new line."));
     };
@@ -23704,7 +23922,12 @@ wake: any
         null,
         muted("Pictures:"),
         h("select", { onchange: (e) => set2("set", e.target.value) }, opt("", "the farm's own patterns", M.set), sets.map((n) => opt(n, n + " (the farm's set)", M.set)), opt("__own", "my own links", M.set)),
-        h("textarea", { rows: 3, cols: 40, placeholder: "my own links, one per line: https://\u2026/spiral.gif", onchange: (e) => set2("own", e.target.value) }, M.own || "")
+        ownBox,
+        h("div", null, btn("Test my links", () => {
+          fixOwn();
+          testLinks(M.own, tested);
+        }), muted(" GIFs and silent videos (.mp4, .webm) move; a GIF site's page link gets fixed where it can be.")),
+        tested
       ),
       h(
         "div",
@@ -26663,7 +26886,7 @@ wake: any
   };
   var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
   var LETGO_KEY = "fhc-gear-letgo";
-  var letGo2 = () => {
+  var letGo3 = () => {
     try {
       return JSON.parse(LS.getItem(LETGO_KEY)) || {};
     } catch (e) {
@@ -26678,7 +26901,7 @@ wake: any
   };
   var pieceKey = (name, until) => String(name).slice(0, 30) + "|" + (Number(until) || 0);
   function gearFreedHere(name, until) {
-    const m = letGo2();
+    const m = letGo3();
     m[pieceKey(name, until)] = { why: "freed", at: Date.now() };
     letGoSave(m);
   }
@@ -26688,7 +26911,7 @@ wake: any
   var PUT_WINDOW = 12e4;
   var STUCK_MS = 6e5;
   function farmGearLetGo(list2) {
-    const m = letGo2();
+    const m = letGo3();
     let n = 0;
     for (const g of Array.isArray(list2) ? list2 : []) if (g && g.name) {
       m[pieceKey(g.name, g.until)] = { why: "safe", at: Date.now() };
@@ -26710,7 +26933,7 @@ wake: any
   function syncFarmGear(list2, allow, opts) {
     const aside = !!(opts && opts.aside);
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const lg = letGo2(), now = Date.now();
+    const lg = letGo3(), now = Date.now();
     let pruned = false;
     for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 864e5 || now - (lg[k].at || 0) > 6e5 && !(list2 || []).some((g) => g && pieceKey(g.name, g.until) === k)) {
       delete lg[k];

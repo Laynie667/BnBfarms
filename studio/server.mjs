@@ -32,7 +32,7 @@ const BELLY_SRC = join(HERE, "../extension/src/belly.js");
 const REF = (() => { try { const r = JSON.parse(readFileSync(join(HERE, "local.json"), "utf8")).ref; if (r && existsSync(r)) return r; } catch (e) { /* none */ } return join(HOME, "reference"); })();
 const ECHO_RES = (() => { const p = join(REF, "addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json",
-  ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
+  ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp4": "video/mp4", ".webm": "video/webm", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
   ".csv": "text/csv; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".ttf": "font/ttf", ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon" };
 
 if (/^live/i.test(ARG)) {

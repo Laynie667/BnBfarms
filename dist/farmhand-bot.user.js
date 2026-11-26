@@ -3233,7 +3233,7 @@ GOOD TO KNOW
 
   // bot/src/version.js
   var VERSION = "0.103.0";
-  var COMPANION_VERSION = "0.87.1";
+  var COMPANION_VERSION = "0.88.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {

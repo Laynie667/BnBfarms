@@ -34,7 +34,7 @@ import { BOT_MEMBER } from "./config.js";
 import { makeMsg } from "../../shared/protocol.js";
 import { parseLibrary, planSession, sessionSteps, fillIn, LEVELS } from "../../shared/trance-script.js";
 import { STARTER } from "../../shared/trance-starter.js";
-import { normTuning, tuningCode, codeOk, codeIn, descLine, okLink, PUBLIC_BASE, VISOR_KINDS, MAX_SESSIONS, lookOf, SPIRALS, SPINS, PLACES, CHAT_FX, FX, LOOK_DEFAULTS } from "../../shared/visor.js";
+import { normTuning, tuningCode, codeOk, codeIn, descLine, okLink, PUBLIC_BASE, VISOR_KINDS, MAX_SESSIONS, MAX_PICS, lookOf, SPIRALS, SPINS, PLACES, CHAT_FX, FX, LOOK_DEFAULTS, isVideo, fixLink, framesOf } from "../../shared/visor.js";
 import { onHypno, tranceVoice, tranceState, onTranceEnd, oocOf } from "./trance.js";
 import { h, card, title, muted, btn } from "./dom.js";
 
@@ -357,7 +357,8 @@ function unbuild() {
   if (V.obs) { try { V.obs.disconnect(); } catch (e) { /* fine */ } V.obs = null; V.obsOn = null; }
   if (V.wm) { V.wm.remove(); V.wm = null; }
   try { for (const x of W.document.querySelectorAll(".fhc-vfade")) x.classList.remove("fhc-vfade"); } catch (e) { /* fine */ }
-  if (V.el) { V.el.remove(); V.el = null; }
+  if (V.el) { for (const v of V.el.querySelectorAll("video")) letGo(v); V.el.remove(); V.el = null; }
+  V.slots = []; V.kv = null;
 }
 const later = (f, ms) => { V.timers.push(setTimeout(() => { try { f(); } catch (e) { console.warn("[Farmhand Companion] visor:", e); } }, ms)); };
 const every = (ms, f) => { V.ivs.push(setInterval(() => { try { if (V.el) f(); } catch (e) { /* fine */ } }, ms)); };
@@ -369,7 +370,10 @@ function css() {
     "#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}" +
     "#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}" +
     "#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}" +
-    "#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}" +
+    "#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei,#fhc-visor.warp>.kaleiC{filter:url(#fhc-warpf)}" +
+    "#fhc-visor .kaleiC{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 3s;animation:fhcSpin 40s linear infinite}#fhc-visor.calm .kaleiC{animation:none}" +
+    "#fhc-visor .kaleiC .wedge{position:absolute;left:50%;top:calc(50% - var(--R,700px) / 2);width:var(--R,700px);height:var(--R,700px);transform-origin:0 50%;overflow:hidden;clip-path:polygon(0 50%,86.6% 0,100% 0,100% 100%,86.6% 100%)}" +
+    "#fhc-visor .kaleiC .wedge img{display:block;width:100%;height:100%;object-fit:cover}" +
     "#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}" +
     "#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}" +
     "#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}" +
@@ -424,8 +428,14 @@ function build() {
   el.style.setProperty("--ms", t.wordMs + "ms"); el.style.setProperty("--op", String(t.wordOp));
   const add = (tag, cls) => { const x = d.createElement(tag); x.className = cls; el.appendChild(x); return x; };
   if (L.fx.includes("warp")) el.insertAdjacentHTML("beforeend", WARP_SVG);
-  for (let i = 0; i < 2; i++) { const p = add("img", "pic"); p.alt = ""; p.style.objectFit = t.fit; p.referrerPolicy = "no-referrer"; if (L.fx.includes("kalei")) p.style.visibility = "hidden"; }
-  if (L.fx.includes("kalei")) add("canvas", "kalei");
+  V.slots = [0, 1].map(() => { const p = add("img", "pic"); p.alt = ""; p.style.objectFit = t.fit; p.referrerPolicy = "no-referrer"; if (L.fx.includes("kalei")) p.style.visibility = "hidden"; return p; });
+  if (L.fx.includes("kalei")) {
+    // the kaleidoscope, two ways: six folded copies of the picture itself (so a GIF keeps movin' in every one), and a
+    // drawin' of the video's frames for a video (six videos playin' at once would be too heavy)
+    add("canvas", "kalei");
+    const kc = add("div", "kaleiC");
+    for (let k = 0; k < 6; k++) { const w = d.createElement("div"); w.className = "wedge"; w.style.transform = "rotate(" + k * 60 + "deg)" + (k % 2 ? " scaleY(-1)" : ""); const im = d.createElement("img"); im.alt = ""; im.referrerPolicy = "no-referrer"; w.appendChild(im); kc.appendChild(w); }
+  }
   if (L.spiral !== "none" && L.place !== "over") add("canvas", "spin");
   const cv = add("canvas", "body"); if (L.fx.includes("aura")) cv.classList.add("aura");
   if (L.spiral !== "none" && L.place !== "behind") add("canvas", "spinO");
@@ -441,13 +451,22 @@ function build() {
   // the spiral turnin' faint over the chat
   if (L.chat.includes("watermark")) { const wm = d.createElement("img"); wm.id = "fhc-visor-wm"; wm.alt = ""; wm.src = spiralMark(); wm.classList.toggle("calm", calm); d.body.appendChild(wm); V.wm = wm; }
   place(); icon();
-  // pictures: crossfade, slowly (if none of the crafter's will load, the farm's own patterns instead of nothin')
+  // pictures: crossfade, slowly (if none of the crafter's will load, the farm's own patterns instead of nothin'). A video
+  // link plays silent and loopin' like a movin' picture; only the one showin' plays, the one faded out is let go of.
   let pics = t.pictures.length ? t.pictures.slice() : farmPatterns();
   let i = 0, side = 0, loaded = 0, failed = 0;
-  const next = () => { if (!V.el) return; const imgs = V.el.querySelectorAll(".pic"), show = imgs[side], hide = imgs[1 - side];
-    show.onload = () => { loaded++; show.style.opacity = String(t.picOp); hide.style.opacity = "0"; };
-    show.onerror = () => { show.style.opacity = "0"; if (++failed >= pics.length && !loaded && t.pictures.length) { pics = farmPatterns(); failed = 0; i = 0; } if (!loaded) setTimeout(next, 400); };
-    show.src = pics[i++ % pics.length]; side = 1 - side; };
+  const kaleid = L.fx.includes("kalei");
+  const next = () => {
+    if (!V.el) return;
+    const url = pics[i++ % pics.length], other = V.slots[1 - side], m = mediaFor(url, t, kaleid);
+    letGo(V.slots[side]); V.slots[side].replaceWith(m); V.slots[side] = m;
+    const shown = () => { if (!V.el || !m.isConnected) return; loaded++; m.style.opacity = String(t.picOp); other.style.opacity = "0"; kaleiShow(m, url); setTimeout(() => { if (other.style.opacity === "0") letGo(other); }, 5600); };
+    const bad = () => { m.style.opacity = "0"; if (++failed >= pics.length && !loaded && t.pictures.length) { pics = farmPatterns(); failed = 0; i = 0; } if (!loaded) setTimeout(next, 400); };
+    m.onerror = bad;
+    if (m.tagName === "VIDEO") { m.addEventListener("loadeddata", shown, { once: true }); m.src = url; try { const p = m.play(); if (p && p.catch) p.catch(() => { /* it plays once it's loaded */ }); } catch (e) { /* fine */ } }
+    else { m.onload = shown; m.src = url; }
+    side = 1 - side;
+  };
   next(); V.picT = setInterval(() => { if (pics.length > 1) next(); }, t.picEvery * 1000);
   // subliminal words: one at a time, up and gone, never a strobe
   V.wordT = setInterval(() => { if (Math.random() < 0.85) word(); }, Math.max(2, t.wordEvery) * 1000);
@@ -470,6 +489,7 @@ function place() {
   Object.assign(V.el.style, { left: r.left + "px", top: r.top + "px", width: w + "px", height: r.height + "px" });
   V.el.classList.toggle("calm", calmNow());
   const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1000;
+  V.el.style.setProperty("--R", Math.ceil(Math.hypot(cw, ch) / 2) + "px");   // (the kaleidoscope's reach: to the corners)
   for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei")) if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; V.spun = false; }
   const fc = V.el.querySelector("canvas.face"), fs = Math.max(60, Math.round(Math.min(cw, ch) * 0.28));
   if (fc && fc.width !== fs) { fc.width = fs; fc.height = fs; fc.style.width = fs + "px"; fc.style.height = fs + "px"; }
@@ -559,11 +579,33 @@ function spiral(g, t, alpha, L, calm) {
   }
   g.restore();
 }
-// the kaleidoscope: the picture showin', folded into six, turnin' slow
+// a picture or a silent video for one of the two picture places
+function mediaFor(url, t, hidden) {
+  const vid = isVideo(url), m = W.document.createElement(vid ? "video" : "img");
+  m.className = "pic"; m.style.objectFit = t.fit; if (hidden) m.style.visibility = "hidden";
+  if (vid) { m.muted = true; m.defaultMuted = true; m.loop = true; m.autoplay = true; m.playsInline = true; m.setAttribute("muted", ""); m.setAttribute("playsinline", ""); m.disablePictureInPicture = true; m.preload = "auto"; }
+  else { m.alt = ""; m.referrerPolicy = "no-referrer"; }
+  return m;
+}
+// a video no longer showin': stopped and let go of (so it isn't held in memory)
+function letGo(m) {
+  if (!m || m.tagName !== "VIDEO") return;
+  try { m.pause(); m.removeAttribute("src"); m.load(); } catch (e) { /* fine */ }
+}
+// the kaleidoscope follows the picture showin': a picture (or GIF) goes into the six folded copies; a video is drawn
+function kaleiShow(m, url) {
+  if (!V.el || !fxOn("kalei")) return;
+  const kc = V.el.querySelector(".kaleiC"); if (!kc) return;
+  if (m.tagName === "VIDEO") { V.kv = m; kc.style.opacity = "0"; return; }
+  V.kv = null;
+  for (const im of kc.querySelectorAll("img")) { im.style.objectFit = V.on.t.fit; im.src = url; }
+  kc.style.opacity = String(V.on.t.picOp);
+}
+// the kaleidoscope, drawn: a video showin', folded into six, turnin' slow
 function kalei(t, calm) {
   const kc = V.el.querySelector("canvas.kalei"), g = kc && kc.getContext ? kc.getContext("2d") : null; if (!g) return;
   g.clearRect(0, 0, kc.width, kc.height);
-  const img = Array.from(V.el.querySelectorAll("img.pic")).find((p) => Number(p.style.opacity) > 0 && p.complete && p.naturalWidth);
+  const img = V.kv && V.kv.isConnected && V.kv.readyState >= 2 ? V.kv : null;
   if (!img) return;
   const R = Math.hypot(kc.width, kc.height) / 2, a = calm ? 0 : t * (2 * Math.PI / 40);
   g.save(); g.globalAlpha = V.on.t.picOp; g.translate(kc.width / 2, kc.height / 2);
@@ -921,6 +963,50 @@ const FX_NAMES = { float: "room voices float by", wave: "the farm's voice over t
   face: "a close-up of the face, in the corner", zoom: "the view comin' in close to the face" };
 function maker() { try { const v = JSON.parse(LS.getItem(MAKER_KEY)); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } }
 function keepMaker(m) { try { LS.setItem(MAKER_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } }
+// ── "Test my links" (Laynie, Nov 26: "all four"): each of the crafter's own links tried, and what it does said plainly ──
+const shortLink = (u) => { const s = String(u); return s.length > 60 ? s.slice(0, 40) + "…" + s.slice(-16) : s; };
+export function testLinks(raw, out) {
+  out.textContent = "";
+  const links = String(raw || "").split(/\s+/).filter(Boolean).slice(0, 25);
+  if (!links.length) { out.appendChild(h("div", null, "(no links of your own to test yet)")); return Promise.resolve([]); }
+  return Promise.all(links.map((l) => {
+    const f = fixLink(l), row = h("div", null, "… " + shortLink(l)); out.appendChild(row);
+    if (!f.url) { row.textContent = "✘ " + shortLink(l) + ": " + f.note; return Promise.resolve({ link: l, ok: false }); }
+    return tryLink(f.url).then((r) => { row.textContent = r.icon + " " + shortLink(f.url) + ": " + r.text + (f.note ? " (" + f.note + ")" : ""); return Object.assign({ link: f.url }, r); });
+  }));
+}
+// one link tried: a video loads its first bit; a picture loads, and (where the site lets other pages read it) its own
+// bytes say whether it moves
+export function tryLink(url) {
+  return new Promise((done) => {
+    const vid = isVideo(url), m = W.document.createElement(vid ? "video" : "img");
+    let over = false;
+    const finish = (r) => { if (over) return; over = true; clearTimeout(tm); if (vid) letGo(m); done(r); };
+    const tm = setTimeout(() => finish({ icon: "✘", text: "didn't load in 15 seconds", ok: false }), 15000);
+    if (vid) {
+      m.muted = true; m.preload = "metadata";
+      m.onloadedmetadata = () => finish({ icon: "✔", text: "moves (a silent video" + (m.duration > 0 && m.duration < 3600 ? ", " + Math.max(1, Math.round(m.duration)) + " s loop" : "") + ")", ok: true, moves: true });
+      m.onerror = () => finish({ icon: "✘", text: "didn't load (gone, or the site won't let other pages play it)", ok: false });
+      m.src = url; return;
+    }
+    m.referrerPolicy = "no-referrer";
+    m.onload = () => {
+      movesOf(url).then((a) => finish(a === true ? { icon: "✔", text: "moves", ok: true, moves: true } : a === false ? { icon: "▫", text: "a still picture", ok: true, moves: false }
+        : { icon: "✔", text: "shows (the site won't say whether it moves" + (/\.gif([?#]|$)/i.test(url) ? "; a .gif usually does" : "") + ")", ok: true }));
+    };
+    m.onerror = () => finish({ icon: "✘", text: "didn't load (gone, or the site won't let other pages show it)", ok: false });
+    m.src = url;
+  });
+}
+async function movesOf(url) {
+  try {
+    if (typeof W.fetch !== "function") return null;
+    const ac = typeof W.AbortController === "function" ? new W.AbortController() : null, t = setTimeout(() => { if (ac) ac.abort(); }, 10000);
+    const r = await W.fetch(url, { mode: "cors", referrerPolicy: "no-referrer", signal: ac ? ac.signal : undefined }); clearTimeout(t);
+    if (!r || !r.ok || typeof r.arrayBuffer !== "function") return null;
+    return framesOf(new Uint8Array(await r.arrayBuffer()));
+  } catch (e) { return null; }
+}
 export function visorMakerCards(pctx) {
   const M = Object.assign({ sessions: [], need: 1, show: "crafter", words: "", set: "", own: "", picOp: 0.35, wordEvery: 3, wordOp: 0.45, fit: "cover" }, JSON.parse(JSON.stringify(LOOK_DEFAULTS)), { linesNeed: 5 }, maker());
   const set = (k, v) => { M[k] = v; keepMaker(M); };
@@ -929,10 +1015,19 @@ export function visorMakerCards(pctx) {
   if (!V.lib || Date.now() - V.listAt > 3600000) publicList().then(() => { try { if (pctx.setUi) pctx.setUi({}); } catch (e) { /* fine */ } });
   const list = visorSessions(), sets = Object.keys(V.sets);
   const result = h("div", { class: "fhc-muted" });
+  const ownBox = h("textarea", { rows: 3, cols: 40, placeholder: "my own links, one per line: https://…/spiral.gif, or a GIF site's .mp4", onchange: (e) => set("own", e.target.value) }, M.own || "");
+  const tested = h("div", { class: "fhc-muted" });
+  // own links, fixed where a GIF site's page link can be made into the picture's own address (shared/visor.js fixLink)
+  const fixOwn = () => {
+    const raw = String(M.own || "").split(/\s+/).filter(Boolean), fx = raw.map((l) => Object.assign({ was: l }, fixLink(l)));
+    const fixed = fx.filter((f) => f.url && f.url !== f.was);
+    if (fixed.length) { set("own", fx.map((f) => f.url || f.was).join("\n")); ownBox.value = M.own; }
+    return { fx, fixed };
+  };
   const make = () => {
-    const own = String(M.own || "").split(/\s+/).filter(Boolean);
-    const pictures = M.set === "__own" ? own.filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
-    const skipped = M.set === "__own" ? own.length - pictures.length : 0;
+    const { fx, fixed } = M.set === "__own" ? fixOwn() : { fx: [], fixed: [] };
+    const pictures = M.set === "__own" ? fx.map((f) => f.url).filter(okLink).slice(0, MAX_PICS) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+    const left = fx.filter((f) => !f.url), skipped = left.length;
     const t = normTuning({ sessions: M.sessions, need: M.need, show: M.show, words: M.words, set: M.set === "__own" ? "" : M.set, pictures, picOp: M.picOp, wordEvery: M.wordEvery, wordOp: M.wordOp, fit: M.fit,
       spiral: M.spiral, spin: M.spin, place: M.place, spOp: M.spOp, breathe: M.breathe, drift: M.drift, chat: M.chat, lines: M.lines, linesNeed: M.linesNeed, linesLock: M.linesLock, fx: M.fx,
       pet: M.pet, sink: M.sink });
@@ -942,8 +1037,12 @@ export function visorMakerCards(pctx) {
     result.textContent = "";
     result.appendChild(h("div", { style: { margin: "6px 0", padding: "6px 8px", border: "1px dashed #8a6aa0", borderRadius: "6px", userSelect: "all", fontFamily: "monospace" } }, line));
     result.appendChild(btn("Copy it", () => { try { W.navigator.clipboard.writeText(line); } catch (e) { /* select it by hand */ } }, true));
-    if (M.set === "__own") result.appendChild(h("div", null, pictures.length + " of your links in it" + (skipped ? "; " + skipped + " left out (not a picture's own address: https, and not a web page)" : "") +
-      (pictures.length ? "" : ", so it shows the farm's own patterns") + "."));
+    if (M.set === "__own") {
+      result.appendChild(h("div", null, pictures.length + " of your links in it" + (pictures.filter(isVideo).length ? " (" + pictures.filter(isVideo).length + " of them silent videos)" : "") +
+        (fixed.length ? "; " + fixed.length + " fixed (" + fixed[0].note + (fixed.length > 1 ? ", and more" : "") + ")" : "") + (skipped ? "; " + skipped + " left out" : "") +
+        (pictures.length ? "" : ", so it shows the farm's own patterns") + "."));
+      for (const f of left.slice(0, 4)) result.appendChild(h("div", null, "✘ " + shortLink(f.was) + ": " + f.note));
+    }
     if (pictures.some((u) => /encrypted-tbn\d*\.gstatic\.com/i.test(u))) result.appendChild(h("div", null, "(Those are Google's little search thumbnails: they'll look blurry stretched across the screen. Open the picture itself and Copy image address for the full size.)"));
     result.appendChild(h("div", null, "Craft the visor (any visor, or anything worn over the eyes) and put this line in its description. These settings are locked in by that code: change any of them and you get a new line."));
   };
@@ -957,7 +1056,9 @@ export function visorMakerCards(pctx) {
     h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show))),
     h("div", null, muted("Subliminal words (comma between):"), h("input", { value: M.words, size: 40, placeholder: "good cow, empty, deeper", onchange: (e) => set("words", e.target.value) })),
     h("div", null, muted("Pictures:"), h("select", { onchange: (e) => set("set", e.target.value) }, opt("", "the farm's own patterns", M.set), sets.map((n) => opt(n, n + " (the farm's set)", M.set)), opt("__own", "my own links", M.set)),
-      h("textarea", { rows: 3, cols: 40, placeholder: "my own links, one per line: https://…/spiral.gif", onchange: (e) => set("own", e.target.value) }, M.own || "")),
+      ownBox,
+      h("div", null, btn("Test my links", () => { fixOwn(); testLinks(M.own, tested); }), muted(" GIFs and silent videos (.mp4, .webm) move; a GIF site's page link gets fixed where it can be.")),
+      tested),
     h("div", null, muted("How strong:"),
       h("select", { title: "how see-through the pictures are", onchange: (e) => set("picOp", Number(e.target.value)) }, [0.2, 0.35, 0.5, 0.65].map((v) => opt(v, "pictures " + Math.round(v * 100) + "%", M.picOp))),
       h("select", { title: "how often a word shows", onchange: (e) => set("wordEvery", Number(e.target.value)) }, [2, 3, 4, 6].map((v) => opt(v, "a word every " + v + " s", M.wordEvery))),

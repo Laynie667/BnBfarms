@@ -9,7 +9,7 @@
    another; the code proves it's the right one.
    In the crafted item's description (200 characters at most):   farm visor: #k7f2a9q1 · 2 sessions
    Safety: words fade in and out, never strobe (at most one every 2 seconds, shown under a second, never bright);
-   pictures are only links straight to a picture (https, .png .jpg .gif .webp).
+   pictures are only links straight to a picture (https, .png .jpg .gif .webp), or a silent video (.mp4 .webm, muted).
 */
 
 export const VISOR_RE = /farm visor:\s*#([a-z0-9]{6,12})/i;
@@ -23,8 +23,45 @@ const str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(
 // a picture's own address: any https link (Nov 25: Laynie's were Google image links, with no .jpg on the end), only never
 // one that's plainly a page or a file of some other kind. It's only ever shown as a picture, so it can't run anythin'; one
 // that isn't a picture just doesn't show.
+// (Nov 26, Laynie: "is there a way to make animated gifs work for the visor?" and "all four": most GIF sites send a silent
+// video now, so a link straight to an .mp4 or .webm counts too; it plays muted and loopin', never a sound.)
 export const okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) &&
-  !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
+  !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
+export const isVideo = (u) => /\.(mp4|webm)([?#]|$)/i.test(String(u || ""));
+// a link pasted from a GIF site, made into the picture's own address where that can be worked out; where it can't, a
+// plain word on what to copy instead. { url: "" when it can't be used, note }
+export function fixLink(raw) {
+  let u = String(raw || "").trim(), m;
+  if (!u) return { url: "", note: "" };
+  if (/^http:\/\//i.test(u)) u = "https://" + u.slice(7);
+  if ((m = /^https:\/\/(?:www\.)?giphy\.com\/(?:gifs|stickers|embed)\/(?:[^/?#]*-)?([A-Za-z0-9]+)(?:[/?#].*)?$/i.exec(u))) return { url: "https://media.giphy.com/media/" + m[1] + "/giphy.gif", note: "a Giphy page, made into its GIF" };
+  if ((m = /^(https:\/\/i\.imgur\.com\/[A-Za-z0-9]+)\.gifv(?:[?#].*)?$/i.exec(u))) return { url: m[1] + ".mp4", note: "Imgur's .gifv is a page, made into its video" };
+  if ((m = /^https:\/\/(?:www\.)?google\.[a-z.]+\/(?:imgres|url)\?(?:[^#]*?&)?(?:imgurl|url)=([^&#]+)/i.exec(u))) {
+    let inner = ""; try { inner = decodeURIComponent(m[1]); } catch (e) { inner = ""; }
+    if (okLink(inner)) return { url: inner, note: "a Google link, made into the picture's own address" };
+    return { url: "", note: "a Google page: open the picture itself, right-click it, Copy image address" };
+  }
+  if (/^https:\/\/(?:www\.)?tenor\.com\/(?:[a-z-]+\/)?view\//i.test(u)) return { url: "", note: "a Tenor page: right-click the GIF, Copy image address (it starts media.tenor.com)" };
+  if (/^https:\/\/(?:www\.|v3\.)?redgifs\.com\/(?:watch|ifr)\//i.test(u)) return { url: "", note: "a RedGIFs page: right-click the video, Copy video address (an .mp4 link)" };
+  if (/^https:\/\/(?:www\.)?imgur\.com\/(?:a|gallery|t)\//i.test(u)) return { url: "", note: "an Imgur album page: open the picture, right-click it, Copy image address (it starts i.imgur.com)" };
+  if (/^https:\/\/(?:www\.|old\.|new\.)?reddit\.com\//i.test(u)) return { url: "", note: "a Reddit page: open the picture, right-click it, Copy image address (it starts i.redd.it)" };
+  if (/^https:\/\/v\.redd\.it\//i.test(u)) return { url: "", note: "Reddit's own videos can't be linked straight to; use a GIF or an .mp4 from somewhere else" };
+  if (!okLink(u)) return { url: "", note: "not a picture's own address (it has to be https, and not a web page)" };
+  if (/encrypted-tbn\d*\.gstatic\.com/i.test(u)) return { url: u, note: "Google's little search thumbnail: always a still picture, and blurry full-screen" };
+  if (/(?:cdn|media)\.discordapp\.(?:com|net)\/attachments\//i.test(u)) return { url: u, note: "a Discord link: those stop working after a day or so" };
+  return { url: u, note: "" };
+}
+// does a picture move: what its own bytes say (a GIF with more than one frame, an animated WebP or PNG); null when it
+// can't tell
+export function framesOf(b) {
+  if (!b || !b.length) return null;
+  const at = (i, s) => { for (let k = 0; k < s.length; k++) if (b[i + k] !== s.charCodeAt(k)) return false; return true; };
+  if (at(0, "GIF8")) { let n = 0; for (let i = 0; i < b.length - 2 && n < 2; i++) if (b[i] === 0x21 && b[i + 1] === 0xf9 && b[i + 2] === 0x04) n++; return n >= 2; }
+  if (at(0, "RIFF") && at(8, "WEBP")) { for (let i = 12; i <= Math.min(b.length - 4, 4096); i++) if (at(i, "ANIM")) return true; return false; }
+  if (b[0] === 0x89 && at(1, "PNG")) { for (let i = 8; i <= b.length - 4; i++) { if (at(i, "acTL")) return true; if (at(i, "IDAT")) return false; } return false; }
+  if (b[0] === 0xff && b[1] === 0xd8) return false;   // (a JPEG never moves)
+  return null;
+}
 
 // THE LOOK (Nov 25, Laynie: "i love those, so yes please", "More effects too… similar to HSC", "the close up effect of the
 // face"): the spiral, what happens in the chat, the lines to write, and the extra effects. Each is kept only when it

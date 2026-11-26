@@ -15,8 +15,8 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(n.need === 5 && n.wordEvery === 2 && n.wordMs === 500 && n.wordOp === 0.6 && n.picOp === 0.8, 'every setting kept inside its limits: words never more than one every 2 s, never under half a second, never bright');
   ok(n.pictures.join() === 'https://x.example/a.gif,https://x.example/c.webp?s=2' && n.words.join('|') === 'good cow|empty sneaky|deeper' && n.sessions[1].length === 60, '...only links to a picture (never http, a page or a script); no brackets in the words');
   const g = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2MIN2PftY8L9tfwlki_pB0cg8NcK_NEKJpuY5pBR2XA&s=10';
-  ok(V.okLink(g) && V.okLink('https://i.imgur.com/abc123') && !V.okLink('https://x.example/movie.mp4') && !V.okLink('https://x.example/"onerror=x.gif'),
-    'a picture\'s own address with nothin\' on the end counts (Laynie\'s Google image links, Nov 25); videos and anything with quotes never');
+  ok(V.okLink(g) && V.okLink('https://i.imgur.com/abc123') && V.okLink('https://x.example/movie.mp4') && !V.okLink('https://x.example/movie.mov') && !V.okLink('https://x.example/"onerror=x.gif'),
+    'a picture\'s own address with nothin\' on the end counts (Laynie\'s Google image links, Nov 25); a silent .mp4 too (Nov 26); a .mov, or anything with quotes, never');
   const T1 = { sessions: ['For Visors'], need: 2, show: 'crafter', words: ['good cow', 'empty'], pictures: ['https://x.example/a.gif'] };
   const code = V.tuningCode(T1);
   ok(/^[a-z0-9]{8}$/.test(code) && V.tuningCode(JSON.parse(JSON.stringify(T1))) === code && V.tuningCode(Object.assign({}, T1, { need: 3 })) !== code && V.tuningCode(Object.assign({}, T1, { words: ['good cow'] })) !== code,

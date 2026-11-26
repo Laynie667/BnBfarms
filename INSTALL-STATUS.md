@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.6.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.7.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.87.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.88.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.88.0 + Conditioning 2.7.0: movin' pictures in the visor: GIFs and silent videos, a link fixer, a kaleidoscope that keeps them movin', and Test my links** Laynie, Nov 26: "is there a way to make animated gifs work for the visor?", then "all four".
+  - **Silent videos count as pictures**: a link straight to an .mp4 or .webm plays muted and loopin' in the picture's place, see-through like any picture, never a sound and no controls. Most GIF sites send video now (Giphy, Tenor, Imgur, RedGIFs), so this is what makes most of them move. Only the one showin' plays; the one that's faded out is stopped and let go of, so it stays light.
+  - **The link fixer** (the Visor maker and the studio's picture sets): a Giphy page or embed link is made into its GIF, an Imgur .gifv into its video, a Google image-result link into the picture's own address. A link it can't work out (a Tenor or RedGIFs page, an Imgur album, a Reddit page) is left out with a plain word on what to copy instead, and Google thumbnails (always still) and Discord links (they stop working) get a warnin'. Their own list in the maker is fixed for them.
+  - **The kaleidoscope keeps them movin'**: it's now six folded copies of the picture itself, so a GIF keeps movin' in every fold (a canvas only ever gets a GIF's first frame). A video's drawn from its own frames instead (six videos at once would be too heavy).
+  - **Test my links** in the Visor maker: each of their own links tried, and said plainly: ✔ moves, ▫ a still picture, ✔ shows (where the site won't say whether it moves), or ✘ didn't load, and why.
+  - The studio's picture picker shows .mp4 and .webm files from `public/visor/pictures/` too.
 
 - **Companion 0.87.1: turn a farm visor back on without takin' it off** Laynie, Nov 26: "need to add a action on the visors so can turn it back on if they want, without re equipping." While a farm visor's worn but switched off (its 👁 icon, or the safeword), a small dim 🌀 sits in the same corner of the room: click it, or type `/visor on`, and it takes hold again. It's always the wearer's own choice; nothin' asks them to. In the Dispensary's hardcore it still comes back by itself at the next log-in or room change, and this lets them bring it back sooner. With "Farm visors" switched off there's no 🌀.
 

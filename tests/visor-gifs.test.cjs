@@ -30,6 +30,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   // ── a game page ──
   const page = new JSDOM('<!doctype html><html><head></head><body><canvas id="MainCanvas" width="2000" height="1000"></canvas><div id="TextAreaChatLog"></div></body></html>', { url: 'https://www.bondageprojects.elementfx.com/R134/BondageClub/' });
   const W = page.window; global.window = W; global.document = W.document;
+  W.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/webp;base64,AAAA';
   W.HTMLCanvasElement.prototype.getContext = function () { const cv = this; return new Proxy({}, { get: (o, k) => (k === 'canvas' ? cv : k === 'measureText' ? () => ({ width: 10 }) : () => {}), set: () => true }); };
   // (stand-ins for the browser loadin' pictures and videos: a link with "missing" in it never loads)
   const played = [], letGo = [];

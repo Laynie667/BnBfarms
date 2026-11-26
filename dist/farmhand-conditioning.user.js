@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      2.7.0
+// @version      2.8.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2269,8 +2269,10 @@ wake: any
   var SPINS = ["slow", "slower", "still"];
   var PLACES = ["behind", "over", "both"];
   var CHAT_FX = ["whisper", "melt", "fade", "watermark"];
-  var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
-  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+  var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom", "after"];
+  var SHOWS = ["crafter", "wearer", "loom", "eyes"];
+  var FEEDS = ["", "keys", "all"];
+  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false, feed: "" };
   var petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
   function normTuning(t) {
     t = t && typeof t === "object" ? t : {};
@@ -2291,6 +2293,7 @@ wake: any
     keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
     keep("pet", petName(t.pet));
     keep("sink", !!t.sink);
+    keep("feed", FEEDS.includes(t.feed) ? t.feed : "");
     return out;
   }
   function base(t, list2) {
@@ -2298,7 +2301,7 @@ wake: any
       v: 1,
       sessions: list2(t.sessions, MAX_SESSIONS, 60),
       need: Math.round(clamp(t.need, 0, MAX_NEED, 1)),
-      show: t.show === "wearer" ? "wearer" : "crafter",
+      show: SHOWS.includes(t.show) ? t.show : "crafter",
       words: list2(t.words, MAX_WORDS, 24),
       set: str(t.set, 40),
       pictures: (Array.isArray(t.pictures) ? t.pictures : []).filter(okLink).slice(0, MAX_PICS),
@@ -3117,7 +3120,7 @@ wake: any
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "2.7.0",
+    version: "2.8.0",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
     setup(a) {

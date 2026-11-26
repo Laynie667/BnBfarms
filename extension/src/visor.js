@@ -28,6 +28,11 @@
      a pet name (their name in the room while it holds, and their trigger), the visor comin' back on its own (hardcore:
      the icon holds it off only till they next log in or join a room), an afterimage after it comes off, and the
      sinkin' (stronger the more hours it's worn). Their safeword ends all of it and gives their own name back.
+     (Nov 26: the afterimage is the crafter's pick now, and any wearer can switch afterimages off.)
+   • THE ROOM'S SIDE (Nov 26, 5-8): others see a glow over their eyes, how deep, and their lines tinted; now and then a
+     line about them as their own emote; a 👁 to peek into their visor (and feed a word, if the crafter lets them); a herd
+     trance for everybody in the room wearin' the same visor; the crafter towerin' over them, or their face in the spiral.
+   • MOVIN' PICTURES (Nov 26): GIFs, silent videos (.mp4 .webm), a link fixer, Test my links, a kaleidoscope that keeps them movin'.
 */
 import { LS, onAccount } from "./acct.js";
 import { BOT_MEMBER } from "./config.js";
@@ -45,12 +50,13 @@ const LOAD_ID = Math.random().toString(36).slice(2, 10);   // (this page load: a
 let ctx = null;   // { toBot, toChat, prefs(), botHere(), mod }
 const V = { lib: null, sets: {}, listAt: 0, listFrom: "", cache: {}, done: {}, lines: {}, on: null, off: {}, unlocked: {}, asked: {}, run: null, el: null, timers: [], ivs: [], wordT: null, picT: null, drawT: null,
   raf: 0, lastF: 0, lastB: 0, spun: false, depth: 0, geo: null, obs: null, obsOn: null, wm: null, L: null,
-  name: null, nameBack: "", nameAt: 0, dropAt: 0, after: null, afterEl: null, afterT: null, hours: {}, hourAt: 0, hoursAt: 0, joins: 0, room: "", miss: 0, fed: [] };
+  name: null, nameBack: "", nameAt: 0, dropAt: 0, after: null, afterEl: null, afterT: null, hours: {}, hourAt: 0, hoursAt: 0, joins: 0, room: "", miss: 0, fed: [],
+  likes: {}, likeImg: {}, likeAt: {}, rv: {}, peekers: {}, peek: null, given: [], feedAt: {}, saidKey: "", saidAt: 0, emoteAt: 0, picNow: "", wordNow: "", lineNow: "", viewKey: {}, herdT: 0 };
 
 export function initVisor(c) {
   ctx = c;
   load();
-  onAccount(() => { stop(true); V.unlocked = {}; load(); afterDraw(); });
+  onAccount(() => { stop(true); closePeek(); V.rv = {}; V.unlocked = {}; load(); afterDraw(); });
   onTranceEnd(() => safeword("🌀 The visor lets go of you."));   // the safeword (the farm's, or LSCG's)
   // the game's own safeword ends it too, always
   const mod = ctx.mod;
@@ -98,6 +104,11 @@ export function initVisor(c) {
     } catch (e) { console.warn("[Farmhand Companion] visor voices:", e); }
   };
   reg();
+  // the room's side: a glow, how deep and a 👁 over somebody under a visor, on your screen; a click on the 👁 peeks in
+  if (mod) {
+    try { mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 0, (args, next) => { const r = next(args); try { drawOver(args[0], args[1], args[2], args[3]); } catch (e) { /* never break the game's drawin' */ } return r; }); } catch (e) { /* an older game */ }
+    try { mod.hookFunction("ChatRoomCharacterViewClickCharacter", 0, (args, next) => { try { if (clickOver(args[0], args[4], args[5])) return; } catch (e) { /* fine */ } return next(args); }); } catch (e) { /* an older game */ }
+  }
   setInterval(check, 2000);
   setTimeout(publicList, 4000);
 }
@@ -116,7 +127,7 @@ function load() {
   try { const d = JSON.parse(LS.getItem(DONE_KEY)); V.done = d && typeof d === "object" ? d : {}; } catch (e) { V.done = {}; }
   try { const l = JSON.parse(LS.getItem(LINES_KEY)); V.lines = l && typeof l === "object" ? l : {}; } catch (e) { V.lines = {}; }
   const obj = (k) => { try { const v = JSON.parse(LS.getItem(k)); return v && typeof v === "object" ? v : null; } catch (e) { return null; } };
-  V.name = obj(NAME_KEY); V.after = obj(AFTER_KEY); V.hours = obj(HOURS_KEY) || {}; V.off = obj(OFF_KEY) || {};
+  V.name = obj(NAME_KEY); V.after = obj(AFTER_KEY); V.hours = obj(HOURS_KEY) || {}; V.off = obj(OFF_KEY) || {}; V.likes = obj(LIKE_KEY) || {}; V.likeImg = {};
   if (V.name && !V.name.pet) V.name = null;
 }
 const keepJson = (k, v) => { try { if (v == null) LS.removeItem(k); else LS.setItem(k, JSON.stringify(v)); } catch (e) { /* fine */ } };
@@ -167,10 +178,12 @@ export function check() {
       if (V.name) giveName("🌀 Farm visors are switched off for you: your own name comes back.");
       if (V.after) { V.after = null; keepAfter(); afterDraw(); }
       onIcon(null);
+      roomTick();
       return;
     }
     visorCheck();
     nameTick(); afterTick();
+    roomTick();
   } catch (e) { console.warn("[Farmhand Companion] visor:", e); }
 }
 function visorCheck() {
@@ -243,6 +256,7 @@ export function onVisorMsg(m) {
   if (!m || !m.from) return;
   const me = W.Player && W.Player.MemberNumber;
   if (m.from === me) return;
+  if (/^visor(State|Herd|Peek|View|Feed|Fed)$/.test(m.type)) { try { roomMsg(m); } catch (e) { console.warn("[Farmhand Companion] visor room:", e); } return; }   // (the room's side)
   const code = String(m.code || "").toLowerCase();
   if (m.type === "visorTune") { if (remember(code, m.t)) check(); return; }
   if (m.type === "visorAsk") { if (V.cache[code] && !isBot()) setTimeout(() => { try { W.ServerSend("ChatRoomChat", makeMsg("visorTune", { code, t: V.cache[code] }, m.from)); } catch (e) { /* fine */ } }, 300 + Math.random() * 1200); return; }
@@ -326,11 +340,12 @@ function start(w, t, back) {
   linesAsk();
   later(nextSession, back ? 1500 : 5000);
 }
-// it comes off (taken off, or the icon): the name hangs on a while, and so does an afterimage
+// it comes off (taken off, or the icon): the name hangs on a while, and so does an afterimage (if the crafter picked one)
 function off(say) {
   const was = V.on; if (!was) return;
   stop(false, say);
-  nameAfter(was); afterStart(was);
+  nameAfter(was);
+  if (lookOf(was.t).fx.includes("after") && !noAfter()) afterStart(was);
 }
 // writin' lines: what to write, and how many are left
 function linesAsk() {
@@ -342,8 +357,11 @@ function linesAsk() {
 export function stop(quiet, say) {
   const was = V.on;
   for (const x of V.timers) clearTimeout(x); V.timers = [];
+  clearTimeout(V.herdT); V.peekers = {}; V.viewKey = {}; V.given = [];
   unbuild();
-  if (V.run) { V.run = null; try { onHypno({ do: "wake" }); } catch (e) { /* fine */ } }
+  // (a trance the visor itself started, still goin' as it comes off, even in the moments after a session ends: woken)
+  if (V.run || (V.mine && tranceState.session === V.mine)) { V.run = null; try { onHypno({ do: "wake" }); } catch (e) { /* fine */ } }
+  V.mine = null;
   if (was && V.hours[was.code]) keepHours();
   V.on = null; V.depth = 0; V.geo = null; V.L = null;
   afterDraw();
@@ -368,7 +386,17 @@ function css() {
   s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}" +
     "#fhc-visor>*{position:absolute;pointer-events:none}" +
     "#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}" +
-    "#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}" +
+    "#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei,#fhc-visor .eyes{left:0;top:0;width:100%;height:100%}" +
+    // the room's side (Nov 26): somebody else's visor, peeked into
+    "#fhc-peek{position:fixed;z-index:9993;width:280px;background:#120a19;border:1px solid rgba(198,139,230,.55);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.6);color:#ecd9f6;font:13px system-ui,sans-serif;overflow:hidden}" +
+    "#fhc-peek .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(60,30,80,.6)}#fhc-peek .hd button{background:none;border:0;color:#ecd9f6;cursor:pointer;font-size:14px}" +
+    "#fhc-peek .st{position:relative;height:300px;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%)}#fhc-peek .st>*{position:absolute}" +
+    "#fhc-peek .pic{left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:.35}#fhc-peek canvas{left:0;top:0;width:100%;height:100%}" +
+    "#fhc-peek .w{left:0;right:0;top:40%;text-align:center;font:600 1.1rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;animation:fhcSub 900ms ease-in-out forwards}" +
+    "#fhc-peek .ln{left:6px;right:6px;bottom:6px;font:italic 12px Georgia,serif;color:rgba(232,200,250,.9);text-shadow:0 0 4px #000}" +
+    "#fhc-peek .dp{right:6px;top:6px;font:600 11px system-ui,sans-serif;color:#f2c6ea}" +
+    "#fhc-peek .fd{display:flex;gap:4px;padding:6px}#fhc-peek .fd input{flex:1;min-width:0;background:#0d0812;border:1px solid #45354f;border-radius:5px;color:#ecd9f6;padding:3px 6px}#fhc-peek .fd button{background:#2b1d38;border:1px solid #45354f;border-radius:5px;color:#ecd9f6;cursor:pointer}" +
+    "#fhc-peek .nt{padding:0 8px 6px;color:#a993b6;font-size:11px}" +
     "#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}" +
     "#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei,#fhc-visor.warp>.kaleiC{filter:url(#fhc-warpf)}" +
     "#fhc-visor .kaleiC{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 3s;animation:fhcSpin 40s linear infinite}#fhc-visor.calm .kaleiC{animation:none}" +
@@ -438,6 +466,7 @@ function build() {
   }
   if (L.spiral !== "none" && L.place !== "over") add("canvas", "spin");
   const cv = add("canvas", "body"); if (L.fx.includes("aura")) cv.classList.add("aura");
+  if (t.show === "eyes") add("canvas", "eyes");   // (the crafter's face in the middle of the spiral, faint, over them: watchin')
   if (L.spiral !== "none" && L.place !== "behind") add("canvas", "spinO");
   if (L.fx.includes("crowd")) add("div", "crowd").innerHTML = crowdSvg();
   if (L.fx.includes("tunnel")) add("div", "vig");
@@ -460,7 +489,7 @@ function build() {
     if (!V.el) return;
     const url = pics[i++ % pics.length], other = V.slots[1 - side], m = mediaFor(url, t, kaleid);
     letGo(V.slots[side]); V.slots[side].replaceWith(m); V.slots[side] = m;
-    const shown = () => { if (!V.el || !m.isConnected) return; loaded++; m.style.opacity = String(t.picOp); other.style.opacity = "0"; kaleiShow(m, url); setTimeout(() => { if (other.style.opacity === "0") letGo(other); }, 5600); };
+    const shown = () => { if (!V.el || !m.isConnected) return; loaded++; m.style.opacity = String(t.picOp); other.style.opacity = "0"; kaleiShow(m, url); V.picNow = /^data:/.test(url) ? "farm:" + Math.max(0, farmPatterns().indexOf(url)) : url; setTimeout(() => { if (other.style.opacity === "0") letGo(other); }, 5600); };
     const bad = () => { m.style.opacity = "0"; if (++failed >= pics.length && !loaded && t.pictures.length) { pics = farmPatterns(); failed = 0; i = 0; } if (!loaded) setTimeout(next, 400); };
     m.onerror = bad;
     if (m.tagName === "VIDEO") { m.addEventListener("loadeddata", shown, { once: true }); m.src = url; try { const p = m.play(); if (p && p.catch) p.catch(() => { /* it plays once it's loaded */ }); } catch (e) { /* fine */ } }
@@ -490,7 +519,7 @@ function place() {
   V.el.classList.toggle("calm", calmNow());
   const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1000;
   V.el.style.setProperty("--R", Math.ceil(Math.hypot(cw, ch) / 2) + "px");   // (the kaleidoscope's reach: to the corners)
-  for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei")) if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; V.spun = false; }
+  for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei,canvas.eyes")) if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; V.spun = false; }
   const fc = V.el.querySelector("canvas.face"), fs = Math.max(60, Math.round(Math.min(cw, ch) * 0.28));
   if (fc && fc.width !== fs) { fc.width = fs; fc.height = fs; fc.style.width = fs + "px"; fc.style.height = fs + "px"; }
   if (V.wm) {
@@ -523,27 +552,101 @@ function bodyRect(src) {
   const up = src.height > 1000 ? Math.max(0, src.height - 1150) : 0, sy = Math.max(0, up - 120);
   return { up, sx: 0, sy, sw: src.width, sh: Math.min(src.height - sy, up + 1000 - sy) };
 }
+// a body to draw, from a character's own canvas: where it is on that canvas, and where its face is
+function figOf(C) {
+  if (C && !C.Canvas && typeof W.CharacterLoadCanvas === "function") { try { W.CharacterLoadCanvas(C); } catch (e) { /* fine */ } }
+  const src = C && C.Canvas; if (!src || !src.width || !src.height) return null;
+  const R = bodyRect(src);
+  return { src, sx: 0, sy: R.sy, sw: R.sw, sh: R.sh, fx: src.width / 2, fy: R.up + 145, top: R.up - 20, u: 1 };
+}
+// one body drawn hh tall at dx,dy (z: how far the view's come in to its face); where its face ended up on screen
+function drawFig(g, f, dx, dy, hh, z) {
+  z = z || 0;
+  const fh = Math.min(360 * f.u, f.sh), fw = fh * f.sw / f.sh, fx0 = f.fx - fw / 2, fy0 = Math.max(f.sy, f.fy - fh / 2);
+  const sx = f.sx + (fx0 - f.sx) * z, sy = f.sy + (fy0 - f.sy) * z, sw = f.sw + (fw - f.sw) * z, sh = f.sh + (fh - f.sh) * z;
+  const ww = hh * f.sw / f.sh, k = hh / sh;
+  try { g.drawImage(f.src, sx, sy, sw, sh, dx, dy, ww, hh); } catch (e) { /* not drawn yet */ }
+  return { faceX: dx + (f.fx - sx) * k, faceY: dy + (f.fy - sy) * k, top: dy + (f.top - sy) * k, k };
+}
+const faceOf = (g, f, x, y, w, h) => { try { g.drawImage(f.src, f.fx - 105 * f.u, f.fy - 105 * f.u, 210 * f.u, 210 * f.u, x, y, w, h); } catch (e) { /* fine */ } };
+const myMn = () => Number(W.Player && W.Player.MemberNumber) || 0;
 function drawBody(t) {
   if (!V.el || !V.on) return;
   const cv = V.el.querySelector("canvas.body"), g = cv && cv.getContext ? cv.getContext("2d") : null; if (!g) return;
-  const C = (V.on.t.show === "crafter" && charOf(V.on.crafter)) || W.Player;
-  if (C && !C.Canvas && typeof W.CharacterLoadCanvas === "function") { try { W.CharacterLoadCanvas(C); } catch (e) { /* fine */ } }
   g.clearRect(0, 0, cv.width, cv.height);
-  const src = C && C.Canvas; if (!src || !src.width || !src.height) return;
-  const R = bodyRect(src), L = look(), faceY = R.up + 145;
-  // the view comin' in close to the face and back out, slow (closer the deeper they've gone)
-  let z = 0;
-  if (L.fx.includes("zoom")) z = (calmNow() ? 0.5 : 0.5 - 0.5 * Math.cos(2 * Math.PI * (t || 0) / 60)) * (0.3 + 0.6 * V.depth);
-  const fh = Math.min(360, R.sh), fw = fh * R.sw / R.sh, fx0 = src.width / 2 - fw / 2, fy = Math.max(R.sy, faceY - fh / 2);
-  const sx = R.sx + (fx0 - R.sx) * z, sy = R.sy + (fy - R.sy) * z, sw = R.sw + (fw - R.sw) * z, sh = R.sh + (fh - R.sh) * z;
-  const hh = cv.height * 0.96, ww = hh * R.sw / R.sh, dx = (cv.width - ww) / 2, dy = cv.height - hh;
-  try { g.drawImage(src, sx, sy, sw, sh, dx, dy, ww, hh); } catch (e) { /* not drawn yet */ }
-  // where the face is on screen now (for the breath, and the voice over the head)
-  const k = hh / sh;
-  V.geo = { faceX: dx + (src.width / 2 - sx) * k, faceY: dy + (faceY - sy) * k, top: dy + (R.up - 20 - sy) * k, k };
-  // the close-up: their face in a soft circle, up in the corner
+  const L = look(), show = V.on.t.show, me = figOf(W.Player), H = cv.height, mates = herdMates();
+  let main = null, geo = null;
+  if (mates.length) {
+    // the herd: everybody wearin' this visor in the room, side by side in each other's dark
+    const figs = [myMn()].concat(mates).sort((a, b) => a - b).map((mn) => ({ mn, f: mn === myMn() ? me : figOf(charOf(mn)) })).filter((x) => x.f).slice(0, 5);
+    const slot = cv.width / Math.max(1, figs.length);
+    for (const x of figs) {
+      const hh = Math.min(H * 0.9, slot * 0.98 * x.f.sh / x.f.sw), ww = hh * x.f.sw / x.f.sh, i = figs.indexOf(x);
+      const gg = drawFig(g, x.f, i * slot + (slot - ww) / 2, H - hh, hh, 0);
+      if (x.mn === myMn()) geo = gg;
+    }
+    main = me;
+  } else {
+    // the crafter's body, or their own; the crafter towerin' over them; or their own with the crafter's face in the spiral
+    const cr = show === "wearer" || show === "eyes" ? null : crafterFig();
+    main = cr || me;
+    if (!main) return;
+    let z = 0;
+    if (L.fx.includes("zoom")) z = (calmNow() ? 0.5 : 0.5 - 0.5 * Math.cos(2 * Math.PI * (t || 0) / 60)) * (0.3 + 0.6 * V.depth);
+    const hh = H * 0.96, ww = hh * main.sw / main.sh;
+    geo = drawFig(g, main, (cv.width - ww) / 2, H - hh, hh, z);
+    if (show === "loom" && cr && me) {   // (them, small, kneelin' at the crafter's feet, in front)
+      const h2 = H * 0.34;
+      geo = drawFig(g, me, cv.width / 2 + ww * 0.06, H - h2, h2, 0);
+    }
+  }
+  V.geo = geo;
+  // the close-up: a face in a soft circle, up in the corner
   const fc = V.el.querySelector("canvas.face"), fg = fc && fc.getContext ? fc.getContext("2d") : null;
-  if (fg) { fg.clearRect(0, 0, fc.width, fc.height); try { fg.drawImage(src, src.width / 2 - 105, R.up + 40, 210, 210, 0, 0, fc.width, fc.height); } catch (e) { /* fine */ } }
+  if (fg && main) { fg.clearRect(0, 0, fc.width, fc.height); faceOf(fg, main, 0, 0, fc.width, fc.height); }
+  // the crafter's face in the middle of the spiral, watchin' them
+  const ec = V.el.querySelector("canvas.eyes"), eg = ec && ec.getContext ? ec.getContext("2d") : null;
+  if (eg) { eg.clearRect(0, 0, ec.width, ec.height); const cf = crafterFig(); if (cf) eyesDraw(eg, ec, cf, t); }
+}
+function eyesDraw(g, c, f, t) {
+  const r = Math.min(c.width, c.height) * 0.3, cx = c.width / 2, cy = c.height * 0.45, a = calmNow() ? 0.32 : 0.26 + 0.08 * Math.sin(2 * Math.PI * (t || 0) / 8);
+  g.save(); g.globalAlpha = a; faceOf(g, f, cx - r, cy - r, r * 2, r * 2); g.restore();
+  // soft edges, fadin' into the dark
+  g.save(); g.globalCompositeOperation = "destination-in";
+  const gr = g.createRadialGradient(cx, cy, r * 0.45, cx, cy, r);
+  gr.addColorStop(0, "rgba(0,0,0,1)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height); g.restore();
+}
+// the crafter's body: from them when they're in the room (a small likeness kept now and then), from that likeness when
+// they aren't. Kept on this computer only, three crafters at most.
+const LIKE_KEY = "fhc-visor-likeness";
+function crafterFig() {
+  const C = charOf(V.on.crafter);
+  if (C) { const f = figOf(C); if (f) { keepLikeness(V.on.crafter, f); return f; } }
+  return likenessFig(V.on.crafter);
+}
+function keepLikeness(mn, f) {
+  const now = Date.now(); if (now - (V.likeAt[mn] || 0) < 120000) return;
+  V.likeAt[mn] = now;
+  try {
+    const k = 0.5, c = W.document.createElement("canvas"); c.width = Math.round(f.sw * k); c.height = Math.round(f.sh * k);
+    const g = c.getContext("2d"); if (!g) return;
+    g.drawImage(f.src, f.sx, f.sy, f.sw, f.sh, 0, 0, c.width, c.height);
+    let data = ""; try { data = c.toDataURL("image/webp", 0.8); } catch (e) { return; }   // (a picture from another site in their look: can't be kept)
+    if (typeof data !== "string" || !/^data:image\/(webp|png|jpeg)/.test(data) || data.length > 400000) return;
+    V.likes[mn] = { at: now, data, fx: (f.fx - f.sx) * k, fy: (f.fy - f.sy) * k, top: (f.top - f.sy) * k, u: k * f.u };
+    const keys = Object.keys(V.likes).sort((a, b) => V.likes[b].at - V.likes[a].at);
+    for (const x of keys.slice(3)) delete V.likes[x];
+    delete V.likeImg[mn];
+    try { LS.setItem(LIKE_KEY, JSON.stringify(V.likes)); } catch (e) { /* full: kept till the page closes */ }
+  } catch (e) { /* fine */ }
+}
+function likenessFig(mn) {
+  const e = V.likes[mn]; if (!e || !e.data) return null;
+  let img = V.likeImg[mn];
+  if (!img) { img = V.likeImg[mn] = W.document.createElement("img"); img.src = e.data; }
+  if (!img.complete || !img.naturalWidth) return null;
+  return { src: img, sx: 0, sy: 0, sw: img.naturalWidth, sh: img.naturalHeight, fx: e.fx, fy: e.fy, top: e.top, u: e.u };
 }
 // ── the spirals: behind the body, over it faint, or both; at their fastest a turn every 14 seconds ──
 const SPEED = { still: 0, slower: 2 * Math.PI / 30, slow: 2 * Math.PI / 14 };
@@ -689,7 +792,8 @@ function spiralMark() {
 }
 function word() {
   if (!V.el) return;
-  const w = W.document.createElement("div"); w.className = "sub"; w.textContent = V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
+  const w = W.document.createElement("div"); w.className = "sub"; w.textContent = V.given.length ? V.given.shift() : V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
+  V.wordNow = w.textContent; V.wordAt = Date.now();
   w.style.left = (15 + Math.random() * 45) + "%"; w.style.top = (18 + Math.random() * 55) + "%";
   V.el.appendChild(w); setTimeout(() => w.remove(), V.el.classList.contains("calm") ? 9500 : V.on.t.wordMs + 200);
 }
@@ -739,6 +843,9 @@ export function fitLine(line, b) {
 function nextSession() {
   if (!V.on || V.run) return;
   if (tranceState.session) { later(nextSession, 60000); return; }   // (the farm's runnin' a session on you: the visor waits its turn)
+  // a herd (others in the room wearin' this very visor): the one with the lowest number leads, the rest follow its lines
+  const mates = herdMates();
+  if (mates.length && Math.min.apply(null, mates) < myMn()) { later(nextSession, 20000); return; }
   const lib = library(), blocks = lib.blocks.filter((b) => !b.bad && (VISOR_KINDS.includes(b.kind) || (b.kind === "session" && b.labels.visor)));
   const all = blocks.filter((b) => b.kind === "session").map((b) => b.name), names = V.on.t.sessions.filter((n) => all.some((x) => x.toLowerCase() === n.toLowerCase()));
   const name = (names.length ? names : all)[Math.floor(Math.random() * Math.max(1, (names.length ? names : all).length))];
@@ -749,28 +856,36 @@ function nextSession() {
   const steps = sessionSteps(plan, { keep: (t) => fitLine(t, me.body) }).filter((s) => VISOR_KINDS.includes(s.kind));
   if (!steps.length) { later(nextSession, 120000); return; }
   const ms = steps.reduce((n, s) => n + (s.gap || 0) * 1000, 0);
-  V.run = { steps, i: 0, level, name: recipe ? recipe.name : "", depth: 0, base: Math.max(0.1, V.depth * 0.6) };
+  V.run = { steps, i: 0, level, name: recipe ? recipe.name : "", depth: 0, base: Math.max(0.1, V.depth * 0.6), herd: mates.length > 0, hl: Math.floor(Math.random() * HERD_LINES.length), ms: Math.round(ms + 300000) };
   V.on.deepest = deeper(V.on.deepest, level);   // (how deep it's had them: how long the name and the afterimage hold after)
   if (V.name && V.name.code === V.on.code) { V.name.level = deeper(V.name.level, level); keepName(); }
   V.depth = V.run.base;
-  onHypno({ do: "under", by: BOT_MEMBER, ms: Math.round(ms + 300000), level });
+  onHypno({ do: "under", by: BOT_MEMBER, ms: V.run.ms, level }); V.mine = tranceState.session;
   step();
 }
 function step() {
-  const r = V.run; if (!r || !V.on) return;
+  const r = V.run; if (!r || !V.on || r.follow) return;
   const s = r.steps[r.i];
   if (!s) { finish(); return; }
+  if (r.herd && herdMates().length) herdSend(r, s);
+  runStep(r, s);
+  r.i++;
+  V.depth = Math.max(r.base, r.i / r.steps.length);
+  later(step, Math.max(1, s.gap || 0) * 1000);
+}
+// one line of a session (theirs, or the herd leader's)
+const HERD_LINES = ["All of you now, side by side. One herd, one breath, one voice.", "Look at you all, standin' together in the dark. Breathe in with them. Breathe out with them.",
+  "You're not alone down here. Your herd sinks with you, every breath, every word."];
+function runStep(r, s) {
+  if (r.i === 0 && r.herd) { const hl = HERD_LINES[r.hl] || HERD_LINES[0]; ctx.toChat("[Voice] " + hl, "#a67fd4", true); tranceVoice(hl); V.lineNow = hl; }
   if (s.start || s.beats || s.look || s.volume != null) onHypno({ do: "cue", kind: s.kind, block: s.block, beats: s.beats || undefined, volume: s.volume, look: Object.assign({ words: true }, s.look || {}) });
   if (s.deeper) { r.depth = Math.max(0, Math.min(100, r.depth + s.deeper)); onHypno({ do: "depth", depth: r.depth }); }
   if (s.text) {
-    const line = say(s.text); ctx.toChat("[Voice] " + line, "#a67fd4", true); tranceVoice(line);
+    const line = say(s.text); ctx.toChat("[Voice] " + line, "#a67fd4", true); tranceVoice(line); V.lineNow = line;
     if (fxOn("wave")) waveOver(line.length > 60 ? line.split(/[.!?]/)[0] : line);
     if (fxOn("breath") && r.i > 3 && Math.random() < 0.35) breathPuffs(3);
     if (fxOn("bloom") && /deeper|down|sink/i.test(line) && Math.random() < 0.5) bloomOnce();
   }
-  r.i++;
-  V.depth = Math.max(r.base, r.i / r.steps.length);
-  later(step, Math.max(1, s.gap || 0) * 1000);
 }
 function finish() {
   const r = V.run; V.run = null; if (!V.on || !r) return;
@@ -783,6 +898,255 @@ function finish() {
   try { if (ctx.botHere()) ctx.toBot("visorDone", { code, level: r.level, session: r.name }); } catch (e) { /* fine */ }
   later(linesAsk, 6000);
   later(nextSession, 90000);   // (another, in a while, as long as it's on)
+}
+
+// ── THE ROOM'S SIDE (Laynie, Nov 25-26: "5-8" of the ideas, "sounds good") ─────────────────────
+// • SEEN FROM OUTSIDE: a wearer's Companion tells the room it's on, and how deep (visorState, every 30 s or when it
+//   changes). Everybody else's Companion draws a slow pink glow over their eyes, how deep over their head and a small 👁,
+//   and tints their lines. Now and then (8-12 minutes) a line about them goes to the room as their own emote, so people
+//   without the Companion see it too ("Visor lines in the room" on the trance card switches that off).
+// • PEEK INSIDE: the 👁 opens a little window of what they're seein' (drawn from the same visor, with the picture, word and
+//   line showin' right now, sent only to whoever's peekin', at most every 4 s, three peekers at a time). If the crafter
+//   let them, a peeker can feed a word into their dark (once every 30 s each).
+// • HERD TRANCE: everybody in the room wearin' this very visor: the lowest number leads the session, the rest follow it
+//   line by line (visorHerd), their bodies side by side in each other's dark, sinkin' together.
+// • THE CRAFTER LOOMS: drawBody (the crafter towerin', or their face in the spiral).
+const inRoom = () => { try { return typeof W.ServerPlayerIsInChatRoom !== "function" || W.ServerPlayerIsInChatRoom(); } catch (e) { return false; } };
+const roomSend = (type, data, to) => { try { W.ServerSend("ChatRoomChat", makeMsg(type, data, to)); } catch (e) { /* not in a room */ } };
+function herdMates() {
+  if (!V.on) return [];
+  const now = Date.now(), here = new Set((W.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+  return Object.keys(V.rv).map(Number).filter((mn) => { const x = V.rv[mn]; return x && x.on && x.code === V.on.code && now - x.at < 75000 && here.has(mn) && mn !== myMn(); });
+}
+const leaderOf = () => { const m = herdMates(); return m.length ? Math.min.apply(null, m.concat(myMn())) : myMn(); };
+function herdSend(r, s) {
+  const x = { text: s.text || "", kind: s.kind || "", gap: s.gap || 0, deeper: s.deeper || 0 };
+  if (s.start) x.start = 1; if (s.beats) x.beats = s.beats; if (s.look) x.look = s.look; if (s.volume != null) x.volume = s.volume; if (s.block) x.block = s.block;
+  roomSend("visorHerd", { code: V.on.code, i: r.i, n: r.steps.length, level: r.level, name: r.name, hl: r.hl, ms: r.i === 0 ? r.ms : undefined, s: x });
+}
+// (what a follower takes from the leader's message: plain words and numbers, kept inside their limits)
+const num = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : undefined; };
+function cleanStep(s) {
+  s = s && typeof s === "object" ? s : {};
+  const o = { text: String(s.text || "").replace(/[<>]/g, "").slice(0, 600), kind: String(s.kind || "").slice(0, 20), gap: num(s.gap, 0, 120) || 0, deeper: num(s.deeper, -50, 50) || 0, start: !!s.start, block: String(s.block || "").slice(0, 60) };
+  if (s.volume != null) o.volume = num(s.volume, 0, 100);
+  if (s.beats && typeof s.beats === "object") o.beats = { off: !!s.beats.off, from: num(s.beats.from, 1, 30), to: num(s.beats.to, 1, 30), over: num(s.beats.over, 0, 900) };
+  if (s.look && typeof s.look === "object") { o.look = {}; for (const [k, v] of Object.entries(s.look).slice(0, 12)) if (/^[a-z]{1,12}$/i.test(k) && (typeof v === "boolean" || typeof v === "number")) o.look[k] = typeof v === "number" ? num(v, 0, 100) : v; }
+  return o;
+}
+function herdFollow(m) {
+  if (!V.on || isBot() || m.code !== V.on.code || m.from !== leaderOf()) return;
+  const n = Math.max(1, Math.min(200, Number(m.n) || 1)), i = Math.max(0, Math.min(n - 1, Number(m.i) || 0)), level = LEVELS_IN.includes(m.level) && m.level ? m.level : "fun";
+  let r = V.run;
+  if (!r || !r.follow || r.from !== m.from || i === 0) {
+    if (r && !r.follow) V.run = null;   // (their own session gives way to the herd's)
+    r = V.run = { follow: true, from: m.from, steps: [], i, n, level, name: String(m.name || "").slice(0, 60), depth: 0, base: Math.max(0.1, V.depth * 0.6), herd: true, hl: Number(m.hl) || 0 };
+    V.on.deepest = deeper(V.on.deepest, level);
+    if (V.name && V.name.code === V.on.code) { V.name.level = deeper(V.name.level, level); keepName(); }
+    if (!tranceState.session) { onHypno({ do: "under", by: BOT_MEMBER, ms: num(m.ms, 60000, 7200000) || 1800000, level }); V.mine = tranceState.session; }
+  }
+  r.i = i; r.at = Date.now();
+  const s = cleanStep(m.s), me = tranceState.me || {};
+  if (s.text && !fitLine(s.text, me.body)) s.text = "";   // (a line that doesn't fit their body: they hear the quiet instead)
+  runStep(r, s);
+  V.depth = Math.max(r.base, (i + 1) / n);
+  if (i + 1 >= n) later(() => { if (V.run === r) finish(); }, Math.max(1, s.gap) * 1000);
+  // nothin' more from the leader for a minute: back to their own sessions
+  clearTimeout(V.herdT);
+  V.herdT = setTimeout(() => { try { if (V.run === r && Date.now() - r.at > 55000) { V.run = null; onHypno({ do: "wake" }); later(nextSession, 5000); } } catch (e) { /* fine */ } }, 60000);
+}
+
+// what a wearer's Companion says to the room, now and then
+function roomTick() {
+  if (!ctx || isBot()) return;
+  const now = Date.now(), here = new Set((W.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+  for (const mn of Object.keys(V.rv)) if (now - V.rv[mn].at > 75000 || !here.has(Number(mn))) { delete V.rv[mn]; if (V.peek && V.peek.mn === Number(mn)) closePeek("🌀 Their visor's gone quiet."); }
+  tint();
+  if (!inRoom()) { V.saidKey = ""; return; }
+  // on, and how deep: when it changes, and every 30 s (and once more when it goes off)
+  const d = V.on ? Math.round(V.depth * 10) * 10 : 0, key = V.on ? V.on.code + "|" + d + "|" + V.joins : "off";
+  if (key !== V.saidKey || (V.on && now - V.saidAt > 30000)) {
+    if (V.on || (V.saidKey && V.saidKey !== "off")) roomSend("visorState", V.on ? { on: 1, code: V.on.code, crafter: V.on.crafter, d, feed: look().feed || "" } : { on: 0 });
+    V.saidKey = key; V.saidAt = now;
+  }
+  if (!V.on) { V.peekers = {}; return; }
+  // a line about them in the room, as their own emote (8-12 minutes apart; their switch)
+  if (!V.emoteAt) V.emoteAt = now + 120000 + Math.random() * 120000;
+  if (now > V.emoteAt) { V.emoteAt = now + 480000 + Math.random() * 240000; if (!(ctx.prefs() || {}).noVisorEmotes) roomEmote(); }
+  // what they're seein', to whoever's peekin'
+  for (const mn of Object.keys(V.peekers)) {
+    if (V.peekers[mn] < now || !here.has(Number(mn))) { delete V.peekers[mn]; delete V.viewKey[mn]; continue; }
+    const view = { pic: V.picNow, w: now - (V.wordAt || 0) < 4000 ? V.wordNow : "", l: V.lineNow, d }, k = JSON.stringify(view), last = V.viewKey[mn] || {};
+    if (k === last.k || now - (last.at || 0) < 4000) continue;
+    V.viewKey[mn] = { k, at: now };
+    roomSend("visorView", view, Number(mn));
+  }
+}
+const EMOTE_LIGHT = ["{n}'s visor glows a soft pink. {n} has gone quiet behind it.", "A slow spiral turns across the glass of {n}'s visor.", "{n} sways a little where they are, the visor's light pulsin' slow.",
+  "{n}'s lips move without a sound, followin' some voice only they can hear.", "Faint pink light spills from under {n}'s visor."];
+const EMOTE_DEEP = ["{n}'s visor pulses slow and pink. Their mouth hangs a little open.", "{n} has gone slack behind the visor, breathin' slow and even.", "A soft hum comes from {n}'s visor, and {n} sinks a little lower with it.",
+  "{n} doesn't seem to hear the room at all now, lost behind the pink glass.", "A thin line of drool shines at the corner of {n}'s mouth, under the visor.", "{n}'s head nods, slow, to a rhythm nobody else can hear."];
+const EMOTE_HERD = ["{n} and the others in the same visors sway together, breathin' as one.", "{n} stands with the rest of their visored herd, all of them slack and quiet, all of them glowin' pink."];
+function roomEmote() {
+  const P = W.Player || {}, n = String(P.Nickname || P.Name || "Somebody");
+  const pool = herdMates().length && leaderOf() === myMn() ? EMOTE_HERD : V.depth >= 0.4 ? EMOTE_DEEP : EMOTE_LIGHT;
+  const line = pick(pool).replace(/\{n\}/g, n).replace(/\b(snap)(s)\b/gi, "$1⁠$2");
+  try { W.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + line }); } catch (e) { /* fine */ }
+}
+// their lines in the chat, tinted pink while they're under a visor
+function tint() {
+  const d = W.document; if (!d || !d.head) return;
+  const mns = Object.keys(V.rv).filter((mn) => V.rv[mn].on && /^\d+$/.test(mn)), key = mns.join(",");
+  let s = d.getElementById("fhc-visor-room");
+  if (!mns.length) { if (s) s.remove(); V.tintKey = ""; return; }
+  if (s && V.tintKey === key) return;
+  V.tintKey = key;
+  if (!s) { s = d.createElement("style"); s.id = "fhc-visor-room"; d.head.appendChild(s); }
+  const sel = mns.map((mn) => ["Chat", "Whisper", "Emote"].map((t) => "#TextAreaChatLog .ChatMessage" + t + "[data-sender=\"" + mn + "\"]").join(",")).join(",");
+  s.textContent = sel + "{background:linear-gradient(90deg,rgba(214,120,240,.16),rgba(214,120,240,0) 70%);text-shadow:0 0 6px rgba(230,150,250,.45)}";
+}
+// over them on everybody else's screen (the game's character view): a glow over the eyes, how deep, and the 👁
+function headAt(C, X, Y, Z) {
+  const HR = Number(C.HeightRatio) || 1;
+  const xo = typeof W.CharacterAppearanceXOffset === "function" ? W.CharacterAppearanceXOffset(C, HR) : 500 * (1 - HR) / 2;
+  const yo = typeof W.CharacterAppearanceYOffset === "function" ? W.CharacterAppearanceYOffset(C, HR) : 1000 * (1 - HR);
+  return { HR, xo, yo, hx: X + (xo + 250 * HR) * Z, hy: Y + (yo + 138 * HR) * Z };
+}
+function drawOver(C, X, Y, Z) {
+  const x = C && V.rv[C.MemberNumber];
+  if (!x || !x.on || C.MemberNumber === myMn() || !W.MainCanvas || !W.MainCanvas.getContext) return;
+  const g = W.MainCanvas.getContext("2d"), p = headAt(C, X, Y, Z), t = Date.now() / 1000, a = calmNow() ? 0.45 : 0.38 + 0.14 * Math.sin(2 * Math.PI * t / 4);
+  g.save();
+  const rx = 78 * p.HR * Z, ry = 26 * p.HR * Z, gr = g.createRadialGradient(p.hx, p.hy, 0, p.hx, p.hy, rx);
+  gr.addColorStop(0, "rgba(255,170,230," + a.toFixed(3) + ")"); gr.addColorStop(0.6, "rgba(200,110,240," + (a * 0.6).toFixed(3) + ")"); gr.addColorStop(1, "rgba(160,80,220,0)");
+  g.fillStyle = gr; g.beginPath(); g.ellipse(p.hx, p.hy, rx, ry, 0, 0, 7); g.fill();
+  g.textAlign = "center"; g.textBaseline = "middle";
+  g.font = "bold " + Math.max(10, Math.round(24 * Z)) + "px sans-serif"; g.lineWidth = Math.max(2, 3 * Z); g.strokeStyle = "rgba(30,10,40,.85)"; g.fillStyle = "rgba(240,200,255,.95)";
+  const ty = Y + (p.yo + 12 * p.HR) * Z; g.strokeText("🌀 " + (Number(x.d) || 0), p.hx, ty); g.fillText("🌀 " + (Number(x.d) || 0), p.hx, ty);
+  const ex = X + (p.xo + 400 * p.HR) * Z, ey = Y + (p.yo + 70 * p.HR) * Z, er = 24 * Z;
+  g.fillStyle = "rgba(40,20,55,.8)"; g.beginPath(); g.arc(ex, ey, er, 0, 7); g.fill(); g.strokeStyle = "rgba(220,170,245,.85)"; g.lineWidth = Math.max(1, 2 * Z); g.stroke();
+  g.font = Math.max(10, Math.round(24 * Z)) + "px sans-serif"; g.fillStyle = "#fff"; g.fillText("👁", ex, ey + Z);
+  g.restore();
+}
+// a click on that 👁 (the game hands it over relative to the character, without the room's zoom)
+function clickOver(C, cx, cy) {
+  const x = C && V.rv[C.MemberNumber]; if (!x || !x.on || C.MemberNumber === myMn()) return false;
+  const p = headAt(C, 0, 0, 1), ex = p.xo + 400 * p.HR, ey = p.yo + 70 * p.HR;
+  if (Math.hypot(cx - ex, cy - ey) > 34) return false;
+  openPeek(C.MemberNumber); return true;
+}
+// ── peekin' in: a little window of what they see ──
+export function openPeek(mn) {
+  const x = V.rv[mn]; if (!x || !x.on) return;
+  closePeek();
+  if (!V.cache[x.code]) ask(x.code);
+  const d = W.document; css();
+  const box = d.createElement("div"); box.id = "fhc-peek";
+  const hd = d.createElement("div"); hd.className = "hd";
+  const ttl = d.createElement("span"); ttl.textContent = "👁 Inside " + nameOf(mn) + "'s visor"; hd.appendChild(ttl);
+  const cl = d.createElement("button"); cl.type = "button"; cl.textContent = "✕"; cl.title = "Stop peekin'"; cl.addEventListener("click", () => closePeek()); hd.appendChild(cl);
+  const st = d.createElement("div"); st.className = "st";
+  const pic = d.createElement("img"); pic.className = "pic"; pic.alt = ""; pic.referrerPolicy = "no-referrer"; st.appendChild(pic);
+  const sp = d.createElement("canvas"); sp.width = 280; sp.height = 300; st.appendChild(sp);
+  const bd = d.createElement("canvas"); bd.width = 280; bd.height = 300; st.appendChild(bd);
+  const ln = d.createElement("div"); ln.className = "ln"; st.appendChild(ln);
+  const dp = d.createElement("div"); dp.className = "dp"; dp.textContent = "🌀 " + (Number(x.d) || 0); st.appendChild(dp);
+  box.appendChild(hd); box.appendChild(st);
+  const nt = d.createElement("div"); nt.className = "nt";
+  if (x.feed) {
+    const fd = d.createElement("div"); fd.className = "fd";
+    const inp = d.createElement("input"); inp.maxLength = 24; inp.placeholder = "feed them a word";
+    const go = d.createElement("button"); go.type = "button"; go.textContent = "Feed";
+    const send = () => { const w = inp.value.trim(); if (!w) return; roomSend("visorFeed", { w: w.slice(0, 24) }, mn); inp.value = ""; nt.textContent = "Sent: it shows in their dark if they'll take it from you."; };
+    go.addEventListener("click", send); inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter") send(); });
+    fd.appendChild(inp); fd.appendChild(go); box.appendChild(fd);
+    nt.textContent = x.feed === "keys" ? "Only their crafter or keyholders can feed it." : "Anybody can feed it a word.";
+  }
+  box.appendChild(nt);
+  box.addEventListener("mousedown", (e) => e.stopPropagation());
+  const c = d.getElementById("MainCanvas"), r = c && c.getBoundingClientRect();
+  Object.assign(box.style, { left: (r ? r.left + r.width / 2 - 290 : 20) + "px", top: (r ? r.top + 14 : 20) + "px" });
+  d.body.appendChild(box);
+  V.peek = { mn, box, pic, sp, bd, ln, dp, st, nt, picNow: "", t0: Date.now() };
+  roomSend("visorPeek", { on: 1 }, mn);
+  V.peek.ping = setInterval(() => { if (V.peek && V.peek.mn === mn) roomSend("visorPeek", { on: 1 }, mn); }, 20000);
+  V.peek.draw = setInterval(peekDraw, 66);
+}
+export function closePeek(say) {
+  const p = V.peek; if (!p) return;
+  V.peek = null; clearInterval(p.ping); clearInterval(p.draw);
+  roomSend("visorPeek", { on: 0 }, p.mn);
+  if (p.vid) letGo(p.vid);
+  p.box.remove();
+  if (say && ctx) ctx.toChat(say, "#a67fd4", true);
+}
+function peekDraw() {
+  const p = V.peek; if (!p) return;
+  const x = V.rv[p.mn]; if (!x) return;
+  const t = V.cache[x.code] || { show: "crafter" };   // (its settings not here yet: the farm's own look till they are)
+  const L = lookOf(t), now = Date.now() / 1000, gs = p.sp.getContext && p.sp.getContext("2d"), gb = p.bd.getContext && p.bd.getContext("2d");
+  try { if (gs) spiral(gs, now, L.place === "over" ? 0 : L.spOp, L, calmNow()); } catch (e) { /* fine */ }
+  if (!gb) return;
+  gb.clearRect(0, 0, p.bd.width, p.bd.height);
+  const them = charOf(p.mn), C = t.show === "wearer" || t.show === "eyes" ? them : charOf(x.crafter) || them, f = figOf(C);
+  if (f) { const hh = p.bd.height * 0.94, ww = hh * f.sw / f.sh; drawFig(gb, f, (p.bd.width - ww) / 2, p.bd.height - hh, hh, 0); }
+}
+function peekView(m) {
+  const p = V.peek; if (!p || m.from !== p.mn) return;
+  const x = V.rv[p.mn], t = x && V.cache[x.code];
+  if (typeof m.pic === "string" && m.pic !== p.picNow) {
+    p.picNow = m.pic;
+    const url = /^farm:\d$/.test(m.pic) ? farmPatterns()[Number(m.pic.slice(5))] || "" : okLink(m.pic) ? m.pic : "";
+    if (url) {
+      const el = mediaFor(url, t || { fit: "cover" }, false); el.style.opacity = String(t ? t.picOp : 0.35);
+      if (p.vid) letGo(p.vid);
+      p.vid = el.tagName === "VIDEO" ? el : null;
+      p.pic.replaceWith(el); p.pic = el; el.src = url;
+      if (p.vid) { try { const q = el.play(); if (q && q.catch) q.catch(() => { /* fine */ }); } catch (e) { /* fine */ } }
+    }
+  }
+  if (m.w) { const w = W.document.createElement("div"); w.className = "w"; w.textContent = String(m.w).slice(0, 24); p.st.appendChild(w); setTimeout(() => w.remove(), 1000); }
+  if (typeof m.l === "string") p.ln.textContent = m.l.slice(0, 200);
+  if (m.d != null) p.dp.textContent = "🌀 " + (Number(m.d) || 0);
+}
+// a word somebody fed in while peekin' (if the crafter lets them): it's the next one in their dark
+function fedWord(m) {
+  if (!V.on) return;
+  const F = look().feed, from = m.from, now = Date.now();
+  const ok = F === "all" || (F === "keys" && (from === V.on.crafter || keyholders().includes(from)));
+  const reply = (k, why) => roomSend("visorFed", { ok: k ? 1 : 0, why: why || "" }, from);
+  if (!ok) { reply(false, "it doesn't take words from you"); return; }
+  if (now - (V.feedAt[from] || 0) < 30000) { reply(false, "slow down: one word every 30 seconds"); return; }
+  const w = String(m.w || "").replace(/[^\p{L}\p{Nd}' !?-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 24);
+  if (!w) { reply(false, "that isn't a word it can show"); return; }
+  V.feedAt[from] = now;
+  V.given.push(w); V.given = V.given.slice(-5);
+  reply(true);
+}
+const FEEDS_OK = ["", "keys", "all"];
+// the room's messages about visors
+function roomMsg(m) {
+  const me = myMn();
+  if (m.type === "visorState") {
+    if (m.from === me) return;
+    if (!m.on) { delete V.rv[m.from]; if (V.peek && V.peek.mn === m.from) closePeek("🌀 " + nameOf(m.from) + "'s visor is off now."); tint(); return; }
+    V.rv[m.from] = { on: true, code: String(m.code || "").toLowerCase().slice(0, 12), crafter: Number(m.crafter) || 0, d: num(m.d, 0, 100) || 0, feed: FEEDS_OK.includes(m.feed) ? m.feed : "", at: Date.now() };
+    tint();
+    return;
+  }
+  if (m.type === "visorHerd") { herdFollow(m); return; }
+  if (m.type === "visorPeek") {
+    if (!V.on) return;
+    if (!m.on) { delete V.peekers[m.from]; delete V.viewKey[m.from]; return; }
+    const fresh = !V.peekers[m.from];
+    if (fresh && Object.keys(V.peekers).length >= 3) return;   // (three at a time)
+    V.peekers[m.from] = Date.now() + 45000;
+    if (fresh) ctx.toChat("👁 " + nameOf(m.from) + " is lookin' in through your visor.", "#c39be0", true);
+    return;
+  }
+  if (m.type === "visorView") { peekView(m); return; }
+  if (m.type === "visorFeed") { fedWord(m); return; }
+  if (m.type === "visorFed" && V.peek && V.peek.mn === m.from) V.peek.nt.textContent = m.ok ? "🌀 Your word went into their dark." : "It didn't take: " + String(m.why || "").slice(0, 80) + ".";
 }
 
 // ── it sinks with them (Laynie, Nov 25: "12" of the ideas): the longer a visor's worn, the stronger it gets ──
@@ -923,9 +1287,12 @@ function afterStart(was) {
   keepAfter(); afterDraw();
 }
 function afterTick() {
-  if (V.after && !(V.after.until > Date.now() && Array.isArray(V.after.words) && V.after.words.length)) { V.after = null; keepAfter(); }
+  if (V.after && (noAfter() || !(V.after.until > Date.now() && Array.isArray(V.after.words) && V.after.words.length))) { V.after = null; keepAfter(); }
   afterDraw();
 }
+// (Nov 26, Laynie: "yes" to both) only a visor whose crafter picked it leaves an afterimage, and any wearer can switch
+// afterimages off for themselves (the trance card's "Visor afterimages")
+const noAfter = () => !!(ctx && (ctx.prefs() || {}).noAfter);
 function afterDraw() {
   const d = W.document; if (!d || !d.body) return;
   if (!(V.after && !V.on && ctx && !(ctx.prefs() || {}).noVisor)) { if (V.afterEl) { V.afterEl.remove(); V.afterEl = null; } clearInterval(V.afterT); V.afterT = null; return; }
@@ -960,7 +1327,7 @@ const SPIRAL_NAMES = { classic: "classic: two arms", pinwheel: "pinwheel: eight 
 const CHAT_NAMES = { whisper: "whispers between lines", melt: "other voices melt", fade: "other voices fade", watermark: "a spiral turnin' over the chat" };
 const FX_NAMES = { float: "room voices float by", wave: "the farm's voice over the head", breath: "breath puffs", tunnel: "tunnel vision, closin' in as they sink", bloom: "a pink bloom now and then",
   warp: "meltin' warp", ripple: "ripples", crowd: "a watchin' crowd", kalei: "pictures in a kaleidoscope", hearts: "risin' hearts", aura: "an aura round the body", meter: "a trance meter",
-  face: "a close-up of the face, in the corner", zoom: "the view comin' in close to the face" };
+  face: "a close-up of the face, in the corner", zoom: "the view comin' in close to the face", after: "an afterimage at the edges of their screen once it comes off (minutes to hours, by how deep)" };
 function maker() { try { const v = JSON.parse(LS.getItem(MAKER_KEY)); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } }
 function keepMaker(m) { try { LS.setItem(MAKER_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } }
 // ── "Test my links" (Laynie, Nov 26: "all four"): each of the crafter's own links tried, and what it does said plainly ──
@@ -1030,7 +1397,7 @@ export function visorMakerCards(pctx) {
     const left = fx.filter((f) => !f.url), skipped = left.length;
     const t = normTuning({ sessions: M.sessions, need: M.need, show: M.show, words: M.words, set: M.set === "__own" ? "" : M.set, pictures, picOp: M.picOp, wordEvery: M.wordEvery, wordOp: M.wordOp, fit: M.fit,
       spiral: M.spiral, spin: M.spin, place: M.place, spOp: M.spOp, breathe: M.breathe, drift: M.drift, chat: M.chat, lines: M.lines, linesNeed: M.linesNeed, linesLock: M.linesLock, fx: M.fx,
-      pet: M.pet, sink: M.sink });
+      pet: M.pet, sink: M.sink, feed: M.feed });
     const code = tuningCode(t); remember(code, t);
     try { if (ctx.botHere()) ctx.toBot("visorKeep", { code, t }); } catch (e) { /* fine */ }
     const line = descLine(code, t);
@@ -1053,7 +1420,7 @@ export function visorMakerCards(pctx) {
       list.length ? list.map((s) => h("label", { style: { display: "block" } }, h("input", { type: "checkbox", checked: M.sessions.includes(s.name) || null, onchange: (e) => set("sessions", (e.target.checked ? M.sessions.concat(s.name) : M.sessions.filter((x) => x !== s.name)).slice(0, MAX_SESSIONS)) }), " " + s.name + " (" + s.level.join(", ") + ")"))
         : muted("(the farm's list is still loadin')")),
     h("div", null, muted("Before a hardcore wearer can take it off:"), h("select", { onchange: (e) => set("need", Number(e.target.value)) }, [0, 1, 2, 3, 4, 5].map((n) => opt(n, n ? n + " full session" + (n === 1 ? "" : "s") : "any time", M.need)))),
-    h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show))),
+    h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show), opt("loom", "mine, towerin' over them, small at my feet", M.show), opt("eyes", "their own, with my face in the spiral, watchin'", M.show))),
     h("div", null, muted("Subliminal words (comma between):"), h("input", { value: M.words, size: 40, placeholder: "good cow, empty, deeper", onchange: (e) => set("words", e.target.value) })),
     h("div", null, muted("Pictures:"), h("select", { onchange: (e) => set("set", e.target.value) }, opt("", "the farm's own patterns", M.set), sets.map((n) => opt(n, n + " (the farm's set)", M.set)), opt("__own", "my own links", M.set)),
       ownBox,
@@ -1078,6 +1445,7 @@ export function visorMakerCards(pctx) {
     h("div", null, muted("More (all slow, nothin' flashes):"), h("div", null, FX.map((v) => tick("fx", v, FX_NAMES[v])))),
     h("div", null, muted("A pet name for whoever wears it (their name in the room while it's on, and a while after; anybody who says it takes them down):"),
       h("input", { value: M.pet || "", size: 22, maxlength: 20, placeholder: "Bessie", onchange: (e) => set("pet", e.target.value) })),
+    h("div", null, muted("Who can feed a word into their dark, peekin' in:"), h("select", { onchange: (e) => set("feed", e.target.value) }, opt("", "nobody", M.feed), opt("keys", "me and their keyholders", M.feed), opt("all", "anybody in the room", M.feed))),
     h("div", null, tick("sink", true, "it sinks with them: the longer it's worn, the stronger it gets"),
       muted("(1 hour: whispers in the chat · 3: tunnel vision · 6: one more session before it comes off · 10: the name holds twice as long · 20: voices melt, and it lingers twice as long after · 40: one more session again, and the room's own words get fed in)")),
     h("div", { style: { marginTop: "6px" } }, btn("Make the visor", make, true)),

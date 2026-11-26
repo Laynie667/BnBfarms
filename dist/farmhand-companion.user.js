@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.88.0
+// @version      0.89.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5134,7 +5134,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function scar(g, ink2, x0, y0) {
-    const w = ink2.width, h2 = ink2.height, tint = (col, blur, dx, dy, a) => {
+    const w = ink2.width, h2 = ink2.height, tint2 = (col, blur, dx, dy, a) => {
       const c = document.createElement("canvas");
       c.width = w;
       c.height = h2;
@@ -5149,9 +5149,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.drawImage(c, x0 + dx, y0 + dy);
       g.globalAlpha = 1;
     };
-    tint("#5e1414", 3, 0, 1, 0.75);
-    tint("#b4524a", 0.6, 0, 0, 0.95);
-    tint("#f2b9a8", 0.8, -1, -1.4, 0.45);
+    tint2("#5e1414", 3, 0, 1, 0.75);
+    tint2("#b4524a", 0.6, 0, 0, 0.95);
+    tint2("#f2b9a8", 0.8, -1, -1.4, 0.45);
   }
   function glow(g, ink2, x0, y0, col) {
     const c = document.createElement("canvas");
@@ -5524,7 +5524,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.globalAlpha = 1;
   }
   function welt(g, ink2, x0, y0) {
-    const w = ink2.width, h2 = ink2.height, tint = (col, blur, a, op) => {
+    const w = ink2.width, h2 = ink2.height, tint2 = (col, blur, a, op) => {
       const c = document.createElement("canvas");
       c.width = w;
       c.height = h2;
@@ -5541,9 +5541,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.globalAlpha = 1;
       g.globalCompositeOperation = "source-over";
     };
-    tint("#c22f3a", 9, 0.55, "multiply");
-    tint("#d8434c", 3, 0.5, "multiply");
-    tint("#ff8f8a", 2, 0.22);
+    tint2("#c22f3a", 9, 0.55, "multiply");
+    tint2("#d8434c", 3, 0.5, "multiply");
+    tint2("#ff8f8a", 2, 0.22);
   }
   function upArrow(g, x, y0, y1, wd) {
     g.lineWidth = wd;
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.88.0";
+  var VERSION = "0.89.0";
 
   // shared/species.js
   var WORDS = {
@@ -10156,7 +10156,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (y0 < 0) continue;
           spans.push([k, y0, s.L.slice(y0, y1 + 1), s.R.slice(y0, y1 + 1), s.bottom == null ? -1 : s.bottom]);
         }
-        const num = (v) => typeof v === "number" || Array.isArray(v) && v.every((n) => n === null || typeof n === "number" || Array.isArray(n) && n.every((m) => typeof m === "number"));
+        const num2 = (v) => typeof v === "number" || Array.isArray(v) && v.every((n) => n === null || typeof n === "number" || Array.isArray(n) && n.every((m) => typeof m === "number"));
         return {
           v: 1,
           spans: spans.slice(-240),
@@ -10166,11 +10166,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           holdSig: BREAST.holdSig || "",
           band: Object.assign({}, BREAST.band),
           hands: BREAST.handsBehind === void 0 ? null : !!BREAST.handsBehind,
-          cover: [...BREAST.cover].filter(([, v]) => num(v)).slice(-1500),
+          cover: [...BREAST.cover].filter(([, v]) => num2(v)).slice(-1500),
           mcover: [...MOULD.cover].filter(([, v]) => typeof v === "number").slice(-400),
           prof: [...MOULD.prof].slice(-300).map(([src, p]) => [src, p.L, p.R, p.w, p.h]),
           skin: [...BELLY.skin].filter(([, v]) => Array.isArray(v)).slice(-60),
-          halves: [...BREAST.halves].filter(([, v]) => num(v)).slice(-200)
+          halves: [...BREAST.halves].filter(([, v]) => num2(v)).slice(-200)
         };
       }
       const listy = (a) => Array.isArray(a) || ArrayBuffer.isView(a);
@@ -13842,12 +13842,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function clean(d) {
     if (!d || typeof d !== "object") return null;
-    const num = (v, lo, hi, def) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
+    const num2 = (v, lo, hi, def) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
     const s = DEFAULTS();
-    s.cup = Math.round(num(d.cup, 0, 20, 12));
+    s.cup = Math.round(num2(d.cup, 0, 20, 12));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) {
       const v = d.breast && d.breast[k];
-      if (typeof v === "number" && isFinite(v)) s.breast[k] = num(v, -100, 100, 0);
+      if (typeof v === "number" && isFinite(v)) s.breast[k] = num2(v, -100, 100, 0);
     }
     let n = 0;
     for (const [k, v] of Object.entries(d.wear || {})) if (n < 80 && /^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) {
@@ -13858,18 +13858,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     for (const k of ["std", "AllFours", "Hogtied"]) {
       const f = d.belly && d.belly[k];
       if (!f || typeof f !== "object") continue;
-      s.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) };
+      s.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num2(f.rx, 20, 170, 70), ry: num2(f.ry, 20, 190, 80), sag: num2(f.sag, 0, 0.5, 0.22), x: num2(f.x, -120, 120, 0), y: num2(f.y, -200, 200, 0), cut: num2(f.cut, 0.2, 1, 0.74) };
     }
     s.auto = d.auto !== false;
     s.tuck = d.tuck !== false;
     s.dress = d.dress !== false;
-    if (d.gen && typeof d.gen === "object") s.gen = { inches: Math.round(num(d.gen.inches, GEN_IN[0], GEN_IN[1], 6)), balls: Math.round(num(d.gen.balls, GEN_BALLS[0], GEN_BALLS[1], 3)), pent: !!d.gen.pent, style: Math.round(num(d.gen.style, 0, 2, 0)) };
+    if (d.gen && typeof d.gen === "object") s.gen = { inches: Math.round(num2(d.gen.inches, GEN_IN[0], GEN_IN[1], 6)), balls: Math.round(num2(d.gen.balls, GEN_BALLS[0], GEN_BALLS[1], 3)), pent: !!d.gen.pent, style: Math.round(num2(d.gen.style, 0, 2, 0)) };
     s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
     for (const [k, m] of Object.entries(d.mould && d.mould.mode || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
     if (d.brand && typeof d.brand === "object") {
       const b = d.brand, places = {};
-      for (const [k, p] of Object.entries(b.places || {})) if (/^(hip|thigh|chest|shoulder)[LR]$|^(mons|tummy)$/.test(k) && p && typeof p === "object") places[k] = { size: num(p.size, 16, 200, 46), angle: num(p.angle, -180, 180, 0), dx: num(p.dx, -80, 80, 0), dy: num(p.dy, -80, 80, 0) };
-      s.brand = { art: b.art === "full" ? "full" : "mark", look: ["seared", "healed", "ink"].includes(b.look) ? b.look : "seared", size: num(b.size, 16, 200, 46), places };
+      for (const [k, p] of Object.entries(b.places || {})) if (/^(hip|thigh|chest|shoulder)[LR]$|^(mons|tummy)$/.test(k) && p && typeof p === "object") places[k] = { size: num2(p.size, 16, 200, 46), angle: num2(p.angle, -180, 180, 0), dx: num2(p.dx, -80, 80, 0), dy: num2(p.dy, -80, 80, 0) };
+      s.brand = { art: b.art === "full" ? "full" : "mark", look: ["seared", "healed", "ink"].includes(b.look) ? b.look : "seared", size: num2(b.size, 16, 200, 46), places };
     }
     return s;
   }
@@ -15088,7 +15088,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.width = w + pad * 2;
       c.height = h2 + pad * 2;
       const g = c.getContext("2d");
-      const tint = (color, alpha, blur, grow) => {
+      const tint2 = (color, alpha, blur, grow) => {
         const t = document.createElement("canvas");
         t.width = c.width;
         t.height = c.height;
@@ -15104,15 +15104,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         g.drawImage(t, 0, 0);
         g.globalAlpha = 1;
       };
-      if (b.look === "ink") tint("#16120f", 0.85, 0.4);
+      if (b.look === "ink") tint2("#16120f", 0.85, 0.4);
       else if (b.look === "healed") {
-        tint("#e7b6a6", 0.55, 2.2, 1.04);
-        tint("#f3d2c4", 0.75, 0.6);
-        tint("#ffffff", 0.18, 0);
+        tint2("#e7b6a6", 0.55, 2.2, 1.04);
+        tint2("#f3d2c4", 0.75, 0.6);
+        tint2("#ffffff", 0.18, 0);
       } else {
-        tint("#c8574a", 0.5, 3, 1.06);
-        tint("#7a2418", 0.85, 0.8);
-        tint("#3a120c", 0.55, 0.3);
+        tint2("#c8574a", 0.5, 3, 1.06);
+        tint2("#7a2418", 0.85, 0.8);
+        tint2("#3a120c", 0.55, 0.3);
       }
       made3.set(key3, c);
       if (made3.size > 24) made3.delete(made3.keys().next().value);
@@ -16059,16 +16059,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] screen nap unavailable:", e);
     }
     setInterval(() => {
-      const inRoom2 = W11.CurrentScreen === "ChatRoom";
-      if (wasRoom && !inRoom2 && screenLight()) redraw2([W11.Player, W11.InformationSheetSelection].filter(Boolean));
-      if (!wasRoom && inRoom2 && screenLight()) for (const C2 of [W11.Player].concat(W11.ChatRoomCharacter || [])) {
+      const inRoom3 = W11.CurrentScreen === "ChatRoom";
+      if (wasRoom && !inRoom3 && screenLight()) redraw2([W11.Player, W11.InformationSheetSelection].filter(Boolean));
+      if (!wasRoom && inRoom3 && screenLight()) for (const C2 of [W11.Player].concat(W11.ChatRoomCharacter || [])) {
         try {
           speck(C2);
         } catch (e) {
         }
       }
-      if (!inRoom2) roomAt = 0;
-      wasRoom = inRoom2;
+      if (!inRoom3) roomAt = 0;
+      wasRoom = inRoom3;
     }, 1e3);
   }
 
@@ -22044,8 +22044,10 @@ wake: any
   var SPINS = ["slow", "slower", "still"];
   var PLACES = ["behind", "over", "both"];
   var CHAT_FX = ["whisper", "melt", "fade", "watermark"];
-  var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
-  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+  var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom", "after"];
+  var SHOWS = ["crafter", "wearer", "loom", "eyes"];
+  var FEEDS = ["", "keys", "all"];
+  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false, feed: "" };
   var petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
   function lookOf(t) {
     return Object.assign({}, LOOK_DEFAULTS, t || {});
@@ -22069,6 +22071,7 @@ wake: any
     keep3("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
     keep3("pet", petName(t.pet));
     keep3("sink", !!t.sink);
+    keep3("feed", FEEDS.includes(t.feed) ? t.feed : "");
     return out;
   }
   function base(t, list2) {
@@ -22076,7 +22079,7 @@ wake: any
       v: 1,
       sessions: list2(t.sessions, MAX_SESSIONS, 60),
       need: Math.round(clamp2(t.need, 0, MAX_NEED, 1)),
-      show: t.show === "wearer" ? "wearer" : "crafter",
+      show: SHOWS.includes(t.show) ? t.show : "crafter",
       words: list2(t.words, MAX_WORDS, 24),
       set: str(t.set, 40),
       pictures: (Array.isArray(t.pictures) ? t.pictures : []).filter(okLink).slice(0, MAX_PICS),
@@ -22173,13 +22176,31 @@ wake: any
     joins: 0,
     room: "",
     miss: 0,
-    fed: []
+    fed: [],
+    likes: {},
+    likeImg: {},
+    likeAt: {},
+    rv: {},
+    peekers: {},
+    peek: null,
+    given: [],
+    feedAt: {},
+    saidKey: "",
+    saidAt: 0,
+    emoteAt: 0,
+    picNow: "",
+    wordNow: "",
+    lineNow: "",
+    viewKey: {},
+    herdT: 0
   };
   function initVisor(c) {
     ctx2 = c;
     load3();
     onAccount(() => {
       stop(true);
+      closePeek();
+      V.rv = {};
       V.unlocked = {};
       load3();
       afterDraw();
@@ -22250,6 +22271,29 @@ wake: any
       }
     };
     reg();
+    if (mod3) {
+      try {
+        mod3.hookFunction("ChatRoomCharacterViewDrawOverlay", 0, (args, next) => {
+          const r = next(args);
+          try {
+            drawOver(args[0], args[1], args[2], args[3]);
+          } catch (e) {
+          }
+          return r;
+        });
+      } catch (e) {
+      }
+      try {
+        mod3.hookFunction("ChatRoomCharacterViewClickCharacter", 0, (args, next) => {
+          try {
+            if (clickOver(args[0], args[4], args[5])) return;
+          } catch (e) {
+          }
+          return next(args);
+        });
+      } catch (e) {
+      }
+    }
     setInterval(check2, 2e3);
     setTimeout(publicList, 4e3);
   }
@@ -22296,6 +22340,8 @@ wake: any
     V.after = obj(AFTER_KEY);
     V.hours = obj(HOURS_KEY) || {};
     V.off = obj(OFF_KEY) || {};
+    V.likes = obj(LIKE_KEY) || {};
+    V.likeImg = {};
     if (V.name && !V.name.pet) V.name = null;
   }
   var keepJson = (k, v) => {
@@ -22385,11 +22431,13 @@ wake: any
           afterDraw();
         }
         onIcon(null);
+        roomTick();
         return;
       }
       visorCheck();
       nameTick();
       afterTick();
+      roomTick();
     } catch (e) {
       console.warn("[Farmhand Companion] visor:", e);
     }
@@ -22511,6 +22559,14 @@ wake: any
     if (!m || !m.from) return;
     const me5 = W15.Player && W15.Player.MemberNumber;
     if (m.from === me5) return;
+    if (/^visor(State|Herd|Peek|View|Feed|Fed)$/.test(m.type)) {
+      try {
+        roomMsg(m);
+      } catch (e) {
+        console.warn("[Farmhand Companion] visor room:", e);
+      }
+      return;
+    }
     const code = String(m.code || "").toLowerCase();
     if (m.type === "visorTune") {
       if (remember(code, m.t)) check2();
@@ -22670,7 +22726,7 @@ wake: any
     if (!was2) return;
     stop(false, say4);
     nameAfter(was2);
-    afterStart(was2);
+    if (lookOf(was2.t).fx.includes("after") && !noAfter()) afterStart(was2);
   }
   function linesAsk() {
     const L = V.on && lookOf(V.on.t);
@@ -22683,14 +22739,19 @@ wake: any
     const was2 = V.on;
     for (const x of V.timers) clearTimeout(x);
     V.timers = [];
+    clearTimeout(V.herdT);
+    V.peekers = {};
+    V.viewKey = {};
+    V.given = [];
     unbuild();
-    if (V.run) {
+    if (V.run || V.mine && tranceState.session === V.mine) {
       V.run = null;
       try {
         onHypno({ do: "wake" });
       } catch (e) {
       }
     }
+    V.mine = null;
     if (was2 && V.hours[was2.code]) keepHours();
     V.on = null;
     V.depth = 0;
@@ -22759,7 +22820,7 @@ wake: any
     if (d.getElementById("fhc-visor-css")) return;
     const s = d.createElement("style");
     s.id = "fhc-visor-css";
-    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei,#fhc-visor.warp>.kaleiC{filter:url(#fhc-warpf)}#fhc-visor .kaleiC{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 3s;animation:fhcSpin 40s linear infinite}#fhc-visor.calm .kaleiC{animation:none}#fhc-visor .kaleiC .wedge{position:absolute;left:50%;top:calc(50% - var(--R,700px) / 2);width:var(--R,700px);height:var(--R,700px);transform-origin:0 50%;overflow:hidden;clip-path:polygon(0 50%,86.6% 0,100% 0,100% 100%,86.6% 100%)}#fhc-visor .kaleiC .wedge img{display:block;width:100%;height:100%;object-fit:cover}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}#fhc-visor-on:hover{opacity:.95}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
+    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei,#fhc-visor .eyes{left:0;top:0;width:100%;height:100%}#fhc-peek{position:fixed;z-index:9993;width:280px;background:#120a19;border:1px solid rgba(198,139,230,.55);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.6);color:#ecd9f6;font:13px system-ui,sans-serif;overflow:hidden}#fhc-peek .hd{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:rgba(60,30,80,.6)}#fhc-peek .hd button{background:none;border:0;color:#ecd9f6;cursor:pointer;font-size:14px}#fhc-peek .st{position:relative;height:300px;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%)}#fhc-peek .st>*{position:absolute}#fhc-peek .pic{left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:.35}#fhc-peek canvas{left:0;top:0;width:100%;height:100%}#fhc-peek .w{left:0;right:0;top:40%;text-align:center;font:600 1.1rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;animation:fhcSub 900ms ease-in-out forwards}#fhc-peek .ln{left:6px;right:6px;bottom:6px;font:italic 12px Georgia,serif;color:rgba(232,200,250,.9);text-shadow:0 0 4px #000}#fhc-peek .dp{right:6px;top:6px;font:600 11px system-ui,sans-serif;color:#f2c6ea}#fhc-peek .fd{display:flex;gap:4px;padding:6px}#fhc-peek .fd input{flex:1;min-width:0;background:#0d0812;border:1px solid #45354f;border-radius:5px;color:#ecd9f6;padding:3px 6px}#fhc-peek .fd button{background:#2b1d38;border:1px solid #45354f;border-radius:5px;color:#ecd9f6;cursor:pointer}#fhc-peek .nt{padding:0 8px 6px;color:#a993b6;font-size:11px}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei,#fhc-visor.warp>.kaleiC{filter:url(#fhc-warpf)}#fhc-visor .kaleiC{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 3s;animation:fhcSpin 40s linear infinite}#fhc-visor.calm .kaleiC{animation:none}#fhc-visor .kaleiC .wedge{position:absolute;left:50%;top:calc(50% - var(--R,700px) / 2);width:var(--R,700px);height:var(--R,700px);transform-origin:0 50%;overflow:hidden;clip-path:polygon(0 50%,86.6% 0,100% 0,100% 100%,86.6% 100%)}#fhc-visor .kaleiC .wedge img{display:block;width:100%;height:100%;object-fit:cover}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}#fhc-visor-on:hover{opacity:.95}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
     d.head.appendChild(s);
   }
   var WARP_SVG = "<svg width='0' height='0' style='position:absolute'><filter id='fhc-warpf'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.012' numOctaves='2' seed='3'><animate attributeName='baseFrequency' dur='24s' values='0.008 0.012;0.012 0.008;0.008 0.012' repeatCount='indefinite'/></feTurbulence><feDisplacementMap in='SourceGraphic' scale='14'/></filter></svg>";
@@ -22805,6 +22866,7 @@ wake: any
     if (L.spiral !== "none" && L.place !== "over") add3("canvas", "spin");
     const cv = add3("canvas", "body");
     if (L.fx.includes("aura")) cv.classList.add("aura");
+    if (t.show === "eyes") add3("canvas", "eyes");
     if (L.spiral !== "none" && L.place !== "behind") add3("canvas", "spinO");
     if (L.fx.includes("crowd")) add3("div", "crowd").innerHTML = crowdSvg();
     if (L.fx.includes("tunnel")) add3("div", "vig");
@@ -22846,6 +22908,7 @@ wake: any
         m.style.opacity = String(t.picOp);
         other.style.opacity = "0";
         kaleiShow(m, url);
+        V.picNow = /^data:/.test(url) ? "farm:" + Math.max(0, farmPatterns().indexOf(url)) : url;
         setTimeout(() => {
           if (other.style.opacity === "0") letGo2(other);
         }, 5600);
@@ -22911,7 +22974,7 @@ wake: any
     V.el.classList.toggle("calm", calmNow());
     const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1e3;
     V.el.style.setProperty("--R", Math.ceil(Math.hypot(cw, ch) / 2) + "px");
-    for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei")) if (cv.width !== cw || cv.height !== ch) {
+    for (const cv of V.el.querySelectorAll("canvas.body,canvas.spin,canvas.spinO,canvas.kalei,canvas.eyes")) if (cv.width !== cw || cv.height !== ch) {
       cv.width = cw;
       cv.height = ch;
       V.spun = false;
@@ -22964,40 +23027,144 @@ wake: any
     const up = src.height > 1e3 ? Math.max(0, src.height - 1150) : 0, sy = Math.max(0, up - 120);
     return { up, sx: 0, sy, sw: src.width, sh: Math.min(src.height - sy, up + 1e3 - sy) };
   }
-  function drawBody(t) {
-    if (!V.el || !V.on) return;
-    const cv = V.el.querySelector("canvas.body"), g = cv && cv.getContext ? cv.getContext("2d") : null;
-    if (!g) return;
-    const C2 = V.on.t.show === "crafter" && charOf4(V.on.crafter) || W15.Player;
+  function figOf(C2) {
     if (C2 && !C2.Canvas && typeof W15.CharacterLoadCanvas === "function") {
       try {
         W15.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }
-    g.clearRect(0, 0, cv.width, cv.height);
     const src = C2 && C2.Canvas;
-    if (!src || !src.width || !src.height) return;
-    const R = bodyRect(src), L = look2(), faceY = R.up + 145;
-    let z = 0;
-    if (L.fx.includes("zoom")) z = (calmNow() ? 0.5 : 0.5 - 0.5 * Math.cos(2 * Math.PI * (t || 0) / 60)) * (0.3 + 0.6 * V.depth);
-    const fh = Math.min(360, R.sh), fw = fh * R.sw / R.sh, fx0 = src.width / 2 - fw / 2, fy = Math.max(R.sy, faceY - fh / 2);
-    const sx = R.sx + (fx0 - R.sx) * z, sy = R.sy + (fy - R.sy) * z, sw = R.sw + (fw - R.sw) * z, sh = R.sh + (fh - R.sh) * z;
-    const hh = cv.height * 0.96, ww = hh * R.sw / R.sh, dx = (cv.width - ww) / 2, dy = cv.height - hh;
+    if (!src || !src.width || !src.height) return null;
+    const R = bodyRect(src);
+    return { src, sx: 0, sy: R.sy, sw: R.sw, sh: R.sh, fx: src.width / 2, fy: R.up + 145, top: R.up - 20, u: 1 };
+  }
+  function drawFig(g, f, dx, dy, hh, z) {
+    z = z || 0;
+    const fh = Math.min(360 * f.u, f.sh), fw = fh * f.sw / f.sh, fx0 = f.fx - fw / 2, fy0 = Math.max(f.sy, f.fy - fh / 2);
+    const sx = f.sx + (fx0 - f.sx) * z, sy = f.sy + (fy0 - f.sy) * z, sw = f.sw + (fw - f.sw) * z, sh = f.sh + (fh - f.sh) * z;
+    const ww = hh * f.sw / f.sh, k = hh / sh;
     try {
-      g.drawImage(src, sx, sy, sw, sh, dx, dy, ww, hh);
+      g.drawImage(f.src, sx, sy, sw, sh, dx, dy, ww, hh);
     } catch (e) {
     }
-    const k = hh / sh;
-    V.geo = { faceX: dx + (src.width / 2 - sx) * k, faceY: dy + (faceY - sy) * k, top: dy + (R.up - 20 - sy) * k, k };
-    const fc = V.el.querySelector("canvas.face"), fg = fc && fc.getContext ? fc.getContext("2d") : null;
-    if (fg) {
-      fg.clearRect(0, 0, fc.width, fc.height);
-      try {
-        fg.drawImage(src, src.width / 2 - 105, R.up + 40, 210, 210, 0, 0, fc.width, fc.height);
-      } catch (e) {
+    return { faceX: dx + (f.fx - sx) * k, faceY: dy + (f.fy - sy) * k, top: dy + (f.top - sy) * k, k };
+  }
+  var faceOf = (g, f, x, y, w, h2) => {
+    try {
+      g.drawImage(f.src, f.fx - 105 * f.u, f.fy - 105 * f.u, 210 * f.u, 210 * f.u, x, y, w, h2);
+    } catch (e) {
+    }
+  };
+  var myMn = () => Number(W15.Player && W15.Player.MemberNumber) || 0;
+  function drawBody(t) {
+    if (!V.el || !V.on) return;
+    const cv = V.el.querySelector("canvas.body"), g = cv && cv.getContext ? cv.getContext("2d") : null;
+    if (!g) return;
+    g.clearRect(0, 0, cv.width, cv.height);
+    const L = look2(), show2 = V.on.t.show, me5 = figOf(W15.Player), H2 = cv.height, mates = herdMates();
+    let main = null, geo = null;
+    if (mates.length) {
+      const figs = [myMn()].concat(mates).sort((a, b) => a - b).map((mn) => ({ mn, f: mn === myMn() ? me5 : figOf(charOf4(mn)) })).filter((x) => x.f).slice(0, 5);
+      const slot = cv.width / Math.max(1, figs.length);
+      for (const x of figs) {
+        const hh = Math.min(H2 * 0.9, slot * 0.98 * x.f.sh / x.f.sw), ww = hh * x.f.sw / x.f.sh, i = figs.indexOf(x);
+        const gg = drawFig(g, x.f, i * slot + (slot - ww) / 2, H2 - hh, hh, 0);
+        if (x.mn === myMn()) geo = gg;
+      }
+      main = me5;
+    } else {
+      const cr = show2 === "wearer" || show2 === "eyes" ? null : crafterFig();
+      main = cr || me5;
+      if (!main) return;
+      let z = 0;
+      if (L.fx.includes("zoom")) z = (calmNow() ? 0.5 : 0.5 - 0.5 * Math.cos(2 * Math.PI * (t || 0) / 60)) * (0.3 + 0.6 * V.depth);
+      const hh = H2 * 0.96, ww = hh * main.sw / main.sh;
+      geo = drawFig(g, main, (cv.width - ww) / 2, H2 - hh, hh, z);
+      if (show2 === "loom" && cr && me5) {
+        const h2 = H2 * 0.34;
+        geo = drawFig(g, me5, cv.width / 2 + ww * 0.06, H2 - h2, h2, 0);
       }
     }
+    V.geo = geo;
+    const fc = V.el.querySelector("canvas.face"), fg = fc && fc.getContext ? fc.getContext("2d") : null;
+    if (fg && main) {
+      fg.clearRect(0, 0, fc.width, fc.height);
+      faceOf(fg, main, 0, 0, fc.width, fc.height);
+    }
+    const ec = V.el.querySelector("canvas.eyes"), eg = ec && ec.getContext ? ec.getContext("2d") : null;
+    if (eg) {
+      eg.clearRect(0, 0, ec.width, ec.height);
+      const cf = crafterFig();
+      if (cf) eyesDraw(eg, ec, cf, t);
+    }
+  }
+  function eyesDraw(g, c, f, t) {
+    const r = Math.min(c.width, c.height) * 0.3, cx = c.width / 2, cy = c.height * 0.45, a = calmNow() ? 0.32 : 0.26 + 0.08 * Math.sin(2 * Math.PI * (t || 0) / 8);
+    g.save();
+    g.globalAlpha = a;
+    faceOf(g, f, cx - r, cy - r, r * 2, r * 2);
+    g.restore();
+    g.save();
+    g.globalCompositeOperation = "destination-in";
+    const gr = g.createRadialGradient(cx, cy, r * 0.45, cx, cy, r);
+    gr.addColorStop(0, "rgba(0,0,0,1)");
+    gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr;
+    g.fillRect(0, 0, c.width, c.height);
+    g.restore();
+  }
+  var LIKE_KEY = "fhc-visor-likeness";
+  function crafterFig() {
+    const C2 = charOf4(V.on.crafter);
+    if (C2) {
+      const f = figOf(C2);
+      if (f) {
+        keepLikeness(V.on.crafter, f);
+        return f;
+      }
+    }
+    return likenessFig(V.on.crafter);
+  }
+  function keepLikeness(mn, f) {
+    const now = Date.now();
+    if (now - (V.likeAt[mn] || 0) < 12e4) return;
+    V.likeAt[mn] = now;
+    try {
+      const k = 0.5, c = W15.document.createElement("canvas");
+      c.width = Math.round(f.sw * k);
+      c.height = Math.round(f.sh * k);
+      const g = c.getContext("2d");
+      if (!g) return;
+      g.drawImage(f.src, f.sx, f.sy, f.sw, f.sh, 0, 0, c.width, c.height);
+      let data = "";
+      try {
+        data = c.toDataURL("image/webp", 0.8);
+      } catch (e) {
+        return;
+      }
+      if (typeof data !== "string" || !/^data:image\/(webp|png|jpeg)/.test(data) || data.length > 4e5) return;
+      V.likes[mn] = { at: now, data, fx: (f.fx - f.sx) * k, fy: (f.fy - f.sy) * k, top: (f.top - f.sy) * k, u: k * f.u };
+      const keys = Object.keys(V.likes).sort((a, b) => V.likes[b].at - V.likes[a].at);
+      for (const x of keys.slice(3)) delete V.likes[x];
+      delete V.likeImg[mn];
+      try {
+        LS.setItem(LIKE_KEY, JSON.stringify(V.likes));
+      } catch (e) {
+      }
+    } catch (e) {
+    }
+  }
+  function likenessFig(mn) {
+    const e = V.likes[mn];
+    if (!e || !e.data) return null;
+    let img2 = V.likeImg[mn];
+    if (!img2) {
+      img2 = V.likeImg[mn] = W15.document.createElement("img");
+      img2.src = e.data;
+    }
+    if (!img2.complete || !img2.naturalWidth) return null;
+    return { src: img2, sx: 0, sy: 0, sw: img2.naturalWidth, sh: img2.naturalHeight, fx: e.fx, fy: e.fy, top: e.top, u: e.u };
   }
   var SPEED = { still: 0, slower: 2 * Math.PI / 30, slow: 2 * Math.PI / 14 };
   function cols(t, L, calm2) {
@@ -23330,7 +23497,9 @@ wake: any
     if (!V.el) return;
     const w = W15.document.createElement("div");
     w.className = "sub";
-    w.textContent = V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
+    w.textContent = V.given.length ? V.given.shift() : V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
+    V.wordNow = w.textContent;
+    V.wordAt = Date.now();
     w.style.left = 15 + Math.random() * 45 + "%";
     w.style.top = 18 + Math.random() * 55 + "%";
     V.el.appendChild(w);
@@ -23406,6 +23575,11 @@ wake: any
       later2(nextSession, 6e4);
       return;
     }
+    const mates = herdMates();
+    if (mates.length && Math.min.apply(null, mates) < myMn()) {
+      later2(nextSession, 2e4);
+      return;
+    }
     const lib = library(), blocks = lib.blocks.filter((b) => !b.bad && (VISOR_KINDS.includes(b.kind) || b.kind === "session" && b.labels.visor));
     const all = blocks.filter((b) => b.kind === "session").map((b) => b.name), names2 = V.on.t.sessions.filter((n) => all.some((x) => x.toLowerCase() === n.toLowerCase()));
     const name = (names2.length ? names2 : all)[Math.floor(Math.random() * Math.max(1, (names2.length ? names2 : all).length))];
@@ -23419,23 +23593,42 @@ wake: any
       return;
     }
     const ms = steps2.reduce((n, s) => n + (s.gap || 0) * 1e3, 0);
-    V.run = { steps: steps2, i: 0, level, name: recipe ? recipe.name : "", depth: 0, base: Math.max(0.1, V.depth * 0.6) };
+    V.run = { steps: steps2, i: 0, level, name: recipe ? recipe.name : "", depth: 0, base: Math.max(0.1, V.depth * 0.6), herd: mates.length > 0, hl: Math.floor(Math.random() * HERD_LINES.length), ms: Math.round(ms + 3e5) };
     V.on.deepest = deeper(V.on.deepest, level);
     if (V.name && V.name.code === V.on.code) {
       V.name.level = deeper(V.name.level, level);
       keepName();
     }
     V.depth = V.run.base;
-    onHypno({ do: "under", by: BOT_MEMBER, ms: Math.round(ms + 3e5), level });
+    onHypno({ do: "under", by: BOT_MEMBER, ms: V.run.ms, level });
+    V.mine = tranceState.session;
     step();
   }
   function step() {
     const r = V.run;
-    if (!r || !V.on) return;
+    if (!r || !V.on || r.follow) return;
     const s = r.steps[r.i];
     if (!s) {
       finish2();
       return;
+    }
+    if (r.herd && herdMates().length) herdSend(r, s);
+    runStep(r, s);
+    r.i++;
+    V.depth = Math.max(r.base, r.i / r.steps.length);
+    later2(step, Math.max(1, s.gap || 0) * 1e3);
+  }
+  var HERD_LINES = [
+    "All of you now, side by side. One herd, one breath, one voice.",
+    "Look at you all, standin' together in the dark. Breathe in with them. Breathe out with them.",
+    "You're not alone down here. Your herd sinks with you, every breath, every word."
+  ];
+  function runStep(r, s) {
+    if (r.i === 0 && r.herd) {
+      const hl = HERD_LINES[r.hl] || HERD_LINES[0];
+      ctx2.toChat("[Voice] " + hl, "#a67fd4", true);
+      tranceVoice(hl);
+      V.lineNow = hl;
     }
     if (s.start || s.beats || s.look || s.volume != null) onHypno({ do: "cue", kind: s.kind, block: s.block, beats: s.beats || void 0, volume: s.volume, look: Object.assign({ words: true }, s.look || {}) });
     if (s.deeper) {
@@ -23446,13 +23639,11 @@ wake: any
       const line3 = say2(s.text);
       ctx2.toChat("[Voice] " + line3, "#a67fd4", true);
       tranceVoice(line3);
+      V.lineNow = line3;
       if (fxOn("wave")) waveOver(line3.length > 60 ? line3.split(/[.!?]/)[0] : line3);
       if (fxOn("breath") && r.i > 3 && Math.random() < 0.35) breathPuffs(3);
       if (fxOn("bloom") && /deeper|down|sink/i.test(line3) && Math.random() < 0.5) bloomOnce();
     }
-    r.i++;
-    V.depth = Math.max(r.base, r.i / r.steps.length);
-    later2(step, Math.max(1, s.gap || 0) * 1e3);
   }
   function finish2() {
     const r = V.run;
@@ -23475,6 +23666,440 @@ wake: any
     }
     later2(linesAsk, 6e3);
     later2(nextSession, 9e4);
+  }
+  var inRoom = () => {
+    try {
+      return typeof W15.ServerPlayerIsInChatRoom !== "function" || W15.ServerPlayerIsInChatRoom();
+    } catch (e) {
+      return false;
+    }
+  };
+  var roomSend = (type, data, to) => {
+    try {
+      W15.ServerSend("ChatRoomChat", makeMsg(type, data, to));
+    } catch (e) {
+    }
+  };
+  function herdMates() {
+    if (!V.on) return [];
+    const now = Date.now(), here2 = new Set((W15.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+    return Object.keys(V.rv).map(Number).filter((mn) => {
+      const x = V.rv[mn];
+      return x && x.on && x.code === V.on.code && now - x.at < 75e3 && here2.has(mn) && mn !== myMn();
+    });
+  }
+  var leaderOf = () => {
+    const m = herdMates();
+    return m.length ? Math.min.apply(null, m.concat(myMn())) : myMn();
+  };
+  function herdSend(r, s) {
+    const x = { text: s.text || "", kind: s.kind || "", gap: s.gap || 0, deeper: s.deeper || 0 };
+    if (s.start) x.start = 1;
+    if (s.beats) x.beats = s.beats;
+    if (s.look) x.look = s.look;
+    if (s.volume != null) x.volume = s.volume;
+    if (s.block) x.block = s.block;
+    roomSend("visorHerd", { code: V.on.code, i: r.i, n: r.steps.length, level: r.level, name: r.name, hl: r.hl, ms: r.i === 0 ? r.ms : void 0, s: x });
+  }
+  var num = (v, lo, hi) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : void 0;
+  };
+  function cleanStep(s) {
+    s = s && typeof s === "object" ? s : {};
+    const o = { text: String(s.text || "").replace(/[<>]/g, "").slice(0, 600), kind: String(s.kind || "").slice(0, 20), gap: num(s.gap, 0, 120) || 0, deeper: num(s.deeper, -50, 50) || 0, start: !!s.start, block: String(s.block || "").slice(0, 60) };
+    if (s.volume != null) o.volume = num(s.volume, 0, 100);
+    if (s.beats && typeof s.beats === "object") o.beats = { off: !!s.beats.off, from: num(s.beats.from, 1, 30), to: num(s.beats.to, 1, 30), over: num(s.beats.over, 0, 900) };
+    if (s.look && typeof s.look === "object") {
+      o.look = {};
+      for (const [k, v] of Object.entries(s.look).slice(0, 12)) if (/^[a-z]{1,12}$/i.test(k) && (typeof v === "boolean" || typeof v === "number")) o.look[k] = typeof v === "number" ? num(v, 0, 100) : v;
+    }
+    return o;
+  }
+  function herdFollow(m) {
+    if (!V.on || isBot2() || m.code !== V.on.code || m.from !== leaderOf()) return;
+    const n = Math.max(1, Math.min(200, Number(m.n) || 1)), i = Math.max(0, Math.min(n - 1, Number(m.i) || 0)), level = LEVELS_IN.includes(m.level) && m.level ? m.level : "fun";
+    let r = V.run;
+    if (!r || !r.follow || r.from !== m.from || i === 0) {
+      if (r && !r.follow) V.run = null;
+      r = V.run = { follow: true, from: m.from, steps: [], i, n, level, name: String(m.name || "").slice(0, 60), depth: 0, base: Math.max(0.1, V.depth * 0.6), herd: true, hl: Number(m.hl) || 0 };
+      V.on.deepest = deeper(V.on.deepest, level);
+      if (V.name && V.name.code === V.on.code) {
+        V.name.level = deeper(V.name.level, level);
+        keepName();
+      }
+      if (!tranceState.session) {
+        onHypno({ do: "under", by: BOT_MEMBER, ms: num(m.ms, 6e4, 72e5) || 18e5, level });
+        V.mine = tranceState.session;
+      }
+    }
+    r.i = i;
+    r.at = Date.now();
+    const s = cleanStep(m.s), me5 = tranceState.me || {};
+    if (s.text && !fitLine(s.text, me5.body)) s.text = "";
+    runStep(r, s);
+    V.depth = Math.max(r.base, (i + 1) / n);
+    if (i + 1 >= n) later2(() => {
+      if (V.run === r) finish2();
+    }, Math.max(1, s.gap) * 1e3);
+    clearTimeout(V.herdT);
+    V.herdT = setTimeout(() => {
+      try {
+        if (V.run === r && Date.now() - r.at > 55e3) {
+          V.run = null;
+          onHypno({ do: "wake" });
+          later2(nextSession, 5e3);
+        }
+      } catch (e) {
+      }
+    }, 6e4);
+  }
+  function roomTick() {
+    if (!ctx2 || isBot2()) return;
+    const now = Date.now(), here2 = new Set((W15.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+    for (const mn of Object.keys(V.rv)) if (now - V.rv[mn].at > 75e3 || !here2.has(Number(mn))) {
+      delete V.rv[mn];
+      if (V.peek && V.peek.mn === Number(mn)) closePeek("\u{1F300} Their visor's gone quiet.");
+    }
+    tint();
+    if (!inRoom()) {
+      V.saidKey = "";
+      return;
+    }
+    const d = V.on ? Math.round(V.depth * 10) * 10 : 0, key3 = V.on ? V.on.code + "|" + d + "|" + V.joins : "off";
+    if (key3 !== V.saidKey || V.on && now - V.saidAt > 3e4) {
+      if (V.on || V.saidKey && V.saidKey !== "off") roomSend("visorState", V.on ? { on: 1, code: V.on.code, crafter: V.on.crafter, d, feed: look2().feed || "" } : { on: 0 });
+      V.saidKey = key3;
+      V.saidAt = now;
+    }
+    if (!V.on) {
+      V.peekers = {};
+      return;
+    }
+    if (!V.emoteAt) V.emoteAt = now + 12e4 + Math.random() * 12e4;
+    if (now > V.emoteAt) {
+      V.emoteAt = now + 48e4 + Math.random() * 24e4;
+      if (!(ctx2.prefs() || {}).noVisorEmotes) roomEmote();
+    }
+    for (const mn of Object.keys(V.peekers)) {
+      if (V.peekers[mn] < now || !here2.has(Number(mn))) {
+        delete V.peekers[mn];
+        delete V.viewKey[mn];
+        continue;
+      }
+      const view2 = { pic: V.picNow, w: now - (V.wordAt || 0) < 4e3 ? V.wordNow : "", l: V.lineNow, d }, k = JSON.stringify(view2), last2 = V.viewKey[mn] || {};
+      if (k === last2.k || now - (last2.at || 0) < 4e3) continue;
+      V.viewKey[mn] = { k, at: now };
+      roomSend("visorView", view2, Number(mn));
+    }
+  }
+  var EMOTE_LIGHT = [
+    "{n}'s visor glows a soft pink. {n} has gone quiet behind it.",
+    "A slow spiral turns across the glass of {n}'s visor.",
+    "{n} sways a little where they are, the visor's light pulsin' slow.",
+    "{n}'s lips move without a sound, followin' some voice only they can hear.",
+    "Faint pink light spills from under {n}'s visor."
+  ];
+  var EMOTE_DEEP = [
+    "{n}'s visor pulses slow and pink. Their mouth hangs a little open.",
+    "{n} has gone slack behind the visor, breathin' slow and even.",
+    "A soft hum comes from {n}'s visor, and {n} sinks a little lower with it.",
+    "{n} doesn't seem to hear the room at all now, lost behind the pink glass.",
+    "A thin line of drool shines at the corner of {n}'s mouth, under the visor.",
+    "{n}'s head nods, slow, to a rhythm nobody else can hear."
+  ];
+  var EMOTE_HERD = ["{n} and the others in the same visors sway together, breathin' as one.", "{n} stands with the rest of their visored herd, all of them slack and quiet, all of them glowin' pink."];
+  function roomEmote() {
+    const P5 = W15.Player || {}, n = String(P5.Nickname || P5.Name || "Somebody");
+    const pool = herdMates().length && leaderOf() === myMn() ? EMOTE_HERD : V.depth >= 0.4 ? EMOTE_DEEP : EMOTE_LIGHT;
+    const line3 = pick(pool).replace(/\{n\}/g, n).replace(/\b(snap)(s)\b/gi, "$1\u2060$2");
+    try {
+      W15.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + line3 });
+    } catch (e) {
+    }
+  }
+  function tint() {
+    const d = W15.document;
+    if (!d || !d.head) return;
+    const mns = Object.keys(V.rv).filter((mn) => V.rv[mn].on && /^\d+$/.test(mn)), key3 = mns.join(",");
+    let s = d.getElementById("fhc-visor-room");
+    if (!mns.length) {
+      if (s) s.remove();
+      V.tintKey = "";
+      return;
+    }
+    if (s && V.tintKey === key3) return;
+    V.tintKey = key3;
+    if (!s) {
+      s = d.createElement("style");
+      s.id = "fhc-visor-room";
+      d.head.appendChild(s);
+    }
+    const sel = mns.map((mn) => ["Chat", "Whisper", "Emote"].map((t) => "#TextAreaChatLog .ChatMessage" + t + '[data-sender="' + mn + '"]').join(",")).join(",");
+    s.textContent = sel + "{background:linear-gradient(90deg,rgba(214,120,240,.16),rgba(214,120,240,0) 70%);text-shadow:0 0 6px rgba(230,150,250,.45)}";
+  }
+  function headAt(C2, X, Y, Z) {
+    const HR = Number(C2.HeightRatio) || 1;
+    const xo = typeof W15.CharacterAppearanceXOffset === "function" ? W15.CharacterAppearanceXOffset(C2, HR) : 500 * (1 - HR) / 2;
+    const yo = typeof W15.CharacterAppearanceYOffset === "function" ? W15.CharacterAppearanceYOffset(C2, HR) : 1e3 * (1 - HR);
+    return { HR, xo, yo, hx: X + (xo + 250 * HR) * Z, hy: Y + (yo + 138 * HR) * Z };
+  }
+  function drawOver(C2, X, Y, Z) {
+    const x = C2 && V.rv[C2.MemberNumber];
+    if (!x || !x.on || C2.MemberNumber === myMn() || !W15.MainCanvas || !W15.MainCanvas.getContext) return;
+    const g = W15.MainCanvas.getContext("2d"), p = headAt(C2, X, Y, Z), t = Date.now() / 1e3, a = calmNow() ? 0.45 : 0.38 + 0.14 * Math.sin(2 * Math.PI * t / 4);
+    g.save();
+    const rx = 78 * p.HR * Z, ry = 26 * p.HR * Z, gr = g.createRadialGradient(p.hx, p.hy, 0, p.hx, p.hy, rx);
+    gr.addColorStop(0, "rgba(255,170,230," + a.toFixed(3) + ")");
+    gr.addColorStop(0.6, "rgba(200,110,240," + (a * 0.6).toFixed(3) + ")");
+    gr.addColorStop(1, "rgba(160,80,220,0)");
+    g.fillStyle = gr;
+    g.beginPath();
+    g.ellipse(p.hx, p.hy, rx, ry, 0, 0, 7);
+    g.fill();
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.font = "bold " + Math.max(10, Math.round(24 * Z)) + "px sans-serif";
+    g.lineWidth = Math.max(2, 3 * Z);
+    g.strokeStyle = "rgba(30,10,40,.85)";
+    g.fillStyle = "rgba(240,200,255,.95)";
+    const ty = Y + (p.yo + 12 * p.HR) * Z;
+    g.strokeText("\u{1F300} " + (Number(x.d) || 0), p.hx, ty);
+    g.fillText("\u{1F300} " + (Number(x.d) || 0), p.hx, ty);
+    const ex = X + (p.xo + 400 * p.HR) * Z, ey = Y + (p.yo + 70 * p.HR) * Z, er = 24 * Z;
+    g.fillStyle = "rgba(40,20,55,.8)";
+    g.beginPath();
+    g.arc(ex, ey, er, 0, 7);
+    g.fill();
+    g.strokeStyle = "rgba(220,170,245,.85)";
+    g.lineWidth = Math.max(1, 2 * Z);
+    g.stroke();
+    g.font = Math.max(10, Math.round(24 * Z)) + "px sans-serif";
+    g.fillStyle = "#fff";
+    g.fillText("\u{1F441}", ex, ey + Z);
+    g.restore();
+  }
+  function clickOver(C2, cx, cy) {
+    const x = C2 && V.rv[C2.MemberNumber];
+    if (!x || !x.on || C2.MemberNumber === myMn()) return false;
+    const p = headAt(C2, 0, 0, 1), ex = p.xo + 400 * p.HR, ey = p.yo + 70 * p.HR;
+    if (Math.hypot(cx - ex, cy - ey) > 34) return false;
+    openPeek(C2.MemberNumber);
+    return true;
+  }
+  function openPeek(mn) {
+    const x = V.rv[mn];
+    if (!x || !x.on) return;
+    closePeek();
+    if (!V.cache[x.code]) ask3(x.code);
+    const d = W15.document;
+    css2();
+    const box3 = d.createElement("div");
+    box3.id = "fhc-peek";
+    const hd = d.createElement("div");
+    hd.className = "hd";
+    const ttl = d.createElement("span");
+    ttl.textContent = "\u{1F441} Inside " + nameOf2(mn) + "'s visor";
+    hd.appendChild(ttl);
+    const cl = d.createElement("button");
+    cl.type = "button";
+    cl.textContent = "\u2715";
+    cl.title = "Stop peekin'";
+    cl.addEventListener("click", () => closePeek());
+    hd.appendChild(cl);
+    const st2 = d.createElement("div");
+    st2.className = "st";
+    const pic = d.createElement("img");
+    pic.className = "pic";
+    pic.alt = "";
+    pic.referrerPolicy = "no-referrer";
+    st2.appendChild(pic);
+    const sp = d.createElement("canvas");
+    sp.width = 280;
+    sp.height = 300;
+    st2.appendChild(sp);
+    const bd = d.createElement("canvas");
+    bd.width = 280;
+    bd.height = 300;
+    st2.appendChild(bd);
+    const ln = d.createElement("div");
+    ln.className = "ln";
+    st2.appendChild(ln);
+    const dp = d.createElement("div");
+    dp.className = "dp";
+    dp.textContent = "\u{1F300} " + (Number(x.d) || 0);
+    st2.appendChild(dp);
+    box3.appendChild(hd);
+    box3.appendChild(st2);
+    const nt = d.createElement("div");
+    nt.className = "nt";
+    if (x.feed) {
+      const fd = d.createElement("div");
+      fd.className = "fd";
+      const inp = d.createElement("input");
+      inp.maxLength = 24;
+      inp.placeholder = "feed them a word";
+      const go = d.createElement("button");
+      go.type = "button";
+      go.textContent = "Feed";
+      const send4 = () => {
+        const w = inp.value.trim();
+        if (!w) return;
+        roomSend("visorFeed", { w: w.slice(0, 24) }, mn);
+        inp.value = "";
+        nt.textContent = "Sent: it shows in their dark if they'll take it from you.";
+      };
+      go.addEventListener("click", send4);
+      inp.addEventListener("keydown", (e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") send4();
+      });
+      fd.appendChild(inp);
+      fd.appendChild(go);
+      box3.appendChild(fd);
+      nt.textContent = x.feed === "keys" ? "Only their crafter or keyholders can feed it." : "Anybody can feed it a word.";
+    }
+    box3.appendChild(nt);
+    box3.addEventListener("mousedown", (e) => e.stopPropagation());
+    const c = d.getElementById("MainCanvas"), r = c && c.getBoundingClientRect();
+    Object.assign(box3.style, { left: (r ? r.left + r.width / 2 - 290 : 20) + "px", top: (r ? r.top + 14 : 20) + "px" });
+    d.body.appendChild(box3);
+    V.peek = { mn, box: box3, pic, sp, bd, ln, dp, st: st2, nt, picNow: "", t0: Date.now() };
+    roomSend("visorPeek", { on: 1 }, mn);
+    V.peek.ping = setInterval(() => {
+      if (V.peek && V.peek.mn === mn) roomSend("visorPeek", { on: 1 }, mn);
+    }, 2e4);
+    V.peek.draw = setInterval(peekDraw, 66);
+  }
+  function closePeek(say4) {
+    const p = V.peek;
+    if (!p) return;
+    V.peek = null;
+    clearInterval(p.ping);
+    clearInterval(p.draw);
+    roomSend("visorPeek", { on: 0 }, p.mn);
+    if (p.vid) letGo2(p.vid);
+    p.box.remove();
+    if (say4 && ctx2) ctx2.toChat(say4, "#a67fd4", true);
+  }
+  function peekDraw() {
+    const p = V.peek;
+    if (!p) return;
+    const x = V.rv[p.mn];
+    if (!x) return;
+    const t = V.cache[x.code] || { show: "crafter" };
+    const L = lookOf(t), now = Date.now() / 1e3, gs = p.sp.getContext && p.sp.getContext("2d"), gb = p.bd.getContext && p.bd.getContext("2d");
+    try {
+      if (gs) spiral(gs, now, L.place === "over" ? 0 : L.spOp, L, calmNow());
+    } catch (e) {
+    }
+    if (!gb) return;
+    gb.clearRect(0, 0, p.bd.width, p.bd.height);
+    const them = charOf4(p.mn), C2 = t.show === "wearer" || t.show === "eyes" ? them : charOf4(x.crafter) || them, f = figOf(C2);
+    if (f) {
+      const hh = p.bd.height * 0.94, ww = hh * f.sw / f.sh;
+      drawFig(gb, f, (p.bd.width - ww) / 2, p.bd.height - hh, hh, 0);
+    }
+  }
+  function peekView(m) {
+    const p = V.peek;
+    if (!p || m.from !== p.mn) return;
+    const x = V.rv[p.mn], t = x && V.cache[x.code];
+    if (typeof m.pic === "string" && m.pic !== p.picNow) {
+      p.picNow = m.pic;
+      const url = /^farm:\d$/.test(m.pic) ? farmPatterns()[Number(m.pic.slice(5))] || "" : okLink(m.pic) ? m.pic : "";
+      if (url) {
+        const el2 = mediaFor(url, t || { fit: "cover" }, false);
+        el2.style.opacity = String(t ? t.picOp : 0.35);
+        if (p.vid) letGo2(p.vid);
+        p.vid = el2.tagName === "VIDEO" ? el2 : null;
+        p.pic.replaceWith(el2);
+        p.pic = el2;
+        el2.src = url;
+        if (p.vid) {
+          try {
+            const q2 = el2.play();
+            if (q2 && q2.catch) q2.catch(() => {
+            });
+          } catch (e) {
+          }
+        }
+      }
+    }
+    if (m.w) {
+      const w = W15.document.createElement("div");
+      w.className = "w";
+      w.textContent = String(m.w).slice(0, 24);
+      p.st.appendChild(w);
+      setTimeout(() => w.remove(), 1e3);
+    }
+    if (typeof m.l === "string") p.ln.textContent = m.l.slice(0, 200);
+    if (m.d != null) p.dp.textContent = "\u{1F300} " + (Number(m.d) || 0);
+  }
+  function fedWord(m) {
+    if (!V.on) return;
+    const F = look2().feed, from = m.from, now = Date.now();
+    const ok2 = F === "all" || F === "keys" && (from === V.on.crafter || keyholders().includes(from));
+    const reply = (k, why) => roomSend("visorFed", { ok: k ? 1 : 0, why: why || "" }, from);
+    if (!ok2) {
+      reply(false, "it doesn't take words from you");
+      return;
+    }
+    if (now - (V.feedAt[from] || 0) < 3e4) {
+      reply(false, "slow down: one word every 30 seconds");
+      return;
+    }
+    const w = String(m.w || "").replace(/[^\p{L}\p{Nd}' !?-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 24);
+    if (!w) {
+      reply(false, "that isn't a word it can show");
+      return;
+    }
+    V.feedAt[from] = now;
+    V.given.push(w);
+    V.given = V.given.slice(-5);
+    reply(true);
+  }
+  var FEEDS_OK = ["", "keys", "all"];
+  function roomMsg(m) {
+    const me5 = myMn();
+    if (m.type === "visorState") {
+      if (m.from === me5) return;
+      if (!m.on) {
+        delete V.rv[m.from];
+        if (V.peek && V.peek.mn === m.from) closePeek("\u{1F300} " + nameOf2(m.from) + "'s visor is off now.");
+        tint();
+        return;
+      }
+      V.rv[m.from] = { on: true, code: String(m.code || "").toLowerCase().slice(0, 12), crafter: Number(m.crafter) || 0, d: num(m.d, 0, 100) || 0, feed: FEEDS_OK.includes(m.feed) ? m.feed : "", at: Date.now() };
+      tint();
+      return;
+    }
+    if (m.type === "visorHerd") {
+      herdFollow(m);
+      return;
+    }
+    if (m.type === "visorPeek") {
+      if (!V.on) return;
+      if (!m.on) {
+        delete V.peekers[m.from];
+        delete V.viewKey[m.from];
+        return;
+      }
+      const fresh2 = !V.peekers[m.from];
+      if (fresh2 && Object.keys(V.peekers).length >= 3) return;
+      V.peekers[m.from] = Date.now() + 45e3;
+      if (fresh2) ctx2.toChat("\u{1F441} " + nameOf2(m.from) + " is lookin' in through your visor.", "#c39be0", true);
+      return;
+    }
+    if (m.type === "visorView") {
+      peekView(m);
+      return;
+    }
+    if (m.type === "visorFeed") {
+      fedWord(m);
+      return;
+    }
+    if (m.type === "visorFed" && V.peek && V.peek.mn === m.from) V.peek.nt.textContent = m.ok ? "\u{1F300} Your word went into their dark." : "It didn't take: " + String(m.why || "").slice(0, 80) + ".";
   }
   var RUNGS = [
     { h: 1, chat: "whisper", say: "it whispers to you in the chat now" },
@@ -23659,12 +24284,13 @@ wake: any
     afterDraw();
   }
   function afterTick() {
-    if (V.after && !(V.after.until > Date.now() && Array.isArray(V.after.words) && V.after.words.length)) {
+    if (V.after && (noAfter() || !(V.after.until > Date.now() && Array.isArray(V.after.words) && V.after.words.length))) {
       V.after = null;
       keepAfter();
     }
     afterDraw();
   }
+  var noAfter = () => !!(ctx2 && (ctx2.prefs() || {}).noAfter);
   function afterDraw() {
     const d = W15.document;
     if (!d || !d.body) return;
@@ -23741,7 +24367,8 @@ wake: any
     aura: "an aura round the body",
     meter: "a trance meter",
     face: "a close-up of the face, in the corner",
-    zoom: "the view comin' in close to the face"
+    zoom: "the view comin' in close to the face",
+    after: "an afterimage at the edges of their screen once it comes off (minutes to hours, by how deep)"
   };
   function maker() {
     try {
@@ -23880,7 +24507,8 @@ wake: any
         linesLock: M.linesLock,
         fx: M.fx,
         pet: M.pet,
-        sink: M.sink
+        sink: M.sink,
+        feed: M.feed
       });
       const code = tuningCode(t);
       remember(code, t);
@@ -23915,7 +24543,7 @@ wake: any
         list2.length ? list2.map((s) => h("label", { style: { display: "block" } }, h("input", { type: "checkbox", checked: M.sessions.includes(s.name) || null, onchange: (e) => set2("sessions", (e.target.checked ? M.sessions.concat(s.name) : M.sessions.filter((x) => x !== s.name)).slice(0, MAX_SESSIONS)) }), " " + s.name + " (" + s.level.join(", ") + ")")) : muted("(the farm's list is still loadin')")
       ),
       h("div", null, muted("Before a hardcore wearer can take it off:"), h("select", { onchange: (e) => set2("need", Number(e.target.value)) }, [0, 1, 2, 3, 4, 5].map((n) => opt(n, n ? n + " full session" + (n === 1 ? "" : "s") : "any time", M.need)))),
-      h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set2("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show))),
+      h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set2("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show), opt("loom", "mine, towerin' over them, small at my feet", M.show), opt("eyes", "their own, with my face in the spiral, watchin'", M.show))),
       h("div", null, muted("Subliminal words (comma between):"), h("input", { value: M.words, size: 40, placeholder: "good cow, empty, deeper", onchange: (e) => set2("words", e.target.value) })),
       h(
         "div",
@@ -23964,6 +24592,7 @@ wake: any
         muted("A pet name for whoever wears it (their name in the room while it's on, and a while after; anybody who says it takes them down):"),
         h("input", { value: M.pet || "", size: 22, maxlength: 20, placeholder: "Bessie", onchange: (e) => set2("pet", e.target.value) })
       ),
+      h("div", null, muted("Who can feed a word into their dark, peekin' in:"), h("select", { onchange: (e) => set2("feed", e.target.value) }, opt("", "nobody", M.feed), opt("keys", "me and their keyholders", M.feed), opt("all", "anybody in the room", M.feed))),
       h(
         "div",
         null,
@@ -24109,6 +24738,8 @@ wake: any
       pref(ctx5, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
       prefNot(ctx5, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
       prefNot(ctx5, "noVisor", "Farm visors", "A crafted farm visor on you (its description says farm visor: #\u2026) takes the room away: only one body, the crafter's pictures and words, and the farm's sessions one after another. A small icon in its corner takes it off (in the Dispensary's hardcore, only once its sessions are done). Your safeword always ends it. Off: a farm visor's just a visor."),
+      prefNot(ctx5, "noAfter", "Visor afterimages", "After a farm visor comes off (one whose crafter picked it), a faint spiral at the edges of your screen and the odd word driftin' by, for a while: minutes after a light session, hours after a deep one. Off: none, and one that's showin' goes."),
+      prefNot(ctx5, "noVisorEmotes", "Visor lines in the room", "While a farm visor has you, now and then a line about you goes to the room as your own emote (your visor glowin', you swayin'), so people without the Companion see it too. Off: none."),
       prefNot(ctx5, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
       pref(ctx5, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
       ctx5.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx5.setPref("farmBeatsVol", v) }, v + "%"))) : null
@@ -27748,11 +28379,11 @@ wake: any
     return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
   };
   var loggedIn = () => !!(W18.Player && W18.Player.MemberNumber) && W18.CurrentScreen !== "Login" && W18.CurrentScreen !== "Relog";
-  var inRoom = () => W18.CurrentScreen === "ChatRoom" && !!W18.ChatRoomData;
-  var atFarm = (h2) => inRoom() && !!h2 && String(W18.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
+  var inRoom2 = () => W18.CurrentScreen === "ChatRoom" && !!W18.ChatRoomData;
+  var atFarm = (h2) => inRoom2() && !!h2 && String(W18.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
   function tell4(text3) {
     try {
-      if (inRoom() && deps.say) {
+      if (inRoom2() && deps.say) {
         deps.say(text3);
         return;
       }
@@ -29232,7 +29863,7 @@ wake: any
       }
       return;
     }
-    if (/^visor(Ask|Tune|Unlock|Unlocked|Name|Reset|Ok)$/.test(m.type)) {
+    if (/^visor(Ask|Tune|Unlock|Unlocked|Name|Reset|Ok|State|Herd|Peek|View|Feed|Fed)$/.test(m.type)) {
       try {
         onVisorMsg(m);
       } catch (e) {

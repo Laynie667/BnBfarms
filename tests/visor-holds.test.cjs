@@ -15,6 +15,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   // ── a game page ──
   const page = new JSDOM('<!doctype html><html><head></head><body><canvas id="MainCanvas" width="2000" height="1000"></canvas><div id="TextAreaChatLog"></div></body></html>', { url: 'https://www.bondageprojects.elementfx.com/R134/BondageClub/' });
   const W = page.window; global.window = W; global.document = W.document;
+  W.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/webp;base64,AAAA';
   W.HTMLCanvasElement.prototype.getContext = function () { const cv = this; return new Proxy({}, { get: (o, k) => (k === 'canvas' ? cv : k === 'measureText' ? () => ({ width: 10 }) : () => {}), set: () => true }); };
   const sent = [], chats = [], toBot = [], cmds = [];
   W.Player = { MemberNumber: 500, Name: 'Moo', Nickname: 'Moo-moo', Appearance: [], ActivePose: [], ArousalSettings: { Progress: 10 }, IsPlayer: () => true, Canvas: { width: 500, height: 1850 } };
@@ -59,7 +60,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     Vis.check(); Vis.onVisorMsg({ type: 'visorTune', from: 221397, code, t }); return code;
   };
   const takeOff = () => { W.Player.Appearance = []; Vis.check(); };
-  const T = { sessions: ['For Visors'], need: 1, words: ['good cow'], pet: 'Bessie', chat: [] };
+  const T = { sessions: ['For Visors'], need: 1, words: ['good cow'], pet: 'Bessie', chat: [], fx: ['after'] };   // (the afterimage: the crafter's pick, Nov 26)
 
   // ── 1. the pet name ──
   const code = wear(T);

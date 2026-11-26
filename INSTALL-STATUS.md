@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.7.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.8.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.88.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.89.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.89.0 + Conditioning 2.8.0: the visor in the room: seen from outside, peekin' in, herd trance, the crafter loomin'; afterimages the crafter's pick** Laynie, Nov 25-26: from the visor ideas she picked "5-8" and said "sounds good"; and about the afterimage she didn't expect ("i have a spiral super imposed on my screen, even with no visor"), "yes" to makin' it the crafter's pick with a wearer's own switch.
+  - **Afterimages**: only a visor whose crafter ticked "an afterimage at the edges…" in the Visor maker leaves one now (visors made before don't). And any wearer can switch them off on the trance card ("Visor afterimages"), which also clears one that's showin'.
+  - **Seen from outside**: while a farm visor has somebody, everybody else with the Companion sees a slow pink glow over their eyes, how deep they are (🌀 60) over their head and a small 👁 beside it, in the room's character view (the map view gets the rest), and their lines in the chat tinted pink. Now and then (8 to 12 minutes apart) a line about them goes to the room as their own emote, so people without the Companion see it too ("{n}'s visor pulses slow and pink. Their mouth hangs a little open."); "Visor lines in the room" on the trance card switches that off.
+  - **Peek inside**: a click on the 👁 opens a little window into their visor: the spiral, the body they see, and the picture, word and line showin' right now (silent videos too). The wearer's told who's lookin' in. Three peekers at a time, and what's sent is small and only to the peekers (every 4 seconds at most). If the crafter picked it in the maker ("me and their keyholders", or "anybody in the room"), a peeker can feed a word into their dark: it's the next word they see. One every 30 seconds each; only letters and numbers get through.
+  - **Herd trance**: everybody in the room wearin' the same visor (the same crafter, the same code) shares one session. The lowest member number leads; the rest follow it line by line, each line in their own name, with a welcome for the herd at the start. Their bodies stand side by side in each other's dark, and they sink together. Each still earns their own sessions toward their own lock. If the leader goes quiet for a minute, the rest go back to their own sessions.
+  - **The crafter looms**: two new choices for whose body they see: the crafter towerin' with them small at the crafter's feet, or their own body with the crafter's face hoverin' faint over them in the spiral, watchin'. When the crafter isn't in the room, the visor uses a small likeness of them it kept the last time they were (on the wearer's computer only, three crafters at most).
+  - Fixed: a visor taken off in the few seconds right after a session ended left that session's trance runnin' till it timed out; it's woken now.
 
 - **Companion 0.88.0 + Conditioning 2.7.0: movin' pictures in the visor: GIFs and silent videos, a link fixer, a kaleidoscope that keeps them movin', and Test my links** Laynie, Nov 26: "is there a way to make animated gifs work for the visor?", then "all four".
   - **Silent videos count as pictures**: a link straight to an .mp4 or .webm plays muted and loopin' in the picture's place, see-through like any picture, never a sound and no controls. Most GIF sites send video now (Giphy, Tenor, Imgur, RedGIFs), so this is what makes most of them move. Only the one showin' plays; the one that's faded out is stopped and let go of, so it stays light.

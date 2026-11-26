@@ -35,6 +35,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const W = page.window; global.window = W; global.document = W.document;
   // (a stand-in for the browser's drawin': every call does nothin', drawImage is written down)
   const drawn = [], draws = [];
+  W.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/webp;base64,AAAA';
   W.HTMLCanvasElement.prototype.getContext = function () {
     const cv = this;
     return new Proxy({}, { get: (o, k) => (k === 'canvas' ? cv : k === 'drawImage' ? (...a) => { drawn.push(a[0]); draws.push({ on: cv.className, a }); } : k === 'measureText' ? () => ({ width: 10 }) : () => {}), set: () => true });

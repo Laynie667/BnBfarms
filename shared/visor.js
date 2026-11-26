@@ -70,10 +70,16 @@ export const SPIRALS = ["classic", "pinwheel", "tight", "tunnel", "counter", "he
 export const SPINS = ["slow", "slower", "still"];
 export const PLACES = ["behind", "over", "both"];
 export const CHAT_FX = ["whisper", "melt", "fade", "watermark"];
-export const FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
+// ("after", Nov 26: the afterimage once it comes off is the crafter's pick now, not every visor's; Laynie: "yes")
+export const FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom", "after"];
+// whose body they see (Nov 26, "the crafter looms"): the crafter's, their own, the crafter towerin' over them small at
+// their feet, or their own with the crafter's face in the middle of the spiral, watchin'
+export const SHOWS = ["crafter", "wearer", "loom", "eyes"];
+// who may feed a word into it when they peek in: nobody, the crafter and the wearer's keyholders, or anyone
+export const FEEDS = ["", "keys", "all"];
 // …and (Nov 25, Laynie picked them: "1, 5-8, 10, 11, 12 are good") the pet name the visor gives its wearer (their name in
 // the room while it holds, and their trigger), and whether it sinks deeper the longer it's worn
-export const LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+export const LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false, feed: "" };
 // a pet name the game takes as a name: letters, numbers, spaces, ' and -, 20 at most (BC's ServerCharacterNicknameRegex)
 export const petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
 export function lookOf(t) { return Object.assign({}, LOOK_DEFAULTS, t || {}); }   // (a tuning with its defaults filled in, for showin' it)
@@ -95,6 +101,7 @@ export function normTuning(t) {
   keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
   keep("pet", petName(t.pet));
   keep("sink", !!t.sink);
+  keep("feed", FEEDS.includes(t.feed) ? t.feed : "");
   return out;
 }
 function base(t, list) {
@@ -102,7 +109,7 @@ function base(t, list) {
     v: 1,
     sessions: list(t.sessions, MAX_SESSIONS, 60),
     need: Math.round(clamp(t.need, 0, MAX_NEED, 1)),
-    show: t.show === "wearer" ? "wearer" : "crafter",
+    show: SHOWS.includes(t.show) ? t.show : "crafter",
     words: list(t.words, MAX_WORDS, 24),
     set: str(t.set, 40),
     pictures: (Array.isArray(t.pictures) ? t.pictures : []).filter(okLink).slice(0, MAX_PICS),

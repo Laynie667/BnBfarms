@@ -166,6 +166,7 @@ export function check() {
       if (V.on) stop(false, "🌀 Farm visors are switched off for you: the room comes back.");
       if (V.name) giveName("🌀 Farm visors are switched off for you: your own name comes back.");
       if (V.after) { V.after = null; keepAfter(); afterDraw(); }
+      onIcon(null);
       return;
     }
     visorCheck();
@@ -174,6 +175,7 @@ export function check() {
 }
 function visorCheck() {
   const w = wornVisor();
+  onIcon(w && V.off[w.code] && !V.on ? w : null);
   if (!w) {
     if (V.on) off("🌀 The visor comes off, and the room comes back.");
     for (const k of Object.keys(V.done)) if (V.done[k]) { V.done[k] = 0; keepDone(); }   // (a fresh wearin' starts the count again)
@@ -191,14 +193,41 @@ function visorCheck() {
   }
   if (V.on && V.on.code === w.code) { place(); tickHours(); return; }
   if (V.on) stop(true);
-  const t = V.cache[w.code];
-  if (t) { start(w, t, back); return; }
+  const t = V.cache[w.code], mode = back ? "back" : V.again ? "again" : "";
+  V.again = false;
+  if (t) { start(w, t, mode); return; }
   ask(w.code);
 }
 const setOff = (code, why) => { V.off[code] = { why, load: LOAD_ID, joins: V.joins }; keepOff(); };
+// Laynie, Nov 26: "need to add a action on the visors so can turn it back on if they want, without re equipping".
+// While a farm visor's worn but switched off (its icon, or the safeword), a small dim 🌀 sits in the same corner: a click
+// (or /visor on) and it takes hold again. Always their own choice: nothin' asks them to.
+function onIcon(w) {
+  const d = W.document; if (!d || !d.body) return;
+  let b = d.getElementById("fhc-visor-on");
+  if (!w) { if (b) b.remove(); return; }
+  css();
+  if (!b) {
+    b = d.createElement("button"); b.type = "button"; b.id = "fhc-visor-on"; b.textContent = "🌀";
+    b.addEventListener("click", (e) => { e.stopPropagation(); turnOn(); });
+    b.addEventListener("mousedown", (e) => e.stopPropagation());
+    d.body.appendChild(b);
+  }
+  b.title = "Let the " + w.item + " take hold of you again (the room goes dark)";
+  const c = d.getElementById("MainCanvas"), r = c && c.getBoundingClientRect();
+  if (r) Object.assign(b.style, { left: (r.left + 10) + "px", top: (r.top + Math.max(40, r.height) - 40) + "px" });
+}
+export function turnOn() {
+  if ((ctx.prefs() || {}).noVisor) { ctx.toChat("🌀 Farm visors are switched off for you (Settings › the farm's trance). Switch them back on first.", "#a67fd4", true); return; }
+  const w = wornVisor();
+  if (!w || V.on || !V.off[w.code]) { ctx.toChat(V.on ? "🌀 Your visor's already got hold of you." : "🌀 There's no farm visor on you that's switched off.", "#a67fd4", true); return; }
+  delete V.off[w.code]; keepOff();
+  V.again = true;
+  check();
+}
 // the safeword: the visor lets go at once, their own name comes back, no afterimage, lock or no lock
 function safeword(say) {
-  if (V.on) { setOff(V.on.code, "safeword"); stop(false, say); }
+  if (V.on) { setOff(V.on.code, "safeword"); stop(false, say); onIcon(wornVisor()); }
   if (V.name) giveName("🌀 Your own name comes back to you.");
   if (V.after) { V.after = null; keepAfter(); afterDraw(); }
 }
@@ -266,8 +295,9 @@ const owedTill = () => { const n = needOf(), o = []; if ((V.done[V.on.code] || 0
 // name back, or starts its sinkin' over
 const ASKS = { unlock: ["visorUnlock", "it opens"], name: ["visorName", "they get their own name back"], reset: ["visorReset", "its sinkin' starts over"] };
 function command(args) {
+  if (/^\s*on\s*$/i.test(args)) { turnOn(); return; }
   const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
-  if (!m) { ctx.toChat("🌀 /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over. For a visor you crafted, or somebody whose key you hold.", "#a67fd4", true); return; }
+  if (!m) { ctx.toChat("🌀 /visor on: let your switched-off farm visor take hold of you again. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true); return; }
   const q = m[2].trim().toLowerCase(), c = (W.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q));
   if (!c) { ctx.toChat("🌀 Nobody here by that name.", "#a67fd4", true); return; }
   const [type, then] = ASKS[m[1].toLowerCase()];
@@ -287,10 +317,11 @@ function start(w, t, back) {
   V.depth = 0.1; V.geo = null; V.spun = false; V.hourAt = Date.now(); V.fed = [];
   V.L = computeLook();
   if (V.after) { V.after = null; keepAfter(); }   // (on again: the old afterimage goes under the new dark)
+  onIcon(null);
   afterDraw();
   build();
-  ctx.toChat((back ? "🌀 The " + w.item + "'s still on you, and it takes hold of you again." : "🌀 The " + w.item + " settles over your eyes, and the room goes dark around you.") +
-    (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
+  ctx.toChat((back === "back" ? "🌀 The " + w.item + "'s still on you, and it takes hold of you again." : back === "again" ? "🌀 You let the " + w.item + " take hold of you again, and the room goes dark." :
+    "🌀 The " + w.item + " settles over your eyes, and the room goes dark around you.") + (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
   nameOn();
   linesAsk();
   later(nextSession, back ? 1500 : 5000);
@@ -357,6 +388,8 @@ function css() {
     "#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}" +
     "#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}" +
     "#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}" +
+    "#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}" +
+    "#fhc-visor-on:hover{opacity:.95}" +
     "#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}" +
     "#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}" +
     // the afterimage: a faint spiral at the edges of the ordinary screen, and the odd word driftin' by
@@ -629,7 +662,9 @@ function iconClick(e) {
   if (!V.on) return;
   if (visorLocked()) { ctx.toChat("🔒 The visor won't come off yet: " + owedText() + ". Its crafter or your keyholders can open it early; your safeword always ends it.", "#a67fd4", true); return; }
   setOff(V.on.code, "icon");
-  off("🌀 You take the visor's hold off. The room comes back" + (hardcore() ? " for now: it takes hold again when you next log in or change rooms." : " (it starts again if you put it back on)."));
+  const w = wornVisor();
+  off("🌀 You take the visor's hold off. The room comes back" + (hardcore() ? " for now: it takes hold again when you next log in or change rooms, or sooner with the little 🌀 in the corner or /visor on." : ". The little 🌀 in the corner, or /visor on, lets it take hold again."));
+  onIcon(w);
 }
 // the farm's own patterns, for a visor with no pictures of its own
 function farmPatterns() {

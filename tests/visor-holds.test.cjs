@@ -148,7 +148,23 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   hooks.ChatRoomSafewordRelease([], () => {});
   W.ChatRoomData = { Name: 'Barn' }; Vis.check(); S.off[c2].load = 'an-older-load'; Vis.check();
   ok(!el() && S.off[c2].why === 'safeword', 'the safeword\'s off sticks, rooms and log-ins or not, till it\'s taken off and put back on');
+  // turnin' it back on without takin' it off (Laynie, Nov 26: "need to add a action on the visors so can turn it back on if they want, without re equipping")
+  const onBtn = () => W.document.getElementById('fhc-visor-on');
+  ok(onBtn() && onBtn().textContent === '🌀' && /take hold of you again/.test(onBtn().title), 'worn but switched off: a small 🌀 in the corner');
+  chats.length = 0; cmds.find((x) => x.Tag === 'visor').Action('on');
+  ok(el() && !onBtn() && said(/You let the Bessie Visor take hold of you again, and the room goes dark/), '/visor on: it takes hold again, no re-equippin\' (after the safeword too: their own choice)');
+  chats.length = 0; cmds.find((x) => x.Tag === 'visor').Action('on');
+  ok(said(/already got hold of you/), '...already on: says so');
+  S.unlocked[c2] = true; el().querySelector('button.icon').click();
+  ok(!el() && onBtn() && said(/sooner with the little 🌀 in the corner or \/visor on/), 'taken off with its icon: the 🌀 shows straight away, and they\'re told about it');
+  onBtn().click();
+  ok(el() && !onBtn(), 'a click on the 🌀: on again');
+  prefs.noVisor = true; Vis.check();
+  ok(!el() && !onBtn(), '"Farm visors" switched off: no visor, no 🌀');
+  prefs.noVisor = false;
   takeOff();
+  chats.length = 0; cmds.find((x) => x.Tag === 'visor').Action('on');
+  ok(said(/no farm visor on you that's switched off/), '/visor on with nothin\' to turn on: says so');
   ok(!Object.keys(S.off).length, '(taken off for real: the slate\'s clean)');
 
   // ── 12. it sinks with them ──

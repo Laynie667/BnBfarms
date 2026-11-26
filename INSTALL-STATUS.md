@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.87.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.87.1** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.87.1: turn a farm visor back on without takin' it off** Laynie, Nov 26: "need to add a action on the visors so can turn it back on if they want, without re equipping." While a farm visor's worn but switched off (its 👁 icon, or the safeword), a small dim 🌀 sits in the same corner of the room: click it, or type `/visor on`, and it takes hold again. It's always the wearer's own choice; nothin' asks them to. In the Dispensary's hardcore it still comes back by itself at the next log-in or room change, and this lets them bring it back sooner. With "Farm visors" switched off there's no 🌀.
 
 - **Companion 0.87.0 + Conditioning 2.6.0: a visor's pet name and trigger, it comes back on its own, an afterimage, and it sinks with them** Laynie, Nov 25: "I think the next step is to add a "suggestions" tool for the visor"; from the ideas she picked "1, 5-8, 10, 11, 12" and said "sounds good" to the plan. This is the wearer's half (1, 10, 11, 12); the room's half (5-8: seen from outside, peek inside, herd trance, the crafter loomin') comes next. The crafter picks the name and the sinkin' in the Visor maker; both go into the visor's code. Visors made before keep their very same code.
   - **The pet name**: while the visor's on, their name in the room is the crafter's pet name (the game's own nickname, so the room's told; 20 letters at most). **It's their trigger**: somebody in the room says it (in a line or an emote) and down they go for a minute or two, or deeper if they're under already. At most once every 2 minutes; never from their own lines, the farm's, or anythin' in brackets. When the visor comes off, the name hangs on: an hour after light sessions, a day after deep ones, and after no-holds-barred till the crafter or a keyholder gives their own name back (`/visor name <name>`). Changed back by hand: in the Dispensary's hardcore the visor puts it back; otherwise that ends it. If their owner keeps their name locked, the farm's voice calls them it anyway and it still takes them down.

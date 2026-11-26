@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.87.0
+// @version      0.87.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.87.0";
+  var VERSION = "0.87.1";
 
   // shared/species.js
   var WORDS = {
@@ -22332,6 +22332,7 @@ wake: any
           keepAfter();
           afterDraw();
         }
+        onIcon(null);
         return;
       }
       visorCheck();
@@ -22343,6 +22344,7 @@ wake: any
   }
   function visorCheck() {
     const w = wornVisor();
+    onIcon(w && V.off[w.code] && !V.on ? w : null);
     if (!w) {
       if (V.on) off("\u{1F300} The visor comes off, and the room comes back.");
       for (const k of Object.keys(V.done)) if (V.done[k]) {
@@ -22376,9 +22378,10 @@ wake: any
       return;
     }
     if (V.on) stop(true);
-    const t = V.cache[w.code];
+    const t = V.cache[w.code], mode = back ? "back" : V.again ? "again" : "";
+    V.again = false;
     if (t) {
-      start(w, t, back);
+      start(w, t, mode);
       return;
     }
     ask3(w.code);
@@ -22387,10 +22390,51 @@ wake: any
     V.off[code] = { why, load: LOAD_ID, joins: V.joins };
     keepOff();
   };
+  function onIcon(w) {
+    const d = W15.document;
+    if (!d || !d.body) return;
+    let b = d.getElementById("fhc-visor-on");
+    if (!w) {
+      if (b) b.remove();
+      return;
+    }
+    css2();
+    if (!b) {
+      b = d.createElement("button");
+      b.type = "button";
+      b.id = "fhc-visor-on";
+      b.textContent = "\u{1F300}";
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        turnOn();
+      });
+      b.addEventListener("mousedown", (e) => e.stopPropagation());
+      d.body.appendChild(b);
+    }
+    b.title = "Let the " + w.item + " take hold of you again (the room goes dark)";
+    const c = d.getElementById("MainCanvas"), r = c && c.getBoundingClientRect();
+    if (r) Object.assign(b.style, { left: r.left + 10 + "px", top: r.top + Math.max(40, r.height) - 40 + "px" });
+  }
+  function turnOn() {
+    if ((ctx2.prefs() || {}).noVisor) {
+      ctx2.toChat("\u{1F300} Farm visors are switched off for you (Settings \u203A the farm's trance). Switch them back on first.", "#a67fd4", true);
+      return;
+    }
+    const w = wornVisor();
+    if (!w || V.on || !V.off[w.code]) {
+      ctx2.toChat(V.on ? "\u{1F300} Your visor's already got hold of you." : "\u{1F300} There's no farm visor on you that's switched off.", "#a67fd4", true);
+      return;
+    }
+    delete V.off[w.code];
+    keepOff();
+    V.again = true;
+    check2();
+  }
   function safeword(say4) {
     if (V.on) {
       setOff(V.on.code, "safeword");
       stop(false, say4);
+      onIcon(wornVisor());
     }
     if (V.name) giveName("\u{1F300} Your own name comes back to you.");
     if (V.after) {
@@ -22522,9 +22566,13 @@ wake: any
   };
   var ASKS = { unlock: ["visorUnlock", "it opens"], name: ["visorName", "they get their own name back"], reset: ["visorReset", "its sinkin' starts over"] };
   function command(args) {
+    if (/^\s*on\s*$/i.test(args)) {
+      turnOn();
+      return;
+    }
     const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
     if (!m) {
-      ctx2.toChat("\u{1F300} /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over. For a visor you crafted, or somebody whose key you hold.", "#a67fd4", true);
+      ctx2.toChat("\u{1F300} /visor on: let your switched-off farm visor take hold of you again. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true);
       return;
     }
     const q2 = m[2].trim().toLowerCase(), c = (W15.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
@@ -22557,9 +22605,10 @@ wake: any
       V.after = null;
       keepAfter();
     }
+    onIcon(null);
     afterDraw();
     build();
-    ctx2.toChat((back ? "\u{1F300} The " + w.item + "'s still on you, and it takes hold of you again." : "\u{1F300} The " + w.item + " settles over your eyes, and the room goes dark around you.") + (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
+    ctx2.toChat((back === "back" ? "\u{1F300} The " + w.item + "'s still on you, and it takes hold of you again." : back === "again" ? "\u{1F300} You let the " + w.item + " take hold of you again, and the room goes dark." : "\u{1F300} The " + w.item + " settles over your eyes, and the room goes dark around you.") + (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
     nameOn();
     linesAsk();
     later2(nextSession, back ? 1500 : 5e3);
@@ -22655,7 +22704,7 @@ wake: any
     if (d.getElementById("fhc-visor-css")) return;
     const s = d.createElement("style");
     s.id = "fhc-visor-css";
-    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
+    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-on{position:fixed;z-index:9995;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.4);background:rgba(30,16,40,.55);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.45}#fhc-visor-on:hover{opacity:.95}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
     d.head.appendChild(s);
   }
   var WARP_SVG = "<svg width='0' height='0' style='position:absolute'><filter id='fhc-warpf'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.012' numOctaves='2' seed='3'><animate attributeName='baseFrequency' dur='24s' values='0.008 0.012;0.012 0.008;0.008 0.012' repeatCount='indefinite'/></feTurbulence><feDisplacementMap in='SourceGraphic' scale='14'/></filter></svg>";
@@ -23165,7 +23214,9 @@ wake: any
       return;
     }
     setOff(V.on.code, "icon");
-    off("\u{1F300} You take the visor's hold off. The room comes back" + (hardcore() ? " for now: it takes hold again when you next log in or change rooms." : " (it starts again if you put it back on)."));
+    const w = wornVisor();
+    off("\u{1F300} You take the visor's hold off. The room comes back" + (hardcore() ? " for now: it takes hold again when you next log in or change rooms, or sooner with the little \u{1F300} in the corner or /visor on." : ". The little \u{1F300} in the corner, or /visor on, lets it take hold again."));
+    onIcon(w);
   }
   function farmPatterns() {
     const pts = (k, c) => {

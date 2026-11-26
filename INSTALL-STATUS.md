@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.4.1** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.5.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.85.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.86.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.86.0 + Conditioning 2.5.0: visor spirals, chat effects, lines to write, HSC-style effects, and a close-up of the face** Laynie, Nov 25: "I would love more visual effects, especially spirals, and maybe stuff in chat"; then "i love those, so yes please. More effects too, and maybe some different ones similar to HSC?"; then "yes, the close up effect of the face would be nice too if possible". Everything below is picked by the crafter in the Visor maker and goes into the visor's code, so it's locked in like the rest. Visors made before keep their very same code and look.
+  - **Spirals**: classic, pinwheel, tight, tunnel (rings driftin' out), two turnin' against each other, hearts, paw prints or bells along a spiral, the visor's words written along it, or none. Turnin' slow (a turn every 14 seconds at the fastest), slower, or still; behind the body, over everything faint, or both; how strong (20-70%); a breathin' zoom and colours driftin', each on or off.
+  - **In the chat**: whispers of the visor's words between lines, other people's voices meltin' (words lost, or turned into the visor's words), other voices fadin' a while after they're said, and a spiral turnin' faint over the chat. Never the farm's lines, never the crafter's, and never an out-of-character line.
+  - **Lines to write**: the crafter gives a line and how many times (3, 5, 10 or 20). The wearer types it in the chat; a line that matches is counted and never goes to the room. The crafter can make the lines count toward the hardcore lock, so it won't come off till they're written too.
+  - **More, HSC-style but the farm's own and all slow** (nothin' flashes; no climax flash): room voices floatin' across the dark, the farm's voice bobbin' over the head, breath puffs from the mouth, tunnel vision closin' in as the session goes deeper, a pink bloom now and then, a meltin' warp through the pictures, ripples, a watchin' crowd of farm silhouettes, the pictures turned into a slow kaleidoscope, risin' hearts, an aura round the body, a trance meter, **a close-up of the face** in a soft circle in the corner, and **the view comin' in close to the face** and back out, slow (closer the deeper they go). The calm look slows it all down and holds the spiral still.
+  - **The body's drawn right now**: BC's character pictures are taller than the visor thought (700 over the body for hair and ears, 150 under the feet), so the body came out squashed, small and low. It's cut whole now, ears to feet.
 
 - **Companion 0.85.1 + Conditioning 2.4.1: a visor takes any picture link** Laynie, Nov 25: "in game, the visor created with image links doesnt seem to work." Her links were Google image links (no .jpg on the end), and the visor only took links that ended in .png, .jpg, .gif or .webp, so it quietly left them all out and showed its own patterns. Now any https link to a picture counts (never http, never one that's plainly a web page, a script or a video, and never one with spaces, quotes or brackets; it's only ever shown as a picture). The Visor maker says how many links went in and why any were left out, and mentions when they're Google's little search thumbnails (blurry full screen). A visor whose pictures all fail to load shows the farm's own patterns instead of nothin'. The studio's picture sets take the same links.
 

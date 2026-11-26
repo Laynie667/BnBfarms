@@ -21,13 +21,24 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const code = V.tuningCode(T1);
   ok(/^[a-z0-9]{8}$/.test(code) && V.tuningCode(JSON.parse(JSON.stringify(T1))) === code && V.tuningCode(Object.assign({}, T1, { need: 3 })) !== code && V.tuningCode(Object.assign({}, T1, { words: ['good cow'] })) !== code,
     'the code: the same settings always give the same one, any change a new one (' + code + ')');
+  // the look (Nov 25): spirals, the chat, lines, the HSC-style effects; kept only when they aren't the default
+  ok(code === 'fzpu33rn' && V.tuningCode(Object.assign({}, T1, V.LOOK_DEFAULTS)) === code, 'a visor built before the look keeps the very same code (its look is the default one)');
+  const lk = V.normTuning(Object.assign({}, T1, { spiral: 'hearts', spin: 'zoomy', spOp: 5, chat: ['melt', 'nope'], fx: ['face', 'zoom', 'flash'], linesNeed: 9, linesLock: true }));
+  ok(lk.spiral === 'hearts' && !('spin' in lk) && lk.spOp === 0.7 && lk.chat.join() === 'melt' && lk.fx.join() === 'face,zoom' && !('linesNeed' in lk) && !('linesLock' in lk) && V.tuningCode(lk) !== code,
+    'the look kept inside its limits too: only the farm\'s own spirals and effects, never above 70%, no lines to count without a line to write');
+  ok(V.lookOf(V.normTuning(T1)).chat.join() === 'whisper,fade,watermark' && V.lookOf(lk).spin === 'slow', '...and filled back in with the defaults for showin\'');
   const line = V.descLine(code, T1);
   ok(line === 'farm visor: #' + code + ' · 2 sessions' && V.codeIn('A pretty visor. ' + line) === code && line.length < 200, 'the line for the crafted description: ' + line);
 
   // ── a game page ──
   const page = new JSDOM('<!doctype html><html><head></head><body><canvas id="MainCanvas" width="2000" height="1000"></canvas><div id="TextAreaChatLog"></div></body></html>', { url: 'https://www.bondageprojects.elementfx.com/R134/BondageClub/' });
   const W = page.window; global.window = W; global.document = W.document;
-  const drawn = []; W.HTMLCanvasElement.prototype.getContext = function () { return { clearRect() {}, drawImage: (src) => drawn.push(src) }; };   // (a stand-in for the browser's drawin')
+  // (a stand-in for the browser's drawin': every call does nothin', drawImage is written down)
+  const drawn = [], draws = [];
+  W.HTMLCanvasElement.prototype.getContext = function () {
+    const cv = this;
+    return new Proxy({}, { get: (o, k) => (k === 'canvas' ? cv : k === 'drawImage' ? (...a) => { drawn.push(a[0]); draws.push({ on: cv.className, a }); } : k === 'measureText' ? () => ({ width: 10 }) : () => {}), set: () => true });
+  };
   const sent = [], chats = [], toBot = [], cmds = [];
   W.Player = { MemberNumber: 500, Name: 'Moo', Appearance: [], ActivePose: [], ArousalSettings: { Progress: 10 }, IsPlayer: () => true, Canvas: { width: 500, height: 1000 } };
   const crafter = { MemberNumber: 221397, Name: 'Laynie', Canvas: { width: 500, height: 1000 } };
@@ -35,7 +46,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   W.ServerSend = (ev, d) => sent.push([ev, JSON.parse(JSON.stringify(d))]);
   W.ServerPlayerIsInChatRoom = () => true;
   W.CommandCombine = (list) => cmds.push(...list);
-  W.ChatRoomRegisterMessageHandler = () => {};
+  const handlers = []; W.ChatRoomRegisterMessageHandler = (h) => handlers.push(h);
   const LIB = "=== induction: In\npace: 1s\n\nHear my voice, {name}.\nGood {animal}.\n\n=== wake: Up\npace: 1s\n\nUp you come.\n\n=== session: For Visors\nvisor: yes\nlevel: deep\ninduction: any\nwake: any\n";
   W.fetch = async (u) => (/library\.txt$/.test(u) ? { ok: true, text: async () => LIB } : /sets\.json$/.test(u) ? { ok: true, json: async () => ({ 'Pink Daze': ['https://x.example/p.gif'] }) } : { ok: false });
   const esbuild = require('esbuild'), entry = path.join(os.tmpdir(), 'fh-visor-entry-' + process.pid + '.js'), tmp = path.join(os.tmpdir(), 'fh-visor-' + process.pid + '.cjs');
@@ -87,10 +98,17 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const pics = el().querySelectorAll('img.pic'), icon = el().querySelector('button.icon');
   ok(pics.length === 2 && [...pics].some((p) => p.getAttribute('src') === 'https://x.example/a.gif') && el().querySelector('canvas.body'), 'the crafter\'s pictures, see-through, and one body drawn (nobody else, no map)');
   ok(icon && icon.textContent === '👁' && /Take the visor off/.test(icon.title), 'a small icon in the corner to take it off');
+  await wait(200);
   ok(drawn.length && drawn.every((s) => s === crafter.Canvas), 'the one body drawn is the crafter\'s (they picked theirs)');
+  ok(el().querySelector('canvas.spin') && !el().querySelector('canvas.spinO') && W.document.getElementById('fhc-visor-wm') && !el().querySelector('canvas.face'),
+    'the default look: the classic spiral behind the body, a spiral turnin\' faint over the chat, no extras');
+  // BC's own character canvas (R134): 700 over the body, the body's 1000, 150 under the feet; the body's cut from it whole
+  crafter.Canvas.height = 1850; draws.length = 0; await wait(250);
+  const cut = draws.filter((d) => d.on === 'body').pop();
+  ok(cut && cut.a[1] === 0 && cut.a[2] === 580 && cut.a[3] === 500 && cut.a[4] === 1120, 'the body cut whole from the game\'s tall canvas, ears to feet, not squashed: ' + (cut && cut.a.slice(1, 5).join(',')));
+  // (words come one every few seconds, now and then skippin' one: every word that shows is written down, and looked at later)
+  const subs = []; new W.MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) if (n.classList && n.classList.contains('sub')) subs.push(n.textContent); }).observe(el(), { childList: true });
   await wait(3200);
-  const sub = el().querySelector('.sub');
-  ok(sub && ['good cow', 'empty'].includes(sub.textContent), 'a subliminal word, up and gone: ' + (sub && sub.textContent));
   // another Companion asks for this one: handed over (to them only)
   Vis.onVisorMsg({ type: 'visorAsk', from: 700, code }); await wait(1600);
   ok(room('visorTune').some((m) => m.to === 700 && m.code === code && V.codeOk(m.code, m.t)), 'somebody else asks for it: handed to them, to them only');
@@ -99,6 +117,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   await wait(3000);
   ok(Tr.tranceState.session && Tr.tranceState.session.level === 'deep', 'a session from the farm\'s list starts: under (the farm\'s trance on top)');
   await wait(6000);
+  ok(subs.length && subs.every((x) => ['good cow', 'empty'].includes(x)), 'subliminal words, up and gone, only the crafter\'s: ' + subs.slice(0, 3).join(', '));
   ok(chats.some((x) => x === '[Voice] Hear my voice, Moo.') && chats.some((x) => x === '[Voice] Up you come.'), '...in the farm\'s voice, filled in for them');
   ok(bot('visorDone').some((d) => d.code === code && d.level === 'deep' && d.session === 'For Visors') && Vis.visorState.done[code] === 1, 'a session done: counted on the visor, and the farm counts it toward their tiers');
 
@@ -144,6 +163,42 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(!el(), '"Farm visors" switched off: a farm visor\'s just a visor');
   prefs.noVisor = false; Vis.check();
   ok(el(), '...switched back on: it works again');
+
+  // ── a visor with the look picked (Nov 25: "i love those, so yes please"; "More effects too… similar to HSC"; "the close up effect of the face") ──
+  const T2 = { sessions: ['For Visors'], need: 0, show: 'crafter', words: ['good cow'], spiral: 'hearts', place: 'both', chat: ['melt', 'fade'], lines: "I am the farm's good cow", linesNeed: 2, linesLock: true,
+    fx: ['face', 'zoom', 'float', 'meter', 'tunnel', 'crowd', 'aura', 'warp', 'kalei'] };
+  const code2 = V.tuningCode(T2);
+  W.Player.Appearance = []; Vis.check(); chats.length = 0;
+  W.Player.Appearance = [{ Asset: { Name: 'InteractiveVisor', Group: { Name: 'ItemHead' } }, Craft: { Name: 'Heart Visor', Description: V.descLine(code2, T2), MemberNumber: 221397 } }];
+  Vis.check(); Vis.onVisorMsg({ type: 'visorTune', from: 221397, code: code2, t: T2 }); await wait(300);
+  const e2 = el();
+  ok(e2 && e2.querySelector('canvas.spin') && e2.querySelector('canvas.spinO') && e2.querySelector('canvas.face') && e2.querySelector('.meter') && e2.querySelector('.vig') && e2.querySelector('.crowd svg') &&
+    e2.querySelector('canvas.body.aura') && e2.querySelector('#fhc-warpf') && e2.querySelector('canvas.kalei') && !W.document.getElementById('fhc-visor-wm'),
+    'every piece the crafter picked is there: hearts behind the body and over it, the face close-up, the meter, tunnel vision, the crowd, the aura, the warp, the kaleidoscope (and no watermark: not picked)');
+  ok(/Write it out in the chat, 2 more times, just as it's written: “I am the farm's good cow”.*won't come off till they're done/.test(chats.join(' ')), 'they\'re told the line to write, and that it holds the lock');
+  const face = draws.filter((d) => d.on === 'face').pop();
+  ok(face && face.a[1] === 145 && face.a[2] === 740 && face.a[3] === 210 && face.a[4] === 210, 'the close-up: their face, cut from the top of the body');
+  ok(Vis.visorLocked() && /Locked: 0 of 2 lines done/.test(e2.querySelector('button.icon').title), 'hardcore, no sessions owed, but the lines are: locked till they\'re written');
+  // writin' the lines: a match is counted and never sent; anythin' else goes to the room as usual
+  let wentOut = 0; const say = (txt) => hooks.ServerSend(['ChatRoomChat', { Type: 'Chat', Content: txt }], () => { wentOut++; });
+  say('I am the farm\'s good cow.'); say('hi everyone');
+  ok(Vis.visorState.lines[code2] === 1 && wentOut === 1 && /1 of 2\. Good\. Again\./.test(chats.join(' ')), 'a line written: counted (1 of 2) and kept from the room; somethin\' else said goes out as usual');
+  say('i am the FARM\'S good cow');
+  ok(Vis.visorState.lines[code2] === 2 && wentOut === 1 && !Vis.visorLocked() && /2 of 2\. That's all of them/.test(chats.join(' ')), '...all of them written: the lock lets go');
+  // other voices: meltin', floatin' across the dark; never their own, the farm's, or out-of-character ones
+  const voices = handlers.find((x) => /visor voices/.test(x.Description));
+  const long = Array.from({ length: 40 }, (_, i) => 'word' + i).join(' ');
+  const r = voices.Callback({ Type: 'Chat' }, { MemberNumber: 999, Name: 'Stranger' }, long);
+  ok(r && typeof r.msg === 'string' && r.msg !== long && e2.querySelector('.float') && /^Stranger: /.test(e2.querySelector('.float').textContent), 'somebody else talks: their words melt, and drift across the dark');
+  ok(voices.Callback({ Type: 'Chat' }, { MemberNumber: 999, Name: 'Stranger' }, '(brb, food)') === false && voices.Callback({ Type: 'Chat' }, { MemberNumber: 500, Name: 'Moo' }, long) === false && voices.Callback({ Type: 'Chat' }, { MemberNumber: 260239, Name: 'Farm' }, long) === false,
+    '...never an out-of-character line, never their own, never the farm\'s');
+  // other voices fade a while after they're said (not the crafter's, not out-of-character ones)
+  const log = W.document.getElementById('TextAreaChatLog'), msg = (from, text) => { const m = W.document.createElement('div'); m.className = 'ChatMessage ChatMessageChat'; m.setAttribute('data-sender', String(from)); m.innerHTML = '<span class="ChatMessageName">X</span>: ' + text; log.appendChild(m); return m; };
+  const m1 = msg(999, 'hi'), m2 = msg(221397, 'good girl'), m3 = msg(999, '(you ok?)');
+  await wait(6300);
+  ok(m1.classList.contains('fhc-vfade') && !m2.classList.contains('fhc-vfade') && !m3.classList.contains('fhc-vfade'), 'voices fade after a while: not the crafter\'s, never an out-of-character line');
+  Vis.stop(true);
+  ok(!el() && !m1.classList.contains('fhc-vfade'), 'taken off: everythin\' comes back as it was');
   Vis.stop(true);
   out(fails ? 'FAIL ' + fails : 'ALL OK'); process.exit(fails ? 1 : 0);
 })();

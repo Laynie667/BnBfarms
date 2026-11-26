@@ -26,10 +26,35 @@ const str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(
 export const okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) &&
   !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
 
+// THE LOOK (Nov 25, Laynie: "i love those, so yes please", "More effects too… similar to HSC", "the close up effect of the
+// face"): the spiral, what happens in the chat, the lines to write, and the extra effects. Each is kept only when it
+// isn't the default, so a visor built before them keeps the very same code.
+export const SPIRALS = ["classic", "pinwheel", "tight", "tunnel", "counter", "hearts", "paws", "bells", "words", "none"];
+export const SPINS = ["slow", "slower", "still"];
+export const PLACES = ["behind", "over", "both"];
+export const CHAT_FX = ["whisper", "melt", "fade", "watermark"];
+export const FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
+export const LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [] };
+export function lookOf(t) { return Object.assign({}, LOOK_DEFAULTS, t || {}); }   // (a tuning with its defaults filled in, for showin' it)
 // a tuning, every value checked and kept inside its limits (so nothin' a crafter or another Companion sends is unsafe)
 export function normTuning(t) {
   t = t && typeof t === "object" ? t : {};
   const list = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
+  const out = base(t, list), D = LOOK_DEFAULTS, keep = (k, v) => { if (JSON.stringify(v) !== JSON.stringify(D[k])) out[k] = v; };
+  keep("spiral", SPIRALS.includes(t.spiral) ? t.spiral : D.spiral);
+  keep("spin", SPINS.includes(t.spin) ? t.spin : D.spin);
+  keep("place", PLACES.includes(t.place) ? t.place : D.place);
+  keep("spOp", Math.round(clamp(t.spOp, 0.1, 0.7, D.spOp) * 100) / 100);
+  keep("breathe", t.breathe === undefined ? D.breathe : !!t.breathe);
+  keep("drift", t.drift === undefined ? D.drift : !!t.drift);
+  keep("chat", t.chat === undefined ? D.chat : CHAT_FX.filter((x) => (Array.isArray(t.chat) ? t.chat : []).includes(x)));
+  keep("lines", str(t.lines, 80));
+  keep("linesNeed", out.lines ? Math.round(clamp(t.linesNeed, 0, 20, 0)) : 0);
+  keep("linesLock", !!(out.lines && t.linesLock));
+  keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
+  return out;
+}
+function base(t, list) {
   return {
     v: 1,
     sessions: list(t.sessions, MAX_SESSIONS, 60),

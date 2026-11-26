@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      2.4.1
+// @version      2.5.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2265,9 +2265,32 @@ wake: any
   };
   var str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
   var okLink = (u) => typeof u === "string" && u.length <= 600 && /^https:\/\/[a-z0-9.-]+(:[0-9]+)?\/[^\s"'<>()]*$/i.test(u) && !/\.(html?|php|aspx?|jsp|js|mjs|css|json|txt|xml|pdf|zip|rar|7z|exe|msi|apk|mp4|webm|mov|mp3|wav|ogg|svg)([?#]|$)/i.test(u);
+  var SPIRALS = ["classic", "pinwheel", "tight", "tunnel", "counter", "hearts", "paws", "bells", "words", "none"];
+  var SPINS = ["slow", "slower", "still"];
+  var PLACES = ["behind", "over", "both"];
+  var CHAT_FX = ["whisper", "melt", "fade", "watermark"];
+  var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
+  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [] };
   function normTuning(t) {
     t = t && typeof t === "object" ? t : {};
     const list2 = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
+    const out = base(t, list2), D2 = LOOK_DEFAULTS, keep = (k, v) => {
+      if (JSON.stringify(v) !== JSON.stringify(D2[k])) out[k] = v;
+    };
+    keep("spiral", SPIRALS.includes(t.spiral) ? t.spiral : D2.spiral);
+    keep("spin", SPINS.includes(t.spin) ? t.spin : D2.spin);
+    keep("place", PLACES.includes(t.place) ? t.place : D2.place);
+    keep("spOp", Math.round(clamp(t.spOp, 0.1, 0.7, D2.spOp) * 100) / 100);
+    keep("breathe", t.breathe === void 0 ? D2.breathe : !!t.breathe);
+    keep("drift", t.drift === void 0 ? D2.drift : !!t.drift);
+    keep("chat", t.chat === void 0 ? D2.chat : CHAT_FX.filter((x) => (Array.isArray(t.chat) ? t.chat : []).includes(x)));
+    keep("lines", str(t.lines, 80));
+    keep("linesNeed", out.lines ? Math.round(clamp(t.linesNeed, 0, 20, 0)) : 0);
+    keep("linesLock", !!(out.lines && t.linesLock));
+    keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
+    return out;
+  }
+  function base(t, list2) {
     return {
       v: 1,
       sessions: list2(t.sessions, MAX_SESSIONS, 60),
@@ -3091,7 +3114,7 @@ wake: any
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "2.4.1",
+    version: "2.5.0",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
     setup(a) {

@@ -5,9 +5,10 @@
    handlers, unless they have a set herd leader"): {herd} is their herd leader's name if they have one, else "the farm".
    A line starting {t} is only for somebody with tits, {c} a cock, {v} a pussy.
    Part 2 (Nov 25): a trigger made of the farm's own instructions (To the Stalls), and the slips and nudges for the farm's
-   pull through the day.
+   pull through the day. And (Nov 25, "bulk up the sessions content") everything in trance-more.js on the end.
 */
-export const STARTER = `# The farm's starter trance library. The studio's trance editor opens this when you start fresh.
+import { MORE } from "./trance-more.js";
+const CORE = `# The farm's starter trance library. The studio's trance editor opens this when you start fresh.
 # Every block: === kind: Name, then labels, then the lines. A session is a recipe of blocks.
 
 === induction: Settling In
@@ -526,3 +527,4 @@ compulsion: any 2
 hangon: any 2
 wake: any
 `;
+export const STARTER = CORE + "\n" + MORE;

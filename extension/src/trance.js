@@ -56,7 +56,9 @@ const T = { session: null, lingerUntil: 0, look: {}, depth: 0, farm: [], pull: {
   hijackAt: 0, speaking: false,
   // part 3: the hang-ons runnin' on you [{ id, name, effect, until }]
   hang: [], foursAt: 0, heelAt: 0 };
-const HANG_KEY = "fhc-hangons";
+const HANG_KEY = "fhc-hangons", ME_KEY = "fhc-trance-me";
+// what the farm last said about you (your sound, kind, body, tones): kept, so a visor knows you off the farm too
+function loadMe() { try { const v = JSON.parse(LS.getItem(ME_KEY)); T.me = Object.assign({ sound: "", animal: "", herd: 0, low: "kneel" }, v && typeof v === "object" ? v : {}); } catch (e) { /* fine */ } }
 // whatever else lets go when all of it does (the safeword, the farm's or LSCG's): the visor (visor.js)
 const endHooks = [];
 export const onTranceEnd = (f) => { if (typeof f === "function") endHooks.push(f); };
@@ -68,8 +70,8 @@ export function initTrance(c) {
   hookLscg();
   hookChat();
   hookGame();
-  loadHang();
-  onAccount(() => { endAll(true); loadFarm(); loadHang(); T.lastReport = ""; T.pullN = 0; T.slips = []; T.me = { sound: "", animal: "", herd: 0, low: "kneel" }; });
+  loadHang(); loadMe();
+  onAccount(() => { endAll(true); loadFarm(); loadHang(); T.lastReport = ""; T.pullN = 0; T.slips = []; T.me = { sound: "", animal: "", herd: 0, low: "kneel" }; loadMe(); });
   watchChat();
   setInterval(tick, 5000);
 }
@@ -715,6 +717,11 @@ function setPull(m) {
   if (typeof m.animal === "string") T.me.animal = m.animal.slice(0, 30);
   if (m.herd != null) { T.me.herd = Number(m.herd) || 0; drawNarrow(); }
   if (m.low === "fours" || m.low === "kneel") T.me.low = m.low;
+  // their kind, body and tones (Nov 25): a visor's lines fit them, on the farm or off it (kept on this computer)
+  if (typeof m.species === "string") T.me.species = m.species.slice(0, 20);
+  if (Array.isArray(m.tone)) T.me.tone = m.tone.filter((x) => x === "praise" || x === "degrade");
+  if (m.body && typeof m.body === "object") T.me.body = { g: String(m.body.g || "").slice(0, 12), tits: !!m.body.tits, cock: !!m.body.cock, vulva: !!m.body.vulva };
+  try { LS.setItem(ME_KEY, JSON.stringify(T.me)); } catch (e) { /* fine */ }
   if (Array.isArray(m.slips)) T.slips = m.slips.filter((x) => x && typeof x.t === "string" && x.t.trim()).slice(0, 60)
     .map((x) => ({ t: x.t.replace(/[()]/g, "").slice(0, 160), p: Math.max(0, Math.min(100, Number(x.p) || 0)) }));
 }

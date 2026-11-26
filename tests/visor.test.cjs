@@ -64,6 +64,14 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   ok(made && V.codeOk(made.code, made.t) && made.t.sessions.join() === 'For Visors' && made.t.need === 2 && made.t.pictures.join() === 'https://x.example/p.gif' && /farm visor: #[a-z0-9]{8} · 2 sessions/.test(cards[0].textContent),
     'Make the visor: the line to paste, the picture set\'s links locked in with it, and the farm keeps a copy: ' + (made && made.code));
 
+  // ── fittin' a visor's lines to the wearer (Nov 25): the farm tells their Companion their kind, body and tones ──
+  ok(Vis.fitLine('Hi.', null) && !Vis.fitLine('{c}Hard.', null), 'nothin\' known about their body yet: only the lines for anybody');
+  Tr.onHypno({ do: 'pull', n: 0, sound: 'whinny', animal: 'stallion', herd: 0, low: 'kneel', species: 'horse', tone: ['degrade', 'nonsense'], body: { g: 'male', cock: true } });
+  const me = Tr.tranceState.me;
+  ok(me.species === 'horse' && me.tone.join() === 'degrade' && me.body.g === 'male' && me.body.cock && !me.body.vulva, 'the farm says: a stallion, rough, with a cock');
+  ok(Vis.fitLine('{c}Hard and achin\'.', me.body) && !Vis.fitLine('{v}Wet.', me.body) && !Vis.fitLine('{t}{f}Udders.', me.body) && Vis.fitLine('{m}Such a strong stallion.', me.body), '...so a visor\'s lines fit him');
+  Tr.onHypno({ do: 'pull', n: 0, sound: 'moo', animal: 'cow', herd: 221397, low: 'kneel', species: 'cow', tone: [], body: { g: 'female', tits: true, vulva: true } });
+
   // ── wearin' one: the tuning comes from whoever knows it, proven by its code ──
   W.Player.Appearance = [{ Asset: { Name: 'HypnoticVisor', Group: { Name: 'ItemHead' } }, Craft: { Name: 'Pink Daze Visor', Description: 'Soft and glowing. ' + line, MemberNumber: 221397 } }];
   Vis.check();

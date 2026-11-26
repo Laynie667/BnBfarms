@@ -240,6 +240,8 @@ function speciesKey(mn) {
   return SPECIES[s] ? s : SPECIES[r] ? r : s || r || "default";
 }
 const wearsOf = (mn) => { const g = gearOf(api, mn); return Object.keys(g).filter((k) => g[k]); };
+// the tones they asked for (Nov 25): ?praise on, sweeter blocks too; ?degrade on, rougher ones too
+const tonesOf = (mn) => { const r = api.rec(mn) || {}; return [].concat(r.praiseMe ? ["praise"] : [], r.degradeMe ? ["degrade"] : []); };
 const lowOf = (mn) => (me(mn).low === "fours" ? "fours" : "kneel");
 // the fill-ins a library line can use
 function wordsFor(mn) {
@@ -385,7 +387,7 @@ const pullFree = (mn) => pullOn(mn) && !!api.char(mn) && !running.has(mn) && !he
 // the library's slips or nudges that suit them (their deepest level, their kind, their gear, their body), as far as the
 // pull is built up (n; null: all of them, each with how far it needs, for their Companion to choose from)
 function asideLines(mn, kind, n) {
-  const who = { level: me(mn).max, species: speciesKey(mn), wears: wearsOf(mn) }, b = bodyOf(api, mn), out = [];
+  const who = { level: me(mn).max, species: speciesKey(mn), wears: wearsOf(mn), tone: tonesOf(mn) }, b = bodyOf(api, mn), out = [];
   for (const blk of lib().blocks) {
     if (blk.kind !== kind || !blockFits(blk, who)) continue;
     const need = blk.labels.pull || 0;
@@ -399,8 +401,11 @@ function asideLines(mn, kind, n) {
 const told = new Map();
 function sendPull(mn, slips) {
   if (!api.hasCompanion || !api.hasCompanion(mn)) return;
-  const L = lib(), w = wordsFor(mn), key = L.from + ":" + (L.stamp || "") + ":" + me(mn).max + ":" + speciesKey(mn);
-  const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: (api.herdLeaderOf && api.herdLeaderOf(mn)) || 0, low: lowOf(mn) };
+  const L = lib(), w = wordsFor(mn), key = L.from + ":" + (L.stamp || "") + ":" + me(mn).max + ":" + speciesKey(mn) + ":" + tonesOf(mn).join("+");
+  // (and their kind, their body and their tones, so a visor's lines fit them even off the farm)
+  const bd = bodyOf(api, mn) || {};
+  const msg = { do: "pull", n: pullOn(mn) ? Math.round(pullOf(mn).n) : 0, sound: w.sound, animal: w.animal, herd: (api.herdLeaderOf && api.herdLeaderOf(mn)) || 0, low: lowOf(mn),
+    species: speciesKey(mn), tone: tonesOf(mn), body: { g: String(bd.g || ""), tits: !!bd.tits, cock: !!bd.cock, vulva: !!bd.vulva } };
   if (slips || told.get(mn) !== key) { msg.slips = asideLines(mn, "slip", null).slice(0, 60); told.set(mn, key); }
   api.hypno(mn, msg);
 }
@@ -487,7 +492,7 @@ if (typeof window !== "undefined" && window.__FARMHAND_TEST__) window.__condPull
 function start(by, mn, level, own, echs, opts) {
   opts = opts || {};
   if (echs) { running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: true }); step(mn); return; }   // through ECHS: as before
-  const plan = planSession(lib().blocks, { level, species: speciesKey(mn), wears: wearsOf(mn) }, { name: opts.session });
+  const plan = planSession(lib().blocks, { level, species: speciesKey(mn), wears: wearsOf(mn), tone: tonesOf(mn) }, { name: opts.session });
   if (!plan.blocks.some((b) => b.lines.length)) { running.set(mn, { by, level, lines: scriptFor(level, mn, own, false), i: 0, echs: false }); step(mn); return; }
   const b = bodyOf(api, mn), steps = sessionSteps(plan, { keep: (t) => fitsBody(t, b) });
   // the handler's own words: after the first suggestion, and again just before the wake

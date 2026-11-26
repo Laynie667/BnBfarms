@@ -96,6 +96,8 @@ a { color: var(--accent); }
       <div class="row"><select id="vsSets"></select><button id="vsDel" title="take this set out">✕</button></div>
       <div class="row"><input id="vsName" size="22" placeholder="set name, like Pink Daze"><button id="vsSave">Save set</button></div>
       <textarea id="vsLinks" rows="4" spellcheck="false" placeholder="https://…/spiral.gif (one per line)"></textarea>
+      <p class="hint">The farm's own pictures (drop them in <code>public/visor/pictures/</code> in the project folder; Publish for visors puts them on GitHub). Click one to add it to the set. <button id="vsPicsReload" class="small">look again</button></p>
+      <div id="vsPics" style="display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto"></div>
       <div class="row"><button id="vsPublish" class="main">Publish for visors</button><span class="hint" id="vsStatus"></span></div>
     </section>
     <section style="margin-top:12px"><h2>The text</h2>

@@ -80,7 +80,10 @@ export const BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], b
 export const BAND_RANGE = { delta: "1-4 Hz", theta: "4-8 Hz", alpha: "8-12 Hz", beta: "12-30 Hz" };
 export const HZ_MIN = 1, HZ_MAX = 30;
 export const MAX_DOES = 3;
-const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts", "visor"];
+const LABELS = ["level", "for", "wears", "tone", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts", "visor"];
+// the tone a block's written in (Nov 25, Laynie: ?degrade / ?praise followed, "yes"): praise only reaches somebody with
+// ?praise on, degrade only somebody with ?degrade on; a block with no tone reaches anybody
+export const TONES = ["praise", "degrade"];
 
 // LSCG's own instruction names (Settings/Models/hypno.ts, LSCGHypnoInstruction)
 export const LSCG = { cum: "Orgasm", deny: "Denial", needy: "Insatiable", touch: "Perform Activity", strip: "Strip", pose: "Assume Pose",
@@ -343,6 +346,7 @@ function finish(b, err, warn) {
   if (get("level")) { const v = list(lc(r.level[0])).map((x) => (x === "no human left" ? "nhl" : x)); const bad = v.filter((x) => !LEVELS.includes(x) && x !== "any" && x !== "all"); if (bad.length) err(r.level[1], "level is fun, deep or nhl, not " + bad.join(", ")); L.level = v.includes("any") || v.includes("all") ? LEVELS.slice() : v.filter((x) => LEVELS.includes(x)); }
   if (get("for")) { const v = list(lc(r.for[0])); L.for = v.includes("any") || v.includes("all") ? null : v; }
   if (get("wears")) L.wears = list(lc(r.wears[0]));
+  if (get("tone")) { const v = lc(r.tone[0]); if (v === "any" || v === "") L.tone = ""; else if (!TONES.includes(v)) err(r.tone[1], "tone is praise or degrade (or any), not " + r.tone[0]); else L.tone = v; }
   if (get("pace")) { const p = parsePace(r.pace[0]); if (!p) err(r.pace[1], 'pace is like 30s or 20-40s, not "' + r.pace[0] + '"'); else L.pace = p; }
   if (get("pick")) { const p = Number(clean(r.pick[0])); if (!(p >= 1 && p <= 99 && Math.floor(p) === p)) err(r.pick[1], "pick is a number of lines, like 3"); else L.pick = p; }
   if (get("beats")) { const v = parseBeats(r.beats[0]); if (!v) err(r.beats[1], 'beats like "theta", "6", "alpha 10 → theta 6 over 3m" or "off" (1 to 30 Hz), not "' + r.beats[0] + '"'); else L.beats = v; }
@@ -422,6 +426,7 @@ export function formatBlock(b) {
   if (L.level && formatLevel(L.level)) out.push("level: " + formatLevel(L.level));
   if (L.for && L.for.length) out.push("for: " + L.for.join(", "));
   if (L.wears && L.wears.length) out.push("wears: " + L.wears.join(", "));
+  if (L.tone) out.push("tone: " + L.tone);
   if (L.pace) out.push("pace: " + (L.pace.min === L.pace.max ? fmtSecs(L.pace.min) : L.pace.min + "-" + fmtSecs(L.pace.max)));
   if (L.pick) out.push("pick: " + L.pick);
   if (L.beats) out.push("beats: " + formatBeats(L.beats));
@@ -451,10 +456,11 @@ export function formatCue(c) {
 export function formatLibrary(blocks) { return blocks.map(formatBlock).join("\n\n") + "\n"; }
 
 // ── pickin' a session ─────────────────────────────────────────
-// does a block suit them? { level, species, wears: [things they have on] }
+// does a block suit them? { level, species, wears: [things they have on], tone: [the tones they asked for: praise, degrade] }
 export function fits(b, who) {
   const L = b.labels || {}; who = who || {};
   if (b.bad) return false;
+  if (L.tone && ![].concat(who.tone || []).includes(L.tone)) return false;
   if (who.level && L.level && L.level.length && !L.level.includes(who.level)) return false;
   if (L.for && L.for.length && !L.for.includes(lc(who.species))) return false;
   if (L.wears && L.wears.length && !L.wears.some((w) => (who.wears || []).includes(w))) return false;

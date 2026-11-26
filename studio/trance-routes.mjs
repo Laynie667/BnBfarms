@@ -7,7 +7,7 @@
 // THE VISOR'S PUBLIC LIST (Nov 25; Laynie: "select which sessions load from a list I make publically accessible"):
 // "Publish for visors" writes the sessions she marked "visor: yes" (and the trance blocks they're made of) and her picture
 // sets into public/visor/, then puts just those files on GitHub (tools/publish-visor.mjs), where every Companion reads them.
-import { readFile, writeFile, mkdir, rename, readdir, unlink } from "node:fs/promises";
+import { readFile, writeFile, mkdir, rename, readdir, unlink, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -71,6 +71,20 @@ export async function tranceRoutes(req, res, path, origin, ctx) {
     if (!existsSync(file)) { res.writeHead(200, { "Content-Type": name.endsWith(".json") ? "application/json" : "text/plain", "Cache-Control": "no-store" }).end(name.endsWith(".json") ? "{}" : ""); return true; }
     await send(res, file); return true;
   }
+  // the farm's own pictures (public/visor/pictures/: she drops them in, they go to GitHub with Publish for visors): the
+  // list, with the link each will have once it's published, and the pictures themselves for the editor's thumbnails
+  if (name === "pictures" || name.startsWith("pictures/")) {
+    const V = await visorLib(ctx), pdir = join(ctx.publicDir, "pictures");
+    if (name === "pictures") {
+      let files = []; try { files = (await readdir(pdir)).filter((f) => PIC.test(f)).sort(); } catch (e) { files = []; }
+      const list = [];
+      for (const f of files) { try { const st = await stat(join(pdir, f)); if (st.size <= 8 * 1024 * 1024) list.push({ file: f, kb: Math.round(st.size / 1024), url: V.PUBLIC_BASE + "pictures/" + encodeURIComponent(f) }); } catch (e) { /* gone */ } }
+      res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" }).end(JSON.stringify(list)); return true;
+    }
+    const f = decodeURIComponent(name.slice("pictures/".length));
+    if (!PIC.test(f) || /[\\/]|\.\./.test(f)) { res.writeHead(400).end("bad name"); return true; }
+    await send(res, join(pdir, f)); return true;
+  }
   // the visor's picture sets, as she keeps them
   if (name === "sets.json") {
     const file = join(dir, "sets.json"), V = await visorLib(ctx);
@@ -104,6 +118,7 @@ export async function tranceRoutes(req, res, path, origin, ctx) {
   res.writeHead(404).end("not found"); return true;
 }
 async function visorLib(ctx) { return import(pathToFileURL(join(ctx.shared, "visor.js")).href); }
+const PIC = /^[A-Za-z0-9 _.,'+-]{1,80}\.(png|jpe?g|gif|webp)$/i;
 // { name: [links] }: up to 40 sets, each up to 20 links straight to a picture
 function cleanSets(v, V) {
   const out = {};

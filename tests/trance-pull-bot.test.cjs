@@ -95,7 +95,8 @@ Good {animal}s don't need to think, {name}.
   // ── their Companion is told how far the pull is, their sound, their herd leader, and the slips ──
   let k=sent.length; ext(500,'hypnoState',lscg); await wait(300);
   const p0=hyp(k,500,'pull')[0];
-  ok(p0 && p0.n===0 && p0.sound==='moo' && p0.animal==='cow' && p0.herd===221397, 'a Companion comes: told the pull (0), their sound, their kind and their herd leader: '+JSON.stringify(p0||{}).slice(0,120));
+  ok(p0 && p0.species==='cow' && Array.isArray(p0.tone) && !p0.tone.length && p0.body && typeof p0.body.tits==='boolean', '...and their kind, their body and their tones, for a visor\'s lines (Nov 25): '+JSON.stringify(p0&&{species:p0.species,tone:p0.tone,body:p0.body}));
+  ok(p0 && p0.n===0 && p0.sound==='moo' && p0.animal==='cow' && p0.herd===221397,'a Companion comes: told the pull (0), their sound, their kind and their herd leader: '+JSON.stringify(p0||{}).slice(0,120));
   const ts=(p0&&p0.slips||[]).map(x=>x.t+'@'+x.p);
   ok(ts.includes('Moo~@0') && ts.includes('Good cows give milk.@60') && ts.includes('Nothin\' up here but straw…@40'), '...and the library\'s slips, filled in for them, each with how far the pull has to be: '+ts.join(' · '));
 

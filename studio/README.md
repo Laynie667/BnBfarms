@@ -29,6 +29,10 @@ An offline dressing room for Bondage Club, for our own use. It runs on this comp
 > sets** in the Visor list panel, and **Publish for visors**: it writes `public/visor/` (only those sessions, their trance
 > blocks and the sets) and sends just those files to GitHub (`tools/publish-visor.mjs`), where every Companion reads them.
 > Don't publish while a release is runnin'.
+> **The farm's pictures**: drop .png .jpg .gif or .webp files in `public/visor/pictures/` (keep them small; slow GIFs
+> only). The Visor list panel shows them; a click adds one to the set you're editing. Publish for visors sends them to
+> GitHub. GitHub doesn't allow pornographic pictures, and character pictures never go there: explicit ones go on an adult
+> image host and into a set as links. Restart the studio after an update so its newest parts are runnin'.
 
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the

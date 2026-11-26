@@ -257,7 +257,18 @@ function words() {
   return { name: String(P.Nickname || P.Name || "sugar"), animal: a, sound: me.sound || "mmh", body: "body", pet: "good " + a, act: "obey", pose: "still", paws: "paws",
     low: me.low === "fours" ? "on all fours" : "on your knees", herd: "the farm", a, s: me.sound || "mmh", p: "body" };
 }
-const say = (t) => fillIn(String(t).replace(/^\{(?:nv|nc|nt|v|c|t|f|m|fu|fb|ok)\}/, ""), words()).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+const say = (t) => fillIn(String(t).replace(/^(\{(?:nv|nc|nt|v|c|t|f|m|fu|fb|nb|ok)\})+/, ""), words()).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+// does a line fit them: the tags on its front against the body the farm last told us about (none known: only untagged lines)
+export function fitLine(line, b) {
+  const m = /^((?:\{[a-z]{1,2}\})+)/.exec(String(line));
+  if (!m) return true;
+  if (!b || !b.g) return false;
+  for (const t of m[1].slice(1, -1).split("}{")) {
+    if ((t === "v" && !b.vulva) || (t === "nv" && b.vulva) || (t === "c" && !b.cock) || (t === "nc" && b.cock) || (t === "t" && !b.tits) || (t === "nt" && b.tits) ||
+        (t === "f" && b.g !== "female") || (t === "m" && b.g !== "male") || (t === "fu" && b.g !== "futa") || (t === "fb" && b.g !== "femboy") || (t === "nb" && b.g !== "nonbinary")) return false;
+  }
+  return true;
+}
 function nextSession() {
   if (!V.on || V.run) return;
   if (tranceState.session) { later(nextSession, 60000); return; }   // (the farm's runnin' a session on you: the visor waits its turn)
@@ -266,8 +277,9 @@ function nextSession() {
   const name = (names.length ? names : all)[Math.floor(Math.random() * Math.max(1, (names.length ? names : all).length))];
   const recipe = blocks.find((b) => b.kind === "session" && !!name && b.name.toLowerCase() === name.toLowerCase());
   const level = recipe && recipe.labels.level && recipe.labels.level.length ? recipe.labels.level[0] : "fun";
-  const plan = planSession(blocks, { level, species: animal(), wears: [] }, { name: recipe ? recipe.name : "" });
-  const steps = sessionSteps(plan, { keep: (t) => !/^\{(?:nv|nc|nt|v|c|t|fu|fb)\}/.test(t) }).filter((s) => VISOR_KINDS.includes(s.kind));
+  const me = tranceState.me || {};
+  const plan = planSession(blocks, { level, species: me.species || "", wears: [], tone: me.tone || [] }, { name: recipe ? recipe.name : "" });
+  const steps = sessionSteps(plan, { keep: (t) => fitLine(t, me.body) }).filter((s) => VISOR_KINDS.includes(s.kind));
   if (!steps.length) { later(nextSession, 120000); return; }
   const ms = steps.reduce((n, s) => n + (s.gap || 0) * 1000, 0);
   V.run = { steps, i: 0, level, name: recipe ? recipe.name : "", depth: 0 };

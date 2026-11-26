@@ -1,0 +1,102 @@
+{
+ "at": "2026-11-26T00:10:26.987Z",
+ "sessions": [
+  {
+   "name": "Fun in the Straw",
+   "level": [
+    "fun"
+   ]
+  },
+  {
+   "name": "Deep in the Barn",
+   "level": [
+    "deep"
+   ]
+  },
+  {
+   "name": "No Human Left",
+   "level": [
+    "nhl"
+   ]
+  },
+  {
+   "name": "Under the Glow",
+   "level": [
+    "fun",
+    "deep",
+    "nhl"
+   ]
+  },
+  {
+   "name": "Udder Worship",
+   "level": [
+    "deep",
+    "nhl"
+   ]
+  },
+  {
+   "name": "Stud Service",
+   "level": [
+    "deep",
+    "nhl"
+   ]
+  },
+  {
+   "name": "Pony Trainin'",
+   "level": [
+    "fun",
+    "deep"
+   ]
+  },
+  {
+   "name": "Good Pup",
+   "level": [
+    "fun",
+    "deep"
+   ]
+  },
+  {
+   "name": "Kitty in Heat",
+   "level": [
+    "deep",
+    "nhl"
+   ]
+  },
+  {
+   "name": "Mud and Trough",
+   "level": [
+    "fun",
+    "deep"
+   ]
+  },
+  {
+   "name": "Deep Barn Cellar",
+   "level": [
+    "nhl"
+   ]
+  }
+ ],
+ "sets": [
+  "The Farm's Spirals",
+  "Empty Heads",
+  "The Breeding Barn",
+  "Cows · girls",
+  "Cows · boys",
+  "Cows · everyone",
+  "Ponies · girls",
+  "Ponies · boys",
+  "Ponies · everyone",
+  "Pups · girls",
+  "Pups · boys",
+  "Pups · everyone",
+  "Kitties · girls",
+  "Kitties · boys",
+  "Kitties · everyone",
+  "Pigs · girls",
+  "Pigs · boys",
+  "Pigs · everyone",
+  "Bunnies · girls",
+  "Bunnies · boys",
+  "Bunnies · everyone"
+ ]
+}

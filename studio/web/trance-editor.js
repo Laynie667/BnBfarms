@@ -463,8 +463,23 @@ async function vsKeep(pick) {
   catch (e) { $("#vsStatus").textContent = "couldn't save the sets: is the studio still running?"; }
   vsRender(pick);
 }
+// the farm's own pictures, as thumbnails: one click adds its published link to the set bein' edited
+async function vsPics() {
+  const box = $("#vsPics"); box.textContent = "";
+  let list = []; try { list = await (await fetch("/__studio/trance/pictures", { cache: "no-store" })).json(); } catch (e) { list = []; }
+  if (!list.length) { box.appendChild(h("span", { class: "hint" }, "(none yet)")); return; }
+  for (const p of list) {
+    const inSet = () => $("#vsLinks").value.split(/\s+/).includes(p.url);
+    const img = h("img", { src: "/__studio/trance/pictures/" + encodeURIComponent(p.file), title: p.file + " · " + p.kb + " KB" + (p.kb > 1024 ? " (big: every wearer downloads it)" : ""), alt: p.file,
+      style: "width:72px;height:72px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid " + (inSet() ? "var(--accent)" : "transparent"),
+      onclick: (e) => { const ta = $("#vsLinks"); if (inSet()) ta.value = ta.value.split(/\s+/).filter((x) => x && x !== p.url).join("\n"); else ta.value = (ta.value.trim() ? ta.value.trim() + "\n" : "") + p.url; e.target.style.borderColor = inSet() ? "var(--accent)" : "transparent"; } });
+    box.appendChild(img);
+  }
+}
 function vsWire() {
-  $("#vsSets").onchange = () => { const n = $("#vsSets").value; $("#vsName").value = n; $("#vsLinks").value = n ? VS.sets[n].join("\n") : ""; $("#vsDel").disabled = !n; };
+  $("#vsPicsReload").onclick = vsPics; vsPics();
+  $("#vsLinks").addEventListener("input", () => { for (const img of $("#vsPics").querySelectorAll("img")) { const u = (img.title || "").split(" · ")[0]; img.style.borderColor = $("#vsLinks").value.includes(encodeURIComponent(u)) ? "var(--accent)" : "transparent"; } });
+  $("#vsSets").onchange = () => { const n = $("#vsSets").value; $("#vsName").value = n; $("#vsLinks").value = n ? VS.sets[n].join("\n") : ""; $("#vsDel").disabled = !n; $("#vsLinks").dispatchEvent(new Event("input")); };
   $("#vsSave").onclick = () => {
     const n = $("#vsName").value.replace(/[()<>]/g, "").trim().slice(0, 40), links = $("#vsLinks").value.split(/\s+/).filter(Boolean), good = links.filter(okLink);
     if (!n) { $("#vsName").focus(); return; }

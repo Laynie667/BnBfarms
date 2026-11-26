@@ -64,6 +64,16 @@ const ROOT = path.join(__dirname, "..");
   ok(pidx.sessions[0].name === "For Visors" && pidx.sessions[0].level.join() === "deep" && pidx.sets.join() === "Pink Daze" && JSON.parse(fs.readFileSync(path.join(dir, "public", "sets.json"), "utf8"))["Pink Daze"].length === 2, "...with an index, and the picture sets");
   r = await call("POST", "/__studio/trance/publish-visor", game, VLIB);
   ok(r.code === 403, "...and only from the studio itself");
+  // the farm's own pictures folder: listed with the links they'll have, and shown to the editor as thumbnails
+  fs.mkdirSync(path.join(dir, "public", "pictures"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "public", "pictures", "pinup-cow-girl.jpg"), "x"); fs.writeFileSync(path.join(dir, "public", "pictures", "notes.txt"), "x");
+  r = await call("GET", "/__studio/trance/pictures", "http://localhost:4780");
+  const plist = JSON.parse(r.body);
+  ok(plist.length === 1 && plist[0].file === "pinup-cow-girl.jpg" && plist[0].url === "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/public/visor/pictures/pinup-cow-girl.jpg", "the pictures folder: only pictures, each with the link it'll have on GitHub");
+  r = await call("GET", "/__studio/trance/pictures/pinup-cow-girl.jpg", "http://localhost:4780");
+  ok(r.code === 200, "...and shown to the editor");
+  r = await call("GET", "/__studio/trance/pictures/..%2Fsets.json", "http://localhost:4780");
+  ok(r.code === 400, "...nothin' else through it");
   const tool = fs.readFileSync(path.join(ROOT, "tools/publish-visor.mjs"), "utf8");
   ok(/"--only"/.test(tool) && /"--", "public\/visor"/.test(tool) && /HEAD\.\.origin\/main/.test(tool), "the GitHub step sends only public/visor/, and never over newer work");
   const gi = fs.readFileSync(path.join(ROOT, ".gitignore"), "utf8");

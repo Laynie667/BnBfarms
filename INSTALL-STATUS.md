@@ -1,6 +1,6 @@
 # What to install (current versions)
 
-Updated 2026-11-25. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-26. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.3.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.4.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.84.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.85.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.85.0 + Conditioning 2.4.0: a much bigger trance library, praise and degrade tones, and the farm's own visor pictures** Laynie, Nov 25: "bulk up the sessions content and hypno scripts, choose some pictures, and sexy ones, per species and gender"; "any species and gender", and ?degrade / ?praise followed: "yes".
+  - **The starter library, bulked up** (shared/trance-more.js, about 90 new blocks; 126 in all): new inductions (The Glow, Countin' Down in the Straw, Head to Tail, The Milker's Rhythm), deepeners (The Cellar Stairs, The Warm Trough, Pasture Sunset, Up and Down Again, Deeper Every Time), convincers, suggestions for anybody (The Ache, Held on the Edge, Belongs to the Farm, Under Glass…), a pack for every kind of stock (cows and bulls, ponies and horses, pups, dogs, wolves and foxes, kitties, pigs, bunnies, goats, sheep, deer, rats, dragons, goblins) with lines for each body and gender, more triggers (Drop for the Farm, Present, Milk Letdown, Walk On, Who's a Good One, Here Kitty, Sooey), compulsions, hang-ons, wakes, slips and nudges, and eight new sessions, seven of them for visors (Under the Glow, Udder Worship, Stud Service, Pony Trainin', Good Pup, Kitty in Heat, Mud and Trough; Deep Barn Cellar for the farm). Not one clinical word in it (a test holds it to that).
+  - **Tone**: a block can say `tone: praise` (only for somebody with ?praise on) or `tone: degrade` (only ?degrade on); everything else reaches anybody. Sessions, slips, nudges and visors all follow it.
+  - **The farm's own visor pictures** (`public/visor/pictures/`, 41 originals drawn for the farm, no characters): slow spirals and rings, a slowly turning spiral GIF, mantra posters (GOOD COW, BREED, EMPTY, GOOD PUP, KITTY…), species prints (cow spots, paws, hooves, horseshoes, bells, carrots, snouts), and neon pin-up silhouettes for cows, ponies, pups, kitties, pigs and bunnies, each a girl, a guy and somebody in between. 21 ready-made picture sets (each kind: girls, boys, everyone; plus The Farm's Spirals, Empty Heads, The Breeding Barn) in the farm's public visor list, and in the studio's Visor list.
+  - **The studio's picture picker**: drop pictures in `public/visor/pictures/` in the project folder; the Visor list panel shows them as thumbnails, and a click adds one to the set you're editing. Publish for visors sends them to GitHub with the rest. (GitHub doesn't allow pornographic pictures, and no character pictures go there; explicit ones belong on an adult image host, added to a set as links.)
+  - **Visors fit their wearer**: the farm tells each Companion their kind, body and tones (kept for off the farm), so a visor's session picks blocks for their kind and tone and only the lines that fit their body.
 
 - **Bot 0.103.0 + Companion 0.84.0 + Dispensary 0.29.0 + Conditioning 2.3.0: the farm's visor: the room goes dark, one body, the crafter's pictures and words, sessions from the farm's public list, a small icon to take it off (locked in hardcore till its sessions are done)**
 - **Bot 0.103.0 + Companion 0.84.0 + Conditioning 2.3.0 + Dispensary 0.29.0: the farm's visor** Laynie, Nov 25: "For the hypnotic visor items in bc and echoes, what if we built on a subliminal set of effects… renders nothing else map wise, in combination with our session and binaurals beats? with a onscreen button to turn the visor off… for hardcore mode players, is locked until a set number of sessions is finished"; pictures and GIFs "being links, as long as it points at the pictures address"; off the farm too; any visor; "the keyholders and crafter" open it early; it fills the pull and counts toward tiers; sessions "from a list I make publically accessible"; "once a visor is built, its settings should be locked in unless the crafter changes them"; "The button needs to be a small icon".

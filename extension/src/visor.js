@@ -41,6 +41,7 @@ import { parseLibrary, planSession, sessionSteps, fillIn, LEVELS } from "../../s
 import { STARTER } from "../../shared/trance-starter.js";
 import { normTuning, tuningCode, codeOk, codeIn, descLine, okLink, PUBLIC_BASE, VISOR_KINDS, MAX_SESSIONS, MAX_PICS, lookOf, SPIRALS, SPINS, PLACES, CHAT_FX, FX, LOOK_DEFAULTS, isVideo, fixLink, framesOf } from "../../shared/visor.js";
 import { onHypno, tranceVoice, tranceState, onTranceEnd, oocOf } from "./trance.js";
+import { offRoom } from "./hidehyp.js";
 import { h, card, title, muted, btn } from "./dom.js";
 
 const W = window;
@@ -51,7 +52,7 @@ let ctx = null;   // { toBot, toChat, prefs(), botHere(), mod }
 const V = { lib: null, sets: {}, listAt: 0, listFrom: "", cache: {}, done: {}, lines: {}, on: null, off: {}, unlocked: {}, asked: {}, run: null, el: null, timers: [], ivs: [], wordT: null, picT: null, drawT: null,
   raf: 0, lastF: 0, lastB: 0, spun: false, depth: 0, geo: null, obs: null, obsOn: null, wm: null, L: null,
   name: null, nameBack: "", nameAt: 0, dropAt: 0, after: null, afterEl: null, afterT: null, hours: {}, hourAt: 0, hoursAt: 0, joins: 0, room: "", miss: 0, fed: [],
-  likes: {}, likeImg: {}, likeAt: {}, rv: {}, peekers: {}, peek: null, given: [], feedAt: {}, saidKey: "", saidAt: 0, emoteAt: 0, picNow: "", wordNow: "", lineNow: "", viewKey: {}, herdT: 0 };
+  likes: {}, likeImg: {}, likeAt: {}, rv: {}, peekers: {}, peek: null, given: [], feedAt: {}, saidKey: "", saidAt: 0, emoteAt: 0, picNow: "", wordNow: "", lineNow: "", viewKey: {}, herdT: 0, eyes: {} };
 
 export function initVisor(c) {
   ctx = c;
@@ -64,7 +65,7 @@ export function initVisor(c) {
     try { mod.hookFunction(f, 20, (args, next) => { try { safeword("🌀 Your safeword: the visor lets go of you."); } catch (e) { /* fine */ } return next(args); }); } catch (e) { /* an older game */ }
   }
   if (typeof W.CommandCombine === "function") {
-    try { W.CommandCombine([{ Tag: "visor", Description: "unlock <name> · name <name> · reset <name>: open a farm visor early, give its wearer their own name back, or start its sinkin' over (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]); } catch (e) { /* fine */ }
+    try { W.CommandCombine([{ Tag: "visor", Description: "on · peek <name> · unlock <name> · name <name> · reset <name>: your visor back on, look into somebody's, or open a farm visor early, give its wearer their own name back, or start its sinkin' over (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]); } catch (e) { /* fine */ }
   }
   // writin' lines: a line that matches the visor's, typed out loud, is counted here and never goes to the room
   if (mod) {
@@ -106,8 +107,11 @@ export function initVisor(c) {
   reg();
   // the room's side: a glow, how deep and a 👁 over somebody under a visor, on your screen; a click on the 👁 peeks in
   if (mod) {
-    try { mod.hookFunction("ChatRoomCharacterViewDrawOverlay", 0, (args, next) => { const r = next(args); try { drawOver(args[0], args[1], args[2], args[3]); } catch (e) { /* never break the game's drawin' */ } return r; }); } catch (e) { /* an older game */ }
+    // (Nov 26, Laynie: "i dont see the button for peeking": the farm's rooms are map rooms, and only the character view
+    // had it. Now it rides on the game's own DrawCharacter, so it's over them in both views, on the room screen only.)
+    try { mod.hookFunction("DrawCharacter", 0, (args, next) => { const r = next(args); try { if (!args[5] && W.CurrentScreen === "ChatRoom" && W.CurrentCharacter == null) drawOver(args[0], args[1], args[2], args[3]); } catch (e) { /* never break the game's drawin' */ } return r; }); } catch (e) { /* an older game */ }
     try { mod.hookFunction("ChatRoomCharacterViewClickCharacter", 0, (args, next) => { try { if (clickOver(args[0], args[4], args[5])) return; } catch (e) { /* fine */ } return next(args); }); } catch (e) { /* an older game */ }
+    try { mod.hookFunction("ChatRoomMapViewClick", 0, (args, next) => { try { if (clickEye(W.MouseX, W.MouseY)) return; } catch (e) { /* fine */ } return next(args); }); } catch (e) { /* an older game */ }
   }
   setInterval(check, 2000);
   setTimeout(publicList, 4000);
@@ -310,8 +314,16 @@ const owedTill = () => { const n = needOf(), o = []; if ((V.done[V.on.code] || 0
 const ASKS = { unlock: ["visorUnlock", "it opens"], name: ["visorName", "they get their own name back"], reset: ["visorReset", "its sinkin' starts over"] };
 function command(args) {
   if (/^\s*on\s*$/i.test(args)) { turnOn(); return; }
+  // /visor peek <name>: look in through somebody's farm visor (the same as their 👁)
+  const pk = /^\s*peek\s+(.+)$/i.exec(args);
+  if (pk) {
+    const q = pk[1].trim().toLowerCase(), c = (W.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q));
+    if (!c) { ctx.toChat("🌀 Nobody here by that name.", "#a67fd4", true); return; }
+    if (!V.rv[c.MemberNumber] || !V.rv[c.MemberNumber].on) { ctx.toChat("🌀 " + nameOf(c.MemberNumber) + " isn't under a farm visor (or their Companion hasn't said so yet: it tells the room every 30 seconds).", "#a67fd4", true); return; }
+    openPeek(c.MemberNumber); return;
+  }
   const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
-  if (!m) { ctx.toChat("🌀 /visor on: let your switched-off farm visor take hold of you again. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true); return; }
+  if (!m) { ctx.toChat("🌀 /visor on: let your switched-off farm visor take hold of you again. /visor peek <name>: look in through somebody's farm visor. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true); return; }
   const q = m[2].trim().toLowerCase(), c = (W.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q));
   if (!c) { ctx.toChat("🌀 Nobody here by that name.", "#a67fd4", true); return; }
   const [type, then] = ASKS[m[1].toLowerCase()];
@@ -514,7 +526,10 @@ function build() {
 // over the room's half of the game (the chat, and the game's own buttons, stay where they are)
 function place() {
   const d = W.document, c = d.getElementById("MainCanvas"); if (!c || !V.el) return;
-  const r = c.getBoundingClientRect(), w = r.width / 2;
+  // (the room's part of the screen: half, or as wide as the game's map has been dragged out to)
+  let split = 1000;
+  try { if (typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && Number(W.ChatRoomMapViewSplitPosition) > 0) split = Math.max(500, Math.min(2000, Number(W.ChatRoomMapViewSplitPosition))); } catch (e) { /* half */ }
+  const r = c.getBoundingClientRect(), w = r.width * split / 2000;
   Object.assign(V.el.style, { left: r.left + "px", top: r.top + "px", width: w + "px", height: r.height + "px" });
   V.el.classList.toggle("calm", calmNow());
   const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1000;
@@ -534,7 +549,7 @@ function frame() {
   return (V.raf = typeof W.requestAnimationFrame === "function" ? W.requestAnimationFrame(go) : setTimeout(() => go(Date.now()), 40));
 }
 function draw(now) {
-  if (now - V.lastF < 33) return;    // (about 30 a second, smooth and slow)
+  if (now - V.lastF < 33 || offRoom()) return;    // (about 30 a second, smooth and slow; nothin' drawn while it's hidden off the room screen)
   V.lastF = now;
   const t = now / 1000, L = look(), calm = calmNow();
   const moving = !calm && (L.spin !== "still" || L.breathe || L.drift || L.spiral === "tunnel");
@@ -1023,10 +1038,21 @@ function drawOver(C, X, Y, Z) {
   g.textAlign = "center"; g.textBaseline = "middle";
   g.font = "bold " + Math.max(10, Math.round(24 * Z)) + "px sans-serif"; g.lineWidth = Math.max(2, 3 * Z); g.strokeStyle = "rgba(30,10,40,.85)"; g.fillStyle = "rgba(240,200,255,.95)";
   const ty = Y + (p.yo + 12 * p.HR) * Z; g.strokeText("🌀 " + (Number(x.d) || 0), p.hx, ty); g.fillText("🌀 " + (Number(x.d) || 0), p.hx, ty);
-  const ex = X + (p.xo + 400 * p.HR) * Z, ey = Y + (p.yo + 70 * p.HR) * Z, er = 24 * Z;
+  // (on the map the characters are small: the 👁 keeps a size you can see and click)
+  const er = Math.max(11, 24 * Z), ex = X + (p.xo + 400 * p.HR) * Z + Math.max(0, er - 24 * Z), ey = Y + (p.yo + 70 * p.HR) * Z;
   g.fillStyle = "rgba(40,20,55,.8)"; g.beginPath(); g.arc(ex, ey, er, 0, 7); g.fill(); g.strokeStyle = "rgba(220,170,245,.85)"; g.lineWidth = Math.max(1, 2 * Z); g.stroke();
-  g.font = Math.max(10, Math.round(24 * Z)) + "px sans-serif"; g.fillStyle = "#fff"; g.fillText("👁", ex, ey + Z);
+  g.font = Math.max(10, Math.round(er)) + "px sans-serif"; g.fillStyle = "#fff"; g.fillText("👁", ex, ey + 1);
   g.restore();
+  V.eyes[C.MemberNumber] = { x: ex, y: ey, r: Math.max(14, er + 3), at: Date.now() };   // (where it is, for a click on the map)
+}
+// a click on the map: on one of the 👁 just drawn?
+function clickEye(mx, my) {
+  const now = Date.now();
+  for (const [mn, e] of Object.entries(V.eyes)) {
+    if (now - e.at > 1000) { delete V.eyes[mn]; continue; }
+    if (Math.hypot(Number(mx) - e.x, Number(my) - e.y) <= e.r && V.rv[mn] && V.rv[mn].on) { openPeek(Number(mn)); return true; }
+  }
+  return false;
 }
 // a click on that 👁 (the game hands it over relative to the character, without the room's zoom)
 function clickOver(C, cx, cy) {

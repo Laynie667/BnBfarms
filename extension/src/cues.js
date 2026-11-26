@@ -21,7 +21,7 @@ let ctx = null;   // { toBot, panel, local }
 export function initCues(c) { ctx = c; setInterval(sightTick, 4000); setInterval(feelTick, 60000); setInterval(heelTick, 500); }
 const pref = (k) => !ctx.panel.prefs[k];   // every cue is on unless switched off
 export const cueOff = () => ({ face: !pref("noFace") || undefined, sound: !pref("noSound") || undefined, trance: !pref("noTrance") || undefined,
-  lead: !pref("noLead") || undefined, slow: !pref("noSlow") || undefined, stir: (ctx.panel.prefs.stir ? undefined : true), gear: (ctx.panel.prefs.gear ? undefined : true), ink: (ctx.panel.prefs.ink ? undefined : true) });
+  lead: !pref("noLead") || undefined, slow: !pref("noSlow") || undefined, stir: (ctx.panel.prefs.stir ? undefined : true), gear: (ctx.panel.prefs.gear ? undefined : true), ink: (ctx.panel.prefs.ink ? undefined : true), strip: (ctx.panel.prefs.strip ? undefined : true) });
 const mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
 const others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
 

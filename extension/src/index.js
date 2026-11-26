@@ -18,7 +18,7 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, topUpOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, keptClothes, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
@@ -40,6 +40,7 @@ import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe,
 import { LS, onAccount, initAcct } from "./acct.js";   // each account its own (Nov 24)
 import { initTrance, onHypno, tranceHello, tranceVoice } from "./trance.js";   // the farm's trance (Nov 25)
 import { initVisor, onVisorMsg } from "./visor.js";   // the farm's visor (Nov 25)
+import { initHide } from "./hidehyp.js";   // the trance and visor step aside off the room screen (Nov 26, Sera's suggestion)
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -375,7 +376,7 @@ function onFarmMsg(m) {
         // messes stayed on and ?wash "wouldn't let me clean all the messes on me" (Laynie, Oct 22)
         if (m.wash) { try { messWash(); } catch (e) { console.warn("[Farmhand Companion] wash:", e); } try { r = washMarks(); } catch (e) { console.warn("[Farmhand Companion] wash splatters:", e); r = { ok: true, did: ["mess"], why: e.message }; } }
         else if (m.rinse) { let d = []; try { if (messRinse()) d.push("mess"); } catch (e) { console.warn("[Farmhand Companion] rinse:", e); } try { d = d.concat(rinseMarks().did || []); } catch (e) { console.warn("[Farmhand Companion] rinse splatters:", e); } r = { ok: true, did: d }; }
-        else if (m.strip) r = stripMe(prefs);
+        else if (m.strip) r = stripMe(prefs, m.strip === true ? "" : String(m.strip));   // (a trap can take just part: "lower" or "top", Nov 26)
         else if (m.dress) r = dressMe();
         else {
           // our own mess, drawn by the Companion (messes.js), first and on its own: when the game's splatters below failed
@@ -484,6 +485,9 @@ const api = {
   },
   hasBackup,
   rehello: () => hello(),   // tell the bot a setting changed (the relay switch)
+  // clothes the farm (or a trap) took off them, kept on this computer: put back on (Settings, by "Farm can strip me")
+  keptClothes: () => keptClothes(),
+  dressMe: () => { const r = dressMe(); toChat(r.ok ? "👗 Your own clothes are back on." : "👗 There are no clothes of yours kept to put back.", "#c79bd8"); return r; },
   // the Log tab asks the farm girl for the record (views/log.js)
   logAsk(q) { st.panel.ui.logRows = { id: 0, rows: [], total: 0, busy: true }; st.panel.render(); toBot("logAsk", q); },
   // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
@@ -531,6 +535,7 @@ function start() {
   // the farm's trance (trance.js, Nov 25): LSCG's own in the farm's name, its beats, the look, the farm's own triggers
   try { initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere, mod, arouse: (add, cap) => arouse({ add, cap }), lead }); } catch (e) { console.warn("[Farmhand Companion] trance:", e); }
   try { initVisor({ toBot, toChat, prefs: () => st.panel.prefs, botHere, mod }); } catch (e) { console.warn("[Farmhand Companion] visor:", e); }
+  try { initHide(mod); } catch (e) { console.warn("[Farmhand Companion] hide:", e); }
   setInterval(parasiteSync, 60000);
   setInterval(() => { nurseryPowderTick(); nurseryStatsSend(false); }, 30000);   // a little's paddin' (ABCL) for the nursery, and the baby powder brushin' off
   initBelly(mod);  // the drawn-belly test (belly.js)

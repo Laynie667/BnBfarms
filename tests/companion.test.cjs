@@ -331,6 +331,16 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("15 stripped: clothes off, the locked rope stays ->", !(loaded || []).some((b) => b.Group === "Cloth"), (loaded || []).some((b) => b.Group === "ItemArms"));
   bot({ type: "mark", dress: true }); await wait(50);
   out("15 dressed again ->", (loaded || []).some((b) => b.Group === "Cloth" && b.Name === "Shirt"));
+  // a trap can take just part (Nov 26): "lower" the bottoms and whatever covers them, "top" the top and bra
+  Object.assign(G, { Panties: { Name: "Panties", Clothing: true, Category: "Appearance" }, Bra: { Name: "Bra", Clothing: true, Category: "Appearance" }, Shoes: { Name: "Shoes", Clothing: true, Category: "Appearance" } });
+  w.Player.Appearance = w.Player.Appearance.concat([item("Panties", "Panties1"), item("Bra", "Bra1"), item("Shoes", "Shoes1")]);
+  bot({ type: "mark", strip: "top" }); await wait(50);
+  const g15 = () => (loaded || []).map((b) => b.Group);
+  out("15 a trap takes just the top: the bra and shirt go, the panties and shoes stay ->", !g15().includes("Bra") && !g15().includes("Cloth") && g15().includes("Panties") && g15().includes("Shoes"));
+  bot({ type: "mark", strip: "lower" }); await wait(50);
+  out("15 ...then the bottoms: the panties go, the shoes stay ->", !g15().includes("Panties") && g15().includes("Shoes"));
+  bot({ type: "mark", dress: true }); await wait(50);
+  out("15 dressed again: the shirt back (and the rest of what was kept) ->", g15().includes("Cloth"));
   bot({ type: "mark", wash: true }); await wait(50);
   // 17. Echo's Body Treatise (Nov 21): even when the game has it, the farm writes the game's own way (the Treatise loops the
   // game's check since R134 and gets folks cut off), and the day's tally is a written line too

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.89.0
+// @version      0.90.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5805,8 +5805,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W23, H2) {
-    const t = cy - H2 / 2, L = cx - W23 / 2, R = cx + W23 / 2;
+  function shield(g, cx, cy, W24, H2) {
+    const t = cy - H2 / 2, L = cx - W24 / 2, R = cx + W24 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -6668,9 +6668,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       auto: "loads",
       sample: { n: 23 },
       draw: (g, w, h2, V2) => {
-        const x0 = 94, y0 = 12, W23 = 192, H2 = 226;
+        const x0 = 94, y0 = 12, W24 = 192, H2 = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W23, H2);
+        g.strokeRect(x0, y0, W24, H2);
         const L = (t, size2, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size2 + "px Arial";
           g.textAlign = "left";
@@ -6678,20 +6678,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W23 - 8, yy);
+            g.fillText(right, x0 + W24 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W23 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W24 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W23 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W24 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
         L("Loads taken", 21, true, y0 + 113, String(V2.n));
-        g.fillRect(x0 + 6, y0 + 126, W23 - 12, 4);
+        g.fillRect(x0 + 6, y0 + 126, W24 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W23 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W24 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -7219,8 +7219,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W23, d, V2) {
-    doc = W23.document;
+  function drawCard(W24, d, V2) {
+    doc = W24.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
@@ -7248,7 +7248,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W23, d, m, layer, V2) {
+  function picture(W24, d, m, layer, V2) {
     const key3 = d.name + "|" + JSON.stringify(V2);
     let set2 = cache.get(key3);
     if (set2) {
@@ -7257,30 +7257,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base2 = drawCard(W23, d, V2), parts2 = layersOf(base2, m);
+    const base2 = drawCard(W24, d, V2), parts2 = layersOf(base2, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key3, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W23, u);
+      for (const u of Object.values(os)) forget(W24, u);
     }
     return set2[layer] || null;
   }
-  function forget(W23, url) {
+  function forget(W24, url) {
     try {
-      const m = W23.GLDrawImageCache;
+      const m = W24.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W23.DrawImageCache;
+      const m = W24.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W23.GLDrawCanvas && W23.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W24.GLDrawCanvas && W24.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7384,19 +7384,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W23, a) {
-    Wd = W23;
+  function openInkPanel(W24, a) {
+    Wd = W24;
     api = a;
     close();
-    if (!W23.document.getElementById("fi-style")) {
-      const s = W23.document.createElement("style");
+    if (!W24.document.getElementById("fi-style")) {
+      const s = W24.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W23.document.head.appendChild(s);
+      W24.document.head.appendChild(s);
     }
-    box = W23.document.createElement("div");
+    box = W24.document.createElement("div");
     box.id = "fi-panel";
-    W23.document.body.appendChild(box);
+    W24.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7492,9 +7492,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
-  function describe(W23) {
+  function describe(W24) {
     for (const slot of ALL_SLOTS) {
-      const G = W23.AssetGroupMap && W23.AssetGroupMap.get(slot);
+      const G = W24.AssetGroupMap && W24.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7503,32 +7503,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W23) => typeof W23.AssetGroupAdd === "function" && typeof W23.AssetAdd === "function" && W23.AssetGroupMap && W23.AssetGroupMap.size > 30;
-  function addSlots(W23) {
+  var gameReady = (W24) => typeof W24.AssetGroupAdd === "function" && typeof W24.AssetAdd === "function" && W24.AssetGroupMap && W24.AssetGroupMap.size > 30;
+  function addSlots(W24) {
     let added = false;
     for (const slot of ALL_SLOTS) {
-      if (W23.AssetGroupMap.has(slot)) continue;
-      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W23.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W23.AssetAdd(G, a, W23.AssetFemale3DCGExtended || {}, def);
+      if (W24.AssetGroupMap.has(slot)) continue;
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W24.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W24.AssetAdd(G, a, W24.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
-    describe(W23);
+    describe(W24);
     return added;
   }
   var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
-  function liveSrc(W23, C2, slot, name, layer) {
+  function liveSrc(W24, C2, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W23, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+      return picture(W24, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W23) {
-    const P5 = W23.Player, out = [];
+  function wornLive(W24) {
+    const P5 = W24.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P5, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7536,8 +7536,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W23, slot, values, now) {
-    const it = itemIn(W23.Player, slot);
+  function write(W24, slot, values, now) {
+    const it = itemIn(W24.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7547,17 +7547,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W23), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W24), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(W23.Player);
+      if (typeof W24.CharacterRefresh === "function") W24.CharacterRefresh(W24.Player);
     } catch (e) {
     }
     try {
-      if (typeof W23.ChatRoomCharacterItemUpdate === "function") W23.ChatRoomCharacterItemUpdate(W23.Player, slot);
+      if (typeof W24.ChatRoomCharacterItemUpdate === "function") W24.ChatRoomCharacterItemUpdate(W24.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7566,17 +7566,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var counts = {};
   var mine = {};
   var DAY = 864e5;
-  var cumKey = (W23) => "farmink-lastcum-" + (W23.Player && W23.Player.MemberNumber);
-  function daysDenied(W23) {
+  var cumKey = (W24) => "farmink-lastcum-" + (W24.Player && W24.Player.MemberNumber);
+  function daysDenied(W24) {
     let t = 0;
     try {
-      t = Number(W23.localStorage.getItem(cumKey(W23))) || 0;
+      t = Number(W24.localStorage.getItem(cumKey(W24))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W23, auto) {
-    if (auto === "denied") return { n: daysDenied(W23) };
+  function autoOf(W24, auto) {
+    if (auto === "denied") return { n: daysDenied(W24) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
@@ -7588,12 +7588,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W23) {
-    for (const { slot, name, item } of wornLive(W23)) {
+  function refreshAuto(W24) {
+    for (const { slot, name, item } of wornLive(W24)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W23, d.auto);
-      if (v) write(W23, slot, v);
+      const v = autoOf(W24, d.auto);
+      if (v) write(W24, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7628,7 +7628,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W23) => "farmink-done-" + (W23.Player && W23.Player.MemberNumber);
+  var doneKey = (W24) => "farmink-done-" + (W24.Player && W24.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
@@ -7641,21 +7641,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W23, list2, on3, now, opts) {
+  function farmInkSync(W24, list2, on3, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P5 = W23.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list2) || typeof W23.InventoryWear !== "function") return null;
+    const P5 = W24.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list2) || typeof W24.InventoryWear !== "function") return null;
     now = now || Date.now();
     const want = on3 ? list2.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed2 = [];
     let done = {};
     try {
-      done = JSON.parse(W23.localStorage.getItem(doneKey(W23))) || {};
+      done = JSON.parse(W24.localStorage.getItem(doneKey(W24))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W23.InventoryRemove === "function") W23.InventoryRemove(P5, slot, false);
+        if (typeof W24.InventoryRemove === "function") W24.InventoryRemove(P5, slot, false);
         else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7702,7 +7702,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (itemIn(P5, slot)) remove(slot);
       const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W23.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
+        W24.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
@@ -7717,29 +7717,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W23.localStorage.setItem(doneKey(W23), JSON.stringify(done));
+      W24.localStorage.setItem(doneKey(W24), JSON.stringify(done));
     } catch (e) {
     }
     if (changed2.length) {
       try {
-        if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(P5);
+        if (typeof W24.CharacterRefresh === "function") W24.CharacterRefresh(P5);
       } catch (e) {
       }
       try {
-        if (typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(P5);
+        if (typeof W24.ChatRoomCharacterUpdate === "function") W24.ChatRoomCharacterUpdate(P5);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W23) => {
-    const id = farmOf(itemIn(W23.Player, BRAND_SLOT));
+  var farmBrandWorn = (W24) => {
+    const id = farmOf(itemIn(W24.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W23, C2) => {
+  var dosed = (W24, C2) => {
     try {
-      const D = W23.FarmhandDispensary;
+      const D = W24.FarmhandDispensary;
       return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
     } catch (e) {
       return false;
@@ -7757,29 +7757,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.trophy === "string" ? f.trophy : null;
   };
-  function trophyWorn(W23) {
+  function trophyWorn(W24) {
     const o = {};
     for (const s of INK_SLOTS) {
-      const id = trophyOf(itemIn(W23.Player, s));
+      const id = trophyOf(itemIn(W24.Player, s));
       if (id) o[id] = s;
     }
     return o;
   }
-  var roomSees = (W23, P5) => {
+  var roomSees = (W24, P5) => {
     try {
-      if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(P5);
+      if (typeof W24.CharacterRefresh === "function") W24.CharacterRefresh(P5);
     } catch (e) {
     }
     try {
-      if (typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(P5);
+      if (typeof W24.ChatRoomCharacterUpdate === "function") W24.ChatRoomCharacterUpdate(P5);
     } catch (e) {
     }
   };
-  function trophyWear(W23, t, slot) {
-    const P5 = W23.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || typeof W23.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  function trophyWear(W24, t, slot) {
+    const P5 = W24.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || typeof W24.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
     if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
-    const worn = trophyWorn(W23);
+    const worn = trophyWorn(W24);
     if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
     if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
     slot = slot || INK_SLOTS.find((s) => !itemIn(P5, s));
@@ -7789,100 +7789,100 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }) };
     if (itemIn(P5, slot)) {
       try {
-        W23.InventoryRemove(P5, slot, false);
+        W24.InventoryRemove(P5, slot, false);
       } catch (e) {
         return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
       }
     }
     try {
-      W23.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
+      W24.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
     } catch (e) {
       return { ok: false, why: "the game wouldn't take it" };
     }
     const it = itemIn(P5, slot);
     if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
-    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W23, d.auto) : null;
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W24, d.auto) : null;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
-    roomSees(W23, P5);
+    roomSees(W24, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
-  function trophyOff(W23, id) {
-    const P5 = W23.Player, slot = P5 && trophyWorn(W23)[id];
+  function trophyOff(W24, id) {
+    const P5 = W24.Player, slot = P5 && trophyWorn(W24)[id];
     if (!slot) return { ok: true, already: true };
     try {
-      if (typeof W23.InventoryRemove === "function") W23.InventoryRemove(P5, slot, false);
+      if (typeof W24.InventoryRemove === "function") W24.InventoryRemove(P5, slot, false);
       else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
     } catch (e) {
       return { ok: false, why: "it wouldn't come off" };
     }
-    roomSees(W23, P5);
+    roomSees(W24, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W23, t) => {
+  var say = (W24, t) => {
     try {
-      if (typeof W23.ChatRoomSendLocal === "function") {
-        const d = W23.document.createElement("div");
+      if (typeof W24.ChatRoomSendLocal === "function") {
+        const d = W24.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W23.ChatRoomSendLocal(d.outerHTML);
+        W24.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W23) {
+  function wornAll(W24) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W23.Player, slot);
+      const it = itemIn(W24.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W23) => ({ worn: () => wornAll(W23), write: (slot, v) => write(W23, slot, v, true), command: (a) => inkCommand(W23, a) });
-  function inkCommand(W23, args) {
+  var panelApi = (W24) => ({ worn: () => wornAll(W24), write: (slot, v) => write(W24, slot, v, true), command: (a) => inkCommand(W24, a) });
+  function inkCommand(W24, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W23);
-    if (!a && W23.document && W23.document.body) {
-      openInkPanel(W23, panelApi(W23));
+    const worn = wornLive(W24);
+    if (!a && W24.document && W24.document.body) {
+      openInkPanel(W24, panelApi(W24));
       return;
     }
-    if (/^why$/i.test(a)) return say(W23, whyText());
+    if (/^why$/i.test(a)) return say(W24, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W23.Player, slot2)) return say(W23, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W23, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W23, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W24.Player, slot2)) return say(W24, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W24, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W24, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W23, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W23, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W24, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W24, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W23.Player, slot);
-    if (!it) return say(W23, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W23, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W24.Player, slot);
+    if (!it) return say(W24, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W24, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W23, "");
+    if (!rest) return inkCommand(W24, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W23, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W23, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W23);
-    say(W23, "Written on " + d.title + ".");
+    else return say(W24, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W24, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W24);
+    say(W24, "Written on " + d.title + ".");
   }
-  function farmInkEntry(W23) {
-    const PD = W23.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W23.PropertyDataEntry;
+  function farmInkEntry(W24) {
+    const PD = W24.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W24.PropertyDataEntry;
     if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
     const same = (a, b) => {
       try {
@@ -7905,9 +7905,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return true;
   }
-  function registerInk(W23, mod3) {
-    if (W23.__farmInk) return W23.__farmInk;
-    const st2 = W23.__farmInk = {
+  function registerInk(W24, mod3) {
+    if (W24.__farmInk) return W24.__farmInk;
+    const st2 = W24.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7917,7 +7917,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W23);
+            refreshAuto(W24);
           } catch (e) {
           }
         }
@@ -7927,26 +7927,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           mine = c;
           try {
-            refreshAuto(W23);
+            refreshAuto(W24);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W23, slot, v, true),
-      command: (a) => inkCommand(W23, a),
+      write: (slot, v) => write(W24, slot, v, true),
+      command: (a) => inkCommand(W24, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list2, on3, opts) => farmInkSync(W23, list2, on3, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W23),
+      farm: (list2, on3, opts) => farmInkSync(W24, list2, on3, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W24),
       // trophies (the Companion's 🏆 Trophies row)
-      trophyWear: (t2, slot) => trophyWear(W23, t2, slot),
-      trophyOff: (id) => trophyOff(W23, id),
-      trophyWorn: () => trophyWorn(W23),
-      worn: () => wornLive(W23).map(({ slot, name }) => ({ slot, name }))
+      trophyWear: (t2, slot) => trophyWear(W24, t2, slot),
+      trophyOff: (id) => trophyOff(W24, id),
+      trophyWorn: () => trophyWorn(W24),
+      worn: () => wornLive(W24).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook4 = (name, pri, fn) => {
         try {
-          if (typeof W23[name] === "function") mod3.hookFunction(name, pri, fn);
+          if (typeof W24[name] === "function") mod3.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7967,7 +7967,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W23);
+          describe(W24);
         } catch (e) {
         }
         return r;
@@ -7985,14 +7985,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen3 = /* @__PURE__ */ new Set(), notReady = [];
         const ready2 = (u) => {
           try {
-            const c = W23.GLDrawImageCache;
+            const c = W24.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain2, self, u, x, y, o) => {
-          const T3 = W23.__farmInkTint;
+          const T3 = W24.__farmInkTint;
           if (typeof T3 !== "function") return false;
           let t2;
           try {
@@ -8032,7 +8032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W23, C2, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W24, C2, lm[1], lm[2], lm[3]);
               seen3.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
@@ -8046,7 +8046,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W23, C2)) return void 0;
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W24, C2)) return void 0;
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -8059,7 +8059,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W23, C2, seen3, notReady);
+          note2(W24, C2, seen3, notReady);
         } catch (e) {
         }
         return out;
@@ -8075,7 +8075,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
+          if (back && typeof W24.CharacterLoadCanvas === "function") W24.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
@@ -8092,8 +8092,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             back++;
           }
           if (back) {
-            if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(C2, false);
-            if (args[2] && typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(C2);
+            if (typeof W24.CharacterRefresh === "function") W24.CharacterRefresh(C2, false);
+            if (args[2] && typeof W24.ChatRoomCharacterUpdate === "function") W24.ChatRoomCharacterUpdate(C2);
           }
         } catch (e) {
         }
@@ -8102,13 +8102,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W23);
+          addSlots(W24);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      if (typeof W23.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+      if (typeof W24.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
         const r = next(args);
         try {
           const it = args[0];
@@ -8117,13 +8117,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      farmInkEntry(W23);
+      farmInkEntry(W24);
       hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
-          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W23.ActivityOrgasmRuined) {
-            W23.localStorage.setItem(cumKey(W23), String(Date.now()));
-            setTimeout(() => refreshAuto(W23), 1e3);
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W24.ActivityOrgasmRuined) {
+            W24.localStorage.setItem(cumKey(W24), String(Date.now()));
+            setTimeout(() => refreshAuto(W24), 1e3);
           }
         } catch (e) {
         }
@@ -8131,53 +8131,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W23)) return;
+      if (!gameReady(W24)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W23);
+        addSlots(W24);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C2 of W23.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
+          for (const C2 of W24.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W24.CharacterLoadCanvas === "function") W24.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W23.CommandCombine === "function") W23.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W23, a) }]);
+        if (typeof W24.CommandCombine === "function") W24.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W24, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W23.Player && W23.Player.Appearance) refreshAuto(W23);
+        if (W24.Player && W24.Player.Appearance) refreshAuto(W24);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W23.addEventListener("farmhand-dispensary", (e) => {
+      W24.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W23.Player && W23.Player.MemberNumber;
-        const C2 = (W23.Player && W23.Player.MemberNumber === mn ? W23.Player : (W23.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C2 && wearsDosedOnly(C2) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
+        const mn = d.type === "icons" ? d.from : W24.Player && W24.Player.MemberNumber;
+        const C2 = (W24.Player && W24.Player.MemberNumber === mn ? W24.Player : (W24.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W24.CharacterLoadCanvas === "function") W24.CharacterLoadCanvas(C2);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C2 of W23.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
+        for (const C2 of W24.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W24.CharacterLoadCanvas === "function") W24.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W23, C2, seen3, notReady) {
+  function note2(W24, C2, seen3, notReady) {
     if (!C2 || !Array.isArray(C2.Appearance)) return;
     const pose2 = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose2)) return;
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.89.0";
+  var VERSION = "0.90.0";
 
   // shared/species.js
   var WORDS = {
@@ -9367,11 +9367,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W23 = window;
-      const takesDrawings = () => typeof W23.GLDrawLoadTransient === "function";
+      const W24 = window;
+      const takesDrawings = () => typeof W24.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W23.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W23.DrawCacheImage, W23.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W24.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W24.DrawCacheImage, W24.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen3 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -9380,7 +9380,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (seen3 == null) seen3 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W23.DrawGetImage(src);
+          W24.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -10815,7 +10815,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W24 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W25 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -10824,7 +10824,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on3 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on3) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W24 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W25 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -10843,26 +10843,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W24 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W25 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W24 + 1.5;
+                      g.lineWidth = W25 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W24;
+                      g.lineWidth = W25;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W24 * 0.18, p[1] + dx / L * W24 * 0.18];
+                        return [p[0] - dy / L * W25 * 0.18, p[1] + dx / L * W25 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W24 * 0.22);
+                      g.lineWidth = Math.max(1, W25 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -12277,12 +12277,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (st2) return stampCanvas(st2, o, o.skin || [236, 204, 196]);
       const K2 = KINDS3[o.kind] || KINDS3.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
       const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K2.soft));
-      const W23 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
-      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W23 * 1.25 : 0;
+      const W24 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
+      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W24 * 1.25 : 0;
       const col = K2.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K2.sheath === "skin" || !K2.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K2.sheath;
       const bend = (hard ? 0.11 : 0.09) * L;
-      const widest = W23 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
-      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W23 : W23 * 1.2) + 10, down = Math.max(hard ? W23 * 1.5 : L + W23, drop2 + br * 1.5) + 12;
+      const widest = W24 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
+      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W24 : W24 * 1.2) + 10, down = Math.max(hard ? W24 * 1.5 : L + W24, drop2 + br * 1.5) + 12;
       const cv = document.createElement("canvas");
       cv.width = Math.ceil(half * 2);
       cv.height = Math.ceil(up + down);
@@ -12292,14 +12292,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.lineJoin = "round";
       g.lineCap = "round";
       const sack = () => {
-        const top = oy + W23 * 0.2, cy = top + drop2, r = br;
+        const top = oy + W24 * 0.2, cy = top + drop2, r = br;
         const path = () => {
           g.beginPath();
-          g.moveTo(ox - W23 * 0.9, top);
+          g.moveTo(ox - W24 * 0.9, top);
           g.bezierCurveTo(ox - r * 1.1, top + drop2 * 0.35, ox - r * 2.05, cy - r * 0.5, ox - r * 1.75, cy + r * 0.45);
           g.bezierCurveTo(ox - r * 1.5, cy + r * 1.3, ox - r * 0.35, cy + r * 1.4, ox, cy + r * 0.95);
           g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);
-          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W23 * 0.9, top);
+          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W24 * 0.9, top);
           g.closePath();
         };
         const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
@@ -12345,8 +12345,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const shaft = (dx, lean) => {
         const dir = hard ? -1 : 1, N2 = 56, kn = (t) => knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0;
-        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W23 * 0.15)];
-        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W23;
+        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W24 * 0.15)];
+        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W24;
         const L0 = [], R0 = [];
         for (let i = 0; i <= N2; i++) {
           const t = i / N2, c = cen(t), c2 = cen(Math.min(1, t + 0.01)), c1 = cen(Math.max(0, t - 0.01));
@@ -12378,7 +12378,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         along.addColorStop(1, rgb2(K2.tipCol, 1.04));
         g.fillStyle = along;
         g.fillRect(0, 0, cv.width, cv.height);
-        const across = g.createLinearGradient(ox + dx - W23 * 1.6, 0, ox + dx + W23 * 1.6, 0);
+        const across = g.createLinearGradient(ox + dx - W24 * 1.6, 0, ox + dx + W24 * 1.6, 0);
         across.addColorStop(0.12, "rgba(110,50,48,0.34)");
         across.addColorStop(0.36, "rgba(255,255,255,0.10)");
         across.addColorStop(0.6, "rgba(0,0,0,0)");
@@ -12390,14 +12390,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.strokeStyle = line3(col);
           g.lineWidth = 1.2;
           g.beginPath();
-          g.moveTo(c[0] - W23 * 1.4, c[1]);
-          g.quadraticCurveTo(c[0], c[1] + dir * W23 * 0.5, c[0] + W23 * 1.4, c[1]);
+          g.moveTo(c[0] - W24 * 1.4, c[1]);
+          g.quadraticCurveTo(c[0], c[1] + dir * W24 * 0.5, c[0] + W24 * 1.4, c[1]);
           g.stroke();
           g.fillStyle = "rgba(222,150,152,0.45)";
           for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) {
             const c3 = cen(b2);
             g.beginPath();
-            g.ellipse(c3[0] + a * W23, c3[1], r * W23, r * W23 * 1.5, 0, 0, Math.PI * 2);
+            g.ellipse(c3[0] + a * W24, c3[1], r * W24, r * W24 * 1.5, 0, 0, Math.PI * 2);
             g.fill();
           }
         }
@@ -12422,15 +12422,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.stroke();
           const e = cen(0.985);
           g.beginPath();
-          g.moveTo(e[0], e[1] - dir * W23 * 0.25);
-          g.lineTo(e[0], e[1] + dir * W23 * 0.12);
+          g.moveTo(e[0], e[1] - dir * W24 * 0.25);
+          g.lineTo(e[0], e[1] + dir * W24 * 0.12);
           g.stroke();
           if (K2.cleft) {
             const a = cen(K2.headAt + 0.02), b2 = cen(0.97);
             g.globalAlpha = 0.5;
             g.beginPath();
             g.moveTo(a[0], a[1]);
-            g.quadraticCurveTo(a[0] + W23 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
+            g.quadraticCurveTo(a[0] + W24 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
             g.stroke();
             g.globalAlpha = 1;
           }
@@ -12460,8 +12460,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (false) {
           g.beginPath();
           const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68);
-          g.moveTo(a[0] - W23 * 0.3, a[1]);
-          g.bezierCurveTo(b2[0] - W23 * 0.8, b2[1], b2[0] + W23 * 0.4, b2[1], c4[0] - W23 * 0.1, c4[1]);
+          g.moveTo(a[0] - W24 * 0.3, a[1]);
+          g.bezierCurveTo(b2[0] - W24 * 0.8, b2[1], b2[0] + W24 * 0.4, b2[1], c4[0] - W24 * 0.1, c4[1]);
           g.stroke();
         }
         {
@@ -12481,18 +12481,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.beginPath();
             g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2);
             g.fill();
-            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W23 * 0.9);
+            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W24 * 0.9);
             sh2.addColorStop(0, "rgba(110,50,48,0.30)");
             sh2.addColorStop(1, "rgba(110,50,48,0)");
             g.fillStyle = sh2;
-            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W23 * 0.9), cv.width, W23 * 0.9);
+            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W24 * 0.9), cv.width, W24 * 0.9);
           }
         }
         g.restore();
         if (K2.barbs) {
           g.fillStyle = line3(col);
           for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) {
-            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W23 * 0.22);
+            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W24 * 0.22);
             g.beginPath();
             g.moveTo(p[0], p[1] - dir * s2 * 0.6);
             g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4);
@@ -12514,14 +12514,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           const cE = cen(M / N2);
-          g.quadraticCurveTo(cE[0], cE[1] + dir * W23 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
+          g.quadraticCurveTo(cE[0], cE[1] + dir * W24 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
           for (let i = M; i >= 0; i--) {
             const c = cen(i / N2), p = R0[i];
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           g.closePath();
         };
-        const sg = g.createLinearGradient(ox + dx - W23 * 1.6, 0, ox + dx + W23 * 1.6, 0);
+        const sg = g.createLinearGradient(ox + dx - W24 * 1.6, 0, ox + dx + W24 * 1.6, 0);
         sg.addColorStop(0, rgb2(sh, 0.97));
         sg.addColorStop(0.36, rgb2(sh, 1));
         sg.addColorStop(1, rgb2(sh, 0.96));
@@ -12547,12 +12547,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         shafts();
       }
       g.globalCompositeOperation = "destination-out";
-      const melt2 = g.createLinearGradient(0, oy - W23 * 0.5, 0, oy + W23 * 0.7);
+      const melt2 = g.createLinearGradient(0, oy - W24 * 0.5, 0, oy + W24 * 0.7);
       melt2.addColorStop(0, "rgba(0,0,0,1)");
       melt2.addColorStop(1, "rgba(0,0,0,0)");
       if (!hard) {
         g.fillStyle = melt2;
-        g.fillRect(0, oy - W23 * 1.4, cv.width, W23 * 2.1);
+        g.fillRect(0, oy - W24 * 1.4, cv.width, W24 * 2.1);
       }
       g.globalCompositeOperation = "source-over";
       return cv;
@@ -14729,14 +14729,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W23 = c.width, H2 = c.height, d = x.getImageData(0, 0, W23, H2).data, seen3 = new Uint8Array(W23 * H2), out = [];
-      for (let i = 0; i < W23 * H2; i++) {
+      const W24 = c.width, H2 = c.height, d = x.getImageData(0, 0, W24, H2).data, seen3 = new Uint8Array(W24 * H2), out = [];
+      for (let i = 0; i < W24 * H2; i++) {
         if (seen3[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen3[i] = 1;
-        let x0 = W23, y0 = H2, x1 = 0, y1 = 0, n = 0;
+        let x0 = W24, y0 = H2, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W23, py = p / W23 | 0;
+          const p = q2.pop(), px = p % W24, py = p / W24 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -14744,8 +14744,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W23 || ny >= H2) continue;
-            const k = ny * W23 + nx;
+            if (nx < 0 || ny < 0 || nx >= W24 || ny >= H2) continue;
+            const k = ny * W24 + nx;
             if (!seen3[k] && d[k * 4 + 3] >= 16) {
               seen3[k] = 1;
               q2.push(k);
@@ -22122,8 +22122,43 @@ wake: any
     return m ? m[1].toLowerCase() : "";
   };
 
-  // extension/src/visor.js
+  // extension/src/hidehyp.js
   var W15 = window;
+  var IDS = ["fhc-trance", "fhc-hyp", "fhc-nudge", "fhc-visor", "fhc-visor-after", "fhc-visor-wm", "fhc-visor-on", "fhc-peek"];
+  var offRoom = () => !!(W15.CurrentScreen && W15.CurrentScreen !== "ChatRoom");
+  function hideTick() {
+    const d = W15.document;
+    if (!d || !d.documentElement) return;
+    if (d.head && !d.getElementById("fhc-hide-css")) {
+      const s = d.createElement("style");
+      s.id = "fhc-hide-css";
+      s.textContent = IDS.map((i) => "html.fhc-offroom #" + i).join(",") + "{display:none!important}";
+      d.head.appendChild(s);
+    }
+    const off2 = offRoom();
+    if (d.documentElement.classList.contains("fhc-offroom") !== off2) d.documentElement.classList.toggle("fhc-offroom", off2);
+  }
+  function initHide(mod3) {
+    hideTick();
+    setInterval(hideTick, 500);
+    if (mod3) {
+      try {
+        mod3.hookFunction("CommonSetScreen", 0, (args, next) => {
+          const r = next(args);
+          try {
+            hideTick();
+            Promise.resolve(r).then(hideTick, hideTick);
+          } catch (e) {
+          }
+          return r;
+        });
+      } catch (e) {
+      }
+    }
+  }
+
+  // extension/src/visor.js
+  var W16 = window;
   var CACHE_KEY = "fhc-visor-tunings";
   var DONE_KEY = "fhc-visor-done";
   var MAKER_KEY = "fhc-visor-maker";
@@ -22192,7 +22227,8 @@ wake: any
     wordNow: "",
     lineNow: "",
     viewKey: {},
-    herdT: 0
+    herdT: 0,
+    eyes: {}
   };
   function initVisor(c) {
     ctx2 = c;
@@ -22219,9 +22255,9 @@ wake: any
       } catch (e) {
       }
     }
-    if (typeof W15.CommandCombine === "function") {
+    if (typeof W16.CommandCombine === "function") {
       try {
-        W15.CommandCombine([{ Tag: "visor", Description: "unlock <name> \xB7 name <name> \xB7 reset <name>: open a farm visor early, give its wearer their own name back, or start its sinkin' over (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]);
+        W16.CommandCombine([{ Tag: "visor", Description: "on \xB7 peek <name> \xB7 unlock <name> \xB7 name <name> \xB7 reset <name>: your visor back on, look into somebody's, or open a farm visor early, give its wearer their own name back, or start its sinkin' over (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]);
       } catch (e) {
       }
     }
@@ -22246,15 +22282,15 @@ wake: any
       }
     }
     const reg = () => {
-      if (typeof W15.ChatRoomRegisterMessageHandler !== "function") {
+      if (typeof W16.ChatRoomRegisterMessageHandler !== "function") {
         setTimeout(reg, 3e3);
         return;
       }
       try {
-        W15.ChatRoomRegisterMessageHandler({ Priority: 225, Description: "B&B Farm visor voices", Callback: (data, sender, msg) => {
+        W16.ChatRoomRegisterMessageHandler({ Priority: 225, Description: "B&B Farm visor voices", Callback: (data, sender, msg) => {
           try {
             if (!data || !sender || typeof msg !== "string") return false;
-            const me5 = W15.Player && W15.Player.MemberNumber, ty = data.Type;
+            const me5 = W16.Player && W16.Player.MemberNumber, ty = data.Type;
             if (sender.MemberNumber === me5 || sender.MemberNumber === BOT_MEMBER || msg.includes("(")) return false;
             if ((ty === "Chat" || ty === "Whisper" || ty === "Emote") && nameHeard(msg)) dropName(sender);
             if (!V.on || ty !== "Chat" && ty !== "Whisper") return false;
@@ -22273,10 +22309,10 @@ wake: any
     reg();
     if (mod3) {
       try {
-        mod3.hookFunction("ChatRoomCharacterViewDrawOverlay", 0, (args, next) => {
+        mod3.hookFunction("DrawCharacter", 0, (args, next) => {
           const r = next(args);
           try {
-            drawOver(args[0], args[1], args[2], args[3]);
+            if (!args[5] && W16.CurrentScreen === "ChatRoom" && W16.CurrentCharacter == null) drawOver(args[0], args[1], args[2], args[3]);
           } catch (e) {
           }
           return r;
@@ -22287,6 +22323,16 @@ wake: any
         mod3.hookFunction("ChatRoomCharacterViewClickCharacter", 0, (args, next) => {
           try {
             if (clickOver(args[0], args[4], args[5])) return;
+          } catch (e) {
+          }
+          return next(args);
+        });
+      } catch (e) {
+      }
+      try {
+        mod3.hookFunction("ChatRoomMapViewClick", 0, (args, next) => {
+          try {
+            if (clickEye(W16.MouseX, W16.MouseY)) return;
           } catch (e) {
           }
           return next(args);
@@ -22379,8 +22425,8 @@ wake: any
     if (!force && V.lib && Date.now() - V.listAt < 36e5) return V.lib;
     V.listAt = Date.now();
     try {
-      if (typeof W15.fetch !== "function") throw new Error("no fetch");
-      const [t, s] = await Promise.all([W15.fetch(PUBLIC_BASE + "library.txt", { cache: "no-store" }), W15.fetch(PUBLIC_BASE + "sets.json", { cache: "no-store" })]);
+      if (typeof W16.fetch !== "function") throw new Error("no fetch");
+      const [t, s] = await Promise.all([W16.fetch(PUBLIC_BASE + "library.txt", { cache: "no-store" }), W16.fetch(PUBLIC_BASE + "sets.json", { cache: "no-store" })]);
       if (!t.ok) throw new Error("no list yet");
       const lib = parseLibrary(await t.text());
       if (!lib.blocks.some((b) => b.kind === "session" && b.labels.visor && !b.bad)) throw new Error("no visor sessions");
@@ -22407,7 +22453,7 @@ wake: any
   var library = () => V.lib || (V.lib = parseLibrary(STARTER), V.listFrom = "the starter library", V.lib);
   var visorSessions = () => library().blocks.filter((b) => b.kind === "session" && !b.bad && b.labels.visor).map((b) => ({ name: b.name, level: b.labels.level && b.labels.level.length ? b.labels.level : LEVELS }));
   function wornVisor() {
-    const P5 = W15.Player;
+    const P5 = W16.Player;
     if (!P5 || !Array.isArray(P5.Appearance)) return null;
     for (const it of P5.Appearance) {
       const c = it && it.Craft, code = c && codeIn(c.Description);
@@ -22415,11 +22461,11 @@ wake: any
     }
     return null;
   }
-  var isBot2 = () => !!(W15.Player && W15.Player.MemberNumber === BOT_MEMBER);
+  var isBot2 = () => !!(W16.Player && W16.Player.MemberNumber === BOT_MEMBER);
   function check2() {
     try {
-      if (!ctx2 || isBot2() || !W15.Player || !W15.Player.MemberNumber) return;
-      const room = W15.ChatRoomData && W15.ChatRoomData.Name || "";
+      if (!ctx2 || isBot2() || !W16.Player || !W16.Player.MemberNumber) return;
+      const room = W16.ChatRoomData && W16.ChatRoomData.Name || "";
       if (room && room !== V.room) V.joins++;
       V.room = room;
       if ((ctx2.prefs() || {}).noVisor) {
@@ -22491,7 +22537,7 @@ wake: any
     keepOff();
   };
   function onIcon(w) {
-    const d = W15.document;
+    const d = W16.document;
     if (!d || !d.body) return;
     let b = d.getElementById("fhc-visor-on");
     if (!w) {
@@ -22547,7 +22593,7 @@ wake: any
     if (Date.now() - (V.asked[code] || 0) < 2e4) return;
     V.asked[code] = Date.now();
     try {
-      if (W15.ServerSend && (!W15.ServerPlayerIsInChatRoom || W15.ServerPlayerIsInChatRoom())) W15.ServerSend("ChatRoomChat", makeMsg("visorAsk", { code }));
+      if (W16.ServerSend && (!W16.ServerPlayerIsInChatRoom || W16.ServerPlayerIsInChatRoom())) W16.ServerSend("ChatRoomChat", makeMsg("visorAsk", { code }));
     } catch (e) {
     }
     try {
@@ -22557,7 +22603,7 @@ wake: any
   }
   function onVisorMsg(m) {
     if (!m || !m.from) return;
-    const me5 = W15.Player && W15.Player.MemberNumber;
+    const me5 = W16.Player && W16.Player.MemberNumber;
     if (m.from === me5) return;
     if (/^visor(State|Herd|Peek|View|Feed|Fed)$/.test(m.type)) {
       try {
@@ -22575,7 +22621,7 @@ wake: any
     if (m.type === "visorAsk") {
       if (V.cache[code] && !isBot2()) setTimeout(() => {
         try {
-          W15.ServerSend("ChatRoomChat", makeMsg("visorTune", { code, t: V.cache[code] }, m.from));
+          W16.ServerSend("ChatRoomChat", makeMsg("visorTune", { code, t: V.cache[code] }, m.from));
         } catch (e) {
         }
       }, 300 + Math.random() * 1200);
@@ -22589,7 +22635,7 @@ wake: any
       icon();
       ctx2.toChat("\u{1F513} " + nameOf2(m.from) + " opened your visor: you can take it off now.", "#a67fd4", true);
       try {
-        W15.ServerSend("ChatRoomChat", makeMsg("visorUnlocked", { name: nameOf2(me5) }, m.from));
+        W16.ServerSend("ChatRoomChat", makeMsg("visorUnlocked", { name: nameOf2(me5) }, m.from));
       } catch (e) {
       }
       return;
@@ -22603,7 +22649,7 @@ wake: any
       if (!n || !(m.from === n.crafter || keyholders().includes(m.from))) return;
       giveName("\u{1F300} " + nameOf2(m.from) + " gives you your own name back.");
       try {
-        W15.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "name", name: nameOf2(me5) }, m.from));
+        W16.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "name", name: nameOf2(me5) }, m.from));
       } catch (e) {
       }
       return;
@@ -22627,21 +22673,21 @@ wake: any
       }
       ctx2.toChat("\u{1F300} " + nameOf2(m.from) + " starts your visor's sinkin' over.", "#a67fd4", true);
       try {
-        W15.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "reset", name: nameOf2(me5) }, m.from));
+        W16.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "reset", name: nameOf2(me5) }, m.from));
       } catch (e) {
       }
       return;
     }
     if (m.type === "visorOk") ctx2.toChat("\u{1F300} " + String(m.name || "They").slice(0, 40) + (m.what === "name" ? " has their own name back." : "'s visor starts its sinkin' over."), "#a67fd4", true);
   }
-  var charOf4 = (mn) => (W15.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf4 = (mn) => (W16.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var nameOf2 = (mn) => {
     const c = charOf4(mn);
     return c ? String(c.Nickname || c.Name || "#" + mn) : "#" + mn;
   };
   function keyholders() {
     try {
-      const D = W15.FarmhandDispensary;
+      const D = W16.FarmhandDispensary;
       return D && typeof D.keyholders === "function" ? D.keyholders().map(Number) : [];
     } catch (e) {
       return [];
@@ -22649,7 +22695,7 @@ wake: any
   }
   function hardcore() {
     try {
-      const D = W15.FarmhandDispensary, x = D && typeof D.hard === "function" ? D.hard() : null;
+      const D = W16.FarmhandDispensary, x = D && typeof D.hard === "function" ? D.hard() : null;
       return !!(x && x.on);
     } catch (e) {
       return false;
@@ -22678,19 +22724,33 @@ wake: any
       turnOn();
       return;
     }
-    const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
-    if (!m) {
-      ctx2.toChat("\u{1F300} /visor on: let your switched-off farm visor take hold of you again. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true);
+    const pk = /^\s*peek\s+(.+)$/i.exec(args);
+    if (pk) {
+      const q3 = pk[1].trim().toLowerCase(), c2 = (W16.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q3));
+      if (!c2) {
+        ctx2.toChat("\u{1F300} Nobody here by that name.", "#a67fd4", true);
+        return;
+      }
+      if (!V.rv[c2.MemberNumber] || !V.rv[c2.MemberNumber].on) {
+        ctx2.toChat("\u{1F300} " + nameOf2(c2.MemberNumber) + " isn't under a farm visor (or their Companion hasn't said so yet: it tells the room every 30 seconds).", "#a67fd4", true);
+        return;
+      }
+      openPeek(c2.MemberNumber);
       return;
     }
-    const q2 = m[2].trim().toLowerCase(), c = (W15.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
+    const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
+    if (!m) {
+      ctx2.toChat("\u{1F300} /visor on: let your switched-off farm visor take hold of you again. /visor peek <name>: look in through somebody's farm visor. /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over (those three: for a visor you crafted, or somebody whose key you hold).", "#a67fd4", true);
+      return;
+    }
+    const q2 = m[2].trim().toLowerCase(), c = (W16.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
     if (!c) {
       ctx2.toChat("\u{1F300} Nobody here by that name.", "#a67fd4", true);
       return;
     }
     const [type, then] = ASKS[m[1].toLowerCase()];
     try {
-      W15.ServerSend("ChatRoomChat", makeMsg(type, {}, c.MemberNumber));
+      W16.ServerSend("ChatRoomChat", makeMsg(type, {}, c.MemberNumber));
     } catch (e) {
     }
     ctx2.toChat("\u{1F300} Sent: if you crafted their visor or hold their key, " + then + ".", "#a67fd4", true);
@@ -22768,7 +22828,7 @@ wake: any
     clearInterval(V.drawT);
     if (V.raf) {
       try {
-        if (typeof W15.cancelAnimationFrame === "function") W15.cancelAnimationFrame(V.raf);
+        if (typeof W16.cancelAnimationFrame === "function") W16.cancelAnimationFrame(V.raf);
         clearTimeout(V.raf);
       } catch (e) {
       }
@@ -22787,7 +22847,7 @@ wake: any
       V.wm = null;
     }
     try {
-      for (const x of W15.document.querySelectorAll(".fhc-vfade")) x.classList.remove("fhc-vfade");
+      for (const x of W16.document.querySelectorAll(".fhc-vfade")) x.classList.remove("fhc-vfade");
     } catch (e) {
     }
     if (V.el) {
@@ -22816,7 +22876,7 @@ wake: any
     }, ms));
   };
   function css2() {
-    const d = W15.document;
+    const d = W16.document;
     if (d.getElementById("fhc-visor-css")) return;
     const s = d.createElement("style");
     s.id = "fhc-visor-css";
@@ -22825,7 +22885,7 @@ wake: any
   }
   var WARP_SVG = "<svg width='0' height='0' style='position:absolute'><filter id='fhc-warpf'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.012' numOctaves='2' seed='3'><animate attributeName='baseFrequency' dur='24s' values='0.008 0.012;0.012 0.008;0.008 0.012' repeatCount='indefinite'/></feTurbulence><feDisplacementMap in='SourceGraphic' scale='14'/></filter></svg>";
   function build() {
-    const d = W15.document;
+    const d = W16.document;
     if (!d || !d.body) return;
     css2();
     const t = V.on.t, L = look2(), calm2 = calmNow(), el2 = d.createElement("div");
@@ -22967,9 +23027,14 @@ wake: any
     }
   }
   function place() {
-    const d = W15.document, c = d.getElementById("MainCanvas");
+    const d = W16.document, c = d.getElementById("MainCanvas");
     if (!c || !V.el) return;
-    const r = c.getBoundingClientRect(), w = r.width / 2;
+    let split = 1e3;
+    try {
+      if (typeof W16.ChatRoomMapViewIsActive === "function" && W16.ChatRoomMapViewIsActive() && Number(W16.ChatRoomMapViewSplitPosition) > 0) split = Math.max(500, Math.min(2e3, Number(W16.ChatRoomMapViewSplitPosition)));
+    } catch (e) {
+    }
+    const r = c.getBoundingClientRect(), w = r.width * split / 2e3;
     Object.assign(V.el.style, { left: r.left + "px", top: r.top + "px", width: w + "px", height: r.height + "px" });
     V.el.classList.toggle("calm", calmNow());
     const cw = Math.round(w) || 500, ch = Math.round(r.height) || 1e3;
@@ -23004,10 +23069,10 @@ wake: any
       }
       V.raf = frame2();
     };
-    return V.raf = typeof W15.requestAnimationFrame === "function" ? W15.requestAnimationFrame(go) : setTimeout(() => go(Date.now()), 40);
+    return V.raf = typeof W16.requestAnimationFrame === "function" ? W16.requestAnimationFrame(go) : setTimeout(() => go(Date.now()), 40);
   }
   function draw2(now) {
-    if (now - V.lastF < 33) return;
+    if (now - V.lastF < 33 || offRoom()) return;
     V.lastF = now;
     const t = now / 1e3, L = look2(), calm2 = calmNow();
     const moving = !calm2 && (L.spin !== "still" || L.breathe || L.drift || L.spiral === "tunnel");
@@ -23028,9 +23093,9 @@ wake: any
     return { up, sx: 0, sy, sw: src.width, sh: Math.min(src.height - sy, up + 1e3 - sy) };
   }
   function figOf(C2) {
-    if (C2 && !C2.Canvas && typeof W15.CharacterLoadCanvas === "function") {
+    if (C2 && !C2.Canvas && typeof W16.CharacterLoadCanvas === "function") {
       try {
-        W15.CharacterLoadCanvas(C2);
+        W16.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }
@@ -23056,13 +23121,13 @@ wake: any
     } catch (e) {
     }
   };
-  var myMn = () => Number(W15.Player && W15.Player.MemberNumber) || 0;
+  var myMn = () => Number(W16.Player && W16.Player.MemberNumber) || 0;
   function drawBody(t) {
     if (!V.el || !V.on) return;
     const cv = V.el.querySelector("canvas.body"), g = cv && cv.getContext ? cv.getContext("2d") : null;
     if (!g) return;
     g.clearRect(0, 0, cv.width, cv.height);
-    const L = look2(), show2 = V.on.t.show, me5 = figOf(W15.Player), H2 = cv.height, mates = herdMates();
+    const L = look2(), show2 = V.on.t.show, me5 = figOf(W16.Player), H2 = cv.height, mates = herdMates();
     let main = null, geo = null;
     if (mates.length) {
       const figs = [myMn()].concat(mates).sort((a, b) => a - b).map((mn) => ({ mn, f: mn === myMn() ? me5 : figOf(charOf4(mn)) })).filter((x) => x.f).slice(0, 5);
@@ -23131,7 +23196,7 @@ wake: any
     if (now - (V.likeAt[mn] || 0) < 12e4) return;
     V.likeAt[mn] = now;
     try {
-      const k = 0.5, c = W15.document.createElement("canvas");
+      const k = 0.5, c = W16.document.createElement("canvas");
       c.width = Math.round(f.sw * k);
       c.height = Math.round(f.sh * k);
       const g = c.getContext("2d");
@@ -23160,7 +23225,7 @@ wake: any
     if (!e || !e.data) return null;
     let img2 = V.likeImg[mn];
     if (!img2) {
-      img2 = V.likeImg[mn] = W15.document.createElement("img");
+      img2 = V.likeImg[mn] = W16.document.createElement("img");
       img2.src = e.data;
     }
     if (!img2.complete || !img2.naturalWidth) return null;
@@ -23293,7 +23358,7 @@ wake: any
     g.restore();
   }
   function mediaFor(url, t, hidden) {
-    const vid = isVideo(url), m = W15.document.createElement(vid ? "video" : "img");
+    const vid = isVideo(url), m = W16.document.createElement(vid ? "video" : "img");
     m.className = "pic";
     m.style.objectFit = t.fit;
     if (hidden) m.style.visibility = "hidden";
@@ -23366,14 +23431,14 @@ wake: any
     g.restore();
   }
   function fadeWatch() {
-    const d = W15.document;
-    if (typeof W15.MutationObserver !== "function") return;
+    const d = W16.document;
+    if (typeof W16.MutationObserver !== "function") return;
     const hook4 = () => {
       const l = d.getElementById("TextAreaChatLog");
       if (!l || l === V.obsOn) return;
       if (V.obs) V.obs.disconnect();
       V.obsOn = l;
-      V.obs = new W15.MutationObserver((ms) => {
+      V.obs = new W16.MutationObserver((ms) => {
         for (const m of ms) for (const n of m.addedNodes) fadeOne(n);
       });
       V.obs.observe(l, { childList: true });
@@ -23384,7 +23449,7 @@ wake: any
   function fadeOne(n) {
     try {
       if (!V.on || !n || !n.classList || !/\bChatMessage(Chat|Whisper)\b/.test(n.className)) return;
-      const s = Number(n.getAttribute("data-sender")), me5 = W15.Player && W15.Player.MemberNumber;
+      const s = Number(n.getAttribute("data-sender")), me5 = W16.Player && W16.Player.MemberNumber;
       if (!s || s === me5 || s === BOT_MEMBER || s === V.on.crafter || oocOf(n)) return;
       setTimeout(() => {
         if (V.on) n.classList.add("fhc-vfade");
@@ -23395,7 +23460,7 @@ wake: any
   var size = () => ({ w: V.el && (V.el.clientWidth || parseFloat(V.el.style.width)) || 500, h: V.el && (V.el.clientHeight || parseFloat(V.el.style.height)) || 1e3 });
   var fx = (cls, ms, set2) => {
     if (!V.el) return;
-    const x = W15.document.createElement("div");
+    const x = W16.document.createElement("div");
     x.className = cls;
     set2(x);
     V.el.appendChild(x);
@@ -23417,7 +23482,7 @@ wake: any
       x.style.left = (g ? g.faceX : w / 2) + "px";
       x.style.top = Math.max(8, (g ? g.top : 80) - 40) + "px";
       Array.from(String(text3).slice(0, 70)).forEach((c, i) => {
-        const s = W15.document.createElement("span");
+        const s = W16.document.createElement("span");
         s.textContent = c === " " ? "\xA0" : c;
         s.style.animationDelay = i * 0.08 + "s";
         x.appendChild(s);
@@ -23495,7 +23560,7 @@ wake: any
   }
   function word() {
     if (!V.el) return;
-    const w = W15.document.createElement("div");
+    const w = W16.document.createElement("div");
     w.className = "sub";
     w.textContent = V.given.length ? V.given.shift() : V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
     V.wordNow = w.textContent;
@@ -23542,7 +23607,7 @@ wake: any
   }
   var animal = () => tranceState.me && tranceState.me.animal || "animal";
   function words() {
-    const me5 = tranceState.me || {}, P5 = W15.Player || {}, a = animal();
+    const me5 = tranceState.me || {}, P5 = W16.Player || {}, a = animal();
     return {
       name: String(V.name && V.name.pet || P5.Nickname || P5.Name || "sugar"),
       animal: a,
@@ -23669,20 +23734,20 @@ wake: any
   }
   var inRoom = () => {
     try {
-      return typeof W15.ServerPlayerIsInChatRoom !== "function" || W15.ServerPlayerIsInChatRoom();
+      return typeof W16.ServerPlayerIsInChatRoom !== "function" || W16.ServerPlayerIsInChatRoom();
     } catch (e) {
       return false;
     }
   };
   var roomSend = (type, data, to) => {
     try {
-      W15.ServerSend("ChatRoomChat", makeMsg(type, data, to));
+      W16.ServerSend("ChatRoomChat", makeMsg(type, data, to));
     } catch (e) {
     }
   };
   function herdMates() {
     if (!V.on) return [];
-    const now = Date.now(), here2 = new Set((W15.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+    const now = Date.now(), here2 = new Set((W16.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
     return Object.keys(V.rv).map(Number).filter((mn) => {
       const x = V.rv[mn];
       return x && x.on && x.code === V.on.code && now - x.at < 75e3 && here2.has(mn) && mn !== myMn();
@@ -23756,7 +23821,7 @@ wake: any
   }
   function roomTick() {
     if (!ctx2 || isBot2()) return;
-    const now = Date.now(), here2 = new Set((W15.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
+    const now = Date.now(), here2 = new Set((W16.ChatRoomCharacter || []).map((c) => c && Number(c.MemberNumber)));
     for (const mn of Object.keys(V.rv)) if (now - V.rv[mn].at > 75e3 || !here2.has(Number(mn))) {
       delete V.rv[mn];
       if (V.peek && V.peek.mn === Number(mn)) closePeek("\u{1F300} Their visor's gone quiet.");
@@ -23810,16 +23875,16 @@ wake: any
   ];
   var EMOTE_HERD = ["{n} and the others in the same visors sway together, breathin' as one.", "{n} stands with the rest of their visored herd, all of them slack and quiet, all of them glowin' pink."];
   function roomEmote() {
-    const P5 = W15.Player || {}, n = String(P5.Nickname || P5.Name || "Somebody");
+    const P5 = W16.Player || {}, n = String(P5.Nickname || P5.Name || "Somebody");
     const pool = herdMates().length && leaderOf() === myMn() ? EMOTE_HERD : V.depth >= 0.4 ? EMOTE_DEEP : EMOTE_LIGHT;
     const line3 = pick(pool).replace(/\{n\}/g, n).replace(/\b(snap)(s)\b/gi, "$1\u2060$2");
     try {
-      W15.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + line3 });
+      W16.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + line3 });
     } catch (e) {
     }
   }
   function tint() {
-    const d = W15.document;
+    const d = W16.document;
     if (!d || !d.head) return;
     const mns = Object.keys(V.rv).filter((mn) => V.rv[mn].on && /^\d+$/.test(mn)), key3 = mns.join(",");
     let s = d.getElementById("fhc-visor-room");
@@ -23840,14 +23905,14 @@ wake: any
   }
   function headAt(C2, X, Y, Z) {
     const HR = Number(C2.HeightRatio) || 1;
-    const xo = typeof W15.CharacterAppearanceXOffset === "function" ? W15.CharacterAppearanceXOffset(C2, HR) : 500 * (1 - HR) / 2;
-    const yo = typeof W15.CharacterAppearanceYOffset === "function" ? W15.CharacterAppearanceYOffset(C2, HR) : 1e3 * (1 - HR);
+    const xo = typeof W16.CharacterAppearanceXOffset === "function" ? W16.CharacterAppearanceXOffset(C2, HR) : 500 * (1 - HR) / 2;
+    const yo = typeof W16.CharacterAppearanceYOffset === "function" ? W16.CharacterAppearanceYOffset(C2, HR) : 1e3 * (1 - HR);
     return { HR, xo, yo, hx: X + (xo + 250 * HR) * Z, hy: Y + (yo + 138 * HR) * Z };
   }
   function drawOver(C2, X, Y, Z) {
     const x = C2 && V.rv[C2.MemberNumber];
-    if (!x || !x.on || C2.MemberNumber === myMn() || !W15.MainCanvas || !W15.MainCanvas.getContext) return;
-    const g = W15.MainCanvas.getContext("2d"), p = headAt(C2, X, Y, Z), t = Date.now() / 1e3, a = calmNow() ? 0.45 : 0.38 + 0.14 * Math.sin(2 * Math.PI * t / 4);
+    if (!x || !x.on || C2.MemberNumber === myMn() || !W16.MainCanvas || !W16.MainCanvas.getContext) return;
+    const g = W16.MainCanvas.getContext("2d"), p = headAt(C2, X, Y, Z), t = Date.now() / 1e3, a = calmNow() ? 0.45 : 0.38 + 0.14 * Math.sin(2 * Math.PI * t / 4);
     g.save();
     const rx = 78 * p.HR * Z, ry = 26 * p.HR * Z, gr = g.createRadialGradient(p.hx, p.hy, 0, p.hx, p.hy, rx);
     gr.addColorStop(0, "rgba(255,170,230," + a.toFixed(3) + ")");
@@ -23866,7 +23931,7 @@ wake: any
     const ty = Y + (p.yo + 12 * p.HR) * Z;
     g.strokeText("\u{1F300} " + (Number(x.d) || 0), p.hx, ty);
     g.fillText("\u{1F300} " + (Number(x.d) || 0), p.hx, ty);
-    const ex = X + (p.xo + 400 * p.HR) * Z, ey = Y + (p.yo + 70 * p.HR) * Z, er = 24 * Z;
+    const er = Math.max(11, 24 * Z), ex = X + (p.xo + 400 * p.HR) * Z + Math.max(0, er - 24 * Z), ey = Y + (p.yo + 70 * p.HR) * Z;
     g.fillStyle = "rgba(40,20,55,.8)";
     g.beginPath();
     g.arc(ex, ey, er, 0, 7);
@@ -23874,10 +23939,25 @@ wake: any
     g.strokeStyle = "rgba(220,170,245,.85)";
     g.lineWidth = Math.max(1, 2 * Z);
     g.stroke();
-    g.font = Math.max(10, Math.round(24 * Z)) + "px sans-serif";
+    g.font = Math.max(10, Math.round(er)) + "px sans-serif";
     g.fillStyle = "#fff";
-    g.fillText("\u{1F441}", ex, ey + Z);
+    g.fillText("\u{1F441}", ex, ey + 1);
     g.restore();
+    V.eyes[C2.MemberNumber] = { x: ex, y: ey, r: Math.max(14, er + 3), at: Date.now() };
+  }
+  function clickEye(mx, my) {
+    const now = Date.now();
+    for (const [mn, e] of Object.entries(V.eyes)) {
+      if (now - e.at > 1e3) {
+        delete V.eyes[mn];
+        continue;
+      }
+      if (Math.hypot(Number(mx) - e.x, Number(my) - e.y) <= e.r && V.rv[mn] && V.rv[mn].on) {
+        openPeek(Number(mn));
+        return true;
+      }
+    }
+    return false;
   }
   function clickOver(C2, cx, cy) {
     const x = C2 && V.rv[C2.MemberNumber];
@@ -23892,7 +23972,7 @@ wake: any
     if (!x || !x.on) return;
     closePeek();
     if (!V.cache[x.code]) ask3(x.code);
-    const d = W15.document;
+    const d = W16.document;
     css2();
     const box3 = d.createElement("div");
     box3.id = "fhc-peek";
@@ -24027,7 +24107,7 @@ wake: any
       }
     }
     if (m.w) {
-      const w = W15.document.createElement("div");
+      const w = W16.document.createElement("div");
       w.className = "w";
       w.textContent = String(m.w).slice(0, 24);
       p.st.appendChild(w);
@@ -24159,7 +24239,7 @@ wake: any
   var deeper = (a, b) => LEVELS_IN.indexOf(b) > LEVELS_IN.indexOf(a || "") ? b : a || "";
   var HOLD_H = { "": 1, fun: 1, deep: 24 };
   function nameOn() {
-    const L = look2(), P5 = W15.Player;
+    const L = look2(), P5 = W16.Player;
     if (!L.pet || !P5 || V.nameBack === V.on.code) return;
     if (!V.name || V.name.pet !== L.pet) V.name = { pet: L.pet, old: V.name ? V.name.old : String(P5.Nickname || ""), level: "" };
     Object.assign(V.name, { code: V.on.code, crafter: V.on.crafter, until: 0, perm: false });
@@ -24167,16 +24247,16 @@ wake: any
     if (setNick(L.pet)) ctx2.toChat("\u{1F300} Your name's " + L.pet + " now. Anybody who says it takes you down.", "#a67fd4", true);
   }
   function setNick(n) {
-    const P5 = W15.Player;
+    const P5 = W16.Player;
     if (!P5) return false;
     if (String(P5.Nickname || "") === n) return true;
-    if (typeof W15.CharacterSetNickname !== "function") {
+    if (typeof W16.CharacterSetNickname !== "function") {
       failName("the game won't take it");
       return false;
     }
     let r = null;
     try {
-      r = W15.CharacterSetNickname(P5, n);
+      r = W16.CharacterSetNickname(P5, n);
     } catch (e) {
       r = "error";
     }
@@ -24211,7 +24291,7 @@ wake: any
     keepName();
   }
   function nameTick() {
-    const n = V.name, P5 = W15.Player;
+    const n = V.name, P5 = W16.Player;
     if (!n || !P5) return;
     const now = Date.now(), wearing = !!(V.on && V.on.code === n.code);
     if (!wearing && !n.perm && !n.until) {
@@ -24240,7 +24320,7 @@ wake: any
     V.name = null;
     keepName();
     if (V.on && V.on.code === n.code) V.nameBack = n.code;
-    if (!n.failed && String((W15.Player || {}).Nickname || "") === n.pet) setNick(n.old || "");
+    if (!n.failed && String((W16.Player || {}).Nickname || "") === n.pet) setNick(n.old || "");
     if (say4) ctx2.toChat(say4, "#a67fd4", true);
   }
   function nameHeard(msg) {
@@ -24292,7 +24372,7 @@ wake: any
   }
   var noAfter = () => !!(ctx2 && (ctx2.prefs() || {}).noAfter);
   function afterDraw() {
-    const d = W15.document;
+    const d = W16.document;
     if (!d || !d.body) return;
     if (!(V.after && !V.on && ctx2 && !(ctx2.prefs() || {}).noVisor)) {
       if (V.afterEl) {
@@ -24325,7 +24405,7 @@ wake: any
     V.afterEl.classList.toggle("calm", calmNow());
   }
   function afterWord() {
-    const w = W15.document.createElement("div");
+    const w = W16.document.createElement("div");
     w.className = "aw";
     w.textContent = pick(V.after.words);
     w.style.left = (Math.random() < 0.5 ? 2 + Math.random() * 10 : 78 + Math.random() * 12) + "%";
@@ -24410,7 +24490,7 @@ wake: any
   }
   function tryLink(url) {
     return new Promise((done) => {
-      const vid = isVideo(url), m = W15.document.createElement(vid ? "video" : "img");
+      const vid = isVideo(url), m = W16.document.createElement(vid ? "video" : "img");
       let over = false;
       const finish3 = (r) => {
         if (over) return;
@@ -24438,11 +24518,11 @@ wake: any
   }
   async function movesOf(url) {
     try {
-      if (typeof W15.fetch !== "function") return null;
-      const ac = typeof W15.AbortController === "function" ? new W15.AbortController() : null, t = setTimeout(() => {
+      if (typeof W16.fetch !== "function") return null;
+      const ac = typeof W16.AbortController === "function" ? new W16.AbortController() : null, t = setTimeout(() => {
         if (ac) ac.abort();
       }, 1e4);
-      const r = await W15.fetch(url, { mode: "cors", referrerPolicy: "no-referrer", signal: ac ? ac.signal : void 0 });
+      const r = await W16.fetch(url, { mode: "cors", referrerPolicy: "no-referrer", signal: ac ? ac.signal : void 0 });
       clearTimeout(t);
       if (!r || !r.ok || typeof r.arrayBuffer !== "function") return null;
       return framesOf(new Uint8Array(await r.arrayBuffer()));
@@ -24521,7 +24601,7 @@ wake: any
       result.appendChild(h("div", { style: { margin: "6px 0", padding: "6px 8px", border: "1px dashed #8a6aa0", borderRadius: "6px", userSelect: "all", fontFamily: "monospace" } }, line3));
       result.appendChild(btn("Copy it", () => {
         try {
-          W15.navigator.clipboard.writeText(line3);
+          W16.navigator.clipboard.writeText(line3);
         } catch (e) {
         }
       }, true));
@@ -24698,7 +24778,11 @@ wake: any
           ctx5.api.rehello && ctx5.api.rehello();
         }),
         bellyToggle(ctx5),
-        pref(ctx5, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
+        pref(ctx5, "strip", "Farm can strip me", `When the farm says so, your clothes come off (locked pieces stay). A trap takes them too when its story does: every stitch for a line that strips you, your bottoms and whatever covers them when somethin' goes into you, your top when your udders or nipples get used (never with strippin' or nudity in your trap limits). They're kept on this computer: "My clothes back on" puts them back.`, rehello(ctx5)),
+        ctx5.api.keptClothes && ctx5.api.keptClothes() ? h("div", null, btn("\u{1F457} My clothes back on", () => {
+          ctx5.api.dressMe();
+          if (ctx5.setUi) ctx5.setUi({});
+        })) : null,
         pref(ctx5, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx5))
       ),
       // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
@@ -24927,12 +25011,12 @@ wake: any
   }
 
   // extension/src/settings.js
-  var W16 = window;
+  var W17 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
   var box2 = null;
   var page = "switches";
-  var settingsAvailable = () => typeof W16.PreferenceRegisterExtensionSetting === "function";
+  var settingsAvailable = () => typeof W17.PreferenceRegisterExtensionSetting === "function";
   function ctx3() {
     const c = panel.ctx();
     return Object.assign({}, c, {
@@ -24970,7 +25054,7 @@ wake: any
         { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
         h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
         btn("Back", () => {
-          if (typeof W16.PreferenceSubscreenExtensionsClear === "function") W16.PreferenceSubscreenExtensionsClear();
+          if (typeof W17.PreferenceSubscreenExtensionsClear === "function") W17.PreferenceSubscreenExtensionsClear();
           else close2();
         }, true)
       ),
@@ -24983,9 +25067,9 @@ wake: any
   }
   function open() {
     close2();
-    box2 = W16.document.createElement("div");
+    box2 = W17.document.createElement("div");
     box2.id = "fhc-settings";
-    W16.document.body.appendChild(box2);
+    W17.document.body.appendChild(box2);
     draw3();
   }
   function close2() {
@@ -24998,7 +25082,7 @@ wake: any
     panel = p;
     if (!settingsAvailable()) return false;
     try {
-      W16.PreferenceRegisterExtensionSetting({
+      W17.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "Farmhand Companion",
         load: () => open(),
@@ -25021,8 +25105,8 @@ wake: any
   function openSettings(which) {
     if (which) page = which === "files" ? "privacy" : which;
     try {
-      if (typeof W16.PreferenceSubscreenExtensionsOpen === "function") {
-        W16.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W17.PreferenceSubscreenExtensionsOpen === "function") {
+        W17.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -27790,8 +27874,18 @@ wake: any
     return { ok: true, did: ["rinse"] };
   }
   var BODY_BITS = /^(HairAccessory\d|TailStraps|Wings)$/;
-  function stripMe(prefs2) {
+  var STRIP_PART = { lower: ["ClothLower", "Panties", "SuitLower", "Suit", "Cloth", "ClothOuter"], top: ["Cloth", "Bra", "Suit", "ClothOuter"] };
+  var keptClothes = () => {
+    try {
+      const v = JSON.parse(LS.getItem(STRIP_KEY));
+      return !!(v && Array.isArray(v.bundle));
+    } catch (e) {
+      return false;
+    }
+  };
+  function stripMe(prefs2, part) {
     if (!prefs2.strip) return { ok: false, why: "off" };
+    const only = STRIP_PART[part] || null;
     const cur = bundle(), stuck = lockedGroups();
     if (!LS.getItem(STRIP_KEY)) {
       try {
@@ -27802,7 +27896,7 @@ wake: any
     const mem = load4();
     const next = cur.filter((b) => {
       const g = groupOf(b.Group);
-      return !(g && g.Clothing) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
+      return !(g && g.Clothing) || only && !only.includes(b.Group) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
     });
     if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
     commit(next);
@@ -27983,7 +28077,7 @@ wake: any
   };
 
   // extension/src/statue.js
-  var W17 = window;
+  var W18 = window;
   var MATS = ["stone", "porcelain", "gold", "latex", "marble", "bronze"];
   var TURN = /^(BodyUpper|BodyLower|ArmsLeft|ArmsRight|HandsLeft|HandsRight|Head|Nipples|Pussy|Mouth|BodyMarkings)$/;
   var HAIR = /^(HairFront|HairBack|Eyebrows)$/;
@@ -27997,7 +28091,7 @@ wake: any
     if (seg[0] === "Override") seg.splice(0, 2);
     return seg[0] || "";
   };
-  var onBot4 = () => !!(W17.Player && W17.Player.MemberNumber === BOT_MEMBER);
+  var onBot4 = () => !!(W18.Player && W18.Player.MemberNumber === BOT_MEMBER);
   var others3 = /* @__PURE__ */ new Map();
   var RAMPS = {
     stone: [[0, 40, 38, 36], [0.45, 96, 92, 88], [0.8, 150, 145, 138], [0.92, 172, 167, 159], [1, 200, 195, 187]],
@@ -28051,7 +28145,7 @@ wake: any
     const ink2 = how === "ink";
     const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
     if (!w || !h2) return null;
-    const c = W17.document.createElement("canvas");
+    const c = W18.document.createElement("canvas");
     c.width = w;
     c.height = h2;
     const g = c.getContext("2d", { willReadFrequently: true });
@@ -28137,7 +28231,7 @@ wake: any
   function imgOf(src) {
     let im = imgs2.get(src);
     if (!im) {
-      im = new W17.Image();
+      im = new W18.Image();
       im.crossOrigin = "anonymous";
       im.onload = () => redrawAll(400);
       im.src = src;
@@ -28178,7 +28272,7 @@ wake: any
   }
   function mineNow() {
     try {
-      const D = W17.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("statue") : null;
+      const D = W18.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("statue") : null;
       return d ? { mat: MATS.includes(d.p) ? d.p : "stone", left: d.left } : null;
     } catch (e) {
       return null;
@@ -28186,7 +28280,7 @@ wake: any
   }
   function statueOf(C2) {
     if (!C2 || onBot4()) return null;
-    if (C2 === W17.Player || typeof C2.IsPlayer === "function" && C2.IsPlayer()) {
+    if (C2 === W18.Player || typeof C2.IsPlayer === "function" && C2.IsPlayer()) {
       const m = mineNow();
       return m ? m.mat : null;
     }
@@ -28198,7 +28292,7 @@ wake: any
     }
     return o.mat;
   }
-  var charOf5 = (mn) => Array.isArray(W17.ChatRoomCharacter) ? W17.ChatRoomCharacter.find((c) => c && c.MemberNumber === mn) : null;
+  var charOf5 = (mn) => Array.isArray(W18.ChatRoomCharacter) ? W18.ChatRoomCharacter.find((c) => c && c.MemberNumber === mn) : null;
   var redrawT = /* @__PURE__ */ new Map();
   function redrawC(C2, soon) {
     if (!C2) return;
@@ -28206,15 +28300,15 @@ wake: any
     clearTimeout(redrawT.get(key3));
     redrawT.set(key3, setTimeout(() => {
       try {
-        if (typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
+        if (typeof W18.CharacterLoadCanvas === "function") W18.CharacterLoadCanvas(C2);
       } catch (e) {
         warnSome("[Farmhand Companion] statue redraw:", e);
       }
     }, soon || 0));
   }
   function redrawAll(soon) {
-    for (const C2 of W17.ChatRoomCharacter || []) if (statueOf(C2)) redrawC(C2, soon);
-    if (W17.Player && statueOf(W17.Player) && !(W17.ChatRoomCharacter || []).includes(W17.Player)) redrawC(W17.Player, soon);
+    for (const C2 of W18.ChatRoomCharacter || []) if (statueOf(C2)) redrawC(C2, soon);
+    if (W18.Player && statueOf(W18.Player) && !(W18.ChatRoomCharacter || []).includes(W18.Player)) redrawC(W18.Player, soon);
   }
   function kindOf3(src) {
     if (typeof src === "string") {
@@ -28273,7 +28367,7 @@ wake: any
       hooked4 = false;
     }
   }
-  W17.__farmInkTint = (C2, src, x, y) => {
+  W18.__farmInkTint = (C2, src, x, y) => {
     const mat = statueOf(C2);
     if (!mat) return void 0;
     try {
@@ -28284,7 +28378,7 @@ wake: any
   };
   var send3 = (type, data) => {
     try {
-      if (W17.ServerSend && (!W17.ServerPlayerIsInChatRoom || W17.ServerPlayerIsInChatRoom())) W17.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W18.ServerSend && (!W18.ServerPlayerIsInChatRoom || W18.ServerPlayerIsInChatRoom())) W18.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -28302,13 +28396,13 @@ wake: any
     const sig2 = (mineNow() || {}).mat || "";
     if (sig2 === told) return false;
     tell3("change");
-    redrawC(W17.Player, 0);
+    redrawC(W18.Player, 0);
     if (!sig2 && !others3.size) forget3();
     return true;
   }
   function onStatueMsg(m) {
     const mn = m.from;
-    if (!mn || W17.Player && mn === W17.Player.MemberNumber || onBot4()) return;
+    if (!mn || W18.Player && mn === W18.Player.MemberNumber || onBot4()) return;
     if (m.type === "statueAsk") {
       if (mineNow()) setTimeout(() => tell3("ask"), 300 + Math.random() * 1500);
       return;
@@ -28343,10 +28437,10 @@ wake: any
       }
     }, 5e3);
   }
-  if (W17.__FARMHAND_TEST__) W17.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf3, turnedOf };
+  if (W18.__FARMHAND_TEST__) W18.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf3, turnedOf };
 
   // extension/src/homeward.js
-  var W18 = window;
+  var W19 = window;
   var KEY5 = "fhc-home";
   var WARN_S = 30;
   var SAFE_MIN = 30;
@@ -28378,9 +28472,9 @@ wake: any
     const d = new Date(t);
     return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
   };
-  var loggedIn = () => !!(W18.Player && W18.Player.MemberNumber) && W18.CurrentScreen !== "Login" && W18.CurrentScreen !== "Relog";
-  var inRoom2 = () => W18.CurrentScreen === "ChatRoom" && !!W18.ChatRoomData;
-  var atFarm = (h2) => inRoom2() && !!h2 && String(W18.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
+  var loggedIn = () => !!(W19.Player && W19.Player.MemberNumber) && W19.CurrentScreen !== "Login" && W19.CurrentScreen !== "Relog";
+  var inRoom2 = () => W19.CurrentScreen === "ChatRoom" && !!W19.ChatRoomData;
+  var atFarm = (h2) => inRoom2() && !!h2 && String(W19.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
   function tell4(text3) {
     try {
       if (inRoom2() && deps.say) {
@@ -28390,7 +28484,7 @@ wake: any
     } catch (e) {
     }
     try {
-      if (typeof W18.ServerShowBeep === "function") W18.ServerShowBeep(text3, 8e3, { silent: false });
+      if (typeof W19.ServerShowBeep === "function") W19.ServerShowBeep(text3, 8e3, { silent: false });
     } catch (e) {
     }
   }
@@ -28462,15 +28556,15 @@ wake: any
     try {
       tell4("\u{1F9ED} Home to the farm you go, sugar.");
       try {
-        if (typeof W18.ServerPlayerIsInChatRoom === "function" && W18.ServerPlayerIsInChatRoom() && typeof W18.ChatRoomLeave === "function") W18.ChatRoomLeave(true);
+        if (typeof W19.ServerPlayerIsInChatRoom === "function" && W19.ServerPlayerIsInChatRoom() && typeof W19.ChatRoomLeave === "function") W19.ChatRoomLeave(true);
       } catch (e) {
       }
-      if (typeof W18.ChatSearchStart === "function") await W18.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
-      for (let i = 0; i < 20 && W18.CurrentScreen !== "ChatSearch"; i++) await sleep(500);
+      if (typeof W19.ChatSearchStart === "function") await W19.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+      for (let i = 0; i < 20 && W19.CurrentScreen !== "ChatSearch"; i++) await sleep(500);
       let res = null;
-      if (typeof W18.ServerRoomJoin === "function") res = await W18.ServerRoomJoin(h2.room);
+      if (typeof W19.ServerRoomJoin === "function") res = await W19.ServerRoomJoin(h2.room);
       else {
-        W18.ServerSend("ChatRoomJoin", { Name: h2.room });
+        W19.ServerSend("ChatRoomJoin", { Name: h2.room });
         res = null;
       }
       const err = res && res.error ? String(res.error.message || res.error) : "";
@@ -28493,8 +28587,8 @@ wake: any
     walking = true;
     try {
       tell4("\u{1F9ED} The farm girl walks you out to the gate, sugar. Half an hour: back by " + clock3(h2.until) + ", or she whistles you home.");
-      if (typeof W18.ChatRoomLeave === "function") W18.ChatRoomLeave(true);
-      if (typeof W18.ChatSearchStart === "function") await W18.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+      if (typeof W19.ChatRoomLeave === "function") W19.ChatRoomLeave(true);
+      if (typeof W19.ChatSearchStart === "function") await W19.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
     } catch (e) {
       console.warn("[Farmhand Companion] walkin' out:", e);
     } finally {
@@ -28520,7 +28614,7 @@ wake: any
       return;
     }
     if (retryAt > now) return;
-    if (BUSY.has(String(W18.CurrentScreen || ""))) {
+    if (BUSY.has(String(W19.CurrentScreen || ""))) {
       if (!busySince) busySince = now;
       if (now - busySince < BUSY_MAX) return;
     } else busySince = 0;
@@ -28608,7 +28702,7 @@ wake: any
   }
 
   // extension/src/chatlog.js
-  var W19 = window;
+  var W20 = window;
   var KEY6 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
@@ -28620,7 +28714,7 @@ wake: any
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W19.localStorage.getItem(KEY6));
+    const v = JSON.parse(W20.localStorage.getItem(KEY6));
     if (Array.isArray(v)) rows2 = v.slice(-MAX3);
   } catch (e) {
     rows2 = [];
@@ -28629,7 +28723,7 @@ wake: any
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W19.localStorage.setItem(KEY6, JSON.stringify(rows2));
+        W20.localStorage.setItem(KEY6, JSON.stringify(rows2));
       } catch (e) {
         rows2 = rows2.slice(-300);
       }
@@ -28657,7 +28751,7 @@ wake: any
     }
   }
   function flush2() {
-    if (!on2() || !rows2.length || !botHere() || typeof W19.ServerSend !== "function") return;
+    if (!on2() || !rows2.length || !botHere() || typeof W20.ServerSend !== "function") return;
     let sent2 = 0;
     for (let part = 0; part < 4 && rows2.length; part++) {
       const batch = [];
@@ -28669,7 +28763,7 @@ wake: any
         size2 += s;
       }
       try {
-        W19.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W20.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent2 += batch.length;
       } catch (e) {
         rows2 = batch.concat(rows2);
@@ -28733,7 +28827,7 @@ wake: any
   }
 
   // extension/src/keys.js
-  var W20 = window;
+  var W21 = window;
   var KEY7 = "fhc-wards";
   var wards = {};
   var loadWards = () => {
@@ -28751,14 +28845,14 @@ wake: any
     } catch (e) {
     }
   };
-  var me4 = () => W20.Player && W20.Player.MemberNumber || 0;
-  var here = (mn) => (W20.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var me4 = () => W21.Player && W21.Player.MemberNumber || 0;
+  var here = (mn) => (W21.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
   var say3 = () => {
   };
   function sendTo(mn, data) {
     try {
-      if (here(mn) && typeof W20.ServerSend === "function") {
-        W20.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
+      if (here(mn) && typeof W21.ServerSend === "function") {
+        W21.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
         return true;
       }
     } catch (e) {
@@ -28769,9 +28863,9 @@ wake: any
   function keyDo(mn, what) {
     if (sendTo(mn, { do: what })) return "in the room";
     try {
-      if (typeof W20.ServerSend !== "function") return null;
-      const nm = W20.Player && (W20.Player.Nickname || W20.Player.Name) || "Your keyholder";
-      W20.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
+      if (typeof W21.ServerSend !== "function") return null;
+      const nm = W21.Player && (W21.Player.Nickname || W21.Player.Name) || "Your keyholder";
+      W21.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
       return "by beep";
     } catch (e) {
       return null;
@@ -28847,9 +28941,9 @@ wake: any
   }
   function initKeys(sayLocal) {
     say3 = sayLocal;
-    if (typeof W20.CommandCombine === "function") {
+    if (typeof W21.CommandCombine === "function") {
       try {
-        W20.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
+        W21.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
       } catch (e) {
       }
     }
@@ -28994,19 +29088,19 @@ wake: any
   }
 
   // extension/src/trophies.js
-  var W21 = window;
+  var W22 = window;
   var WEEK2 = 7 * 864e5;
-  var key2 = () => "farm-trophies-" + (W21.Player && W21.Player.MemberNumber || 0);
+  var key2 = () => "farm-trophies-" + (W22.Player && W22.Player.MemberNumber || 0);
   function seen2() {
     try {
-      return JSON.parse(W21.localStorage.getItem(key2())) || {};
+      return JSON.parse(W22.localStorage.getItem(key2())) || {};
     } catch (e) {
       return {};
     }
   }
   function keep2(o) {
     try {
-      W21.localStorage.setItem(key2(), JSON.stringify(o));
+      W22.localStorage.setItem(key2(), JSON.stringify(o));
     } catch (e) {
     }
   }
@@ -29032,7 +29126,7 @@ wake: any
     s[String(id)] = "done";
     keep2(s);
   }
-  var ink = () => W21.__farmInk && typeof W21.__farmInk.trophyWear === "function" ? W21.__farmInk : null;
+  var ink = () => W22.__farmInk && typeof W22.__farmInk.trophyWear === "function" ? W22.__farmInk : null;
   function trophyWear2(t, slot) {
     const I = ink();
     if (!I) return { ok: false, why: "the ink slots haven't loaded yet (reload the page if it stays like this)" };
@@ -29061,7 +29155,7 @@ wake: any
   }
 
   // extension/src/cues.js
-  var W22 = window;
+  var W23 = window;
   var ctx4 = null;
   function initCues(c) {
     ctx4 = c;
@@ -29078,17 +29172,18 @@ wake: any
     slow: !pref2("noSlow") || void 0,
     stir: ctx4.panel.prefs.stir ? void 0 : true,
     gear: ctx4.panel.prefs.gear ? void 0 : true,
-    ink: ctx4.panel.prefs.ink ? void 0 : true
+    ink: ctx4.panel.prefs.ink ? void 0 : true,
+    strip: ctx4.panel.prefs.strip ? void 0 : true
   });
-  var mapOn = () => typeof W22.ChatRoomMapViewIsActive === "function" && W22.ChatRoomMapViewIsActive() && W22.Player && W22.Player.MapData && W22.Player.MapData.Pos;
-  var others4 = () => (W22.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W22.Player && W22.Player.MemberNumber));
+  var mapOn = () => typeof W23.ChatRoomMapViewIsActive === "function" && W23.ChatRoomMapViewIsActive() && W23.Player && W23.Player.MapData && W23.Player.MapData.Pos;
+  var others4 = () => (W23.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W23.Player && W23.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W22.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W22.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others4().filter((c) => W22.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others4().filter((c) => typeof W22.ChatRoomMapViewCharacterIsHearable === "function" && W22.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS2 = W22.Player && W22.Player.LSCG, S3 = LS2 && LS2.SplatterModule;
+      if (W23.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W23.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others4().filter((c) => W23.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others4().filter((c) => typeof W23.ChatRoomMapViewCharacterIsHearable === "function" && W23.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS2 = W23.Player && W23.Player.LSCG, S3 = LS2 && LS2.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS2.GlobalModule || LS2.GlobalModule.enabled !== false)) : void 0;
       const key3 = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key3 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -29104,13 +29199,13 @@ wake: any
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W22.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W23.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W22.ChatRoomMapViewWidth || 40, high = W22.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
+    const wide = W23.ChatRoomMapViewWidth || 40, high = W23.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key3(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -29140,8 +29235,8 @@ wake: any
       if (walk && !walk.heel) walk = null;
       ctx4.toBot("leadNo", { id: m.id });
     };
-    if (!pref2("noLead") || !mapOn() || typeof W22.ChatRoomMapViewMove !== "function") return no();
-    const from = W22.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref2("noLead") || !mapOn() || typeof W23.ChatRoomMapViewMove !== "function") return no();
+    const from = W23.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -29160,7 +29255,7 @@ wake: any
     }
   }
   function stepWalk() {
-    const w = walk, p = W22.Player && W22.Player.MapData && W22.Player.MapData.Pos;
+    const w = walk, p = W23.Player && W23.Player.MapData && W23.Player.MapData.Pos;
     const end = (ok2) => {
       if (walk === w) walk = null;
       stepping = false;
@@ -29187,9 +29282,9 @@ wake: any
       if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W22.ChatRoomMapViewMovement == null) {
+    if (W23.ChatRoomMapViewMovement == null) {
       try {
-        W22.ChatRoomMapViewMove(w.path[w.i]);
+        W23.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -29211,7 +29306,7 @@ wake: any
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W22.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W22.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W23.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W23.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
@@ -29223,7 +29318,7 @@ wake: any
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me5 = W22.Player.MapData.Pos;
+      const me5 = W23.Player.MapData.Pos;
       if (Math.max(Math.abs(me5.X - lp.X), Math.abs(me5.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
@@ -29251,12 +29346,12 @@ wake: any
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref2("noFace") || typeof W22.CharacterSetFacialExpression !== "function" || !W22.Player) return;
+    if (!f || !pref2("noFace") || typeof W23.CharacterSetFacialExpression !== "function" || !W23.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W22.CharacterSetFacialExpression(W22.Player, g, e, secs);
-        if (g === "Eyes") W22.CharacterSetFacialExpression(W22.Player, "Eyes2", e, secs);
+        W23.CharacterSetFacialExpression(W23.Player, g, e, secs);
+        if (g === "Eyes") W23.CharacterSetFacialExpression(W23.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -29305,35 +29400,35 @@ wake: any
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref2("noSound") || typeof W22.AudioPlayInstantSound !== "function") return;
-    const vol = W22.Player && W22.Player.AudioSettings && W22.Player.AudioSettings.Volume || 0;
+    if (!f || !pref2("noSound") || typeof W23.AudioPlayInstantSound !== "function") return;
+    const vol = W23.Player && W23.Player.AudioSettings && W23.Player.AudioSettings.Volume || 0;
     try {
-      W22.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W23.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el2 = W22.document.getElementById("fhc-trance");
+    let el2 = W23.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el2) el2.remove();
       return;
     }
     if (!el2) {
-      el2 = W22.document.createElement("div");
+      el2 = W23.document.createElement("div");
       el2.id = "fhc-trance";
       el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W22.document.getElementById("fhc-trance-css")) {
-        const s = W22.document.createElement("style");
+      if (!W23.document.getElementById("fhc-trance-css")) {
+        const s = W23.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W22.document.head.appendChild(s);
+        W23.document.head.appendChild(s);
       }
-      W22.document.body.appendChild(el2);
+      W23.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W22.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W23.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el2.style.opacity = "1";
     });
   }
@@ -29405,13 +29500,13 @@ wake: any
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref2("noFeelings") || W22.CurrentScreen !== "ChatRoom" || !W22.Player || !ctx4.panel.s || !ctx4.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W23.CurrentScreen !== "ChatRoom" || !W23.Player || !ctx4.panel.s || !ctx4.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx4.panel.s, items = (W22.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx4.panel.s, items = (W23.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W22.Player.ArousalSettings && W22.Player.ArousalSettings.Progress || 0;
+      const arousal = W23.Player.ArousalSettings && W23.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -29435,11 +29530,11 @@ wake: any
   function drawMarkers() {
     try {
       const s = ctx4.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W22.DrawText !== "function") return;
-      const R = W22.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me5 = W22.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W23.DrawText !== "function") return;
+      const R = W23.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me5 = W23.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C2 = (W22.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W22.ChatRoomMapViewCharacterIsVisible(C2)) continue;
+        const C2 = (W23.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W23.ChatRoomMapViewCharacterIsVisible(C2)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -29449,7 +29544,7 @@ wake: any
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me5.X + R) * tile, sy = (C2.MapData.Pos.Y - me5.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W22.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W23.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -29466,11 +29561,11 @@ wake: any
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W22.Player || !W22.Player.ArousalSettings || typeof W22.ActivitySetArousal !== "function") return;
-      if (W22.Player.ArousalSettings.Active === "Inactive" || W22.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W22.Player.ArousalSettings.Progress) || 0, cap2 = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W23.Player || !W23.Player.ArousalSettings || typeof W23.ActivitySetArousal !== "function") return;
+      if (W23.Player.ArousalSettings.Active === "Inactive" || W23.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W23.Player.ArousalSettings.Progress) || 0, cap2 = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap2, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W22.ActivitySetArousal(W22.Player, next);
+      if (next > cur || m.add < 0) W23.ActivitySetArousal(W23.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -29478,11 +29573,11 @@ wake: any
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W22.Player && Array.isArray(W22.Player.Appearance) ? W22.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W22.DialogCanUnlock === "function" && !W22.DialogCanUnlock(W22.Player, it)));
+  var vibeToys = () => (W23.Player && Array.isArray(W23.Player.Appearance) ? W23.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W23.DialogCanUnlock === "function" && !W23.DialogCanUnlock(W23.Player, it)));
   function vibePush(toys) {
-    if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(W22.Player, false);
-    if (typeof W22.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W22.ChatRoomCharacterItemUpdate(W22.Player, it.Asset.Group.Name));
-    else if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(W22.Player);
+    if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(W23.Player, false);
+    if (typeof W23.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W23.ChatRoomCharacterItemUpdate(W23.Player, it.Asset.Group.Name));
+    else if (typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(W23.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -29538,7 +29633,7 @@ wake: any
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W22.ChatRoomMapViewHasSuperPowers === "function" && W22.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W23.ChatRoomMapViewHasSuperPowers === "function" && W23.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -30072,7 +30167,7 @@ wake: any
               console.warn("[Farmhand Companion] rinse splatters:", e);
             }
             r = { ok: true, did: d };
-          } else if (m.strip) r = stripMe(prefs2);
+          } else if (m.strip) r = stripMe(prefs2, m.strip === true ? "" : String(m.strip));
           else if (m.dress) r = dressMe();
           else {
             let drew = false;
@@ -30268,6 +30363,13 @@ wake: any
     hasBackup,
     rehello: () => hello(),
     // tell the bot a setting changed (the relay switch)
+    // clothes the farm (or a trap) took off them, kept on this computer: put back on (Settings, by "Farm can strip me")
+    keptClothes: () => keptClothes(),
+    dressMe: () => {
+      const r = dressMe();
+      toChat(r.ok ? "\u{1F457} Your own clothes are back on." : "\u{1F457} There are no clothes of yours kept to put back.", "#c79bd8");
+      return r;
+    },
     // the Log tab asks the farm girl for the record (views/log.js)
     logAsk(q2) {
       st.panel.ui.logRows = { id: 0, rows: [], total: 0, busy: true };
@@ -30348,6 +30450,11 @@ wake: any
       initVisor({ toBot, toChat, prefs: () => st.panel.prefs, botHere: botHere2, mod: mod2 });
     } catch (e) {
       console.warn("[Farmhand Companion] visor:", e);
+    }
+    try {
+      initHide(mod2);
+    } catch (e) {
+      console.warn("[Farmhand Companion] hide:", e);
     }
     setInterval(parasiteSync, 6e4);
     setInterval(() => {

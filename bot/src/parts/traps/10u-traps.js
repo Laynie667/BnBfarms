@@ -149,7 +149,8 @@
         const late = run.i > Math.max(2, Math.floor(beats.length * 0.4));
         let tail = !late ? "" : intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i, stateKeys);
         if (tail && run.tails.has(tail.trim())) tail = ""; else if (tail) run.tails.add(tail.trim());
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+tail, mn);
+        const raw = pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(raw, mn, v)+tail+trapStripLine(mn, kind, raw, run), mn);   // (and the clothes the line takes off them: 10z9-trap-strip.js)
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;

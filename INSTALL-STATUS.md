@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.104.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.8.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.89.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.90.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.104.0 + Companion 0.90.0: traps take clothes; the hypno effects step aside off the room screen; the visor's 👁 on the map**
+  - **Traps take clothes** (Laynie, Nov 26: "traps should be more liberal with stripping clothing, like for penetrative events or ones that mention stripping", then "yes" to the plan). Every trap's lines are read as they're told (the wild traps' too): a line that says clothes come off takes everything; somethin' goin' into them from below takes their bottoms, underwear and whatever covers them (skirts, trousers, panties, dresses, outfits, suits, coats); their udders, teats or nipples bein' used takes their top and bra. Once each per trap, and a short line goes on the end of the trap's own namin' what went ("Moo's jeans and panties? Torn off and tossed over the rail."). Only with "Farm can strip me" on (now told to the farm girl when it's switched), never with strippin' or nudity in their trap limits; locked pieces, ears, tails, wings and the farm's marks stay on. Their clothes are kept on their own computer, and nothin' puts them back for them: the new "👗 My clothes back on" button by "Farm can strip me" does (or the game's wardrobe). Checked against all 8,233 trap lines: a plow, a trough, the top of a well, a needle, somebody else's tits, a fleece, the dairy's strippin' cups and lines that only push clothes aside take nothin'.
+  - **The hypno effects step aside** (Sera's suggestion, passed on by Laynie: "The hypno effects should hide when an accounts profile page, or preference windows are open."). The farm's trance and visor show on the chat room screen only: on a profile, in the preferences (the farm's own settings and LSCG's among them), the wardrobe, the room's settings, or anywhere else, the conditioning haze, the trance look, the pull's nudges, and the visor's dark, afterimage, spiral over the chat, 🌀 and peek window are hidden, and come back the moment you're in the room again. Sound and sessions carry on underneath. (A visor's dark no longer covers, or blocks clicks on, the left half of the preferences.)
+  - **The visor's 👁 and glow on the map too** (Laynie, Nov 26: "i dont see the button for peeking."). The glow, how deep and the 👁 were only drawn in the room's character view, and the farm's rooms are map rooms. They now ride on the game's own character drawin', so they're over a visored player in both views (on the room screen, never while somebody's dialog is open); on the map the 👁 keeps a size you can see and click. `/visor peek <name>` opens the window too. And a farm visor's dark now covers the map however wide it's been dragged out, not just the left half.
 
 - **Companion 0.89.0 + Conditioning 2.8.0: the visor in the room: seen from outside, peekin' in, herd trance, the crafter loomin'; afterimages the crafter's pick** Laynie, Nov 25-26: from the visor ideas she picked "5-8" and said "sounds good"; and about the afterimage she didn't expect ("i have a spiral super imposed on my screen, even with no visor"), "yes" to makin' it the crafter's pick with a wearer's own switch.
   - **Afterimages**: only a visor whose crafter ticked "an afterimage at the edges…" in the Visor maker leaves one now (visors made before don't). And any wearer can switch them off on the trance card ("Visor afterimages"), which also clears one that's showin'.

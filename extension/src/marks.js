@@ -481,14 +481,19 @@ export function rinseMarks() {
 // ears (HairAccessory1-3), tails, wings: never stripped
 export const BODY_BITS = /^(HairAccessory\d|TailStraps|Wings)$/;
 // strip: clothes off (locked ones stay), kept on this computer · dress: back on
-export function stripMe(prefs) {
+// (Nov 26, Laynie: traps "more liberal with stripping": a trap can take just part. "lower": the bottoms, underwear and
+// whatever covers them; "top": the top, bra and whatever covers it. Anything else: every stitch.)
+const STRIP_PART = { lower: ["ClothLower", "Panties", "SuitLower", "Suit", "Cloth", "ClothOuter"], top: ["Cloth", "Bra", "Suit", "ClothOuter"] };
+export const keptClothes = () => { try { const v = JSON.parse(LS.getItem(STRIP_KEY)); return !!(v && Array.isArray(v.bundle)); } catch (e) { return false; } };
+export function stripMe(prefs, part) {
   if (!prefs.strip) return { ok: false, why: "off" };
+  const only = STRIP_PART[part] || null;
   const cur = bundle(), stuck = lockedGroups();
   if (!LS.getItem(STRIP_KEY)) { try { LS.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur })); } catch (e) { /* no storage: no dressin' back */ } }
   const mem = load();
   // (the farm's own marks stay on; and so do ears, tails, wings and hair bits: the game files them as clothes, but they're
   // part of who somebody is. Nikto's #14, Oct 11: "for me these items are considered part of the characters body")
-  const next = cur.filter((b) => { const g = groupOf(b.Group); return !(g && g.Clothing) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group; });
+  const next = cur.filter((b) => { const g = groupOf(b.Group); return !(g && g.Clothing) || (only && !only.includes(b.Group)) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group; });
   if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
   commit(next);
   return { ok: true, did: ["strip"] };

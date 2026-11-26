@@ -5,16 +5,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.102.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.2.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.3.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.83.0** |
-| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.28.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.84.0** |
+| The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.103.0 + Companion 0.84.0 + Dispensary 0.29.0 + Conditioning 2.3.0: the farm's visor: the room goes dark, one body, the crafter's pictures and words, sessions from the farm's public list, a small icon to take it off (locked in hardcore till its sessions are done)**
+- **Bot 0.103.0 + Companion 0.84.0 + Conditioning 2.3.0 + Dispensary 0.29.0: the farm's visor** Laynie, Nov 25: "For the hypnotic visor items in bc and echoes, what if we built on a subliminal set of effects… renders nothing else map wise, in combination with our session and binaurals beats? with a onscreen button to turn the visor off… for hardcore mode players, is locked until a set number of sessions is finished"; pictures and GIFs "being links, as long as it points at the pictures address"; off the farm too; any visor; "the keyholders and crafter" open it early; it fills the pull and counts toward tiers; sessions "from a list I make publically accessible"; "once a visor is built, its settings should be locked in unless the crafter changes them"; "The button needs to be a small icon".
+  - **Wearin' one**: any worn item whose crafted description says `farm visor: #code` (BC's Hypnotic, Interactive or Futuristic Visor, Echoes' visor, anything). The room's half of the screen goes dark: no map, nobody else, just one body (the crafter's, or the wearer's own, as the crafter picked), the crafter's pictures see-through underneath, subliminal words fadin' in and out (never a strobe: one at most every 2 seconds, under a second each, never bright; "Calm trance look" makes them drift), and the farm's trance on top (LSCG's own in the farm's name if they let the farm in, its beats if they turned them on). Sessions from the farm's public list play one after another while it's on; the chat stays. A small 👁 icon in the corner takes it off.
+  - **Hardcore** (the Dispensary's): the icon shows 🔒 till the visor's number of full sessions are done. The crafter or the wearer's keyholders open it early with `/visor unlock <name>` in their own Companion. The safeword always ends it (the farm's, LSCG's or the game's own). A fresh wearin' starts the count again.
+  - **On the farm**, a finished visor session counts toward their conditioning tiers (never past the depth they allow) and feeds the farm's pull. Visor sessions are trance only: induction, deepeners, convincers, suggestions and the wake (no triggers, compulsions or hang-ons; those are the farm's to plant).
+  - **The Visor maker** (Companion › Settings › 🌀 Visor maker): pick sessions from the farm's list, how many before a hardcore wearer can take it off, whose body, the words, the pictures (one of the farm's sets, or their own links), how strong. It gives a line for the item's description. The code in it is a fingerprint of exactly those settings (the picture links too), so a visor stays as it was built: change anything and it's a new code, and only the crafter can change their own craft's description. Companions hand a tuning to each other in the room (the code proves it's the right one), and the farm keeps a copy, so it works anywhere once it's been seen.
+  - **The farm's public list** (the trance studio): tick "for visors" on the sessions crafters may pick; keep picture sets (a name and links straight to pictures) in the new Visor list panel; **Publish for visors** writes them to `public/visor/` and sends just those files to GitHub, where every Companion reads them. Till the first publish, visors play the starter library's sessions.
+  - **Their own switch**: "Farm visors" in the Companion's trance settings (on unless switched off). Off, a farm visor's just a visor.
 
 - **Bot 0.102.0 + Companion 0.83.0 + Conditioning 2.2.0: the farm's trance, part 3: compulsions, hang-ons, and the deeper the more permanent** Laynie, Nov 24-25: compulsions "would be amazing", with "a small, random chance of them triggering"; hang-ons wanted; "The deeper they go, the more permanent some of it becomes"; permanent ones removed by the "handler or proprieter"; then "part three then".
   - **Compulsions**: a session plants them like triggers, but no word sets them off. Somethin' happenin' does: comin' up out of a session, their herd leader walkin' in or talkin', a milkin' stall takin' them, bein' near full, a feeder feedin' them, a pat on the head, hands on their tits, cummin'. A small chance each time (10% unless the block says, at most 50%), never the same one twice in ten minutes, never while a trap, a scene or ?quiet has them, a session's runnin', or they're away from the keys. Their Companion reaches in like a trigger: give in or fight it. They're made of the same steps as a trigger (LSCG's and the farm's own).

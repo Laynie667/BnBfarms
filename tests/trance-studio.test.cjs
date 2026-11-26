@@ -13,7 +13,7 @@ const ROOT = path.join(__dirname, "..");
     const req = (async function* () { if (body != null) yield Buffer.from(body); })();
     req.method = method; req.headers = Object.assign({}, headers || {});
     const res = { code: 0, head: {}, body: "", setHeader(k, v) { this.head[k] = v; }, writeHead(c, h) { this.code = c; Object.assign(this.head, h || {}); return this; }, end(b) { this.body = String(b == null ? "" : b); return this; } };
-    const handled = await tranceRoutes(req, res, url, origin || "", { dir, shared: path.join(ROOT, "shared"), web: path.join(ROOT, "studio/web"), GAME_ORIGIN, OWN_ORIGIN,
+    const handled = await tranceRoutes(req, res, url, origin || "", { dir, shared: path.join(ROOT, "shared"), web: path.join(ROOT, "studio/web"), GAME_ORIGIN, OWN_ORIGIN, publicDir: path.join(dir, "public"), github: null,
       send: async (rs, f) => { if (!fs.existsSync(f)) { rs.writeHead(404).end("nf"); return; } rs.writeHead(200).end(fs.readFileSync(f, "utf8")); } });
     return Object.assign(res, { handled });
   };
@@ -47,6 +47,25 @@ const ROOT = path.join(__dirname, "..");
   ok(r.code === 403, "the game's sites can't read the workin' copy, only what was pushed");
   r = await call("POST", "/__studio/trance/publish", game, "=== induction: Hijack\n");
   ok(r.code === 403 && !fs.readFileSync(path.join(dir, "published.txt"), "utf8").includes("Hijack"), "...and can never push");
+  // ── the visor's public list (Nov 25): picture sets, and publishin' the sessions marked for visors ──
+  r = await call("POST", "/__studio/trance/sets.json", "http://localhost:4780", JSON.stringify({ "Pink Daze": ["https://x.example/a.gif", "http://x.example/b.png", "https://x.example/page.html", "https://x.example/c.webp"], "": ["https://x.example/d.gif"], "Empty": ["nope"] }));
+  r = await call("GET", "/__studio/trance/sets.json", "");
+  const sets = JSON.parse(r.body);
+  ok(Object.keys(sets).join() === "Pink Daze" && sets["Pink Daze"].join() === "https://x.example/a.gif,https://x.example/c.webp", "picture sets kept: only links straight to a picture (https, .gif .png .jpg .webp)");
+  r = await call("POST", "/__studio/trance/sets.json", game, JSON.stringify({ Bad: ["https://x.example/e.gif"] }));
+  ok(r.code === 403, "...and no other web page can change them");
+  r = await call("POST", "/__studio/trance/publish-visor", "http://localhost:4780", "=== induction: In\n\nHi.\n\n=== session: Plain\ninduction: any\n");
+  ok(r.code === 400 && /for visors/.test(JSON.parse(r.body).error), "publish for visors with no session ticked: says what to do");
+  const VLIB = "=== induction: In\n\nHi {name}.\n\n=== trigger: Moo\ntrigger: good cow\ndoes: moo\n\nMoo.\n\n=== wake: Up\n\nUp.\n\n=== session: For Visors\nvisor: yes\nlevel: deep\ninduction: any\nwake: any\n\n=== session: Farm Only\ninduction: any\ntrigger: any\nwake: any\n";
+  r = await call("POST", "/__studio/trance/publish-visor", "http://localhost:4780", VLIB);
+  const pv = JSON.parse(r.body), plib = fs.readFileSync(path.join(dir, "public", "library.txt"), "utf8"), pidx = JSON.parse(fs.readFileSync(path.join(dir, "public", "index.json"), "utf8"));
+  ok(r.code === 200 && pv.sessions === 1 && pv.sets === 1 && !pv.github, "published: one session, one picture set (a test studio never touches GitHub)");
+  ok(/=== session: For Visors\nlevel: deep\nvisor: yes/.test(plib) && !/Farm Only/.test(plib) && !/trigger: Moo/.test(plib) && /=== induction: In/.test(plib), "...the public list: only the sessions ticked for visors, and only trance blocks (never the farm's triggers)");
+  ok(pidx.sessions[0].name === "For Visors" && pidx.sessions[0].level.join() === "deep" && pidx.sets.join() === "Pink Daze" && JSON.parse(fs.readFileSync(path.join(dir, "public", "sets.json"), "utf8"))["Pink Daze"].length === 2, "...with an index, and the picture sets");
+  r = await call("POST", "/__studio/trance/publish-visor", game, VLIB);
+  ok(r.code === 403, "...and only from the studio itself");
+  const tool = fs.readFileSync(path.join(ROOT, "tools/publish-visor.mjs"), "utf8");
+  ok(/"--only"/.test(tool) && /"--", "public\/visor"/.test(tool) && /HEAD\.\.origin\/main/.test(tool), "the GitHub step sends only public/visor/, and never over newer work");
   const gi = fs.readFileSync(path.join(ROOT, ".gitignore"), "utf8");
   ok(/^studio\/trance\/$/m.test(gi), "studio/trance/ (her scripts, what she pushed) never goes on GitHub");
   fs.rmSync(dir, { recursive: true, force: true });

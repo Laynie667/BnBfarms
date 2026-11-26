@@ -83,7 +83,7 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], tier: "Trained
   // ⚙ Settings (no game settings page here: the panel's own)
   D.querySelector('#fhc-panel button[aria-label="Settings"]').click(); await wait(50);
   const pages = [...D.querySelectorAll("#fhc-panel .fhc-set-nav button")].map((b) => bare(b.textContent).replace(/^ℹ\s*/, ""));
-  ok(pages.join(",") === "Farm switches,Body and look,Gear and marks,Messages,Privacy and record,Guides,Advanced,About", "eight settings pages: " + pages.join(", "));
+  ok(pages.join(",") === "Farm switches,Body and look,Gear and marks,Visor maker,Messages,Privacy and record,Guides,Advanced,About", "nine settings pages (the Visor maker, Nov 25): " + pages.join(", "));
   ok(/‹ Back to/.test(text()), "with a way back to the tabs");
   // every switch the old Toggles tab had is on one of them
   const OLD = ["Hypno", "Tease me", "Breedable", "Fertile", "Mpreg", "Jar breedin'", "Free use", "Futa", "Milkable", "Milk my seed", "Natural heat", "Praise", "Degrade",

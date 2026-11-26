@@ -99,7 +99,10 @@ createServer(async (req, res) => {
   try {
     const path = new URL(req.url, "http://localhost").pathname, origin = String(req.headers.origin || "");
     if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && origin && !OWN_ORIGIN.test(origin)) { res.writeHead(403).end("not from here"); return; }
-    if (await tranceRoutes(req, res, path, origin, { dir: TRANCE, shared: join(HERE, "../shared"), web: WEB, send, GAME_ORIGIN, OWN_ORIGIN })) return;   // the trance editor (Nov 25)
+    // the trance editor (Nov 25). The visor's public list goes in the repo's public/visor/ (a test studio: its own folder,
+    // and it never touches GitHub)
+    if (await tranceRoutes(req, res, path, origin, { dir: TRANCE, shared: join(HERE, "../shared"), web: WEB, send, GAME_ORIGIN, OWN_ORIGIN,
+      publicDir: process.argv[4] ? join(TRANCE, "public") : join(HERE, "../public/visor"), github: !process.argv[4] ? join(HERE, "../tools/publish-visor.mjs") : null })) return;
     if (path.startsWith("/__studio/fits/") && GAME_ORIGIN.test(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin); res.setHeader("Vary", "Origin");
       if (req.method === "OPTIONS") { res.writeHead(204, { "Access-Control-Allow-Methods": "GET", "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600" }).end(); return; }

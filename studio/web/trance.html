@@ -91,6 +91,13 @@ a { color: var(--accent); }
       <div id="pv"><div class="haze"></div><div class="spiral"></div><div class="ring"></div><div class="ring" style="animation-delay:3s"></div><div class="ring" style="animation-delay:6s"></div><div class="who">said by <b>the farm girl</b> · <span class="beat" id="pvHz">no beats</span></div></div>
       <div id="feed"><p class="hint">Plan it to see the session the bot would run for them, line by line. Play runs it with its look and beats, sped up.</p></div>
     </section>
+    <section style="margin-top:12px" id="visorBox"><h2>Visor list</h2>
+      <p class="hint">What crafters can pick for a farm visor: the sessions you tick "for visors", and these picture sets (each a name and links straight to pictures). Publish puts them where every Companion reads them, on GitHub.</p>
+      <div class="row"><select id="vsSets"></select><button id="vsDel" title="take this set out">✕</button></div>
+      <div class="row"><input id="vsName" size="22" placeholder="set name, like Pink Daze"><button id="vsSave">Save set</button></div>
+      <textarea id="vsLinks" rows="4" spellcheck="false" placeholder="https://…/spiral.gif (one per line)"></textarea>
+      <div class="row"><button id="vsPublish" class="main">Publish for visors</button><span class="hint" id="vsStatus"></span></div>
+    </section>
     <section style="margin-top:12px"><h2>The text</h2>
       <p class="hint">The library is this text. The form writes it, and you can write or paste here too (a script from anywhere: start each piece with <code>=== kind: Name</code>). Notes start with #.</p>
       <textarea id="text" spellcheck="false"></textarea>

@@ -494,6 +494,7 @@ The session's over. The {animal} isn't. Stay as you are.
 
 === session: Fun in the Straw
 level: fun
+visor: yes
 induction: any
 deepener: any
 suggestion: any 2
@@ -503,6 +504,7 @@ wake: any
 
 === session: Deep in the Barn
 level: deep
+visor: yes
 induction: any
 deepener: any
 convincer: any
@@ -514,6 +516,7 @@ wake: any
 
 === session: No Human Left
 level: nhl
+visor: yes
 induction: any
 deepener: any
 convincer: any

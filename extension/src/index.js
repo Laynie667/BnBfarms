@@ -39,6 +39,7 @@ import { trophyNews, trophyNext, trophyAnswered, trophyWear, trophyOff, trophyWo
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
 import { LS, onAccount, initAcct } from "./acct.js";   // each account its own (Nov 24)
 import { initTrance, onHypno, tranceHello, tranceVoice } from "./trance.js";   // the farm's trance (Nov 25)
+import { initVisor, onVisorMsg } from "./visor.js";   // the farm's visor (Nov 25)
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -272,6 +273,7 @@ function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.type === "statue" || m.type === "statueAsk") { try { onStatueMsg(m); } catch (e) { console.warn("[Farmhand Companion] statue:", e); } return; }   // somebody under the Statue Serum (statue.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
+  if (/^visor(Ask|Tune|Unlock|Unlocked)$/.test(m.type)) { try { onVisorMsg(m); } catch (e) { console.warn("[Farmhand Companion] visor:", e); } return; }   // another Companion's visor (visor.js)
   if (/^disp(Hard|Ask|KeyState)$/.test(m.type)) { try { onWardMsg(m.from, m); } catch (e) { console.warn("[Farmhand Companion] keys:", e); } return; }   // somebody's Dispensary hardcore names you a keyholder (keys.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (!/^(ping|state|stateDiff|store|roomlines)$/.test(m.type)) st.lastHeard = Date.now();   // (an answer to somethin' you sent)
@@ -400,7 +402,9 @@ function onFarmMsg(m) {
     case "arouse": arouse(m); break;   // a trap or a toy stirs you up, if you let the farm do that (cues.js)
     case "sound": sound(m); break;
     case "trance": trance(m); break;
-    case "hypno": try { onHypno(m); } catch (e) { console.warn("[Farmhand Companion] trance:", e); } break;   // the farm's trance (trance.js)
+    case "hypno":   // the farm's trance (trance.js); a visor's tuning the farm kept (visor.js)
+      try { if (m.do === "visor") onVisorMsg({ type: "visorTune", from: BOT_MEMBER, code: m.code, t: m.t }); else onHypno(m); } catch (e) { console.warn("[Farmhand Companion] trance:", e); }
+      break;
     case "voice": {
       // only you see it, like a thought; nothin' goes to the room
       const line = String(m.text || "").slice(0, 300);
@@ -526,6 +530,7 @@ function start() {
   initCues({ toBot, panel: st.panel, local: toChat });
   // the farm's trance (trance.js, Nov 25): LSCG's own in the farm's name, its beats, the look, the farm's own triggers
   try { initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere, mod, arouse: (add, cap) => arouse({ add, cap }), lead }); } catch (e) { console.warn("[Farmhand Companion] trance:", e); }
+  try { initVisor({ toBot, toChat, prefs: () => st.panel.prefs, botHere, mod }); } catch (e) { console.warn("[Farmhand Companion] visor:", e); }
   setInterval(parasiteSync, 60000);
   setInterval(() => { nurseryPowderTick(); nurseryStatsSend(false); }, 30000);   // a little's paddin' (ABCL) for the nursery, and the baby powder brushin' off
   initBelly(mod);  // the drawn-belly test (belly.js)

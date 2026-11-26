@@ -308,6 +308,8 @@ function sessionForm(L) {
   }, { form });
   const names = (k) => S.lib.blocks.filter((b) => b.kind === k).map((b) => b.name);
   return h("fieldset", null, h("legend", null, "In this order"),
+    h("label", { class: "chip", title: "On the farm's public visor list: crafters can pick it for a visor (only its trance blocks play there: no triggers, compulsions or hang-ons)" },
+      h("input", { type: "checkbox", checked: !!L.visor, onchange: (e) => edit((x) => { x.labels.visor = e.target.checked || undefined; }) }), "for visors"),
     picks.map((p, i) => h("div", { class: "row" },
       h("select", { onchange: (e) => { p.kind = e.target.value; write(true); } }, T.SESSION_KINDS.map((k) => h("option", { value: k, selected: k === p.kind || null }, k))),
       h("input", { value: p.items, size: 30, list: "dl-" + p.kind, placeholder: "any, any 2, all, or names", onchange: (e) => { p.items = e.target.value; write(); } }),
@@ -445,8 +447,46 @@ function play() {
   next();
 }
 
+// ── the visor list (Nov 25): picture sets, and publishin' what crafters can pick ──
+const VS = { sets: {} };
+const okLink = (u) => /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+function vsRender(pick) {
+  const sel = $("#vsSets"); sel.textContent = "";
+  sel.appendChild(h("option", { value: "" }, "— a new set —"));
+  for (const n of Object.keys(VS.sets).sort()) sel.appendChild(h("option", { value: n }, n + " (" + VS.sets[n].length + ")"));
+  sel.value = pick && VS.sets[pick] ? pick : "";
+  $("#vsDel").disabled = !sel.value;
+}
+async function vsLoad() { try { VS.sets = await (await fetch("/__studio/trance/sets.json", { cache: "no-store" })).json() || {}; } catch (e) { VS.sets = {}; } vsRender(""); }
+async function vsKeep(pick) {
+  try { const r = await fetch("/__studio/trance/sets.json", { method: "POST", body: JSON.stringify(VS.sets) }); $("#vsStatus").textContent = r.ok ? "picture sets saved " + time() : "couldn't save the sets (" + r.status + ")"; }
+  catch (e) { $("#vsStatus").textContent = "couldn't save the sets: is the studio still running?"; }
+  vsRender(pick);
+}
+function vsWire() {
+  $("#vsSets").onchange = () => { const n = $("#vsSets").value; $("#vsName").value = n; $("#vsLinks").value = n ? VS.sets[n].join("\n") : ""; $("#vsDel").disabled = !n; };
+  $("#vsSave").onclick = () => {
+    const n = $("#vsName").value.replace(/[()<>]/g, "").trim().slice(0, 40), links = $("#vsLinks").value.split(/\s+/).filter(Boolean), good = links.filter(okLink);
+    if (!n) { $("#vsName").focus(); return; }
+    if (!good.length || good.length < links.length) { $("#vsStatus").textContent = good.length ? (links.length - good.length) + " link(s) aren't straight to a picture (https, ending .png .jpg .gif .webp), so they're left out" : "each link has to go straight to a picture: https, ending .png .jpg .gif or .webp"; if (!good.length) return; }
+    const was = $("#vsSets").value; if (was && was !== n) delete VS.sets[was];
+    VS.sets[n] = good.slice(0, 20); vsKeep(n);
+  };
+  $("#vsDel").onclick = () => { const n = $("#vsSets").value; if (!n || !confirm("Take out the picture set " + n + "?")) return; delete VS.sets[n]; $("#vsName").value = ""; $("#vsLinks").value = ""; vsKeep(""); };
+  $("#vsPublish").onclick = async () => {
+    const n = S.lib.blocks.filter((b) => b.kind === "session" && !b.bad && b.labels.visor).length;
+    if (!n) { $("#vsStatus").textContent = "tick \"for visors\" on the sessions crafters may pick first"; return; }
+    $("#vsStatus").textContent = "publishin'…";
+    try {
+      const r = await fetch("/__studio/trance/publish-visor", { method: "POST", body: S.text }), p = await r.json();
+      $("#vsStatus").textContent = p.error ? p.error : "published " + time() + ": " + p.sessions + " session" + (p.sessions === 1 ? "" : "s") + ", " + p.sets + " picture set" + (p.sets === 1 ? "" : "s") + (p.github ? " · " + p.github : "");
+    } catch (e) { $("#vsStatus").textContent = "couldn't publish: " + e.message; }
+  };
+}
+
 // ── start ────────────────────────────────────────────────────
 async function start() {
+  vsWire(); vsLoad();
   $(".spiral", $("#pv")).style.background = "center/contain no-repeat url(\"" + spiralSvg() + "\")";
   for (const k of Object.keys(KINDS_OF)) $("#pvSpecies").appendChild(h("option", { value: k }, k));
   $("#save").onclick = save; $("#push").onclick = push;

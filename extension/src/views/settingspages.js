@@ -19,6 +19,7 @@ import { redrawRoom } from "../botscreen.js";
 import { voice } from "./staffdata.js";
 import { workCard } from "./staff.js";
 import { lscgTodo, hangons } from "../trance.js";
+import { visorMakerCards } from "../visor.js";
 
 // the farm switches by what they're about (the commands and words are SWITCH_INFO's, livestock.js)
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
@@ -107,6 +108,7 @@ function tranceCard(ctx) {
     ctx.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx.send("lowpose kneel")), btn("All fours", () => ctx.send("lowpose fours"))) : null,
     pref(ctx, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
     prefNot(ctx, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
+    prefNot(ctx, "noVisor", "Farm visors", "A crafted farm visor on you (its description says farm visor: #…) takes the room away: only one body, the crafter's pictures and words, and the farm's sessions one after another. A small icon in its corner takes it off (in the Dispensary's hardcore, only once its sessions are done). Your safeword always ends it. Off: a farm visor's just a visor."),
     prefNot(ctx, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
     pref(ctx, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
     ctx.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx.setPref("farmBeatsVol", v) }, v + "%"))) : null);
@@ -192,6 +194,7 @@ export const SETTINGS_PAGES = [
   { id: "switches", label: "🐄 Farm switches", render: farmPage },
   { id: "body", label: "🪞 Body and look", render: bodyPage },
   { id: "gear", label: "⛓ Gear and marks", render: gearPage },
+  { id: "visor", label: "🌀 Visor maker", render: (ctx) => visorMakerCards(ctx) },   // the farm's visor (visor.js, Nov 25)
   { id: "messages", label: "💬 Messages", render: messagesPage },
   { id: "privacy", label: "🔒 Privacy and record", render: privacyPage },
   // staff only: on call and the ECHS card (Staff panel tabs till Nov 4). Zones stayed on the Staff panel: drawin' one

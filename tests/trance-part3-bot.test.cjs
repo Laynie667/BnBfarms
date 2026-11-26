@@ -146,6 +146,20 @@ wake: any
   k=sent.length; ext(500,'hypnoState',Object.assign({},lscg,{under:true,ours:true})); await wait(500);
   const b=lscgBeeps(k,500)[0], rm=b&&b.Message.command.args.find(a=>a.name==='removed');
   ok(rm && rm.value.some(s=>s.id==='bnbfarm-good-cow') && !(L().mods.conditioning.people['500'].unplant||[]).length, 'under in the farm\'s name: taken out of their LSCG the way it went in');
-  ok(!warns.some(w=>/conditioning|hypno|compel/i.test(w)), 'no add-on errors: '+warns.filter(w=>/conditioning|hypno|compel/i.test(w)).join(' | ').slice(0,200));
+  // ── the farm's visor (Nov 25): a crafter's tuning kept, handed to a wearer who asks, a visor session counted ──
+  const VV=await import(require('url').pathToFileURL(path.join(__dirname,'../shared/visor.js')).href);
+  const vt={sessions:['Quick'],need:1,words:['good cow']}, vc=VV.tuningCode(vt);
+  ext(600,'hello',{ver:'0.84.0'}); await wait(300);
+  ext(500,'visorKeep',{code:vc,t:vt}); ext(500,'visorKeep',{code:'abcdefgh',t:vt}); await wait(300);
+  ok(L().mods.conditioning.visors[vc] && L().mods.conditioning.visors[vc].by===500 && !L().mods.conditioning.visors['abcdefgh'], 'a crafter\'s visor kept by the farm (one whose code doesn\'t match its settings: turned away)');
+  k=sent.length; ext(600,'visorAsk',{code:vc}); await wait(400);
+  const vg=hyp(k,600,'visor')[0];
+  ok(vg && vg.code===vc && VV.codeOk(vc,vg.t), 'a wearer\'s Companion asks for it: handed over, and it matches its code');
+  k=sent.length; ext(600,'visorAsk',{code:'zzzzzzzz'}); await wait(300);
+  ok(!hyp(k,600,'visor').length, '...one the farm never saw: nothin\'');
+  const pull=()=>P.of(500), x5=L().mods.conditioning.people['500'], tot=x5.total, dp=x5.sessions.deep; pull().n=30;
+  ext(500,'visorDone',{code:vc,level:'deep',session:'Quick'}); await wait(300);
+  ok(x5.total===tot+1 && x5.sessions.deep===dp+1 && pull().n===38, 'a visor session done: it counts toward their tiers, and feeds the farm\'s pull');
+  ok(!warns.some(w=>/conditioning|hypno|compel|visor/i.test(w)), 'no add-on errors: '+warns.filter(w=>/conditioning|hypno|compel|visor/i.test(w)).join(' | ').slice(0,200));
   out(fails ? 'FAIL '+fails : 'ALL OK'); process.exit(fails?1:0);
 })();

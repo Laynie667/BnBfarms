@@ -25,6 +25,10 @@ An offline dressing room for Bondage Club, for our own use. It runs on this comp
 > up the farm's pull has to be first. Triggers can use the farm's own steps too: moo, stall, beg, dose.
 > Part 3 (Nov 25): **compulsion** blocks (what sets them off, how likely, and what they do) and **hangon** blocks (an
 > effect that stays a while after the session, and for how long).
+> **The visor list** (Nov 25): tick **for visors** on the sessions crafters may pick for a farm visor, keep **picture
+> sets** in the Visor list panel, and **Publish for visors**: it writes `public/visor/` (only those sessions, their trance
+> blocks and the sets) and sends just those files to GitHub (`tools/publish-visor.mjs`), where every Companion reads them.
+> Don't publish while a release is runnin'.
 
 It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
 from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the

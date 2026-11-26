@@ -54,6 +54,7 @@ import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf, fits as f
 import { SPECIES_MORE, MALE, UDDER_KINDS, SCRIPT_MORE, GEAR_SUGGEST } from "./more-lines.js";
 import { parseLibrary, planSession, sessionSteps, lscgSuggestion, farmCompulsion, fillIn, slug, stepName, fits as blockFits, WHEN, KEEP_MS, HANG_CAP_S, LEVELS as LIB_LEVELS } from "../../shared/trance-script.js";
 import { STARTER } from "../../shared/trance-starter.js";
+import { codeOk, normTuning } from "../../shared/visor.js";
 
 // words for each species; anything unknown uses "default"
 const SPECIES = {
@@ -570,6 +571,16 @@ function finish(mn, run) {
     (next ? (next - x.total) + " more to the next tier." : "You're as deep as the farm takes anybody.") + (run.level === "nhl" ? " The haze lifts in a couple of minutes." : ""));
   if (run.by !== mn) api.notice(run.by, "🌀 " + api.name(mn) + "'s " + LEVEL_NAME[run.level] + " session is done (" + x.total + " in all, tier " + x.tier + ").");
 }
+// a visor session finished (their Companion ran it, visor.js): it counts toward their tiers and feeds the farm's pull,
+// never past the deepest they allow
+function visorDone(mn, level) {
+  const x = me(mn), lv = LEVELS.indexOf(level) > LEVELS.indexOf(x.max) ? x.max : level;
+  x.sessions[lv] = (x.sessions[lv] || 0) + 1; x.total++;
+  if (pullOn(mn)) { const p = pullOf(mn); p.n = Math.min(PULL.SESSION_CAP, Math.max(p.n, p.n + PULL.SESSION)); p.at = Date.now(); sendPull(mn); }
+  const tier = MILESTONES.filter((m) => x.total >= m).length;
+  if (tier > x.tier) { x.tier = tier; api.notice(mn, "🌀 Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time."); }
+  api.save();
+}
 function stop(mn, why) {
   waitingEchs.delete(mn);
   if (!running.has(mn)) return false;
@@ -741,6 +752,19 @@ connect({
     },
     // a milkin' (the stall's, or staff's ?milk) feeds the pull; the farm's "go to a free stall" instruction lands here
     milked: (mn) => pullAdd(mn, PULL.MILKED),
+    // the farm's visor (the Companion's visor.js): a crafter's tuning kept here (any wearer on the farm can have it, the code
+    // proves it's the one), handed to a wearer who asks, and a finished visor session counted
+    visor: (mn, d) => {
+      const all = (D().visors = D().visors || {});
+      if (d.do === "keep") {
+        if (!codeOk(d.code, d.t)) return;
+        all[d.code] = { t: normTuning(d.t), by: mn, at: Date.now() };
+        const k = Object.keys(all).sort((a, b) => all[a].at - all[b].at); for (const x of k.slice(0, Math.max(0, k.length - 300))) delete all[x];
+        api.save(); return;
+      }
+      if (d.do === "ask") { const x = all[d.code]; if (x) api.hypno(mn, { do: "visor", code: d.code, t: x.t }); return; }
+      if (d.do === "done" && api.rec(mn)) visorDone(mn, d.level);
+    },
     hypnoDo: (mn, d) => { if (d && d.what === "stall") toStall(mn); },
     // part 3: farm moments a compulsion can answer to
     join: (mn) => { for (const m of herdOf(mn)) compel(m, "leader", mn); },                                   // their herd leader walks in

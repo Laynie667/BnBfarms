@@ -80,7 +80,7 @@ export const BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], b
 export const BAND_RANGE = { delta: "1-4 Hz", theta: "4-8 Hz", alpha: "8-12 Hz", beta: "12-30 Hz" };
 export const HZ_MIN = 1, HZ_MAX = 30;
 export const MAX_DOES = 3;
-const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts"];
+const LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts", "visor"];
 
 // LSCG's own instruction names (Settings/Models/hypno.ts, LSCGHypnoInstruction)
 export const LSCG = { cum: "Orgasm", deny: "Denial", needy: "Insatiable", touch: "Perform Activity", strip: "Strip", pose: "Assume Pose",
@@ -379,6 +379,8 @@ function finish(b, err, warn) {
     else L.effect = e;
     if (get("lasts")) { const s = seconds(r.lasts[0]); if (s == null || s < 60 || s > 4 * 3600) err(r.lasts[1], "lasts is 1m to 4h, like: lasts: 30m"); else L.lasts = s; }
   } else for (const k of ["effect", "lasts"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a hang-on, so it's skipped here");
+  // the visor (Nov 25): a session marked for visors goes on the farm's public list, for crafters to pick
+  if (get("visor")) { if (b.kind !== "session") warn(r.visor[1], "visor only means somethin' on a session, so it's skipped here"); else L.visor = /^(yes|on|true|y)$/i.test(clean(r.visor[0])); }
   if (b.kind === "session") {
     L.picks = (r.picks || []).map(([kind, v, n]) => ({ kind, at: n, items: list(v).map((it) => {
       const m = /^any(?:\s+(\d+))?$/i.exec(it);
@@ -431,6 +433,7 @@ export function formatBlock(b) {
   if (b.kind === "compulsion") { if (L.when) out.push("when: " + L.when); if (L.chance) out.push("chance: " + L.chance + "%"); }
   if (b.kind === "trigger" || b.kind === "compulsion") { if (L.does) out.push("does: " + L.does); if (L.waits) out.push("waits: " + L.waits); }
   if (b.kind === "hangon") { if (L.effect) out.push("effect: " + L.effect); if (L.lasts) out.push("lasts: " + fmtSecs(L.lasts)); }
+  if (b.kind === "session" && L.visor) out.push("visor: yes");
   if (b.kind === "session") for (const p of L.picks || []) out.push(p.kind + ": " + p.items.map((it) => (it.all ? "all" : it.any ? (it.any > 1 ? "any " + it.any : "any") : it.name)).join(", "));
   if (b.lines && b.lines.length) {
     out.push("");

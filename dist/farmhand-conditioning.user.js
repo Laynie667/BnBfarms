@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      2.2.0
+// @version      2.3.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -302,7 +302,7 @@
   var HZ_MIN = 1;
   var HZ_MAX = 30;
   var MAX_DOES = 3;
-  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts"];
+  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts", "visor"];
   var LSCG = {
     cum: "Orgasm",
     deny: "Denial",
@@ -777,6 +777,10 @@
         else L.lasts = s;
       }
     } else for (const k of ["effect", "lasts"]) if (get(k)) warn(r[k][1], k + " only means somethin' on a hang-on, so it's skipped here");
+    if (get("visor")) {
+      if (b.kind !== "session") warn(r.visor[1], "visor only means somethin' on a session, so it's skipped here");
+      else L.visor = /^(yes|on|true|y)$/i.test(clean(r.visor[0]));
+    }
     if (b.kind === "session") {
       L.picks = (r.picks || []).map(([kind, v, n]) => ({ kind, at: n, items: list(v).map((it) => {
         const m = /^any(?:\s+(\d+))?$/i.exec(it);
@@ -1416,6 +1420,7 @@ The session's over. The {animal} isn't. Stay as you are.
 
 === session: Fun in the Straw
 level: fun
+visor: yes
 induction: any
 deepener: any
 suggestion: any 2
@@ -1425,6 +1430,7 @@ wake: any
 
 === session: Deep in the Barn
 level: deep
+visor: yes
 induction: any
 deepener: any
 convincer: any
@@ -1436,6 +1442,7 @@ wake: any
 
 === session: No Human Left
 level: nhl
+visor: yes
 induction: any
 deepener: any
 convincer: any
@@ -1445,6 +1452,59 @@ compulsion: any 2
 hangon: any 2
 wake: any
 `;
+
+  // shared/visor.js
+  var MAX_SESSIONS = 5;
+  var MAX_NEED = 5;
+  var MAX_WORDS = 12;
+  var MAX_PICS = 20;
+  var clamp = (v, lo, hi, d) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
+  };
+  var str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+  var okLink = (u) => typeof u === "string" && u.length <= 400 && /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+  function normTuning(t) {
+    t = t && typeof t === "object" ? t : {};
+    const list2 = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
+    return {
+      v: 1,
+      sessions: list2(t.sessions, MAX_SESSIONS, 60),
+      need: Math.round(clamp(t.need, 0, MAX_NEED, 1)),
+      show: t.show === "wearer" ? "wearer" : "crafter",
+      words: list2(t.words, MAX_WORDS, 24),
+      set: str(t.set, 40),
+      pictures: (Array.isArray(t.pictures) ? t.pictures : []).filter(okLink).slice(0, MAX_PICS),
+      wordEvery: clamp(t.wordEvery, 2, 8, 3),
+      // seconds between words, never under 2
+      wordMs: Math.round(clamp(t.wordMs, 500, 1e3, 800)),
+      // how long each shows (fadin' in and out inside it)
+      wordOp: clamp(t.wordOp, 0.15, 0.6, 0.45),
+      // how bright a word gets, never full
+      picOp: clamp(t.picOp, 0.1, 0.8, 0.35),
+      // how see-through the pictures are
+      picEvery: Math.round(clamp(t.picEvery, 8, 60, 20)),
+      fit: t.fit === "contain" ? "contain" : "cover"
+    };
+  }
+  function stable(v) {
+    if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
+    if (v && typeof v === "object") return "{" + Object.keys(v).sort().map((k) => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+    return JSON.stringify(v);
+  }
+  function fnv(s, seed) {
+    let h = seed >>> 0;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+  function tuningCode(t) {
+    const s = stable(normTuning(t));
+    return (fnv(s, 2166136261).toString(36).padStart(7, "0").slice(-4) + fnv(s, 2538058380).toString(36).padStart(7, "0").slice(-4)).toLowerCase();
+  }
+  var codeOk = (code, t) => typeof code === "string" && !!t && tuningCode(t) === code.toLowerCase();
 
   // addons/conditioning/index.js
   var SPECIES = {
@@ -2066,6 +2126,23 @@ wake: any
     api.notice(mn, "\u{1F300} Session over: " + LEVEL_NAME[run.level] + ", your " + x.total + (x.total === 1 ? "st" : x.total === 2 ? "nd" : x.total === 3 ? "rd" : "th") + ". " + (next ? next - x.total + " more to the next tier." : "You're as deep as the farm takes anybody.") + (run.level === "nhl" ? " The haze lifts in a couple of minutes." : ""));
     if (run.by !== mn) api.notice(run.by, "\u{1F300} " + api.name(mn) + "'s " + LEVEL_NAME[run.level] + " session is done (" + x.total + " in all, tier " + x.tier + ").");
   }
+  function visorDone(mn, level) {
+    const x = me(mn), lv = LEVELS2.indexOf(level) > LEVELS2.indexOf(x.max) ? x.max : level;
+    x.sessions[lv] = (x.sessions[lv] || 0) + 1;
+    x.total++;
+    if (pullOn(mn)) {
+      const p = pullOf(mn);
+      p.n = Math.min(PULL.SESSION_CAP, Math.max(p.n, p.n + PULL.SESSION));
+      p.at = Date.now();
+      sendPull(mn);
+    }
+    const tier = MILESTONES.filter((m) => x.total >= m).length;
+    if (tier > x.tier) {
+      x.tier = tier;
+      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time.");
+    }
+    api.save();
+  }
   function stop(mn, why) {
     waitingEchs.delete(mn);
     if (!running.has(mn)) return false;
@@ -2198,7 +2275,7 @@ wake: any
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "2.2.0",
+    version: "2.3.0",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
     setup(a) {
@@ -2280,6 +2357,25 @@ wake: any
       },
       // a milkin' (the stall's, or staff's ?milk) feeds the pull; the farm's "go to a free stall" instruction lands here
       milked: (mn) => pullAdd(mn, PULL.MILKED),
+      // the farm's visor (the Companion's visor.js): a crafter's tuning kept here (any wearer on the farm can have it, the code
+      // proves it's the one), handed to a wearer who asks, and a finished visor session counted
+      visor: (mn, d) => {
+        const all = D().visors = D().visors || {};
+        if (d.do === "keep") {
+          if (!codeOk(d.code, d.t)) return;
+          all[d.code] = { t: normTuning(d.t), by: mn, at: Date.now() };
+          const k = Object.keys(all).sort((a, b) => all[a].at - all[b].at);
+          for (const x of k.slice(0, Math.max(0, k.length - 300))) delete all[x];
+          api.save();
+          return;
+        }
+        if (d.do === "ask") {
+          const x = all[d.code];
+          if (x) api.hypno(mn, { do: "visor", code: d.code, t: x.t });
+          return;
+        }
+        if (d.do === "done" && api.rec(mn)) visorDone(mn, d.level);
+      },
       hypnoDo: (mn, d) => {
         if (d && d.what === "stall") toStall(mn);
       },

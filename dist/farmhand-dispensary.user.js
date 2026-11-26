@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — The Farmhand's Dispensary
 // @namespace    bnbfarm
-// @version      0.28.0
+// @version      0.29.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dispensary.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8194,7 +8194,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var import_bondage_club_mod_sdk = __toESM(require_bcmodsdk(), 1);
 
   // dispensary/src/version.js
-  var VERSION = "0.28.0";
+  var VERSION = "0.29.0";
 
   // dispensary/src/config.js
   var BOT = 260239;
@@ -18957,6 +18957,9 @@ GOOD TO KNOW
       const d = st().doses[String(id)];
       return d && active(String(id)) ? { x: d.x || 1, p: d.p || "", left: leftMs(String(id)) } : null;
     },
+    // who holds your key (your owner, the farm's proprietors if you're stock, ones you added): the farm visor lets them open
+    // it early (the Companion's visor.js, Nov 25)
+    keyholders: () => keyholders().slice(),
     // the farm's trance (Nov 25): one of its triggers fired in you without LSCG, and it says "take a dose". By its name,
     // whole | half | double, and only from somebody on your list. → { ok, id, why }
     take: (name, strength, by) => {

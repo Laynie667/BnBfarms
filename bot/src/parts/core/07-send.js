@@ -527,6 +527,7 @@
     if (m.type === "hypnoState"){ try { hypnoStateFrom(mn, m); } catch(e){ warn("hypno state:", e); } return; }   // their LSCG and trance (10f-addons.js)
     if (m.type === "hypnoEvent"){ try { hypnoEventFrom(mn, m); } catch(e){ warn("hypno event:", e); } return; }
     if (m.type === "hypnoDo"){ try { hypnoDoFrom(mn, m); } catch(e){ warn("hypno do:", e); } return; }   // one of the farm's LSCG instructions needs the farm (part 2)
+    if (/^visor(Keep|Ask|Done)$/.test(m.type)){ try { visorFrom(mn, m); } catch(e){ warn("visor:", e); } return; }   // the farm's visor (Conditioning keeps tunings, counts sessions)
     if (m.type === "hello"){
       // LAG (Laynie, Oct 27: "limit how much has to be sent via my connection"): every hello used to wipe what I knew
       // about that panel, so the half-hourly hello, the ping and every switch flipped sent the whole panel and the whole

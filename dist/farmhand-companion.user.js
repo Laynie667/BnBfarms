@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.83.0
+// @version      0.84.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -5805,8 +5805,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.arc(x, y, s * 0.18, 0, Math.PI * 2);
     g.fill();
   }
-  function shield(g, cx, cy, W22, H2) {
-    const t = cy - H2 / 2, L = cx - W22 / 2, R = cx + W22 / 2;
+  function shield(g, cx, cy, W23, H2) {
+    const t = cy - H2 / 2, L = cx - W23 / 2, R = cx + W23 / 2;
     g.beginPath();
     g.moveTo(L + 14, t);
     g.lineTo(R - 14, t);
@@ -5818,7 +5818,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.quadraticCurveTo(L, t, L + 14, t);
     g.closePath();
   }
-  function speciesBrand(word, icon) {
+  function speciesBrand(word2, icon2) {
     return (g, w, h2) => {
       const cx = w / 2, cy = h2 / 2 + 2;
       g.fillStyle = INK;
@@ -5826,8 +5826,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.lineWidth = 8;
       shield(g, cx, cy, 172, 206);
       g.stroke();
-      icon(g, cx, cy - 30);
-      text(g, word, cx, cy + 44, "Black Ops One", 29, { max: 132 });
+      icon2(g, cx, cy - 30);
+      text(g, word2, cx, cy + 44, "Black Ops One", 29, { max: 132 });
     };
   }
   var ICON = {
@@ -6421,12 +6421,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "neck or hip",
       fields: ["num"],
       sample: { num: 123456 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.lineWidth = 4;
         g.strokeRect(36, 46, w - 72, h2 - 92);
         text2(g, "PROPERTY OF B&B FARM", w / 2, 84, "Stardos Stencil", 30, { max: w - 100 });
-        barcode(g, 70, 108, w - 140, 58, V.num || 7);
-        text2(g, "N\xBA " + V.num, w / 2, 186, "Black Ops One", 24);
+        barcode(g, 70, 108, w - 140, 58, V2.num || 7);
+        text2(g, "N\xBA " + V2.num, w / 2, 186, "Black Ops One", 24);
       }
     },
     {
@@ -6437,10 +6437,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "used",
       sample: { n: 17 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "USED BY STRANGERS", w / 2, 62, "Permanent Marker", 32, { max: w - 30 });
-        tallyCount(g, 60, 108, V.n, 64);
-        if (V.n > 25) text2(g, String(V.n), w - 40, 212, "Permanent Marker", 30);
+        tallyCount(g, 60, 108, V2.n, 64);
+        if (V2.n > 25) text2(g, String(V2.n), w - 40, 212, "Permanent Marker", 30);
       }
     },
     {
@@ -6451,10 +6451,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "loads",
       sample: { n: 23 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "BRED", w / 2, 56, "Black Ops One", 40);
-        tallyCount(g, 54, 96, V.n, 62);
-        text2(g, String(V.n), w - 50, 200, "Black Ops One", 26);
+        tallyCount(g, 54, 96, V2.n, 62);
+        text2(g, String(V2.n), w - 50, 200, "Black Ops One", 26);
       }
     },
     {
@@ -6465,14 +6465,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "litters",
       sample: { n: 7 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.lineWidth = 4;
         g.beginPath();
         g.roundRect(70, 50, w - 140, h2 - 100, 24);
         g.stroke();
         text2(g, "LITTERS", w / 2, 92, "Rye", 34);
-        text2(g, String(V.n), w / 2, 140, "Rye", 58, { max: w - 170 });
-        const k = Math.min(7, V.n);
+        text2(g, String(V2.n), w / 2, 140, "Rye", 58, { max: w - 170 });
+        const k = Math.min(7, V2.n);
         for (let i = 0; i < k; i++) {
           heart(g, w / 2 - (k - 1) * 15 + i * 30, 188, 7);
           g.fill();
@@ -6487,9 +6487,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "milked",
       sample: { n: 412 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         jug(g, 92, h2 / 2, 74);
-        text2(g, V.n + " L", 236, 112, "Bungee", 50, { max: 200 });
+        text2(g, V2.n + " L", 236, 112, "Bungee", 50, { max: 200 });
         text2(g, "MILKED", 236, 162, "Bungee", 26);
       }
     },
@@ -6501,9 +6501,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "eggs",
       sample: { n: 96 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         for (const [x, y] of [[70, 120], [100, 104], [96, 146], [128, 128], [66, 158]]) egg(g, x, y, 40);
-        text2(g, String(V.n), 250, 108, "Bungee", 62, { max: 190 });
+        text2(g, String(V2.n), 250, 108, "Bungee", 62, { max: 190 });
         text2(g, "EGGS LAID", 250, 166, "Bungee", 24);
       }
     },
@@ -6515,16 +6515,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "denied",
       sample: { n: 12 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.fillStyle = "#1f6b3a";
         g.fillRect(34, 40, w - 68, h2 - 80);
         g.fillStyle = "#fff";
         text2(g, "THIS SLUT HAS GONE", w / 2, 72, "Black Ops One", 18);
         g.fillRect(w / 2 - 44, 92, 88, 64);
         g.fillStyle = "#1f6b3a";
-        text2(g, String(V.n), w / 2, 125, "Black Ops One", 48, { max: 80 });
+        text2(g, String(V2.n), w / 2, 125, "Black Ops One", 48, { max: 80 });
         g.fillStyle = "#fff";
-        text2(g, V.n === 1 ? "DAY WITHOUT CUMMING" : "DAYS WITHOUT CUMMING", w / 2, 180, "Black Ops One", 18);
+        text2(g, V2.n === 1 ? "DAY WITHOUT CUMMING" : "DAYS WITHOUT CUMMING", w / 2, 180, "Black Ops One", 18);
       }
     },
     {
@@ -6535,9 +6535,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["t"],
       dflt: "owner",
       sample: { t: "Mistress" },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "owned by", w / 2, 64, "Pinyon Script", 30);
-        text2(g, V.t, w / 2, 126, "Great Vibes", 72, { max: 300 });
+        text2(g, V2.t, w / 2, 126, "Great Vibes", 72, { max: 300 });
         g.lineWidth = 2.5;
         g.beginPath();
         g.moveTo(80, 172);
@@ -6553,14 +6553,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "back of the neck",
       fields: ["num"],
       sample: { num: 123456 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.save();
         g.translate(w * 0.72, h2 / 2);
         g.rotate(-Math.PI / 2);
-        barcode(g, -90, -45, 180, 90, V.num || 11);
+        barcode(g, -90, -45, 180, 90, V2.num || 11);
         g.restore();
         text2(g, "STOCK", 112, 105, "Stardos Stencil", 30);
-        text2(g, "N\xBA " + V.num, 112, 145, "Stardos Stencil", 22, { max: 170 });
+        text2(g, "N\xBA " + V2.num, 112, 145, "Stardos Stencil", 22, { max: 170 });
       }
     },
     {
@@ -6571,10 +6571,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["t"],
       dflt: "owner",
       sample: { t: "Mistress" },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         padlock(g, w / 2 - 50, h2 / 2, 70);
         key(g, w / 2 + 30, h2 / 2 + 10, 90);
-        text2(g, "keyholder: " + V.t, w / 2, h2 - 30, "Pinyon Script", 30, { max: w - 20 });
+        text2(g, "keyholder: " + V2.t, w / 2, h2 - 30, "Pinyon Script", 30, { max: w - 20 });
       }
     },
     {
@@ -6599,7 +6599,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["num"],
       sample: { num: 123456 },
       logo: true,
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.fillStyle = "#e3b021";
         earTag(g, w / 2, 22, 210, 206);
         g.fill("nonzero");
@@ -6614,7 +6614,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         });
         g.fillStyle = INK2;
         logo(g, "letters", w / 2, 128, 64);
-        text2(g, String(V.num), w / 2, 192, "Black Ops One", 34, { max: 180 });
+        text2(g, String(V2.num), w / 2, 192, "Black Ops One", 34, { max: 180 });
       }
     },
     {
@@ -6625,7 +6625,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "tank",
       sample: { n: 90 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         const cx = w / 2, cy = 152, R = 104;
         g.lineCap = "butt";
         g.lineWidth = 7;
@@ -6644,7 +6644,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const a2 = Math.PI * f;
           text2(g, t, cx + Math.cos(a2) * (R - 46), cy + Math.sin(a2) * (R - 46), "Black Ops One", 24);
         }
-        const a = Math.PI * (1.1 + 0.8 * pct(V.n));
+        const a = Math.PI * (1.1 + 0.8 * pct(V2.n));
         g.lineWidth = 7;
         g.lineCap = "round";
         g.beginPath();
@@ -6667,10 +6667,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "loads",
       sample: { n: 23 },
-      draw: (g, w, h2, V) => {
-        const x0 = 94, y0 = 12, W22 = 192, H2 = 226;
+      draw: (g, w, h2, V2) => {
+        const x0 = 94, y0 = 12, W23 = 192, H2 = 226;
         g.lineWidth = 3;
-        g.strokeRect(x0, y0, W22, H2);
+        g.strokeRect(x0, y0, W23, H2);
         const L = (t, size, bold, yy, right) => {
           g.font = (bold ? "900 " : "") + size + "px Arial";
           g.textAlign = "left";
@@ -6678,20 +6678,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.fillText(t, x0 + 8, yy);
           if (right != null) {
             g.textAlign = "right";
-            g.fillText(right, x0 + W22 - 8, yy);
+            g.fillText(right, x0 + W23 - 8, yy);
           }
         };
         L("Breeding Facts", 21, true, y0 + 21);
-        g.fillRect(x0 + 6, y0 + 37, W22 - 12, 1.5);
+        g.fillRect(x0 + 6, y0 + 37, W23 - 12, 1.5);
         L("Serving size", 12, false, y0 + 49, "1 load");
         L("Servings per day", 12, false, y0 + 64, "as many as fit");
-        g.fillRect(x0 + 6, y0 + 75, W22 - 12, 8);
+        g.fillRect(x0 + 6, y0 + 75, W23 - 12, 8);
         L("Amount per serving", 11, true, y0 + 93);
-        L("Loads taken", 21, true, y0 + 113, String(V.n));
-        g.fillRect(x0 + 6, y0 + 126, W22 - 12, 4);
+        L("Loads taken", 21, true, y0 + 113, String(V2.n));
+        g.fillRect(x0 + 6, y0 + 126, W23 - 12, 4);
         [["Cum", "100%"], ["Seed that took", "100%"], ["Holes open", "3"], ["Dignity", "0%"]].forEach(([a, b], i) => {
           L(a, 12, i < 2, y0 + 142 + i * 17, b);
-          g.fillRect(x0 + 6, y0 + 151 + i * 17, W22 - 12, 1);
+          g.fillRect(x0 + 6, y0 + 151 + i * 17, W23 - 12, 1);
         });
         L("* bred fresh at B&B Farm", 10, false, y0 + 214);
       }
@@ -6704,13 +6704,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "loading",
       sample: { n: 80 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "LOADING...", w / 2, 62, "Press Start 2P", 22);
         g.lineWidth = 5;
         g.strokeRect(46, 96, 288, 50);
-        const k = Math.round(8 * pct(V.n));
+        const k = Math.round(8 * pct(V2.n));
         for (let i = 0; i < k; i++) g.fillRect(56 + i * 34.5, 106, 28, 30);
-        text2(g, "BREEDING " + Math.min(100, V.n) + "%", w / 2, 178, "Press Start 2P", 15);
+        text2(g, "BREEDING " + Math.min(100, V2.n) + "%", w / 2, 178, "Press Start 2P", 15);
         text2(g, "please do not unplug", w / 2, 210, "Press Start 2P", 9);
       }
     },
@@ -6721,12 +6721,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "a butt cheek",
       fields: ["t"],
       sample: { t: "Mistress" },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.fillStyle = "#c41e3a";
         lips(g, 108, 84, 46, -0.32);
         lips(g, 268, 74, 40, 0.28);
         lips(g, 196, 150, 44, 0.06);
-        text2(g, "kissed by " + V.t, w / 2, 218, "Great Vibes", 36, { max: w - 20 });
+        text2(g, "kissed by " + V2.t, w / 2, 218, "Great Vibes", 36, { max: w - 20 });
       }
     },
     {
@@ -6736,7 +6736,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "a thigh",
       fields: ["t"],
       sample: { t: "Big Red" },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.lineWidth = 3;
         g.beginPath();
         g.roundRect(34, 32, 312, 182, 16);
@@ -6756,7 +6756,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         text2(g, "\u201Cwould breed again\u201D", w / 2, 138, "Great Vibes", 40);
         g.font = "13px Arial";
         g.textAlign = "center";
-        g.fillText(V.t + ", verified owner \u2713", w / 2, 186);
+        g.fillText(V2.t + ", verified owner \u2713", w / 2, 186);
       }
     },
     {
@@ -6767,15 +6767,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["list", "more"],
       auto: "studs",
       sample: { list: ["Big Red", "the Bull", "Goblin #3", "Stud 7"], more: 19 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "Bred by:", 72, 30, "Pinyon Script", 32, { align: "left" });
         const F = [["Great Vibes", 36], ["Permanent Marker", 24], ["Rye", 24], ["Special Elite", 22]];
-        (V.list || []).slice(0, 4).forEach((n, i) => {
+        (V2.list || []).slice(0, 4).forEach((n, i) => {
           const y = 72 + i * 38;
           text2(g, n, 90, y, F[i][0], F[i][1], { align: "left", max: 220 });
           g.fillRect(70, y + 15, 240, 1.4);
         });
-        if (V.more) text2(g, "+ " + V.more + " more", 310, 232, "Pinyon Script", 22, { align: "right" });
+        if (V2.more) text2(g, "+ " + V2.more + " more", 310, 232, "Pinyon Script", 22, { align: "right" });
       }
     },
     {
@@ -6786,7 +6786,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "punches",
       sample: { n: 7 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         const cx = w / 2;
         g.lineWidth = 3;
         g.beginPath();
@@ -6794,7 +6794,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         g.stroke();
         text2(g, "B&B BREEDING CARD", cx, 54, "Black Ops One", 22);
         text2(g, "every tenth load's on the house", cx, 80, "Special Elite", 15);
-        const k = Math.min(10, V.n);
+        const k = Math.min(10, V2.n);
         for (let i = 0; i < 10; i++) {
           const x = 96 + i % 5 * 47, y = 126 + Math.floor(i / 5) * 54;
           g.lineWidth = 2.5;
@@ -6816,8 +6816,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["list"],
       auto: "passport",
       sample: { list: ["B&B FARM", "THE BARN", "B&B FARM", "THE FIELD"] },
-      draw: (g, w, h2, V) => {
-        const L = (V.list || []).map((x) => String(x).toUpperCase());
+      draw: (g, w, h2, V2) => {
+        const L = (V2.list || []).map((x) => String(x).toUpperCase());
         if (L[0]) {
           g.fillStyle = "#5b2a86";
           g.strokeStyle = "#5b2a86";
@@ -6888,7 +6888,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["rows"],
       auto: "scores",
       sample: { rows: [["BIG RED", 23], ["THE BULL", 17], ["GOBLIN", 12], ["STUD 7", 9]] },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         text2(g, "HIGH SCORES", w / 2, 36, "Press Start 2P", 19);
         g.font = fontCss(9, "Press Start 2P");
         g.textBaseline = "middle";
@@ -6897,7 +6897,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         g.fillText("NAME", 112, 70);
         g.textAlign = "right";
         g.fillText("LOADS", 336, 70);
-        (V.rows || []).slice(0, 4).forEach(([b, c], i) => {
+        (V2.rows || []).slice(0, 4).forEach(([b, c], i) => {
           const y = 100 + i * 28;
           g.font = fontCss(13, "Press Start 2P");
           g.textAlign = "left";
@@ -6917,10 +6917,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n"],
       auto: "tied",
       sample: { n: 7 },
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         flash(g, () => canine(g, 70, 150, 190, -0.42), "#d9577a", 4);
         g.fillStyle = INK2;
-        text2(g, "\xD7" + V.n, 296, 92, "Black Ops One", 64, { max: 150 });
+        text2(g, "\xD7" + V2.n, 296, 92, "Black Ops One", 64, { max: 150 });
         banner(g, w / 2, 196, 180, 44, YEL3, YEL22, "TIED", "Rye", 30);
       }
     },
@@ -6934,7 +6934,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       sample: { d: Date.UTC(2026, 10, 17, 12), due: Date.UTC(2027, 7, 9, 12) },
       style: "stamp",
       color: "#1d3f8f",
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         const cx = w / 2;
         g.lineWidth = 5;
         g.strokeRect(70, 46, 240, 160);
@@ -6944,9 +6944,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         g.lineTo(300, 124);
         g.stroke();
         text2(g, "BRED ON", cx, 74, "Black Ops One", 26);
-        text2(g, dateWord(V.d), cx, 104, "Black Ops One", 30);
+        text2(g, dateWord(V2.d), cx, 104, "Black Ops One", 30);
         text2(g, "DUE", cx, 146, "Black Ops One", 20);
-        text2(g, V.due ? dateWord(V.due) : "SOON", cx, 178, "Black Ops One", 30);
+        text2(g, V2.due ? dateWord(V2.due) : "SOON", cx, 178, "Black Ops One", 30);
       }
     },
     {
@@ -6959,8 +6959,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       sample: { n: 66 },
       style: "glow",
       color: PINKGLOW2,
-      draw: (g, w, h2, V) => {
-        const cx = w / 2, cy = 116, k = Math.round(12 * pct(V.n));
+      draw: (g, w, h2, V2) => {
+        const cx = w / 2, cy = 116, k = Math.round(12 * pct(V2.n));
         g.lineCap = "butt";
         for (let i = 0; i < 12; i++) {
           const a0 = -Math.PI / 2 + i / 12 * Math.PI * 2 + 0.04, a1 = a0 + Math.PI * 2 / 12 - 0.08;
@@ -6995,8 +6995,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["n", "c"],
       auto: "womb",
       sample: { n: 0, c: 0 },
-      draw: (g, w, h2, V) => {
-        const cx = w / 2, cy = 96, s = 110, n = Math.max(0, Math.min(20, V.n | 0)), c = Math.max(0, Math.min(99, V.c | 0));
+      draw: (g, w, h2, V2) => {
+        const cx = w / 2, cy = 96, s = 110, n = Math.max(0, Math.min(20, V2.n | 0)), c = Math.max(0, Math.min(99, V2.c | 0));
         const hearts = (fill) => {
           for (let i = 0; i < 20; i++) {
             const a = Math.PI * (0.11 + 0.78 * i / 19), x = cx - Math.cos(a) * 138, y = cy + 48 + Math.sin(a) * 60;
@@ -7047,7 +7047,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "anywhere",
       fields: ["t"],
       sample: { t: "Breeding Stock" },
-      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "UnifrakturMaguntia", 58, { max: 330 })
+      draw: (g, w, h2, V2) => text2(g, V2.t, w / 2, h2 / 2, "UnifrakturMaguntia", 58, { max: 330 })
     },
     {
       name: "LiveWordsScript",
@@ -7056,7 +7056,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "anywhere",
       fields: ["t"],
       sample: { t: "Good Girl" },
-      draw: (g, w, h2, V) => text2(g, V.t, w / 2, h2 / 2, "Great Vibes", 92, { max: 330 })
+      draw: (g, w, h2, V2) => text2(g, V2.t, w / 2, h2 / 2, "Great Vibes", 92, { max: 330 })
     },
     {
       name: "LiveWordsTypewriter",
@@ -7065,8 +7065,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       where: "anywhere",
       fields: ["t"],
       sample: { t: "used goods" },
-      draw: (g, w, h2, V) => {
-        text2(g, V.t, w / 2, h2 / 2, "Special Elite", 48, { max: 300 });
+      draw: (g, w, h2, V2) => {
+        text2(g, V2.t, w / 2, h2 / 2, "Special Elite", 48, { max: 300 });
         g.lineWidth = 2;
         g.strokeRect(34, h2 / 2 - 36, w - 68, 72);
       }
@@ -7079,10 +7079,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       fields: ["t"],
       sample: { t: "cum dump" },
       color: "#1d3f8f",
-      draw: (g, w, h2, V) => {
+      draw: (g, w, h2, V2) => {
         g.fillStyle = "#1d3f8f";
         g.strokeStyle = "#1d3f8f";
-        text2(g, V.t, w / 2, h2 / 2, "Sedgwick Ave Display", 84, { max: 330 });
+        text2(g, V2.t, w / 2, h2 / 2, "Sedgwick Ave Display", 84, { max: 330 });
         dripFrom(g, w, h2, 40, 340, 5, 6);
       }
     }
@@ -7090,14 +7090,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var LIVE_BY = Object.fromEntries(LIVE.map((d) => [d.name, d]));
   var isLive = (name) => !!LIVE_BY[name];
   function valuesFor(d, written, who2) {
-    const V = Object.assign({}, d.sample, cleanValues(written));
-    if (d.fields.includes("num") && !(written && written.num != null) && who2 && who2.num) V.num = who2.num;
-    if (d.dflt === "owner" && !(written && written.t) && who2 && who2.owner) V.t = who2.owner;
-    if (V.n == null) V.n = 0;
-    delete V.sz;
-    delete V.sw;
-    delete V.sh;
-    return V;
+    const V2 = Object.assign({}, d.sample, cleanValues(written));
+    if (d.fields.includes("num") && !(written && written.num != null) && who2 && who2.num) V2.num = who2.num;
+    if (d.dflt === "owner" && !(written && written.t) && who2 && who2.owner) V2.t = who2.owner;
+    if (V2.n == null) V2.n = 0;
+    delete V2.sz;
+    delete V2.sw;
+    delete V2.sh;
+    return V2;
   }
   var MID = "#808080";
   var doc = null;
@@ -7219,12 +7219,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return out;
   }
-  function drawCard(W22, d, V) {
-    doc = W22.document;
+  function drawCard(W23, d, V2) {
+    doc = W23.document;
     const c = mk(), g = c.getContext("2d");
     g.fillStyle = INK2;
     g.strokeStyle = INK2;
-    d.draw(g, CW2, CH2, V);
+    d.draw(g, CW2, CH2, V2);
     return c;
   }
   function shrink(c, box3, s) {
@@ -7248,8 +7248,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var cache = /* @__PURE__ */ new Map();
   var CACHE_MAX = 80;
-  function picture(W22, d, m, layer, V) {
-    const key3 = d.name + "|" + JSON.stringify(V);
+  function picture(W23, d, m, layer, V2) {
+    const key3 = d.name + "|" + JSON.stringify(V2);
     let set2 = cache.get(key3);
     if (set2) {
       cache.delete(key3);
@@ -7257,30 +7257,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return set2[layer] || null;
     }
     if (d.logo && !IMG.letters) return null;
-    const base = drawCard(W22, d, V), parts2 = layersOf(base, m);
+    const base = drawCard(W23, d, V2), parts2 = layersOf(base, m);
     set2 = {};
     for (const [n, c] of Object.entries(parts2)) set2[n] = shrink(c, m.box, m.s).toDataURL("image/png");
     cache.set(key3, set2);
     while (cache.size > CACHE_MAX) {
       const old = cache.keys().next().value, os = cache.get(old);
       cache.delete(old);
-      for (const u of Object.values(os)) forget(W22, u);
+      for (const u of Object.values(os)) forget(W23, u);
     }
     return set2[layer] || null;
   }
-  function forget(W22, url) {
+  function forget(W23, url) {
     try {
-      const m = W22.GLDrawImageCache;
+      const m = W23.GLDrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const m = W22.DrawImageCache;
+      const m = W23.DrawImageCache;
       if (m && typeof m.delete === "function") m.delete(url);
     } catch (e) {
     }
     try {
-      const gl = W22.GLDrawCanvas && W22.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
+      const gl = W23.GLDrawCanvas && W23.GLDrawCanvas.GL, tc = gl && gl.textureCache, t = tc && tc.get(url);
       if (t) {
         if (t.texture) gl.deleteTexture(t.texture);
         tc.delete(url);
@@ -7384,19 +7384,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function draw() {
     if (box) box.replaceChildren(...view().flat().filter(Boolean));
   }
-  function openInkPanel(W22, a) {
-    Wd = W22;
+  function openInkPanel(W23, a) {
+    Wd = W23;
     api = a;
     close();
-    if (!W22.document.getElementById("fi-style")) {
-      const s = W22.document.createElement("style");
+    if (!W23.document.getElementById("fi-style")) {
+      const s = W23.document.createElement("style");
       s.id = "fi-style";
       s.textContent = CSS;
-      W22.document.head.appendChild(s);
+      W23.document.head.appendChild(s);
     }
-    box = W22.document.createElement("div");
+    box = W23.document.createElement("div");
     box.id = "fi-panel";
-    W22.document.body.appendChild(box);
+    W23.document.body.appendChild(box);
     draw();
     return true;
   }
@@ -7492,9 +7492,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Asset: ink_designs_default.groups[picKind(slot)].map((a) => Object.assign(assetDef(a), { Left: Math.round(cx - a.w / 2), Top: Math.round(cy - a.h / 2) }))
     };
   }
-  function describe(W22) {
+  function describe(W23) {
     for (const slot of ALL_SLOTS) {
-      const G = W22.AssetGroupMap && W22.AssetGroupMap.get(slot);
+      const G = W23.AssetGroupMap && W23.AssetGroupMap.get(slot);
       if (!G) continue;
       G.Description = SLOT_NAMES[slot];
       for (const A of G.Asset || []) {
@@ -7503,32 +7503,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  var gameReady = (W22) => typeof W22.AssetGroupAdd === "function" && typeof W22.AssetAdd === "function" && W22.AssetGroupMap && W22.AssetGroupMap.size > 30;
-  function addSlots(W22) {
+  var gameReady = (W23) => typeof W23.AssetGroupAdd === "function" && typeof W23.AssetAdd === "function" && W23.AssetGroupMap && W23.AssetGroupMap.size > 30;
+  function addSlots(W23) {
     let added = false;
     for (const slot of ALL_SLOTS) {
-      if (W22.AssetGroupMap.has(slot)) continue;
-      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W22.AssetGroupAdd("Female3DCG", def);
-      for (const a of def.Asset) W22.AssetAdd(G, a, W22.AssetFemale3DCGExtended || {}, def);
+      if (W23.AssetGroupMap.has(slot)) continue;
+      const def = isHid(slot) ? markDef(slot) : groupDef(slot), G = W23.AssetGroupAdd("Female3DCG", def);
+      for (const a of def.Asset) W23.AssetAdd(G, a, W23.AssetFemale3DCGExtended || {}, def);
       added = true;
     }
-    describe(W22);
+    describe(W23);
     return added;
   }
   var itemIn = (C2, slot) => C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot) : null;
   var whoOf = (C2) => ({ num: C2 && C2.MemberNumber, owner: C2 && C2.Ownership && typeof C2.Ownership.Name === "string" ? C2.Ownership.Name : "" });
-  function liveSrc(W22, C2, slot, name, layer) {
+  function liveSrc(W23, C2, slot, name, layer) {
     const d = LIVE_BY[name], m = MANIFEST[name], it = itemIn(C2, slot);
     if (!d || !m || !it || it.Asset.Name !== name) return null;
     try {
-      return picture(W22, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
+      return picture(W23, d, m, layer, valuesFor(d, it.Property && it.Property.FarmInk, whoOf(C2)));
     } catch (e) {
       console.warn("[Farm ink] couldn't draw " + name, e);
       return null;
     }
   }
-  function wornLive(W22) {
-    const P5 = W22.Player, out = [];
+  function wornLive(W23) {
+    const P5 = W23.Player, out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
       const it = itemIn(P5, slot);
       if (it && isLive(it.Asset.Name)) out.push({ slot, name: it.Asset.Name, item: it });
@@ -7536,8 +7536,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   var lastWrite = {};
-  function write(W22, slot, values, now) {
-    const it = itemIn(W22.Player, slot);
+  function write(W23, slot, values, now) {
+    const it = itemIn(W23.Player, slot);
     if (!it || !kindOf(slot)) return false;
     const cur = it.Property && it.Property.FarmInk || {}, merged = Object.assign({}, cur, values);
     for (const k of Object.keys(merged)) if (merged[k] == null) delete merged[k];
@@ -7547,17 +7547,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const since2 = Date.now() - (lastWrite[slot] || 0);
     if (!now && since2 < 6e4) {
       clearTimeout(retry[slot]);
-      retry[slot] = setTimeout(() => refreshAuto(W22), 60500 - since2);
+      retry[slot] = setTimeout(() => refreshAuto(W23), 60500 - since2);
       return false;
     }
     lastWrite[slot] = Date.now();
     it.Property = Object.assign({}, it.Property, { FarmInk: next });
     try {
-      if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(W22.Player);
+      if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(W23.Player);
     } catch (e) {
     }
     try {
-      if (typeof W22.ChatRoomCharacterItemUpdate === "function") W22.ChatRoomCharacterItemUpdate(W22.Player, slot);
+      if (typeof W23.ChatRoomCharacterItemUpdate === "function") W23.ChatRoomCharacterItemUpdate(W23.Player, slot);
     } catch (e) {
     }
     return true;
@@ -7566,17 +7566,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var counts = {};
   var mine = {};
   var DAY = 864e5;
-  var cumKey = (W22) => "farmink-lastcum-" + (W22.Player && W22.Player.MemberNumber);
-  function daysDenied(W22) {
+  var cumKey = (W23) => "farmink-lastcum-" + (W23.Player && W23.Player.MemberNumber);
+  function daysDenied(W23) {
     let t = 0;
     try {
-      t = Number(W22.localStorage.getItem(cumKey(W22))) || 0;
+      t = Number(W23.localStorage.getItem(cumKey(W23))) || 0;
     } catch (e) {
     }
     return t ? Math.max(0, Math.floor((Date.now() - t) / DAY)) : 0;
   }
-  function autoOf(W22, auto) {
-    if (auto === "denied") return { n: daysDenied(W22) };
+  function autoOf(W23, auto) {
+    if (auto === "denied") return { n: daysDenied(W23) };
     const c = counts[auto];
     if (auto === "studs") return c && Array.isArray(c.list) ? { list: c.list, more: c.more || null } : null;
     if (auto === "scores") return Array.isArray(c) ? { rows: c } : null;
@@ -7588,12 +7588,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return typeof c === "number" ? { n: c } : null;
   }
-  function refreshAuto(W22) {
-    for (const { slot, name, item } of wornLive(W22)) {
+  function refreshAuto(W23) {
+    for (const { slot, name, item } of wornLive(W23)) {
       const d = LIVE_BY[name], own = item.Property && item.Property.FarmInk;
       if (!d.auto || own && own.manual) continue;
-      const v = autoOf(W22, d.auto);
-      if (v) write(W22, slot, v);
+      const v = autoOf(W23, d.auto);
+      if (v) write(W23, slot, v);
     }
   }
   var HEALED = { BrandEdge: [150, 96, 88], Brand: [226, 184, 172], BrandShine: [246, 226, 218] };
@@ -7628,7 +7628,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.farm === "string" ? f.farm : null;
   };
-  var doneKey = (W22) => "farmink-done-" + (W22.Player && W22.Player.MemberNumber);
+  var doneKey = (W23) => "farmink-done-" + (W23.Player && W23.Player.MemberNumber);
   var KEEP_AGAIN = 20 * 36e5;
   function cleanEntry(e) {
     if (!e || typeof e !== "object" || typeof e.id !== "string" || !/^[\w:.-]{1,48}$/.test(e.id)) return null;
@@ -7641,21 +7641,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const color = Array.isArray(e.color) ? e.color.filter((c) => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).slice(0, 8) : null;
     return { id: e.id, slot, design: e.design, at: n(e.at, 4e12), heal: n(e.heal, 60 * DAY), fade: n(e.fade, 60 * DAY) || FADE_OF[e.design] || 0, keep: !!e.keep, color: color && color.length ? color : null, values: e.values && typeof e.values === "object" ? e.values : null };
   }
-  function farmInkSync(W22, list, on3, now, opts) {
+  function farmInkSync(W23, list2, on3, now, opts) {
     const hard = !!(opts && opts.hard);
-    const P5 = W22.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list) || typeof W22.InventoryWear !== "function") return null;
+    const P5 = W23.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || !Array.isArray(list2) || typeof W23.InventoryWear !== "function") return null;
     now = now || Date.now();
-    const want = on3 ? list.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed2 = [];
+    const want = on3 ? list2.map(cleanEntry).filter(Boolean) : [], ids = new Set(want.map((e) => e.id)), out = { put: [], off: [], full: [], taken: [], marked: [] }, changed2 = [];
     let done = {};
     try {
-      done = JSON.parse(W22.localStorage.getItem(doneKey(W22))) || {};
+      done = JSON.parse(W23.localStorage.getItem(doneKey(W23))) || {};
     } catch (e) {
       done = {};
     }
     const remove = (slot) => {
       try {
-        if (typeof W22.InventoryRemove === "function") W22.InventoryRemove(P5, slot, false);
+        if (typeof W23.InventoryRemove === "function") W23.InventoryRemove(P5, slot, false);
         else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
       } catch (e) {
         return false;
@@ -7702,7 +7702,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (itemIn(P5, slot)) remove(slot);
       const kind = picKind(slot), color = e.color || LAYERS_OF[kind + ":" + e.design] || "Default";
       try {
-        W22.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
+        W23.InventoryWear(P5, e.design, slot, color, 0, P5.MemberNumber, null, false);
       } catch (err) {
         continue;
       }
@@ -7717,29 +7717,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     for (const k of Object.keys(done)) if (!ids.has(k) && now - done[k] > 60 * DAY) delete done[k];
     try {
-      W22.localStorage.setItem(doneKey(W22), JSON.stringify(done));
+      W23.localStorage.setItem(doneKey(W23), JSON.stringify(done));
     } catch (e) {
     }
     if (changed2.length) {
       try {
-        if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(P5);
+        if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(P5);
       } catch (e) {
       }
       try {
-        if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(P5);
+        if (typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(P5);
       } catch (e) {
       }
     }
     return out;
   }
-  var farmBrandWorn = (W22) => {
-    const id = farmOf(itemIn(W22.Player, BRAND_SLOT));
+  var farmBrandWorn = (W23) => {
+    const id = farmOf(itemIn(W23.Player, BRAND_SLOT));
     return !!(id && /^brand:/.test(id));
   };
   var DOSED_ONLY = /* @__PURE__ */ new Set(["GlowSlutGlowInk"]);
-  var dosed = (W22, C2) => {
+  var dosed = (W23, C2) => {
     try {
-      const D = W22.FarmhandDispensary;
+      const D = W23.FarmhandDispensary;
       return !!(D && typeof D.dosedOf === "function" && C2 && D.dosedOf(C2.MemberNumber));
     } catch (e) {
       return false;
@@ -7757,29 +7757,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const f = it && it.Property && it.Property.FarmInk;
     return f && typeof f.trophy === "string" ? f.trophy : null;
   };
-  function trophyWorn(W22) {
+  function trophyWorn(W23) {
     const o = {};
     for (const s of INK_SLOTS) {
-      const id = trophyOf(itemIn(W22.Player, s));
+      const id = trophyOf(itemIn(W23.Player, s));
       if (id) o[id] = s;
     }
     return o;
   }
-  var roomSees = (W22, P5) => {
+  var roomSees = (W23, P5) => {
     try {
-      if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(P5);
+      if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(P5);
     } catch (e) {
     }
     try {
-      if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(P5);
+      if (typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(P5);
     } catch (e) {
     }
   };
-  function trophyWear(W22, t, slot) {
-    const P5 = W22.Player;
-    if (!P5 || !Array.isArray(P5.Appearance) || typeof W22.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
+  function trophyWear(W23, t, slot) {
+    const P5 = W23.Player;
+    if (!P5 || !Array.isArray(P5.Appearance) || typeof W23.InventoryWear !== "function") return { ok: false, why: "you're not in the game yet" };
     if (!t || typeof t.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(t.id) || !LIVE_BY[t.design] || !DESIGNS.ink.has(t.design)) return { ok: false, why: "that isn't a trophy the farm gives" };
-    const worn = trophyWorn(W22);
+    const worn = trophyWorn(W23);
     if (worn[t.id]) return { ok: true, slot: worn[t.id], already: true };
     if (slot != null && !INK_SLOTS.includes(slot)) return { ok: false, why: "there's no slot by that name" };
     slot = slot || INK_SLOTS.find((s) => !itemIn(P5, s));
@@ -7789,100 +7789,100 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }) };
     if (itemIn(P5, slot)) {
       try {
-        W22.InventoryRemove(P5, slot, false);
+        W23.InventoryRemove(P5, slot, false);
       } catch (e) {
         return { ok: false, why: "what's in " + SLOT_NAMES[slot] + " wouldn't come off" };
       }
     }
     try {
-      W22.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
+      W23.InventoryWear(P5, t.design, slot, LAYERS_OF["FarmInk:" + t.design] || "Default", 0, P5.MemberNumber, null, false);
     } catch (e) {
       return { ok: false, why: "the game wouldn't take it" };
     }
     const it = itemIn(P5, slot);
     if (!it || it.Asset.Name !== t.design) return { ok: false, why: "the game wouldn't take it" };
-    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W22, d.auto) : null;
+    const d = LIVE_BY[t.design], v = d.auto ? autoOf(W23, d.auto) : null;
     it.Property = Object.assign({}, it.Property, { FarmInk: cleanValues(Object.assign({}, v || {}, { trophy: t.id })) });
-    roomSees(W22, P5);
+    roomSees(W23, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
-  function trophyOff(W22, id) {
-    const P5 = W22.Player, slot = P5 && trophyWorn(W22)[id];
+  function trophyOff(W23, id) {
+    const P5 = W23.Player, slot = P5 && trophyWorn(W23)[id];
     if (!slot) return { ok: true, already: true };
     try {
-      if (typeof W22.InventoryRemove === "function") W22.InventoryRemove(P5, slot, false);
+      if (typeof W23.InventoryRemove === "function") W23.InventoryRemove(P5, slot, false);
       else P5.Appearance = P5.Appearance.filter((it) => !(it && it.Asset && it.Asset.Group && it.Asset.Group.Name === slot));
     } catch (e) {
       return { ok: false, why: "it wouldn't come off" };
     }
-    roomSees(W22, P5);
+    roomSees(W23, P5);
     return { ok: true, slot, name: SLOT_NAMES[slot] };
   }
   var SLOT_OF = { 1: "FarmInk1", 2: "FarmInk2", 3: "FarmInk3", 4: "FarmInk4", brand: BRAND_SLOT };
-  var say = (W22, t) => {
+  var say = (W23, t) => {
     try {
-      if (typeof W22.ChatRoomSendLocal === "function") {
-        const d = W22.document.createElement("div");
+      if (typeof W23.ChatRoomSendLocal === "function") {
+        const d = W23.document.createElement("div");
         d.style.cssText = "color:#c79bd8;white-space:pre-wrap";
         d.textContent = "\u{1F58B}\uFE0F " + t;
-        W22.ChatRoomSendLocal(d.outerHTML);
+        W23.ChatRoomSendLocal(d.outerHTML);
       }
     } catch (e) {
     }
   };
-  function wornAll(W22) {
+  function wornAll(W23) {
     const out = [];
     for (const slot of [...INK_SLOTS, BRAND_SLOT]) {
-      const it = itemIn(W22.Player, slot);
+      const it = itemIn(W23.Player, slot);
       if (!it) continue;
       const d = LIVE_BY[it.Asset.Name];
       out.push({ slot, name: it.Asset.Name, title: TITLES[kindOf(slot) + ":" + it.Asset.Name] || it.Asset.Name, live: !!d, fields: d ? d.fields : [], auto: d ? d.auto || null : null, values: it.Property && it.Property.FarmInk || {} });
     }
     return out;
   }
-  var panelApi = (W22) => ({ worn: () => wornAll(W22), write: (slot, v) => write(W22, slot, v, true), command: (a) => inkCommand(W22, a) });
-  function inkCommand(W22, args) {
+  var panelApi = (W23) => ({ worn: () => wornAll(W23), write: (slot, v) => write(W23, slot, v, true), command: (a) => inkCommand(W23, a) });
+  function inkCommand(W23, args) {
     const a = String(args || "").trim(), m = /^(1|2|3|4|brand)\b\s*(.*)$/i.exec(a);
-    const worn = wornLive(W22);
-    if (!a && W22.document && W22.document.body) {
-      openInkPanel(W22, panelApi(W22));
+    const worn = wornLive(W23);
+    if (!a && W23.document && W23.document.body) {
+      openInkPanel(W23, panelApi(W23));
       return;
     }
-    if (/^why$/i.test(a)) return say(W22, whyText());
+    if (/^why$/i.test(a)) return say(W23, whyText());
     const sm = m && /^(size|wide|width|tall|height)\s+(\d{1,3})%?$/i.exec(m[2].trim());
     if (sm) {
       const slot2 = SLOT_OF[m[1].toLowerCase()], k = /^s/i.test(sm[1]) ? "sz" : /^w/i.test(sm[1]) ? "sw" : "sh", lim = k === "sz" ? [25, 400] : [50, 200];
       const v2 = Math.max(lim[0], Math.min(lim[1], Number(sm[2]))) / 100;
-      if (!itemIn(W22.Player, slot2)) return say(W22, "Nothin' in " + SLOT_NAMES[slot2] + ".");
-      write(W22, slot2, { [k]: v2 === 1 ? null : v2 }, true);
-      return say(W22, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
+      if (!itemIn(W23.Player, slot2)) return say(W23, "Nothin' in " + SLOT_NAMES[slot2] + ".");
+      write(W23, slot2, { [k]: v2 === 1 ? null : v2 }, true);
+      return say(W23, SLOT_NAMES[slot2] + ": " + { sz: "size", sw: "width", sh: "height" }[k] + " " + Math.round(v2 * 100) + "%.");
     }
     if (!m) {
-      if (!worn.length) return say(W22, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
-      return say(W22, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
+      if (!worn.length) return say(W23, "You've no live ink on. Pick one in the wardrobe (Farm Ink 1 to 4): the ones that say keeps count, a name, your number or your words. Then /ink <slot> <words> writes on it.");
+      return say(W23, "Your live ink:\n" + worn.map(({ slot: slot2, name, item }) => {
         const d2 = LIVE_BY[name], own = item.Property && item.Property.FarmInk || {}, k = Object.keys(SLOT_OF).find((x) => SLOT_OF[x] === slot2);
         return "\u2022 " + k + ": " + d2.title + (own.t ? ' \xB7 "' + own.t + '"' : "") + (own.n != null ? " \xB7 " + own.n : "") + (own.list ? " \xB7 " + own.list.join(", ") : "") + (d2.auto ? own.manual ? " (your number, not the farm's)" : " (follows the farm)" : "");
       }).join("\n") + "\n/ink opens the ink panel \xB7 /ink <slot> <words> writes on it \xB7 /ink <slot> <number> sets a count \xB7 /ink <slot> a, b, c for a list \xB7 /ink <slot> auto follows the farm again \xB7 /ink <slot> clear \xB7 /ink <slot> size 150 (wide, tall)");
     }
-    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W22.Player, slot);
-    if (!it) return say(W22, "Nothin' in " + SLOT_NAMES[slot] + ".");
-    if (!isLive(it.Asset.Name)) return say(W22, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
+    const slot = SLOT_OF[m[1].toLowerCase()], rest = m[2].trim(), it = itemIn(W23.Player, slot);
+    if (!it) return say(W23, "Nothin' in " + SLOT_NAMES[slot] + ".");
+    if (!isLive(it.Asset.Name)) return say(W23, (TITLES["FarmInk:" + it.Asset.Name] || TITLES["FarmBrand:" + it.Asset.Name] || "That") + " doesn't take writin': it's drawn as it is.");
     const d = LIVE_BY[it.Asset.Name];
     let v;
-    if (!rest) return inkCommand(W22, "");
+    if (!rest) return inkCommand(W23, "");
     if (/^clear$/i.test(rest)) v = { t: null, n: null, num: null, list: null, more: null, rows: null, d: null, due: null, manual: null };
     else if (/^auto$/i.test(rest)) {
       v = { manual: null, n: null, list: null, more: null, rows: null };
     } else if (/^\d{1,9}$/.test(rest) && (d.fields.includes("n") || d.fields.includes("num"))) v = d.fields.includes("num") ? { num: Number(rest) } : { n: Number(rest), manual: true };
     else if (rest.includes(",") && d.fields.includes("list")) v = { list: rest.split(",").map((x) => x.trim()).filter(Boolean), manual: true };
     else if (d.fields.includes("t")) v = { t: rest };
-    else return say(W22, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
-    write(W22, slot, v, true);
-    if (/^auto$/i.test(rest)) refreshAuto(W22);
-    say(W22, "Written on " + d.title + ".");
+    else return say(W23, d.title + " takes " + (d.fields.includes("n") ? "a number" : d.fields.includes("num") ? "a number" : d.fields.includes("list") ? "names, with commas between" : "nothin'") + ".");
+    write(W23, slot, v, true);
+    if (/^auto$/i.test(rest)) refreshAuto(W23);
+    say(W23, "Written on " + d.title + ".");
   }
-  function farmInkEntry(W22) {
-    const PD = W22.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W22.PropertyDataEntry;
+  function farmInkEntry(W23) {
+    const PD = W23.PropertyData, PDE = typeof PropertyDataEntry !== "undefined" ? PropertyDataEntry : W23.PropertyDataEntry;
     if (!PD || typeof PDE !== "function" || PD.FarmInk) return false;
     const same = (a, b) => {
       try {
@@ -7905,9 +7905,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     return true;
   }
-  function registerInk(W22, mod3) {
-    if (W22.__farmInk) return W22.__farmInk;
-    const st2 = W22.__farmInk = {
+  function registerInk(W23, mod3) {
+    if (W23.__farmInk) return W23.__farmInk;
+    const st2 = W23.__farmInk = {
       ready: false,
       slots: [...INK_SLOTS, BRAND_SLOT],
       designs: ink_designs_default.groups.FarmInk.length + ink_designs_default.groups.FarmBrand.length,
@@ -7917,7 +7917,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           counts = c;
           try {
-            refreshAuto(W22);
+            refreshAuto(W23);
           } catch (e) {
           }
         }
@@ -7927,26 +7927,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (c && typeof c === "object") {
           mine = c;
           try {
-            refreshAuto(W22);
+            refreshAuto(W23);
           } catch (e) {
           }
         }
       },
-      write: (slot, v) => write(W22, slot, v, true),
-      command: (a) => inkCommand(W22, a),
+      write: (slot, v) => write(W23, slot, v, true),
+      command: (a) => inkCommand(W23, a),
       // the farm's own ink (the Companion hands over the farm girl's list and the "Farm can ink me" switch)
-      farm: (list, on3, opts) => farmInkSync(W22, list, on3, void 0, opts),
-      farmBrandWorn: () => farmBrandWorn(W22),
+      farm: (list2, on3, opts) => farmInkSync(W23, list2, on3, void 0, opts),
+      farmBrandWorn: () => farmBrandWorn(W23),
       // trophies (the Companion's 🏆 Trophies row)
-      trophyWear: (t2, slot) => trophyWear(W22, t2, slot),
-      trophyOff: (id) => trophyOff(W22, id),
-      trophyWorn: () => trophyWorn(W22),
-      worn: () => wornLive(W22).map(({ slot, name }) => ({ slot, name }))
+      trophyWear: (t2, slot) => trophyWear(W23, t2, slot),
+      trophyOff: (id) => trophyOff(W23, id),
+      trophyWorn: () => trophyWorn(W23),
+      worn: () => wornLive(W23).map(({ slot, name }) => ({ slot, name }))
     };
     const hooks = () => {
       const hook4 = (name, pri, fn) => {
         try {
-          if (typeof W22[name] === "function") mod3.hookFunction(name, pri, fn);
+          if (typeof W23[name] === "function") mod3.hookFunction(name, pri, fn);
           else console.warn("[Farm ink] the game has no " + name);
         } catch (e) {
           console.warn("[Farm ink] couldn't hook " + name, e);
@@ -7967,7 +7967,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetBuildDescription", 0, (args, next) => {
         const r = next(args);
         try {
-          describe(W22);
+          describe(W23);
         } catch (e) {
         }
         return r;
@@ -7985,14 +7985,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const seen3 = /* @__PURE__ */ new Set(), notReady = [];
         const ready2 = (u) => {
           try {
-            const c = W22.GLDrawImageCache;
+            const c = W23.GLDrawImageCache;
             if (c && typeof c.has === "function" && c.has(u) && !c.get(u).isLoaded()) return false;
           } catch (e) {
           }
           return true;
         };
         const statue = (plain2, self, u, x, y, o) => {
-          const T3 = W22.__farmInkTint;
+          const T3 = W23.__farmInkTint;
           if (typeof T3 !== "function") return false;
           let t2;
           try {
@@ -8032,7 +8032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
             if (lm) {
-              const u = liveSrc(W22, C2, lm[1], lm[2], lm[3]);
+              const u = liveSrc(W23, C2, lm[1], lm[2], lm[3]);
               seen3.add(lm[2]);
               if (!u) {
                 notReady.push(lm[2] + " (not drawn yet)");
@@ -8046,7 +8046,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
             const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
             if (sm) {
-              if (DOSED_ONLY.has(sm[2]) && !dosed(W22, C2)) return void 0;
+              if (DOSED_ONLY.has(sm[2]) && !dosed(W23, C2)) return void 0;
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
@@ -8059,7 +8059,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         };
         const out = next([args[0], Object.assign({}, cb, { drawImage: wrap(cb.drawImage, cb.drawImage), drawImageBlink: wrap(cb.drawImageBlink, cb.drawImageBlink), drawImageColorize: wrap(cb.drawImageColorize, cb.drawImage), drawImageColorizeBlink: wrap(cb.drawImageColorizeBlink, cb.drawImageBlink) }), ...args.slice(2)]);
         try {
-          note2(W22, C2, seen3, notReady);
+          note2(W23, C2, seen3, notReady);
         } catch (e) {
         }
         return out;
@@ -8075,7 +8075,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               back++;
             }
           }
-          if (back && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C2);
+          if (back && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
         } catch (e) {
         }
         return r;
@@ -8092,8 +8092,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             back++;
           }
           if (back) {
-            if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(C2, false);
-            if (args[2] && typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(C2);
+            if (typeof W23.CharacterRefresh === "function") W23.CharacterRefresh(C2, false);
+            if (args[2] && typeof W23.ChatRoomCharacterUpdate === "function") W23.ChatRoomCharacterUpdate(C2);
           }
         } catch (e) {
         }
@@ -8102,13 +8102,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       hook4("AssetLoadAll", 0, (args, next) => {
         const r = next(args);
         try {
-          addSlots(W22);
+          addSlots(W23);
         } catch (e) {
           console.warn("[Farm ink] couldn't add the slots again", e);
         }
         return r;
       });
-      if (typeof W22.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
+      if (typeof W23.ItemPropertiesGetBundleProperties === "function") hook4("ItemPropertiesGetBundleProperties", 0, (args, next) => {
         const r = next(args);
         try {
           const it = args[0];
@@ -8117,13 +8117,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return r;
       });
-      farmInkEntry(W22);
+      farmInkEntry(W23);
       hook4("ActivityOrgasmStart", 0, (args, next) => {
         try {
           const C2 = args[0];
-          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W22.ActivityOrgasmRuined) {
-            W22.localStorage.setItem(cumKey(W22), String(Date.now()));
-            setTimeout(() => refreshAuto(W22), 1e3);
+          if (C2 && typeof C2.IsPlayer === "function" && C2.IsPlayer() && !W23.ActivityOrgasmRuined) {
+            W23.localStorage.setItem(cumKey(W23), String(Date.now()));
+            setTimeout(() => refreshAuto(W23), 1e3);
           }
         } catch (e) {
         }
@@ -8131,53 +8131,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     };
     const t = setInterval(() => {
-      if (!gameReady(W22)) return;
+      if (!gameReady(W23)) return;
       clearInterval(t);
       try {
         hooks();
-        addSlots(W22);
+        addSlots(W23);
         st2.ready = true;
       } catch (e) {
         console.warn("[Farm ink] couldn't add the slots", e);
       }
       loadLiveArt().then(() => {
         try {
-          for (const C2 of W22.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C2);
+          for (const C2 of W23.ChatRoomCharacter || []) if (wornByLogo(C2) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
         } catch (e) {
         }
       });
       try {
-        if (typeof W22.CommandCombine === "function") W22.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W22, a) }]);
+        if (typeof W23.CommandCombine === "function") W23.CommandCombine([{ Tag: "ink", Description: "[slot words]: your live farm ink (counts, names, your own words)", Action: (a) => inkCommand(W23, a) }]);
       } catch (e) {
       }
     }, 50);
     setInterval(() => {
       try {
-        if (W22.Player && W22.Player.Appearance) refreshAuto(W22);
+        if (W23.Player && W23.Player.Appearance) refreshAuto(W23);
       } catch (e) {
       }
     }, 10 * 6e4);
     try {
-      W22.addEventListener("farmhand-dispensary", (e) => {
+      W23.addEventListener("farmhand-dispensary", (e) => {
         const d = e && e.detail;
         if (!d || !(d.type === "dose" || d.type === "icons")) return;
-        const mn = d.type === "icons" ? d.from : W22.Player && W22.Player.MemberNumber;
-        const C2 = (W22.Player && W22.Player.MemberNumber === mn ? W22.Player : (W22.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
-        if (C2 && wearsDosedOnly(C2) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C2);
+        const mn = d.type === "icons" ? d.from : W23.Player && W23.Player.MemberNumber;
+        const C2 = (W23.Player && W23.Player.MemberNumber === mn ? W23.Player : (W23.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn)) || null;
+        if (C2 && wearsDosedOnly(C2) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
       });
     } catch (e) {
     }
     setInterval(() => {
       try {
         const now = Date.now();
-        for (const C2 of W22.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W22.CharacterLoadCanvas === "function") W22.CharacterLoadCanvas(C2);
+        for (const C2 of W23.ChatRoomCharacter || []) if (stillChanging(C2, now) && typeof W23.CharacterLoadCanvas === "function") W23.CharacterLoadCanvas(C2);
       } catch (e) {
       }
     }, 30 * 6e4);
     return st2;
   }
   var DIAG = [];
-  function note2(W22, C2, seen3, notReady) {
+  function note2(W23, C2, seen3, notReady) {
     if (!C2 || !Array.isArray(C2.Appearance)) return;
     const pose2 = [].concat(C2.ActivePose || [], C2.Pose || []).join(",");
     if (/AllFours|Hogtied/.test(pose2)) return;
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.83.0";
+  var VERSION = "0.84.0";
 
   // shared/species.js
   var WORDS = {
@@ -8334,12 +8334,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!low) return null;
     const whole2 = low.replace(/[\s\/-]+/g, "");
     if (known(whole2)) return known(whole2);
-    const words = low.split(/[\s\/-]+/).filter(Boolean);
-    for (const w of words) {
+    const words2 = low.split(/[\s\/-]+/).filter(Boolean);
+    for (const w of words2) {
       const k = known(w);
       if (k) return k;
     }
-    for (const w of words) {
+    for (const w of words2) {
       const hit = INSIDE.find((x) => w.startsWith(x) || w.endsWith(x));
       if (hit) return WORDS[hit];
     }
@@ -8372,11 +8372,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ANIMALS = Object.keys(NOISES).filter((k) => k !== "kitt");
   var noisesOf = (species) => NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
   function mooify(text3, species, share) {
-    const say3 = noisesOf(species);
+    const say4 = noisesOf(species);
     const keep3 = 1 - (typeof share === "number" ? Math.max(0, Math.min(1, share)) : 0.5);
     return String(text3).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < keep3) return w;
-      const n = say3[Math.floor(Math.random() * say3.length)];
+      const n = say4[Math.floor(Math.random() * say4.length)];
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
   }
@@ -8670,8 +8670,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     );
   }
   var ml = (n) => n >= 1e3 ? (n / 1e3).toFixed(1) + " L" : Math.round(n) + " mL";
-  var meters = (list) => {
-    const ms = list.filter(Boolean);
+  var meters = (list2) => {
+    const ms = list2.filter(Boolean);
     return ms.length ? h("div", { class: "fhc-meters" }, ms.map((m) => h(
       "div",
       { class: "fhc-m" },
@@ -8680,8 +8680,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h("div", { class: "fhc-m-t" }, h("div", { class: m.kind ? "fhc-fill-" + m.kind : "", style: { width: Math.max(0, Math.min(100, m.pct || 0)) + "%" } }))
     ))) : null;
   };
-  function rows(ctx4, key3, list) {
-    const items = list.filter(Boolean), openId = ctx4.ui["open_" + key3];
+  function rows(ctx5, key3, list2) {
+    const items = list2.filter(Boolean), openId = ctx5.ui["open_" + key3];
     if (!items.length) return null;
     return h("div", { class: "fhc-rows" }, items.map((r) => {
       const open2 = r.id === openId && r.body;
@@ -8691,7 +8691,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           type: "button",
           class: "fhc-r" + (open2 ? " open" : ""),
           "aria-expanded": r.body ? open2 ? "true" : "false" : null,
-          onclick: () => r.go ? r.go() : ctx4.setUi({ ["open_" + key3]: open2 ? null : r.id })
+          onclick: () => r.go ? r.go() : ctx5.setUi({ ["open_" + key3]: open2 ? null : r.id })
         },
         h("span", { class: "fhc-r-k" }, r.label, r.dot ? h("span", { class: "fhc-dot", "aria-label": "new" }) : null),
         r.sum ? h("span", { class: "fhc-r-s" }, r.sum) : null,
@@ -8700,24 +8700,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return open2 ? [head, h("div", { class: "fhc-open" }, r.body())] : head;
     }));
   }
-  function quick(ctx4, key3, list, more) {
-    const isOpen = !!ctx4.ui["more_" + key3];
+  function quick(ctx5, key3, list2, more) {
+    const isOpen = !!ctx5.ui["more_" + key3];
     return h(
       "div",
       null,
       h(
         "div",
         { class: "fhc-qa" },
-        list.filter(Boolean).map(([label, fn]) => h("button", { type: "button", class: "fhc-b", onclick: fn }, label)),
+        list2.filter(Boolean).map(([label, fn]) => h("button", { type: "button", class: "fhc-b", onclick: fn }, label)),
         more && more.length ? h("button", {
           type: "button",
           class: "fhc-b" + (isOpen ? " on" : ""),
           "aria-expanded": isOpen ? "true" : "false",
-          onclick: () => ctx4.setUi({ ["more_" + key3]: !isOpen })
+          onclick: () => ctx5.setUi({ ["more_" + key3]: !isOpen })
         }, isOpen ? "More \u25B4" : "More \u25BE") : null
       ),
       isOpen ? h("div", { class: "fhc-menu", role: "menu", "aria-label": "More" }, more.filter(Boolean).map(([label, fn]) => h("button", { type: "button", role: "menuitem", class: "fhc-b", onclick: () => {
-        ctx4.setUi({ ["more_" + key3]: false }, true);
+        ctx5.setUi({ ["more_" + key3]: false }, true);
         fn();
       } }, label))) : null
     );
@@ -8728,8 +8728,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     h("div", { class: "fhc-sh" }, head, right ? h("span", { class: "fhc-sh-x" }, right) : null),
     ...kids
   );
-  var pairs = (list) => {
-    const ps = list.filter((p) => p && p[1] !== void 0 && p[1] !== null && p[1] !== "" && p[1] !== false);
+  var pairs = (list2) => {
+    const ps = list2.filter((p) => p && p[1] !== void 0 && p[1] !== null && p[1] !== "" && p[1] !== false);
     return ps.length ? h("div", { class: "fhc-pairs" }, ps.map(([k, v]) => [h("span", { class: "fhc-muted" }, k), h("span", null, v)])) : null;
   };
 
@@ -8771,11 +8771,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
 
   // extension/src/views/common.js
-  function safetyTab(ctx4) {
+  function safetyTab(ctx5) {
     const big = (label, cmd, red, note4) => h(
       "div",
       { style: { marginBottom: "10px" } },
-      h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx4.send(cmd) }, label),
+      h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx5.send(cmd) }, label),
       muted(note4)
     );
     return [
@@ -8786,21 +8786,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         big("Call staff", "staff", false, "Just want a hand, or somebody to talk to? This calls whoever's on duty.")
       ),
       muted("From chat, without the panel: ?safe \xB7 ?stuck \xB7 ?staff"),
-      sayCard(ctx4)
+      sayCard(ctx5)
     ];
   }
-  function sayCard(ctx4) {
-    if (!ctx4.api || !ctx4.api.say) return null;
+  function sayCard(ctx5) {
+    if (!ctx5.api || !ctx5.api.say) return null;
     const box3 = h("textarea", {
       class: "fhc-in",
       rows: 2,
       maxlength: 300,
       placeholder: "What you need to say\u2026",
-      value: ctx4.ui.sayText || "",
-      oninput: (e) => ctx4.setUi({ sayText: e.target.value }, true)
+      value: ctx5.ui.sayText || "",
+      oninput: (e) => ctx5.setUi({ sayText: e.target.value }, true)
     });
     const go = (to) => {
-      if (ctx4.api.say(box3.value, to)) ctx4.setUi({ sayText: "" });
+      if (ctx5.api.say(box3.value, to)) ctx5.setUi({ sayText: "" });
     };
     return card(
       title("\u{1F5E3}\uFE0F Say it"),
@@ -8810,28 +8810,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       muted("Tell staff sends it to whoever's on duty, and your herd leader.")
     );
   }
-  function guidesTab(ctx4, staff) {
-    const q2 = (ctx4.ui.search || "").toLowerCase();
+  function guidesTab(ctx5, staff) {
+    const q2 = (ctx5.ui.search || "").toLowerCase();
     const groups2 = PUBLIC_GROUPS.concat(
       staff ? STAFF_GROUPS : [],
-      staff && ctx4.s.proprietor ? OWNER_GROUPS : [],
-      (ctx4.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
+      staff && ctx5.s.proprietor ? OWNER_GROUPS : [],
+      (ctx5.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
     );
     const shown = groups2.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
     const input2 = h("input", {
       class: "fhc-in",
       placeholder: "milk, breed, keys\u2026",
-      value: ctx4.ui.search || "",
-      oninput: (e) => ctx4.setUi({ search: e.target.value }, true)
+      value: ctx5.ui.search || "",
+      oninput: (e) => ctx5.setUi({ search: e.target.value }, true)
     });
     return [
       h("label", { class: "fhc-label" }, "Search guides and commands", input2),
-      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx4.send(cmd), true))),
+      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx5.send(cmd), true))),
       shown.map((g) => card(title(g.name), h("div", null, g.cmds.map((c) => h("button", {
         type: "button",
         class: "fhc-cmd",
         title: needsInput(c) ? "Fill in the rest, then send" : "Send it",
-        onclick: () => needsInput(c) ? ctx4.fillBox(cmdStem(c) + " ") : ctx4.send(c)
+        onclick: () => needsInput(c) ? ctx5.fillBox(cmdStem(c) + " ") : ctx5.send(c)
       }, "?" + c))))),
       staff ? null : muted("Staff see their own commands on the Staff panel.")
     ];
@@ -8851,8 +8851,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // extension/src/views/store.js
   var minsLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
   var KIND = { reward: "\u{1F36C}", punish: "\u{1F53B}", silly: "\u{1F3AD}" };
-  function storeParts(ctx4) {
-    const s = ctx4.s, items = s.store || [], fx = s.fx || [], log2 = s.ribbonLog || [];
+  function storeParts(ctx5) {
+    const s = ctx5.s, items = s.store || [], fx = s.fx || [], log2 = s.ribbonLog || [];
     const vat = s.vat ? h(
       "div",
       null,
@@ -8867,10 +8867,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const dare = s.dare ? [
       h("p", { style: { margin: "0" } }, s.dare.text),
       muted(minsLeft(s.dare.until) + " minutes left."),
-      h("div", null, btn("I did it", () => ctx4.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx4.send("dare skip")))
+      h("div", null, btn("I did it", () => ctx5.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx5.send("dare skip")))
     ] : null;
     const pen = s.penned ? muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.") : null;
-    const who2 = () => String(ctx4.ui.giftWho || "").trim();
+    const who2 = () => String(ctx5.ui.giftWho || "").trim();
     const row = (it) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
@@ -8881,16 +8881,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         chip(it.price + " \u{1F380}", (s.ribbons || 0) >= it.price ? "good" : "")
       ),
       muted(it.desc),
-      it.id === "bounty" || it.id === "greeting" || it.id === "tag" || it.id === "dedicate" ? btn("Write it\u2026", () => ctx4.fillBox("buy " + it.id + " ")) : h(
+      it.id === "bounty" || it.id === "greeting" || it.id === "tag" || it.id === "dedicate" ? btn("Write it\u2026", () => ctx5.fillBox("buy " + it.id + " ")) : h(
         "div",
         null,
-        btn("Buy", () => ctx4.send("buy " + it.id), true),
-        s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx4.send("buy " + it.id + " with milk")) : null,
-        it.gift ? btn("Gift it", () => who2() ? ctx4.send("buy " + it.id + " for " + who2()) : ctx4.hint("Type who it's for in the box above the potions first.")) : null
+        btn("Buy", () => ctx5.send("buy " + it.id), true),
+        s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx5.send("buy " + it.id + " with milk")) : null,
+        it.gift ? btn("Gift it", () => who2() ? ctx5.send("buy " + it.id + " for " + who2()) : ctx5.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
     const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink2 = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
-    const messWho = () => String(ctx4.ui.messWho || "").trim();
+    const messWho = () => String(ctx5.ui.messWho || "").trim();
     const messRow = (it) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
@@ -8899,8 +8899,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         null,
-        btn("On them", () => messWho() ? ctx4.send("buy " + it.id + " for " + messWho()) : ctx4.hint("Type who it's for in the box above the messes first."), true),
-        btn("On me", () => ctx4.send("buy " + it.id))
+        btn("On them", () => messWho() ? ctx5.send("buy " + it.id + " for " + messWho()) : ctx5.hint("Type who it's for in the box above the messes first."), true),
+        btn("On me", () => ctx5.send("buy " + it.id))
       )
     );
     const shelves = [
@@ -8914,7 +8914,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "label",
           { class: "fhc-label" },
           "Gift to (name or member number)",
-          h("input", { class: "fhc-in", value: ctx4.ui.giftWho || "", oninput: (e) => ctx4.setUi({ giftWho: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx5.ui.giftWho || "", oninput: (e) => ctx5.setUi({ giftWho: e.target.value }, true) })
         ),
         potions.map(row)
       ] },
@@ -8924,9 +8924,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "label",
           { class: "fhc-label" },
           "For (name or member number)",
-          h("input", { class: "fhc-in", value: ctx4.ui.messWho || "", oninput: (e) => ctx4.setUi({ messWho: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx5.ui.messWho || "", oninput: (e) => ctx5.setUi({ messWho: e.target.value }, true) })
         ),
-        h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx4.send("messes " + (s.messesOn ? "off" : "on")))),
+        h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx5.send("messes " + (s.messesOn ? "off" : "on")))),
         messes.map(messRow)
       ] }
     ].filter(Boolean);
@@ -8934,29 +8934,29 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/views/extras.js
-  function modsFor(ctx4, view2) {
-    const mods = ctx4.s.mods || {};
+  function modsFor(ctx5, view2) {
+    const mods = ctx5.s.mods || {};
     return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view2)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view2 === "staff" ? true : !c.staff && !c.me)) })]).filter(([, m]) => m.cards.length);
   }
-  function mePieces(ctx4) {
+  function mePieces(ctx5) {
     const bars = [], chips = [], cards = [], labels = [];
-    for (const [name, m] of Object.entries(ctx4.s.mods || {})) {
+    for (const [name, m] of Object.entries(ctx5.s.mods || {})) {
       if (!m || typeof m !== "object" || !Array.isArray(m.cards)) continue;
       m.cards.forEach((c, i) => {
         if (!c || !c.me || c.staff) return;
         if (Array.isArray(c.bars)) bars.push(...c.bars);
         if (Array.isArray(c.chips)) chips.push(...c.chips);
-        cards.push(drawCard2(ctx4, name, Object.assign({}, c, { bars: null, chips: null }), i));
+        cards.push(drawCard2(ctx5, name, Object.assign({}, c, { bars: null, chips: null }), i));
         labels.push(String(c.title || m.label || name));
       });
     }
-    for (const [name, m] of modsFor(ctx4, "livestock")) {
+    for (const [name, m] of modsFor(ctx5, "livestock")) {
       labels.push(String(m.label || name));
-      cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)), m.cards.map((c, i) => drawCard2(ctx4, name, c, i))));
+      cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)), m.cards.map((c, i) => drawCard2(ctx5, name, c, i))));
     }
     return { bars, chips, cards, labels: [...new Set(labels)] };
   }
-  function drawCard2(ctx4, name, c, i) {
+  function drawCard2(ctx5, name, c, i) {
     const key3 = "x_" + name + "_" + i;
     return card(
       c.title && title(String(c.title)),
@@ -8964,34 +8964,34 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
       Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
       Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
-      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx4.send(String(t.cmd)))),
+      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx5.send(String(t.cmd)))),
       c.input && h(
         "div",
         null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx4.ui[key3] || "", oninput: (e) => ctx4.setUi({ [key3]: e.target.value }, true) }),
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx5.ui[key3] || "", oninput: (e) => ctx5.setUi({ [key3]: e.target.value }, true) }),
         btn(String(c.input.label || "Send"), () => {
-          const v = (ctx4.ui[key3] || "").trim();
-          if (!v) return ctx4.hint("Type somethin' in the box first.");
-          ctx4.send(String(c.input.cmd) + " " + v);
-          ctx4.setUi({ [key3]: "" });
+          const v = (ctx5.ui[key3] || "").trim();
+          if (!v) return ctx5.hint("Type somethin' in the box first.");
+          ctx5.send(String(c.input.cmd) + " " + v);
+          ctx5.setUi({ [key3]: "" });
         }, true)
       ),
-      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx4.send(String(b.cmd)), !!b.accent))) : null,
+      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx5.send(String(b.cmd)), !!b.accent))) : null,
       c.note && muted(String(c.note))
     );
   }
-  function render(ctx4, view2) {
-    const list = modsFor(ctx4, view2);
-    if (!list.length) return [muted("No farm extras for you right now.")];
-    return list.map(([name, m]) => h(
+  function render(ctx5, view2) {
+    const list2 = modsFor(ctx5, view2);
+    if (!list2.length) return [muted("No farm extras for you right now.")];
+    return list2.map(([name, m]) => h(
       "div",
       null,
       h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
-      m.cards.map((c, i) => drawCard2(ctx4, name, c, i))
+      m.cards.map((c, i) => drawCard2(ctx5, name, c, i))
     ));
   }
-  function withExtras(tabs, view2, ctx4) {
-    if (!modsFor(ctx4, view2).length) return tabs;
+  function withExtras(tabs, view2, ctx5) {
+    if (!modsFor(ctx5, view2).length) return tabs;
     const t = { id: "extras", label: "\u{1F9E9} Farm extras", render: (c) => render(c, view2) };
     const at = tabs.findIndex((x) => x.id === "guides");
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
@@ -9049,8 +9049,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const CUPS = ["Flat", "AA", "A", "B", "C", "D", "DD", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"];
     const DRAWN_FROM = NATIVE.length;
     const ROOT_Y = 284;
-    const clamp2 = (v) => Math.max(0, Math.min(255, Math.round(v)));
-    const rgb2 = (c, k) => "rgb(" + clamp2(c[0] * k) + "," + clamp2(c[1] * k) + "," + clamp2(c[2] * k) + ")";
+    const clamp3 = (v) => Math.max(0, Math.min(255, Math.round(v)));
+    const rgb2 = (c, k) => "rgb(" + clamp3(c[0] * k) + "," + clamp3(c[1] * k) + "," + clamp3(c[2] * k) + ")";
     function shape(cup, adj) {
       const a = adj || {}, i = Math.max(0, cup - DRAWN_FROM), n = CUPS.length - 1 - DRAWN_FROM;
       const k = i / n, hang = a.hang == null ? 1 : a.hang, full = a.full == null ? 1 : a.full, apart = a.apart == null ? 1 : a.apart;
@@ -9082,9 +9082,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return [s * S3.bx + S3.r * cs * (1 - 0.5 * up * up) - s * S3.r * 0.2 * up * up, S3.by - S3.r * S3.top * up];
     }
     function path(g, S3, s, from, to, ox, oy) {
-      const steps = 80;
-      for (let j = 0; j <= steps; j++) {
-        const p = point(S3, s, from + (to - from) * j / steps);
+      const steps2 = 80;
+      for (let j = 0; j <= steps2; j++) {
+        const p = point(S3, s, from + (to - from) * j / steps2);
         if (j) g.lineTo(ox + p[0], oy + p[1]);
         else g.moveTo(ox + p[0], oy + p[1]);
       }
@@ -9227,7 +9227,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       og.scale(1, 0.66);
       const patch = og.createRadialGradient(0, 0, 62, 0, 0, 80);
       patch.addColorStop(0, rgb2(skin, 1));
-      patch.addColorStop(1, "rgba(" + clamp2(skin[0]) + "," + clamp2(skin[1]) + "," + clamp2(skin[2]) + ",0)");
+      patch.addColorStop(1, "rgba(" + clamp3(skin[0]) + "," + clamp3(skin[1]) + "," + clamp3(skin[2]) + ",0)");
       og.fillStyle = patch;
       og.beginPath();
       og.arc(0, 0, 80, 0, Math.PI * 2);
@@ -9367,11 +9367,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W22 = window;
-      const takesDrawings = () => typeof W22.GLDrawLoadTransient === "function";
+      const W23 = window;
+      const takesDrawings = () => typeof W23.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W22.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W22.DrawCacheImage, W22.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W23.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W23.DrawCacheImage, W23.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen3 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -9380,7 +9380,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (seen3 == null) seen3 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W22.DrawGetImage(src);
+          W23.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -9455,14 +9455,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         MOULD.prof.set(src, p);
         return p;
       }
-      function outline(ctx4) {
+      function outline(ctx5) {
         const parts2 = [];
-        for (const b of ctx4.bodies) {
+        for (const b of ctx5.bodies) {
           const p = edgesOf(b.src);
           if (!p) return null;
           parts2.push({ p, x: b.x, y: b.y });
         }
-        const bp = ctx4.belly.prof || (ctx4.belly.prof = edges(ctx4.belly.cv, ctx4.belly.cv.width, ctx4.belly.cv.height));
+        const bp = ctx5.belly.prof || (ctx5.belly.prof = edges(ctx5.belly.cv, ctx5.belly.cv.width, ctx5.belly.cv.height));
         const row = (yy, withBelly) => {
           let l = Infinity, r = -Infinity;
           for (const q2 of parts2) {
@@ -9474,20 +9474,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
           if (l === Infinity) return null;
           if (withBelly) {
-            const j = yy - Math.round(ctx4.belly.dy);
+            const j = yy - Math.round(ctx5.belly.dy);
             if (j >= 0 && j < bp.h && bp.L[j] >= 0) {
-              l = Math.min(l, ctx4.belly.dx + bp.L[j]);
-              r = Math.max(r, ctx4.belly.dx + bp.R[j]);
+              l = Math.min(l, ctx5.belly.dx + bp.L[j]);
+              r = Math.max(r, ctx5.belly.dx + bp.R[j]);
             }
           }
           return { l, r };
         };
         return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
       }
-      function bellyCover(src, x, y, ctx4) {
+      function bellyCover(src, x, y, ctx5) {
         const im = mouldImg(src);
         if (!im) return 0;
-        const b = ctx4.belly, key3 = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
+        const b = ctx5.belly, key3 = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
         let v = MOULD.cover.get(key3);
         if (v != null) return v;
         const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
@@ -9508,17 +9508,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         MOULD.cover.set(key3, v);
         return v;
       }
-      function bellyAuto(src, x, y, ctx4, behind, pieceKey2) {
-        if (!ctx4.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
+      function bellyAuto(src, x, y, ctx5, behind, pieceKey2) {
+        if (!ctx5.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
         const m0 = new RegExp(SLOT_SRC2).exec(src);
         if (!m0) return false;
         if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
         if (rigidSrc(src)) return false;
-        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx4, "under|" + (pieceKey2 || src), "under");
+        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx5, "under|" + (pieceKey2 || src), "under");
         const pk = pieceKey2 || src;
-        if (bellyCover(src, x, y, ctx4) >= 0.15) MOULD.lies.add(pk);
+        if (bellyCover(src, x, y, ctx5) >= 0.15) MOULD.lies.add(pk);
         if (!MOULD.lies.has(pk)) return false;
-        return mouldCanvas(src, x, y, ctx4, "auto|" + (pieceKey2 || src), "auto");
+        return mouldCanvas(src, x, y, ctx5, "auto|" + (pieceKey2 || src), "auto");
       }
       function pieceSpan(pk, src, x, y) {
         const span = MOULD.span.get("p|" + pk) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
@@ -9694,14 +9694,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return c;
       }
       const shadeSeen = /* @__PURE__ */ new WeakMap();
-      function bellyShade(img2, sx, sy, ctx4) {
-        const b = ctx4.belly;
+      function bellyShade(img2, sx, sy, ctx5) {
+        const b = ctx5.belly;
         if (!b || !img2) return null;
         const fm = bellyForm(b.cv);
         if (!fm) return null;
         const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
         if (!w || !h2) return null;
-        const key3 = Math.round(sx) + "," + Math.round(sy) + "|" + ctx4.sig + "|" + (ctx4.breast ? ctx4.breast.sig : "");
+        const key3 = Math.round(sx) + "," + Math.round(sy) + "|" + ctx5.sig + "|" + (ctx5.breast ? ctx5.breast.sig : "");
         let e = shadeSeen.get(img2);
         if (e && e.key === key3) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
@@ -9715,7 +9715,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data;
           let any = false;
           let bm = null;
-          const Bb = ctx4.breast;
+          const Bb = ctx5.breast;
           if (Bb && Bb.mask) {
             const mc = document.createElement("canvas");
             mc.width = x1 - x0;
@@ -9745,8 +9745,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         shadeSeen.set(img2, { key: key3, out });
         return out;
       }
-      function bellyRows(ctx4) {
-        const b = ctx4.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
+      function bellyRows(ctx5) {
+        const b = ctx5.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
         let t = -1, e = -1;
         for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) {
           if (t < 0) t = j;
@@ -9754,7 +9754,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e };
       }
-      function mouldCanvas(src, x, y, ctx4, piece, mode) {
+      function mouldCanvas(src, x, y, ctx5, piece, mode) {
         let im = mouldImg(src);
         if (!im) return null;
         const M = MOULD.M, w = im.naturalWidth;
@@ -9777,7 +9777,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
           }
         }
-        const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx4.sig;
+        const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx5.sig;
         {
           const had = keptOf(MOULD.out, key3);
           if (had !== void 0) return had;
@@ -9794,14 +9794,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           const g2 = c2.getContext("2d");
           g2.drawImage(im, M, 0);
           g2.globalCompositeOperation = "destination-out";
-          g2.drawImage(ctx4.belly.cv, ctx4.belly.dx - x + M, ctx4.belly.dy - y);
+          g2.drawImage(ctx5.belly.cv, ctx5.belly.dx - x + M, ctx5.belly.dy - y);
           return keep3(c2);
         }
-        const ol = ctx4.outline || (ctx4.outline = outline(ctx4));
+        const ol = ctx5.outline || (ctx5.outline = outline(ctx5));
         if (!ol) return null;
         let changed2 = false;
         if (mode === "over" && ext) {
-          const br = bellyRows(ctx4), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
+          const br = bellyRows(ctx5), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
           if (br && ext.bottom > from + 4 && ext.bottom < to) {
             const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y), tall = document.createElement("canvas");
             tall.width = w;
@@ -9821,8 +9821,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const g = c.getContext("2d");
         let longSrc = false;
         if (mode === "auto" && ext) {
-          const br = bellyRows(ctx4), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
-          const ps = pieceSpan(piece, src, x, y), bp0 = ctx4.belly.prof || (ctx4.belly.prof = edges(ctx4.belly.cv, ctx4.belly.cv.width, ctx4.belly.cv.height));
+          const br = bellyRows(ctx5), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
+          const ps = pieceSpan(piece, src, x, y), bp0 = ctx5.belly.prof || (ctx5.belly.prof = edges(ctx5.belly.cv, ctx5.belly.cv.width, ctx5.belly.cv.height));
           let endW = 1e9, bW = 0;
           for (let k = 3; k <= 8; k++) {
             const yy = ext.bottom - k;
@@ -9846,7 +9846,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
         }
         if (mode === "auto") {
-          const b = ctx4.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
+          const b = ctx5.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
           if (longSrc) {
             c.height = h2;
           }
@@ -9885,7 +9885,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (gl > cxs || gr < cxs) return null;
             return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2), bw: br2 - bl };
           };
-          const strappy = bellyCover(src, x, y, ctx4) < 0.35;
+          const strappy = bellyCover(src, x, y, ctx5) < 0.35;
           for (let j = 0; j < h2; j++) {
             const yy = Math.round(y) + j;
             g.drawImage(im, 0, j, w, 1, M, j, w, 1);
@@ -10373,7 +10373,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const t0 = nowMs2(), m0 = PERF.made, s0 = PERF.saved;
         trim2();
         {
-          let finish = null, seenNow = null, handFNow = null, painted = 0;
+          let finish3 = null, seenNow = null, handFNow = null, painted = 0;
           try {
             const fit = C2 === S3.C ? fitNow() : null, br = C2 === S3.C ? breastNow() : null, real = cb;
             const put2 = (name, img2, x, y, o, from) => {
@@ -10398,11 +10398,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             };
             if (fit && cb && typeof cb.drawImage === "function") {
               let upper = null, lower = false, done = false;
-              const ctx4 = { bodies: [], belly: null, sig: "", seen: {} };
+              const ctx5 = { bodies: [], belly: null, sig: "", seen: {} };
               if (br) {
-                seenNow = ctx4.seen;
+                seenNow = ctx5.seen;
                 handFNow = { get v() {
-                  return ctx4.handF;
+                  return ctx5.handF;
                 } };
               }
               const slot = new RegExp(SLOT_SRC2);
@@ -10447,12 +10447,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
                   put2("drawImage", cv, dx, dy, {}, "skin");
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", cv, dx, dy, {}, "skin");
-                  ctx4.belly = { cv, dx, dy };
-                  ctx4.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx4.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
+                  ctx5.belly = { cv, dx, dy };
+                  ctx5.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx5.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
                 }
-                if (ctx4.cock) {
-                  const k = ctx4.cock;
-                  ctx4.cock = null;
+                if (ctx5.cock) {
+                  const k = ctx5.cock;
+                  ctx5.cock = null;
                   put2("drawImage", k[0], k[1], k[2], {}, "skin");
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", k[0], k[1], k[2], {}, "skin");
                 }
@@ -10533,9 +10533,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[body] over the breasts:", e);
                     }
                   }
-                  ctx4.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key3 + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  ctx5.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key3 + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held2.length) {
-                    const B = ctx4.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
+                    const B = ctx5.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
                     let nc = BREAST.nc;
                     if (!nc || BREAST.ncKey !== ncKey) {
                       nc = document.createElement("canvas");
@@ -10567,7 +10567,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   try {
                     const lv = typeof host.nipOpen === "function" ? Math.max(0, Math.min(3, Math.round(Number(host.nipOpen()) || 0))) : 0;
                     if (lv > 0) {
-                      const B = ctx4.breast, sk2 = bellySkin(upper[2], upper[3], bpose), r0 = 7 * B.kN, oc = openNip(lv, r0, sk2);
+                      const B = ctx5.breast, sk2 = bellySkin(upper[2], upper[3], bpose), r0 = 7 * B.kN, oc = openNip(lv, r0, sk2);
                       for (const p of B.nips) if (p[1] + r0 < B.ground) {
                         put2("drawImage", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin");
                         if (typeof real.drawImageBlink === "function") put2("drawImageBlink", oc, p[0] - oc.width / 2, p[1] - oc.height / 2, {}, "skin");
@@ -10579,7 +10579,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
               };
               const handHidden = (src, x, y) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im) return null;
                 const key3 = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let v = BREAST.cover.get(key3);
@@ -10605,16 +10605,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
               const handDraw = (name, src, x, y, o) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 let bv = null;
                 try {
-                  bv = ctx4.belly && !fit.behind && LOWER_GROUPS.test(groupOf4(src)) ? bellyAuto(src, x, y, ctx4, fit.behind, (pieceOf(src) || {}).key) : null;
+                  bv = ctx5.belly && !fit.behind && LOWER_GROUPS.test(groupOf4(src)) ? bellyAuto(src, x, y, ctx5, fit.behind, (pieceOf(src) || {}).key) : null;
                 } catch (e) {
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx4.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx4.belly ? "|s" + ctx4.sig : "");
+                const key3 = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx5.sig + "|" + mouldId(bv) + "|" + base.width + "x" + base.height : "") + (ctx5.belly ? "|s" + ctx5.sig : "");
                 let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   c = document.createElement("canvas");
@@ -10624,9 +10624,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   g.drawImage(base, 0, 0);
                   g.globalCompositeOperation = "destination-out";
                   g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
-                  if (ctx4.belly && !fit.behind && chestSlot(groupOf4(src)) && groupOf4(src) !== "Panties") {
+                  if (ctx5.belly && !fit.behind && chestSlot(groupOf4(src)) && groupOf4(src) !== "Panties") {
                     try {
-                      const sh = bellyShade(c, x - ox, y, ctx4);
+                      const sh = bellyShade(c, x - ox, y, ctx5);
                       if (sh) c = sh;
                     } catch (e) {
                       warnSome2("[body] belly form:", e);
@@ -10786,7 +10786,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;
                 const fm = frameMeasure(src, im, x, y, B);
                 if (!fm) return false;
@@ -10815,7 +10815,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W23 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W24 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -10824,7 +10824,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on3 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on3) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W23 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W24 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -10843,26 +10843,26 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W23 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W24 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W23 + 1.5;
+                      g.lineWidth = W24 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W23;
+                      g.lineWidth = W24;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W23 * 0.18, p[1] + dx / L * W23 * 0.18];
+                        return [p[0] - dy / L * W24 * 0.18, p[1] + dx / L * W24 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W23 * 0.22);
+                      g.lineWidth = Math.max(1, W24 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -10901,7 +10901,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 return v;
               };
               const bandDraw = (name, src, x, y, o) => {
-                const B = ctx4.breast, im = mouldImg(src);
+                const B = ctx5.breast, im = mouldImg(src);
                 if (!B || !im) return false;
                 const key3 = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let c = keptOf(BREAST.out, key3);
@@ -11013,7 +11013,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };
               const dressDraw = (name, src, x, y, o) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 const pk0 = (pieceOf(src) || {}).key;
                 if (!BREAST.on[pk0] && chestCover(src, im, x, y, B, false) < 0.012 && frameCover(src, im, x, y, B) >= 0.55) {
@@ -11035,9 +11035,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
                 const pk = (pieceOf(src) || {}).key || src;
-                const overBelly = bellyAuto(src, x, y, ctx4, fit.behind, pk);
+                const overBelly = bellyAuto(src, x, y, ctx5, fit.behind, pk);
                 const span = pieceSpan(pk, src, x, y);
-                const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx4.belly && !fit.behind ? ctx4.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");
+                const key3 = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx5.belly && !fit.behind ? ctx5.sig : "") + "|" + mouldId(overBelly) + "|" + span.bottom + (BREAST.solid[pk] ? "|solid" : "");
                 let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
@@ -11080,10 +11080,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       const pj = r0 + j - uyc;
                       if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue;
                       const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW3 * 4;
-                      for (const [edge, step] of [[R, 1], [L, -1]]) {
+                      for (const [edge, step2] of [[R, 1], [L, -1]]) {
                         let src2 = -1;
                         for (let k = 6; k < 12; k++) {
-                          const xx = edge - step * k, p = o2 + xx * 4;
+                          const xx = edge - step2 * k, p = o2 + xx * 4;
                           if (xx >= 0 && xx < CW3 && d[p + 3] > 200) {
                             src2 = p;
                             break;
@@ -11091,7 +11091,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         }
                         if (src2 < 0) continue;
                         for (let k = 1; k <= 40; k++) {
-                          const xx = edge + step * k;
+                          const xx = edge + step2 * k;
                           if (xx < 0 || xx >= CW3) break;
                           const p = o2 + xx * 4;
                           if (d[p + 3] > 200) break;
@@ -11345,7 +11345,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         return a[a.length >> 1];
                       });
                       const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW3 - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH3 - 2, Math.round(uyc + G.y3 + 90));
-                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean4 = new Uint8Array(RW * RH);
+                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean5 = new Uint8Array(RW * RH);
                       let nC = 0, sD = 0, bl = 0;
                       for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
                         const p = (yy * CW3 + xx) * 4;
@@ -11354,7 +11354,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
                         const gr = Math.abs(lum2(spL, p + 4) - lum2(spL, p - 4)) + Math.abs(lum2(spL, p + CW3 * 4) - lum2(spL, p - CW3 * 4));
                         if (gr > 9) continue;
-                        clean4[(yy - ry0) * RW + (xx - rx0)] = 1;
+                        clean5[(yy - ry0) * RW + (xx - rx0)] = 1;
                         nC++;
                         sD += Math.abs(lum2(sp, p) - lum2(spL, p));
                         bl += lum2(spL, p);
@@ -11366,7 +11366,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       for (let yy = 0; yy < RH; yy++) {
                         let row = 0;
                         for (let xx = 0; xx < RW; xx++) {
-                          row += clean4[yy * RW + xx];
+                          row += clean5[yy * RW + xx];
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
@@ -11375,11 +11375,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean4[yy * RW + xx] && box3(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean5[yy * RW + xx] && box3(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S4, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
-                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean4[yy * RW + xx] === 1;
+                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean5[yy * RW + xx] === 1;
                       } };
                     })();
                     if (texOf) {
@@ -11581,9 +11581,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     g.drawImage(sleeves, 0, 0);
                     g.restore();
                   }
-                  if (ctx4.belly && !fit.behind) {
+                  if (ctx5.belly && !fit.behind) {
                     try {
-                      const sh = bellyShade(c, x - c.MX, y - c.MY, ctx4);
+                      const sh = bellyShade(c, x - c.MX, y - c.MY, ctx5);
                       if (sh) {
                         sh.MX = c.MX;
                         sh.MY = c.MY;
@@ -11616,7 +11616,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const strapBase = {};
               const strapDraw = (name, src, x, y, o, piece) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 if (!strapBase[piece.key]) strapBase[piece.key] = src;
                 const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted2 = !!(o && o.HexColor);
@@ -11745,7 +11745,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               };
               const PUMP = { cups: [[188, 296, 40, 42], [272, 296, 40, 42]], cupMid: [[207, 316], [293, 316]], join: [250, 376], pumpTop: 700 };
               const pumpDraw = (name, src, x, y, o) => {
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im || im.naturalHeight < 900) return false;
                 const key3 = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let c = keptOf(BREAST.out, key3);
@@ -11789,12 +11789,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                     warnSome2("[studio] pump:", e);
                   }
                 }
-                const B = ctx4.breast, im = B && mouldImg(src);
+                const B = ctx5.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
                 if (!own) return false;
-                if (!ctx4.native && groupOf4(src) === "Nipples") ctx4.native = own.map((p) => p && [x + p[0], y + p[1]]);
-                const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx4.native ? "n" : "o");
+                if (!ctx5.native && groupOf4(src) === "Nipples") ctx5.native = own.map((p) => p && [x + p[0], y + p[1]]);
+                const key3 = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx5.native ? "n" : "o");
                 let c = keptOf(BREAST.out, key3);
                 if (!c) {
                   const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
@@ -11806,7 +11806,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   const g = c.getContext("2d");
                   [[0, split], [split, w - split]].forEach(([sx, sw], i) => {
                     if (sw <= 0) return;
-                    const N2 = ctx4.native && ctx4.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
+                    const N2 = ctx5.native && ctx5.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
                     if (!N2) return;
                     const T3 = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T3[0] - x) + (sx + x - N2[0]) * kN, MY + (T3[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
@@ -11834,11 +11834,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   } catch (e) {
                   }
                   upper = [x, y, src, o && o.HexColor];
-                  ctx4.bodies.push({ src, x, y });
+                  ctx5.bodies.push({ src, x, y });
                 }
                 if (src.includes("/BodyLower/")) {
                   lower = true;
-                  ctx4.bodies.push({ src, x, y });
+                  ctx5.bodies.push({ src, x, y });
                 }
               };
               const wrap = (name) => {
@@ -11881,7 +11881,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[studio] nipples:", e);
                     }
                   }
-                  if (done && /Decal/i.test(gname) && ctx4.breast && ctx4.breast.pose !== "AllFours") {
+                  if (done && /Decal/i.test(gname) && ctx5.breast && ctx5.breast.pose !== "AllFours") {
                     try {
                       const p0 = edgesOf(src);
                       if (p0) {
@@ -11891,8 +11891,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                           t1 = j;
                         }
                         if (t02 >= 0) {
-                          const cyL = y + (t02 + t1) / 2 - ctx4.breast.uy;
-                          put2(name, src, x, y + (ctx4.breast.fit.mapY(cyL) - cyL), o);
+                          const cyL = y + (t02 + t1) / 2 - ctx5.breast.uy;
+                          put2(name, src, x, y + (ctx5.breast.fit.mapY(cyL) - cyL), o);
                           return;
                         }
                       }
@@ -11903,10 +11903,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                   if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src) && !rigidSrc(src)) {
                     const piece = pieceOf(src), how = piece && BREAST.wear[piece.key] || "";
                     try {
-                      const im0 = piece && ctx4.breast && mouldImg(src);
-                      if (im0 && chestCover(src, im0, x, y, ctx4.breast, true) >= 0.05) ctx4.seen[piece.key] = true;
-                      if (im0 && chestCover(src, im0, x, y, ctx4.breast, false) >= 0.012) ctx4.seen["on:" + piece.key] = true;
-                      if (im0 && chestCover(src, im0, x, y, ctx4.breast, false) >= 0.6) ctx4.seen["solid:" + piece.key] = true;
+                      const im0 = piece && ctx5.breast && mouldImg(src);
+                      if (im0 && chestCover(src, im0, x, y, ctx5.breast, true) >= 0.05) ctx5.seen[piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx5.breast, false) >= 0.012) ctx5.seen["on:" + piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx5.breast, false) >= 0.6) ctx5.seen["solid:" + piece.key] = true;
                     } catch (e) {
                     }
                     try {
@@ -11919,11 +11919,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       warnSome2("[studio] chest wear:", e);
                     }
                   }
-                  if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx4.breast && ctx4.breast.pose !== "AllFours") {
+                  if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx5.breast && ctx5.breast.pose !== "AllFours") {
                     try {
                       if (/^Hands/.test(gname)) {
                         const fr = handHidden(src, x, y);
-                        if (fr != null) ctx4.handF = Math.max(ctx4.handF || 0, fr);
+                        if (fr != null) ctx5.handF = Math.max(ctx5.handF || 0, fr);
                       }
                     } catch (e) {
                       warnSome2("[studio] hands:", e);
@@ -11944,7 +11944,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       GEN.cvKey = key3;
                     }
                     if (hard && !done) {
-                      if (!blink) ctx4.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
+                      if (!blink) ctx5.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
                     put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}, "skin");
@@ -11955,9 +11955,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
                 let drawn = false;
                 try {
-                  if (ctx4.belly && !fit.behind && typeof src === "string") {
-                    const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx4, q2.key, q2.mode) : bellyAuto(src, x, y, ctx4, fit.behind, (pieceOf(src) || {}).key);
-                    const gname2 = groupOf4(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && !rigidSrc(src) && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx4) : bellyShade(mouldImg(src), x, y, ctx4) : null;
+                  if (ctx5.belly && !fit.behind && typeof src === "string") {
+                    const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx5, q2.key, q2.mode) : bellyAuto(src, x, y, ctx5, fit.behind, (pieceOf(src) || {}).key);
+                    const gname2 = groupOf4(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && !rigidSrc(src) && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx5) : bellyShade(mouldImg(src), x, y, ctx5) : null;
                     if (formed) {
                       put2(name, formed, m ? x - MOULD.M : x, y, o, src);
                       drawn = true;
@@ -11979,7 +11979,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                 }
               } : real[name];
               cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
-              finish = () => {
+              finish3 = () => {
                 paint();
                 flushInk();
               };
@@ -11988,21 +11988,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             warnSome2("[studio] belly hook:", e);
           }
           const out = game(cb);
-          if (finish) {
+          if (finish3) {
             try {
-              finish();
+              finish3();
             } catch (e) {
               warnSome2("[studio] belly:", e);
             }
           }
-          if (finish && seenNow && handFNow && handFNow.v != null) {
+          if (finish3 && seenNow && handFNow && handFNow.v != null) {
             const behind = handFNow.v >= 0.45;
             if (behind !== !!BREAST.handsBehind) {
               BREAST.handsBehind = behind;
               againFromSeen();
             }
           }
-          if (finish && seenNow) {
+          if (finish3 && seenNow) {
             const sig2 = Object.keys(seenNow).sort().join("|");
             if (sig2 !== BREAST.holdSig) {
               BREAST.holds = seenNow;
@@ -12068,7 +12068,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // studio/web/cock-drawing.js
   (() => {
     const PX_PER_INCH = 9;
-    const KINDS2 = {
+    const KINDS3 = {
       human: {
         label: "Human",
         col: null,
@@ -12135,9 +12135,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         w: (t) => 0.92 - 0.5 * Math.pow(t, 2.2)
       }
     };
-    const clamp2 = (v) => Math.max(0, Math.min(255, Math.round(v)));
-    const rgb2 = (c, k) => "rgb(" + clamp2(c[0] * k) + "," + clamp2(c[1] * k) + "," + clamp2(c[2] * k) + ")";
-    const line3 = (c) => "rgb(" + clamp2(c[0] * 0.74) + "," + clamp2(c[1] * 0.62) + "," + clamp2(c[2] * 0.6) + ")";
+    const clamp3 = (v) => Math.max(0, Math.min(255, Math.round(v)));
+    const rgb2 = (c, k) => "rgb(" + clamp3(c[0] * k) + "," + clamp3(c[1] * k) + "," + clamp3(c[2] * k) + ")";
+    const line3 = (c) => "rgb(" + clamp3(c[0] * 0.74) + "," + clamp3(c[1] * 0.62) + "," + clamp3(c[2] * 0.6) + ")";
     const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
     const ballR = (level) => 5 + 2.1 * Math.max(0, level - 1) + 0.18 * Math.pow(Math.max(0, level - 6), 2);
     const STAMP_FILES = { human: { hard: ["hard-18-1", "hard-35-3", "hard-33-2"], drained: "balls-4-3", pent: "balls-37-16", softShaft: "soft-24-4-shaft", softSack: "soft-24-4-sack" } };
@@ -12275,14 +12275,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     function canvas(o) {
       const st2 = o.stamps !== false && stamps[o.kind || "human"];
       if (st2) return stampCanvas(st2, o, o.skin || [236, 204, 196]);
-      const K2 = KINDS2[o.kind] || KINDS2.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
+      const K2 = KINDS3[o.kind] || KINDS3.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
       const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K2.soft));
-      const W22 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
-      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W22 * 1.25 : 0;
+      const W23 = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K2.slim || 1) * (hard ? 1.06 : 1));
+      const br = ballR(o.balls || 3), knotted = !!(o.knot || K2.knot), gap = K2.two ? W23 * 1.25 : 0;
       const col = K2.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K2.sheath === "skin" || !K2.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K2.sheath;
       const bend = (hard ? 0.11 : 0.09) * L;
-      const widest = W22 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
-      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W22 : W22 * 1.2) + 10, down = Math.max(hard ? W22 * 1.5 : L + W22, drop2 + br * 1.5) + 12;
+      const widest = W23 * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop2 = br * (1.15 + Math.min(0.6, br / 90));
+      const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W23 : W23 * 1.2) + 10, down = Math.max(hard ? W23 * 1.5 : L + W23, drop2 + br * 1.5) + 12;
       const cv = document.createElement("canvas");
       cv.width = Math.ceil(half * 2);
       cv.height = Math.ceil(up + down);
@@ -12292,14 +12292,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g.lineJoin = "round";
       g.lineCap = "round";
       const sack = () => {
-        const top = oy + W22 * 0.2, cy = top + drop2, r = br;
+        const top = oy + W23 * 0.2, cy = top + drop2, r = br;
         const path = () => {
           g.beginPath();
-          g.moveTo(ox - W22 * 0.9, top);
+          g.moveTo(ox - W23 * 0.9, top);
           g.bezierCurveTo(ox - r * 1.1, top + drop2 * 0.35, ox - r * 2.05, cy - r * 0.5, ox - r * 1.75, cy + r * 0.45);
           g.bezierCurveTo(ox - r * 1.5, cy + r * 1.3, ox - r * 0.35, cy + r * 1.4, ox, cy + r * 0.95);
           g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);
-          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W22 * 0.9, top);
+          g.bezierCurveTo(ox + r * 2, cy - r * 0.55, ox + r * 1.1, top + drop2 * 0.35, ox + W23 * 0.9, top);
           g.closePath();
         };
         const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
@@ -12345,8 +12345,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const shaft = (dx, lean) => {
         const dir = hard ? -1 : 1, N2 = 56, kn = (t) => knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0;
-        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W22 * 0.15)];
-        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W22;
+        const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K2.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W23 * 0.15)];
+        const wd = (t) => Math.max(0.02, K2.w(t, hard) + kn(t)) * W23;
         const L0 = [], R0 = [];
         for (let i = 0; i <= N2; i++) {
           const t = i / N2, c = cen(t), c2 = cen(Math.min(1, t + 0.01)), c1 = cen(Math.max(0, t - 0.01));
@@ -12378,7 +12378,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         along.addColorStop(1, rgb2(K2.tipCol, 1.04));
         g.fillStyle = along;
         g.fillRect(0, 0, cv.width, cv.height);
-        const across = g.createLinearGradient(ox + dx - W22 * 1.6, 0, ox + dx + W22 * 1.6, 0);
+        const across = g.createLinearGradient(ox + dx - W23 * 1.6, 0, ox + dx + W23 * 1.6, 0);
         across.addColorStop(0.12, "rgba(110,50,48,0.34)");
         across.addColorStop(0.36, "rgba(255,255,255,0.10)");
         across.addColorStop(0.6, "rgba(0,0,0,0)");
@@ -12390,14 +12390,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.strokeStyle = line3(col);
           g.lineWidth = 1.2;
           g.beginPath();
-          g.moveTo(c[0] - W22 * 1.4, c[1]);
-          g.quadraticCurveTo(c[0], c[1] + dir * W22 * 0.5, c[0] + W22 * 1.4, c[1]);
+          g.moveTo(c[0] - W23 * 1.4, c[1]);
+          g.quadraticCurveTo(c[0], c[1] + dir * W23 * 0.5, c[0] + W23 * 1.4, c[1]);
           g.stroke();
           g.fillStyle = "rgba(222,150,152,0.45)";
           for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) {
             const c3 = cen(b2);
             g.beginPath();
-            g.ellipse(c3[0] + a * W22, c3[1], r * W22, r * W22 * 1.5, 0, 0, Math.PI * 2);
+            g.ellipse(c3[0] + a * W23, c3[1], r * W23, r * W23 * 1.5, 0, 0, Math.PI * 2);
             g.fill();
           }
         }
@@ -12422,15 +12422,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           g.stroke();
           const e = cen(0.985);
           g.beginPath();
-          g.moveTo(e[0], e[1] - dir * W22 * 0.25);
-          g.lineTo(e[0], e[1] + dir * W22 * 0.12);
+          g.moveTo(e[0], e[1] - dir * W23 * 0.25);
+          g.lineTo(e[0], e[1] + dir * W23 * 0.12);
           g.stroke();
           if (K2.cleft) {
             const a = cen(K2.headAt + 0.02), b2 = cen(0.97);
             g.globalAlpha = 0.5;
             g.beginPath();
             g.moveTo(a[0], a[1]);
-            g.quadraticCurveTo(a[0] + W22 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
+            g.quadraticCurveTo(a[0] + W23 * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]);
             g.stroke();
             g.globalAlpha = 1;
           }
@@ -12460,8 +12460,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (false) {
           g.beginPath();
           const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68);
-          g.moveTo(a[0] - W22 * 0.3, a[1]);
-          g.bezierCurveTo(b2[0] - W22 * 0.8, b2[1], b2[0] + W22 * 0.4, b2[1], c4[0] - W22 * 0.1, c4[1]);
+          g.moveTo(a[0] - W23 * 0.3, a[1]);
+          g.bezierCurveTo(b2[0] - W23 * 0.8, b2[1], b2[0] + W23 * 0.4, b2[1], c4[0] - W23 * 0.1, c4[1]);
           g.stroke();
         }
         {
@@ -12481,18 +12481,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.beginPath();
             g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2);
             g.fill();
-            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W22 * 0.9);
+            const r0 = cen(K2.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W23 * 0.9);
             sh2.addColorStop(0, "rgba(110,50,48,0.30)");
             sh2.addColorStop(1, "rgba(110,50,48,0)");
             g.fillStyle = sh2;
-            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W22 * 0.9), cv.width, W22 * 0.9);
+            g.fillRect(0, Math.min(r0[1], r0[1] - dir * W23 * 0.9), cv.width, W23 * 0.9);
           }
         }
         g.restore();
         if (K2.barbs) {
           g.fillStyle = line3(col);
           for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) {
-            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W22 * 0.22);
+            const i = Math.round(t * N2), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W23 * 0.22);
             g.beginPath();
             g.moveTo(p[0], p[1] - dir * s2 * 0.6);
             g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4);
@@ -12514,14 +12514,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           const cE = cen(M / N2);
-          g.quadraticCurveTo(cE[0], cE[1] + dir * W22 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
+          g.quadraticCurveTo(cE[0], cE[1] + dir * W23 * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw);
           for (let i = M; i >= 0; i--) {
             const c = cen(i / N2), p = R0[i];
             g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw);
           }
           g.closePath();
         };
-        const sg = g.createLinearGradient(ox + dx - W22 * 1.6, 0, ox + dx + W22 * 1.6, 0);
+        const sg = g.createLinearGradient(ox + dx - W23 * 1.6, 0, ox + dx + W23 * 1.6, 0);
         sg.addColorStop(0, rgb2(sh, 0.97));
         sg.addColorStop(0.36, rgb2(sh, 1));
         sg.addColorStop(1, rgb2(sh, 0.96));
@@ -12547,17 +12547,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         shafts();
       }
       g.globalCompositeOperation = "destination-out";
-      const melt = g.createLinearGradient(0, oy - W22 * 0.5, 0, oy + W22 * 0.7);
+      const melt = g.createLinearGradient(0, oy - W23 * 0.5, 0, oy + W23 * 0.7);
       melt.addColorStop(0, "rgba(0,0,0,1)");
       melt.addColorStop(1, "rgba(0,0,0,0)");
       if (!hard) {
         g.fillStyle = melt;
-        g.fillRect(0, oy - W22 * 1.4, cv.width, W22 * 2.1);
+        g.fillRect(0, oy - W23 * 1.4, cv.width, W23 * 2.1);
       }
       g.globalCompositeOperation = "source-over";
       return cv;
     }
-    window.FarmCock = { KINDS: KINDS2, PX_PER_INCH, ballR, canvas, loadStamps, hasStamps, STAMP_FILES, get ver() {
+    window.FarmCock = { KINDS: KINDS3, PX_PER_INCH, ballR, canvas, loadStamps, hasStamps, STAMP_FILES, get ver() {
       return ver;
     } };
   })();
@@ -12881,9 +12881,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return [cx + S3.rx * cs * wide / (1 + S3.sag), cy + S3.ry * sn * drop2 / (1 + S3.sag * 0.35)];
   }
   function bellyPath(g, S3, cx, cy, from, to) {
-    const steps = 72;
-    for (let i = 0; i <= steps; i++) {
-      const p = bellyPoint(S3, cx, cy, from + (to - from) * i / steps);
+    const steps2 = 72;
+    for (let i = 0; i <= steps2; i++) {
+      const p = bellyPoint(S3, cx, cy, from + (to - from) * i / steps2);
       if (i) g.lineTo(p[0], p[1]);
       else g.moveTo(p[0], p[1]);
     }
@@ -13137,7 +13137,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     hooked = true;
     try {
       mod3.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
-        let finish = null;
+        let finish3 = null;
         try {
           const C2 = args[0], cb = args[1];
           if (trial && !W2.__farmDrawnBody && C2 && W2.Player && C2.MemberNumber === W2.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
@@ -13212,7 +13212,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               }
             } : cb[name];
             args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
-            finish = () => {
+            finish3 = () => {
               paint();
               flushInk();
             };
@@ -13221,9 +13221,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           warnSome("[Farmhand Companion] belly hook:", e);
         }
         const out = next(args);
-        if (finish) {
+        if (finish3) {
           try {
-            finish();
+            finish3();
           } catch (e) {
             warnSome("[Farmhand Companion] belly:", e);
           }
@@ -13234,7 +13234,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] belly test unavailable:", e);
     }
   }
-  function bellyTrial(n, say3) {
+  function bellyTrial(n, say4) {
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
     scrubCache();
     if (trial) hookBelly(sdk);
@@ -13248,7 +13248,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     redraw3();
     setTimeout(redraw3, 500);
     setTimeout(redraw3, 1800);
-    if (say3) say3(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
+    if (say4) say4(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 
   // extension/src/bcr.js
@@ -13258,12 +13258,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function bcrOverBreast(C2, bc, bx, by) {
     try {
       if (typeof W3.BodyMarksZonesOf !== "function" || typeof W3.BodyMarksDrawZone !== "function" || typeof W3.BodyMarksZoneBox !== "function") return null;
-      const ZONES = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
-      if (!ZONES || !ZONES.Breasts || !C2 || C2.MemberNumber == null) return null;
+      const ZONES2 = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
+      if (!ZONES2 || !ZONES2.Breasts || !C2 || C2.MemberNumber == null) return null;
       const zones2 = W3.BodyMarksZonesOf(C2), state = zones2 && zones2.Breasts;
       if (!state) return null;
       const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C2.MemberNumber) : void 0;
-      const def = ZONES.Breasts, box3 = W3.BodyMarksZoneBox(C2, def, measured);
+      const def = ZONES2.Breasts, box3 = W3.BodyMarksZoneBox(C2, def, measured);
       if (!box3 || box3.Hidden) return null;
       const size = typeof W3.BodyMarksSizeOf === "function" ? W3.BodyMarksSizeOf(C2, def) || 1 : 1;
       const key3 = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box3.Top) + "|" + size;
@@ -13798,11 +13798,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       B.cvKey = "";
       B.holdSig = "";
     }
-    const fits2 = s.belly && typeof s.belly === "object" ? s.belly : null;
+    const fits3 = s.belly && typeof s.belly === "object" ? s.belly : null;
     for (const k of Object.keys(E.BELLY.fits)) {
       const f = E.BELLY.fits[k];
       Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 });
-      if (fits2 && fits2[k]) Object.assign(f, fits2[k]);
+      if (fits3 && fits3[k]) Object.assign(f, fits3[k]);
     }
     E.BELLY.auto = s.auto !== false;
     B.tuck = s.tuck !== false;
@@ -14174,32 +14174,32 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function onFarmLook() {
   }
-  function drawnBodyBelly(mode, say3) {
+  function drawnBodyBelly(mode, say4) {
     S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
     delete S.bellyOn;
     save();
     if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
+    if (say4) say4({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
   }
-  function drawnBodyUseFarm(say3) {
+  function drawnBodyUseFarm(say4) {
     delete S.saved;
     S.cupSet = false;
     save();
     if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3("Back to the farm's look.");
+    if (say4) say4("Back to the farm's look.");
   }
-  function drawnBodySet(on3, say3) {
+  function drawnBodySet(on3, say4) {
     S.on = !!on3;
     save();
     if (S.on) {
       if (!engine()) {
         S.on = false;
         save();
-        return say3 && say3("The drawn body didn't load. Reload the page and try again.");
+        return say4 && say4("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
       W5.__farmDrawnBody = true;
@@ -14208,14 +14208,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
-    if (say3) {
+    if (say4) {
       const st2 = drawnBodyState();
-      if (!S.on) say3("Drawn body off. You're the game's own picture again, for you and everybody else.");
-      else if (S.cup >= 6 && st2.chest !== "XLarge") say3("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
-      else say3("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
+      if (!S.on) say4("Drawn body off. You're the game's own picture again, for you and everybody else.");
+      else if (S.cup >= 6 && st2.chest !== "XLarge") say4("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
+      else say4("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
   }
-  function drawnBodySeeOthers(on3, say3) {
+  function drawnBodySeeOthers(on3, say4) {
     seeOthers = !!on3;
     try {
       LS.setItem(SEE_KEY, on3 ? "1" : "0");
@@ -14226,9 +14226,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       hook();
       ask();
     }
-    if (say3) say3(on3 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
+    if (say4) say4(on3 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
-  function drawnBodyCup(i, say3) {
+  function drawnBodyCup(i, say4) {
     const n = W5.FarmBreasts ? W5.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
       S.cupSet = false;
@@ -14236,7 +14236,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (mine2.E) apply(mine2.E, eff());
       redraw(60);
       tell(true);
-      if (say3) say3("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
+      if (say4) say4("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
     }
     S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
@@ -14245,9 +14245,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
+    if (say4) say4("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
   }
-  function take(d, say3, from) {
+  function take(d, say4, from) {
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
     s.on = S.on;
@@ -14262,23 +14262,23 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (mine2.E) apply(mine2.E, eff());
     redraw(60);
     tell(true);
-    if (say3) say3("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
+    if (say4) say4("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
     return true;
   }
-  function drawnBodyPaste(text3, say3) {
+  function drawnBodyPaste(text3, say4) {
     try {
       const t = String(text3 || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
       const raw = W5.LZString && typeof W5.LZString.decompressFromBase64 === "function" ? W5.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
-      return take(d, say3, "from the code");
+      return take(d, say4, "from the code");
     } catch (e) {
-      if (say3) say3("I couldn't read that code: " + (e && e.message || e));
+      if (say4) say4("I couldn't read that code: " + (e && e.message || e));
       return false;
     }
   }
-  async function drawnBodyFromStudio(say3) {
+  async function drawnBodyFromStudio(say4) {
     try {
       const get2 = async (f) => {
         const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" });
@@ -14287,9 +14287,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       };
       const [br, be, it, bd] = await Promise.all([get2("breasts.json"), get2("belly.json").catch(() => null), get2("items.json").catch(() => null), get2("brand.json").catch(() => null)]);
       if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
-      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say3, "from your studio");
+      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say4, "from your studio");
     } catch (e) {
-      if (say3) say3("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
+      if (say4) say4("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
       return false;
     }
   }
@@ -14408,7 +14408,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function localSaveNow(version) {
     return writeNow(version, true);
   }
-  function localSaveLoad(say3) {
+  function localSaveLoad(say4) {
     const inp = W6.document.createElement("input");
     inp.type = "file";
     inp.accept = ".json,application/json";
@@ -14422,7 +14422,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         } catch (e) {
         }
         if (!d || d.kind !== "farmhand-companion" || !d.data || typeof d.data !== "object") {
-          say3 && say3("That file isn't a Farmhand Companion save.");
+          say4 && say4("That file isn't a Farmhand Companion save.");
           return;
         }
         const keys = Object.keys(d.data).filter((k) => MINE.test(k) && typeof d.data[k] === "string");
@@ -14434,7 +14434,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           }
           for (const k of keys) W6.localStorage.setItem(k, d.data[k]);
         } catch (e) {
-          say3 && say3("Couldn't load it: " + (e && e.message || e));
+          say4 && say4("Couldn't load it: " + (e && e.message || e));
           return;
         }
         W6.location.reload();
@@ -14474,7 +14474,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return ((t ^ t >>> 14) >>> 0) / 4294967296;
       };
     }
-    const KINDS2 = {
+    const KINDS3 = {
       // cum matches the game's own Splatters (Laynie: "match the color and translucency of the games own splatters"): read off its
       // pictures, a cool white, #E3E4E5 in the middle, #C2C3C5 in the shade, #FBFBFB at the shine, solid in the middle, soft at the edges
       cum: { style: "run", base: "#E6E7E8", edge: "#B4B6B9", gloss: "#FDFDFD", alpha: 0.97, run: 1, width: 1, ropes: 1, beads: 0.6 },
@@ -14514,7 +14514,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       marshmallow: { style: "smear", smudge: 0.5, base: "#FCE6EF", edge: "#E2BCCB", gloss: "#FFFFFF", alpha: 0.95, run: 0.25, width: 1.25, patches: "#FFFFFF", crumbs: ["#FFFFFF", "#FCE6EF", "#E3F1FF", "#FFF4D6"] },
       grape: { style: "run", tint: "#6A2A52", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.2, turn: 0.35, texture: "sheen", base: "#5B2245", edge: "#2E0E22", gloss: "#C88AB0", alpha: 0.7, run: 1.3, width: 0.95, beads: 0.5, droplets: 1.3, crumbs: ["#3E1430", "#4E1A3C", "#6A2A52"] }
     };
-    function ribbon(ctx4, pts) {
+    function ribbon(ctx5, pts) {
       const L = [], R = [];
       for (let i = 0; i < pts.length; i++) {
         const p = pts[i], q2 = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)];
@@ -14525,57 +14525,57 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         L.push([p[0] - dy * p[2] / 2, p[1] + dx * p[2] / 2]);
         R.push([p[0] + dy * p[2] / 2, p[1] - dx * p[2] / 2]);
       }
-      ctx4.beginPath();
-      ctx4.moveTo(L[0][0], L[0][1]);
+      ctx5.beginPath();
+      ctx5.moveTo(L[0][0], L[0][1]);
       for (let i = 1; i < L.length; i++) {
         const m = [(L[i - 1][0] + L[i][0]) / 2, (L[i - 1][1] + L[i][1]) / 2];
-        ctx4.quadraticCurveTo(L[i - 1][0], L[i - 1][1], m[0], m[1]);
+        ctx5.quadraticCurveTo(L[i - 1][0], L[i - 1][1], m[0], m[1]);
       }
-      ctx4.lineTo(L[L.length - 1][0], L[L.length - 1][1]);
-      ctx4.lineTo(R[R.length - 1][0], R[R.length - 1][1]);
+      ctx5.lineTo(L[L.length - 1][0], L[L.length - 1][1]);
+      ctx5.lineTo(R[R.length - 1][0], R[R.length - 1][1]);
       for (let i = R.length - 2; i >= 0; i--) {
         const m = [(R[i + 1][0] + R[i][0]) / 2, (R[i + 1][1] + R[i][1]) / 2];
-        ctx4.quadraticCurveTo(R[i + 1][0], R[i + 1][1], m[0], m[1]);
+        ctx5.quadraticCurveTo(R[i + 1][0], R[i + 1][1], m[0], m[1]);
       }
-      ctx4.lineTo(R[0][0], R[0][1]);
-      ctx4.closePath();
+      ctx5.lineTo(R[0][0], R[0][1]);
+      ctx5.closePath();
       return { L, R };
     }
-    function puddle(ctx4, r, x, y, w, h2, rough) {
+    function puddle(ctx5, r, x, y, w, h2, rough) {
       const n = 14, pts = [];
       for (let i = 0; i < n; i++) {
         const a = i / n * Math.PI * 2, k = 1 + (r() - 0.5) * rough;
         pts.push([x + Math.cos(a) * w * k, y + Math.sin(a) * h2 * k]);
       }
-      ctx4.beginPath();
+      ctx5.beginPath();
       for (let i = 0; i <= n; i++) {
         const p = pts[i % n], q2 = pts[(i + 1) % n], m = [(p[0] + q2[0]) / 2, (p[1] + q2[1]) / 2];
-        if (i === 0) ctx4.moveTo(m[0], m[1]);
-        else ctx4.quadraticCurveTo(p[0], p[1], m[0], m[1]);
+        if (i === 0) ctx5.moveTo(m[0], m[1]);
+        else ctx5.quadraticCurveTo(p[0], p[1], m[0], m[1]);
       }
-      ctx4.closePath();
+      ctx5.closePath();
     }
-    function wet(ctx4, K2, a) {
-      ctx4.globalAlpha = K2.alpha * (a || 1);
-      ctx4.fillStyle = K2.base;
-      ctx4.fill();
-      ctx4.globalAlpha = Math.min(1, K2.alpha * 0.8);
-      ctx4.strokeStyle = K2.edge;
-      ctx4.lineWidth = 0.9;
-      ctx4.stroke();
+    function wet(ctx5, K2, a) {
+      ctx5.globalAlpha = K2.alpha * (a || 1);
+      ctx5.fillStyle = K2.base;
+      ctx5.fill();
+      ctx5.globalAlpha = Math.min(1, K2.alpha * 0.8);
+      ctx5.strokeStyle = K2.edge;
+      ctx5.lineWidth = 0.9;
+      ctx5.stroke();
     }
-    function shine(ctx4, K2, side, from, to) {
-      ctx4.globalAlpha = 0.7;
-      ctx4.strokeStyle = K2.gloss;
-      ctx4.lineWidth = 1.1;
-      ctx4.lineCap = "round";
-      ctx4.beginPath();
+    function shine(ctx5, K2, side, from, to) {
+      ctx5.globalAlpha = 0.7;
+      ctx5.strokeStyle = K2.gloss;
+      ctx5.lineWidth = 1.1;
+      ctx5.lineCap = "round";
+      ctx5.beginPath();
       for (let i = from; i < to; i++) {
         const p = side[i];
-        if (i === from) ctx4.moveTo(p[0] + 1.2, p[1]);
-        else ctx4.lineTo(p[0] + 1.2, p[1]);
+        if (i === from) ctx5.moveTo(p[0] + 1.2, p[1]);
+        else ctx5.lineTo(p[0] + 1.2, p[1]);
       }
-      ctx4.stroke();
+      ctx5.stroke();
     }
     function strandPts(r, x, y, len, w, ang) {
       const n = 12, pts = [], beads = [r(), r(), r()].map((v) => [v, 0.6 + r() * 0.9]);
@@ -14591,134 +14591,134 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       }
       return pts;
     }
-    function strandDraw(ctx4, K2, pts) {
+    function strandDraw(ctx5, K2, pts) {
       const wide = pts.map((p) => [p[0], p[1], p[2] + 1.8]);
-      ribbon(ctx4, wide);
-      ctx4.globalAlpha = Math.min(1, K2.alpha + 0.05);
-      ctx4.fillStyle = K2.edge;
-      ctx4.fill();
-      const side = ribbon(ctx4, pts);
-      ctx4.globalAlpha = K2.alpha;
-      ctx4.fillStyle = K2.base;
-      ctx4.fill();
-      ctx4.globalAlpha = 0.85;
-      ctx4.strokeStyle = K2.gloss;
-      ctx4.lineWidth = 1;
-      ctx4.lineCap = "round";
-      ctx4.beginPath();
+      ribbon(ctx5, wide);
+      ctx5.globalAlpha = Math.min(1, K2.alpha + 0.05);
+      ctx5.fillStyle = K2.edge;
+      ctx5.fill();
+      const side = ribbon(ctx5, pts);
+      ctx5.globalAlpha = K2.alpha;
+      ctx5.fillStyle = K2.base;
+      ctx5.fill();
+      ctx5.globalAlpha = 0.85;
+      ctx5.strokeStyle = K2.gloss;
+      ctx5.lineWidth = 1;
+      ctx5.lineCap = "round";
+      ctx5.beginPath();
       side.L.forEach((p, i) => {
         const q2 = pts[i];
         const x = p[0] * 0.35 + q2[0] * 0.65, y = p[1] * 0.35 + q2[1] * 0.65;
-        if (i === 0) ctx4.moveTo(x, y);
-        else ctx4.lineTo(x, y);
+        if (i === 0) ctx5.moveTo(x, y);
+        else ctx5.lineTo(x, y);
       });
-      ctx4.stroke();
+      ctx5.stroke();
     }
-    function strand(ctx4, r, K2, x, y, size, ang0) {
+    function strand(ctx5, r, K2, x, y, size, ang0) {
       const len = size * (0.25 + r() * 0.55) * (0.6 + K2.run * 0.4), w = Math.max(1.6, size * 0.032 * K2.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
       const pts = strandPts(r, x, y, len, w, ang);
       if (r() < 0.3) {
         const cut2 = 4 + Math.floor(r() * 4);
-        strandDraw(ctx4, K2, pts.slice(0, cut2));
-        strandDraw(ctx4, K2, pts.slice(cut2 + 2));
-      } else strandDraw(ctx4, K2, pts);
+        strandDraw(ctx5, K2, pts.slice(0, cut2));
+        strandDraw(ctx5, K2, pts.slice(cut2 + 2));
+      } else strandDraw(ctx5, K2, pts);
       {
         const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
-        strandDraw(ctx4, K2, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
+        strandDraw(ctx5, K2, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
       }
       for (let b = 0, nb = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0; b < nb; b++) {
         const p = pts[2 + Math.floor(r() * 7)], side = r() < 0.5 ? -1 : 1;
-        strandDraw(ctx4, K2, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
+        strandDraw(ctx5, K2, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
       }
       for (let d = 0, nd = Math.floor(r() * 3); d < nd; d++) {
         const p = pts[Math.floor(r() * pts.length)], bx = p[0] + (r() - 0.5) * size * 0.5, by = p[1] + (r() - 0.5) * size * 0.3, bw = w * (0.8 + r() * 0.6);
-        strandDraw(ctx4, K2, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
+        strandDraw(ctx5, K2, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
       }
     }
-    function run(ctx4, r, K2, x, y, len, w) {
-      const steps = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
+    function run(ctx5, r, K2, x, y, len, w) {
+      const steps2 = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
       let px = x;
-      for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
+      for (let i = 0; i <= steps2; i++) {
+        const t = i / steps2;
         px += (r() - 0.5) * 1.4 + wob * 0.06;
         const ww = w * (0.55 + 0.35 * Math.sin(t * 6 + swell) * (r() * 0.5 + 0.5)) * (1 - t * 0.25);
         pts.push([px, y + t * len, Math.max(1.2, ww)]);
       }
-      const side = ribbon(ctx4, pts);
-      wet(ctx4, K2);
-      shine(ctx4, K2, side.L, 1, Math.floor(steps * 0.7));
+      const side = ribbon(ctx5, pts);
+      wet(ctx5, K2);
+      shine(ctx5, K2, side.L, 1, Math.floor(steps2 * 0.7));
       const end = pts[pts.length - 1];
       if (r() < 0.55) {
-        puddle(ctx4, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
-        wet(ctx4, K2);
+        puddle(ctx5, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
+        wet(ctx5, K2);
       } else {
-        ctx4.beginPath();
-        ctx4.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
-        wet(ctx4, K2);
+        ctx5.beginPath();
+        ctx5.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
+        wet(ctx5, K2);
       }
-      ctx4.globalAlpha = 0.85;
-      ctx4.fillStyle = K2.gloss;
-      ctx4.beginPath();
-      ctx4.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
-      ctx4.fill();
+      ctx5.globalAlpha = 0.85;
+      ctx5.fillStyle = K2.gloss;
+      ctx5.beginPath();
+      ctx5.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
+      ctx5.fill();
     }
-    function splash(ctx4, r, K2, x, y, size, amount) {
+    function splash(ctx5, r, K2, x, y, size, amount) {
       const w = size * (0.11 + r() * 0.12) * K2.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
-      ctx4.save();
-      ctx4.translate(x, y);
-      ctx4.rotate(ang);
-      puddle(ctx4, r, 0, 0, w, h2, 0.55);
-      ctx4.restore();
-      wet(ctx4, K2);
+      ctx5.save();
+      ctx5.translate(x, y);
+      ctx5.rotate(ang);
+      puddle(ctx5, r, 0, 0, w, h2, 0.55);
+      ctx5.restore();
+      wet(ctx5, K2);
       const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K2.run));
       for (let i = 0; i < n; i++) {
         const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K2.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
-        run(ctx4, r, K2, sx, y + h2 * 0.3, len, sw);
+        run(ctx5, r, K2, sx, y + h2 * 0.3, len, sw);
       }
     }
-    function rope2(ctx4, r, K2, x, y, size) {
+    function rope2(ctx5, r, K2, x, y, size) {
       const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
       for (let i = 0; i <= 10; i++) {
         const t = i / 10;
         pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K2.width]);
       }
-      const side = ribbon(ctx4, pts);
-      wet(ctx4, K2);
-      shine(ctx4, K2, side.L, 2, 8);
+      const side = ribbon(ctx5, pts);
+      wet(ctx5, K2);
+      shine(ctx5, K2, side.L, 2, 8);
       if (r() < 0.6) {
         const p = pts[3 + Math.floor(r() * 5)];
-        run(ctx4, r, K2, p[0], p[1], size * (0.3 + r() * 0.6) * K2.run, Math.max(2, p[2] * 1.3));
+        run(ctx5, r, K2, p[0], p[1], size * (0.3 + r() * 0.6) * K2.run, Math.max(2, p[2] * 1.3));
       }
     }
-    function smear(ctx4, r, K2, x, y, size) {
+    function smear(ctx5, r, K2, x, y, size) {
       const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K2.width, pts = [];
       for (let i = 0; i <= 12; i++) {
         const t = i / 12;
         pts.push([x + Math.cos(a) * l * (t - 0.5) + (r() - 0.5) * 2, y + Math.sin(a) * l * (t - 0.5) * 0.6 + (r() - 0.5) * 2, w0 * (0.4 + Math.sin(t * Math.PI) * 0.8) * (0.8 + r() * 0.4)]);
       }
-      const side = ribbon(ctx4, pts);
-      wet(ctx4, K2);
-      ctx4.globalAlpha = 0.45;
-      ctx4.strokeStyle = K2.gloss;
-      ctx4.lineWidth = 0.9;
+      const side = ribbon(ctx5, pts);
+      wet(ctx5, K2);
+      ctx5.globalAlpha = 0.45;
+      ctx5.strokeStyle = K2.gloss;
+      ctx5.lineWidth = 0.9;
       for (let s = 0; s < 3; s++) {
         const off = (r() - 0.5) * w0 * 0.6;
-        ctx4.beginPath();
-        pts.forEach((p, i) => i ? ctx4.lineTo(p[0], p[1] + off) : ctx4.moveTo(p[0], p[1] + off));
-        ctx4.stroke();
+        ctx5.beginPath();
+        pts.forEach((p, i) => i ? ctx5.lineTo(p[0], p[1] + off) : ctx5.moveTo(p[0], p[1] + off));
+        ctx5.stroke();
       }
       if (K2.patches) {
-        ctx4.fillStyle = K2.patches;
+        ctx5.fillStyle = K2.patches;
         for (let s = 0; s < 6; s++) {
           const p = (r() < 0.5 ? side.L : side.R)[Math.floor(r() * side.L.length)];
-          ctx4.globalAlpha = 0.9;
-          puddle(ctx4, r, p[0], p[1], 2 + r() * w0 * 0.35, 1.5 + r() * w0 * 0.2, 0.6);
-          ctx4.fill();
+          ctx5.globalAlpha = 0.9;
+          puddle(ctx5, r, p[0], p[1], 2 + r() * w0 * 0.35, 1.5 + r() * w0 * 0.2, 0.6);
+          ctx5.fill();
         }
       }
       if (r() < K2.run) {
         const p = pts[Math.floor(r() * pts.length)];
-        run(ctx4, r, K2, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K2.run, Math.max(2.5, p[2] * 0.4));
+        run(ctx5, r, K2, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K2.run, Math.max(2.5, p[2] * 0.4));
       }
     }
     const STAMP_FILES = ["Chest1", "Chest2", "Chest3", "Chest4", "Face1", "Face2", "Face3", "Forehead1", "Forehead2", "Forehead3", "Tummy1", "Tummy2", "Tummy3", "Tummy4"];
@@ -14729,14 +14729,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W22 = c.width, H2 = c.height, d = x.getImageData(0, 0, W22, H2).data, seen3 = new Uint8Array(W22 * H2), out = [];
-      for (let i = 0; i < W22 * H2; i++) {
+      const W23 = c.width, H2 = c.height, d = x.getImageData(0, 0, W23, H2).data, seen3 = new Uint8Array(W23 * H2), out = [];
+      for (let i = 0; i < W23 * H2; i++) {
         if (seen3[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen3[i] = 1;
-        let x0 = W22, y0 = H2, x1 = 0, y1 = 0, n = 0;
+        let x0 = W23, y0 = H2, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W22, py = p / W22 | 0;
+          const p = q2.pop(), px = p % W23, py = p / W23 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -14744,8 +14744,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W22 || ny >= H2) continue;
-            const k = ny * W22 + nx;
+            if (nx < 0 || ny < 0 || nx >= W23 || ny >= H2) continue;
+            const k = ny * W23 + nx;
             if (!seen3[k] && d[k * 4 + 3] >= 16) {
               seen3[k] = 1;
               q2.push(k);
@@ -14874,129 +14874,129 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
       }
     };
-    function stamp2(ctx4, r, K2, x, y, size) {
+    function stamp2(ctx5, r, K2, x, y, size) {
       const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted2(st2, K2), sc = size / 60 * (0.75 + r() * 0.5);
       const flip = r() < 0.5 ? -1 : 1, narrow = K2.narrow ? K2.narrow[0] + r() * (K2.narrow[1] - K2.narrow[0]) : 0.85 + r() * 0.3, long = (K2.long || 1) * (K2.runX || 1);
-      ctx4.save();
-      ctx4.translate(x, y);
-      ctx4.rotate((r() - 0.5) * (K2.turn || 0.6));
-      ctx4.scale(sc * flip * narrow, sc * long);
-      ctx4.globalAlpha = K2.stampAlpha || 1;
-      ctx4.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
-      ctx4.restore();
+      ctx5.save();
+      ctx5.translate(x, y);
+      ctx5.rotate((r() - 0.5) * (K2.turn || 0.6));
+      ctx5.scale(sc * flip * narrow, sc * long);
+      ctx5.globalAlpha = K2.stampAlpha || 1;
+      ctx5.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
+      ctx5.restore();
     }
-    function paint(ctx4, kind, opt) {
-      const K0 = KINDS2[kind] || KINDS2.cum, K2 = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng2(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
-      ctx4.save();
-      ctx4.lineJoin = "round";
+    function paint(ctx5, kind, opt) {
+      const K0 = KINDS3[kind] || KINDS3.cum, K2 = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng2(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      ctx5.save();
+      ctx5.lineJoin = "round";
       for (const [ax, ay, size] of at) {
         const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];
         if (K2.style === "smear") {
           for (let i = 0, n = Math.round((2 + r() * 2) * amount); i < n; i++) {
             const [x, y] = spot();
-            smear(ctx4, r, K2, x, y, size);
+            smear(ctx5, r, K2, x, y, size);
           }
           if (K2.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx4, r, K2, x, y, size * 0.8, amount);
+            splash(ctx5, r, K2, x, y, size * 0.8, amount);
           }
           if (K2.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
             const [x, y] = spot();
-            stamp2(ctx4, r, K2, x, y, size);
+            stamp2(ctx5, r, K2, x, y, size);
           }
         } else if (STAMPS.length && K2.stamp !== false) {
           for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
             const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
-            stamp2(ctx4, r, K2, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
+            stamp2(ctx5, r, K2, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
           }
           for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K2.run - 0.2)); i < n; i++) {
             const [x, y] = spot();
             const p = [x, y];
-            run(ctx4, r, K2, p[0], p[1], size * (0.4 + r() * 0.9) * K2.run, Math.max(2, size * 0.05));
+            run(ctx5, r, K2, p[0], p[1], size * (0.4 + r() * 0.9) * K2.run, Math.max(2, size * 0.05));
           }
         } else if (K2.strands !== false) {
           for (let i = 0, n = Math.round((7 + r() * 6) * amount); i < n; i++) {
             const a = r() * Math.PI * 2, d = size * (0.1 + r() * 0.75), x = ax + Math.cos(a) * d, y = ay + Math.sin(a) * d * 0.7;
             const out = Math.atan2(Math.cos(a), Math.sin(a) * 0.7) * 0.6;
-            strand(ctx4, r, K2, x, y, size, out + (r() - 0.5) * 0.4);
+            strand(ctx5, r, K2, x, y, size, out + (r() - 0.5) * 0.4);
           }
           for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K2.run)); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx4, r, K2, x, y, size * 0.8, amount);
+            splash(ctx5, r, K2, x, y, size * 0.8, amount);
           }
         } else {
           for (let i = 0, n = Math.round((1.5 + r() * 2) * amount); i < n; i++) {
             const [x, y] = spot();
-            splash(ctx4, r, K2, x, y, size, amount);
+            splash(ctx5, r, K2, x, y, size, amount);
           }
           for (let i = 0, n = K2.ropes ? Math.round(r() * 2 * K2.ropes * amount) : 0; i < n; i++) {
             const [x, y] = spot();
-            rope2(ctx4, r, K2, x, y, size);
+            rope2(ctx5, r, K2, x, y, size);
           }
         }
         for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K2.droplets || 0.5)); i < n; i++) {
           const a = r() * Math.PI * 2, d = size * (0.5 + r() * 0.8);
-          ctx4.beginPath();
-          ctx4.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
-          wet(ctx4, K2, 0.9);
+          ctx5.beginPath();
+          ctx5.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
+          wet(ctx5, K2, 0.9);
         }
         if (K2.bubbles) for (let i = 0; i < 6 * amount; i++) {
           const [x, y] = spot();
-          ctx4.globalAlpha = 0.55;
-          ctx4.strokeStyle = K2.gloss;
-          ctx4.lineWidth = 0.9;
-          ctx4.beginPath();
-          ctx4.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
-          ctx4.stroke();
+          ctx5.globalAlpha = 0.55;
+          ctx5.strokeStyle = K2.gloss;
+          ctx5.lineWidth = 0.9;
+          ctx5.beginPath();
+          ctx5.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
+          ctx5.stroke();
         }
         if (K2.seeds) for (let i = 0; i < 8 * amount; i++) {
           const [x, y] = spot();
-          ctx4.globalAlpha = 0.9;
-          ctx4.fillStyle = K2.seeds;
-          ctx4.beginPath();
-          ctx4.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
-          ctx4.fill();
+          ctx5.globalAlpha = 0.9;
+          ctx5.fillStyle = K2.seeds;
+          ctx5.beginPath();
+          ctx5.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
+          ctx5.fill();
         }
         if (K2.specks) for (let i = 0; i < 16 * amount; i++) {
           const [x, y] = spot();
-          ctx4.globalAlpha = 0.75;
-          ctx4.fillStyle = K2.specks;
-          ctx4.beginPath();
-          ctx4.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
-          ctx4.fill();
+          ctx5.globalAlpha = 0.75;
+          ctx5.fillStyle = K2.specks;
+          ctx5.beginPath();
+          ctx5.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
+          ctx5.fill();
         }
         if (K2.crumbs) for (let i = 0; i < 14 * amount; i++) {
           const [x, y] = spot();
-          ctx4.globalAlpha = 1;
-          puddle(ctx4, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
-          ctx4.fillStyle = K2.crumbs[Math.floor(r() * K2.crumbs.length)];
-          ctx4.fill();
+          ctx5.globalAlpha = 1;
+          puddle(ctx5, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
+          ctx5.fillStyle = K2.crumbs[Math.floor(r() * K2.crumbs.length)];
+          ctx5.fill();
         }
         if (K2.sprinkles) for (let i = 0; i < (K2.sprinkleN || 12) * amount; i++) {
           const [x, y] = spot(), a = r() * Math.PI;
-          ctx4.globalAlpha = 1;
-          ctx4.strokeStyle = K2.sprinkles[Math.floor(r() * K2.sprinkles.length)];
-          ctx4.lineWidth = 1.6;
-          ctx4.lineCap = "round";
-          ctx4.beginPath();
-          ctx4.moveTo(x - Math.cos(a) * 2.2, y - Math.sin(a) * 2.2);
-          ctx4.lineTo(x + Math.cos(a) * 2.2, y + Math.sin(a) * 2.2);
-          ctx4.stroke();
+          ctx5.globalAlpha = 1;
+          ctx5.strokeStyle = K2.sprinkles[Math.floor(r() * K2.sprinkles.length)];
+          ctx5.lineWidth = 1.6;
+          ctx5.lineCap = "round";
+          ctx5.beginPath();
+          ctx5.moveTo(x - Math.cos(a) * 2.2, y - Math.sin(a) * 2.2);
+          ctx5.lineTo(x + Math.cos(a) * 2.2, y + Math.sin(a) * 2.2);
+          ctx5.stroke();
         }
       }
-      ctx4.restore();
+      ctx5.restore();
     }
-    function paintOn(ctx4, body2, kind, opt) {
+    function paintOn(ctx5, body2, kind, opt) {
       const c = document.createElement("canvas");
-      c.width = ctx4.canvas.width;
-      c.height = ctx4.canvas.height;
+      c.width = ctx5.canvas.width;
+      c.height = ctx5.canvas.height;
       const x = c.getContext("2d");
       paint(x, kind, opt);
       const m = document.createElement("canvas");
       m.width = c.width;
       m.height = c.height;
       const mx = m.getContext("2d");
-      const sm = KINDS2[kind] && KINDS2[kind].smudge !== void 0 ? KINDS2[kind].smudge : 1;
+      const sm = KINDS3[kind] && KINDS3[kind].smudge !== void 0 ? KINDS3[kind].smudge : 1;
       mx.filter = "blur(" + 5 * sm + "px)";
       mx.globalAlpha = 0.5 * sm;
       mx.drawImage(c, 0, 4);
@@ -15014,7 +15014,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         mx.globalCompositeOperation = "destination-in";
         mx.drawImage(body2, 0, 0);
       }
-      ctx4.drawImage(m, 0, 0);
+      ctx5.drawImage(m, 0, 0);
     }
     const AREAS3 = {
       face: [250, 185, 34],
@@ -15029,7 +15029,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       armR: [350, 380, 22],
       back: [250, 380, 60]
     };
-    root2.FarmMess = { KINDS: KINDS2, AREAS: AREAS3, paint, paintOn, rng: rng2, loadStamps, STAMPS };
+    root2.FarmMess = { KINDS: KINDS3, AREAS: AREAS3, paint, paintOn, rng: rng2, loadStamps, STAMPS };
   })(typeof window !== "undefined" ? window : globalThis);
 
   // studio/web/brand-drawing.js
@@ -15215,7 +15215,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   var ok = (e) => e && typeof e.k === "string" && W7.FarmMess && W7.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W7.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  var clean2 = (list2) => Array.isArray(list2) ? list2.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W7.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
     DIAG2.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W7.FarmMess });
     if (DIAG2.marks.length > 5) DIAG2.marks.shift();
@@ -15278,12 +15278,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return;
     }
     if (m.type !== "mess") return;
-    const list = clean2(m.list), brand = m.brand ? cleanBrand(m.brand) : null;
-    if (!list.length && !brand) {
+    const list2 = clean2(m.list), brand = m.brand ? cleanBrand(m.brand) : null;
+    if (!list2.length && !brand) {
       if (others2.delete(mn)) redrawMn2(mn);
       return;
     }
-    others2.set(mn, { list, brand, at: Date.now() });
+    others2.set(mn, { list: list2, brand, at: Date.now() });
     hook2();
     redrawMn2(mn);
     if (brand && !brandReady(brand)) setTimeout(() => redrawMn2(mn), 600);
@@ -15354,11 +15354,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     made2.set(mn, p);
     if (was2 && was2.src && was2.src !== p.src) forget2(was2.src);
   }
-  function messPicture(C2, list, body2, brand) {
+  function messPicture(C2, list2, body2, brand) {
     const over = W7.CanvasUpperOverflow || 700, h2 = C2.Canvas && C2.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
-    const key3 = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const key3 = JSON.stringify(list2) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list2.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was2 = made2.get(C2.MemberNumber);
     if (was2 && was2.key === key3) return was2;
     let mask = null;
@@ -15386,7 +15386,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
       console.warn("[Farmhand Companion] brand:", e);
     }
-    for (const e of list) W7.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    for (const e of list2) W7.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
     if (typeof W7.GLDrawLoadTransient === "function") {
       const p2 = { key: key3, src: c, dx: 0, dy: 0 };
       keep(C2.MemberNumber, p2);
@@ -15447,9 +15447,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
         const C2 = args[0], real = args[1];
         if (!C2 || !real || typeof real.drawImage !== "function" || !W7.FarmMess || onBot2()) return next(args);
-        const list = listFor(C2), brand = brandFor(C2);
+        const list2 = listFor(C2), brand = brandFor(C2);
         if (C2 === W7.Player) DIAG2.got++;
-        if (!list.length && !brand) return next(args);
+        if (!list2.length && !brand) return next(args);
         const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
         const before = skinOf.get(C2.MemberNumber) || [];
@@ -15462,10 +15462,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               body2.push(b);
               have.add(b[0]);
             }
-            const p = messPicture(C2, list, body2, brand);
+            const p = messPicture(C2, list2, body2, brand);
             if (C2 === W7.Player) {
               DIAG2.draws++;
-              DIAG2.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
+              DIAG2.draw = { at: Date.now(), list: list2.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
             if (p && p.src) {
               real.drawImage(p.src, p.dx, p.dy, {});
@@ -15912,15 +15912,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     clearTimeout(timer);
     timer = null;
     if (!groups.size && !whole) return;
-    const C2 = P(), list = [...groups], all = whole;
+    const C2 = P(), list2 = [...groups], all = whole;
     firstAt = 0;
     groups = /* @__PURE__ */ new Set();
     whole = false;
     if (!C2) return;
     try {
       if (!all && W10.CurrentScreen === "ChatRoom" && typeof W10.ChatRoomCharacterItemUpdate === "function") {
-        for (const g of list) W10.ChatRoomCharacterItemUpdate(C2, g);
-        SENT.items += list.length;
+        for (const g of list2) W10.ChatRoomCharacterItemUpdate(C2, g);
+        SENT.items += list2.length;
         return;
       }
       if (typeof W10.ChatRoomCharacterUpdate === "function") {
@@ -15982,8 +15982,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       delete C2.__farmSpeck;
     }
   }
-  function redraw2(list) {
-    for (const C2 of list) {
+  function redraw2(list2) {
+    for (const C2 of list2) {
       try {
         if (C2 && typeof W11.CharacterLoadCanvas === "function") {
           unspeck(C2);
@@ -16129,13 +16129,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return f.apply(this, a);
     };
   }
-  function initAllocWatch(isBot2, mod3) {
+  function initAllocWatch(isBot3, mod3) {
     if (on) return false;
     if (!W12.Player || typeof W12.Player.MemberNumber !== "number") {
-      setTimeout(() => initAllocWatch(isBot2, mod3), 3e3);
+      setTimeout(() => initAllocWatch(isBot3, mod3), 3e3);
       return false;
     }
-    if (!isBot2()) return false;
+    if (!isBot3()) return false;
     on = true;
     try {
       const H2 = W12.HTMLCanvasElement && W12.HTMLCanvasElement.prototype;
@@ -16434,16 +16434,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (typeof W13.ChatRoomSendLocal === "function") W13.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text3, 12e4);
         else console.log(text3);
       } }, { Tag: "farmfits", Description: ": the drawn body's saved fits on this computer (/farmfits clear starts them over)", Action: (args) => {
-        const say3 = (t) => {
+        const say4 = (t) => {
           if (typeof W13.ChatRoomSendLocal === "function") W13.ChatRoomSendLocal(t, 3e4);
           else console.log(t);
         };
         if (/^\s*clear\b/i.test(String(args || ""))) {
-          fitStoreClear().then(() => say3("Saved fits cleared. Everything gets fitted fresh, and saved again as it goes."));
+          fitStoreClear().then(() => say4("Saved fits cleared. Everything gets fitted fresh, and saved again as it goes."));
           return;
         }
         const f = fitStoreStats();
-        say3(f.on ? "Saved fits on this computer: " + f.count + ", " + f.mb + " MB. Used " + f.taken + " since the page opened, saved " + f.kept + " new." + (f.waiting ? " " + f.waiting + " waiting to save." : "") + " /farmfits clear starts them over." : "Saved fits are off on this computer" + (f.why ? ": " + f.why : "") + ". The drawn body still works, it just fits everything fresh after a reload.");
+        say4(f.on ? "Saved fits on this computer: " + f.count + ", " + f.mb + " MB. Used " + f.taken + " since the page opened, saved " + f.kept + " new." + (f.waiting ? " " + f.waiting + " waiting to save." : "") + " /farmfits clear starts them over." : "Saved fits are off on this computer" + (f.why ? ": " + f.why : "") + ". The drawn body still works, it just fits everything fresh after a reload.");
       } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
         let text3 = "";
         try {
@@ -16466,14 +16466,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var MAP = 40;
   var PX = 7;
   var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
-  function zones(ctx4) {
-    const zs = ctx4.s.zones;
+  function zones(ctx5) {
+    const zs = ctx5.s.zones;
     if (!zs) return [muted("The farm map is for staff.")];
-    const canEdit = ctx4.s.mapEdit !== false;
+    const canEdit = ctx5.s.mapEdit !== false;
     const groups2 = [...new Set(Object.values(zs).map((z) => z.group))];
     const color = (g) => COLORS[groups2.indexOf(g) % COLORS.length];
-    const sel = ctx4.ui.zone && zs[ctx4.ui.zone] ? ctx4.ui.zone : Object.keys(zs)[0];
-    const name = () => (ctx4.ui.zoneName || sel || "").trim().toLowerCase();
+    const sel = ctx5.ui.zone && zs[ctx5.ui.zone] ? ctx5.ui.zone : Object.keys(zs)[0];
+    const name = () => (ctx5.ui.zoneName || sel || "").trim().toLowerCase();
     return [
       card(
         title("Farm map"),
@@ -16484,7 +16484,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             type: "button",
             title: n,
             "aria-label": n,
-            onclick: () => ctx4.setUi({ zone: n }),
+            onclick: () => ctx5.setUi({ zone: n }),
             style: {
               position: "absolute",
               padding: "0",
@@ -16497,7 +16497,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             }
           })),
           // spots: little dots, hover for the name
-          Object.entries(ctx4.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
+          Object.entries(ctx5.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
             title: n + " \xB7 " + p.X + "," + p.Y,
             style: {
               position: "absolute",
@@ -16517,43 +16517,43 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         title("Zones"),
         Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx4.setUi({ zone: n }) },
+          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx5.setUi({ zone: n }) },
           h("b", null, n),
           h("div", { class: "fhc-muted" }, "part of " + z.group + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "\u2014") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "\u2014"))
         )) : muted("No zones yet."),
-        btn("Who's where", () => ctx4.send("zone who"))
+        btn("Who's where", () => ctx5.send("zone who"))
       ),
       canEdit ? card(
         title(sel ? "Editin' " + sel : "New zone"),
-        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx4.ui.zoneName || sel || "", oninput: (e) => ctx4.setUi({ zoneName: e.target.value }, true) })),
+        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx5.ui.zoneName || sel || "", oninput: (e) => ctx5.setUi({ zoneName: e.target.value }, true) })),
         h("div", null, btn("Draw it on the map", () => {
           const n = name();
-          if (!n) return ctx4.hint("Name the zone first.");
-          ctx4.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx4.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+          if (!n) return ctx5.hint("Name the zone first.");
+          ctx5.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx5.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
         }, true)),
         muted("Or walk it: stand on one corner, then the other."),
-        h("div", null, btn("Set A where I stand", () => name() ? ctx4.send("zone a " + name()) : ctx4.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx4.send("zone b " + name()) : ctx4.hint("Name the zone first."))),
-        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx4.ui.zonePair || "", oninput: (e) => ctx4.setUi({ zonePair: e.target.value }, true) })),
+        h("div", null, btn("Set A where I stand", () => name() ? ctx5.send("zone a " + name()) : ctx5.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx5.send("zone b " + name()) : ctx5.hint("Name the zone first."))),
+        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx5.ui.zonePair || "", oninput: (e) => ctx5.setUi({ zonePair: e.target.value }, true) })),
         h(
           "div",
           null,
-          btn("Pair", () => name() && ctx4.ui.zonePair ? ctx4.send("zone pair " + name() + " " + ctx4.ui.zonePair.trim().toLowerCase()) : ctx4.hint("Name the zone, and the place to pair it with.")),
-          btn("Unpair", () => name() ? ctx4.send("zone unpair " + name()) : ctx4.hint("Name the zone first.")),
-          btn("Delete", () => name() ? ctx4.send("zone clear " + name()) : ctx4.hint("Name the zone first."))
+          btn("Pair", () => name() && ctx5.ui.zonePair ? ctx5.send("zone pair " + name() + " " + ctx5.ui.zonePair.trim().toLowerCase()) : ctx5.hint("Name the zone, and the place to pair it with.")),
+          btn("Unpair", () => name() ? ctx5.send("zone unpair " + name()) : ctx5.hint("Name the zone first.")),
+          btn("Delete", () => name() ? ctx5.send("zone clear " + name()) : ctx5.hint("Name the zone first."))
         )
       ) : null,
-      canEdit ? spotsCard(ctx4) : spotsList(ctx4),
+      canEdit ? spotsCard(ctx5) : spotsList(ctx5),
       canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors.")
     ];
   }
-  function spotsList(ctx4) {
-    const sp = Object.entries(ctx4.s.spots || {});
+  function spotsList(ctx5) {
+    const sp = Object.entries(ctx5.s.spots || {});
     return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
   }
-  function spotsCard(ctx4) {
-    const sp = Object.entries(ctx4.s.spots || {});
-    const nm = () => (ctx4.ui.spotName || "").trim().toLowerCase();
-    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx4.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+  function spotsCard(ctx5) {
+    const sp = Object.entries(ctx5.s.spots || {});
+    const nm = () => (ctx5.ui.spotName || "").trim().toLowerCase();
+    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx5.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
       title("Spots"),
       muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
@@ -16564,20 +16564,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h(
           "span",
           null,
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx4.setUi({ spotName: n }) }, "Pick"),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx4.send("spot clear " + n) }, "Clear")
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx5.setUi({ spotName: n }) }, "Pick"),
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx5.send("spot clear " + n) }, "Clear")
         )
       )) : muted("No spots yet."),
-      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx4.ui.spotName || "", oninput: (e) => ctx4.setUi({ spotName: e.target.value }, true) })),
+      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx5.ui.spotName || "", oninput: (e) => ctx5.setUi({ spotName: e.target.value }, true) })),
       h(
         "div",
         null,
         btn("Click it on the map", () => {
           if (!ok2()) return;
           const n = nm();
-          ctx4.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx4.send("spot place " + n + " " + p.X + " " + p.Y));
+          ctx5.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx5.send("spot place " + n + " " + p.X + " " + p.Y));
         }, true),
-        btn("Set where I stand", () => ok2() && ctx4.send("spot set " + nm()))
+        btn("Set where I stand", () => ok2() && ctx5.send("spot set " + nm()))
       ),
       // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
       sp.length ? h(
@@ -16585,13 +16585,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         { style: { marginTop: "6px" } },
         btn("Clear all startin' with the name", () => {
           const n = nm();
-          if (!n) return ctx4.hint("Type the start of the names first, like speaker-");
-          ctx4.send("spot clear " + n + "*");
+          if (!n) return ctx5.hint("Type the start of the names first, like speaker-");
+          ctx5.send("spot clear " + n + "*");
         }),
-        ctx4.s.proprietor && (ctx4.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
-          ctx4.setUi({ clearAllSpots: false });
-          ctx4.send("spot clear all yes");
-        }, true) : btn("Clear all spots\u2026", () => ctx4.setUi({ clearAllSpots: true })))
+        ctx5.s.proprietor && (ctx5.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
+          ctx5.setUi({ clearAllSpots: false });
+          ctx5.send("spot clear all yes");
+        }, true) : btn("Clear all spots\u2026", () => ctx5.setUi({ clearAllSpots: true })))
       ) : null
     );
   }
@@ -16608,14 +16608,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       )
     ];
   }
-  function shift(ctx4) {
-    const sh = ctx4.s.shift || {};
+  function shift(ctx5) {
+    const sh = ctx5.s.shift || {};
     return [
       card(h(
         "div",
         { class: "fhc-kv" },
         h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " \xB7 " + (sh.weekH || 0) + " h this week")),
-        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx4.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
+        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx5.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
       )),
       card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
       card(
@@ -16623,14 +16623,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
         (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " \xB7 mandated" : "") + (o.here ? " \xB7 here" : " \xB7 away"), o.here ? "good" : null)) : muted("Nobody's on call.")
       ),
-      ctx4.s.log && card(title("Farm log"), ctx4.s.log.map((e) => h(
+      ctx5.s.log && card(title("Farm log"), ctx5.s.log.map((e) => h(
         "div",
         { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
         h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
         h("span", { style: { color: "var(--fh-accent)" } }, e.a),
         h("span", null, e.by + (e.d ? " \xB7 " + e.d : ""))
       ))),
-      h("div", null, btn("Hours", () => ctx4.send("hours")), btn("Chores", () => ctx4.send("chores")), btn("Spin the wheel", () => ctx4.send("spin")))
+      h("div", null, btn("Hours", () => ctx5.send("hours")), btn("Chores", () => ctx5.send("chores")), btn("Spin the wheel", () => ctx5.send("spin")))
     ];
   }
 
@@ -18209,8 +18209,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function bcpCommand() {
     try {
-      const list = Array.isArray(window.Commands) ? window.Commands : typeof Commands !== "undefined" && Array.isArray(Commands) ? Commands : [];
-      return list.find((c) => c && String(c.Tag).toLowerCase() === "bcp") || null;
+      const list2 = Array.isArray(window.Commands) ? window.Commands : typeof Commands !== "undefined" && Array.isArray(Commands) ? Commands : [];
+      return list2.find((c) => c && String(c.Tag).toLowerCase() === "bcp") || null;
     } catch (e) {
       return null;
     }
@@ -18257,9 +18257,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     return two(d.getMonth() + 1) + "-" + two(d.getDate()) + " " + two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds());
   };
   var line2 = (r) => when(r.t) + " [" + r.k + "] " + (r.n || r.f || "") + (r.w ? " \u2192 " + r.w : "") + ": " + r.x;
-  function logTab(ctx4) {
-    const ui = ctx4.ui, who2 = ctx4.s.logWho || [], res = ui.logRows;
-    const ask3 = () => ctx4.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
+  function logTab(ctx5) {
+    const ui = ctx5.ui, who2 = ctx5.s.logWho || [], res = ui.logRows;
+    const ask4 = () => ctx5.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
     const save8 = () => {
       try {
         const blob = new Blob([(res.rows || []).map(line2).join("\n")], { type: "text/plain" }), a = document.createElement("a");
@@ -18268,7 +18268,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5e3);
       } catch (e) {
-        ctx4.hint("Couldn't save it: " + e.message);
+        ctx5.hint("Couldn't save it: " + e.message);
       }
     };
     return [
@@ -18281,7 +18281,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "Whose",
           h(
             "select",
-            { class: "fhc-sel", onchange: (e) => ctx4.setUi({ logWho: e.target.value }, true) },
+            { class: "fhc-sel", onchange: (e) => ctx5.setUi({ logWho: e.target.value }, true) },
             [["", "Everybody"]].concat(who2.map((w) => [String(w.mn), w.name + " (" + w.mn + ")"])).map(([v, l]) => h("option", { value: v, selected: String(ui.logWho || "") === v ? "selected" : null }, l))
           )
         ),
@@ -18291,20 +18291,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "How far back",
           h(
             "select",
-            { class: "fhc-sel", onchange: (e) => ctx4.setUi({ logHours: e.target.value }, true) },
+            { class: "fhc-sel", onchange: (e) => ctx5.setUi({ logHours: e.target.value }, true) },
             [["1", "The last hour"], ["3", "3 hours"], ["12", "12 hours"], ["24", "A day"], ["72", "3 days"], ["168", "A week"]].map(([v, l]) => h("option", { value: v, selected: String(ui.logHours || "3") === v ? "selected" : null }, l))
           )
         ),
-        h("div", { style: { marginTop: "4px" } }, KINDS.map(([k, l]) => h("button", { type: "button", class: "fhc-pill" + ((ui.logKind || "") === k ? " on" : ""), onclick: () => ctx4.setUi({ logKind: k }) }, l))),
+        h("div", { style: { marginTop: "4px" } }, KINDS.map(([k, l]) => h("button", { type: "button", class: "fhc-pill" + ((ui.logKind || "") === k ? " on" : ""), onclick: () => ctx5.setUi({ logKind: k }) }, l))),
         h(
           "label",
           { class: "fhc-label" },
           "Words to look for",
-          h("input", { class: "fhc-in", value: ui.logQ || "", placeholder: "a name, a command, anything", oninput: (e) => ctx4.setUi({ logQ: e.target.value }, true), onkeydown: (e) => {
-            if (e.key === "Enter") ask3();
+          h("input", { class: "fhc-in", value: ui.logQ || "", placeholder: "a name, a command, anything", oninput: (e) => ctx5.setUi({ logQ: e.target.value }, true), onkeydown: (e) => {
+            if (e.key === "Enter") ask4();
           } })
         ),
-        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save8) : null)
+        h("div", { style: { marginTop: "6px" } }, btn("Show", ask4, true), res && (res.rows || []).length ? btn("Save as a file", save8) : null)
       ),
       res ? card(
         title(res.busy ? "Lookin'\u2026" : (res.total || 0) + " lines" + (res.total > (res.rows || []).length ? ", the newest " + res.rows.length + " shown" : "")),
@@ -18318,19 +18318,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/views/staff.js
-  function latest(ctx4) {
-    const r = ctx4.feed.filter((x) => x.kind === "reply").slice(-1)[0];
+  function latest(ctx5) {
+    const r = ctx5.feed.filter((x) => x.kind === "reply").slice(-1)[0];
     return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
   }
   var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
-  var input = (ph, key3, ctx4) => h("input", { class: "fhc-in", placeholder: ph, value: ctx4.ui[key3] || "", oninput: (e) => ctx4.setUi({ [key3]: e.target.value }, true) });
-  var select = (key3, opts, ctx4) => h(
+  var input = (ph, key3, ctx5) => h("input", { class: "fhc-in", placeholder: ph, value: ctx5.ui[key3] || "", oninput: (e) => ctx5.setUi({ [key3]: e.target.value }, true) });
+  var select = (key3, opts, ctx5) => h(
     "select",
-    { class: "fhc-sel", onchange: (e) => ctx4.setUi({ [key3]: e.target.value }, true) },
-    opts.map(([v, l]) => h("option", { value: v, selected: (ctx4.ui[key3] || opts[0][0]) === v ? "selected" : null }, l))
+    { class: "fhc-sel", onchange: (e) => ctx5.setUi({ [key3]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx5.ui[key3] || opts[0][0]) === v ? "selected" : null }, l))
   );
-  function duty(ctx4) {
-    const s = ctx4.s;
+  function duty(ctx5) {
+    const s = ctx5.s;
     return h(
       "div",
       { class: "fhc-sum" },
@@ -18347,20 +18347,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         { class: "fhc-kv", style: { border: "none", padding: "0" } },
         muted(s.onDuty ? "Silver and gold keys out." : "Bronze key only. Your Livestock panel is yours."),
-        s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx4.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
+        s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx5.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
       ),
       muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
     );
   }
-  function shiftTab(ctx4) {
-    return [duty(ctx4), shift(ctx4), h("div", null, ["record", "myherd", "keys"].map((c) => btn(c === "myherd" ? "My herd" : c[0].toUpperCase() + c.slice(1), () => ctx4.send(c)))), latest(ctx4)];
+  function shiftTab(ctx5) {
+    return [duty(ctx5), shift(ctx5), h("div", null, ["record", "myherd", "keys"].map((c) => btn(c === "myherd" ? "My herd" : c[0].toUpperCase() + c.slice(1), () => ctx5.send(c)))), latest(ctx5)];
   }
-  function herd(ctx4) {
-    const f = ctx4.ui.herdF || "all", list = (ctx4.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
-    const act = (c, x) => () => ctx4.send(c + " " + x.mn);
+  function herd(ctx5) {
+    const f = ctx5.ui.herdF || "all", list2 = (ctx5.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
+    const act = (c, x) => () => ctx5.send(c + " " + x.mn);
     return [
-      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx4.setUi({ herdF: id }) }, l))),
-      list.length ? rows(ctx4, "herd", list.map((x) => ({
+      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx5.setUi({ herdF: id }) }, l))),
+      list2.length ? rows(ctx5, "herd", list2.map((x) => ({
         id: "h" + x.mn,
         label: (x.mine ? "\u2605 " : "") + x.name,
         dot: x.milk !== null && x.milk >= 75,
@@ -18391,8 +18391,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ];
   }
   var LOOKUPS = ["record", "milk", "drain", "inspect", "vet", "quota", "stats", "keys", "size", "pedigree"];
-  function safeCards(ctx4) {
-    const recent2 = ctx4.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx4.ui["done" + x.at]);
+  function safeCards(ctx5) {
+    const recent2 = ctx5.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx5.ui["done" + x.at]);
     return recent2.map((x) => h(
       "div",
       { class: "fhc-box alert" },
@@ -18401,24 +18401,24 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         { style: { marginTop: "8px" } },
-        btn("I'm goin' to them", () => ctx4.send("where"), true),
-        btn("All okay, close it", () => ctx4.setUi({ ["done" + x.at]: true }))
+        btn("I'm goin' to them", () => ctx5.send("where"), true),
+        btn("All okay, close it", () => ctx5.setUi({ ["done" + x.at]: true }))
       )
     ));
   }
-  function office(ctx4) {
-    const docs = ctx4.docs.slice().reverse();
-    const sel = docs.find((d) => d.id === ctx4.ui.doc) || docs[0];
-    const who2 = () => String(ctx4.ui.look || "").trim();
-    const look2 = (c) => () => who2() ? ctx4.send(c + " " + who2()) : ctx4.hint("Type who first, in the Look somebody up box.");
+  function office(ctx5) {
+    const docs = ctx5.docs.slice().reverse();
+    const sel = docs.find((d) => d.id === ctx5.ui.doc) || docs[0];
+    const who2 = () => String(ctx5.ui.look || "").trim();
+    const look2 = (c) => () => who2() ? ctx5.send(c + " " + who2()) : ctx5.hint("Type who first, in the Look somebody up box.");
     const typed = () => {
       const v = who2();
       if (!v) return;
-      ctx4.send(LOOKUPS.includes(v.split(/\s+/)[0].toLowerCase()) && /\s/.test(v) ? v : "record " + v);
-      ctx4.setUi({ look: "" });
+      ctx5.send(LOOKUPS.includes(v.split(/\s+/)[0].toLowerCase()) && /\s/.test(v) ? v : "record " + v);
+      ctx5.setUi({ look: "" });
     };
     return [
-      safeCards(ctx4),
+      safeCards(ctx5),
       h(
         "div",
         { class: "fhc-sec" },
@@ -18427,8 +18427,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           class: "fhc-in",
           placeholder: "Bessie, or a member number",
           "aria-label": "Look somebody up",
-          value: ctx4.ui.look || "",
-          oninput: (e) => ctx4.setUi({ look: e.target.value }, true),
+          value: ctx5.ui.look || "",
+          oninput: (e) => ctx5.setUi({ look: e.target.value }, true),
           onkeydown: (e) => {
             if (e.key === "Enter") typed();
           }
@@ -18441,7 +18441,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         { class: "fhc-split" },
         h("div", { class: "fhc-docs" }, docs.map((d) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx4.setUi({ doc: d.id }) },
+          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx5.setUi({ doc: d.id }) },
           h("b", null, d.who),
           h("div", { class: "fhc-muted" }, d.kind + " \xB7 " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
         ))),
@@ -18449,16 +18449,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "div",
           { class: "fhc-box", style: { flex: "1", minWidth: "0" } },
           h("div", { class: "fhc-card" }, sel.text),
-          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx4.send(sel.kind + " " + sel.about)), btn("Close", () => ctx4.closeDoc(sel.id)))
+          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx5.send(sel.kind + " " + sel.about)), btn("Close", () => ctx5.closeDoc(sel.id)))
         )
       ) : card(title("Nothin' on the desk"), muted("Try ?vet, ?record or ?stats with somebody's name."))
     ];
   }
-  function contracts(ctx4) {
-    const tpl = () => (ctx4.ui.ctTpl || "deep").trim(), who2 = () => (ctx4.ui.ctWho || "").trim(), dur = () => ctx4.ui.ctDur || "1w";
+  function contracts(ctx5) {
+    const tpl = () => (ctx5.ui.ctTpl || "deep").trim(), who2 = () => (ctx5.ui.ctWho || "").trim(), dur = () => ctx5.ui.ctDur || "1w";
     const q2 = (v) => /\s/.test(v) ? '"' + v + '"' : v;
     const when3 = () => {
-      const u = ctx4.ui, p = [];
+      const u = ctx5.ui, p = [];
       if (u.ctRoom) p.push("room=" + u.ctRoom);
       if ((u.ctNames || "").trim()) p.push((u.ctNamesMode === "notin" ? "notnames=" : "names=") + q2(u.ctNames.trim()));
       if ((u.ctMembers || "").trim()) p.push((u.ctMembersMode === "absent" ? "without=" : "with=") + u.ctMembers.trim().replace(/\s+/g, ""));
@@ -18467,9 +18467,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if ((u.ctOnly || "").trim()) p.push("only=" + u.ctOnly.trim().replace(/\s+/g, ""));
       return p.length ? " when " + p.join(" ") : "";
     };
-    const sel = (key3, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx4.setUi({ [key3]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx4.ui[key3] || "") === v ? "selected" : null }, l)));
-    const timeIn = (key3) => h("input", { class: "fhc-in", type: "time", value: ctx4.ui[key3] || "", style: { width: "110px" }, oninput: (e) => ctx4.setUi({ [key3]: e.target.value }, true) });
-    const rn = ctx4.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
+    const sel = (key3, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx5.setUi({ [key3]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx5.ui[key3] || "") === v ? "selected" : null }, l)));
+    const timeIn = (key3) => h("input", { class: "fhc-in", type: "time", value: ctx5.ui[key3] || "", style: { width: "110px" }, oninput: (e) => ctx5.setUi({ [key3]: e.target.value }, true) });
+    const rn = ctx5.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
     const renewCard = rn.length ? card(
       title("\u{1F4DC} Renewals"),
       muted("A day before a timed contract ends, the farm asks if they'd like another. Offer it gives them the same one again, the same length (they need to be in the room)."),
@@ -18477,18 +18477,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         { class: "fhc-kv" },
         h("span", null, h("b", null, r.name), ' \xB7 "' + r.title + '"' + (r.dur ? " (" + r.dur + ")" : "") + " \xB7 " + (r.ended ? "ended" : "ends in " + hrs(r.until))),
-        r.said === "yes" && !r.offered ? r.here && ctx4.s.herdmaster ? btn("Offer it", () => ctx4.send("renew offer " + r.mn), true) : chip(r.here ? "said yes" : "said yes \xB7 not here", "acc") : chip(r.offered ? "offered again" : r.said === "no" ? "said no" : "asked", r.said === "no" ? "" : "acc")
+        r.said === "yes" && !r.offered ? r.here && ctx5.s.herdmaster ? btn("Offer it", () => ctx5.send("renew offer " + r.mn), true) : chip(r.here ? "said yes" : "said yes \xB7 not here", "acc") : chip(r.offered ? "offered again" : r.said === "no" ? "said no" : "asked", r.said === "no" ? "" : "acc")
       )),
-      h("div", null, btn("All renewals", () => ctx4.send("renew")))
+      h("div", null, btn("All renewals", () => ctx5.send("renew")))
     ) : null;
     return [
       renewCard,
       card(
         title("Offer a BC+ contract"),
         muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
-        field("Contract", h("input", { class: "fhc-in", value: ctx4.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx4.setUi({ ctTpl: e.target.value }, true) })),
-        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx4)),
-        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx4)),
+        field("Contract", h("input", { class: "fhc-in", value: ctx5.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx5.setUi({ ctTpl: e.target.value }, true) })),
+        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx5)),
+        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx5)),
         h(
           "details",
           { style: { margin: "6px 0" } },
@@ -18498,13 +18498,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             "div",
             { class: "fhc-row", style: { padding: "0", border: "none" } },
             sel("ctNamesMode", [["in", "Only in"], ["notin", "Not in"]]),
-            h("input", { class: "fhc-in", value: ctx4.ui.ctNames || "", placeholder: "farm, barn (part of the name)", oninput: (e) => ctx4.setUi({ ctNames: e.target.value }, true) })
+            h("input", { class: "fhc-in", value: ctx5.ui.ctNames || "", placeholder: "farm, barn (part of the name)", oninput: (e) => ctx5.setUi({ ctNames: e.target.value }, true) })
           )),
           field("Who's there", h(
             "div",
             { class: "fhc-row", style: { padding: "0", border: "none" } },
             sel("ctMembersMode", [["present", "While one of these is there"], ["absent", "While none of these is there"]]),
-            h("input", { class: "fhc-in", value: ctx4.ui.ctMembers || "", placeholder: "member numbers, like 221397, 232922", oninput: (e) => ctx4.setUi({ ctMembers: e.target.value }, true) })
+            h("input", { class: "fhc-in", value: ctx5.ui.ctMembers || "", placeholder: "member numbers, like 221397, 232922", oninput: (e) => ctx5.setUi({ ctMembers: e.target.value }, true) })
           )),
           field("Their BC+ roles", h(
             "div",
@@ -18513,56 +18513,56 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             sel("ctRole", [["", "Anybody"], ["owner", "Owner"], ["lover", "Lover"], ["mistress", "Mistress"], ["whitelist", "Whitelist"], ["friend", "Friend"]])
           )),
           field("Time of day", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, "from", timeIn("ctFrom"), "to", timeIn("ctTo"))),
-          field("Only these rules (empty: all of them)", h("input", { class: "fhc-in", value: ctx4.ui.ctOnly || "", placeholder: "pet.speech, pet.hearing", oninput: (e) => ctx4.setUi({ ctOnly: e.target.value }, true) }))
+          field("Only these rules (empty: all of them)", h("input", { class: "fhc-in", value: ctx5.ui.ctOnly || "", placeholder: "pet.speech, pet.hearing", oninput: (e) => ctx5.setUi({ ctOnly: e.target.value }, true) }))
         ),
         h(
           "div",
           null,
-          btn("Preview", () => ctx4.send("contract show " + tpl() + (who2() ? " " + who2() : "") + when3())),
-          btn("Offer it", () => who2() ? ctx4.send("contract offer " + tpl() + " " + who2() + " " + dur() + when3()) : ctx4.hint("Type who it's for first, in the For box."), true)
+          btn("Preview", () => ctx5.send("contract show " + tpl() + (who2() ? " " + who2() : "") + when3())),
+          btn("Offer it", () => who2() ? ctx5.send("contract offer " + tpl() + " " + who2() + " " + dur() + when3()) : ctx5.hint("Type who it's for first, in the For box."), true)
         )
       ),
       card(
         title("In force"),
-        btn("List farm contracts", () => ctx4.send("contract list")),
-        field("Somebody's contracts", input("Bessie", "ctLook", ctx4)),
+        btn("List farm contracts", () => ctx5.send("contract list")),
+        field("Somebody's contracts", input("Bessie", "ctLook", ctx5)),
         h(
           "div",
           null,
-          btn("Ask their BC+", () => ctx4.ui.ctLook ? ctx4.send("contract check " + ctx4.ui.ctLook) : ctx4.hint("Type whose contracts first.")),
-          btn("Release", () => ctx4.ui.ctLook ? ctx4.send("contract release " + ctx4.ui.ctLook) : ctx4.hint("Type whose contract to release first."))
+          btn("Ask their BC+", () => ctx5.ui.ctLook ? ctx5.send("contract check " + ctx5.ui.ctLook) : ctx5.hint("Type whose contracts first.")),
+          btn("Release", () => ctx5.ui.ctLook ? ctx5.send("contract release " + ctx5.ui.ctLook) : ctx5.hint("Type whose contract to release first."))
         )
       ),
-      latest(ctx4)
+      latest(ctx5)
     ];
   }
-  function barn(ctx4) {
-    const who2 = () => (ctx4.ui.barnWho || "").trim();
-    const act = (c) => () => who2() ? ctx4.send(c + " " + who2()) : ctx4.hint("Type who first, in the Who box.");
+  function barn(ctx5) {
+    const who2 = () => (ctx5.ui.barnWho || "").trim();
+    const act = (c) => () => who2() ? ctx5.send(c + " " + who2()) : ctx5.hint("Type who first, in the Who box.");
     return [
       card(
         title("Barn work"),
-        field("Who", input("Bessie", "barnWho", ctx4)),
+        field("Who", input("Bessie", "barnWho", ctx5)),
         h("div", null, ["milk", "collect", "drain", "edge", "denial", "ruin", "inspect", "vet", "quota"].map((c) => btn(c[0].toUpperCase() + c.slice(1), act(c))))
       ),
       card(
         title("Jars"),
-        btn("The jar shelf", () => ctx4.send("jars")),
+        btn("The jar shelf", () => ctx5.send("jars")),
         muted("To breed somebody from a jar: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar breedin' off can't be."),
-        h("div", null, btn("Breed from a jar\u2026", () => ctx4.fillBox("inseminate " + (who2() ? who2() + " " : ""))))
+        h("div", null, btn("Breed from a jar\u2026", () => ctx5.fillBox("inseminate " + (who2() ? who2() + " " : ""))))
       ),
       card(
         title("Herd"),
-        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx4.send(c)))),
+        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx5.send(c)))),
         h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
       ),
-      seasonsCard(ctx4),
-      latest(ctx4)
+      seasonsCard(ctx5),
+      latest(ctx5)
     ];
   }
-  function queue2(ctx4) {
-    const apps = ctx4.s.apps || [], m = ctx4.s.mail;
-    const role = (a) => ctx4.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
+  function queue2(ctx5) {
+    const apps = ctx5.s.apps || [], m = ctx5.s.mail;
+    const role = (a) => ctx5.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
     return [
       card(
         h("div", { class: "fhc-kv" }, title("Applications"), chip(apps.length + " waitin'", apps.length ? "alert" : null)),
@@ -18573,10 +18573,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           muted(a.sum + (a.staffTrack ? " \xB7 wants to be staff" : "")),
           h("label", { class: "fhc-label" }, "Approve as", h(
             "select",
-            { class: "fhc-sel", onchange: (e) => ctx4.setUi({ ["role" + a.mn]: e.target.value }, true) },
+            { class: "fhc-sel", onchange: (e) => ctx5.setUi({ ["role" + a.mn]: e.target.value }, true) },
             ["livestock", "guest", "luxury", "gloryhole", "farmhand", "mandated", "herdmaster"].map((r) => h("option", { value: r, selected: role(a) === r ? "selected" : null }, r))
           )),
-          h("div", null, btn("Read it", () => ctx4.send("app " + a.n)), btn("Approve", () => ctx4.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx4.send("deny " + a.mn)))
+          h("div", null, btn("Read it", () => ctx5.send("app " + a.n)), btn("Approve", () => ctx5.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx5.send("deny " + a.mn)))
         )) : muted("Nobody's waitin'. New ones beep you as well as showin' here.")
       ),
       m && card(
@@ -18586,7 +18586,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'\u2026" : String(m.beepable))),
         muted("Held messages turn into one short summary when that person's back.")
       ),
-      latest(ctx4)
+      latest(ctx5)
     ];
   }
   function summonCheck() {
@@ -18594,25 +18594,25 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
     return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
   }
-  function workCard(ctx4) {
-    const s = ctx4.s, sw = s.switches || {};
+  function workCard(ctx5) {
+    const s = ctx5.s, sw = s.switches || {};
     return card(
       title("\u23F1 On call"),
       muted("Most staff leave this off. Mandated farmhands are always on call."),
-      s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx4.send("forced")),
+      s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx5.send("forced")),
       s.onCall && summonCheck()
     );
   }
   var STAFF_TABS = [
-    { id: "office", label: "\u{1F5C2} Office", render: office, badge: (ctx4) => ctx4.docs.length },
-    { id: "queue", label: "\u{1F4DD} Queue", render: queue2, badge: (ctx4) => (ctx4.s.apps || []).length },
+    { id: "office", label: "\u{1F5C2} Office", render: office, badge: (ctx5) => ctx5.docs.length },
+    { id: "queue", label: "\u{1F4DD} Queue", render: queue2, badge: (ctx5) => (ctx5.s.apps || []).length },
     { id: "herd", label: "\u{1F411} Herd", render: herd },
     { id: "contracts", label: "\u{1F4DC} Contracts", render: contracts },
     { id: "barn", label: "\u{1F3DA} Barn", render: barn },
     { id: "shift", label: "\u23F1 Shift", render: shiftTab },
     { id: "zones", label: "\u{1F5FA} Zones", render: zones },
     // (on the panel, not in ⚙: drawin' a zone needs the map in view)
-    { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx4) => !!ctx4.s.logReader }
+    { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx5) => !!ctx5.s.logReader }
     // the record (chatlog.js), for whoever may read it (221397)
   ];
 
@@ -18660,6 +18660,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     heelAt: 0
   };
   var HANG_KEY = "fhc-hangons";
+  var endHooks = [];
+  var onTranceEnd = (f) => {
+    if (typeof f === "function") endHooks.push(f);
+  };
+  var tranceState = T;
   function initTrance(c) {
     ctx = c;
     loadFarm();
@@ -18714,8 +18719,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function hypCfg() {
-    const st2 = W14.Player && W14.Player.LSCG && W14.Player.LSCG.StateModule, list = st2 && Array.isArray(st2.states) ? st2.states : null;
-    return list && list.find((x) => x && x.type === "hypnotized") || null;
+    const st2 = W14.Player && W14.Player.LSCG && W14.Player.LSCG.StateModule, list2 = st2 && Array.isArray(st2.states) ? st2.states : null;
+    return list2 && list2.find((x) => x && x.type === "hypnotized") || null;
   }
   function keepUnder(s, now) {
     const c = hypCfg();
@@ -18923,14 +18928,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     saveHang();
     hangNames();
     drawNarrow();
+    for (const f of endHooks) {
+      try {
+        f();
+      } catch (e) {
+      }
+    }
     const el2 = W14.document && W14.document.querySelectorAll ? W14.document.querySelectorAll(".fhc-sg-ask") : [];
     for (const x of el2) x.remove();
     if (had && !quiet && ctx) ctx.toChat("\u{1F300} All of it lets go of you.", "#a67fd4", true);
   }
   function check(ids) {
     const h2 = H(), have = h2 && Array.isArray(h2.suggestions) ? h2.suggestions.map((s) => s && s.id) : [];
-    const list = Array.isArray(ids) ? ids.filter((x) => typeof x === "string").slice(0, 100) : [];
-    event({ ev: "checked", ids: list, found: list.filter((id) => have.includes(id)) });
+    const list2 = Array.isArray(ids) ? ids.filter((x) => typeof x === "string").slice(0, 100) : [];
+    event({ ev: "checked", ids: list2, found: list2.filter((id) => have.includes(id)) });
     report(true);
   }
   var isBot = () => !!(W14.Player && W14.Player.MemberNumber === BOT_MEMBER);
@@ -19326,8 +19337,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function okSugg(s) {
     return !!(s && typeof s.id === "string" && s.id.indexOf(SUGG_PREFIX) === 0 && typeof s.trigger === "string" && s.trigger.trim().length >= 4 && Array.isArray(s.instructions) && s.instructions.length >= 1 && s.instructions.length <= 3 && s.instructions.every((i) => i && INSTR.includes(i.type)));
   }
-  function setFarm(list) {
-    T.farm = (Array.isArray(list) ? list : []).filter(okSugg).slice(0, 100).map((s) => ({
+  function setFarm(list2) {
+    T.farm = (Array.isArray(list2) ? list2 : []).filter(okSugg).slice(0, 100).map((s) => ({
       id: s.id.slice(0, 60),
       name: String(s.name || "").slice(0, 80),
       trigger: s.trigger.trim().slice(0, 80),
@@ -19466,13 +19477,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         strip(a.selection);
         break;
       case "Speak Phrase": {
-        const words = String(a.config || p.after || "").replace(/[()]/g, "").trim().slice(0, 200);
-        if (!words || /^[*!/.]/.test(words)) {
+        const words2 = String(a.config || p.after || "").replace(/[()]/g, "").trim().slice(0, 200);
+        if (!words2 || /^[*!/.]/.test(words2)) {
           ctx.toChat("\u{1F300} The words never quite come to you, so that part slides off.", "#a67fd4", true);
           break;
         }
-        T.phrase = words;
-        ctx.toChat("\u{1F300} You want nothin' else but to say: " + words, "#a67fd4", true);
+        T.phrase = words2;
+        ctx.toChat("\u{1F300} You want nothin' else but to say: " + words2, "#a67fd4", true);
         emote(me5 + "'s mouth starts movin' on its own.");
         break;
       }
@@ -19652,9 +19663,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ctx.toBot("hypnoDo", { what: "stall", by: Number(by) || 0 });
   }
   var BEGS = ["{Sound}\u2026 please, milk me\u2026", "Milk me\u2026 please, I'm so full\u2026", "{Sound}\u2026 need milked\u2026 please\u2026", "Please\u2026 the stall\u2026 milk me\u2026"];
-  function farmBeg(words, stall, by) {
+  function farmBeg(words2, stall, by) {
     const s = soundWord(), fillW = (t) => String(t).replace(/\{Sound\}/g, cap(s)).replace(/\{sound\}/g, s).replace(/\{animal\}/gi, T.me.animal || "animal");
-    const own = String(words || "").trim();
+    const own = String(words2 || "").trim();
     sayOut(fillW(own && !/^[*!/.]/.test(own) ? own : pickOf(BEGS)));
     if (stall !== false) setTimeout(() => farmStall(by), 2e3);
   }
@@ -19787,10 +19798,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function slipLine() {
     const depth = Math.round(hijackDepth() * 100), ok2 = T.slips.filter((x) => x.p <= depth);
-    const list = ok2.length ? ok2 : T.slips.filter((x) => x.p === 0);
-    if (list.length) {
-      const top = Math.max(...list.map((x) => x.p));
-      return pickOf(list.filter((x) => x.p >= top - 30)).t;
+    const list2 = ok2.length ? ok2 : T.slips.filter((x) => x.p === 0);
+    if (list2.length) {
+      const top = Math.max(...list2.map((x) => x.p));
+      return pickOf(list2.filter((x) => x.p >= top - 30)).t;
     }
     return cap(stretch(soundWord())) + "~";
   }
@@ -19999,6 +20010,1800 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
 
+  // shared/trance-script.js
+  var KINDS2 = ["induction", "deepener", "convincer", "suggestion", "trigger", "compulsion", "hangon", "wake", "slip", "nudge", "session"];
+  var SPOKEN = KINDS2.filter((k) => k !== "session");
+  var SESSION_KINDS = ["induction", "deepener", "convincer", "suggestion", "trigger", "compulsion", "hangon", "wake"];
+  var ASIDE = ["slip", "nudge"];
+  var PLANTED = ["trigger", "compulsion", "hangon"];
+  var WHEN = {
+    wake: "they come up out of a session",
+    leader: "their herd leader walks in",
+    "leader talks": "their herd leader says somethin'",
+    stall: "a milkin' stall takes them",
+    full: "they're near full (80%)",
+    fed: "a feeder feeds them",
+    pat: "somebody pats their head",
+    squeeze: "somebody gropes their tits",
+    cum: "they cum"
+  };
+  var EFFECTS = {
+    mootalk: "their sound slips out between their words",
+    cowtalk: "no I: just this {animal}",
+    yes: "every no comes out yes",
+    edge: "kept right at the edge",
+    needy: "kept warm and needy",
+    fours: "they stay down low (kneelin' or all fours, their pick)",
+    handsoff: "their hands won't touch themselves",
+    hearing: "only the farm's voice (and their herd leader's) comes through",
+    names: "everybody's names go fuzzy",
+    heel: "drawn to their herd leader's side"
+  };
+  var KEEP_MS = { fun: 864e5, deep: 7 * 864e5 };
+  var HANG_CAP_S = { fun: 20 * 60, deep: 60 * 60, nhl: 4 * 3600 };
+  var LEVELS = ["fun", "deep", "nhl"];
+  var BANDS = { delta: [1.5, 3.5], theta: [4.5, 7], alpha: [8.5, 11.5], beta: [13, 20] };
+  var HZ_MIN = 1;
+  var HZ_MAX = 30;
+  var MAX_DOES = 3;
+  var LABELS = ["level", "for", "wears", "pace", "pick", "beats", "volume", "look", "deeper", "pull", "trigger", "does", "waits", "when", "chance", "effect", "lasts", "visor"];
+  var LSCG = {
+    cum: "Orgasm",
+    deny: "Denial",
+    needy: "Insatiable",
+    touch: "Perform Activity",
+    strip: "Strip",
+    pose: "Assume Pose",
+    follow: "Follow",
+    say: "Speak Phrase",
+    forget: "Forget"
+  };
+  var FARM = { sound: "bnbfarm.sound", stall: "bnbfarm.stall", beg: "bnbfarm.beg", dose: "farmhand-dispensary.dose" };
+  var FARM_TYPES = Object.values(FARM);
+  var STEP_NAMES = { [FARM.sound]: "Their Sound", [FARM.stall]: "To a Free Stall", [FARM.beg]: "Beg to Be Milked", [FARM.dose]: "Take a Dose" };
+  var POSES = {
+    kneel: { lower: "Kneel" },
+    "kneel spread": { lower: "KneelingSpread" },
+    "kneeling spread": { lower: "KneelingSpread" },
+    "all fours": { full: "AllFours" },
+    fours: { full: "AllFours" },
+    stand: { upper: "BaseUpper", lower: "BaseLower" },
+    "legs closed": { lower: "LegsClosed" },
+    "legs spread": { lower: "Spread" },
+    "hands behind": { upper: "BackBoxTie" },
+    "hands behind back": { upper: "BackBoxTie" },
+    "elbows behind": { upper: "BackElbowTouch" },
+    "hands up": { upper: "OverTheHead" },
+    "arms up": { upper: "OverTheHead" },
+    yoked: { upper: "Yoked" }
+  };
+  var STRIP = {
+    top: ["ClothOuter", "Cloth", "Suit", "Bra", "Corset"],
+    bottoms: ["ClothLower", "SuitLower", "Panties", "Garters"],
+    bottom: ["ClothLower", "SuitLower", "Panties", "Garters"],
+    underwear: ["Bra", "Panties"],
+    feet: ["Shoes", "Socks", "SocksLeft", "SocksRight"],
+    shoes: ["Shoes"],
+    gloves: ["Gloves"],
+    hat: ["Hat"]
+  };
+  var ZONES = {
+    head: "ItemHead",
+    hair: "ItemHead",
+    ears: "ItemEars",
+    nose: "ItemNose",
+    mouth: "ItemMouth",
+    lips: "ItemMouth",
+    neck: "ItemNeck",
+    arms: "ItemArms",
+    hands: "ItemHands",
+    tits: "ItemBreast",
+    breasts: "ItemBreast",
+    chest: "ItemBreast",
+    udders: "ItemBreast",
+    nipples: "ItemNipples",
+    belly: "ItemTorso",
+    torso: "ItemTorso",
+    hips: "ItemPelvis",
+    pelvis: "ItemPelvis",
+    pussy: "ItemVulva",
+    vulva: "ItemVulva",
+    clit: "ItemVulvaPiercings",
+    cock: "ItemPenis",
+    butt: "ItemButt",
+    ass: "ItemButt",
+    legs: "ItemLegs",
+    thighs: "ItemLegs",
+    feet: "ItemBoots"
+  };
+  var FORGET = { deny: "Denial", denial: "Denial", needy: "Insatiable", insatiable: "Insatiable", follow: "Follow", say: "Speak Phrase" };
+  var clean3 = (s) => String(s == null ? "" : s).trim();
+  var lc = (s) => clean3(s).toLowerCase();
+  var list = (s) => clean3(s).split(/\s*,\s*/).map(clean3).filter(Boolean);
+  function seconds(s) {
+    s = lc(s);
+    if (!s) return null;
+    if (/^\d+(\.\d+)?$/.test(s)) return Number(s);
+    const m = /^(?:(\d+(?:\.\d+)?)\s*h(?:ours?|rs?)?)?\s*(?:(\d+(?:\.\d+)?)\s*m(?:in)?s?)?\s*(?:(\d+(?:\.\d+)?)\s*s(?:ec)?s?)?$/.exec(s);
+    if (!m || !m[1] && !m[2] && !m[3]) return null;
+    return Math.round((Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Number(m[3] || 0)) * 10) / 10;
+  }
+  function parsePace(s) {
+    s = lc(s);
+    const m = /^(\d+(?:\.\d+)?)\s*(?:s|sec|secs)?\s*(?:-|to|–)\s*(\d+(?:\.\d+)?\s*(?:s|sec|secs|m|min)?)$/.exec(s);
+    if (m) {
+      const a = seconds(m[1]), b = seconds(/[a-z]/.test(m[2]) ? m[2] : m[2] + "s");
+      return a != null && b != null && a > 0 && b >= a ? { min: a, max: b } : null;
+    }
+    const one = seconds(s);
+    return one != null && one > 0 ? { min: one, max: one } : null;
+  }
+  function rate(s) {
+    s = lc(s).replace(/hz$/, "").trim();
+    if (!s) return null;
+    if (/^\d+(\.\d+)?$/.test(s)) {
+      const n = Number(s);
+      return n >= HZ_MIN && n <= HZ_MAX ? { hz: n } : null;
+    }
+    const m = /^(?:deep\s+)?(delta|theta|alpha|beta)(?:\s+(\d+(?:\.\d+)?))?$/.exec(s);
+    if (!m) return null;
+    if (m[2]) {
+      const n = Number(m[2]);
+      return n >= HZ_MIN && n <= HZ_MAX ? { hz: n, band: m[1] } : null;
+    }
+    return { band: m[1] };
+  }
+  function parseBeats(s) {
+    s = lc(s);
+    if (!s) return null;
+    if (/^(off|none|stop|silent)$/.test(s)) return { off: true };
+    let over = null;
+    const o = /\s+over\s+(.+)$/.exec(s);
+    if (o) {
+      over = seconds(o[1]);
+      if (over == null) return null;
+      s = s.slice(0, o.index);
+    }
+    const parts2 = s.split(/\s*(?:→|->|=>|\bto\b)\s*/);
+    if (parts2.length > 2) return null;
+    const from = parts2[0] ? rate(parts2[0]) : null, to = parts2.length === 2 ? rate(parts2[1]) : null;
+    if (parts2[0] && !from) return null;
+    if (parts2.length === 2 && !to) return null;
+    if (!from && !to) return null;
+    return { from: from || null, to: to || null, over: over != null ? Math.min(3600, Math.max(0, over)) : null };
+  }
+  function hzOf(r, rng2) {
+    if (!r) return null;
+    if (r.hz != null) return r.hz;
+    const b = BANDS[r.band];
+    if (!b) return null;
+    return Math.round((b[0] + (rng2 || Math.random)() * (b[1] - b[0])) * 10) / 10;
+  }
+  function parseLook(s) {
+    const out = {}, bad = [];
+    for (const part of list(lc(s))) {
+      let m;
+      if (part === "clear" || part === "off" || part === "none") {
+        Object.assign(out, { haze: 0, spiral: "off", rings: false, words: false, names: false });
+        continue;
+      }
+      if (m = /^haze\s+(\d{1,3})\s*%?$/.exec(part)) {
+        out.haze = Math.min(100, Number(m[1]));
+        continue;
+      }
+      if (/^haze\s+(off|none)$/.test(part)) {
+        out.haze = 0;
+        continue;
+      }
+      if (m = /^spiral(?:\s+(off|slow|on|fast))?$/.exec(part)) {
+        out.spiral = m[1] === "fast" ? "on" : m[1] || "slow";
+        continue;
+      }
+      if (m = /^rings(?:\s+(on|off))?$/.exec(part)) {
+        out.rings = m[1] !== "off";
+        continue;
+      }
+      if (m = /^words(?:\s+(drift|on|off))?$/.exec(part)) {
+        out.words = m[1] !== "off";
+        continue;
+      }
+      if (m = /^names(?:\s+(blur|blurred|on|clear|off))?$/.exec(part)) {
+        out.names = !(m[1] === "clear" || m[1] === "off");
+        continue;
+      }
+      bad.push(part);
+    }
+    return { look: out, bad };
+  }
+  function steps(s) {
+    const out = [];
+    let cur = "", q2 = null;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (q2) {
+        cur += c;
+        if (c === q2) q2 = null;
+        continue;
+      }
+      if (c === '"' || c === "\u201C") {
+        q2 = c === "\u201C" ? "\u201D" : '"';
+        cur += c;
+        continue;
+      }
+      if (c === "\u2192" || c === ";") {
+        out.push(cur);
+        cur = "";
+        continue;
+      }
+      if ((c === "-" || c === "=") && s[i + 1] === ">") {
+        out.push(cur);
+        cur = "";
+        i++;
+        continue;
+      }
+      cur += c;
+    }
+    out.push(cur);
+    return out.map(clean3).filter(Boolean);
+  }
+  var unquote = (s) => clean3(s).replace(/^["“](.*)["”]$/, "$1").trim();
+  function parseStep(s, ctx5) {
+    ctx5 = ctx5 || {};
+    const t = clean3(s), l = t.toLowerCase();
+    let m;
+    if (/^(cum|orgasm|come)$/.test(l)) return { type: LSCG.cum, arguments: {} };
+    if (/^(deny|denial|denied|edge)$/.test(l)) return { type: LSCG.deny, arguments: {} };
+    if (/^(needy|insatiable|horny)$/.test(l)) return { type: LSCG.needy, arguments: {} };
+    if (m = /^strip(?:\s+(.+))?$/i.exec(t)) {
+      const what = list((m[1] || "all").replace(/\s+and\s+/gi, ","));
+      if (what.some((w) => /^(all|everything)$/i.test(w))) return { type: LSCG.strip, arguments: { selection: { all: true, random: false, groups: [] } } };
+      if (what.some((w) => /^(random|one|something)$/i.test(w))) return { type: LSCG.strip, arguments: { selection: { all: false, random: true, groups: [] } } };
+      const groups2 = [];
+      for (const w of what) {
+        if (STRIP[w.toLowerCase()]) groups2.push(...STRIP[w.toLowerCase()]);
+        else if (/^[A-Z][A-Za-z]+$/.test(w)) groups2.push(w);
+        else return { error: 'strip what? "' + w + '" (top, bottoms, underwear, feet, all, random, or a slot like ClothLower)' };
+      }
+      return { type: LSCG.strip, arguments: { selection: { all: false, random: false, groups: Array.from(new Set(groups2)) } } };
+    }
+    if (m = /^pose\s+(.+)$/i.exec(t)) {
+      let p = clean3(m[1]).toLowerCase();
+      if (p === "{low}" || p === "low") p = ctx5.low === "fours" ? "all fours" : "kneel";
+      const raw = /^(upper|lower|full)\s+([A-Za-z]+)$/i.exec(clean3(m[1]));
+      const sel = raw ? { [raw[1].toLowerCase()]: raw[2] } : POSES[p];
+      if (!sel) return { error: 'pose what? "' + m[1] + `" ({low}, kneel, kneel spread, all fours, stand, hands behind, hands up, or upper/lower/full <the game's pose>)` };
+      return { type: LSCG.pose, arguments: { selection: Object.assign({ upper: "", lower: "", full: "" }, sel) } };
+    }
+    if (m = /^say(?:\s*:)?(?:\s+(.+))?$/i.exec(t)) {
+      const words2 = m[1] ? unquote(m[1]) : "";
+      if (/[()]/.test(words2) || /^[*!/.]/.test(words2)) return { error: "what they say can't start with * ! / . or have round brackets" };
+      return { type: LSCG.say, arguments: words2 ? { config: words2.slice(0, 200) } : {} };
+    }
+    if (/^follow(\s+(me|speaker|them))?$/i.test(t)) return { type: LSCG.follow, arguments: { speakerOnly: true } };
+    if (m = /^(?:touch|do|activity)\s+([A-Za-z]+)\s+(?:on\s+)?(?:(?:their|your|the|my)\s+)?([A-Za-z]+)(?:\s+(self|own|speaker|me|them|named))?$/i.exec(t)) {
+      const act = m[1][0].toUpperCase() + m[1].slice(1), zw = m[2].toLowerCase(), zone = ZONES[zw] || (/^Item[A-Z][A-Za-z]+$/.test(m[2]) ? m[2] : null);
+      if (!zone) return { error: 'touch where? "' + m[2] + `" (head, mouth, neck, tits, nipples, belly, pussy, cock, butt, hands, feet, or the game's Item\u2026 name)` };
+      const who2 = (m[3] || "").toLowerCase(), a = { selection: { name: act, group: zone } };
+      if (who2 === "self" || who2 === "own") a.self = true;
+      else if (who2 === "speaker" || who2 === "me") a.speakerOnly = true;
+      return { type: LSCG.touch, arguments: a };
+    }
+    if (m = /^forget(?:\s+(.+))?$/i.exec(t)) {
+      const what = list((m[1] || "all").replace(/\s+and\s+/gi, ","));
+      if (what.some((w) => /^(all|everything)$/i.test(w))) return { type: LSCG.forget, arguments: { selection: { all: true, instructions: [] } } };
+      const ins = [];
+      for (const w of what) {
+        const f = FORGET[w.toLowerCase()];
+        if (!f) return { error: 'forget what? "' + w + '" (all, deny, needy, follow, say)' };
+        ins.push(f);
+      }
+      return { type: LSCG.forget, arguments: { selection: { all: false, instructions: Array.from(new Set(ins)) } } };
+    }
+    if (m = /^(?:moo|sound|noise|make (?:their|your|a) (?:sound|noise))(?:\s+(\d+))?$/i.exec(t)) {
+      const n = Number(m[1] || 1);
+      if (!(n >= 1 && n <= 3)) return { error: "moo once, twice or three times (moo, moo 2, moo 3)" };
+      return { type: FARM.sound, arguments: { options: { times: n } } };
+    }
+    if (/^(?:stall|to (?:a |the )?stalls?|go to (?:a |the )?(?:free )?(?:milk(?:in'?g?)? )?stall)$/i.test(t)) return { type: FARM.stall, arguments: { options: {} } };
+    if (m = /^beg(?:\s+to be milked|\s+for it)?(?:\s*:)?(?:\s+(.+))?$/i.exec(t)) {
+      const words2 = m[1] ? unquote(m[1]) : "";
+      if (/[()]/.test(words2) || /^[*!/.]/.test(words2)) return { error: "what they beg can't start with * ! / . or have round brackets" };
+      return { type: FARM.beg, arguments: { options: words2 ? { words: words2.slice(0, 120) } : {} } };
+    }
+    if (m = /^dose\s+(.+?)(?:\s+(half|whole|double))?$/i.exec(t)) return { type: FARM.dose, arguments: { options: { dose: lc(m[1]).slice(0, 40), strength: lc(m[2] || "whole") } } };
+    return { error: `I don't know "` + t + `" (cum, deny, needy, strip \u2026, pose \u2026, say "\u2026", follow, touch <Activity> <zone>, forget \u2026, or the farm's: moo, stall, beg "\u2026", dose <name>)` };
+  }
+  function parseDoes(does, waits, ctx5) {
+    const parts2 = steps(clean3(does));
+    if (!parts2.length) return { error: "does what? (at least one: cum, deny, needy, strip, pose, say, follow, touch, forget, moo, stall, beg, dose)" };
+    if (parts2.length > MAX_DOES) return { error: "at most " + MAX_DOES + " things (LSCG's limit), not " + parts2.length };
+    const w = list(waits || "").map(seconds), out = [];
+    for (let i = 0; i < parts2.length; i++) {
+      const r = parseStep(parts2[i], ctx5);
+      if (r.error) return { error: r.error };
+      if (i > 0 && w[i - 1] != null) {
+        if (w[i - 1] < 1 || w[i - 1] > 30) return { error: "a wait is 1 to 30 seconds" };
+        r.delay = Math.round(w[i - 1] * 1e3);
+      }
+      out.push(r);
+    }
+    return { ok: true, instructions: out };
+  }
+  var CUE = /\[([^\]]*)\]/g;
+  function readCue(c) {
+    const s = lc(c);
+    let m;
+    if (m = /^(?:wait|pause)\s+(.+)$/.exec(s)) {
+      const v = seconds(m[1]);
+      return v != null && v >= 0 && v <= 600 ? { wait: v } : { bad: c };
+    }
+    if (m = /^deeper\s*\+?\s*(-?\d+)$/.exec(s)) return { deeper: Math.max(-100, Math.min(100, Number(m[1]))) };
+    if (m = /^beats\s+(.+)$/.exec(s)) {
+      const b = parseBeats(m[1]);
+      return b ? { beats: b } : { bad: c };
+    }
+    if (m = /^look\s+(.+)$/.exec(s)) {
+      const L = parseLook(m[1]);
+      return L.bad.length ? { bad: c } : { look: L.look };
+    }
+    return { bad: c };
+  }
+  function parseLibrary(text3) {
+    const blocks = [], errors = [], warnings = [];
+    const rows3 = String(text3 == null ? "" : text3).replace(/\r\n?/g, "\n").split("\n");
+    let b = null, inLabels = false;
+    const err = (n, msg) => {
+      errors.push({ line: n, block: b ? b.kind + ": " + b.name : "", msg });
+      if (b) b.bad = true;
+    };
+    const warn = (n, msg) => warnings.push({ line: n, block: b ? b.kind + ": " + b.name : "", msg });
+    const close3 = () => {
+      if (b) {
+        finish(b, err, warn);
+        blocks.push(b);
+      }
+      b = null;
+    };
+    rows3.forEach((raw, i) => {
+      const n = i + 1, line3 = raw.replace(/\s+$/, "");
+      const head = /^===\s*([A-Za-z]+)\s*:\s*(.*?)\s*=*\s*$/.exec(line3);
+      if (head) {
+        close3();
+        const kind = head[1].toLowerCase(), name = clean3(head[2]);
+        b = { kind, name, labels: {}, raw: {}, lines: [], at: n };
+        inLabels = true;
+        if (!KINDS2.includes(kind)) err(n, 'no such kind "' + head[1] + '" (' + KINDS2.join(", ") + ")");
+        if (!name) err(n, "a block needs a name: === " + kind + ": Its Name");
+        return;
+      }
+      if (/^\s*(#|\/\/)/.test(line3)) return;
+      if (!b) {
+        if (clean3(line3)) warn(n, "this is outside any block, so it's skipped (start one with === kind: Name)");
+        return;
+      }
+      if (!clean3(line3)) {
+        if (b.lines.length || Object.keys(b.raw).length) inLabels = false;
+        return;
+      }
+      const lab = /^\s*([A-Za-z]+)\s*:\s*(.*)$/.exec(line3);
+      const key3 = lab && lab[1].toLowerCase();
+      if (inLabels && lab && (LABELS.includes(key3) || b.kind === "session" && SESSION_KINDS.includes(key3))) {
+        if (b.kind === "session" && SESSION_KINDS.includes(key3)) (b.raw.picks = b.raw.picks || []).push([key3, lab[2], n]);
+        else b.raw[key3] = [lab[2], n];
+        return;
+      }
+      inLabels = false;
+      if (b.kind === "session") {
+        warn(n, "a session only lists blocks (like deepener: any); this line is skipped");
+        return;
+      }
+      let text4 = line3.trim();
+      const cues = [];
+      text4 = text4.replace(CUE, (all, c) => {
+        const r = readCue(c);
+        if (r.bad != null) warn(n, "I don't know the cue [" + c + "] (wait, deeper, beats, look)");
+        else cues.push(r);
+        return " ";
+      });
+      if (/[()]/.test(text4)) {
+        warn(n, "round brackets taken out: hypno add-ons skip anything after one");
+        text4 = text4.replace(/[()]/g, "");
+      }
+      text4 = text4.replace(/\s{2,}/g, " ").trim();
+      if (text4 || cues.length) b.lines.push({ text: text4, cues, at: n });
+    });
+    close3();
+    const seen3 = /* @__PURE__ */ new Map();
+    for (const x of blocks) {
+      const k = x.kind + ":" + lc(x.name);
+      if (seen3.has(k)) {
+        errors.push({ line: x.at, block: x.kind + ": " + x.name, msg: "two " + x.kind + "s are called " + x.name + " (line " + seen3.get(k) + ")" });
+        x.bad = true;
+      } else seen3.set(k, x.at);
+    }
+    for (const x of blocks.filter((y) => y.kind === "session" && !y.bad)) {
+      for (const p of x.labels.picks || []) for (const it of p.items) if (it.name && !blocks.some((y) => y.kind === p.kind && lc(y.name) === lc(it.name))) {
+        errors.push({ line: p.at, block: "session: " + x.name, msg: "there's no " + p.kind + " called " + it.name });
+        x.bad = true;
+      }
+    }
+    return { blocks, errors, warnings };
+  }
+  function finish(b, err, warn) {
+    const r = b.raw, L = b.labels;
+    const get2 = (k) => r[k] ? r[k] : null;
+    if (get2("level")) {
+      const v = list(lc(r.level[0])).map((x) => x === "no human left" ? "nhl" : x);
+      const bad = v.filter((x) => !LEVELS.includes(x) && x !== "any" && x !== "all");
+      if (bad.length) err(r.level[1], "level is fun, deep or nhl, not " + bad.join(", "));
+      L.level = v.includes("any") || v.includes("all") ? LEVELS.slice() : v.filter((x) => LEVELS.includes(x));
+    }
+    if (get2("for")) {
+      const v = list(lc(r.for[0]));
+      L.for = v.includes("any") || v.includes("all") ? null : v;
+    }
+    if (get2("wears")) L.wears = list(lc(r.wears[0]));
+    if (get2("pace")) {
+      const p = parsePace(r.pace[0]);
+      if (!p) err(r.pace[1], 'pace is like 30s or 20-40s, not "' + r.pace[0] + '"');
+      else L.pace = p;
+    }
+    if (get2("pick")) {
+      const p = Number(clean3(r.pick[0]));
+      if (!(p >= 1 && p <= 99 && Math.floor(p) === p)) err(r.pick[1], "pick is a number of lines, like 3");
+      else L.pick = p;
+    }
+    if (get2("beats")) {
+      const v = parseBeats(r.beats[0]);
+      if (!v) err(r.beats[1], 'beats like "theta", "6", "alpha 10 \u2192 theta 6 over 3m" or "off" (1 to 30 Hz), not "' + r.beats[0] + '"');
+      else L.beats = v;
+    }
+    if (get2("volume")) {
+      const m = /^(\d{1,3})\s*%?$/.exec(clean3(r.volume[0]));
+      if (!m || Number(m[1]) > 100) err(r.volume[1], "volume is 0% to 100% of their own");
+      else L.volume = Number(m[1]);
+    }
+    if (get2("look")) {
+      const v = parseLook(r.look[0]);
+      if (v.bad.length) err(r.look[1], "I don't know the look " + v.bad.join(", ") + " (haze N%, spiral slow|on|off, rings on|off, words drift|off, names blur|clear, clear)");
+      else L.look = v.look;
+    }
+    if (get2("deeper")) {
+      const m = /^\+?\s*(-?\d+)$/.exec(clean3(r.deeper[0]));
+      if (!m) err(r.deeper[1], "deeper is a number, like +10");
+      else L.deeper = Math.max(-100, Math.min(100, Number(m[1])));
+    }
+    if (get2("pull")) {
+      const m = /^(\d{1,3})\s*%?\s*\+?$/.exec(clean3(r.pull[0]));
+      if (!ASIDE.includes(b.kind)) warn(r.pull[1], "pull only means somethin' on a slip or a nudge, so it's skipped here");
+      else if (!m || Number(m[1]) > 100) err(r.pull[1], "pull is how far the farm's pull has to be built up first, 0 to 100, like: pull: 60");
+      else L.pull = Number(m[1]);
+    }
+    if (b.kind === "trigger") {
+      if (!get2("trigger") || clean3(r.trigger[0]).length < 4) err(get2("trigger") ? r.trigger[1] : b.at, "a trigger needs its phrase, 4 letters or more: trigger: milkin' time");
+      else {
+        L.trigger = clean3(r.trigger[0]).replace(/[()]/g, "").slice(0, 80);
+        if (/^[*!/.]/.test(L.trigger)) err(r.trigger[1], "a trigger can't start with * ! / .");
+      }
+    } else if (get2("trigger")) warn(r.trigger[1], "trigger only means somethin' on a trigger block, so it's skipped here");
+    if (b.kind === "trigger" || b.kind === "compulsion") {
+      if (!get2("does")) err(b.at, "a " + b.kind + ' needs what it does: does: pose {low} \u2192 say "Moo"');
+      else {
+        const d = parseDoes(r.does[0], get2("waits") ? r.waits[0] : "", { low: "kneel" });
+        if (d.error) err(r.does[1], d.error);
+        else {
+          L.does = clean3(r.does[0]);
+          L.waits = get2("waits") ? clean3(r.waits[0]) : "";
+        }
+      }
+    } else for (const k of ["does", "waits"]) if (get2(k)) warn(r[k][1], k + " only means somethin' on a trigger or a compulsion, so it's skipped here");
+    if (b.kind === "compulsion") {
+      const w = get2("when") ? lc(r.when[0]).replace(/[-_]+/g, " ").replace(/\s+/g, " ") : "";
+      if (!w) err(b.at, "a compulsion needs what sets it off: when: " + Object.keys(WHEN).join(" | "));
+      else if (!WHEN[w]) err(r.when[1], "when is one of " + Object.keys(WHEN).join(", ") + ', not "' + r.when[0] + '"');
+      else L.when = w;
+      if (get2("chance")) {
+        const m = /^(\d{1,2}(?:\.\d+)?)\s*%?$/.exec(clean3(r.chance[0]));
+        if (!m || Number(m[1]) < 1 || Number(m[1]) > 50) err(r.chance[1], "chance is 1% to 50% (a small one: 10% if you leave it out)");
+        else L.chance = Number(m[1]);
+      }
+    } else for (const k of ["when", "chance"]) if (get2(k)) warn(r[k][1], k + " only means somethin' on a compulsion, so it's skipped here");
+    if (b.kind === "hangon") {
+      const e = get2("effect") ? lc(r.effect[0]).replace(/[\s'-]+/g, "") : "";
+      if (!e) err(b.at, "a hang-on needs its effect: effect: " + Object.keys(EFFECTS).join(" | "));
+      else if (!EFFECTS[e]) err(r.effect[1], "effect is one of " + Object.keys(EFFECTS).join(", ") + ', not "' + r.effect[0] + '"');
+      else L.effect = e;
+      if (get2("lasts")) {
+        const s = seconds(r.lasts[0]);
+        if (s == null || s < 60 || s > 4 * 3600) err(r.lasts[1], "lasts is 1m to 4h, like: lasts: 30m");
+        else L.lasts = s;
+      }
+    } else for (const k of ["effect", "lasts"]) if (get2(k)) warn(r[k][1], k + " only means somethin' on a hang-on, so it's skipped here");
+    if (get2("visor")) {
+      if (b.kind !== "session") warn(r.visor[1], "visor only means somethin' on a session, so it's skipped here");
+      else L.visor = /^(yes|on|true|y)$/i.test(clean3(r.visor[0]));
+    }
+    if (b.kind === "session") {
+      L.picks = (r.picks || []).map(([kind, v, n]) => ({ kind, at: n, items: list(v).map((it) => {
+        const m = /^any(?:\s+(\d+))?$/i.exec(it);
+        if (m) return { any: Number(m[1] || 1) };
+        if (/^all$/i.test(it)) return { all: true };
+        return { name: it };
+      }) }));
+      if (!L.picks.length) err(b.at, "a session lists its blocks in order, like: induction: any");
+    } else if (!b.lines.length && b.kind !== "trigger") warn(b.at, "this " + b.kind + " has no lines");
+    if (L.pick && L.pick > b.lines.length && b.lines.length) warn(r.pick[1], "pick " + L.pick + " but there are only " + b.lines.length + " lines");
+    delete b.raw;
+  }
+  function fits2(b, who2) {
+    const L = b.labels || {};
+    who2 = who2 || {};
+    if (b.bad) return false;
+    if (who2.level && L.level && L.level.length && !L.level.includes(who2.level)) return false;
+    if (L.for && L.for.length && !L.for.includes(lc(who2.species))) return false;
+    if (L.wears && L.wears.length && !L.wears.some((w) => (who2.wears || []).includes(w))) return false;
+    return true;
+  }
+  var shuffle = (a, rng2) => {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor((rng2 || Math.random)() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  function planSession(blocks, who2, opts) {
+    opts = opts || {};
+    const rng2 = opts.rng || Math.random;
+    const good = blocks.filter((b) => !b.bad);
+    const sessions = good.filter((b) => b.kind === "session" && fits2(b, who2));
+    let recipe = opts.name ? sessions.find((b) => lc(b.name) === lc(opts.name)) : null;
+    if (!recipe && sessions.length) recipe = sessions[Math.floor(rng2() * sessions.length)];
+    const picks = recipe ? recipe.labels.picks : [
+      { kind: "induction", items: [{ any: 1 }] },
+      { kind: "deepener", items: [{ any: 1 }] },
+      { kind: "suggestion", items: [{ any: 2 }] },
+      { kind: "trigger", items: [{ any: 1 }] },
+      { kind: "wake", items: [{ any: 1 }] }
+    ];
+    const used2 = /* @__PURE__ */ new Set(), out = [];
+    for (const p of picks) {
+      const pool = good.filter((b) => b.kind === p.kind && fits2(b, who2));
+      for (const it of p.items) {
+        if (it.name) {
+          const b = good.find((x) => x.kind === p.kind && lc(x.name) === lc(it.name));
+          if (b && !used2.has(b)) {
+            out.push(b);
+            used2.add(b);
+          }
+          continue;
+        }
+        const free = shuffle(pool.filter((b) => !used2.has(b)), rng2);
+        const take2 = it.all ? free : free.slice(0, it.any || 1);
+        for (const b of take2) {
+          out.push(b);
+          used2.add(b);
+        }
+      }
+    }
+    return { name: recipe ? recipe.name : "", recipe: recipe || null, blocks: out };
+  }
+  function sessionSteps(plan, opts) {
+    opts = opts || {};
+    const rng2 = opts.rng || Math.random, keep3 = opts.keep || (() => true);
+    const out = [];
+    for (const b of plan.blocks) {
+      const L = b.labels || {};
+      let lines = b.lines.filter((l) => !l.text || keep3(l.text));
+      if (L.pick && lines.length > L.pick) {
+        const idx = shuffle(lines.map((x, i) => i), rng2).slice(0, L.pick).sort((a, c) => a - c);
+        lines = idx.map((i) => lines[i]);
+      }
+      const pace = L.pace || { min: 30, max: 30 };
+      const gap = () => Math.round((pace.min + rng2() * (pace.max - pace.min)) * 10) / 10;
+      const first = { kind: b.kind, block: b.name, start: true };
+      if (L.beats) first.beats = beatsNow(L.beats, rng2);
+      if (L.volume != null) first.volume = L.volume;
+      if (L.look) first.look = L.look;
+      if (!lines.length) {
+        out.push(Object.assign(first, { text: "", gap: 0 }));
+      }
+      lines.forEach((l, i) => {
+        const s = i === 0 ? first : { kind: b.kind, block: b.name };
+        s.text = l.text;
+        s.gap = gap();
+        for (const c of l.cues || []) {
+          if (c.wait != null) s.gap = c.wait;
+          if (c.deeper != null) s.deeper = (s.deeper || 0) + c.deeper;
+          if (c.beats) s.beats = beatsNow(c.beats, rng2);
+          if (c.look) s.look = Object.assign({}, s.look || {}, c.look);
+        }
+        out.push(s);
+      });
+      const last2 = out[out.length - 1];
+      if (L.deeper) last2.deeper = (last2.deeper || 0) + L.deeper;
+      if (PLANTED.includes(b.kind)) last2.plant = b;
+    }
+    return out;
+  }
+  function beatsNow(v, rng2) {
+    if (!v) return null;
+    if (v.off) return { off: true };
+    return { from: hzOf(v.from, rng2), to: hzOf(v.to, rng2), over: v.over };
+  }
+  function fillIn(text3, words2) {
+    return String(text3 == null ? "" : text3).replace(/\{([a-z]+)\}/gi, (all, k) => words2 && words2[k.toLowerCase()] != null ? String(words2[k.toLowerCase()]) : all);
+  }
+
+  // shared/trance-starter.js
+  var STARTER = `# The farm's starter trance library. The studio's trance editor opens this when you start fresh.
+# Every block: === kind: Name, then labels, then the lines. A session is a recipe of blocks.
+
+=== induction: Settling In
+pace: 35-45s
+pick: 4
+beats: alpha 10 \u2192 theta 6 over 3m
+look: haze 20%, spiral slow
+
+Hear my voice, {name}. Just my voice. Let everything else in the barn go quiet.
+Listen, {name}. Just listen. The barn is warm, the straw is soft, and my voice is the only thing that matters.
+Breathe in slow. Breathe out slower. Every breath out lets your shoulders drop a little more.
+In through your nose, slow. Out through your mouth, slower. Again. Good.
+Let your hands go loose. Let your jaw go loose. Let everything that's holding on just let go.
+You don't have to think right now, {name}. Thinking is work, and you're not working. You're listening.
+Somewhere a cow lows and a gate creaks, and every sound just makes you sleepier.
+Feel how heavy your eyelids are getting. It's alright to let them close.
+Your body is getting heavy, {name}, heavy and warm, sinking into the straw.
+You've worked hard. You've been good. Now you get to stop, and just hear me.
+Feel the weight of your own head. Let it tip. Let it rest.
+There's nothing you need to do right now, {name}. Nothing at all but listen.
+
+=== deepener: Soft Straw
+level: fun
+pace: 35-45s
+pick: 3
+beats: theta 6
+look: haze 35%
+deeper: +15
+
+Down a little now. Soft and easy, like sinking into warm straw.
+Every word I say makes it easier to drift. Easier to just be a {pet}.
+Good. You're drifting, and it feels so nice to let go.
+Sinking softly now, like a calf curling up in the hay.
+Each breath out, a little further down. Nice and easy. Nothing to it.
+It's so pleasant down here, {name}. Warm and simple and quiet.
+Drifting, drifting, and every drift feels better than the last.
+You're a good {animal} now, and being a good {animal} feels so easy.
+
+=== deepener: Dark and Warm
+level: deep
+pace: 35-45s
+pick: 4
+beats: theta \u2192 delta 3.5 over 4m
+look: haze 50%, rings on, words drift
+deeper: +25
+
+Deeper now. Each time you breathe out, you sink twice as far.
+There's nothing above you but my voice, and nothing below you but more quiet. Keep sinking.
+Your thoughts are getting slow and simple. Simple is good. Simple is right for a {animal}.
+So deep now. You don't need words down here. You just need to listen.
+Down past the busy part of your mind, down where it's dark and warm and slow.
+Every word I say pushes you a little deeper, and you don't want me to stop.
+Your thoughts are coming slower now, one at a time, and then not at all.
+Deeper. You can't feel where your body ends and the straw begins.
+So deep. So good. A good {animal} sinks when they're told.
+
+=== deepener: Past the Words
+level: nhl
+pace: 35-45s
+pick: 4
+beats: delta 3 \u2192 2 over 4m
+look: haze 65%, rings on, words drift, names blur
+deeper: +35
+
+Deeper. Past where the words are. Past where your name lives.
+Let the person part of you drift away like a dream you're forgetting. There's only the {animal} left.
+Nothing up there to hold on to. No worries, no choices, no human things. Just a {animal}.
+Deeper than you've ever been. And every time we do this, you'll go deeper still.
+Deeper than thought. Deeper than words. Down where only the {animal} lives.
+Your name is getting far away, {name}. Let it go. You won't need it down here.
+Every breath out takes a little more of the person with it. Let it go.
+There's no up from here unless I bring you, and I'm in no hurry.
+Lower and lower, until you're nothing but warm and obedient and {animal}.
+
+=== convincer: Heavy Hands
+level: deep, nhl
+pace: 30-40s
+pick: 2
+
+Your hands are so heavy, {name}. Too heavy to lift. Try, and feel how they just stay where they are.
+Your eyelids are sealed now, warm and soft. The harder you try to open them, the deeper you sink.
+Your {paws} are resting where they fell. Nothin' in you wants to move them.
+
+=== suggestion: Good Animal
+level: fun
+pace: 35-45s
+pick: 3
+
+When you come up, your body remembers how a good {animal} waits: {low}.
+Your hands stay away from yourself. Good {animal}s don't touch. They wait to be touched.
+Every time someone calls you {pet}, you'll feel a warm little glow of pride.
+Being a good {animal} is easy. You just {act}, and everything feels right.
+Every time you hear the milking bell, you'll feel a little flutter of good {animal} pride.
+When someone pats your head, you'll lean into it. You won't even notice you're doing it.
+Every time you {sound}, you'll feel a little warm rush. Good {animal}s make their noises.
+When someone says {pet}, you'll smile. You won't be able to help it.
+{t}Your tits will feel full and heavy and proud, like they're there to be admired.
+{c}When you're praised, a little warm throb runs through your cock. Good {animal}s like praise.
+
+=== suggestion: Only the Voice
+level: deep
+pace: 35-45s
+pick: 3
+
+Only my voice matters now. Other voices are just noise in the barn.
+Feel the heat building low in your belly. Let it build. You don't get to finish. You just ache, and it feels like being good.
+When I tell you to, you'll {sound}. Not words. Just a {sound}. Go on. Let it out.
+Every bit of you belongs to the farm, your {body} most of all. You feel that every time someone looks at you.
+You {act} because it's what you're for. It's not a choice, and that's a relief.
+Your mind stays soft and slow even after you wake. Thinking can wait. Obeying can't.
+When the farm speaks, everything else gets quiet. That's how it should be.
+The ache stays with you after you wake, low and warm, and you'll never quite get to finish it.
+You'll {sound} when you're happy. You'll {sound} when you're needy. Words are for people.
+{t}Your tits are the farm's, and they ache to be milked whenever someone looks at them.
+{c}Your cock is the farm's. It stays hard and aching and it doesn't belong to you.
+{v}Your pussy is the farm's. Wet and ready whenever the farm wants it.
+Every time you go down {low}, you'll feel yourself sink a little. Down there is home.
+
+=== suggestion: No Person Left
+level: nhl
+pace: 35-45s
+pick: 3
+
+There's no human left in here. Just a {animal}, {low}, waiting to be used.
+Clothes don't feel like clothes anymore. They feel like a coat, a harness, a hide. You were born in them.
+Words are getting hard. That's alright. {animal}s don't need words. A {sound} says everything.
+You {act}. That's all. That's everything. You don't remember wanting anything else.
+There was never a person. There was only ever a {animal} that thought it was one.
+Hands are {paws}. Words are noises. Wanting is waiting. That's all you need.
+When you're touched, you push into it like an animal. When you're left, you wait like one.
+{t}Your udders are for milking. That's what they're for. That's what you're for.
+{c}You're for breeding now. Your cock knows it even if the rest of you forgets.
+{v}You're for breeding now. Your pussy knows it even if the rest of you forgets.
+The barn is home. The farm is everything. There's nothin' past the fence.
+
+=== suggestion: The Collar
+wears: collar
+pick: 1
+
+Feel your collar, {name}. Every time it presses your throat, you remember whose {animal} you are.
+Your collar is warm against your neck. It's always there, and so is the farm.
+
+=== suggestion: The Leash
+wears: leash
+pick: 1
+
+Feel the leash. A good {animal} goes where the leash goes, and never minds.
+Every tug of your leash is a tug on something deeper. You follow. You like following.
+
+=== suggestion: The Bell
+wears: bell
+pick: 1
+
+Every time your bell rings, you sink a little. Ring, sink. Ring, sink.
+Your bell tells the whole farm where its {animal} is. You like being found.
+
+=== suggestion: The Gag
+wears: gag
+pick: 1
+
+You don't need your mouth for words, {pet}. Let it rest round the gag. Your {sound} is enough.
+The gag keeps the words in. Good. Words were never yours anyway.
+
+=== suggestion: In the Dark
+wears: blind, hood
+pick: 1
+
+You can't see, and you don't need to. My voice is the only thing to follow.
+In the dark, there's only my voice and the warm straw.
+Inside the hood, there's no face to be. There's only the {animal}.
+
+=== suggestion: Paws
+wears: paws
+pick: 1
+
+Your hands are {paws} now. {paws} don't grab. {paws} don't hold. {paws} wait.
+Feel how useless your {paws} are. Isn't it a relief, not having to do anything with them?
+
+=== suggestion: Bound
+wears: arms
+pick: 1
+
+Your arms are tied, so you don't have to decide anything with them. Let them rest.
+Bound, you're free of choices. Just a {animal}, held still, listening.
+
+=== suggestion: Caged
+wears: cage
+pick: 1
+
+{c}Your cage keeps you good. You don't need to touch. You don't even want to.
+{c}Every throb against your cage is the farm reminding you who it belongs to.
+
+=== suggestion: Clamped
+wears: nipples
+pick: 1
+
+That little bite at your nipples is the farm's hand on you. Feel it, and sink.
+Your clamped nipples throb in time with my voice. Every throb, a little deeper.
+
+=== suggestion: Hide and Tack
+wears: latex, harness
+pick: 1
+
+Your latex is your hide now. Smooth, shining, nothing human under it.
+Feel how the rubber holds you. Tight. Close. Like it's keeping the {animal} in.
+Your harness holds you like a farm holds its stock. Snug, and safe, and owned.
+Feel every strap of your harness. Each one says: tack, not clothes.
+
+=== suggestion: Ears and Tail
+wears: ears, tail
+pick: 1
+
+Feel your ears. They twitch at my voice, don't they. {animal}s' ears always do.
+Feel your tail. It moves when you're happy, and you're happy now.
+
+=== suggestion: Hooves
+wears: hooves
+pick: 1
+
+Your hooves keep you up on your toes, the way a good {animal} should stand.
+Feel the weight of your hooves. You weren't made for walking like a person.
+
+=== suggestion: Nose Ring
+wears: noseRing
+pick: 1
+
+Your nose ring is where the farm leads a good {animal}. You'll follow it anywhere.
+Feel the ring in your nose. One tug, and you'll come.
+
+=== trigger: Good Animal
+trigger: good {animal}
+does: say "{sound}~"
+
+And now somethin' to keep. Whenever anyone calls you a good {animal}, a happy little {sound} bubbles right up out of you, and nothin' else will come out till it has.
+
+=== trigger: Low and Still
+trigger: low and still
+does: pose {low}
+
+And somethin' to keep. When you hear the words low and still, your body goes down {low} before you've thought about it at all.
+
+=== trigger: Milking Time
+level: deep, nhl
+trigger: milking time
+does: strip top \u2192 pose {low} \u2192 say "{sound}\u2026 milk me, please."
+waits: 3s, 3s
+
+And somethin' to keep, deep down where you can't reach it. When anyone says it's milking time, your top comes off, you go down {low}, and you ask for it.
+
+=== trigger: Needy Thing
+level: deep, nhl
+trigger: such a needy {animal}
+does: needy \u2192 deny
+waits: 2s
+
+And this one stays with you. When anyone calls you such a needy {animal}, the heat comes up in you, and it won't let you finish.
+
+=== trigger: Let Go
+level: deep, nhl
+trigger: let go for the farm
+does: forget all \u2192 cum
+waits: 2s
+
+And this one's a kindness. When you hear let go for the farm, everything held back comes undone at once.
+
+=== trigger: To the Stalls
+level: deep, nhl
+trigger: to the stalls
+does: moo \u2192 beg
+waits: 2s
+
+And somethin' for the barn to keep. When anyone sends you to the stalls, the {sound} comes up out of you first, then the beggin', and your feet find their own way to a free stall.
+
+# \u2500\u2500 part 3: compulsions (somethin' happenin' sets them off, now and then) and hang-ons (they stay a while after) \u2500\u2500
+# How long they stay: from a Fun session a day (a compulsion fires once), from Deep a week, renewed each time they land;
+# from No human left, set for good (only a herd leader or a proprietor takes them out).
+
+=== compulsion: First Sound
+when: wake
+does: moo
+chance: 15%
+
+And sometimes, when you come up, the first thing out of you won't be a word at all.
+
+=== compulsion: Knees for the Leader
+level: deep, nhl
+when: leader
+does: pose {low}
+
+When the one who leads your herd walks in, sometimes your knees just give, and down you go, {low}.
+
+=== compulsion: Melt at a Pat
+level: deep, nhl
+when: pat
+does: pose {low} \u2192 moo
+waits: 2s
+
+A pat on your head, and sometimes you just melt, right down {low}, with a happy little {sound}.
+
+=== compulsion: Beggin' in the Stall
+level: deep, nhl
+when: stall
+does: beg "{sound}\u2026 more\u2026 milk me more\u2026"
+
+And when the cups take hold of you in the stall, sometimes you can't help beggin' for more.
+
+=== compulsion: So Full
+level: deep, nhl
+when: full
+does: needy \u2192 beg
+waits: 3s
+
+When you're full and heavy, sometimes it all turns to wantin', and you go lookin' for a stall.
+
+=== compulsion: Hands on You
+level: deep, nhl
+when: squeeze
+does: needy \u2192 moo
+waits: 2s
+
+When somebody's hands are on your {body}, sometimes the heat comes right up, and a {sound} with it.
+
+=== compulsion: Mooin' as You Come
+level: nhl
+when: cum
+does: moo 2
+
+And when you finish, sometimes it's the {animal} that comes out of you, not a word.
+
+=== hangon: Moo Talk
+effect: mootalk
+lasts: 30m
+
+For a while after you come up, your {sound} keeps slippin' out between your words.
+
+=== hangon: This Animal
+level: deep, nhl
+effect: cowtalk
+lasts: 1h
+
+And for a while after, there's no I. Just this {animal}.
+
+=== hangon: Down Low
+level: deep, nhl
+effect: fours
+lasts: 20m
+
+Your body stays down {low} a while after, where it's comfy.
+
+=== hangon: Hands Off
+level: deep, nhl
+effect: handsoff
+lasts: 30m
+
+Your hands stay off yourself a while after. That's not theirs to touch.
+
+=== hangon: On the Edge
+level: deep, nhl
+effect: edge
+lasts: 1h
+
+You'll stay right at the edge a while after, achin', and it won't let you over.
+
+=== hangon: Only the Farm's Voice
+level: deep, nhl
+effect: hearing
+lasts: 20m
+
+For a while after, the barn stays quiet but for the farm's voice.
+
+=== hangon: Can't Say No
+level: nhl
+effect: yes
+lasts: 1h
+
+And for a while after, no won't come out of you. Only yes.
+
+# \u2500\u2500 part 2: the farm's pull through the day \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+# slip: what comes out of their mouth in place of their own words, when their speech gets hijacked (said out loud, as them)
+# nudge: the farm's whispers through the day, only to them. pull: how built up the pull has to be first (0-100)
+
+=== slip: Simple Sounds
+
+{sound}.
+{sound}~
+Mm\u2026 {sound}\u2026
+{sound}? {sound}.
+Mmh\u2026 what was I\u2026
+
+=== slip: Good Animal Words
+pull: 20
+
+Good {animal}s don't need words.
+Good {animal}s just listen.
+The farm knows best.
+So quiet in here\u2026
+Mm\u2026 so warm\u2026
+
+=== slip: Full and Achin'
+pull: 40
+
+{t}So full\u2026 need milked\u2026
+{t}Milk me\u2026 please\u2026
+{c}Need\u2026 drained\u2026
+Need the stall\u2026 need it\u2026
+
+=== slip: Empty
+level: deep, nhl
+pull: 60
+
+Empty and happy.
+No thoughts. Just {sound}.
+This {animal} belongs to the barn.
+Good {animal}s give milk.
+Nothin' up here but straw\u2026
+
+=== slip: No Human Left
+level: nhl
+pull: 80
+
+There's no person in here.
+Just a {animal}. Just a {animal}.
+{sound}\u2026 {sound}\u2026 {sound}\u2026
+
+=== nudge: Little Whispers
+
+Good {animal}s don't need to think, {name}.
+Breathe out, {name}. That's it.
+The barn's so warm today.
+Somethin' in you is always listening, {name}.
+Easy, {pet}. Nothin' to hurry for.
+
+=== nudge: Drowsy
+pull: 30
+
+So heavy, {name}. Your eyes want to close.
+You could just let go, right here.
+Doesn't the straw look soft, {pet}?
+Every breath out, a little further down.
+Thinkin's gettin' harder, isn't it?
+
+=== nudge: Nearly There
+pull: 60
+
+Soon, {name}. You can feel it comin', can't you?
+Your words are slippin'. That's alright.
+The farm's waitin' for you, {pet}.
+Just a little more and you're ours again.
+Let it fill you right up.
+
+=== wake: Count Up
+level: fun
+pace: 15s
+pick: 1
+beats: theta \u2192 alpha 11 over 1m
+look: clear
+
+Now I'm going to count you up. Three: feeling your body again. Two: lighter. One: eyes open, {name}. Good {animal}.
+Coming up now. Three, two, one, and you're back in the barn, {name}, smiling for no reason at all. Good {animal}.
+Up you come, slow and easy. Wiggle your fingers. Open your eyes. Welcome back, {pet}.
+
+=== wake: Not All the Way
+level: deep
+pace: 15s
+pick: 1
+beats: \u2192 alpha 10 over 1m
+look: haze 15%, rings off, words off
+
+Counting up slowly. Five, four: the barn coming back. Three, two: your name, your hands. One: awake, {name}. But part of you is still listening.
+I'll bring you up now, {name}, but not all the way. Part of you stays down there, listening. Three, two, one.
+Up, slowly. Your name comes back first, then your hands. But the quiet stays, and so does the farm's voice.
+
+=== wake: The Animal Stays
+level: nhl
+pace: 15s
+pick: 1
+beats: \u2192 theta 6 over 1m
+look: haze 30%, rings off, words off
+
+I won't count you all the way up, {pet}. You'll open your eyes, but the {animal} stays. It's yours now.
+Open your eyes. Look around the barn. Nothing in there but a {animal}. Good.
+No counting up, {pet}. Just open your eyes. The {animal} can look around now.
+The session's over. The {animal} isn't. Stay as you are.
+
+=== session: Fun in the Straw
+level: fun
+visor: yes
+induction: any
+deepener: any
+suggestion: any 2
+trigger: any
+hangon: any
+wake: any
+
+=== session: Deep in the Barn
+level: deep
+visor: yes
+induction: any
+deepener: any
+convincer: any
+suggestion: any 3
+trigger: any 2
+compulsion: any
+hangon: any
+wake: any
+
+=== session: No Human Left
+level: nhl
+visor: yes
+induction: any
+deepener: any
+convincer: any
+suggestion: any 3
+trigger: any 2
+compulsion: any 2
+hangon: any 2
+wake: any
+`;
+
+  // shared/visor.js
+  var VISOR_RE = /farm visor:\s*#([a-z0-9]{6,12})/i;
+  var PUBLIC_BASE = "https://raw.githubusercontent.com/Laynie667/BnBfarms/main/public/visor/";
+  var MAX_SESSIONS = 5;
+  var MAX_NEED = 5;
+  var MAX_WORDS = 12;
+  var MAX_PICS = 20;
+  var VISOR_KINDS = ["induction", "deepener", "convincer", "suggestion", "wake"];
+  var clamp2 = (v, lo, hi, d) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
+  };
+  var str = (s, n) => String(s == null ? "" : s).replace(/[()<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+  var okLink = (u) => typeof u === "string" && u.length <= 400 && /^https:\/\/[^\s"'<>()]+\.(png|jpe?g|gif|webp)(\?[^\s"'<>()]*)?$/i.test(u);
+  function normTuning(t) {
+    t = t && typeof t === "object" ? t : {};
+    const list2 = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
+    return {
+      v: 1,
+      sessions: list2(t.sessions, MAX_SESSIONS, 60),
+      need: Math.round(clamp2(t.need, 0, MAX_NEED, 1)),
+      show: t.show === "wearer" ? "wearer" : "crafter",
+      words: list2(t.words, MAX_WORDS, 24),
+      set: str(t.set, 40),
+      pictures: (Array.isArray(t.pictures) ? t.pictures : []).filter(okLink).slice(0, MAX_PICS),
+      wordEvery: clamp2(t.wordEvery, 2, 8, 3),
+      // seconds between words, never under 2
+      wordMs: Math.round(clamp2(t.wordMs, 500, 1e3, 800)),
+      // how long each shows (fadin' in and out inside it)
+      wordOp: clamp2(t.wordOp, 0.15, 0.6, 0.45),
+      // how bright a word gets, never full
+      picOp: clamp2(t.picOp, 0.1, 0.8, 0.35),
+      // how see-through the pictures are
+      picEvery: Math.round(clamp2(t.picEvery, 8, 60, 20)),
+      fit: t.fit === "contain" ? "contain" : "cover"
+    };
+  }
+  function stable(v) {
+    if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
+    if (v && typeof v === "object") return "{" + Object.keys(v).sort().map((k) => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+    return JSON.stringify(v);
+  }
+  function fnv(s, seed) {
+    let h2 = seed >>> 0;
+    for (let i = 0; i < s.length; i++) {
+      h2 ^= s.charCodeAt(i);
+      h2 = Math.imul(h2, 16777619) >>> 0;
+    }
+    return h2 >>> 0;
+  }
+  function tuningCode(t) {
+    const s = stable(normTuning(t));
+    return (fnv(s, 2166136261).toString(36).padStart(7, "0").slice(-4) + fnv(s, 2538058380).toString(36).padStart(7, "0").slice(-4)).toLowerCase();
+  }
+  var codeOk = (code, t) => typeof code === "string" && !!t && tuningCode(t) === code.toLowerCase();
+  function descLine(code, t) {
+    const n = normTuning(t).need;
+    return "farm visor: #" + code + (n ? " \xB7 " + n + " session" + (n === 1 ? "" : "s") : "");
+  }
+  var codeIn = (desc) => {
+    const m = VISOR_RE.exec(String(desc || ""));
+    return m ? m[1].toLowerCase() : "";
+  };
+
+  // extension/src/visor.js
+  var W15 = window;
+  var CACHE_KEY = "fhc-visor-tunings";
+  var DONE_KEY = "fhc-visor-done";
+  var MAKER_KEY = "fhc-visor-maker";
+  var ctx2 = null;
+  var V = { lib: null, sets: {}, listAt: 0, listFrom: "", cache: {}, done: {}, on: null, off: {}, unlocked: {}, asked: {}, run: null, el: null, timers: [], wordT: null, picT: null, drawT: null };
+  function initVisor(c) {
+    ctx2 = c;
+    load3();
+    onAccount(() => {
+      stop(true);
+      V.off = {};
+      V.unlocked = {};
+      load3();
+    });
+    onTranceEnd(() => {
+      if (V.on) {
+        V.off[V.on.code] = true;
+        stop(false, "\u{1F300} The visor lets go of you.");
+      }
+    });
+    const mod3 = ctx2.mod;
+    if (mod3) for (const f of ["ChatRoomSafewordRevert", "ChatRoomSafewordRelease"]) {
+      try {
+        mod3.hookFunction(f, 20, (args, next) => {
+          try {
+            if (V.on) {
+              V.off[V.on.code] = true;
+              stop(false, "\u{1F300} Your safeword: the visor lets go of you.");
+            }
+          } catch (e) {
+          }
+          return next(args);
+        });
+      } catch (e) {
+      }
+    }
+    if (typeof W15.CommandCombine === "function") {
+      try {
+        W15.CommandCombine([{ Tag: "visor", Description: "unlock <name>: open a hardcore wearer's farm visor early (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]);
+      } catch (e) {
+      }
+    }
+    setInterval(check2, 2e3);
+    setTimeout(publicList, 4e3);
+  }
+  function load3() {
+    try {
+      const c = JSON.parse(LS.getItem(CACHE_KEY));
+      V.cache = c && typeof c === "object" ? c : {};
+    } catch (e) {
+      V.cache = {};
+    }
+    for (const [code, t] of Object.entries(V.cache)) if (!codeOk(code, t)) delete V.cache[code];
+    try {
+      const d = JSON.parse(LS.getItem(DONE_KEY));
+      V.done = d && typeof d === "object" ? d : {};
+    } catch (e) {
+      V.done = {};
+    }
+  }
+  function keepCache() {
+    const k = Object.keys(V.cache);
+    for (const x of k.slice(0, Math.max(0, k.length - 50))) delete V.cache[x];
+    try {
+      LS.setItem(CACHE_KEY, JSON.stringify(V.cache));
+    } catch (e) {
+    }
+  }
+  function keepDone() {
+    try {
+      LS.setItem(DONE_KEY, JSON.stringify(V.done));
+    } catch (e) {
+    }
+  }
+  function remember(code, t) {
+    if (!codeOk(code, t)) return false;
+    V.cache[code] = normTuning(t);
+    keepCache();
+    return true;
+  }
+  async function publicList(force) {
+    if (!force && V.lib && Date.now() - V.listAt < 36e5) return V.lib;
+    V.listAt = Date.now();
+    try {
+      if (typeof W15.fetch !== "function") throw new Error("no fetch");
+      const [t, s] = await Promise.all([W15.fetch(PUBLIC_BASE + "library.txt", { cache: "no-store" }), W15.fetch(PUBLIC_BASE + "sets.json", { cache: "no-store" })]);
+      if (!t.ok) throw new Error("no list yet");
+      const lib = parseLibrary(await t.text());
+      if (!lib.blocks.some((b) => b.kind === "session" && b.labels.visor && !b.bad)) throw new Error("no visor sessions");
+      V.lib = lib;
+      V.listFrom = "the farm's list";
+      try {
+        const sets = s.ok ? await s.json() : {};
+        V.sets = {};
+        for (const [n, l] of Object.entries(sets || {})) {
+          const g = (Array.isArray(l) ? l : []).filter(okLink);
+          if (g.length) V.sets[String(n).slice(0, 40)] = g.slice(0, 20);
+        }
+      } catch (e) {
+        V.sets = {};
+      }
+    } catch (e) {
+      if (!V.lib) {
+        V.lib = parseLibrary(STARTER);
+        V.listFrom = "the starter library";
+      }
+    }
+    return V.lib;
+  }
+  var library = () => V.lib || (V.lib = parseLibrary(STARTER), V.listFrom = "the starter library", V.lib);
+  var visorSessions = () => library().blocks.filter((b) => b.kind === "session" && !b.bad && b.labels.visor).map((b) => ({ name: b.name, level: b.labels.level && b.labels.level.length ? b.labels.level : LEVELS }));
+  function wornVisor() {
+    const P5 = W15.Player;
+    if (!P5 || !Array.isArray(P5.Appearance)) return null;
+    for (const it of P5.Appearance) {
+      const c = it && it.Craft, code = c && codeIn(c.Description);
+      if (code) return { code, crafter: Number(c.MemberNumber) || 0, item: String(c.Name || it.Asset && it.Asset.Name || "visor").slice(0, 40) };
+    }
+    return null;
+  }
+  var isBot2 = () => !!(W15.Player && W15.Player.MemberNumber === BOT_MEMBER);
+  function check2() {
+    try {
+      if (!ctx2 || isBot2()) return;
+      if ((ctx2.prefs() || {}).noVisor) {
+        if (V.on) stop(false, "\u{1F300} Farm visors are switched off for you: the room comes back.");
+        return;
+      }
+      const w = wornVisor();
+      if (!w) {
+        if (V.on) stop(false, "\u{1F300} The visor comes off, and the room comes back.");
+        for (const k of Object.keys(V.done)) if (V.done[k]) {
+          V.done[k] = 0;
+          keepDone();
+        }
+        V.off = {};
+        V.unlocked = {};
+        return;
+      }
+      if (V.off[w.code]) return;
+      if (V.on && V.on.code === w.code) {
+        place();
+        return;
+      }
+      if (V.on) stop(true);
+      const t = V.cache[w.code];
+      if (t) {
+        start(w, t);
+        return;
+      }
+      ask3(w.code);
+    } catch (e) {
+      console.warn("[Farmhand Companion] visor:", e);
+    }
+  }
+  function ask3(code) {
+    if (Date.now() - (V.asked[code] || 0) < 2e4) return;
+    V.asked[code] = Date.now();
+    try {
+      if (W15.ServerSend && (!W15.ServerPlayerIsInChatRoom || W15.ServerPlayerIsInChatRoom())) W15.ServerSend("ChatRoomChat", makeMsg("visorAsk", { code }));
+    } catch (e) {
+    }
+    try {
+      if (ctx2.botHere()) ctx2.toBot("visorAsk", { code });
+    } catch (e) {
+    }
+  }
+  function onVisorMsg(m) {
+    if (!m || !m.from) return;
+    const me5 = W15.Player && W15.Player.MemberNumber;
+    if (m.from === me5) return;
+    const code = String(m.code || "").toLowerCase();
+    if (m.type === "visorTune") {
+      if (remember(code, m.t)) check2();
+      return;
+    }
+    if (m.type === "visorAsk") {
+      if (V.cache[code] && !isBot2()) setTimeout(() => {
+        try {
+          W15.ServerSend("ChatRoomChat", makeMsg("visorTune", { code, t: V.cache[code] }, m.from));
+        } catch (e) {
+        }
+      }, 300 + Math.random() * 1200);
+      return;
+    }
+    if (m.type === "visorUnlock") {
+      if (!V.on) return;
+      const kh = keyholders(), ok2 = m.from === V.on.crafter || kh.includes(m.from);
+      if (!ok2) return;
+      V.unlocked[V.on.code] = true;
+      icon();
+      ctx2.toChat("\u{1F513} " + nameOf2(m.from) + " opened your visor: you can take it off now.", "#a67fd4", true);
+      try {
+        W15.ServerSend("ChatRoomChat", makeMsg("visorUnlocked", { name: nameOf2(me5) }, m.from));
+      } catch (e) {
+      }
+      return;
+    }
+    if (m.type === "visorUnlocked") ctx2.toChat("\u{1F513} " + String(m.name || "They").slice(0, 40) + "'s visor is open: they can take it off now.", "#a67fd4", true);
+  }
+  var charOf4 = (mn) => (W15.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var nameOf2 = (mn) => {
+    const c = charOf4(mn);
+    return c ? String(c.Nickname || c.Name || "#" + mn) : "#" + mn;
+  };
+  function keyholders() {
+    try {
+      const D = W15.FarmhandDispensary;
+      return D && typeof D.keyholders === "function" ? D.keyholders().map(Number) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function hardcore() {
+    try {
+      const D = W15.FarmhandDispensary, x = D && typeof D.hard === "function" ? D.hard() : null;
+      return !!(x && x.on);
+    } catch (e) {
+      return false;
+    }
+  }
+  var visorLocked = () => !!(V.on && hardcore() && (V.done[V.on.code] || 0) < V.on.t.need && !V.unlocked[V.on.code]);
+  function command(args) {
+    const m = /^\s*unlock\s+(.+)$/i.exec(args);
+    if (!m) {
+      ctx2.toChat("\u{1F300} /visor unlock <name>: open the farm visor on somebody whose key you hold, or one you crafted.", "#a67fd4", true);
+      return;
+    }
+    const q2 = m[1].trim().toLowerCase(), c = (W15.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
+    if (!c) {
+      ctx2.toChat("\u{1F300} Nobody here by that name.", "#a67fd4", true);
+      return;
+    }
+    try {
+      W15.ServerSend("ChatRoomChat", makeMsg("visorUnlock", {}, c.MemberNumber));
+    } catch (e) {
+    }
+    ctx2.toChat("\u{1F300} Sent: if you crafted their visor or hold their key, it opens.", "#a67fd4", true);
+  }
+  function start(w, t) {
+    V.on = { code: w.code, crafter: w.crafter, item: w.item, t: normTuning(t), since: Date.now() };
+    build();
+    ctx2.toChat("\u{1F300} The " + w.item + " settles over your eyes, and the room goes dark around you." + (visorLocked() ? " It won't come off till " + V.on.t.need + " session" + (V.on.t.need === 1 ? "'s" : "s are") + " done." : ""), "#a67fd4", true);
+    later2(nextSession, 5e3);
+  }
+  function stop(quiet, say4) {
+    const was2 = V.on;
+    for (const x of V.timers) clearTimeout(x);
+    V.timers = [];
+    clearInterval(V.wordT);
+    clearInterval(V.picT);
+    clearInterval(V.drawT);
+    if (V.run) {
+      V.run = null;
+      try {
+        onHypno({ do: "wake" });
+      } catch (e) {
+      }
+    }
+    if (V.el) {
+      V.el.remove();
+      V.el = null;
+    }
+    V.on = null;
+    if (was2 && !quiet && say4) ctx2.toChat(say4, "#a67fd4", true);
+  }
+  var later2 = (f, ms) => {
+    V.timers.push(setTimeout(() => {
+      try {
+        f();
+      } catch (e) {
+        console.warn("[Farmhand Companion] visor:", e);
+      }
+    }, ms));
+  };
+  function css2() {
+    const d = W15.document;
+    if (d.getElementById("fhc-visor-css")) return;
+    const s = d.createElement("style");
+    s.id = "fhc-visor-css";
+    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body{left:0;top:0;width:100%;height:100%}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;pointer-events:none;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}";
+    d.head.appendChild(s);
+  }
+  function build() {
+    const d = W15.document;
+    if (!d || !d.body) return;
+    css2();
+    const t = V.on.t, el2 = d.createElement("div");
+    el2.id = "fhc-visor";
+    el2.classList.toggle("calm", !!(ctx2.prefs() || {}).calmLook);
+    el2.style.setProperty("--ms", t.wordMs + "ms");
+    el2.style.setProperty("--op", String(t.wordOp));
+    for (let i2 = 0; i2 < 2; i2++) {
+      const p = d.createElement("img");
+      p.className = "pic";
+      p.alt = "";
+      p.style.objectFit = t.fit;
+      p.referrerPolicy = "no-referrer";
+      el2.appendChild(p);
+    }
+    const cv = d.createElement("canvas");
+    cv.className = "body";
+    el2.appendChild(cv);
+    const b = d.createElement("button");
+    b.type = "button";
+    b.className = "icon";
+    b.addEventListener("click", iconClick);
+    el2.appendChild(b);
+    el2.addEventListener("mousedown", (e) => e.stopPropagation());
+    el2.addEventListener("click", (e) => {
+      if (e.target === el2 || e.target === cv) e.stopPropagation();
+    });
+    d.body.appendChild(el2);
+    V.el = el2;
+    place();
+    icon();
+    const pics = t.pictures.length ? t.pictures : farmPatterns();
+    let i = 0, side = 0;
+    const next = () => {
+      if (!V.el) return;
+      const imgs3 = V.el.querySelectorAll(".pic"), show2 = imgs3[side], hide = imgs3[1 - side];
+      show2.onload = () => {
+        show2.style.opacity = String(t.picOp);
+        hide.style.opacity = "0";
+      };
+      show2.onerror = () => {
+        show2.style.opacity = "0";
+      };
+      show2.src = pics[i++ % pics.length];
+      side = 1 - side;
+    };
+    next();
+    V.picT = setInterval(() => {
+      if (pics.length > 1) next();
+    }, t.picEvery * 1e3);
+    V.wordT = setInterval(() => {
+      if (Math.random() < 0.85) word();
+    }, Math.max(2, t.wordEvery) * 1e3);
+    V.drawT = setInterval(drawBody, 150);
+    drawBody();
+  }
+  function place() {
+    const c = W15.document.getElementById("MainCanvas");
+    if (!c || !V.el) return;
+    const r = c.getBoundingClientRect(), w = r.width / 2;
+    Object.assign(V.el.style, { left: r.left + "px", top: r.top + "px", width: w + "px", height: r.height + "px" });
+    const cv = V.el.querySelector(".body");
+    if (cv && (cv.width !== Math.round(w) || cv.height !== Math.round(r.height))) {
+      cv.width = Math.round(w) || 500;
+      cv.height = Math.round(r.height) || 1e3;
+    }
+  }
+  function drawBody() {
+    if (!V.el) return;
+    const cv = V.el.querySelector(".body"), g = cv && cv.getContext ? cv.getContext("2d") : null;
+    if (!g) return;
+    const t = V.on.t, C2 = t.show === "crafter" && charOf4(V.on.crafter) || W15.Player;
+    if (C2 && !C2.Canvas && typeof W15.CharacterLoadCanvas === "function") {
+      try {
+        W15.CharacterLoadCanvas(C2);
+      } catch (e) {
+      }
+    }
+    g.clearRect(0, 0, cv.width, cv.height);
+    const src = C2 && C2.Canvas;
+    if (!src) return;
+    const hh = cv.height * 0.96, ww = hh / 2;
+    try {
+      g.drawImage(src, (cv.width - ww) / 2, cv.height - hh, ww, hh);
+    } catch (e) {
+    }
+  }
+  function word() {
+    if (!V.el) return;
+    const words2 = V.on.t.words.length ? V.on.t.words : ["good " + animal(), "empty", "deeper", "obey the farm", "so warm", "no thoughts"];
+    const w = W15.document.createElement("div");
+    w.className = "sub";
+    w.textContent = words2[Math.floor(Math.random() * words2.length)];
+    w.style.left = 15 + Math.random() * 45 + "%";
+    w.style.top = 18 + Math.random() * 55 + "%";
+    V.el.appendChild(w);
+    setTimeout(() => w.remove(), V.el.classList.contains("calm") ? 9500 : V.on.t.wordMs + 200);
+  }
+  function icon() {
+    const b = V.el && V.el.querySelector(".icon");
+    if (!b) return;
+    const lk = visorLocked();
+    b.classList.toggle("locked", lk);
+    b.textContent = lk ? "\u{1F512}" : "\u{1F441}";
+    b.title = lk ? "Locked: " + (V.done[V.on.code] || 0) + " of " + V.on.t.need + " sessions done. The crafter or your keyholders can open it; your safeword always ends it." : "Take the visor off (the room comes back)";
+  }
+  function iconClick(e) {
+    e.stopPropagation();
+    if (!V.on) return;
+    if (visorLocked()) {
+      ctx2.toChat("\u{1F512} The visor won't come off yet: " + (V.done[V.on.code] || 0) + " of " + V.on.t.need + " sessions done. Its crafter or your keyholders can open it early; your safeword always ends it.", "#a67fd4", true);
+      return;
+    }
+    V.off[V.on.code] = true;
+    stop(false, "\u{1F300} You take the visor's hold off. The room comes back (it starts again if you put it back on).");
+  }
+  function farmPatterns() {
+    const pts = (k, c) => {
+      const o = [];
+      for (let t = 0.2; t < 12 * Math.PI; t += 0.1) {
+        const r = 10 * t;
+        o.push((300 + r * Math.cos(t + k)).toFixed(1) + "," + (300 + r * Math.sin(t + k)).toFixed(1));
+      }
+      return "<polyline points='" + o.join(" ") + "' stroke='" + c + "'/>";
+    };
+    const a = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><rect width='600' height='600' fill='#1a0b24'/><g fill='none' stroke-width='14' stroke-linecap='round'>" + pts(0, "#b978e1") + pts(Math.PI, "#f0aad7") + "</g></svg>";
+    let rings = "";
+    for (let r = 20; r < 300; r += 22) rings += "<circle cx='300' cy='300' r='" + r + "' fill='none' stroke='" + (r % 44 ? "#e7a6d8" : "#8f5bc4") + "' stroke-width='9'/>";
+    const b = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><rect width='600' height='600' fill='#160a1f'/>" + rings + "</svg>";
+    return [a, b].map((s) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s));
+  }
+  var animal = () => tranceState.me && tranceState.me.animal || "animal";
+  function words() {
+    const me5 = tranceState.me || {}, P5 = W15.Player || {}, a = animal();
+    return {
+      name: String(P5.Nickname || P5.Name || "sugar"),
+      animal: a,
+      sound: me5.sound || "mmh",
+      body: "body",
+      pet: "good " + a,
+      act: "obey",
+      pose: "still",
+      paws: "paws",
+      low: me5.low === "fours" ? "on all fours" : "on your knees",
+      herd: "the farm",
+      a,
+      s: me5.sound || "mmh",
+      p: "body"
+    };
+  }
+  var say2 = (t) => fillIn(String(t).replace(/^\{(?:nv|nc|nt|v|c|t|f|m|fu|fb|ok)\}/, ""), words()).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+  function nextSession() {
+    if (!V.on || V.run) return;
+    if (tranceState.session) {
+      later2(nextSession, 6e4);
+      return;
+    }
+    const lib = library(), blocks = lib.blocks.filter((b) => !b.bad && (VISOR_KINDS.includes(b.kind) || b.kind === "session" && b.labels.visor));
+    const all = blocks.filter((b) => b.kind === "session").map((b) => b.name), names2 = V.on.t.sessions.filter((n) => all.some((x) => x.toLowerCase() === n.toLowerCase()));
+    const name = (names2.length ? names2 : all)[Math.floor(Math.random() * Math.max(1, (names2.length ? names2 : all).length))];
+    const recipe = blocks.find((b) => b.kind === "session" && !!name && b.name.toLowerCase() === name.toLowerCase());
+    const level = recipe && recipe.labels.level && recipe.labels.level.length ? recipe.labels.level[0] : "fun";
+    const plan = planSession(blocks, { level, species: animal(), wears: [] }, { name: recipe ? recipe.name : "" });
+    const steps2 = sessionSteps(plan, { keep: (t) => !/^\{(?:nv|nc|nt|v|c|t|fu|fb)\}/.test(t) }).filter((s) => VISOR_KINDS.includes(s.kind));
+    if (!steps2.length) {
+      later2(nextSession, 12e4);
+      return;
+    }
+    const ms = steps2.reduce((n, s) => n + (s.gap || 0) * 1e3, 0);
+    V.run = { steps: steps2, i: 0, level, name: recipe ? recipe.name : "", depth: 0 };
+    onHypno({ do: "under", by: BOT_MEMBER, ms: Math.round(ms + 3e5), level });
+    step();
+  }
+  function step() {
+    const r = V.run;
+    if (!r || !V.on) return;
+    const s = r.steps[r.i];
+    if (!s) {
+      finish2();
+      return;
+    }
+    if (s.start || s.beats || s.look || s.volume != null) onHypno({ do: "cue", kind: s.kind, block: s.block, beats: s.beats || void 0, volume: s.volume, look: Object.assign({ words: true }, s.look || {}) });
+    if (s.deeper) {
+      r.depth = Math.max(0, Math.min(100, r.depth + s.deeper));
+      onHypno({ do: "depth", depth: r.depth });
+    }
+    if (s.text) {
+      const line3 = say2(s.text);
+      ctx2.toChat("[Voice] " + line3, "#a67fd4", true);
+      tranceVoice(line3);
+    }
+    r.i++;
+    later2(step, Math.max(1, s.gap || 0) * 1e3);
+  }
+  function finish2() {
+    const r = V.run;
+    V.run = null;
+    if (!V.on || !r) return;
+    if (r.level === "nhl") onHypno({ do: "linger", secs: 120 });
+    else later2(() => {
+      if (!V.run) onHypno({ do: "wake" });
+    }, 4e3);
+    const code = V.on.code;
+    V.done[code] = (V.done[code] || 0) + 1;
+    keepDone();
+    icon();
+    const need = V.on.t.need, n = V.done[code];
+    ctx2.toChat("\u{1F300} Session over" + (r.name ? ": " + r.name : "") + "." + (hardcore() && need ? n >= need ? " That's " + need + " of " + need + ": the visor can come off now." : " " + n + " of " + need + " before the visor can come off." : ""), "#a67fd4", true);
+    try {
+      if (ctx2.botHere()) ctx2.toBot("visorDone", { code, level: r.level, session: r.name });
+    } catch (e) {
+    }
+    later2(nextSession, 9e4);
+  }
+  function maker() {
+    try {
+      const v = JSON.parse(LS.getItem(MAKER_KEY));
+      return v && typeof v === "object" ? v : {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function keepMaker(m) {
+    try {
+      LS.setItem(MAKER_KEY, JSON.stringify(m));
+    } catch (e) {
+    }
+  }
+  function visorMakerCards(pctx) {
+    const M = Object.assign({ sessions: [], need: 1, show: "crafter", words: "", set: "", own: "", picOp: 0.35, wordEvery: 3, wordOp: 0.45, fit: "cover" }, maker());
+    const set2 = (k, v) => {
+      M[k] = v;
+      keepMaker(M);
+    };
+    if (!V.lib || Date.now() - V.listAt > 36e5) publicList().then(() => {
+      try {
+        if (pctx.setUi) pctx.setUi({});
+      } catch (e) {
+      }
+    });
+    const list2 = visorSessions(), sets = Object.keys(V.sets);
+    const result = h("div", { class: "fhc-muted" });
+    const make = () => {
+      const pictures2 = M.set === "__own" ? String(M.own || "").split(/\s+/).filter(okLink) : M.set && V.sets[M.set] ? V.sets[M.set].slice() : [];
+      const t = normTuning({ sessions: M.sessions, need: M.need, show: M.show, words: M.words, set: M.set === "__own" ? "" : M.set, pictures: pictures2, picOp: M.picOp, wordEvery: M.wordEvery, wordOp: M.wordOp, fit: M.fit });
+      const code = tuningCode(t);
+      remember(code, t);
+      try {
+        if (ctx2.botHere()) ctx2.toBot("visorKeep", { code, t });
+      } catch (e) {
+      }
+      const line3 = descLine(code, t);
+      result.textContent = "";
+      result.appendChild(h("div", { style: { margin: "6px 0", padding: "6px 8px", border: "1px dashed #8a6aa0", borderRadius: "6px", userSelect: "all", fontFamily: "monospace" } }, line3));
+      result.appendChild(btn("Copy it", () => {
+        try {
+          W15.navigator.clipboard.writeText(line3);
+        } catch (e) {
+        }
+      }, true));
+      result.appendChild(h("div", null, "Craft the visor (any visor, or anything worn over the eyes) and put this line in its description. These settings are locked in by that code: change any of them and you get a new line."));
+    };
+    const opt = (v, label, now) => h("option", { value: String(v), selected: String(v) === String(now) || null }, label);
+    return [card(
+      title("\u{1F300} Visor maker"),
+      muted("Make a farm visor: a crafted item that takes the room away from whoever wears it, and puts them under. Sessions come from " + (V.listFrom || "the farm's list") + "."),
+      h(
+        "div",
+        null,
+        muted("Sessions it plays (one at a time, picked fresh):"),
+        list2.length ? list2.map((s) => h("label", { style: { display: "block" } }, h("input", { type: "checkbox", checked: M.sessions.includes(s.name) || null, onchange: (e) => set2("sessions", (e.target.checked ? M.sessions.concat(s.name) : M.sessions.filter((x) => x !== s.name)).slice(0, MAX_SESSIONS)) }), " " + s.name + " (" + s.level.join(", ") + ")")) : muted("(the farm's list is still loadin')")
+      ),
+      h("div", null, muted("Before a hardcore wearer can take it off:"), h("select", { onchange: (e) => set2("need", Number(e.target.value)) }, [0, 1, 2, 3, 4, 5].map((n) => opt(n, n ? n + " full session" + (n === 1 ? "" : "s") : "any time", M.need)))),
+      h("div", null, muted("Whose body they see:"), h("select", { onchange: (e) => set2("show", e.target.value) }, opt("crafter", "mine (the crafter's)", M.show), opt("wearer", "their own", M.show))),
+      h("div", null, muted("Subliminal words (comma between):"), h("input", { value: M.words, size: 40, placeholder: "good cow, empty, deeper", onchange: (e) => set2("words", e.target.value) })),
+      h(
+        "div",
+        null,
+        muted("Pictures:"),
+        h("select", { onchange: (e) => set2("set", e.target.value) }, opt("", "the farm's own patterns", M.set), sets.map((n) => opt(n, n + " (the farm's set)", M.set)), opt("__own", "my own links", M.set)),
+        h("textarea", { rows: 3, cols: 40, placeholder: "my own links, one per line: https://\u2026/spiral.gif", onchange: (e) => set2("own", e.target.value) }, M.own || "")
+      ),
+      h(
+        "div",
+        null,
+        muted("How strong:"),
+        h("select", { title: "how see-through the pictures are", onchange: (e) => set2("picOp", Number(e.target.value)) }, [0.2, 0.35, 0.5, 0.65].map((v) => opt(v, "pictures " + Math.round(v * 100) + "%", M.picOp))),
+        h("select", { title: "how often a word shows", onchange: (e) => set2("wordEvery", Number(e.target.value)) }, [2, 3, 4, 6].map((v) => opt(v, "a word every " + v + " s", M.wordEvery))),
+        h("select", { title: "how bright a word gets", onchange: (e) => set2("wordOp", Number(e.target.value)) }, [[0.25, "faint words"], [0.45, "soft words"], [0.6, "strong words"]].map(([v, l]) => opt(v, l, M.wordOp))),
+        h("select", { onchange: (e) => set2("fit", e.target.value) }, opt("cover", "pictures fill", M.fit), opt("contain", "whole pictures", M.fit))
+      ),
+      h("div", { style: { marginTop: "6px" } }, btn("Make the visor", make, true)),
+      result,
+      muted("Words fade in and out (never a strobe). Wearers can switch the trance look off, or keep it calm, in their own Companion; their safeword always ends it.")
+    )];
+  }
+
   // extension/src/views/settingspages.js
   var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
   var FARM_GROUPS = [
@@ -20009,64 +21814,64 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["\u26A0\uFE0F Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
   ];
-  var pref = (ctx4, key3, label, desc, after) => toggle(label, desc, !!ctx4.prefs[key3], () => {
-    ctx4.setPref(key3, !ctx4.prefs[key3]);
+  var pref = (ctx5, key3, label, desc, after) => toggle(label, desc, !!ctx5.prefs[key3], () => {
+    ctx5.setPref(key3, !ctx5.prefs[key3]);
     if (after) after();
   });
-  var prefNot = (ctx4, key3, label, desc) => toggle(label, desc, !ctx4.prefs[key3], () => {
-    ctx4.setPref(key3, !ctx4.prefs[key3]);
-    ctx4.api.rehello && ctx4.api.rehello();
+  var prefNot = (ctx5, key3, label, desc) => toggle(label, desc, !ctx5.prefs[key3], () => {
+    ctx5.setPref(key3, !ctx5.prefs[key3]);
+    ctx5.api.rehello && ctx5.api.rehello();
   });
-  var rehello = (ctx4) => () => ctx4.api.rehello && ctx4.api.rehello();
-  function farmPage(ctx4) {
-    const s = ctx4.s;
+  var rehello = (ctx5) => () => ctx5.api.rehello && ctx5.api.rehello();
+  function farmPage(ctx5) {
+    const s = ctx5.s;
     if (!s.onBooks) return [card(
       title("\u{1F404} Farm switches"),
       muted("Once you're on the books, your milkin', breedin', trap and teasin' switches show up here."),
-      btn("Apply to join", () => ctx4.send("apply"), true)
+      btn("Apply to join", () => ctx5.send("apply"), true)
     )];
     return [
       muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
-      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx4, pick(...ids)))),
-      trapThemesCard(ctx4),
-      extraSwitches(ctx4)
+      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx5, pick(...ids)))),
+      trapThemesCard(ctx5),
+      extraSwitches(ctx5)
     ];
   }
-  function bodyPage(ctx4) {
-    const s = ctx4.s, brandAt = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" };
+  function bodyPage(ctx5) {
+    const s = ctx5.s, brandAt = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" };
     return [
-      drawnBodyCard(ctx4),
+      drawnBodyCard(ctx5),
       card(
         title("\u{1F4CF} Body shape"),
-        pref(ctx4, "shape", "Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.", rehello(ctx4))
+        pref(ctx5, "shape", "Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.", rehello(ctx5))
       ),
       s.brand ? card(
         title("\u{1F525} The farm's brand"),
         toggle(
           "Show my farm brand",
           "The B&B logo the farm seared on you, on your " + (brandAt[s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
-          !ctx4.prefs.brandOff,
+          !ctx5.prefs.brandOff,
           () => {
-            ctx4.setPref("brandOff", !ctx4.prefs.brandOff);
-            ctx4.api.brandSync && ctx4.api.brandSync();
+            ctx5.setPref("brandOff", !ctx5.prefs.brandOff);
+            ctx5.api.brandSync && ctx5.api.brandSync();
           }
         )
       ) : null,
       s.onBooks ? card(
         title("\u{1F43E} Your animal"),
         muted("How the farm sees you. It picks your farm outfit."),
-        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (s.gender === g ? " on" : ""), onclick: () => ctx4.send("gender " + g) }, g))),
-        farmSwitches(ctx4, pick("ownoutfit"))
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (s.gender === g ? " on" : ""), onclick: () => ctx5.send("gender " + g) }, g))),
+        farmSwitches(ctx5, pick("ownoutfit"))
       ) : null,
       card(
         title("\u{1F457} Farm outfit"),
         muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
-        btn("Dress me", () => ctx4.send("dressme"), true),
-        ctx4.api.hasBackup && ctx4.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx4.api.back && ctx4.api.back())) : null
+        btn("Dress me", () => ctx5.send("dressme"), true),
+        ctx5.api.hasBackup && ctx5.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx5.api.back && ctx5.api.back())) : null
       )
     ];
   }
-  function bellyToggle(ctx4) {
+  function bellyToggle(ctx5) {
     const st2 = drawnBodyState(), on3 = st2.bellyMode !== "off";
     return toggle(
       "Show my drawn belly",
@@ -20074,43 +21879,43 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       on3,
       () => {
         const v = on3 ? "off" : "farm";
-        drawnBodyBelly(v, (t) => ctx4.hint(t));
-        ctx4.setPref("drawnBodyBelly", v);
+        drawnBodyBelly(v, (t) => ctx5.hint(t));
+        ctx5.setPref("drawnBodyBelly", v);
       }
     );
   }
-  function gearPage(ctx4) {
+  function gearPage(ctx5) {
     return [
       card(
         title("\u26D3 On your character"),
         muted("All of these are off until you switch them on. Your safeword takes everything off."),
-        pref(ctx4, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx4)),
-        pref(ctx4, "gearAside", "Traps can set my own things aside", "When a trap's gear needs a spot your own clothes or gear are in, they come off for the scene and go straight back on after, so you see what's done to you. Off, only your farm outfit's pieces step aside. Nothin' anybody else has locked on you is ever moved."),
-        pref(ctx4, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
-        pref(ctx4, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. The marks a trap sears on (the pond's, the pack's, the boar's) go in slots of the farm's own instead, and ?wash scrubs them off unless they're on for good (?marks). Switch this off and the farm's ink comes off.", () => {
-          ctx4.api.inkSync && ctx4.api.inkSync();
-          ctx4.api.rehello && ctx4.api.rehello();
+        pref(ctx5, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx5)),
+        pref(ctx5, "gearAside", "Traps can set my own things aside", "When a trap's gear needs a spot your own clothes or gear are in, they come off for the scene and go straight back on after, so you see what's done to you. Off, only your farm outfit's pieces step aside. Nothin' anybody else has locked on you is ever moved."),
+        pref(ctx5, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
+        pref(ctx5, "ink", "Farm can ink me", "The farm's brand, your animal's brand and the corruption's words go in your wardrobe's Farm Brand and Farm Ink slots, on your skin under your clothes. Never over ink you picked yourself. A fresh brand heals from angry red to pale over three days. Take one off and it stays off. The marks a trap sears on (the pond's, the pack's, the boar's) go in slots of the farm's own instead, and ?wash scrubs them off unless they're on for good (?marks). Switch this off and the farm's ink comes off.", () => {
+          ctx5.api.inkSync && ctx5.api.inkSync();
+          ctx5.api.rehello && ctx5.api.rehello();
         }),
-        bellyToggle(ctx4),
-        pref(ctx4, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
-        pref(ctx4, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx4))
+        bellyToggle(ctx5),
+        pref(ctx5, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
+        pref(ctx5, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx5))
       ),
       // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
       card(
         title("\u2728 On your screen"),
         muted("Only you see and hear these. Each is on unless you switch it off."),
-        prefNot(ctx4, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
-        prefNot(ctx4, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"),
-        prefNot(ctx4, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
-        prefNot(ctx4, "noTrance", "Trance look", "During a session: a haze at the edges of your screen, a slow spiral, soft rings, the farm's words driftin' up, names blurrin'. Nothin' ever flashes"),
-        prefNot(ctx4, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
-        ctx4.s.staff ? prefNot(ctx4, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped, T the farm's pull close to takin' them under") : null
+        prefNot(ctx5, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
+        prefNot(ctx5, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"),
+        prefNot(ctx5, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
+        prefNot(ctx5, "noTrance", "Trance look", "During a session: a haze at the edges of your screen, a slow spiral, soft rings, the farm's words driftin' up, names blurrin'. Nothin' ever flashes"),
+        prefNot(ctx5, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
+        ctx5.s.staff ? prefNot(ctx5, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped, T the farm's pull close to takin' them under") : null
       ),
-      tranceCard(ctx4)
+      tranceCard(ctx5)
     ];
   }
-  function tranceCard(ctx4) {
-    const t = lscgTodo(), vol = Number(ctx4.prefs.farmBeatsVol) || 15;
+  function tranceCard(ctx5) {
+    const t = lscgTodo(), vol = Number(ctx5.prefs.farmBeatsVol) || 15;
     const HANG = {
       mootalk: "moo talk",
       cowtalk: "no I, just this animal",
@@ -20128,45 +21933,46 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       title("\u{1F300} The farm's trance"),
       muted(t.text),
       held2.length ? muted("Holdin' on since your last session: " + held2.join(", ") + ". Your safeword ends them.") : null,
-      ctx4.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx4.send("lowpose kneel")), btn("All fours", () => ctx4.send("lowpose fours"))) : null,
-      pref(ctx4, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
-      prefNot(ctx4, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
-      prefNot(ctx4, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
-      pref(ctx4, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
-      ctx4.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx4.setPref("farmBeatsVol", v) }, v + "%"))) : null
+      ctx5.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx5.send("lowpose kneel")), btn("All fours", () => ctx5.send("lowpose fours"))) : null,
+      pref(ctx5, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
+      prefNot(ctx5, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
+      prefNot(ctx5, "noVisor", "Farm visors", "A crafted farm visor on you (its description says farm visor: #\u2026) takes the room away: only one body, the crafter's pictures and words, and the farm's sessions one after another. A small icon in its corner takes it off (in the Dispensary's hardcore, only once its sessions are done). Your safeword always ends it. Off: a farm visor's just a visor."),
+      prefNot(ctx5, "noSlips", "Hijacked speech", "After a session, or with the farm's pull built up past 60: now and then what you say out loud gets taken. It comes out late, or wrong, or not at all, and you see what you meant to say. Commands, whispers, emotes and out-of-character lines always go through."),
+      pref(ctx5, "farmBeats", "Farm beats (headphones)", "Without LSCG's hypnosis: a soft binaural beat that follows the session, alpha down through theta to delta. With LSCG, its own beats switch decides."),
+      ctx5.prefs.farmBeats ? h("div", null, muted("How loud:"), [10, 15, 25, 40].map((v) => h("button", { type: "button", class: "fhc-pill" + (vol === v ? " on" : ""), onclick: () => ctx5.setPref("farmBeatsVol", v) }, v + "%"))) : null
     );
   }
-  function messagesPage(ctx4) {
-    const s = ctx4.s;
+  function messagesPage(ctx5) {
+    const s = ctx5.s;
     return [
       card(
         title("\u{1F4AC} Where the farm talks to you"),
-        pref(ctx4, "chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log, not just the panel"),
-        pref(ctx4, "chime", "Chime on notices", "A soft sound when the farm messages you"),
-        pref(ctx4, "popopen", "Open on new notice", "Pop the panel open by itself. Off: just the red number on \u{1F33E}"),
+        pref(ctx5, "chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log, not just the panel"),
+        pref(ctx5, "chime", "Chime on notices", "A soft sound when the farm messages you"),
+        pref(ctx5, "popopen", "Open on new notice", "Pop the panel open by itself. Off: just the red number on \u{1F33E}"),
         toggle(
           "Farm emotes about me come from me",
           "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
-          !ctx4.prefs.noRelay,
+          !ctx5.prefs.noRelay,
           () => {
-            ctx4.setPref("noRelay", !ctx4.prefs.noRelay);
-            ctx4.api.rehello && ctx4.api.rehello();
+            ctx5.setPref("noRelay", !ctx5.prefs.noRelay);
+            ctx5.api.rehello && ctx5.api.rehello();
           }
         ),
-        prefNot(ctx4, "noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)")
+        prefNot(ctx5, "noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)")
       ),
-      s.onBooks ? card(title("\u{1F5E3} What the farm says"), muted("Saved by the farm girl."), farmSwitches(ctx4, pick("teaseme", "hypno", "praise", "degrade"))) : null,
+      s.onBooks ? card(title("\u{1F5E3} What the farm says"), muted("Saved by the farm girl."), farmSwitches(ctx5, pick("teaseme", "hypno", "praise", "degrade"))) : null,
       s.intensity ? card(
         title("\u{1F336} How the farm talks to you"),
-        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx4.send("intensity " + id) }, label))),
+        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx5.send("intensity " + id) }, label))),
         muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
         muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
-        h("div", null, btn("Names I love\u2026", () => ctx4.fillBox("callme ")), btn("Never call me\u2026", () => ctx4.fillBox("nevercall ")))
+        h("div", null, btn("Names I love\u2026", () => ctx5.fillBox("callme ")), btn("Never call me\u2026", () => ctx5.fillBox("nevercall ")))
       ) : null
     ];
   }
-  function privacyPage(ctx4) {
-    const s = ctx4.s;
+  function privacyPage(ctx5) {
+    const s = ctx5.s;
     return [
       card(
         title("\u{1F512} Privacy and record"),
@@ -20175,16 +21981,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         s.logMust ? muted("\u{1F4DC} As a proprietor, your Companion always sends its record. There's no switch for it.") : toggle(
           "Send a record of what I see",
           "This option sends a copy of what the companion receives and sends for bug squashing. Completely voluntary participation.",
-          !!ctx4.prefs.chatlog,
-          () => ctx4.setPref("chatlog", !ctx4.prefs.chatlog)
+          !!ctx5.prefs.chatlog,
+          () => ctx5.setPref("chatlog", !ctx5.prefs.chatlog)
         ),
-        s.onBooks ? farmSwitches(ctx4, pick("tally")) : null
+        s.onBooks ? farmSwitches(ctx5, pick("tally")) : null
       ),
-      saveCard(ctx4)
+      saveCard(ctx5)
     ];
   }
-  function saveCard(ctx4) {
-    const ls = localSaveState(), say3 = (t2) => ctx4.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+  function saveCard(ctx5) {
+    const ls = localSaveState(), say4 = (t2) => ctx5.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
     const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
     return card(
       title("\u{1F4BE} Your settings file"),
@@ -20194,15 +22000,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         { style: { marginTop: "6px" } },
         ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
         ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
-        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say3("Saved."))) : null,
+        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say4("Saved."))) : null,
         btn("Load my settings from a file\u2026", () => {
-          say3("Pick the farmhand-companion file to load\u2026");
-          localSaveLoad(say3);
+          say4("Pick the farmhand-companion file to load\u2026");
+          localSaveLoad(say4);
         })
       )
     );
   }
-  function advancedPage(ctx4) {
+  function advancedPage(ctx5) {
     const bot = window.Player && window.Player.MemberNumber === BOT_MEMBER;
     return [
       card(
@@ -20211,22 +22017,22 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         bot ? toggle(
           "Draw the room on the farm girl's screen",
           "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
-          !!ctx4.prefs.drawRoom,
+          !!ctx5.prefs.drawRoom,
           () => {
-            const on3 = !ctx4.prefs.drawRoom;
-            ctx4.setPref("drawRoom", on3);
+            const on3 = !ctx5.prefs.drawRoom;
+            ctx5.setPref("drawRoom", on3);
             if (on3) setTimeout(redrawRoom, 50);
           }
         ) : null,
         bot ? toggle(
           "Let the farm girl's screen nap",
           "On (the default), after 2 minutes with nobody touching this tab the map stops being drawn, and any mouse move or key wakes it right up. The game's newest version works hard on every picture it puts on screen, and this tab is on all day. The farm runs the same either way.",
-          !ctx4.prefs.noNap,
-          () => ctx4.setPref("noNap", !ctx4.prefs.noNap)
+          !ctx5.prefs.noNap,
+          () => ctx5.setPref("noNap", !ctx5.prefs.noNap)
         ) : null,
-        pref(ctx4, "compact", "Compact cards", "Smaller text, more on screen"),
-        pref(ctx4, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
-        h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx4.resetPlaces && ctx4.resetPlaces()))
+        pref(ctx5, "compact", "Compact cards", "Smaller text, more on screen"),
+        pref(ctx5, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
+        h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx5.resetPlaces && ctx5.resetPlaces()))
       ),
       card(
         title("\u{1F9E0} Memory log"),
@@ -20235,8 +22041,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       )
     ];
   }
-  function aboutPage(ctx4) {
-    const p = ctx4.prefs;
+  function aboutPage(ctx5) {
+    const p = ctx5.prefs;
     return [card(
       title("\u{1F33E} Farmhand Companion v" + VERSION),
       muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
@@ -20244,7 +22050,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "Farmhand Companion on",
         "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. The game's settings page stays, so you can switch it back on.",
         !p.off,
-        () => ctx4.setPref("off", !p.off)
+        () => ctx5.setPref("off", !p.off)
       ),
       p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => window.location.reload(), true)) : null
     )];
@@ -20253,39 +22059,41 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     { id: "switches", label: "\u{1F404} Farm switches", render: farmPage },
     { id: "body", label: "\u{1FA9E} Body and look", render: bodyPage },
     { id: "gear", label: "\u26D3 Gear and marks", render: gearPage },
+    { id: "visor", label: "\u{1F300} Visor maker", render: (ctx5) => visorMakerCards(ctx5) },
+    // the farm's visor (visor.js, Nov 25)
     { id: "messages", label: "\u{1F4AC} Messages", render: messagesPage },
     { id: "privacy", label: "\u{1F512} Privacy and record", render: privacyPage },
     // staff only: on call and the ECHS card (Staff panel tabs till Nov 4). Zones stayed on the Staff panel: drawin' one
     // needs the map in view, and the game's settings screen covers it.
-    { id: "staff", label: "\u{1F9D1}\u200D\u{1F33E} Staff tools", show: (ctx4) => !!ctx4.s.staff, render: (ctx4) => [workCard(ctx4), voice()] },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx4) => guidesTab(ctx4, !!ctx4.s.staff) },
+    { id: "staff", label: "\u{1F9D1}\u200D\u{1F33E} Staff tools", show: (ctx5) => !!ctx5.s.staff, render: (ctx5) => [workCard(ctx5), voice()] },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx5) => guidesTab(ctx5, !!ctx5.s.staff) },
     { id: "advanced", label: "\u{1F9F0} Advanced", render: advancedPage },
     { id: "about", label: "\u2139 About", render: aboutPage }
   ];
-  var pagesFor = (ctx4) => SETTINGS_PAGES.filter((p) => !p.show || p.show(ctx4));
-  var drawPage = (p, ctx4) => {
+  var pagesFor = (ctx5) => SETTINGS_PAGES.filter((p) => !p.show || p.show(ctx5));
+  var drawPage = (p, ctx5) => {
     try {
-      return p.render(ctx4);
+      return p.render(ctx5);
     } catch (e) {
       console.warn("[Farmhand Companion]", e);
       return card(title(p.label), muted("This page hit a snag. The others still work."));
     }
   };
-  function findResults(ctx4, q2) {
+  function findResults(ctx5, q2) {
     const out = [], want = q2.trim().toLowerCase();
-    for (const p of pagesFor(ctx4)) {
+    for (const p of pagesFor(ctx5)) {
       if (p.id === "guides") continue;
-      const box3 = h("div", null, drawPage(p, ctx4));
+      const box3 = h("div", null, drawPage(p, ctx5));
       const hits = [...box3.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
       if (hits.length) out.push(card(title(p.label), hits));
     }
     return out.length ? out : [muted(`Nothin' matches "` + q2.trim() + '". Try fewer letters, or look through the pages.')];
   }
-  function settingsView(ctx4, page2, setPage) {
-    const pages = pagesFor(ctx4), cur = pages.find((p) => p.id === page2) || pages[0];
+  function settingsView(ctx5, page2, setPage) {
+    const pages = pagesFor(ctx5), cur = pages.find((p) => p.id === page2) || pages[0];
     const results = h("div", { class: "fhc-set-body" });
-    const find2 = ctx4.ui.setFind || "";
-    const fill = (q2) => results.replaceChildren(...[].concat(q2.trim() ? findResults(ctx4, q2) : drawPage(cur, ctx4)).flat(Infinity).filter(Boolean));
+    const find2 = ctx5.ui.setFind || "";
+    const fill = (q2) => results.replaceChildren(...[].concat(q2.trim() ? findResults(ctx5, q2) : drawPage(cur, ctx5)).flat(Infinity).filter(Boolean));
     fill(find2);
     const input2 = h("input", {
       class: "fhc-in",
@@ -20295,7 +22103,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       value: find2,
       style: { width: "100%" },
       oninput: (e) => {
-        ctx4.setUi({ setFind: e.target.value }, true);
+        ctx5.setUi({ setFind: e.target.value }, true);
         fill(e.target.value);
       }
     });
@@ -20307,7 +22115,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         { class: "fhc-set" },
         h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, pages.map((p) => h("button", { type: "button", class: p === cur && !find2.trim() ? "on" : "", onclick: () => {
-          ctx4.setUi({ setFind: "" }, true);
+          ctx5.setUi({ setFind: "" }, true);
           setPage(p.id);
         } }, p.label))),
         results
@@ -20316,13 +22124,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/settings.js
-  var W15 = window;
+  var W16 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
   var box2 = null;
   var page = "switches";
-  var settingsAvailable = () => typeof W15.PreferenceRegisterExtensionSetting === "function";
-  function ctx2() {
+  var settingsAvailable = () => typeof W16.PreferenceRegisterExtensionSetting === "function";
+  function ctx3() {
     const c = panel.ctx();
     return Object.assign({}, c, {
       setPref: (k, v) => {
@@ -20352,14 +22160,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function draw2() {
     if (!box2) return;
-    const c = ctx2();
+    const c = ctx3();
     box2.replaceChildren(
       h(
         "div",
         { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
         h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
         btn("Back", () => {
-          if (typeof W15.PreferenceSubscreenExtensionsClear === "function") W15.PreferenceSubscreenExtensionsClear();
+          if (typeof W16.PreferenceSubscreenExtensionsClear === "function") W16.PreferenceSubscreenExtensionsClear();
           else close2();
         }, true)
       ),
@@ -20372,9 +22180,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function open() {
     close2();
-    box2 = W15.document.createElement("div");
+    box2 = W16.document.createElement("div");
     box2.id = "fhc-settings";
-    W15.document.body.appendChild(box2);
+    W16.document.body.appendChild(box2);
     draw2();
   }
   function close2() {
@@ -20387,7 +22195,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     panel = p;
     if (!settingsAvailable()) return false;
     try {
-      W15.PreferenceRegisterExtensionSetting({
+      W16.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "Farmhand Companion",
         load: () => open(),
@@ -20410,8 +22218,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function openSettings(which) {
     if (which) page = which === "files" ? "privacy" : which;
     try {
-      if (typeof W15.PreferenceSubscreenExtensionsOpen === "function") {
-        W15.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W16.PreferenceSubscreenExtensionsOpen === "function") {
+        W16.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -20457,34 +22265,34 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var clock2 = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   var of = (a, b) => b >= 1e3 ? (a / 1e3).toFixed(1) + " / " + (b / 1e3).toFixed(1) + " L" : Math.round(a) + " / " + Math.round(b) + " mL";
   var plain = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
-  function goSettings(ctx4, page2) {
+  function goSettings(ctx5, page2) {
     if (settingsAvailable() && openSettings(page2)) return;
-    ctx4.setUi({ setPage: page2, setFind: "", goTab: "settings" });
+    ctx5.setUi({ setPage: page2, setFind: "", goTab: "settings" });
   }
   var errCard = (s) => s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr));
-  function happening(ctx4) {
-    const s = ctx4.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
+  function happening(ctx5) {
+    const s = ctx5.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
     return [
       hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
       h(
         "div",
         null,
-        quiet ? btn("End the quiet", () => ctx4.send("quiet off")) : btn("An hour's quiet", () => ctx4.send("quiet 60")),
+        quiet ? btn("End the quiet", () => ctx5.send("quiet off")) : btn("An hour's quiet", () => ctx5.send("quiet 60")),
         muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
       )
     ];
   }
-  function wearTrophy(ctx4, t, slot) {
-    const r = ctx4.api.trophyWear ? ctx4.api.trophyWear(t, slot) : { ok: false, why: "this Companion can't" };
+  function wearTrophy(ctx5, t, slot) {
+    const r = ctx5.api.trophyWear ? ctx5.api.trophyWear(t, slot) : { ok: false, why: "this Companion can't" };
     if (r.ok) {
-      ctx4.api.trophyAnswered(t.id);
-      ctx4.hint(r.already ? "It's on you already." : "Your " + t.title + " is on, in " + r.name + ". The wardrobe's Layering button moves it; /ink sizes it.");
-      ctx4.setUi({ trophySwap: null, trophyAt: Date.now() });
-    } else if (r.full) ctx4.setUi({ trophySwap: t.id, trophySlots: r.slots || [] });
-    else ctx4.hint("Couldn't put it on: " + r.why + ".");
+      ctx5.api.trophyAnswered(t.id);
+      ctx5.hint(r.already ? "It's on you already." : "Your " + t.title + " is on, in " + r.name + ". The wardrobe's Layering button moves it; /ink sizes it.");
+      ctx5.setUi({ trophySwap: null, trophyAt: Date.now() });
+    } else if (r.full) ctx5.setUi({ trophySwap: t.id, trophySlots: r.slots || [] });
+    else ctx5.hint("Couldn't put it on: " + r.why + ".");
   }
-  function trophySwap(ctx4, t) {
-    if (ctx4.ui.trophySwap !== t.id) return null;
+  function trophySwap(ctx5, t) {
+    if (ctx5.ui.trophySwap !== t.id) return null;
     return h(
       "div",
       { style: { margin: "4px 0" } },
@@ -20492,13 +22300,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         null,
-        (ctx4.ui.trophySlots || []).map((s) => btn(String(s.name).replace(/^Farm /, "") + ": " + (s.title || "empty"), () => wearTrophy(ctx4, t, s.slot))),
-        btn("Never mind", () => ctx4.setUi({ trophySwap: null }))
+        (ctx5.ui.trophySlots || []).map((s) => btn(String(s.name).replace(/^Farm /, "") + ": " + (s.title || "empty"), () => wearTrophy(ctx5, t, s.slot))),
+        btn("Never mind", () => ctx5.setUi({ trophySwap: null }))
       )
     );
   }
-  function trophyOffer(ctx4) {
-    const t = ctx4.api.trophyNext ? ctx4.api.trophyNext(ctx4.s.trophies) : null;
+  function trophyOffer(ctx5) {
+    const t = ctx5.api.trophyNext ? ctx5.api.trophyNext(ctx5.s.trophies) : null;
     if (!t) return null;
     return card(
       title("\u{1F3C6} A trophy for you: " + t.title),
@@ -20506,39 +22314,39 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         null,
-        btn("Wear it", () => wearTrophy(ctx4, t), true),
+        btn("Wear it", () => wearTrophy(ctx5, t), true),
         btn("No thanks", () => {
-          ctx4.api.trophyAnswered(t.id);
-          ctx4.hint("It's kept in your \u{1F3C6} Trophies for whenever you want it.");
-          ctx4.setUi({ trophySwap: null, trophyAt: Date.now() });
+          ctx5.api.trophyAnswered(t.id);
+          ctx5.hint("It's kept in your \u{1F3C6} Trophies for whenever you want it.");
+          ctx5.setUi({ trophySwap: null, trophyAt: Date.now() });
         })
       ),
-      trophySwap(ctx4, t),
+      trophySwap(ctx5, t),
       muted("Either way it's yours for good: the \u{1F3C6} Trophies row puts it on or takes it off any time.")
     );
   }
-  function trophyList(ctx4) {
-    const list = ctx4.s.trophies || [], worn = ctx4.api.trophyWorn ? ctx4.api.trophyWorn() : {};
-    const offered = ctx4.api.trophyNext ? ctx4.api.trophyNext(list) : null;
+  function trophyList(ctx5) {
+    const list2 = ctx5.s.trophies || [], worn = ctx5.api.trophyWorn ? ctx5.api.trophyWorn() : {};
+    const offered = ctx5.api.trophyNext ? ctx5.api.trophyNext(list2) : null;
     return [
-      list.map((t) => [
+      list2.map((t) => [
         h(
           "div",
           { class: "fhc-kv" },
           h("span", null, t.title + " ", h("span", { class: "fhc-muted" }, "for " + t.why)),
           worn[t.id] ? btn("Take it off", () => {
-            const r = ctx4.api.trophyOff(t.id);
-            ctx4.hint(r.ok ? "Off. It's still yours: put it on again whenever you like." : "Couldn't: " + r.why + ".");
-            ctx4.setUi({ trophyAt: Date.now() });
-          }) : btn("Put it on", () => wearTrophy(ctx4, t))
+            const r = ctx5.api.trophyOff(t.id);
+            ctx5.hint(r.ok ? "Off. It's still yours: put it on again whenever you like." : "Couldn't: " + r.why + ".");
+            ctx5.setUi({ trophyAt: Date.now() });
+          }) : btn("Put it on", () => wearTrophy(ctx5, t))
         ),
-        offered && offered.id === t.id ? null : trophySwap(ctx4, t)
+        offered && offered.id === t.id ? null : trophySwap(ctx5, t)
       ]),
       muted("They go in your wardrobe's Farm Ink slots and keep the farm's count. The wardrobe's Layering button moves them; /ink sizes them.")
     ];
   }
-  function me3(ctx4) {
-    const s = ctx4.s, x = mePieces(ctx4), now = Date.now();
+  function me3(ctx5) {
+    const s = ctx5.s, x = mePieces(ctx5), now = Date.now();
     const quiet = s.quietUntil && s.quietUntil > now;
     const sub = [
       [s.tier, s.species].filter(Boolean).join(" "),
@@ -20560,34 +22368,34 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         ...x.bars.map((b) => ({ label: plain(b.label), value: String(b.value ?? ""), pct: Number(b.pct) || 0, kind: b.kind === "good" || b.kind === "alert" ? b.kind : "" }))
       ])
     );
-    const fresh2 = ctx4.feed.filter((m) => m.kind !== "mine" && m.at > (ctx4.ui.inboxSeen || 0)).length;
-    const F = ctx4.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
+    const fresh2 = ctx5.feed.filter((m) => m.kind !== "mine" && m.at > (ctx5.ui.inboxSeen || 0)).length;
+    const F = ctx5.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
     const hp = s.happening || [];
-    const trophies = s.trophies || [], tWorn = trophies.length && ctx4.api.trophyWorn ? Object.keys(ctx4.api.trophyWorn()).length : 0;
+    const trophies = s.trophies || [], tWorn = trophies.length && ctx5.api.trophyWorn ? Object.keys(ctx5.api.trophyWorn()).length : 0;
     return [
       errCard(s),
-      trophyOffer(ctx4),
+      trophyOffer(ctx5),
       sum,
-      rows(ctx4, "me", [
+      rows(ctx5, "me", [
         {
           id: "inbox",
           label: "\u{1F4EC} Inbox",
           dot: fresh2 > 0,
-          sum: fresh2 ? fresh2 + " new" : ctx4.feed.length ? "nothin' new" : "empty",
+          sum: fresh2 ? fresh2 + " new" : ctx5.feed.length ? "nothin' new" : "empty",
           body: () => {
-            ctx4.ui.inboxSeen = Date.now();
-            return inbox(ctx4);
+            ctx5.ui.inboxSeen = Date.now();
+            return inbox(ctx5);
           }
         },
-        hp.length && { id: "now", label: "\u{1F300} What's got you", sum: hp.length === 1 ? String(hp[0]).slice(0, 40) : hp.length + " things", body: () => happening(ctx4) },
+        hp.length && { id: "now", label: "\u{1F300} What's got you", sum: hp.length === 1 ? String(hp[0]).slice(0, 40) : hp.length + " things", body: () => happening(ctx5) },
         (s.preg || s.eggs) && {
           id: "carry",
           label: "\u{1F37C} Carryin'",
           sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" \xB7 "),
           body: () => [
             s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " day(s)"),
-            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due. "), btn("\u{1F95A} To the nest", () => ctx4.send("nest"))),
-            h("div", null, btn("Pedigree", () => ctx4.send("pedigree")), btn("Eggs", () => ctx4.send("eggs")), btn("Body tab \u203A", () => ctx4.setUi({ goTab: "body" })))
+            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due. "), btn("\u{1F95A} To the nest", () => ctx5.send("nest"))),
+            h("div", null, btn("Pedigree", () => ctx5.send("pedigree")), btn("Eggs", () => ctx5.send("eggs")), btn("Body tab \u203A", () => ctx5.setUi({ goTab: "body" })))
           ]
         },
         bodyNow(s).length && {
@@ -20596,7 +22404,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           sum: bodyNow(s).map((b) => b.size).slice(0, 3).join(" \xB7 "),
           body: () => [
             h("div", { class: "fhc-grid" }, bodyNow(s).map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size), b.trained ? muted("trained " + b.trained) : null, b.note ? muted(b.note) : null))),
-            (s.body || []).length ? h("div", null, btn("Measure", () => ctx4.send("measure"))) : null
+            (s.body || []).length ? h("div", null, btn("Measure", () => ctx5.send("measure"))) : null
           ]
         },
         s.today && {
@@ -20605,7 +22413,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           sum: "used " + s.today.tally + " \xB7 " + s.today.naughty + " naughty \xB7 praised " + s.today.praised,
           body: () => [
             pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),
-            h("div", null, btn("My tally", () => ctx4.send("tally")))
+            h("div", null, btn("My tally", () => ctx5.send("tally")))
           ]
         },
         s.kept && {
@@ -20616,10 +22424,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
             s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
             (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x2) => x2 + ":00").join(" and ")) : null,
-            h("div", null, btn("What that means", () => ctx4.send("kept")), btn("End it", () => ctx4.send("kept off")))
+            h("div", null, btn("What that means", () => ctx5.send("kept")), btn("End it", () => ctx5.send("kept off")))
           ]
         },
-        s.roam && { id: "roam", label: "\u{1F9ED} Roam", sum: s.roam.until ? "out till " + clock2(s.roam.until) : s.roam.left + " pass" + (s.roam.left === 1 ? "" : "es"), body: () => roamBody(ctx4) },
+        s.roam && { id: "roam", label: "\u{1F9ED} Roam", sum: s.roam.until ? "out till " + clock2(s.roam.until) : s.roam.left + " pass" + (s.roam.left === 1 ? "" : "es"), body: () => roamBody(ctx5) },
         next && {
           id: "feat",
           label: "\u{1F3C5} Next feat",
@@ -20627,43 +22435,43 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           body: () => [
             bar(next.icon + " " + next.name + ": tier " + TIER[next.tier + 1], next.n + " of " + next.next + " " + next.unit, next.p, "acc"),
             muted("Perk: " + next.perk + ", " + next.desc),
-            h("div", null, btn("All my feats \u203A", () => ctx4.setUi({ goTab: "ribbons", open_rib: "feats" })))
+            h("div", null, btn("All my feats \u203A", () => ctx5.setUi({ goTab: "ribbons", open_rib: "feats" })))
           ]
         },
         x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards },
-        trophies.length && { id: "trophies", label: "\u{1F3C6} Trophies", sum: trophies.length + " earned" + (tWorn ? " \xB7 " + tWorn + " on you" : ""), body: () => trophyList(ctx4) }
+        trophies.length && { id: "trophies", label: "\u{1F3C6} Trophies", sum: trophies.length + " earned" + (tWorn ? " \xB7 " + tWorn + " on you" : ""), body: () => trophyList(ctx5) }
       ]),
-      quick(ctx4, "me", [
-        ["\u{1F6BF} Wash", () => ctx4.send("wash")],
-        ["\u{1F489} Shots", () => ctx4.send("myshots")],
+      quick(ctx5, "me", [
+        ["\u{1F6BF} Wash", () => ctx5.send("wash")],
+        ["\u{1F489} Shots", () => ctx5.send("myshots")],
         // ?drain with their own number: them and nobody else, staff or stock (15-commands.js drainSelf)
-        ["\u{1FAA3} Drain", () => ctx4.send("drain " + (window.Player && window.Player.MemberNumber || "me"))]
+        ["\u{1FAA3} Drain", () => ctx5.send("drain " + (window.Player && window.Player.MemberNumber || "me"))]
       ], [
-        ["\u{1F4CA} Stats", () => ctx4.send("stats")],
-        ["\u{1F4D0} Measure", () => ctx4.send("measure")],
-        ["\u{1F4CB} Record", () => ctx4.send("record")],
-        ["\u{1F333} Pedigree", () => ctx4.send("pedigree")],
-        ["\u{1F511} Keys", () => ctx4.send("keys")],
-        ["\u{1F457} Dress me", () => ctx4.send("dressme")],
-        quiet ? ["\u{1F92B} End the quiet", () => ctx4.send("quiet off")] : ["\u{1F92B} Quiet hour", () => ctx4.send("quiet 60")]
+        ["\u{1F4CA} Stats", () => ctx5.send("stats")],
+        ["\u{1F4D0} Measure", () => ctx5.send("measure")],
+        ["\u{1F4CB} Record", () => ctx5.send("record")],
+        ["\u{1F333} Pedigree", () => ctx5.send("pedigree")],
+        ["\u{1F511} Keys", () => ctx5.send("keys")],
+        ["\u{1F457} Dress me", () => ctx5.send("dressme")],
+        quiet ? ["\u{1F92B} End the quiet", () => ctx5.send("quiet off")] : ["\u{1F92B} Quiet hour", () => ctx5.send("quiet 60")]
       ])
     ];
   }
-  function roamBody(ctx4) {
-    const r = ctx4.s.roam, span = r.mins === 30 ? "half an hour" : r.mins && r.mins !== 60 ? r.mins + " minutes" : "an hour";
+  function roamBody(ctx5) {
+    const r = ctx5.s.roam, span = r.mins === 30 ? "half an hour" : r.mins && r.mins !== 60 ? r.mins + " minutes" : "an hour";
     return [
       r.until ? muted("Roamin' now: back on the farm by " + clock2(r.until) + ", or the farm girl whistles you home, wherever you are.") : muted(r.left ? span[0].toUpperCase() + span.slice(1) + " off the farm each; the whole map is yours either way. " + (r.perm ? "Your contract keeps the door shut, so the Companion walks you out." : "Walk out the door and a pass starts.") + " Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
       h(
         "div",
         null,
-        r.until ? btn("I'm back", () => ctx4.send("roam back")) : r.left ? btn("Roam for " + span, () => ctx4.send("roam start"), true) : null,
-        r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx4.send("buy roampass"))
+        r.until ? btn("I'm back", () => ctx5.send("roam back")) : r.left ? btn("Roam for " + span, () => ctx5.send("roam start"), true) : null,
+        r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx5.send("buy roampass"))
       )
     ];
   }
-  function body(ctx4) {
-    const s = ctx4.s, sw = s.switches || {}, g = s.gear || {}, onoff = (v) => v === true ? "on" : v === false ? "off" : v;
-    const steps = (lv) => h("div", { class: "fhc-steps" }, [1, 2, 3, 4].map((n) => h("div", { class: n <= lv ? "on" : "" })));
+  function body(ctx5) {
+    const s = ctx5.s, sw = s.switches || {}, g = s.gear || {}, onoff = (v) => v === true ? "on" : v === false ? "off" : v;
+    const steps2 = (lv) => h("div", { class: "fhc-steps" }, [1, 2, 3, 4].map((n) => h("div", { class: n <= lv ? "on" : "" })));
     const milk = s.milk ? section(
       "\u{1F95B} Milk",
       "grade " + s.milk.grade,
@@ -20672,7 +22480,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       // what you're hooked up to right now, read off you by the farm
       g.milk ? [
         h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, h("span", null, g.milk.name), h("span", { class: "fhc-muted" }, ["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + " \xB7 " + g.milk.ml + " mL a minute")),
-        steps(g.milk.level),
+        steps2(g.milk.level),
         g.milk.kind === "echo" ? muted("The more worked up you are, the faster it draws.") : null
       ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you."),
       g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
@@ -20682,11 +22490,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         null,
         muted("The stall dial" + (s.milkCums ? " \xB7 milked till you came \xD7 " + s.milkCums : "")),
-        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx4.send("stalldial " + id) }, label))),
+        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx5.send("stalldial " + id) }, label))),
         muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || "")
       ),
-      h("div", null, btn("Quota", () => ctx4.send("quota")), btn("Milk board", () => ctx4.send("board")))
-    ) : section("\u{1F95B} Milk", null, muted("You're not makin' milk right now. Milkable is in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx4, "switches"))));
+      h("div", null, btn("Quota", () => ctx5.send("quota")), btn("Milk board", () => ctx5.send("board")))
+    ) : section("\u{1F95B} Milk", null, muted("You're not makin' milk right now. Milkable is in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx5, "switches"))));
     const breed = section(
       "\u{1F402} Breedin'",
       [sw.fertile ? "fertile" : null, s.heatUntil ? "in heat " + hoursLeft(s.heatUntil) + " h" : null].filter(Boolean).join(" \xB7 "),
@@ -20699,35 +22507,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         ["Carryin'", s.preg ? s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " d" : null],
         ["Eggs in you", s.eggs ? s.eggs.n + " \xB7 lay at the nest" : null]
       ]),
-      h("div", null, btn("My tally", () => ctx4.send("tally")), btn("Eggs", () => ctx4.send("eggs")), btn("Pedigree", () => ctx4.send("pedigree")))
+      h("div", null, btn("My tally", () => ctx5.send("tally")), btn("Eggs", () => ctx5.send("eggs")), btn("Pedigree", () => ctx5.send("pedigree")))
     );
     const hold = s.holding && s.holding.cap ? section(
       "\u{1FAD9} Holdin'",
       Math.round(pct3(s.holding.ml, s.holding.cap)) + "% full",
       bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct3(s.holding.ml, s.holding.cap), "alert"),
-      h("div", null, btn("\u{1FAA3} Drain", () => ctx4.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx4.send("wash")))
+      h("div", null, btn("\u{1FAA3} Drain", () => ctx5.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx5.send("wash")))
     ) : null;
-    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct3(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx4, "switches"))));
+    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct3(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx5, "switches"))));
     return [milk, breed, hold, seed];
   }
-  function trapThemesCard(ctx4) {
-    const list = ctx4.s.trapThemes || [];
-    if (!list.length) return null;
-    return card(title("Kinds of trap"), trapThemes(ctx4));
+  function trapThemesCard(ctx5) {
+    const list2 = ctx5.s.trapThemes || [];
+    if (!list2.length) return null;
+    return card(title("Kinds of trap"), trapThemes(ctx5));
   }
-  function trapThemes(ctx4) {
-    const list = ctx4.s.trapThemes || [];
+  function trapThemes(ctx5) {
+    const list2 = ctx5.s.trapThemes || [];
     return [
-      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx4.s.trapCard ? "" : " (They only matter once your traps are on.)")),
-      list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx4.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
+      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx5.s.trapCard ? "" : " (They only matter once your traps are on.)")),
+      list2.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx5.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
     ];
   }
-  function seasonsCard(ctx4) {
-    const b = seasons(ctx4);
+  function seasonsCard(ctx5) {
+    const b = seasons(ctx5);
     return b ? card(title("\u{1F5D3}\uFE0F Seasons"), b) : null;
   }
-  function seasons(ctx4) {
-    const sa = ctx4.s.seasonsAdmin;
+  function seasons(ctx5) {
+    const sa = ctx5.s.seasonsAdmin;
     if (!sa || !sa.rows || !sa.rows.length) return null;
     const at = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
     return [
@@ -20736,21 +22544,21 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "div",
         { class: "fhc-kv" },
         h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + at(x.until) : "on, its time of year" : x.dates)),
-        h("span", null, x.on ? btn("Stop", () => ctx4.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx4.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx4.send("seasons start " + x.id + " on"))])
+        h("span", null, x.on ? btn("Stop", () => ctx5.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx5.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx5.send("seasons start " + x.id + " on"))])
       )),
       h(
         "div",
         null,
-        btn("All of them, 2 hours", () => ctx4.send("seasons start all 2h")),
-        btn("Stop the ones I started", () => ctx4.send("seasons stop")),
-        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx4.send("seasons costume " + (sa.costume ? "off" : "on"))),
-        btn("The calendar", () => ctx4.send("seasons"))
+        btn("All of them, 2 hours", () => ctx5.send("seasons start all 2h")),
+        btn("Stop the ones I started", () => ctx5.send("seasons stop")),
+        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx5.send("seasons costume " + (sa.costume ? "off" : "on"))),
+        btn("The calendar", () => ctx5.send("seasons"))
       ),
       muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
     ];
   }
-  function play(ctx4) {
-    const s = ctx4.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [], st2 = storeParts(ctx4), themes = s.trapThemes || [];
+  function play(ctx5) {
+    const s = ctx5.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [], st2 = storeParts(ctx5), themes = s.trapThemes || [];
     const traps = tc ? section(
       "\u{1FAA4} Traps" + (tc.rank ? " \xB7 " + tc.rank : ""),
       tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""),
@@ -20760,34 +22568,34 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
       tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
       tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
-      quick(ctx4, "traps", [["Struggle", () => ctx4.send("struggle")], ["What's out there", () => ctx4.send("traps")]], [
-        ["Switch traps off", () => ctx4.send("traps off")],
-        [tc.eager ? "Eager: on" : "Eager: off", () => ctx4.send("traps eager " + (tc.eager ? "off" : "on"))],
-        ["Lay (at the nest)", () => ctx4.send("lay")],
-        ["My brood book", () => ctx4.send("brood")],
-        ["My ratings", () => ctx4.send("rate")],
-        [tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx4.send("rate ask " + (tc.rateAsk === false ? "on" : "off"))]
+      quick(ctx5, "traps", [["Struggle", () => ctx5.send("struggle")], ["What's out there", () => ctx5.send("traps")]], [
+        ["Switch traps off", () => ctx5.send("traps off")],
+        [tc.eager ? "Eager: on" : "Eager: off", () => ctx5.send("traps eager " + (tc.eager ? "off" : "on"))],
+        ["Lay (at the nest)", () => ctx5.send("lay")],
+        ["My brood book", () => ctx5.send("brood")],
+        ["My ratings", () => ctx5.send("rate")],
+        [tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx5.send("rate ask " + (tc.rateAsk === false ? "on" : "off"))]
       ])
-    ) : section("\u{1FAA4} Traps", "off", muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx4.send("traps on"))));
+    ) : section("\u{1FAA4} Traps", "off", muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx5.send("traps on"))));
     const offKinds = themes.filter((t) => !t.on).length;
     return [
       errCard(s),
       traps,
-      rows(ctx4, "play", [
+      rows(ctx5, "play", [
         {
           id: "gear",
           label: "\u26D3 On you right now",
           sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
           body: () => [
             gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, g.keep ? "till somebody else takes it off" : minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
-            !ctx4.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
+            !ctx5.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
           ]
         },
-        themes.length && tc && { id: "kinds", label: "\u{1F9EC} Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx4) },
+        themes.length && tc && { id: "kinds", label: "\u{1F9EC} Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx5) },
         st2.now && { id: "fx", label: "\u{1F9EA} In you right now", sum: (s.fx || []).length + " potion" + ((s.fx || []).length === 1 ? "" : "s"), body: () => st2.now },
         st2.dare && { id: "dare", label: s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare", sum: minsLeft2(s.dare.until) + " min left", body: () => st2.dare },
         st2.pen && { id: "pen", label: "\u{1F6A7} Corralled", sum: minsLeft2(s.penned.until) + " min", body: () => st2.pen },
-        s.sitting && { id: "nest", label: "\u{1FABA} Sittin' the nest", sum: s.sitting.n + " eggs", body: () => [muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, minsLeft2(s.sitting.until)) + " min."), h("div", null, btn("Get up", () => ctx4.send("sit up")))] },
+        s.sitting && { id: "nest", label: "\u{1FABA} Sittin' the nest", sum: s.sitting.n + " eggs", body: () => [muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, minsLeft2(s.sitting.until)) + " min."), h("div", null, btn("Get up", () => ctx5.send("sit up")))] },
         s.holes && s.holes.length && {
           id: "holes",
           label: "\u{1F573} What you've taken",
@@ -20806,14 +22614,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             muted("Only you can open this album.")
           ]
         },
-        s.onBooks && { id: "shots", label: "\u{1F489} Shots in you", sum: "?myshots", go: () => ctx4.send("myshots") },
-        ad && { id: "admin", label: "\u{1F6E0} Proprietor: traps", sum: ad.subjects.length + " with traps on", body: () => trapAdmin(ctx4) },
-        ctx4.s.seasonsAdmin && ctx4.s.seasonsAdmin.rows && ctx4.s.seasonsAdmin.rows.length && { id: "seasons", label: "\u{1F5D3}\uFE0F Seasons", sum: ctx4.s.seasonsAdmin.rows.filter((x) => x.on).map((x) => x.icon).join(" ") || "none on", body: () => seasons(ctx4) }
+        s.onBooks && { id: "shots", label: "\u{1F489} Shots in you", sum: "?myshots", go: () => ctx5.send("myshots") },
+        ad && { id: "admin", label: "\u{1F6E0} Proprietor: traps", sum: ad.subjects.length + " with traps on", body: () => trapAdmin(ctx5) },
+        ctx5.s.seasonsAdmin && ctx5.s.seasonsAdmin.rows && ctx5.s.seasonsAdmin.rows.length && { id: "seasons", label: "\u{1F5D3}\uFE0F Seasons", sum: ctx5.s.seasonsAdmin.rows.filter((x) => x.on).map((x) => x.icon).join(" ") || "none on", body: () => seasons(ctx5) }
       ])
     ];
   }
-  function trapAdmin(ctx4) {
-    const ad = ctx4.s.trapAdmin;
+  function trapAdmin(ctx5) {
+    const ad = ctx5.s.trapAdmin;
     return [
       ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
       ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
@@ -20824,17 +22632,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         null,
-        btn("Kinds & spots", () => ctx4.send("traps")),
-        btn("Subjects", () => ctx4.send("subject")),
-        btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx4.send(ad.hunt ? "hunt stop" : "hunt start")),
-        btn("Gather eggs", () => ctx4.send("gather")),
-        btn("Ratings", () => ctx4.send("traps ratings"))
+        btn("Kinds & spots", () => ctx5.send("traps")),
+        btn("Subjects", () => ctx5.send("subject")),
+        btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx5.send(ad.hunt ? "hunt stop" : "hunt start")),
+        btn("Gather eggs", () => ctx5.send("gather")),
+        btn("Ratings", () => ctx5.send("traps ratings"))
       )
     ];
   }
   var TIER = ["\u2013", "I", "II", "III", "IV", "V"];
-  function feats(ctx4) {
-    const F = ctx4.s.feats;
+  function feats(ctx5) {
+    const F = ctx5.s.feats;
     if (!F || !Array.isArray(F.tracks)) return [muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too.")];
     return [
       muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
@@ -20844,12 +22652,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h("div", { class: "fhc-kv" }, h("b", null, t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
         t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct3(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
         muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
-        t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx4.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
+        t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx5.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
       ))
     ];
   }
-  function ribbons(ctx4) {
-    const s = ctx4.s, st2 = storeParts(ctx4), F = s.feats, tiers = F && Array.isArray(F.tracks) ? F.tracks.reduce((n, t) => n + (t.tier || 0), 0) : 0;
+  function ribbons(ctx5) {
+    const s = ctx5.s, st2 = storeParts(ctx5), F = s.feats, tiers = F && Array.isArray(F.tracks) ? F.tracks.reduce((n, t) => n + (t.tier || 0), 0) : 0;
     const log2 = s.ribbonLog || [];
     return [
       h(
@@ -20860,20 +22668,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         st2.vat,
         muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good.")
       ),
-      rows(ctx4, "rib", [
+      rows(ctx5, "rib", [
         log2.length && { id: "log", label: "\u{1F4D2} Where they came from", sum: (log2[0].n > 0 ? "+" : "") + log2[0].n + " " + log2[0].why, body: () => st2.logList },
         ...st2.shelves.map((sh) => ({ id: sh.id, label: sh.label, sum: sh.n + " on the shelf", body: sh.body })),
-        { id: "feats", label: "\u{1F3C5} Feats", sum: F && Array.isArray(F.tracks) ? tiers + " tier" + (tiers === 1 ? "" : "s") + " earned" : "", body: () => feats(ctx4) },
+        { id: "feats", label: "\u{1F3C5} Feats", sum: F && Array.isArray(F.tracks) ? tiers + " tier" + (tiers === 1 ? "" : "s") + " earned" : "", body: () => feats(ctx5) },
         F && F.titles && F.titles.length && { id: "titles", label: "\u{1F396}\uFE0F Titles", sum: String(F.titles.length), body: () => [muted(F.titles.join(" \xB7 "))] }
       ]),
-      h("div", null, btn("This week's board", () => ctx4.send("ribbons top")))
+      h("div", null, btn("This week's board", () => ctx5.send("ribbons top")))
     ];
   }
-  function inbox(ctx4) {
-    const f = ctx4.ui.filter || "all";
-    const items = ctx4.feed.filter((x) => f === "all" || x.kind === f);
+  function inbox(ctx5) {
+    const f = ctx5.ui.filter || "all";
+    const items = ctx5.feed.filter((x) => f === "all" || x.kind === f);
     return [
-      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx4.setUi({ filter: id }) }, label))),
+      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx5.setUi({ filter: id }) }, label))),
       items.length ? items.slice().reverse().map((x) => h(
         "div",
         { class: "fhc-card " + x.kind },
@@ -20919,16 +22727,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
-  function farmSwitches(ctx4, list) {
-    const sw = ctx4.s.switches || {};
-    return list.map(([cmd, label, desc]) => {
+  function farmSwitches(ctx5, list2) {
+    const sw = ctx5.s.switches || {};
+    return list2.map(([cmd, label, desc]) => {
       const need = NEEDS[cmd];
-      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx4.send(cmd + " on"));
-      return toggle(label, desc, !!sw[cmd], () => ctx4.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx5.send(cmd + " on"));
+      return toggle(label, desc, !!sw[cmd], () => ctx5.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
-  function drawnBodyCard(ctx4) {
-    const st2 = drawnBodyState(), say3 = (t) => ctx4.hint(t);
+  function drawnBodyCard(ctx5) {
+    const st2 = drawnBodyState(), say4 = (t) => ctx5.hint(t);
     const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
     return card(
       title("Drawn body (outfit studio)"),
@@ -20937,8 +22745,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, on your character. Everyone here with the Companion sees it; people without it see the game's own picture of you. Off takes it away.",
         st2.on,
         () => {
-          drawnBodySet(!st2.on, say3);
-          ctx4.setPref("drawnBody", !st2.on);
+          drawnBodySet(!st2.on, say4);
+          ctx5.setPref("drawnBody", !st2.on);
         }
       ),
       h(
@@ -20949,8 +22757,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "select",
           { class: "fhc-sel", onchange: (e) => {
             const v = e.target.value;
-            drawnBodyCup(v === "auto" ? "auto" : Number(v), say3);
-            ctx4.setPref("drawnBodyCup", v);
+            drawnBodyCup(v === "auto" ? "auto" : Number(v), say4);
+            ctx5.setPref("drawnBodyCup", v);
           } },
           [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
             st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: st2.cupSet && i === st2.cup }, c))
@@ -20965,8 +22773,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h(
           "select",
           { class: "fhc-sel", onchange: (e) => {
-            drawnBodyBelly(e.target.value, say3);
-            ctx4.setPref("drawnBodyBelly", e.target.value);
+            drawnBodyBelly(e.target.value, say4);
+            ctx5.setPref("drawnBodyBelly", e.target.value);
           } },
           [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
         )
@@ -20974,39 +22782,39 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       muted("Following the farm, your cup is the size the farm has grown your udder to, and your belly shows and grows as you fill up, carry eggs or get bred."),
       muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
       st2.fromStudio ? btn("Use the farm's look instead", () => {
-        drawnBodyUseFarm(say3);
-        ctx4.setPref("drawnBodyAt", Date.now());
+        drawnBodyUseFarm(say4);
+        ctx5.setPref("drawnBodyAt", Date.now());
       }) : null,
       h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
       h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
-        drawnBodyFromStudio(say3).then((ok2) => {
-          if (ok2) ctx4.setPref("drawnBodyAt", Date.now());
+        drawnBodyFromStudio(say4).then((ok2) => {
+          if (ok2) ctx5.setPref("drawnBodyAt", Date.now());
         });
       }, true)),
       muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
       h("div", { style: { marginTop: "6px" } }, code),
       btn("Put in the pasted code", () => {
-        if (drawnBodyPaste(code.value, say3)) ctx4.setPref("drawnBodyAt", Date.now());
+        if (drawnBodyPaste(code.value, say4)) ctx5.setPref("drawnBodyAt", Date.now());
       }),
       toggle(
         "See other people's drawn bodies",
         "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
         st2.seeOthers,
         () => {
-          drawnBodySeeOthers(!st2.seeOthers, say3);
-          ctx4.setPref("drawnBodySee", !st2.seeOthers);
+          drawnBodySeeOthers(!st2.seeOthers, say4);
+          ctx5.setPref("drawnBodySee", !st2.seeOthers);
         }
       )
     );
   }
-  function extraSwitches(ctx4) {
-    const list = [];
-    for (const m of Object.values(ctx4.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
-    if (!list.length) return null;
+  function extraSwitches(ctx5) {
+    const list2 = [];
+    for (const m of Object.values(ctx5.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list2.push([m.label, t]);
+    if (!list2.length) return null;
     return card(
       title("\u{1F9E9} Farm extras"),
       muted("The farm's add-ons. Each one is off until you switch it on."),
-      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx4.send(String(t.cmd))))
+      list2.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx5.send(String(t.cmd))))
     );
   }
   var LIVESTOCK_TABS = [
@@ -21020,19 +22828,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
 
   // extension/src/views/guest.js
   var GUEST_TABS = [
-    { id: "welcome", label: "\u{1F44B} Welcome", render: (ctx4) => [
+    { id: "welcome", label: "\u{1F44B} Welcome", render: (ctx5) => [
       card(
-        h("div", { class: "fhc-title" }, "Howdy, " + (ctx4.welcome.name || "sugar") + "!"),
+        h("div", { class: "fhc-title" }, "Howdy, " + (ctx5.welcome.name || "sugar") + "!"),
         h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
-        btn("Take the tour", () => ctx4.send("tour"), true),
-        btn("Apply to join", () => ctx4.send("apply")),
-        btn("Luxury stay", () => ctx4.send("luxury")),
-        btn("Dress me", () => ctx4.send("dressme"))
+        btn("Take the tour", () => ctx5.send("tour"), true),
+        btn("Apply to join", () => ctx5.send("apply")),
+        btn("Luxury stay", () => ctx5.send("luxury")),
+        btn("Dress me", () => ctx5.send("dressme"))
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
     { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key3, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key3)), muted(d))) },
-    { id: "rules", label: "\u{1F4CF} Rules", render: (ctx4) => [
+    { id: "rules", label: "\u{1F4CF} Rules", render: (ctx5) => [
       h(
         "div",
         { class: "fhc-box alert" },
@@ -21040,10 +22848,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
       ),
       card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
-      h("div", null, btn("Full rules", () => ctx4.send("rules")), btn("Consent", () => ctx4.send("consent")), btn("What opens what", () => ctx4.send("doors")))
+      h("div", null, btn("Full rules", () => ctx5.send("rules")), btn("Consent", () => ctx5.send("consent")), btn("What opens what", () => ctx5.send("doors")))
     ] },
     { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx4) => guidesTab(ctx4, false) },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx5) => guidesTab(ctx5, false) },
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
     // (the 🆘 button in the header opens it)
     // (the Settings tab is gone, Nov 4: the ⚙ in the header has the drawn body, this panel's switches and the rest)
@@ -21052,9 +22860,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // extension/src/views/dashboard.js
   var field2 = (label, el2) => h("label", { class: "fhc-label" }, label, el2);
   var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
-  function settingControl(ctx4, rule, s) {
-    const key3 = "set:" + rule.id + ":" + s.name, cur = ctx4.ui[key3];
-    const set2 = (v) => ctx4.setUi({ [key3]: v }, true);
+  function settingControl(ctx5, rule, s) {
+    const key3 = "set:" + rule.id + ":" + s.name, cur = ctx5.ui[key3];
+    const set2 = (v) => ctx5.setUi({ [key3]: v }, true);
     const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
     switch (s.type) {
       case "checkbox":
@@ -21082,44 +22890,44 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set2(e.target.value) });
     }
   }
-  function addCommand(ctx4, name, rule) {
+  function addCommand(ctx5, name, rule) {
     const pairs2 = rule.settings.map((s) => {
       const key3 = "set:" + rule.id + ":" + s.name;
-      let v = ctx4.ui[key3];
+      let v = ctx5.ui[key3];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
     });
     return ("contract add " + name + " " + rule.id + " " + pairs2.join(" ")).trim();
   }
-  function contracts2(ctx4) {
-    const nm = () => (ctx4.ui.dName || "").trim().toLowerCase();
+  function contracts2(ctx5) {
+    const nm = () => (ctx5.ui.dName || "").trim().toLowerCase();
     const name = nm();
     const cats = [...new Set([...RULES.values()].map((r) => r.category))];
-    const cat = ctx4.ui.dCat || cats[0];
+    const cat = ctx5.ui.dCat || cats[0];
     const inCat = [...RULES.values()].filter((r) => r.category === cat);
-    const rule = RULES.get(ctx4.ui.dRule) && RULES.get(ctx4.ui.dRule).category === cat ? RULES.get(ctx4.ui.dRule) : inCat[0];
-    const need = () => !nm() && (ctx4.hint("Give your contract a name first (one word, like prizecow)."), true);
+    const rule = RULES.get(ctx5.ui.dRule) && RULES.get(ctx5.ui.dRule).category === cat ? RULES.get(ctx5.ui.dRule) : inCat[0];
+    const need = () => !nm() && (ctx5.hint("Give your contract a name first (one word, like prizecow)."), true);
     return [
       card(
         title("Your contract"),
-        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx4.ui.dName || "", oninput: (e) => ctx4.setUi({ dName: e.target.value }, true) })),
-        ctx4.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
+        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx5.ui.dName || "", oninput: (e) => ctx5.setUi({ dName: e.target.value }, true) })),
+        ctx5.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
         h(
           "div",
           null,
-          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx4.send("contract new " + nm() + " from " + b))),
-          btn("New, empty", () => !need() && ctx4.send("contract new " + nm()))
+          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx5.send("contract new " + nm() + " from " + b))),
+          btn("New, empty", () => !need() && ctx5.send("contract new " + nm()))
         ),
-        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx4.ui.dTitle || "", oninput: (e) => ctx4.setUi({ dTitle: e.target.value }, true) })),
-        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx4.setUi({ dTerms: e.target.value }, true) }, ctx4.ui.dTerms || "")),
+        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx5.ui.dTitle || "", oninput: (e) => ctx5.setUi({ dTitle: e.target.value }, true) })),
+        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx5.setUi({ dTerms: e.target.value }, true) }, ctx5.ui.dTerms || "")),
         h(
           "div",
           null,
-          btn("Save title", () => !need() && (ctx4.ui.dTitle ? ctx4.send("contract title " + nm() + " " + ctx4.ui.dTitle) : ctx4.hint("Type the title first."))),
-          btn("Save terms", () => !need() && (ctx4.ui.dTerms ? ctx4.send("contract terms " + nm() + " " + ctx4.ui.dTerms) : ctx4.hint("Write the terms first."))),
-          btn("Farm ends it", () => !need() && ctx4.send("contract policy " + nm() + " farm")),
-          btn("Either side ends it", () => !need() && ctx4.send("contract policy " + nm() + " either"))
+          btn("Save title", () => !need() && (ctx5.ui.dTitle ? ctx5.send("contract title " + nm() + " " + ctx5.ui.dTitle) : ctx5.hint("Type the title first."))),
+          btn("Save terms", () => !need() && (ctx5.ui.dTerms ? ctx5.send("contract terms " + nm() + " " + ctx5.ui.dTerms) : ctx5.hint("Write the terms first."))),
+          btn("Farm ends it", () => !need() && ctx5.send("contract policy " + nm() + " farm")),
+          btn("Either side ends it", () => !need() && ctx5.send("contract policy " + nm() + " either"))
         )
       ),
       card(
@@ -21127,40 +22935,40 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         muted("Every rule and setting BC+ " + BCPLUS_VERSION + " has. Only values BC+ accepts can be picked."),
         field2("Kind", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx4.setUi({ dCat: e.target.value, dRule: "" }) },
+          { class: "fhc-sel", onchange: (e) => ctx5.setUi({ dCat: e.target.value, dRule: "" }) },
           cats.map((c) => h("option", { value: c, selected: c === cat ? "selected" : null }, c))
         )),
         field2("Rule", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx4.setUi({ dRule: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx5.setUi({ dRule: e.target.value }) },
           inCat.map((r) => h("option", { value: r.id, selected: r === rule ? "selected" : null }, r.name + (NEVER[r.id] ? " (never on the farm)" : "")))
         )),
         rule && muted(rule.description),
         rule && NEVER[rule.id] ? h("div", { class: "fhc-box alert" }, "The farm never uses this one: it " + NEVER[rule.id] + ".") : rule && [
-          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx4, rule, s))),
+          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx5, rule, s))),
           h(
             "div",
             null,
-            btn("Add to " + (name || "contract"), () => !need() && ctx4.send(addCommand(ctx4, nm(), rule)), true),
-            btn("Take it out", () => !need() && ctx4.send("contract remove " + nm() + " " + rule.id))
+            btn("Add to " + (name || "contract"), () => !need() && ctx5.send(addCommand(ctx5, nm(), rule)), true),
+            btn("Take it out", () => !need() && ctx5.send("contract remove " + nm() + " " + rule.id))
           )
         ]
       ),
       card(title("Check and send"), h(
         "div",
         null,
-        btn("Preview", () => !need() && ctx4.send("contract show " + nm())),
-        btn("All contracts", () => ctx4.send("contract list")),
-        btn("Delete", () => !need() && ctx4.send("contract delete " + nm()))
+        btn("Preview", () => !need() && ctx5.send("contract show " + nm())),
+        btn("All contracts", () => ctx5.send("contract list")),
+        btn("Delete", () => !need() && ctx5.send("contract delete " + nm()))
       ), muted("Offer it from the Staff panel's Contracts tab.")),
-      latest(ctx4)
+      latest(ctx5)
     ];
   }
-  function parts(ctx4) {
-    const list = ctx4.s.botParts, fw = ctx4.s.featsWeek || [], b = bcplusStatus(), su = summonReady(BOT_MEMBER);
+  function parts(ctx5) {
+    const list2 = ctx5.s.botParts, fw = ctx5.s.featsWeek || [], b = bcplusStatus(), su = summonReady(BOT_MEMBER);
     return [
       muted("Each part is a piece of the farm girl kept in its own script for easy editin'. Tap one for its guide, or to switch it off."),
-      !Array.isArray(list) ? muted("The farm girl sends this list with your next panel update.") : list.length ? rows(ctx4, "parts", list.map((p) => ({
+      !Array.isArray(list2) ? muted("The farm girl sends this list with your next panel update.") : list2.length ? rows(ctx5, "parts", list2.map((p) => ({
         id: p.name,
         label: (p.mine ? "\u{1F512} " : "") + p.label,
         dot: !!p.errors,
@@ -21171,8 +22979,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           h(
             "div",
             null,
-            btn("Its guide", () => ctx4.send("addons " + p.name)),
-            btn(p.on ? "Switch it off" : "Switch it on", () => ctx4.send("addons " + (p.on ? "off " : "on ") + p.name), !p.on)
+            btn("Its guide", () => ctx5.send("addons " + p.name)),
+            btn(p.on ? "Switch it off" : "Switch it on", () => ctx5.send("addons " + (p.on ? "off " : "on ") + p.name), !p.on)
           )
         ]
       }))) : muted("No parts are runnin' right now."),
@@ -21193,9 +23001,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat", "dragon"];
   var GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
   var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
-  function outfits(ctx4) {
-    const saved = ctx4.s.outfits || {}, rules = ctx4.s.outfitRules || {};
-    const sp = ctx4.ui.oSp || "cow";
+  function outfits(ctx5) {
+    const saved = ctx5.s.outfits || {}, rules = ctx5.s.outfitRules || {};
+    const sp = ctx5.ui.oSp || "cow";
     const slotBox = (key3, label) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", borderColor: saved[key3] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key3] ? "solid" : "dashed" } },
@@ -21204,8 +23012,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       h(
         "div",
         { style: { marginTop: "6px" } },
-        btn("Save what I'm wearin'", () => ctx4.api.save && ctx4.api.save(key3)),
-        saved[key3] ? btn("Clear", () => ctx4.send("outfit clear " + key3.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+        btn("Save what I'm wearin'", () => ctx5.api.save && ctx5.api.save(key3)),
+        saved[key3] ? btn("Clear", () => ctx5.send("outfit clear " + key3.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
       )
     );
     const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
@@ -21222,7 +23030,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         title("New stock, by species and gender"),
         h("label", { class: "fhc-label" }, "Species", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx4.setUi({ oSp: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx5.setUi({ oSp: e.target.value }) },
           SPECIES.map((x) => h("option", { value: x, selected: x === sp ? "selected" : null }, x))
         )),
         h(
@@ -21249,12 +23057,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           "label",
           { class: "fhc-label" },
           "New special (one word: luxury, fairday, prizecow\u2026)",
-          h("input", { class: "fhc-in", value: ctx4.ui.oSpecial || "", oninput: (e) => ctx4.setUi({ oSpecial: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx5.ui.oSpecial || "", oninput: (e) => ctx5.setUi({ oSpecial: e.target.value }, true) })
         ),
         btn("Save what I'm wearin' as this special", () => {
-          const n = (ctx4.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
-          if (n.length < 2) return ctx4.hint("Name the special first (one word, like luxury).");
-          ctx4.api.save && ctx4.api.save("special:" + n);
+          const n = (ctx5.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+          if (n.length < 2) return ctx5.hint("Name the special first (one word, like luxury).");
+          ctx5.api.save && ctx5.api.save("special:" + n);
         })
       ),
       card(
@@ -21262,7 +23070,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
         h("label", { class: "fhc-label" }, "Who holds the keys", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx4.send("outfit keys " + e.target.value) },
+          { class: "fhc-sel", onchange: (e) => ctx5.send("outfit keys " + e.target.value) },
           Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))
         ))
       ),
@@ -21281,12 +23089,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             class: "fhc-sw" + (rules[k] ? " on" : ""),
             "aria-pressed": rules[k] ? "true" : "false",
             "aria-label": label,
-            onclick: () => ctx4.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
+            onclick: () => ctx5.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
           }, h("span"))
         )),
         muted("Contracts offer an outfit when they're signed, too: ?contract outfit <name> auto|none|<slot>.")
       ),
-      latest(ctx4)
+      latest(ctx5)
     ];
   }
   var EDIT_FIELDS = [
@@ -21316,52 +23124,52 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     species: "cow, pony, bunny, kitty\u2026 any animal",
     name: "what the farm calls them; clear goes back to their game nickname"
   };
-  function records(ctx4) {
-    const who2 = () => String(ctx4.ui.eWho || "").trim().replace(/\s+/g, " ");
-    const fld = ctx4.ui.eField || "species";
-    const need = () => who2() ? false : (ctx4.hint("Who? Their member number is safest."), true);
+  function records(ctx5) {
+    const who2 = () => String(ctx5.ui.eWho || "").trim().replace(/\s+/g, " ");
+    const fld = ctx5.ui.eField || "species";
+    const need = () => who2() ? false : (ctx5.hint("Who? Their member number is safest."), true);
     return [
       card(
         title("Edit a record"),
         muted("Fix a mistake on somebody's application or change their details. Member numbers are safest; a name works if it's on the books."),
-        field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx4.ui.eWho || "", oninput: (e) => ctx4.setUi({ eWho: e.target.value }, true) })),
-        btn("Show what's on file", () => !need() && ctx4.send("edit " + who2())),
+        field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx5.ui.eWho || "", oninput: (e) => ctx5.setUi({ eWho: e.target.value }, true) })),
+        btn("Show what's on file", () => !need() && ctx5.send("edit " + who2())),
         field2("What to change", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx4.setUi({ eField: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx5.setUi({ eField: e.target.value }) },
           EDIT_FIELDS.map(([k, label]) => h("option", { value: k, selected: k === fld ? "selected" : null }, label))
         )),
-        field2("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx4.ui.eVal || "", oninput: (e) => ctx4.setUi({ eVal: e.target.value }, true) })),
+        field2("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx5.ui.eVal || "", oninput: (e) => ctx5.setUi({ eVal: e.target.value }, true) })),
         h(
           "div",
           null,
           btn("Save", () => {
             if (need()) return;
-            const v = String(ctx4.ui.eVal || "").replace(/\s+/g, " ").trim();
-            if (!v) return ctx4.hint("Type the new value first (or press Clear it).");
-            ctx4.send("edit " + who2() + " " + fld + " " + v);
-            ctx4.setUi({ eVal: "" });
+            const v = String(ctx5.ui.eVal || "").replace(/\s+/g, " ").trim();
+            if (!v) return ctx5.hint("Type the new value first (or press Clear it).");
+            ctx5.send("edit " + who2() + " " + fld + " " + v);
+            ctx5.setUi({ eVal: "" });
           }),
-          btn("Clear it", () => !need() && ctx4.send("edit " + who2() + " " + fld + " clear"))
+          btn("Clear it", () => !need() && ctx5.send("edit " + who2() + " " + fld + " clear"))
         ),
         muted("Changes are saved on their record and in the audit log. Typed: ?edit <who> <field> <value>.")
       ),
-      latest(ctx4)
+      latest(ctx5)
     ];
   }
   var FB_ICON = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}", meh: "\u{1F44E}", more: "\u2764\uFE0F" };
   var FB_STATUS = { open: ["open", "acc"], done: ["done", "good"], later: ["later", ""], no: ["not now", "alert"] };
-  function suggestions(ctx4) {
-    const all = ctx4.s.feedback || [], f = ctx4.ui.fbFilter || "open";
+  function suggestions(ctx5) {
+    const all = ctx5.s.feedback || [], f = ctx5.ui.fbFilter || "open";
     const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : f === "lines" ? (x.kind === "meh" || x.kind === "more") && x.status === "open" : x.kind === f && x.status === "open");
-    const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx4.setUi({ fbFilter: id }) }, label);
+    const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx5.setUi({ fbFilter: id }) }, label);
     return [
       h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("lines", "\u{1F44E}\u2764\uFE0F Lines"), pill("all", "Everything")),
       shown.length ? shown.map((x) => {
         const key3 = "fbnote_" + x.id, act = (what) => {
-          const note4 = (ctx4.ui[key3] || "").trim();
-          ctx4.send("feedback " + what + " " + x.id + (note4 ? " " + note4 : ""));
-          ctx4.setUi({ [key3]: "" });
+          const note4 = (ctx5.ui[key3] || "").trim();
+          ctx5.send("feedback " + what + " " + x.id + (note4 ? " " + note4 : ""));
+          ctx5.setUi({ [key3]: "" });
         };
         return card(
           h(
@@ -21373,30 +23181,30 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
           x.why && muted("Why: " + x.why),
           x.note && muted("Your note: " + x.note),
-          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx4.ui[key3] || "", oninput: (e) => ctx4.setUi({ [key3]: e.target.value }, true) }),
+          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx5.ui[key3] || "", oninput: (e) => ctx5.setUi({ [key3]: e.target.value }, true) }),
           h(
             "div",
             { style: { marginTop: "6px" } },
             btn("Done", () => act("done"), true),
             btn("Later", () => act("later")),
             btn("Not now", () => act("no")),
-            btn("Delete", () => ctx4.send("feedback del " + x.id))
+            btn("Delete", () => ctx5.send("feedback del " + x.id))
           )
         );
       }) : muted(f === "all" ? "The suggestion box is empty." : "Nothin' open here. Players send them with ?suggest, ?bug and ?feedback."),
-      h("div", { style: { marginTop: "6px" } }, btn("Export everything (for Claude)", () => ctx4.send("feedback export")))
+      h("div", { style: { marginTop: "6px" } }, btn("Export everything (for Claude)", () => ctx5.send("feedback export")))
     ];
   }
   var DASHBOARD_TABS = [
     { id: "contracts", label: "\u{1F4DC} BC+ contracts", render: contracts2 },
     { id: "outfits", label: "\u{1F457} Outfits", render: outfits },
     { id: "records", label: "\u{1F5C3} Records", render: records },
-    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx4) => (ctx4.s.feedback || []).filter((x) => x.status === "open").length },
+    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx5) => (ctx5.s.feedback || []).filter((x) => x.status === "open").length },
     { id: "parts", label: "\u{1F9E9} Bot parts", render: parts }
   ];
 
   // extension/src/views/nursery.js
-  var N = (ctx4) => ctx4.s.nursery || {};
+  var N = (ctx5) => ctx5.s.nursery || {};
   var ACT_LABEL = {
     story: "\u{1F4D6} Story",
     nap: "\u{1F634} Nap",
@@ -21453,36 +23261,36 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var WET = ["dry", "a little damp", "soggy", "leaking!"];
   var MESS = { cake: "cake", cream: "cream", honey: "honey", maple: "syrup", chocolate: "chocolate", strawberry: "strawberry", mud: "mud", slime: "slime" };
   var grid = (items) => h("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px" } }, items);
-  function stars(ctx4) {
-    const n = N(ctx4);
+  function stars(ctx5) {
+    const n = N(ctx5);
     return chip("\u2B50 " + (n.stars || 0) + " of " + (n.cap || 0) + " today", "acc");
   }
-  function offerCard(ctx4) {
-    const o = ctx4.ui.nurseryOffer;
+  function offerCard(ctx5) {
+    const o = ctx5.ui.nurseryOffer;
     if (!o) return null;
-    const g = (N(ctx4).gear || []).find((x) => x.id === o.gear);
+    const g = (N(ctx5).gear || []).find((x) => x.id === o.gear);
     return card(
       title("\u{1F9F8} " + o.from + " is holdin' out a " + o.label),
       h(
         "div",
         null,
         btn("Hold it", () => {
-          const r = g && ctx4.api.nurseryWear ? ctx4.api.nurseryWear(g) : { ok: false, why: "no Companion helper" };
-          ctx4.hint(r.ok ? "You're holdin' the " + o.label + "." : "Couldn't: " + r.why + ".");
-          ctx4.setUi({ nurseryOffer: null });
+          const r = g && ctx5.api.nurseryWear ? ctx5.api.nurseryWear(g) : { ok: false, why: "no Companion helper" };
+          ctx5.hint(r.ok ? "You're holdin' the " + o.label + "." : "Couldn't: " + r.why + ".");
+          ctx5.setUi({ nurseryOffer: null });
         }, true),
-        btn("No thanks", () => ctx4.setUi({ nurseryOffer: null }))
+        btn("No thanks", () => ctx5.setUi({ nurseryOffer: null }))
       )
     );
   }
-  function playTab(ctx4) {
-    const n = N(ctx4);
+  function playTab(ctx5) {
+    const n = N(ctx5);
     const space = card(
-      h("div", { class: "fhc-kv" }, title(n.space ? "\u{1F9F8} You're little right now" : "\u{1F9F8} Little space"), stars(ctx4)),
+      h("div", { class: "fhc-kv" }, title(n.space ? "\u{1F9F8} You're little right now" : "\u{1F9F8} Little space"), stars(ctx5)),
       muted(n.space ? "The farm's grown-up things leave you be till you switch it off. Only nursery folk see what happens in here." : "Switch it on whenever you want to be little. While it's on, traps, breedin', milkin' and the rest of the grown-up farm leave you be."),
-      btn(n.space ? "Grow back up" : "Go little", () => ctx4.send(n.space ? "little off" : "little on"), !n.space)
+      btn(n.space ? "Grow back up" : "Go little", () => ctx5.send(n.space ? "little off" : "little on"), !n.space)
     );
-    if (!n.space) return [offerCard(ctx4), space];
+    if (!n.space) return [offerCard(ctx5), space];
     const w = n.wet || 0;
     const status = card(
       title("How you're doin'"),
@@ -21492,20 +23300,20 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         n.abcl ? chip("Paddin': " + WET[w], w >= 2 ? "warn" : w ? "acc" : "good") : null,
         (n.messes || []).map((m) => chip("Messy: " + (MESS[m] || m), "acc"))
       ),
-      (n.messes || []).length ? h("div", null, btn("\u{1F6C1} Bath time", () => ctx4.send("little bath"))) : null,
+      (n.messes || []).length ? h("div", null, btn("\u{1F6C1} Bath time", () => ctx5.send("little bath"))) : null,
       !n.abcl ? muted("With the ABCL mod, the nursery can tell when your paddin' needs a change.") : null
     );
     return [
-      offerCard(ctx4),
+      offerCard(ctx5),
       space,
       status,
-      card(title("Things to do"), grid((n.acts || Object.keys(ACT_LABEL)).map((a) => btn(ACT_LABEL[a] || a, () => ctx4.send("little " + a)))), muted("A gold star (a ribbon) now and then, a few a day."))
+      card(title("Things to do"), grid((n.acts || Object.keys(ACT_LABEL)).map((a) => btn(ACT_LABEL[a] || a, () => ctx5.send("little " + a)))), muted("A gold star (a ribbon) now and then, a few a day."))
     ];
   }
-  function gamesTab(ctx4) {
-    const n = N(ctx4);
+  function gamesTab(ctx5) {
+    const n = N(ctx5);
     if (!n.space) return [card(title("\u{1F3B2} Games"), muted("Go little first (Play tab), then come play."))];
-    const g = (name, picks, label, desc) => card(title(label), muted(desc), grid(picks.map(([p, l]) => btn(l, () => ctx4.send("little game " + name + (p ? " " + p : ""))))));
+    const g = (name, picks, label, desc) => card(title(label), muted(desc), grid(picks.map(([p, l]) => btn(l, () => ctx5.send("little game " + name + (p ? " " + p : ""))))));
     return [
       g("rps", [["rock", "\u{1FAA8} Rock"], ["paper", "\u{1F4C4} Paper"], ["scissors", "\u2702\uFE0F Scissors"]], "Rock, paper, scissors", "Against the farm girl."),
       g("guess", [["left", "\u{1F448} Left hand"], ["right", "\u{1F449} Right hand"]], "Which hand?", "There's a sweetie in one of 'em."),
@@ -21515,54 +23323,54 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       g("peekaboo", [["", "\u{1F648} Peekaboo"]], "Peekaboo", "Always a winner.")
     ];
   }
-  function gearTab(ctx4) {
-    const n = N(ctx4), worn = ctx4.api.nurseryWorn ? ctx4.api.nurseryWorn() : {};
-    const list = n.gear || [];
-    const row = (kind, label) => card(title(label), grid(list.filter((x) => x.kind === kind).map((x) => {
+  function gearTab(ctx5) {
+    const n = N(ctx5), worn = ctx5.api.nurseryWorn ? ctx5.api.nurseryWorn() : {};
+    const list2 = n.gear || [];
+    const row = (kind, label) => card(title(label), grid(list2.filter((x) => x.kind === kind).map((x) => {
       const on3 = worn[x.group] === x.name;
       return btn((on3 ? "\u2713 " : "") + x.label, () => {
-        const r = on3 ? ctx4.api.nurseryOff(x.group) : ctx4.api.nurseryWear(x);
-        ctx4.hint(r.ok ? (on3 ? "Took off the " : "On: the ") + x.label + "." : "Couldn't: " + r.why + ".");
-        ctx4.setUi({});
+        const r = on3 ? ctx5.api.nurseryOff(x.group) : ctx5.api.nurseryWear(x);
+        ctx5.hint(r.ok ? (on3 ? "Took off the " : "On: the ") + x.label + "." : "Couldn't: " + r.why + ".");
+        ctx5.setUi({});
       }, on3);
     })));
     return [
-      offerCard(ctx4),
+      offerCard(ctx5),
       muted("These go on your own character, only when you press them, and come off the same way. Nothin' here is ever locked."),
       row("stuffie", "\u{1F9F8} Stuffies"),
       row("mouth", "\u{1F37C} Pacifier and bottle"),
       row("wear", "\u{1F380} Baby things"),
       btn("Take all of it off", () => {
-        const r = ctx4.api.nurseryOff ? ctx4.api.nurseryOff() : { ok: false };
-        ctx4.hint(r.ok ? "All the nursery things are off." : "Couldn't.");
-        ctx4.setUi({});
+        const r = ctx5.api.nurseryOff ? ctx5.api.nurseryOff() : { ok: false };
+        ctx5.hint(r.ok ? "All the nursery things are off." : "Couldn't.");
+        ctx5.setUi({});
       })
     ];
   }
-  function grownUpsTab(ctx4) {
-    const n = N(ctx4), cs = n.carers || [];
+  function grownUpsTab(ctx5) {
+    const n = N(ctx5), cs = n.carers || [];
     return [
       card(title("\u{1F49E} My grown-ups"), cs.length ? cs.map((c) => h("div", { class: "fhc-kv" }, h("span", null, c.name), chip(c.here ? "here" : "away", c.here ? "good" : ""))) : muted("Nobody's paired with you yet. A caregiver can ask with ?nursery pair, and your Littlish Club grown-ups count too.")),
-      n.space ? card(title("Ask a grown-up for\u2026"), grid((n.asks || Object.keys(ASK_LABEL)).map((a) => btn(ASK_LABEL[a] || a, () => ctx4.send("little ask " + a)))), muted("Only grown-ups who are here hear it.")) : muted("Go little first to ask your grown-ups for things.")
+      n.space ? card(title("Ask a grown-up for\u2026"), grid((n.asks || Object.keys(ASK_LABEL)).map((a) => btn(ASK_LABEL[a] || a, () => ctx5.send("little ask " + a)))), muted("Only grown-ups who are here hear it.")) : muted("Go little first to ask your grown-ups for things.")
     ];
   }
-  function littleSettings(ctx4) {
-    const n = N(ctx4);
+  function littleSettings(ctx5) {
+    const n = N(ctx5);
     return [card(
       title("Nursery settings"),
-      toggle("Nursery traps", "Ball pits, bubbles, playpens and the like on the nursery's spots, while you're little.", !!n.traps, () => ctx4.send("nursery traps " + (n.traps ? "off" : "on"))),
-      h("div", { style: { marginTop: "8px" } }, btn("What can I do?", () => ctx4.send("nursery")), btn("Leave the nursery", () => ctx4.send("nursery leave")))
+      toggle("Nursery traps", "Ball pits, bubbles, playpens and the like on the nursery's spots, while you're little.", !!n.traps, () => ctx5.send("nursery traps " + (n.traps ? "off" : "on"))),
+      h("div", { style: { marginTop: "8px" } }, btn("What can I do?", () => ctx5.send("nursery")), btn("Leave the nursery", () => ctx5.send("nursery leave")))
     )];
   }
-  function littlesTab(ctx4) {
-    const n = N(ctx4), ls = n.littles || [];
-    if (!ls.length) return [card(title("\u{1F9F8} Littles"), muted("No littles here right now. Littles who are here, and the ones you're paired with, show up in this tab."), stars(ctx4))];
-    const pick2 = ctx4.ui.nurseryLittle && ls.find((l) => l.mn === ctx4.ui.nurseryLittle) ? ctx4.ui.nurseryLittle : (ls.find((l) => l.here && l.space) || ls[0]).mn;
+  function littlesTab(ctx5) {
+    const n = N(ctx5), ls = n.littles || [];
+    if (!ls.length) return [card(title("\u{1F9F8} Littles"), muted("No littles here right now. Littles who are here, and the ones you're paired with, show up in this tab."), stars(ctx5))];
+    const pick2 = ctx5.ui.nurseryLittle && ls.find((l) => l.mn === ctx5.ui.nurseryLittle) ? ctx5.ui.nurseryLittle : (ls.find((l) => l.here && l.space) || ls[0]).mn;
     const L = ls.find((l) => l.mn === pick2);
     return [
       card(
-        h("div", { class: "fhc-kv" }, title("\u{1F9F8} Littles"), stars(ctx4)),
-        h("div", null, ls.map((l) => h("button", { type: "button", class: "fhc-pill" + (l.mn === pick2 ? " on" : ""), onclick: () => ctx4.setUi({ nurseryLittle: l.mn }) }, l.name + (l.mine ? " \u{1F49E}" : ""))))
+        h("div", { class: "fhc-kv" }, title("\u{1F9F8} Littles"), stars(ctx5)),
+        h("div", null, ls.map((l) => h("button", { type: "button", class: "fhc-pill" + (l.mn === pick2 ? " on" : ""), onclick: () => ctx5.setUi({ nurseryLittle: l.mn }) }, l.name + (l.mine ? " \u{1F49E}" : ""))))
       ),
       card(
         title(L.name),
@@ -21574,17 +23382,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
           L.wet ? chip("Paddin': " + WET[L.wet], L.wet >= 2 ? "warn" : "acc") : null,
           (L.messes || []).map((m) => chip("Messy: " + (MESS[m] || m), "acc"))
         ),
-        L.here && L.space ? grid((n.cares || Object.keys(CARE_LABEL)).map((c) => btn(CARE_LABEL[c] || c, () => ctx4.send("care " + c + " " + L.mn), c === "change" && L.wet >= 2 || c === "bath" && (L.messes || []).length))) : muted(L.here ? "They're not in their little space right now." : "They're not at the farm right now."),
-        L.mine ? null : h("div", null, btn("Ask to be their grown-up", () => ctx4.send("nursery pair " + L.mn)))
+        L.here && L.space ? grid((n.cares || Object.keys(CARE_LABEL)).map((c) => btn(CARE_LABEL[c] || c, () => ctx5.send("care " + c + " " + L.mn), c === "change" && L.wet >= 2 || c === "bath" && (L.messes || []).length))) : muted(L.here ? "They're not in their little space right now." : "They're not at the farm right now."),
+        L.mine ? null : h("div", null, btn("Ask to be their grown-up", () => ctx5.send("nursery pair " + L.mn)))
       )
     ];
   }
-  function inviteTab(ctx4) {
-    const box3 = h("input", { class: "fhc-in", placeholder: "Their name or member number", value: ctx4.ui.nurseryWho || "", oninput: (e) => ctx4.setUi({ nurseryWho: e.target.value }, true) });
+  function inviteTab(ctx5) {
+    const box3 = h("input", { class: "fhc-in", placeholder: "Their name or member number", value: ctx5.ui.nurseryWho || "", oninput: (e) => ctx5.setUi({ nurseryWho: e.target.value }, true) });
     const go = (cmd) => {
-      const v = (ctx4.ui.nurseryWho || "").trim();
-      if (!v) return ctx4.hint("Type their name first.");
-      ctx4.send(cmd + " " + v);
+      const v = (ctx5.ui.nurseryWho || "").trim();
+      if (!v) return ctx5.hint("Type their name first.");
+      ctx5.send(cmd + " " + v);
     };
     return [
       card(
@@ -21593,25 +23401,25 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         box3,
         h("div", { style: { marginTop: "6px" } }, btn("Invite as a little", () => go("nursery add"), true), btn("Ask to be their grown-up", () => go("nursery pair")))
       ),
-      ctx4.s.proprietor ? card(
+      ctx5.s.proprietor ? card(
         title("Proprietors"),
         muted("Add a caregiver with ?nursery add <who> caregiver. ?nursery list shows everyone; ?nursery remove <who> takes them off."),
         h("div", null, btn("Add as a caregiver", () => {
-          const v = (ctx4.ui.nurseryWho || "").trim();
-          if (!v) return ctx4.hint("Type their name first.");
-          ctx4.send("nursery add " + v + " caregiver");
-        }), btn("The list", () => ctx4.send("nursery list")))
+          const v = (ctx5.ui.nurseryWho || "").trim();
+          if (!v) return ctx5.hint("Type their name first.");
+          ctx5.send("nursery add " + v + " caregiver");
+        }), btn("The list", () => ctx5.send("nursery list")))
       ) : null
     ];
   }
-  function carerSettings(ctx4) {
+  function carerSettings(ctx5) {
     return [card(
       title("Nursery settings"),
       muted("Everything you do here is seen only by nursery folk."),
-      h("div", null, btn("What can I do?", () => ctx4.send("nursery")), btn("The list", () => ctx4.send("nursery list")), btn("Leave the nursery", () => ctx4.send("nursery leave")))
+      h("div", null, btn("What can I do?", () => ctx5.send("nursery")), btn("The list", () => ctx5.send("nursery list")), btn("Leave the nursery", () => ctx5.send("nursery leave")))
     )];
   }
-  var show = (role) => (ctx4) => N(ctx4).role === role;
+  var show = (role) => (ctx5) => N(ctx5).role === role;
   var NURSERY_TABS = [
     { id: "play", label: "\u{1F9F8} Play", show: show("little"), render: playTab },
     { id: "games", label: "\u{1F3B2} Games", show: show("little"), render: gamesTab },
@@ -21620,7 +23428,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     { id: "littles", label: "\u{1F9F8} Littles", show: show("caregiver"), render: littlesTab },
     { id: "invite", label: "\u2795 Invite", show: show("caregiver"), render: inviteTab },
     { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
-    { id: "nsettings", label: "\u2699\uFE0F Nursery", render: (ctx4) => N(ctx4).role === "little" ? littleSettings(ctx4) : carerSettings(ctx4) },
+    { id: "nsettings", label: "\u2699\uFE0F Nursery", render: (ctx5) => N(ctx5).role === "little" ? littleSettings(ctx5) : carerSettings(ctx5) },
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
   ];
 
@@ -21979,9 +23787,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     // the tabs this view shows: + "Farm extras" when an add-on has somethin' (not on the Livestock panel: there it's a row
     // on Me); a tab with show() only when it says so (the Log tab); and ⚙ Settings in the panel where the game has no
     // settings page of its own
-    tabsFor(view2, ctx4) {
-      const V = VIEWS[view2];
-      const tabs = (view2 === "guest" || view2 === "nursery" || V.extrasInside ? V.tabs : withExtras(V.tabs, view2, ctx4)).filter((t) => !t.show || t.show(ctx4));
+    tabsFor(view2, ctx5) {
+      const V2 = VIEWS[view2];
+      const tabs = (view2 === "guest" || view2 === "nursery" || V2.extrasInside ? V2.tabs : withExtras(V2.tabs, view2, ctx5)).filter((t) => !t.show || t.show(ctx5));
       if (!settingsAvailable() && !tabs.some((t) => t.id === "settings"))
         tabs.push({ id: "settings", label: "\u2699 Settings", offRow: true, render: (c) => settingsView(c, c.ui.setPage || "switches", (p) => c.setUi({ setPage: p })) });
       return tabs;
@@ -21996,8 +23804,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     render() {
       this.pending = false;
-      const ctx4 = this.ctx(), view2 = this.view();
-      const tabs = this.tabsFor(view2, ctx4);
+      const ctx5 = this.ctx(), view2 = this.view();
+      const tabs = this.tabsFor(view2, ctx5);
       const tabKey = "tab_" + view2;
       if (this.ui.goTab) {
         this.ui[tabKey] = this.ui.goTab;
@@ -22010,7 +23818,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const full = !!this.prefs.full;
       const onRow = tabs.filter((t) => !t.offRow), seg = !VIEWS[view2].keepRow;
       const front = seg && onRow.length > 4 ? onRow.slice(0, 4) : onRow, rest = onRow.filter((t) => !front.includes(t));
-      const badge = (t) => t.badge ? t.badge(ctx4) : 0;
+      const badge = (t) => t.badge ? t.badge(ctx5) : 0;
       const tabBtn = (t) => {
         const n = badge(t);
         return h("button", {
@@ -22041,7 +23849,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         (inRest ? String(tab.label).split(" ")[0] + " " : "") + "\u22EF",
         rest.some((t) => badge(t)) && !inRest ? h("span", { class: "fhc-dot" }) : null
       ) : null;
-      const ib = (label, icon, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon);
+      const ib = (label, icon2, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon2);
       this.top.replaceChildren(...[
         h(
           "div",
@@ -22091,7 +23899,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             this.render();
           } }, "\u2039 Back to " + onRow[0].label) : null,
           this.banners(),
-          safeRender(tab, ctx4)
+          safeRender(tab, ctx5)
         )
       ].filter(Boolean));
       const here2 = view2 + ":" + tab.id, body2 = this.el.querySelector(".fhc-body");
@@ -22197,7 +24005,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       ));
       const rt = this.s.rateTrap;
       if (rt && rt.until > Date.now() && this.rated !== rt.kind + ":" + rt.until) {
-        const rate = (v) => {
+        const rate2 = (v) => {
           this.rated = rt.kind + ":" + rt.until;
           this.ask("rate " + rt.kind + " " + v, true);
           this.render();
@@ -22214,7 +24022,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
               this.render();
             } }, "\u2715")
           ),
-          h("div", { style: { marginTop: "6px" } }, btn("\u{1F496} Loved it", () => rate("loved"), true), btn("\u{1F44D} Fine", () => rate("fine")), btn("\u{1F645} Not for me", () => rate("no"))),
+          h("div", { style: { marginTop: "6px" } }, btn("\u{1F496} Loved it", () => rate2("loved"), true), btn("\u{1F44D} Fine", () => rate2("fine")), btn("\u{1F645} Not for me", () => rate2("no"))),
           h("div", { class: "fhc-muted" }, "Loved it: it finds you a bit more often. Not for me: less often, but never not at all (?traps skip " + rt.kind + " does that).")
         ));
       }
@@ -22289,9 +24097,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return false;
     }
   }
-  function safeRender(tab, ctx4) {
+  function safeRender(tab, ctx5) {
     try {
-      return tab.render(ctx4);
+      return tab.render(ctx5);
     } catch (e) {
       console.warn("[Farmhand Companion]", e);
       return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
@@ -22308,7 +24116,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
   var SPILL_CHANCE = 0.35;
   var P2 = () => window.Player;
-  var load3 = () => {
+  var load4 = () => {
     try {
       return JSON.parse(LS.getItem(KEY4)) || {};
     } catch (e) {
@@ -22337,7 +24145,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const did = [];
     if (m.wash) return washMarks();
     if (!prefs2.marks) return { ok: false, why: "off" };
-    let next = bundle(), mem = load3();
+    let next = bundle(), mem = load4();
     const has = (g) => next.find((b) => b.Group === g);
     if (Array.isArray(m.splat) && m.splat.length) {
       const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
@@ -22828,7 +24636,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P2(), group) : null;
       if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
-      const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype), words = signWords(text3);
+      const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype), words2 = signWords(text3);
       let record = null;
       if (data && data.archetype === "typed" && want && Array.isArray(data.options)) {
         const i = data.options.findIndex((o) => o.Name === want);
@@ -22841,13 +24649,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         }
         if (Object.keys(got).length) record = Object.assign({}, it.Property && it.Property.TypeRecord || {}, got);
       }
-      if (record) window.ExtendedItemSetOptionByRecord(P2(), it, record, { push: !words, refresh: true, C_Source: P2() });
-      if (words) {
-        it.Property = Object.assign(it.Property || {}, words);
+      if (record) window.ExtendedItemSetOptionByRecord(P2(), it, record, { push: !words2, refresh: true, C_Source: P2() });
+      if (words2) {
+        it.Property = Object.assign(it.Property || {}, words2);
         if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2(), false);
         if (typeof window.ChatRoomCharacterItemUpdate === "function") window.ChatRoomCharacterItemUpdate(P2(), group);
       }
-      return !!(record || words);
+      return !!(record || words2);
     } catch (e) {
       console.warn("[Farmhand Companion] gear setting:", e);
       return false;
@@ -22930,10 +24738,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var PUT_MAX = 3;
   var PUT_WINDOW = 12e4;
   var STUCK_MS = 6e5;
-  function farmGearLetGo(list) {
+  function farmGearLetGo(list2) {
     const m = letGo2();
     let n = 0;
-    for (const g of Array.isArray(list) ? list : []) if (g && g.name) {
+    for (const g of Array.isArray(list2) ? list2 : []) if (g && g.name) {
       m[pieceKey(g.name, g.until)] = { why: "safe", at: Date.now() };
       n++;
     }
@@ -22950,18 +24758,18 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return null;
     }
   }
-  function syncFarmGear(list, allow, opts) {
+  function syncFarmGear(list2, allow, opts) {
     const aside = !!(opts && opts.aside);
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
     const lg = letGo2(), now = Date.now();
     let pruned = false;
-    for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 864e5 || now - (lg[k].at || 0) > 6e5 && !(list || []).some((g) => g && pieceKey(g.name, g.until) === k)) {
+    for (const k of Object.keys(lg)) if (now - (lg[k].at || 0) > 31 * 864e5 || now - (lg[k].at || 0) > 6e5 && !(list2 || []).some((g) => g && pieceKey(g.name, g.until) === k)) {
       delete lg[k];
       pruned = true;
     }
     if (pruned) letGoSave(lg);
     for (const [n, t] of stuckUntil) if (t <= now) stuckUntil.delete(n);
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name)).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
+    const want = (Array.isArray(list2) ? list2 : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name)).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
@@ -23074,14 +24882,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       mem = {};
     }
     const next = bundle().map((b) => Object.assign({}, b)), did = [];
-    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
+    for (const [group, steps2] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
       const order = SHAPES[group], b = next.find((x) => x.Group === group);
       if (!b) continue;
       const m = mem[group];
       const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
       const at = order.indexOf(own);
       if (at < 0) continue;
-      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
+      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps2)))];
       if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
       if (want !== b.Name) {
         b.Name = want;
@@ -23127,7 +24935,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function washMarks() {
-    const mem = load3(), stuck = lockedGroups();
+    const mem = load4(), stuck = lockedGroups();
     const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
     save4({});
     commit(next);
@@ -23139,7 +24947,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       const C2 = P2();
       if (!C2 || !Array.isArray(C2.Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, did: [] };
-      const mem = load3(), on3 = C2.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === TREATISE.group);
+      const mem = load4(), on3 = C2.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === TREATISE.group);
       if (!on3) {
         if (mem.treatise) {
           delete mem.treatise;
@@ -23188,7 +24996,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       } catch (e) {
       }
     }
-    const mem = load3();
+    const mem = load4();
     const next = cur.filter((b) => {
       const g = groupOf(b.Group);
       return !(g && g.Clothing) || stuck.has(b.Group) || BODY_BITS.test(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
@@ -23372,7 +25180,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
 
   // extension/src/statue.js
-  var W16 = window;
+  var W17 = window;
   var MATS = ["stone", "porcelain", "gold", "latex", "marble", "bronze"];
   var TURN = /^(BodyUpper|BodyLower|ArmsLeft|ArmsRight|HandsLeft|HandsRight|Head|Nipples|Pussy|Mouth|BodyMarkings)$/;
   var HAIR = /^(HairFront|HairBack|Eyebrows)$/;
@@ -23386,7 +25194,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (seg[0] === "Override") seg.splice(0, 2);
     return seg[0] || "";
   };
-  var onBot4 = () => !!(W16.Player && W16.Player.MemberNumber === BOT_MEMBER);
+  var onBot4 = () => !!(W17.Player && W17.Player.MemberNumber === BOT_MEMBER);
   var others3 = /* @__PURE__ */ new Map();
   var RAMPS = {
     stone: [[0, 40, 38, 36], [0.45, 96, 92, 88], [0.8, 150, 145, 138], [0.92, 172, 167, 159], [1, 200, 195, 187]],
@@ -23440,7 +25248,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const ink2 = how === "ink";
     const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
     if (!w || !h2) return null;
-    const c = W16.document.createElement("canvas");
+    const c = W17.document.createElement("canvas");
     c.width = w;
     c.height = h2;
     const g = c.getContext("2d", { willReadFrequently: true });
@@ -23526,7 +25334,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function imgOf(src) {
     let im = imgs2.get(src);
     if (!im) {
-      im = new W16.Image();
+      im = new W17.Image();
       im.crossOrigin = "anonymous";
       im.onload = () => redrawAll(400);
       im.src = src;
@@ -23567,7 +25375,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function mineNow() {
     try {
-      const D = W16.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("statue") : null;
+      const D = W17.FarmhandDispensary, d = D && typeof D.dose === "function" ? D.dose("statue") : null;
       return d ? { mat: MATS.includes(d.p) ? d.p : "stone", left: d.left } : null;
     } catch (e) {
       return null;
@@ -23575,7 +25383,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function statueOf(C2) {
     if (!C2 || onBot4()) return null;
-    if (C2 === W16.Player || typeof C2.IsPlayer === "function" && C2.IsPlayer()) {
+    if (C2 === W17.Player || typeof C2.IsPlayer === "function" && C2.IsPlayer()) {
       const m = mineNow();
       return m ? m.mat : null;
     }
@@ -23587,7 +25395,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
     return o.mat;
   }
-  var charOf4 = (mn) => Array.isArray(W16.ChatRoomCharacter) ? W16.ChatRoomCharacter.find((c) => c && c.MemberNumber === mn) : null;
+  var charOf5 = (mn) => Array.isArray(W17.ChatRoomCharacter) ? W17.ChatRoomCharacter.find((c) => c && c.MemberNumber === mn) : null;
   var redrawT = /* @__PURE__ */ new Map();
   function redrawC(C2, soon) {
     if (!C2) return;
@@ -23595,15 +25403,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     clearTimeout(redrawT.get(key3));
     redrawT.set(key3, setTimeout(() => {
       try {
-        if (typeof W16.CharacterLoadCanvas === "function") W16.CharacterLoadCanvas(C2);
+        if (typeof W17.CharacterLoadCanvas === "function") W17.CharacterLoadCanvas(C2);
       } catch (e) {
         warnSome("[Farmhand Companion] statue redraw:", e);
       }
     }, soon || 0));
   }
   function redrawAll(soon) {
-    for (const C2 of W16.ChatRoomCharacter || []) if (statueOf(C2)) redrawC(C2, soon);
-    if (W16.Player && statueOf(W16.Player) && !(W16.ChatRoomCharacter || []).includes(W16.Player)) redrawC(W16.Player, soon);
+    for (const C2 of W17.ChatRoomCharacter || []) if (statueOf(C2)) redrawC(C2, soon);
+    if (W17.Player && statueOf(W17.Player) && !(W17.ChatRoomCharacter || []).includes(W17.Player)) redrawC(W17.Player, soon);
   }
   function kindOf3(src) {
     if (typeof src === "string") {
@@ -23662,7 +25470,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       hooked4 = false;
     }
   }
-  W16.__farmInkTint = (C2, src, x, y) => {
+  W17.__farmInkTint = (C2, src, x, y) => {
     const mat = statueOf(C2);
     if (!mat) return void 0;
     try {
@@ -23673,7 +25481,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   var send3 = (type, data) => {
     try {
-      if (W16.ServerSend && (!W16.ServerPlayerIsInChatRoom || W16.ServerPlayerIsInChatRoom())) W16.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W17.ServerSend && (!W17.ServerPlayerIsInChatRoom || W17.ServerPlayerIsInChatRoom())) W17.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -23691,13 +25499,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const sig2 = (mineNow() || {}).mat || "";
     if (sig2 === told) return false;
     tell3("change");
-    redrawC(W16.Player, 0);
+    redrawC(W17.Player, 0);
     if (!sig2 && !others3.size) forget3();
     return true;
   }
   function onStatueMsg(m) {
     const mn = m.from;
-    if (!mn || W16.Player && mn === W16.Player.MemberNumber || onBot4()) return;
+    if (!mn || W17.Player && mn === W17.Player.MemberNumber || onBot4()) return;
     if (m.type === "statueAsk") {
       if (mineNow()) setTimeout(() => tell3("ask"), 300 + Math.random() * 1500);
       return;
@@ -23707,7 +25515,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const had = others3.get(mn);
     if (!mat || !left2) {
       if (others3.delete(mn)) {
-        redrawC(charOf4(mn), 0);
+        redrawC(charOf5(mn), 0);
         if (!others3.size && !mineNow()) forget3();
       }
       return;
@@ -23715,7 +25523,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     others3.set(mn, { mat, until: Date.now() + left2 });
     if (!had || had.mat !== mat) {
       hook3();
-      redrawC(charOf4(mn), 0);
+      redrawC(charOf5(mn), 0);
     }
   }
   function initStatue(mod3) {
@@ -23726,16 +25534,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         statueCheck();
         for (const [mn, o] of others3) if (o.until < Date.now()) {
           others3.delete(mn);
-          redrawC(charOf4(mn), 0);
+          redrawC(charOf5(mn), 0);
         }
       } catch (e) {
       }
     }, 5e3);
   }
-  if (W16.__FARMHAND_TEST__) W16.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf3, turnedOf };
+  if (W17.__FARMHAND_TEST__) W17.__statue = { inMaterial, statueOf, others: others3, kindOf: kindOf3, turnedOf };
 
   // extension/src/homeward.js
-  var W17 = window;
+  var W18 = window;
   var KEY5 = "fhc-home";
   var WARN_S = 30;
   var SAFE_MIN = 30;
@@ -23748,7 +25556,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var retryAt = 0;
   var busySince = 0;
   var wantOutAt = 0;
-  var load4 = () => {
+  var load5 = () => {
     try {
       return JSON.parse(LS.getItem(KEY5)) || null;
     } catch (e) {
@@ -23767,9 +25575,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const d = new Date(t);
     return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
   };
-  var loggedIn = () => !!(W17.Player && W17.Player.MemberNumber) && W17.CurrentScreen !== "Login" && W17.CurrentScreen !== "Relog";
-  var inRoom = () => W17.CurrentScreen === "ChatRoom" && !!W17.ChatRoomData;
-  var atFarm = (h2) => inRoom() && !!h2 && String(W17.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
+  var loggedIn = () => !!(W18.Player && W18.Player.MemberNumber) && W18.CurrentScreen !== "Login" && W18.CurrentScreen !== "Relog";
+  var inRoom = () => W18.CurrentScreen === "ChatRoom" && !!W18.ChatRoomData;
+  var atFarm = (h2) => inRoom() && !!h2 && String(W18.ChatRoomData.Name || "").toLowerCase() === String(h2.room || "").toLowerCase();
   function tell4(text3) {
     try {
       if (inRoom() && deps.say) {
@@ -23779,13 +25587,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
     try {
-      if (typeof W17.ServerShowBeep === "function") W17.ServerShowBeep(text3, 8e3, { silent: false });
+      if (typeof W18.ServerShowBeep === "function") W18.ServerShowBeep(text3, 8e3, { silent: false });
     } catch (e) {
     }
   }
   function homeKeep(s) {
     if (!s || typeof s !== "object") return;
-    const ro = s.roam, prev = load4(), now = Date.now();
+    const ro = s.roam, prev = load5(), now = Date.now();
     if (!ro) {
       if (prev) save5(null);
       return;
@@ -23815,14 +25623,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     wantOutAt = Date.now();
   }
   function homeSafe() {
-    const h2 = load4();
+    const h2 = load5();
     if (!h2) return;
     h2.safeUntil = Date.now() + SAFE_MIN * 6e4;
     save5(h2);
     cancel();
   }
   function homeLocalPass() {
-    const h2 = load4();
+    const h2 = load5();
     if (!h2 || !h2.local) return null;
     const l = h2.local;
     delete h2.local;
@@ -23841,7 +25649,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     tell4("\u{1F9ED} " + why + " The farm girl's whistle carries all the way out here: back on the farm in " + warn + " seconds.");
     countdown = { at: Date.now(), t: setTimeout(() => {
       countdown = null;
-      const h22 = load4();
+      const h22 = load5();
       if (h22 && !atFarm(h22) && !(h22.safeUntil > Date.now())) walkHome(h22);
     }, warn * 1e3) };
   }
@@ -23851,15 +25659,15 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       tell4("\u{1F9ED} Home to the farm you go, sugar.");
       try {
-        if (typeof W17.ServerPlayerIsInChatRoom === "function" && W17.ServerPlayerIsInChatRoom() && typeof W17.ChatRoomLeave === "function") W17.ChatRoomLeave(true);
+        if (typeof W18.ServerPlayerIsInChatRoom === "function" && W18.ServerPlayerIsInChatRoom() && typeof W18.ChatRoomLeave === "function") W18.ChatRoomLeave(true);
       } catch (e) {
       }
-      if (typeof W17.ChatSearchStart === "function") await W17.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
-      for (let i = 0; i < 20 && W17.CurrentScreen !== "ChatSearch"; i++) await sleep(500);
+      if (typeof W18.ChatSearchStart === "function") await W18.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+      for (let i = 0; i < 20 && W18.CurrentScreen !== "ChatSearch"; i++) await sleep(500);
       let res = null;
-      if (typeof W17.ServerRoomJoin === "function") res = await W17.ServerRoomJoin(h2.room);
+      if (typeof W18.ServerRoomJoin === "function") res = await W18.ServerRoomJoin(h2.room);
       else {
-        W17.ServerSend("ChatRoomJoin", { Name: h2.room });
+        W18.ServerSend("ChatRoomJoin", { Name: h2.room });
         res = null;
       }
       const err = res && res.error ? String(res.error.message || res.error) : "";
@@ -23882,8 +25690,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     walking = true;
     try {
       tell4("\u{1F9ED} The farm girl walks you out to the gate, sugar. Half an hour: back by " + clock3(h2.until) + ", or she whistles you home.");
-      if (typeof W17.ChatRoomLeave === "function") W17.ChatRoomLeave(true);
-      if (typeof W17.ChatSearchStart === "function") await W17.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
+      if (typeof W18.ChatRoomLeave === "function") W18.ChatRoomLeave(true);
+      if (typeof W18.ChatSearchStart === "function") await W18.ChatSearchStart(h2.space || "X", ["Room", "MainHall"], { Background: "Introduction" });
     } catch (e) {
       console.warn("[Farmhand Companion] walkin' out:", e);
     } finally {
@@ -23891,7 +25699,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function homeTick() {
-    const h2 = load4();
+    const h2 = load5();
     if (!h2) {
       cancel();
       return;
@@ -23909,7 +25717,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       return;
     }
     if (retryAt > now) return;
-    if (BUSY.has(String(W17.CurrentScreen || ""))) {
+    if (BUSY.has(String(W18.CurrentScreen || ""))) {
       if (!busySince) busySince = now;
       if (now - busySince < BUSY_MAX) return;
     } else busySince = 0;
@@ -23943,7 +25751,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     whistle(h2, h2.until ? "Your roam's over, sugar." : "You're off the farm without a roam pass, sugar.");
   }
   function homeBeep(data) {
-    const h2 = load4();
+    const h2 = load5();
     if (!h2 || !data) return false;
     const from = Number(data.MemberNumber) || 0, msg = String(data.Message || "");
     if (!/^\s*summon\b/i.test(msg)) return false;
@@ -23997,7 +25805,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/chatlog.js
-  var W18 = window;
+  var W19 = window;
   var KEY6 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
@@ -24009,7 +25817,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W18.localStorage.getItem(KEY6));
+    const v = JSON.parse(W19.localStorage.getItem(KEY6));
     if (Array.isArray(v)) rows2 = v.slice(-MAX3);
   } catch (e) {
     rows2 = [];
@@ -24018,7 +25826,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W18.localStorage.setItem(KEY6, JSON.stringify(rows2));
+        W19.localStorage.setItem(KEY6, JSON.stringify(rows2));
       } catch (e) {
         rows2 = rows2.slice(-300);
       }
@@ -24046,7 +25854,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function flush2() {
-    if (!on2() || !rows2.length || !botHere() || typeof W18.ServerSend !== "function") return;
+    if (!on2() || !rows2.length || !botHere() || typeof W19.ServerSend !== "function") return;
     let sent2 = 0;
     for (let part = 0; part < 4 && rows2.length; part++) {
       const batch = [];
@@ -24058,7 +25866,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         size += s;
       }
       try {
-        W18.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W19.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent2 += batch.length;
       } catch (e) {
         rows2 = batch.concat(rows2);
@@ -24122,7 +25930,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/keys.js
-  var W19 = window;
+  var W20 = window;
   var KEY7 = "fhc-wards";
   var wards = {};
   var loadWards = () => {
@@ -24140,14 +25948,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     } catch (e) {
     }
   };
-  var me4 = () => W19.Player && W19.Player.MemberNumber || 0;
-  var here = (mn) => (W19.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
-  var say2 = () => {
+  var me4 = () => W20.Player && W20.Player.MemberNumber || 0;
+  var here = (mn) => (W20.ChatRoomCharacter || []).some((c) => c && c.MemberNumber === mn);
+  var say3 = () => {
   };
   function sendTo(mn, data) {
     try {
-      if (here(mn) && typeof W19.ServerSend === "function") {
-        W19.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
+      if (here(mn) && typeof W20.ServerSend === "function") {
+        W20.ServerSend("ChatRoomChat", makeMsg("dispKey", data, mn));
         return true;
       }
     } catch (e) {
@@ -24158,9 +25966,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function keyDo(mn, what) {
     if (sendTo(mn, { do: what })) return "in the room";
     try {
-      if (typeof W19.ServerSend !== "function") return null;
-      const nm = W19.Player && (W19.Player.Nickname || W19.Player.Name) || "Your keyholder";
-      W19.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
+      if (typeof W20.ServerSend !== "function") return null;
+      const nm = W20.Player && (W20.Player.Nickname || W20.Player.Name) || "Your keyholder";
+      W20.ServerSend("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "\u{1F5DD}\uFE0F " + nm + " " + WORDS2[what] + ". [fd:" + what + "]" });
       return "by beep";
     } catch (e) {
       return null;
@@ -24189,13 +25997,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (m.type === "dispAsk" && wards[from]) {
       wards[from].asked = Date.now();
       save6();
-      say2("\u{1F5DD}\uFE0F " + (wards[from].name || "#" + from) + " is askin' to be let out of hardcore. /keys letout " + from + " lifts every dose in them; /keys end " + from + " ends their hardcore.");
+      say3("\u{1F5DD}\uFE0F " + (wards[from].name || "#" + from) + " is askin' to be let out of hardcore. /keys letout " + from + " lifts every dose in them; /keys end " + from + " ends their hardcore.");
       return true;
     }
     return m.type === "dispKeyState";
   }
-  function find(word) {
-    const w = String(word || "").trim().toLowerCase();
+  function find(word2) {
+    const w = String(word2 || "").trim().toLowerCase();
     if (!w) return null;
     if (/^\d+$/.test(w) && wards[Number(w)]) return Number(w);
     if (/^\d+$/.test(w)) return Number(w);
@@ -24210,17 +26018,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function keysCommand(args) {
     const [a0, ...rest] = String(args || "").trim().split(/\s+/), what = (a0 || "").toLowerCase();
     if (!what || what === "list") {
-      const list = Object.entries(wards);
-      say2(list.length ? "\u{1F5DD}\uFE0F You hold keys for: " + list.map(([mn2, x]) => (x.name || "#" + mn2) + " (" + mn2 + ", " + (x.until ? "ends " : "lets go without a check-in ") + when2(x.due) + (x.asked ? ", askin' to be let out" : "") + ")").join("; ") + ". /keys check|letout|end <who>." : "\u{1F5DD}\uFE0F Nobody's told your Companion you hold their key yet. It hears when you share a room with somebody in hardcore who names you.");
+      const list2 = Object.entries(wards);
+      say3(list2.length ? "\u{1F5DD}\uFE0F You hold keys for: " + list2.map(([mn2, x]) => (x.name || "#" + mn2) + " (" + mn2 + ", " + (x.until ? "ends " : "lets go without a check-in ") + when2(x.due) + (x.asked ? ", askin' to be let out" : "") + ")").join("; ") + ". /keys check|letout|end <who>." : "\u{1F5DD}\uFE0F Nobody's told your Companion you hold their key yet. It hears when you share a room with somebody in hardcore who names you.");
       return;
     }
     if (!WORDS2[what]) {
-      say2("\u{1F5DD}\uFE0F /keys, /keys check <who>, /keys letout <who>, /keys end <who>.");
+      say3("\u{1F5DD}\uFE0F /keys, /keys check <who>, /keys letout <who>, /keys end <who>.");
       return;
     }
     const mn = find(rest.join(" "));
     if (!mn) {
-      say2("\u{1F5DD}\uFE0F Who? A member number or the name of somebody you hold a key for.");
+      say3("\u{1F5DD}\uFE0F Who? A member number or the name of somebody you hold a key for.");
       return;
     }
     const how = keyDo(mn, what);
@@ -24232,13 +26040,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       delete wards[mn];
       save6();
     }
-    say2(how ? "\u{1F5DD}\uFE0F Sent " + how + ". Their Dispensary does it if you really hold their key." : "\u{1F5DD}\uFE0F Couldn't reach them just now.");
+    say3(how ? "\u{1F5DD}\uFE0F Sent " + how + ". Their Dispensary does it if you really hold their key." : "\u{1F5DD}\uFE0F Couldn't reach them just now.");
   }
   function initKeys(sayLocal) {
-    say2 = sayLocal;
-    if (typeof W19.CommandCombine === "function") {
+    say3 = sayLocal;
+    if (typeof W20.CommandCombine === "function") {
       try {
-        W19.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
+        W20.CommandCombine([{ Tag: "keys", Description: "[check | letout | end <who>]: the hardcore keys you hold (The Farmhand's Dispensary)", Action: (args) => keysCommand(args) }]);
       } catch (e) {
       }
     }
@@ -24247,7 +26055,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   // extension/src/nursery.js
   var KEY8 = "fhc-nursery";
   var P4 = () => window.Player;
-  var load5 = () => {
+  var load6 = () => {
     try {
       return JSON.parse(LS.getItem(KEY8)) || {};
     } catch (e) {
@@ -24274,7 +26082,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     if (!g || !g.group || !g.name) return { ok: false, why: "nothin' to put on" };
     if (!exists(g.group, g.name)) return { ok: false, why: "the game doesn't have that one" };
     if (locked(g.group)) return { ok: false, why: "there's somethin' locked there" };
-    const mem = load5();
+    const mem = load6();
     mem.gear = mem.gear || {};
     let next = bundle2();
     const there = next.find((b) => b.Group === g.group);
@@ -24287,7 +26095,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function nurseryOff(group) {
     if (!ready()) return { ok: false, why: "not in a room" };
-    const mem = load5(), gear = mem.gear || {};
+    const mem = load6(), gear = mem.gear || {};
     const groups2 = group ? [group] : Object.keys(gear);
     const next = bundle2().filter((b) => !(groups2.includes(b.Group) && gear[b.Group] === b.Name && !locked(b.Group)));
     for (const g of groups2) delete gear[g];
@@ -24296,7 +26104,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     commit3(next);
     return { ok: true };
   }
-  var nurseryWorn = () => Object.assign({}, load5().gear || {});
+  var nurseryWorn = () => Object.assign({}, load6().gear || {});
   function nurseryChange() {
     const A = window.ABCL, did = [];
     try {
@@ -24319,7 +26127,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     try {
       if (ready() && exists("BodyMarkings", "BabyPowderDust") && !bundle2().some((b) => b.Group === "BodyMarkings")) {
         commit3(bundle2().concat([{ Group: "BodyMarkings", Name: "BabyPowderDust" }]));
-        const mem = load5();
+        const mem = load6();
         mem.powderUntil = Date.now() + 10 * 6e4;
         save7(mem);
         did.push("powder");
@@ -24331,7 +26139,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
   function nurseryPowderTick() {
     try {
-      const mem = load5();
+      const mem = load6();
       if (!mem.powderUntil || Date.now() < mem.powderUntil || !ready()) return;
       const next = bundle2().filter((b) => !(b.Group === "BodyMarkings" && b.Name === "BabyPowderDust"));
       mem.powderUntil = 0;
@@ -24383,27 +26191,27 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/trophies.js
-  var W20 = window;
+  var W21 = window;
   var WEEK2 = 7 * 864e5;
-  var key2 = () => "farm-trophies-" + (W20.Player && W20.Player.MemberNumber || 0);
+  var key2 = () => "farm-trophies-" + (W21.Player && W21.Player.MemberNumber || 0);
   function seen2() {
     try {
-      return JSON.parse(W20.localStorage.getItem(key2())) || {};
+      return JSON.parse(W21.localStorage.getItem(key2())) || {};
     } catch (e) {
       return {};
     }
   }
   function keep2(o) {
     try {
-      W20.localStorage.setItem(key2(), JSON.stringify(o));
+      W21.localStorage.setItem(key2(), JSON.stringify(o));
     } catch (e) {
     }
   }
-  var clean3 = (list) => Array.isArray(list) ? list.filter((t) => t && typeof t.id === "string" && typeof t.design === "string" && typeof t.title === "string") : [];
+  var clean4 = (list2) => Array.isArray(list2) ? list2.filter((t) => t && typeof t.id === "string" && typeof t.design === "string" && typeof t.title === "string") : [];
   var offerable = (t, now) => !(Number(t.at) > 0) || now - Number(t.at) < WEEK2;
-  function trophyNews(list) {
-    const s = seen2(), now = Date.now(), fresh2 = clean3(list).filter((t) => !s[t.id] && offerable(t, now));
-    for (const t of clean3(list)) if (!s[t.id] && !offerable(t, now)) s[t.id] = "done";
+  function trophyNews(list2) {
+    const s = seen2(), now = Date.now(), fresh2 = clean4(list2).filter((t) => !s[t.id] && offerable(t, now));
+    for (const t of clean4(list2)) if (!s[t.id] && !offerable(t, now)) s[t.id] = "done";
     if (!fresh2.length) {
       keep2(s);
       return null;
@@ -24412,16 +26220,16 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     keep2(s);
     return fresh2.length === 1 ? "\u{1F3C6} You've earned a trophy: " + fresh2[0].title + ", for " + fresh2[0].why + ". Wear it or No thanks, in your \u{1F33E} panel." : "\u{1F3C6} You've earned " + fresh2.length + " trophies: " + fresh2.map((t) => t.title).join(", ") + ". Wear them or No thanks, in your \u{1F33E} panel.";
   }
-  function trophyNext(list) {
+  function trophyNext(list2) {
     const s = seen2(), now = Date.now();
-    return clean3(list).find((t) => s[t.id] !== "done" && offerable(t, now)) || null;
+    return clean4(list2).find((t) => s[t.id] !== "done" && offerable(t, now)) || null;
   }
   function trophyAnswered(id) {
     const s = seen2();
     s[String(id)] = "done";
     keep2(s);
   }
-  var ink = () => W20.__farmInk && typeof W20.__farmInk.trophyWear === "function" ? W20.__farmInk : null;
+  var ink = () => W21.__farmInk && typeof W21.__farmInk.trophyWear === "function" ? W21.__farmInk : null;
   function trophyWear2(t, slot) {
     const I = ink();
     if (!I) return { ok: false, why: "the ink slots haven't loaded yet (reload the page if it stays like this)" };
@@ -24450,41 +26258,41 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   }
 
   // extension/src/cues.js
-  var W21 = window;
-  var ctx3 = null;
+  var W22 = window;
+  var ctx4 = null;
   function initCues(c) {
-    ctx3 = c;
+    ctx4 = c;
     setInterval(sightTick, 4e3);
     setInterval(feelTick, 6e4);
     setInterval(heelTick, 500);
   }
-  var pref2 = (k) => !ctx3.panel.prefs[k];
+  var pref2 = (k) => !ctx4.panel.prefs[k];
   var cueOff = () => ({
     face: !pref2("noFace") || void 0,
     sound: !pref2("noSound") || void 0,
     trance: !pref2("noTrance") || void 0,
     lead: !pref2("noLead") || void 0,
     slow: !pref2("noSlow") || void 0,
-    stir: ctx3.panel.prefs.stir ? void 0 : true,
-    gear: ctx3.panel.prefs.gear ? void 0 : true,
-    ink: ctx3.panel.prefs.ink ? void 0 : true
+    stir: ctx4.panel.prefs.stir ? void 0 : true,
+    gear: ctx4.panel.prefs.gear ? void 0 : true,
+    ink: ctx4.panel.prefs.ink ? void 0 : true
   });
-  var mapOn = () => typeof W21.ChatRoomMapViewIsActive === "function" && W21.ChatRoomMapViewIsActive() && W21.Player && W21.Player.MapData && W21.Player.MapData.Pos;
-  var others4 = () => (W21.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W21.Player && W21.Player.MemberNumber));
+  var mapOn = () => typeof W22.ChatRoomMapViewIsActive === "function" && W22.ChatRoomMapViewIsActive() && W22.Player && W22.Player.MapData && W22.Player.MapData.Pos;
+  var others4 = () => (W22.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W22.Player && W22.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W21.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W21.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others4().filter((c) => W21.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others4().filter((c) => typeof W21.ChatRoomMapViewCharacterIsHearable === "function" && W21.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS2 = W21.Player && W21.Player.LSCG, S3 = LS2 && LS2.SplatterModule;
+      if (W22.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W22.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others4().filter((c) => W22.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others4().filter((c) => typeof W22.ChatRoomMapViewCharacterIsHearable === "function" && W22.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS2 = W22.Player && W22.Player.LSCG, S3 = LS2 && LS2.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS2.GlobalModule || LS2.GlobalModule.enabled !== false)) : void 0;
       const key3 = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key3 === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       if (Date.now() - (sightTick.at || 0) < 8e3) return;
       lastSight = key3;
       sightTick.at = Date.now();
-      ctx3.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
+      ctx4.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
     } catch (e) {
       console.warn("[Farmhand Companion] sight:", e);
     }
@@ -24493,13 +26301,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W21.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W22.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W21.ChatRoomMapViewWidth || 40, high = W21.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
+    const wide = W22.ChatRoomMapViewWidth || 40, high = W22.ChatRoomMapViewHeight || 40, key3 = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key3(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -24527,17 +26335,17 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function lead(m) {
     const no = () => {
       if (walk && !walk.heel) walk = null;
-      ctx3.toBot("leadNo", { id: m.id });
+      ctx4.toBot("leadNo", { id: m.id });
     };
-    if (!pref2("noLead") || !mapOn() || typeof W21.ChatRoomMapViewMove !== "function") return no();
-    const from = W21.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref2("noLead") || !mapOn() || typeof W22.ChatRoomMapViewMove !== "function") return no();
+    const from = W22.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
-      ctx3.toBot("leadOk", { id: m.id });
+      ctx4.toBot("leadOk", { id: m.id });
       return;
     }
-    ctx3.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
+    ctx4.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
     startWalk({ id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false });
   }
   var stepping = false;
@@ -24549,11 +26357,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     }
   }
   function stepWalk() {
-    const w = walk, p = W21.Player && W21.Player.MapData && W21.Player.MapData.Pos;
+    const w = walk, p = W22.Player && W22.Player.MapData && W22.Player.MapData.Pos;
     const end = (ok2) => {
       if (walk === w) walk = null;
       stepping = false;
-      if (w && !w.heel) ctx3.toBot(ok2 ? "leadOk" : "leadNo", { id: w.id });
+      if (w && !w.heel) ctx4.toBot(ok2 ? "leadOk" : "leadNo", { id: w.id });
     };
     if (!w) {
       stepping = false;
@@ -24576,9 +26384,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W21.ChatRoomMapViewMovement == null) {
+    if (W22.ChatRoomMapViewMovement == null) {
       try {
-        W21.ChatRoomMapViewMove(w.path[w.i]);
+        W22.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -24588,19 +26396,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   function reinsState(r) {
     const on3 = r && Number(r.mn) && !r.hold && Number(r.until || 0) > Date.now();
     if (!on3) {
-      if (heel && !(r && r.hold)) ctx3.local("\u{1F434} The reins come off.", "#c9a35b", true);
+      if (heel && !(r && r.hold)) ctx4.local("\u{1F434} The reins come off.", "#c9a35b", true);
       heel = r && r.hold && heel ? Object.assign(heel, { hold: true }) : null;
       if (walk && walk.heel) walk = null;
       return;
     }
-    if (!heel || heel.mn !== Number(r.mn)) ctx3.local("\u{1F434} You're on " + String(r.name || "somebody") + "'s reins: you'll follow a step behind them till they let go. Your safeword frees you.", "#c9a35b", true);
+    if (!heel || heel.mn !== Number(r.mn)) ctx4.local("\u{1F434} You're on " + String(r.name || "somebody") + "'s reins: you'll follow a step behind them till they let go. Your safeword frees you.", "#c9a35b", true);
     if (!heel || heel.mn !== Number(r.mn)) heel = { mn: Number(r.mn), trail: [] };
     heel.hold = false;
     heel.until = Number(r.until);
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W21.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W21.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W22.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W22.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
@@ -24612,7 +26420,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me5 = W21.Player.MapData.Pos;
+      const me5 = W22.Player.MapData.Pos;
       if (Math.max(Math.abs(me5.X - lp.X), Math.abs(me5.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
@@ -24640,12 +26448,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref2("noFace") || typeof W21.CharacterSetFacialExpression !== "function" || !W21.Player) return;
+    if (!f || !pref2("noFace") || typeof W22.CharacterSetFacialExpression !== "function" || !W22.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W21.CharacterSetFacialExpression(W21.Player, g, e, secs);
-        if (g === "Eyes") W21.CharacterSetFacialExpression(W21.Player, "Eyes2", e, secs);
+        W22.CharacterSetFacialExpression(W22.Player, g, e, secs);
+        if (g === "Eyes") W22.CharacterSetFacialExpression(W22.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -24694,35 +26502,35 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref2("noSound") || typeof W21.AudioPlayInstantSound !== "function") return;
-    const vol = W21.Player && W21.Player.AudioSettings && W21.Player.AudioSettings.Volume || 0;
+    if (!f || !pref2("noSound") || typeof W22.AudioPlayInstantSound !== "function") return;
+    const vol = W22.Player && W22.Player.AudioSettings && W22.Player.AudioSettings.Volume || 0;
     try {
-      W21.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W22.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el2 = W21.document.getElementById("fhc-trance");
+    let el2 = W22.document.getElementById("fhc-trance");
     const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el2) el2.remove();
       return;
     }
     if (!el2) {
-      el2 = W21.document.createElement("div");
+      el2 = W22.document.createElement("div");
       el2.id = "fhc-trance";
       el2.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W21.document.getElementById("fhc-trance-css")) {
-        const s = W21.document.createElement("style");
+      if (!W22.document.getElementById("fhc-trance-css")) {
+        const s = W22.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W21.document.head.appendChild(s);
+        W22.document.head.appendChild(s);
       }
-      W21.document.body.appendChild(el2);
+      W22.document.body.appendChild(el2);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el2.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W21.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W22.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el2.style.opacity = "1";
     });
   }
@@ -24794,13 +26602,13 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref2("noFeelings") || W21.CurrentScreen !== "ChatRoom" || !W21.Player || !ctx3.panel.s || !ctx3.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W22.CurrentScreen !== "ChatRoom" || !W22.Player || !ctx4.panel.s || !ctx4.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx3.panel.s, items = (W21.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx4.panel.s, items = (W22.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W21.Player.ArousalSettings && W21.Player.ArousalSettings.Progress || 0;
+      const arousal = W22.Player.ArousalSettings && W22.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -24816,19 +26624,19 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       const line3 = pool[Math.floor(Math.random() * pool.length)];
       recentFeel.push(line3);
       while (recentFeel.length > 8) recentFeel.shift();
-      ctx3.local(line3, "#b58ad9", true);
+      ctx4.local(line3, "#b58ad9", true);
     } catch (e) {
       console.warn("[Farmhand Companion] feelings:", e);
     }
   }
   function drawMarkers() {
     try {
-      const s = ctx3.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W21.DrawText !== "function") return;
-      const R = W21.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me5 = W21.Player.MapData.Pos;
+      const s = ctx4.panel.s;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W22.DrawText !== "function") return;
+      const R = W22.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me5 = W22.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C2 = (W21.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W21.ChatRoomMapViewCharacterIsVisible(C2)) continue;
+        const C2 = (W22.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C2 || !C2.MapData || !C2.MapData.Pos || !W22.ChatRoomMapViewCharacterIsVisible(C2)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -24838,28 +26646,28 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         if (!tags.length) continue;
         const sx = (C2.MapData.Pos.X - me5.X + R) * tile, sy = (C2.MapData.Pos.Y - me5.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W21.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W22.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
   }
-  var stirOn = () => !!ctx3.panel.prefs.stir;
+  var stirOn = () => !!ctx4.panel.prefs.stir;
   var deniedNow = () => {
-    const s = ctx3.panel.s;
+    const s = ctx4.panel.s;
     return !!(s && s.deniedUntil && s.deniedUntil > Date.now());
   };
   function slowFactor() {
-    const s = ctx3 && ctx3.panel && ctx3.panel.s;
+    const s = ctx4 && ctx4.panel && ctx4.panel.s;
     if (!s || !pref2("noSlow") || !(s.slow > 1)) return 1;
     return Math.max(1, Math.min(3, Number(s.slow) || 1));
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W21.Player || !W21.Player.ArousalSettings || typeof W21.ActivitySetArousal !== "function") return;
-      if (W21.Player.ArousalSettings.Active === "Inactive" || W21.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W21.Player.ArousalSettings.Progress) || 0, cap2 = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W22.Player || !W22.Player.ArousalSettings || typeof W22.ActivitySetArousal !== "function") return;
+      if (W22.Player.ArousalSettings.Active === "Inactive" || W22.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W22.Player.ArousalSettings.Progress) || 0, cap2 = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap2, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W21.ActivitySetArousal(W21.Player, next);
+      if (next > cur || m.add < 0) W22.ActivitySetArousal(W22.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -24867,11 +26675,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W21.Player && Array.isArray(W21.Player.Appearance) ? W21.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W21.DialogCanUnlock === "function" && !W21.DialogCanUnlock(W21.Player, it)));
+  var vibeToys = () => (W22.Player && Array.isArray(W22.Player.Appearance) ? W22.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W22.DialogCanUnlock === "function" && !W22.DialogCanUnlock(W22.Player, it)));
   function vibePush(toys) {
-    if (typeof W21.CharacterRefresh === "function") W21.CharacterRefresh(W21.Player, false);
-    if (typeof W21.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W21.ChatRoomCharacterItemUpdate(W21.Player, it.Asset.Group.Name));
-    else if (typeof W21.ChatRoomCharacterUpdate === "function") W21.ChatRoomCharacterUpdate(W21.Player);
+    if (typeof W22.CharacterRefresh === "function") W22.CharacterRefresh(W22.Player, false);
+    if (typeof W22.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W22.ChatRoomCharacterItemUpdate(W22.Player, it.Asset.Group.Name));
+    else if (typeof W22.ChatRoomCharacterUpdate === "function") W22.ChatRoomCharacterUpdate(W22.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -24927,7 +26735,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W21.ChatRoomMapViewHasSuperPowers === "function" && W21.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W22.ChatRoomMapViewHasSuperPowers === "function" && W22.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -24943,7 +26751,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             C2.ArousalSettings.Progress = 94;
             if (Date.now() - (initBody.told || 0) > 6e4) {
               initBody.told = Date.now();
-              ctx3.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true);
+              ctx4.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true);
             }
             return;
           }
@@ -25025,9 +26833,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       console.warn("[Farmhand Companion] farm ink:", e);
     }
   }
-  function trophyTell(list) {
+  function trophyTell(list2) {
     try {
-      const t = trophyNews(list);
+      const t = trophyNews(list2);
       if (t) {
         toChat(t, "#d9a400");
         if (st.panel) st.panel.renderSoon();
@@ -25193,10 +27001,10 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         return;
       }
       st.gearSyncAt = Date.now();
-      let list = Array.isArray(s.farmGear) ? s.farmGear : [];
+      let list2 = Array.isArray(s.farmGear) ? s.farmGear : [];
       if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
-        list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
-      const did = syncFarmGear(list, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });
+        list2 = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
+      const did = syncFarmGear(list2, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });
       if (botHere2()) gearFreedTell(null);
       try {
         syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape);
@@ -25249,6 +27057,14 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         onMessMsg(m);
       } catch (e) {
         console.warn("[Farmhand Companion] messes:", e);
+      }
+      return;
+    }
+    if (/^visor(Ask|Tune|Unlock|Unlocked)$/.test(m.type)) {
+      try {
+        onVisorMsg(m);
+      } catch (e) {
+        console.warn("[Farmhand Companion] visor:", e);
       }
       return;
     }
@@ -25514,12 +27330,12 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
         break;
       case "hypno":
         try {
-          onHypno(m);
+          if (m.do === "visor") onVisorMsg({ type: "visorTune", from: BOT_MEMBER, code: m.code, t: m.t });
+          else onHypno(m);
         } catch (e) {
           console.warn("[Farmhand Companion] trance:", e);
         }
         break;
-      // the farm's trance (trance.js)
       case "voice": {
         const line3 = String(m.text || "").slice(0, 300);
         if (!toChat("[Voice] " + line3, "#a67fd4", true)) st.panel.add("[Voice] " + line3, "notice");
@@ -25696,7 +27512,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     st.panel.toggle(true);
     return true;
   }
-  function start() {
+  function start2() {
     loadStore();
     st.panel = new Panel(sendCommand, api2);
     onAccount((mn, first) => {
@@ -25724,6 +27540,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       initTrance({ toBot, toChat, prefs: () => st.panel.prefs, botHere: botHere2, mod: mod2, arouse: (add3, cap2) => arouse({ add: add3, cap: cap2 }), lead });
     } catch (e) {
       console.warn("[Farmhand Companion] trance:", e);
+    }
+    try {
+      initVisor({ toBot, toChat, prefs: () => st.panel.prefs, botHere: botHere2, mod: mod2 });
+    } catch (e) {
+      console.warn("[Farmhand Companion] visor:", e);
     }
     setInterval(parasiteSync, 6e4);
     setInterval(() => {
@@ -25978,7 +27799,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var wait = setInterval(() => {
     if (typeof window.ServerSend === "function" && window.document && window.document.body) {
       clearInterval(wait);
-      start();
+      start2();
     }
   }, 1e3);
 })();

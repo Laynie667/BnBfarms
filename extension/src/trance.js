@@ -57,6 +57,9 @@ const T = { session: null, lingerUntil: 0, look: {}, depth: 0, farm: [], pull: {
   // part 3: the hang-ons runnin' on you [{ id, name, effect, until }]
   hang: [], foursAt: 0, heelAt: 0 };
 const HANG_KEY = "fhc-hangons";
+// whatever else lets go when all of it does (the safeword, the farm's or LSCG's): the visor (visor.js)
+const endHooks = [];
+export const onTranceEnd = (f) => { if (typeof f === "function") endHooks.push(f); };
 export const tranceState = T;   // (tests)
 
 export function initTrance(c) {
@@ -198,6 +201,7 @@ function endAll(quiet) {
   T.afterUntil = 0; T.narrowUntil = 0; T.pullN = 0;   // (the safeword: nothin' slips, everybody's heard again)
   T.hang = []; saveHang(); hangNames();   // (and every hang-on ends)
   drawNarrow();
+  for (const f of endHooks) { try { f(); } catch (e) { /* fine */ } }   // (the visor lets go too, visor.js)
   const el = W.document && W.document.querySelectorAll ? W.document.querySelectorAll(".fhc-sg-ask") : [];
   for (const x of el) x.remove();
   if (had && !quiet && ctx) ctx.toChat("🌀 All of it lets go of you.", "#a67fd4", true);

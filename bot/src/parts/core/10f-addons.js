@@ -139,6 +139,15 @@
   }
   // one of the farm's own LSCG instructions (part 2) their game is carryin' out that needs the farm: "stall" walks them to
   // a free milkin' stall. Told to the add-ons (Conditioning does it).
+  // the farm's visor (Nov 25, the Companion's visor.js): a crafter's tuning to keep, a wearer askin' for one, or a visor
+  // session finished. Told to the add-ons (Conditioning).
+  function visorFrom(mn, m){
+    const code = String(m.code || "").toLowerCase(); if (!/^[a-z0-9]{6,12}$/.test(code)) return;
+    const d = { do: m.type === "visorKeep" ? "keep" : m.type === "visorAsk" ? "ask" : "done", code };
+    if (d.do === "keep"){ let s = ""; try { s = JSON.stringify(m.t || null); } catch(e){ return; } if (!s || s.length > 12000) return; d.t = JSON.parse(s); }
+    if (d.do === "done"){ d.level = ["fun", "deep", "nhl"].includes(m.level) ? m.level : "fun"; d.session = String(m.session || "").slice(0, 60); }
+    addonsEmit("visor", mn, d);
+  }
   function hypnoDoFrom(mn, m){
     const what = String(m.what || "").slice(0, 20); if (!/^(stall)$/.test(what)) return;
     addonsEmit("hypnoDo", mn, { what, by: Number(m.by) || 0 });

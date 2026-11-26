@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.102.0
+// @version      0.103.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -3232,8 +3232,8 @@ GOOD TO KNOW
   ];
 
   // bot/src/version.js
-  var VERSION = "0.102.0";
-  var COMPANION_VERSION = "0.83.0";
+  var VERSION = "0.103.0";
+  var COMPANION_VERSION = "0.84.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6399,6 +6399,14 @@ GOOD TO KNOW
           hypnoDoFrom(mn, m);
         } catch (e) {
           warn("hypno do:", e);
+        }
+        return;
+      }
+      if (/^visor(Keep|Ask|Done)$/.test(m.type)) {
+        try {
+          visorFrom(mn, m);
+        } catch (e) {
+          warn("visor:", e);
         }
         return;
       }
@@ -10953,6 +10961,26 @@ GOOD TO KNOW
       };
       (state.hypnoState = state.hypnoState || /* @__PURE__ */ new Map()).set(mn, s);
       addonsEmit("hypnoState", mn, Object.assign({}, s));
+    }
+    function visorFrom(mn, m) {
+      const code = String(m.code || "").toLowerCase();
+      if (!/^[a-z0-9]{6,12}$/.test(code)) return;
+      const d = { do: m.type === "visorKeep" ? "keep" : m.type === "visorAsk" ? "ask" : "done", code };
+      if (d.do === "keep") {
+        let s = "";
+        try {
+          s = JSON.stringify(m.t || null);
+        } catch (e) {
+          return;
+        }
+        if (!s || s.length > 12e3) return;
+        d.t = JSON.parse(s);
+      }
+      if (d.do === "done") {
+        d.level = ["fun", "deep", "nhl"].includes(m.level) ? m.level : "fun";
+        d.session = String(m.session || "").slice(0, 60);
+      }
+      addonsEmit("visor", mn, d);
     }
     function hypnoDoFrom(mn, m) {
       const what = String(m.what || "").slice(0, 20);

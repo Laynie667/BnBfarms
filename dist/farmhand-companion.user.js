@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.86.0
+// @version      0.87.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.86.0";
+  var VERSION = "0.87.0";
 
   // shared/species.js
   var WORDS = {
@@ -11230,11 +11230,11 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
                       });
                     })();
                     const kyAt = (yn2) => Math.max(0.2, B.fit.mapY(yn2 - uyc + 1) - B.fit.mapY(yn2 - uyc));
-                    const FT = B.fit, srcOff = (off, sg) => {
-                      if (FT.to == null || sc <= 1.001) return off / sg;
-                      const e = Math.max(0, Math.min(1, (sg - 1) / (sc - 1))), a = Math.abs(off);
+                    const FT = B.fit, srcOff = (off2, sg) => {
+                      if (FT.to == null || sc <= 1.001) return off2 / sg;
+                      const e = Math.max(0, Math.min(1, (sg - 1) / (sc - 1))), a = Math.abs(off2);
                       const m = a <= FT.ti ? FT.ti > 0.5 ? a * FT.gi / FT.ti : FT.gi : FT.tn == null || !pin ? FT.gi + (a - FT.ti) * (FT.go - FT.gi) / Math.max(1, FT.to - FT.ti) : a <= FT.tn ? FT.gi + (a - FT.ti) * (FT.gn - FT.gi) / Math.max(1, FT.tn - FT.ti) : FT.gn + (a - FT.tn) * (FT.go - FT.gn) / Math.max(1, FT.to - FT.tn);
-                      return (off < 0 ? -1 : 1) * ((1 - e) * a + e * m);
+                      return (off2 < 0 ? -1 : 1) * ((1 - e) * a + e * m);
                     };
                     const groundRow = B.ground < 1e8 ? MY + B.ground - y - 1 : 1e9;
                     const tentOn = false, tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S22.rv * 2.4) : 0;
@@ -14702,9 +14702,9 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
       ctx5.strokeStyle = K2.gloss;
       ctx5.lineWidth = 0.9;
       for (let s = 0; s < 3; s++) {
-        const off = (r() - 0.5) * w0 * 0.6;
+        const off2 = (r() - 0.5) * w0 * 0.6;
         ctx5.beginPath();
-        pts.forEach((p, i) => i ? ctx5.lineTo(p[0], p[1] + off) : ctx5.moveTo(p[0], p[1] + off));
+        pts.forEach((p, i) => i ? ctx5.lineTo(p[0], p[1] + off2) : ctx5.moveTo(p[0], p[1] + off2));
         ctx5.stroke();
       }
       if (K2.patches) {
@@ -15158,8 +15158,8 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
   var mine3 = [];
   var myBrand = null;
   function brandLook(b) {
-    const look2 = farm_look_default && farm_look_default.brand || {}, per = (look2.places || {})[b.place] || {};
-    return Object.assign({ art: look2.art || "mark", look: look2.look || "seared", size: per.size || look2.size || 46, angle: per.angle || 0, dx: per.dx || 0, dy: per.dy || 0 }, b);
+    const look3 = farm_look_default && farm_look_default.brand || {}, per = (look3.places || {})[b.place] || {};
+    return Object.assign({ art: look3.art || "mark", look: look3.look || "seared", size: per.size || look3.size || 46, angle: per.angle || 0, dx: per.dx || 0, dy: per.dy || 0 }, b);
   }
   function messBrand(b) {
     const nb = b && b.place ? cleanBrand(brandLook(b)) : null;
@@ -18410,7 +18410,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
     const docs = ctx5.docs.slice().reverse();
     const sel = docs.find((d) => d.id === ctx5.ui.doc) || docs[0];
     const who2 = () => String(ctx5.ui.look || "").trim();
-    const look2 = (c) => () => who2() ? ctx5.send(c + " " + who2()) : ctx5.hint("Type who first, in the Look somebody up box.");
+    const look3 = (c) => () => who2() ? ctx5.send(c + " " + who2()) : ctx5.hint("Type who first, in the Look somebody up box.");
     const typed = () => {
       const v = who2();
       if (!v) return;
@@ -18433,7 +18433,7 @@ nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
             if (e.key === "Enter") typed();
           }
         }),
-        h("div", null, LOOKUPS.slice(0, 6).map((c) => btn(c[0].toUpperCase() + c.slice(1), look2(c), c === "record"))),
+        h("div", null, LOOKUPS.slice(0, 6).map((c) => btn(c[0].toUpperCase() + c.slice(1), look3(c), c === "record"))),
         muted("What you look up lands here, not in the chat. Stats, keys, size and pedigree work too: type ?stats Bessie in the box at the bottom.")
       ),
       docs.length ? h(
@@ -21993,7 +21993,8 @@ wake: any
   var PLACES = ["behind", "over", "both"];
   var CHAT_FX = ["whisper", "melt", "fade", "watermark"];
   var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
-  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [] };
+  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+  var petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
   function lookOf(t) {
     return Object.assign({}, LOOK_DEFAULTS, t || {});
   }
@@ -22014,6 +22015,8 @@ wake: any
     keep3("linesNeed", out.lines ? Math.round(clamp2(t.linesNeed, 0, 20, 0)) : 0);
     keep3("linesLock", !!(out.lines && t.linesLock));
     keep3("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
+    keep3("pet", petName(t.pet));
+    keep3("sink", !!t.sink);
     return out;
   }
   function base(t, list2) {
@@ -22070,6 +22073,11 @@ wake: any
   var DONE_KEY = "fhc-visor-done";
   var MAKER_KEY = "fhc-visor-maker";
   var LINES_KEY = "fhc-visor-lines";
+  var NAME_KEY = "fhc-visor-name";
+  var AFTER_KEY = "fhc-visor-after";
+  var HOURS_KEY = "fhc-visor-hours";
+  var OFF_KEY = "fhc-visor-off";
+  var LOAD_ID = Math.random().toString(36).slice(2, 10);
   var ctx2 = null;
   var V = {
     lib: null,
@@ -22098,32 +22106,39 @@ wake: any
     geo: null,
     obs: null,
     obsOn: null,
-    wm: null
+    wm: null,
+    L: null,
+    name: null,
+    nameBack: "",
+    nameAt: 0,
+    dropAt: 0,
+    after: null,
+    afterEl: null,
+    afterT: null,
+    hours: {},
+    hourAt: 0,
+    hoursAt: 0,
+    joins: 0,
+    room: "",
+    miss: 0,
+    fed: []
   };
   function initVisor(c) {
     ctx2 = c;
     load3();
     onAccount(() => {
       stop(true);
-      V.off = {};
       V.unlocked = {};
       load3();
+      afterDraw();
     });
-    onTranceEnd(() => {
-      if (V.on) {
-        V.off[V.on.code] = true;
-        stop(false, "\u{1F300} The visor lets go of you.");
-      }
-    });
+    onTranceEnd(() => safeword("\u{1F300} The visor lets go of you."));
     const mod3 = ctx2.mod;
     if (mod3) for (const f of ["ChatRoomSafewordRevert", "ChatRoomSafewordRelease"]) {
       try {
         mod3.hookFunction(f, 20, (args, next) => {
           try {
-            if (V.on) {
-              V.off[V.on.code] = true;
-              stop(false, "\u{1F300} Your safeword: the visor lets go of you.");
-            }
+            safeword("\u{1F300} Your safeword: the visor lets go of you.");
           } catch (e) {
           }
           return next(args);
@@ -22133,7 +22148,7 @@ wake: any
     }
     if (typeof W15.CommandCombine === "function") {
       try {
-        W15.CommandCombine([{ Tag: "visor", Description: "unlock <name>: open a hardcore wearer's farm visor early (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]);
+        W15.CommandCombine([{ Tag: "visor", Description: "unlock <name> \xB7 name <name> \xB7 reset <name>: open a farm visor early, give its wearer their own name back, or start its sinkin' over (you crafted it, or you hold their key)", Action: (args) => command(String(args || "")) }]);
       } catch (e) {
       }
     }
@@ -22165,11 +22180,14 @@ wake: any
       try {
         W15.ChatRoomRegisterMessageHandler({ Priority: 225, Description: "B&B Farm visor voices", Callback: (data, sender, msg) => {
           try {
-            if (!V.on || !data || data.Type !== "Chat" && data.Type !== "Whisper" || !sender || typeof msg !== "string") return false;
-            const me5 = W15.Player && W15.Player.MemberNumber;
+            if (!data || !sender || typeof msg !== "string") return false;
+            const me5 = W15.Player && W15.Player.MemberNumber, ty = data.Type;
             if (sender.MemberNumber === me5 || sender.MemberNumber === BOT_MEMBER || msg.includes("(")) return false;
-            const L = lookOf(V.on.t);
+            if ((ty === "Chat" || ty === "Whisper" || ty === "Emote") && nameHeard(msg)) dropName(sender);
+            if (!V.on || ty !== "Chat" && ty !== "Whisper") return false;
+            const L = look2();
             if (L.fx.includes("float")) floatBy(String(sender.Nickname || sender.Name || "") + ": " + msg);
+            if (rungs().some((r) => r.fed)) feed(msg);
             if (L.chat.includes("melt")) return { msg: melt(msg) };
           } catch (e) {
           }
@@ -22214,7 +22232,31 @@ wake: any
     } catch (e) {
       V.lines = {};
     }
+    const obj = (k) => {
+      try {
+        const v = JSON.parse(LS.getItem(k));
+        return v && typeof v === "object" ? v : null;
+      } catch (e) {
+        return null;
+      }
+    };
+    V.name = obj(NAME_KEY);
+    V.after = obj(AFTER_KEY);
+    V.hours = obj(HOURS_KEY) || {};
+    V.off = obj(OFF_KEY) || {};
+    if (V.name && !V.name.pet) V.name = null;
   }
+  var keepJson = (k, v) => {
+    try {
+      if (v == null) LS.removeItem(k);
+      else LS.setItem(k, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var keepName = () => keepJson(NAME_KEY, V.name);
+  var keepAfter = () => keepJson(AFTER_KEY, V.after);
+  var keepHours = () => keepJson(HOURS_KEY, V.hours);
+  var keepOff = () => keepJson(OFF_KEY, V.off);
   function keepCache() {
     const k = Object.keys(V.cache);
     for (const x of k.slice(0, Math.max(0, k.length - 50))) delete V.cache[x];
@@ -22278,40 +22320,83 @@ wake: any
   var isBot2 = () => !!(W15.Player && W15.Player.MemberNumber === BOT_MEMBER);
   function check2() {
     try {
-      if (!ctx2 || isBot2()) return;
+      if (!ctx2 || isBot2() || !W15.Player || !W15.Player.MemberNumber) return;
+      const room = W15.ChatRoomData && W15.ChatRoomData.Name || "";
+      if (room && room !== V.room) V.joins++;
+      V.room = room;
       if ((ctx2.prefs() || {}).noVisor) {
         if (V.on) stop(false, "\u{1F300} Farm visors are switched off for you: the room comes back.");
-        return;
-      }
-      const w = wornVisor();
-      if (!w) {
-        if (V.on) stop(false, "\u{1F300} The visor comes off, and the room comes back.");
-        for (const k of Object.keys(V.done)) if (V.done[k]) {
-          V.done[k] = 0;
-          keepDone();
+        if (V.name) giveName("\u{1F300} Farm visors are switched off for you: your own name comes back.");
+        if (V.after) {
+          V.after = null;
+          keepAfter();
+          afterDraw();
         }
-        for (const k of Object.keys(V.lines)) if (V.lines[k]) {
-          V.lines[k] = 0;
-          keepLines();
-        }
-        V.off = {};
-        V.unlocked = {};
         return;
       }
-      if (V.off[w.code]) return;
-      if (V.on && V.on.code === w.code) {
-        place();
-        return;
-      }
-      if (V.on) stop(true);
-      const t = V.cache[w.code];
-      if (t) {
-        start(w, t);
-        return;
-      }
-      ask3(w.code);
+      visorCheck();
+      nameTick();
+      afterTick();
     } catch (e) {
       console.warn("[Farmhand Companion] visor:", e);
+    }
+  }
+  function visorCheck() {
+    const w = wornVisor();
+    if (!w) {
+      if (V.on) off("\u{1F300} The visor comes off, and the room comes back.");
+      for (const k of Object.keys(V.done)) if (V.done[k]) {
+        V.done[k] = 0;
+        keepDone();
+      }
+      for (const k of Object.keys(V.lines)) if (V.lines[k]) {
+        V.lines[k] = 0;
+        keepLines();
+      }
+      if (Object.keys(V.off).length) {
+        V.off = {};
+        keepOff();
+      }
+      V.unlocked = {};
+      V.nameBack = "";
+      return;
+    }
+    let back = false;
+    const o = V.off[w.code];
+    if (o) {
+      if (o.why === "icon" && hardcore() && (o.load !== LOAD_ID || o.joins !== V.joins)) {
+        delete V.off[w.code];
+        keepOff();
+        back = true;
+      } else return;
+    }
+    if (V.on && V.on.code === w.code) {
+      place();
+      tickHours();
+      return;
+    }
+    if (V.on) stop(true);
+    const t = V.cache[w.code];
+    if (t) {
+      start(w, t, back);
+      return;
+    }
+    ask3(w.code);
+  }
+  var setOff = (code, why) => {
+    V.off[code] = { why, load: LOAD_ID, joins: V.joins };
+    keepOff();
+  };
+  function safeword(say4) {
+    if (V.on) {
+      setOff(V.on.code, "safeword");
+      stop(false, say4);
+    }
+    if (V.name) giveName("\u{1F300} Your own name comes back to you.");
+    if (V.after) {
+      V.after = null;
+      keepAfter();
+      afterDraw();
     }
   }
   function ask3(code) {
@@ -22357,7 +22442,45 @@ wake: any
       }
       return;
     }
-    if (m.type === "visorUnlocked") ctx2.toChat("\u{1F513} " + String(m.name || "They").slice(0, 40) + "'s visor is open: they can take it off now.", "#a67fd4", true);
+    if (m.type === "visorUnlocked") {
+      ctx2.toChat("\u{1F513} " + String(m.name || "They").slice(0, 40) + "'s visor is open: they can take it off now.", "#a67fd4", true);
+      return;
+    }
+    if (m.type === "visorName") {
+      const n = V.name;
+      if (!n || !(m.from === n.crafter || keyholders().includes(m.from))) return;
+      giveName("\u{1F300} " + nameOf2(m.from) + " gives you your own name back.");
+      try {
+        W15.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "name", name: nameOf2(me5) }, m.from));
+      } catch (e) {
+      }
+      return;
+    }
+    if (m.type === "visorReset") {
+      const kh = keyholders().includes(m.from);
+      let n = 0;
+      for (const [c, e] of Object.entries(V.hours)) if (kh || e && e.crafter === m.from) {
+        delete V.hours[c];
+        n++;
+      }
+      if (!n) return;
+      keepHours();
+      if (V.on) {
+        V.L = computeLook();
+        if (V.el) {
+          unbuild();
+          build();
+        }
+        icon();
+      }
+      ctx2.toChat("\u{1F300} " + nameOf2(m.from) + " starts your visor's sinkin' over.", "#a67fd4", true);
+      try {
+        W15.ServerSend("ChatRoomChat", makeMsg("visorOk", { what: "reset", name: nameOf2(me5) }, m.from));
+      } catch (e) {
+      }
+      return;
+    }
+    if (m.type === "visorOk") ctx2.toChat("\u{1F300} " + String(m.name || "They").slice(0, 40) + (m.what === "name" ? " has their own name back." : "'s visor starts its sinkin' over."), "#a67fd4", true);
   }
   var charOf4 = (mn) => (W15.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var nameOf2 = (mn) => {
@@ -22384,50 +22507,69 @@ wake: any
     const L = V.on && lookOf(V.on.t);
     return !!(L && L.lines && L.linesNeed && L.linesLock && (V.lines[V.on.code] || 0) < L.linesNeed);
   };
-  var visorLocked = () => !!(V.on && hardcore() && ((V.done[V.on.code] || 0) < V.on.t.need || linesOwed()) && !V.unlocked[V.on.code]);
+  var visorLocked = () => !!(V.on && hardcore() && ((V.done[V.on.code] || 0) < needOf() || linesOwed()) && !V.unlocked[V.on.code]);
   var owedText = () => {
-    const L = lookOf(V.on.t), o = [];
-    if (V.on.t.need || !(L.lines && L.linesNeed && L.linesLock)) o.push((V.done[V.on.code] || 0) + " of " + V.on.t.need + " sessions");
+    const L = lookOf(V.on.t), o = [], need = needOf();
+    if (need || !(L.lines && L.linesNeed && L.linesLock)) o.push((V.done[V.on.code] || 0) + " of " + need + " sessions");
     if (L.lines && L.linesNeed && L.linesLock) o.push((V.lines[V.on.code] || 0) + " of " + L.linesNeed + " lines");
     return o.join(", ") + " done";
   };
   var owedTill = () => {
-    const n = V.on.t.need, o = [];
+    const n = needOf(), o = [];
     if ((V.done[V.on.code] || 0) < n) o.push(n + " session" + (n === 1 ? "'s" : "s are") + " done");
     if (linesOwed()) o.push("its lines are written");
     return o.join(" and ");
   };
+  var ASKS = { unlock: ["visorUnlock", "it opens"], name: ["visorName", "they get their own name back"], reset: ["visorReset", "its sinkin' starts over"] };
   function command(args) {
-    const m = /^\s*unlock\s+(.+)$/i.exec(args);
+    const m = /^\s*(unlock|name|reset)\s+(.+)$/i.exec(args);
     if (!m) {
-      ctx2.toChat("\u{1F300} /visor unlock <name>: open the farm visor on somebody whose key you hold, or one you crafted.", "#a67fd4", true);
+      ctx2.toChat("\u{1F300} /visor unlock <name>: open somebody's farm visor early. /visor name <name>: give them their own name back. /visor reset <name>: start its sinkin' over. For a visor you crafted, or somebody whose key you hold.", "#a67fd4", true);
       return;
     }
-    const q2 = m[1].trim().toLowerCase(), c = (W15.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
+    const q2 = m[2].trim().toLowerCase(), c = (W15.ChatRoomCharacter || []).find((x) => x && [x.Nickname, x.Name, String(x.MemberNumber)].some((n) => n && String(n).toLowerCase() === q2));
     if (!c) {
       ctx2.toChat("\u{1F300} Nobody here by that name.", "#a67fd4", true);
       return;
     }
+    const [type, then] = ASKS[m[1].toLowerCase()];
     try {
-      W15.ServerSend("ChatRoomChat", makeMsg("visorUnlock", {}, c.MemberNumber));
+      W15.ServerSend("ChatRoomChat", makeMsg(type, {}, c.MemberNumber));
     } catch (e) {
     }
-    ctx2.toChat("\u{1F300} Sent: if you crafted their visor or hold their key, it opens.", "#a67fd4", true);
+    ctx2.toChat("\u{1F300} Sent: if you crafted their visor or hold their key, " + then + ".", "#a67fd4", true);
   }
   var calmNow = () => !!(ctx2 && (ctx2.prefs() || {}).calmLook);
-  var fxOn = (k) => !!(V.on && lookOf(V.on.t).fx.includes(k));
+  var look2 = () => V.L || lookOf(V.on && V.on.t);
+  var fxOn = (k) => !!(V.on && look2().fx.includes(k));
   var DEFAULT_WORDS = () => ["good " + animal(), "empty", "deeper", "obey the farm", "so warm", "no thoughts"];
   var wordsOf = () => V.on && V.on.t.words.length ? V.on.t.words : DEFAULT_WORDS();
   var pick = (a) => a[Math.floor(Math.random() * a.length)];
-  function start(w, t) {
-    V.on = { code: w.code, crafter: w.crafter, item: w.item, t: normTuning(t), since: Date.now() };
+  function start(w, t, back) {
+    V.on = { code: w.code, crafter: w.crafter, item: w.item, t: normTuning(t), since: Date.now(), deepest: "" };
     V.depth = 0.1;
     V.geo = null;
     V.spun = false;
+    V.hourAt = Date.now();
+    V.fed = [];
+    V.L = computeLook();
+    if (V.after) {
+      V.after = null;
+      keepAfter();
+    }
+    afterDraw();
     build();
-    ctx2.toChat("\u{1F300} The " + w.item + " settles over your eyes, and the room goes dark around you." + (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
+    ctx2.toChat((back ? "\u{1F300} The " + w.item + "'s still on you, and it takes hold of you again." : "\u{1F300} The " + w.item + " settles over your eyes, and the room goes dark around you.") + (visorLocked() ? " It won't come off till " + owedTill() + "." : ""), "#a67fd4", true);
+    nameOn();
     linesAsk();
-    later2(nextSession, 5e3);
+    later2(nextSession, back ? 1500 : 5e3);
+  }
+  function off(say4) {
+    const was2 = V.on;
+    if (!was2) return;
+    stop(false, say4);
+    nameAfter(was2);
+    afterStart(was2);
   }
   function linesAsk() {
     const L = V.on && lookOf(V.on.t);
@@ -22440,6 +22582,23 @@ wake: any
     const was2 = V.on;
     for (const x of V.timers) clearTimeout(x);
     V.timers = [];
+    unbuild();
+    if (V.run) {
+      V.run = null;
+      try {
+        onHypno({ do: "wake" });
+      } catch (e) {
+      }
+    }
+    if (was2 && V.hours[was2.code]) keepHours();
+    V.on = null;
+    V.depth = 0;
+    V.geo = null;
+    V.L = null;
+    afterDraw();
+    if (was2 && !quiet && say4) ctx2.toChat(say4, "#a67fd4", true);
+  }
+  function unbuild() {
     for (const x of V.ivs) clearInterval(x);
     V.ivs = [];
     clearInterval(V.wordT);
@@ -22469,21 +22628,10 @@ wake: any
       for (const x of W15.document.querySelectorAll(".fhc-vfade")) x.classList.remove("fhc-vfade");
     } catch (e) {
     }
-    if (V.run) {
-      V.run = null;
-      try {
-        onHypno({ do: "wake" });
-      } catch (e) {
-      }
-    }
     if (V.el) {
       V.el.remove();
       V.el = null;
     }
-    V.on = null;
-    V.depth = 0;
-    V.geo = null;
-    if (was2 && !quiet && say4) ctx2.toChat(say4, "#a67fd4", true);
   }
   var later2 = (f, ms) => {
     V.timers.push(setTimeout(() => {
@@ -22507,7 +22655,7 @@ wake: any
     if (d.getElementById("fhc-visor-css")) return;
     const s = d.createElement("style");
     s.id = "fhc-visor-css";
-    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
+    s.textContent = "#fhc-visor{position:fixed;z-index:9995;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#1b0f26 0%,#0b0610 55%,#050307 100%);pointer-events:auto}#fhc-visor>*{position:absolute;pointer-events:none}#fhc-visor .pic{left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 5s ease-in-out;-webkit-mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%);mask-image:radial-gradient(ellipse at center,#000 35%,rgba(0,0,0,.15) 100%)}#fhc-visor .body,#fhc-visor .spin,#fhc-visor .spinO,#fhc-visor .kalei{left:0;top:0;width:100%;height:100%}#fhc-visor .body.aura{animation:fhcAura 5s ease-in-out infinite}#fhc-visor.warp>.pic,#fhc-visor.warp>.spin,#fhc-visor.warp>.kalei{filter:url(#fhc-warpf)}#fhc-visor .sub{font:600 1.7rem Georgia,serif;color:#f6e2ff;letter-spacing:.06em;text-shadow:0 0 12px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcSub var(--ms,800ms) ease-in-out forwards}#fhc-visor.calm .sub{animation:fhcSubCalm 9s linear forwards}#fhc-visor .face{right:4%;top:4%;border-radius:50%;border:2px solid rgba(240,190,240,.55);box-shadow:0 0 24px rgba(220,140,240,.55),inset 0 0 18px rgba(20,8,30,.8);background:#120818;animation:fhcFace 9s ease-in-out infinite}#fhc-visor .crowd{left:0;right:0;bottom:0;height:30%;opacity:.95}#fhc-visor .crowd svg{width:100%;height:100%}#fhc-visor .vig{left:0;top:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 50%,transparent var(--in,45%),rgba(5,2,8,.92) 100%);transition:background 3s;animation:fhcVig 10s ease-in-out infinite}#fhc-visor .bloom{left:0;top:0;width:100%;height:100%;opacity:0;background:radial-gradient(ellipse at center,rgba(255,180,225,.38),rgba(240,140,210,.18) 60%,transparent 85%);transition:opacity 2.5s ease-in-out}#fhc-visor .meter{right:14px;bottom:14px;width:40px;height:40px;border-radius:50%;border:2px solid rgba(198,139,230,.6);overflow:hidden;background:rgba(20,10,28,.6)}#fhc-visor .meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#f2aad6,#9b5bd0);transition:height 2s}#fhc-visor .meter b{position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:600 11px system-ui,sans-serif;color:#fff}#fhc-visor .float{white-space:nowrap;font:italic 15px Georgia,serif;color:rgba(225,200,240,.55);animation:fhcFloat var(--dur,15s) linear forwards}#fhc-visor .wave{transform:translateX(-50%);font:600 1.15rem Georgia,serif;color:#f4dcff;text-shadow:0 0 10px rgba(200,140,240,.8);white-space:nowrap;opacity:0;animation:fhcWaveIn 7s ease-in-out forwards}#fhc-visor .wave span{display:inline-block;animation:fhcBob 2.4s ease-in-out infinite}#fhc-visor .puff{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,250,.55),rgba(255,200,240,0) 70%);animation:fhcPuff 2.4s ease-out forwards}#fhc-visor .ripple{width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:2px solid rgba(220,170,245,.4);animation:fhcRipple 7s ease-out forwards}#fhc-visor .mote{font-size:14px;color:rgba(250,190,230,.6);animation:fhcRise var(--dur,14s) linear forwards}#fhc-visor.calm .float,#fhc-visor.calm .mote,#fhc-visor.calm .ripple{animation-duration:30s}#fhc-visor.calm .face,#fhc-visor.calm .vig,#fhc-visor.calm .body.aura{animation:none}#fhc-visor .icon{left:10px;bottom:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(198,139,230,.55);background:rgba(30,16,40,.75);color:#ecd9f6;font-size:15px;line-height:28px;text-align:center;cursor:pointer;padding:0;opacity:.7;pointer-events:auto;z-index:5}#fhc-visor .icon:hover{opacity:1}#fhc-visor .icon.locked{border-color:#7a5b33;cursor:not-allowed}#fhc-visor-wm{position:fixed;z-index:9994;pointer-events:none;opacity:.07;animation:fhcSpin 80s linear infinite}#fhc-visor-wm.calm{animation:none}#TextAreaChatLog .fhc-vfade{opacity:.28;transition:opacity 3s}#fhc-visor-after{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9990;pointer-events:none;overflow:hidden;transition:opacity 4s;-webkit-mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%);mask-image:radial-gradient(ellipse at center,transparent 50%,#000 95%)}#fhc-visor-after img{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;opacity:.16;animation:fhcSpin 120s linear infinite}#fhc-visor-after.calm img{animation:none}#fhc-visor-after .aw{position:absolute;font:600 1.2rem Georgia,serif;color:#f6e2ff;text-shadow:0 0 10px rgba(200,140,240,.7);opacity:0;white-space:nowrap;animation:fhcAfterWord 7s ease-in-out forwards}#fhc-visor-after.calm .aw{animation-name:fhcAfterWordCalm}@keyframes fhcAfterWord{0%{opacity:0;transform:translateY(0)}30%{opacity:.35}70%{opacity:.25}100%{opacity:0;transform:translateY(-6vh)}}@keyframes fhcAfterWordCalm{0%{opacity:0}30%{opacity:.3}70%{opacity:.25}100%{opacity:0}}@keyframes fhcSub{0%{opacity:0}45%{opacity:var(--op,.45)}100%{opacity:0}}@keyframes fhcSubCalm{0%{opacity:0;transform:translateY(0)}20%{opacity:.35}80%{opacity:.25}100%{opacity:0;transform:translateY(-10vh)}}@keyframes fhcSpin{to{transform:rotate(360deg)}}@keyframes fhcAura{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,220,.5)) drop-shadow(0 0 30px rgba(200,120,240,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,220,.85)) drop-shadow(0 0 56px rgba(200,120,240,.55))}}@keyframes fhcFace{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}@keyframes fhcVig{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}@keyframes fhcFloat{0%{transform:translateX(0);opacity:0}10%{opacity:1}85%{opacity:.8}100%{transform:translateX(calc(-1 * var(--dx)));opacity:0}}@keyframes fhcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes fhcWaveIn{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}@keyframes fhcPuff{0%{transform:translate(0,0) scale(.4);opacity:0}20%{opacity:.8}100%{transform:translate(-40px,-50px) scale(2.2);opacity:0}}@keyframes fhcRipple{0%{transform:scale(.3);opacity:0}15%{opacity:.6}100%{transform:scale(18);opacity:0}}@keyframes fhcRise{0%{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-70vh) translateX(var(--sway,20px));opacity:0}}";
     d.head.appendChild(s);
   }
   var WARP_SVG = "<svg width='0' height='0' style='position:absolute'><filter id='fhc-warpf'><feTurbulence type='fractalNoise' baseFrequency='0.008 0.012' numOctaves='2' seed='3'><animate attributeName='baseFrequency' dur='24s' values='0.008 0.012;0.012 0.008;0.008 0.012' repeatCount='indefinite'/></feTurbulence><feDisplacementMap in='SourceGraphic' scale='14'/></filter></svg>";
@@ -22515,7 +22663,7 @@ wake: any
     const d = W15.document;
     if (!d || !d.body) return;
     css2();
-    const t = V.on.t, L = lookOf(t), calm2 = calmNow(), el2 = d.createElement("div");
+    const t = V.on.t, L = look2(), calm2 = calmNow(), el2 = d.createElement("div");
     el2.id = "fhc-visor";
     el2.classList.toggle("calm", calm2);
     el2.classList.toggle("warp", L.fx.includes("warp"));
@@ -22657,7 +22805,7 @@ wake: any
   function draw2(now) {
     if (now - V.lastF < 33) return;
     V.lastF = now;
-    const t = now / 1e3, L = lookOf(V.on.t), calm2 = calmNow();
+    const t = now / 1e3, L = look2(), calm2 = calmNow();
     const moving = !calm2 && (L.spin !== "still" || L.breathe || L.drift || L.spiral === "tunnel");
     if (L.spiral !== "none" && (moving || !V.spun)) {
       V.spun = true;
@@ -22689,7 +22837,7 @@ wake: any
     g.clearRect(0, 0, cv.width, cv.height);
     const src = C2 && C2.Canvas;
     if (!src || !src.width || !src.height) return;
-    const R = bodyRect(src), L = lookOf(V.on.t), faceY = R.up + 145;
+    const R = bodyRect(src), L = look2(), faceY = R.up + 145;
     let z = 0;
     if (L.fx.includes("zoom")) z = (calmNow() ? 0.5 : 0.5 - 0.5 * Math.cos(2 * Math.PI * (t || 0) / 60)) * (0.3 + 0.6 * V.depth);
     const fh = Math.min(360, R.sh), fw = fh * R.sw / R.sh, fx0 = src.width / 2 - fw / 2, fy = Math.max(R.sy, faceY - fh / 2);
@@ -22792,8 +22940,8 @@ wake: any
       arm(Math.PI, b, b * 1.4, c1, -1);
     } else if (L.spiral === "pinwheel") {
       for (let i = 0; i < 8; i++) {
-        const p = (r, off) => {
-          const an = i * Math.PI / 4 + off + a + r * 6e-3;
+        const p = (r, off2) => {
+          const an = i * Math.PI / 4 + off2 + a + r * 6e-3;
           return [r * Math.cos(an), r * Math.sin(an)];
         };
         g.beginPath();
@@ -22995,7 +23143,7 @@ wake: any
     if (!V.el) return;
     const w = W15.document.createElement("div");
     w.className = "sub";
-    w.textContent = pick(wordsOf());
+    w.textContent = V.fed.length && Math.random() < 0.5 ? V.fed.shift() : pick(wordsOf());
     w.style.left = 15 + Math.random() * 45 + "%";
     w.style.top = 18 + Math.random() * 55 + "%";
     V.el.appendChild(w);
@@ -23016,8 +23164,8 @@ wake: any
       ctx2.toChat("\u{1F512} The visor won't come off yet: " + owedText() + ". Its crafter or your keyholders can open it early; your safeword always ends it.", "#a67fd4", true);
       return;
     }
-    V.off[V.on.code] = true;
-    stop(false, "\u{1F300} You take the visor's hold off. The room comes back (it starts again if you put it back on).");
+    setOff(V.on.code, "icon");
+    off("\u{1F300} You take the visor's hold off. The room comes back" + (hardcore() ? " for now: it takes hold again when you next log in or change rooms." : " (it starts again if you put it back on)."));
   }
   function farmPatterns() {
     const pts = (k, c) => {
@@ -23038,7 +23186,7 @@ wake: any
   function words() {
     const me5 = tranceState.me || {}, P5 = W15.Player || {}, a = animal();
     return {
-      name: String(P5.Nickname || P5.Name || "sugar"),
+      name: String(V.name && V.name.pet || P5.Nickname || P5.Name || "sugar"),
       animal: a,
       sound: me5.sound || "mmh",
       body: "body",
@@ -23083,6 +23231,11 @@ wake: any
     }
     const ms = steps2.reduce((n, s) => n + (s.gap || 0) * 1e3, 0);
     V.run = { steps: steps2, i: 0, level, name: recipe ? recipe.name : "", depth: 0, base: Math.max(0.1, V.depth * 0.6) };
+    V.on.deepest = deeper(V.on.deepest, level);
+    if (V.name && V.name.code === V.on.code) {
+      V.name.level = deeper(V.name.level, level);
+      keepName();
+    }
     V.depth = V.run.base;
     onHypno({ do: "under", by: BOT_MEMBER, ms: Math.round(ms + 3e5), level });
     step();
@@ -23125,7 +23278,7 @@ wake: any
     keepDone();
     V.depth = 1;
     icon();
-    const need = V.on.t.need, n = V.done[code];
+    const need = needOf(), n = V.done[code];
     ctx2.toChat("\u{1F300} Session over" + (r.name ? ": " + r.name : "") + "." + (hardcore() && need ? n >= need ? " That's " + need + " of " + need + ": the visor can come off now." : " " + n + " of " + need + " before the visor can come off." : ""), "#a67fd4", true);
     try {
       if (ctx2.botHere()) ctx2.toBot("visorDone", { code, level: r.level, session: r.name });
@@ -23133,6 +23286,244 @@ wake: any
     }
     later2(linesAsk, 6e3);
     later2(nextSession, 9e4);
+  }
+  var RUNGS = [
+    { h: 1, chat: "whisper", say: "it whispers to you in the chat now" },
+    { h: 3, fx: "tunnel", say: "the dark closes in at the edges as you sink" },
+    { h: 6, need: 1, say: "it wants one more session before it comes off" },
+    { h: 10, nameX: 2, say: "your name holds twice as long after" },
+    { h: 20, chat: "melt", afterX: 2, say: "other voices melt, and it stays with you twice as long after" },
+    { h: 40, need: 1, fed: true, say: "one more session again, and the room's own words find their way in" }
+  ];
+  var hoursOf = (code) => (V.hours[code] && V.hours[code].ms || 0) / 36e5;
+  var rungsFor = (code, t) => lookOf(t).sink ? RUNGS.filter((r) => hoursOf(code) >= r.h) : [];
+  var rungs = () => V.on ? rungsFor(V.on.code, V.on.t) : [];
+  var timesX = (list2, k) => list2.reduce((n, r) => n * (r[k] || 1), 1);
+  var needOf = () => V.on ? V.on.t.need + rungs().reduce((n, r) => n + (r.need || 0), 0) : 0;
+  function computeLook() {
+    const L = lookOf(V.on.t);
+    L.chat = L.chat.slice();
+    L.fx = L.fx.slice();
+    for (const r of rungs()) {
+      if (r.chat && !L.chat.includes(r.chat)) L.chat.push(r.chat);
+      if (r.fx && !L.fx.includes(r.fx)) L.fx.push(r.fx);
+    }
+    return L;
+  }
+  function tickHours() {
+    if (!V.on || !look2().sink) return;
+    const now = Date.now(), e = V.hours[V.on.code] || (V.hours[V.on.code] = { ms: 0, crafter: V.on.crafter });
+    const had = rungs().length;
+    e.ms += Math.max(0, Math.min(1e4, now - (V.hourAt || now)));
+    V.hourAt = now;
+    if (now - V.hoursAt > 3e4) {
+      V.hoursAt = now;
+      keepHours();
+    }
+    const got = rungs();
+    if (got.length > had) sinkDeeper(got[got.length - 1]);
+  }
+  function sinkDeeper(r) {
+    keepHours();
+    V.L = computeLook();
+    if (V.el) {
+      unbuild();
+      build();
+    }
+    icon();
+    ctx2.toChat("\u{1F300} The visor sinks a little deeper into you: " + r.say + ".", "#a67fd4", true);
+  }
+  function feed(msg) {
+    if (Math.random() < 0.5) return;
+    const w = String(msg).replace(/[^\p{L}\p{Nd}' -]/gu, " ").split(/\s+/).filter((x) => x.length > 2);
+    if (!w.length) return;
+    const i = Math.floor(Math.random() * w.length);
+    V.fed.push(w.slice(i, i + 1 + Math.floor(Math.random() * 2)).join(" ").toLowerCase().slice(0, 24));
+    V.fed = V.fed.slice(-6);
+  }
+  var LEVELS_IN = ["", "fun", "deep", "nhl"];
+  var deeper = (a, b) => LEVELS_IN.indexOf(b) > LEVELS_IN.indexOf(a || "") ? b : a || "";
+  var HOLD_H = { "": 1, fun: 1, deep: 24 };
+  function nameOn() {
+    const L = look2(), P5 = W15.Player;
+    if (!L.pet || !P5 || V.nameBack === V.on.code) return;
+    if (!V.name || V.name.pet !== L.pet) V.name = { pet: L.pet, old: V.name ? V.name.old : String(P5.Nickname || ""), level: "" };
+    Object.assign(V.name, { code: V.on.code, crafter: V.on.crafter, until: 0, perm: false });
+    keepName();
+    if (setNick(L.pet)) ctx2.toChat("\u{1F300} Your name's " + L.pet + " now. Anybody who says it takes you down.", "#a67fd4", true);
+  }
+  function setNick(n) {
+    const P5 = W15.Player;
+    if (!P5) return false;
+    if (String(P5.Nickname || "") === n) return true;
+    if (typeof W15.CharacterSetNickname !== "function") {
+      failName("the game won't take it");
+      return false;
+    }
+    let r = null;
+    try {
+      r = W15.CharacterSetNickname(P5, n);
+    } catch (e) {
+      r = "error";
+    }
+    if (r) {
+      if (n) failName(r === "NicknameLocked" ? "your owner keeps your name" : "the game won't take it");
+      return false;
+    }
+    if (V.name && n === V.name.pet && V.name.failed) {
+      V.name.failed = false;
+      keepName();
+    }
+    return true;
+  }
+  function failName(why) {
+    if (!V.name || V.name.failed) return;
+    V.name.failed = true;
+    keepName();
+    ctx2.toChat("\u{1F300} The visor calls you " + V.name.pet + ", but your name in the room can't change: " + why + ". The farm's voice calls you it all the same, and it still takes you down.", "#a67fd4", true);
+  }
+  function nameAfter(was2) {
+    const n = V.name;
+    if (!n || n.code !== was2.code) return;
+    n.level = deeper(n.level, was2.deepest);
+    if (n.perm || n.level === "nhl") {
+      n.perm = true;
+      n.until = 0;
+      ctx2.toChat("\u{1F300} You're still " + n.pet + ". It stays your name till your crafter or a keyholder gives you yours back.", "#a67fd4", true);
+    } else {
+      n.until = Date.now() + (HOLD_H[n.level] || 1) * timesX(rungsFor(was2.code, was2.t), "nameX") * 36e5;
+      ctx2.toChat("\u{1F300} You're still " + n.pet + " for a while yet.", "#a67fd4", true);
+    }
+    keepName();
+  }
+  function nameTick() {
+    const n = V.name, P5 = W15.Player;
+    if (!n || !P5) return;
+    const now = Date.now(), wearing = !!(V.on && V.on.code === n.code);
+    if (!wearing && !n.perm && !n.until) {
+      nameAfter({ code: n.code, t: V.cache[n.code] || {}, deepest: "" });
+      return;
+    }
+    if (!wearing && !n.perm && n.until <= now) {
+      giveName("\u{1F300} " + n.pet + " slips off you, and your own name comes back.");
+      return;
+    }
+    if (n.failed || String(P5.Nickname || "") === n.pet) return;
+    if (hardcore()) {
+      if (now - V.nameAt > 15e3) {
+        V.nameAt = now;
+        if (setNick(n.pet)) ctx2.toChat("\u{1F300} That isn't your name. You're " + n.pet + ".", "#a67fd4", true);
+      }
+      return;
+    }
+    V.name = null;
+    keepName();
+    ctx2.toChat("\u{1F300} You take your own name back, and the visor lets go of it.", "#a67fd4", true);
+  }
+  function giveName(say4) {
+    const n = V.name;
+    if (!n) return;
+    V.name = null;
+    keepName();
+    if (V.on && V.on.code === n.code) V.nameBack = n.code;
+    if (!n.failed && String((W15.Player || {}).Nickname || "") === n.pet) setNick(n.old || "");
+    if (say4) ctx2.toChat(say4, "#a67fd4", true);
+  }
+  function nameHeard(msg) {
+    const n = V.name;
+    if (!n || !n.pet) return false;
+    if (!(n.perm || n.until > Date.now() || V.on && V.on.code === n.code)) return false;
+    const esc2 = n.pet.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("(^|[^\\p{L}\\p{Nd}])" + esc2 + "($|[^\\p{L}\\p{Nd}])", "iu").test(msg);
+  }
+  function dropName(sender) {
+    const now = Date.now();
+    if (now - V.dropAt < 12e4) return;
+    V.dropAt = now;
+    const who2 = String(sender.Nickname || sender.Name || "Somebody").slice(0, 30), pet = V.name.pet;
+    if (V.run || tranceState.session) {
+      V.depth = Math.min(1, V.depth + 0.15);
+      depthDraw();
+      if (tranceState.session) onHypno({ do: "depth", depth: Math.min(100, (Number(tranceState.depth) || 0) + 15) });
+      ctx2.toChat("\u{1F300} " + who2 + " says \u201C" + pet + "\u201D, and you sink deeper.", "#a67fd4", true);
+      return;
+    }
+    onHypno({ do: "under", by: BOT_MEMBER, ms: 12e4, level: "fun" });
+    const s = tranceState.session;
+    ctx2.toChat("\u{1F300} " + who2 + " says \u201C" + pet + "\u201D\u2026 and down you go.", "#a67fd4", true);
+    try {
+      tranceVoice("That's your name now, " + pet + ". Hear it, and drop.");
+    } catch (e) {
+    }
+    setTimeout(() => {
+      try {
+        if (s && tranceState.session === s && !V.run) onHypno({ do: "wake" });
+      } catch (e) {
+      }
+    }, 9e4 + Math.random() * 3e4);
+  }
+  var AFTER_MIN2 = { "": 5, fun: 15, deep: 120, nhl: 360 };
+  function afterStart(was2) {
+    const mins = (AFTER_MIN2[was2.deepest || ""] || 5) * timesX(rungsFor(was2.code, was2.t), "afterX");
+    V.after = { until: Date.now() + mins * 6e4, total: mins * 6e4, words: (was2.t.words.length ? was2.t.words : DEFAULT_WORDS()).slice(0, 12) };
+    keepAfter();
+    afterDraw();
+  }
+  function afterTick() {
+    if (V.after && !(V.after.until > Date.now() && Array.isArray(V.after.words) && V.after.words.length)) {
+      V.after = null;
+      keepAfter();
+    }
+    afterDraw();
+  }
+  function afterDraw() {
+    const d = W15.document;
+    if (!d || !d.body) return;
+    if (!(V.after && !V.on && ctx2 && !(ctx2.prefs() || {}).noVisor)) {
+      if (V.afterEl) {
+        V.afterEl.remove();
+        V.afterEl = null;
+      }
+      clearInterval(V.afterT);
+      V.afterT = null;
+      return;
+    }
+    css2();
+    if (!V.afterEl) {
+      const el2 = d.createElement("div");
+      el2.id = "fhc-visor-after";
+      const img2 = d.createElement("img");
+      img2.alt = "";
+      img2.src = spiralMark();
+      el2.appendChild(img2);
+      d.body.appendChild(el2);
+      V.afterEl = el2;
+      V.afterT = setInterval(() => {
+        try {
+          if (V.afterEl && V.after && Math.random() < 0.5) afterWord();
+        } catch (e) {
+        }
+      }, 3e4);
+    }
+    const left2 = Math.max(0, V.after.until - Date.now()) / Math.max(1, V.after.total);
+    V.afterEl.style.opacity = (0.35 + 0.65 * left2).toFixed(3);
+    V.afterEl.classList.toggle("calm", calmNow());
+  }
+  function afterWord() {
+    const w = W15.document.createElement("div");
+    w.className = "aw";
+    w.textContent = pick(V.after.words);
+    w.style.left = (Math.random() < 0.5 ? 2 + Math.random() * 10 : 78 + Math.random() * 12) + "%";
+    w.style.top = 8 + Math.random() * 80 + "%";
+    V.afterEl.appendChild(w);
+    setTimeout(() => w.remove(), 7e3);
+  }
+  var leftText = (ms) => ms > 54e5 ? Math.round(ms / 36e5) + " h" : Math.max(1, Math.round(ms / 6e4)) + " min";
+  function visorHolds() {
+    const o = [], now = Date.now();
+    if (V.name) o.push("called " + V.name.pet + (V.on && V.on.code === V.name.code ? " while the visor's on" : V.name.perm ? " till it's given back" : V.name.until ? " (" + leftText(V.name.until - now) + ")" : ""));
+    if (V.after && !V.on) o.push("the visor's afterimage (" + leftText(V.after.until - now) + ")");
+    return o;
   }
   var SPIRAL_NAMES = {
     classic: "classic: two arms",
@@ -23221,7 +23612,9 @@ wake: any
         lines: M.lines,
         linesNeed: M.linesNeed,
         linesLock: M.linesLock,
-        fx: M.fx
+        fx: M.fx,
+        pet: M.pet,
+        sink: M.sink
       });
       const code = tuningCode(t);
       remember(code, t);
@@ -23291,6 +23684,18 @@ wake: any
         tick3("linesLock", true, "they count toward the hardcore lock")
       ),
       h("div", null, muted("More (all slow, nothin' flashes):"), h("div", null, FX.map((v) => tick3("fx", v, FX_NAMES[v])))),
+      h(
+        "div",
+        null,
+        muted("A pet name for whoever wears it (their name in the room while it's on, and a while after; anybody who says it takes them down):"),
+        h("input", { value: M.pet || "", size: 22, maxlength: 20, placeholder: "Bessie", onchange: (e) => set2("pet", e.target.value) })
+      ),
+      h(
+        "div",
+        null,
+        tick3("sink", true, "it sinks with them: the longer it's worn, the stronger it gets"),
+        muted("(1 hour: whispers in the chat \xB7 3: tunnel vision \xB7 6: one more session before it comes off \xB7 10: the name holds twice as long \xB7 20: voices melt, and it lingers twice as long after \xB7 40: one more session again, and the room's own words get fed in)")
+      ),
       h("div", { style: { marginTop: "6px" } }, btn("Make the visor", make, true)),
       result,
       muted("Words fade in and out (never a strobe). Wearers can switch the trance look off, or keep it calm, in their own Companion; their safeword always ends it.")
@@ -23421,11 +23826,11 @@ wake: any
       names: "names gone fuzzy",
       heel: "drawn to your herd leader"
     };
-    const held2 = hangons().map((x) => HANG[x.effect] + " (" + Math.max(1, Math.round((x.until - Date.now()) / 6e4)) + " min)");
+    const held2 = hangons().map((x) => HANG[x.effect] + " (" + Math.max(1, Math.round((x.until - Date.now()) / 6e4)) + " min)").concat(visorHolds());
     return card(
       title("\u{1F300} The farm's trance"),
       muted(t.text),
-      held2.length ? muted("Holdin' on since your last session: " + held2.join(", ") + ". Your safeword ends them.") : null,
+      held2.length ? muted("Holdin' on to you: " + held2.join(", ") + ". Your safeword ends them.") : null,
       ctx5.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx5.send("lowpose kneel")), btn("All fours", () => ctx5.send("lowpose fours"))) : null,
       pref(ctx5, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
       prefNot(ctx5, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),
@@ -28553,7 +28958,7 @@ wake: any
       }
       return;
     }
-    if (/^visor(Ask|Tune|Unlock|Unlocked)$/.test(m.type)) {
+    if (/^visor(Ask|Tune|Unlock|Unlocked|Name|Reset|Ok)$/.test(m.type)) {
       try {
         onVisorMsg(m);
       } catch (e) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      2.5.0
+// @version      2.6.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2270,7 +2270,8 @@ wake: any
   var PLACES = ["behind", "over", "both"];
   var CHAT_FX = ["whisper", "melt", "fade", "watermark"];
   var FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
-  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [] };
+  var LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+  var petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
   function normTuning(t) {
     t = t && typeof t === "object" ? t : {};
     const list2 = (a, n, len) => (Array.isArray(a) ? a : String(a || "").split(",")).map((x) => str(x, len)).filter(Boolean).slice(0, n);
@@ -2288,6 +2289,8 @@ wake: any
     keep("linesNeed", out.lines ? Math.round(clamp(t.linesNeed, 0, 20, 0)) : 0);
     keep("linesLock", !!(out.lines && t.linesLock));
     keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
+    keep("pet", petName(t.pet));
+    keep("sink", !!t.sink);
     return out;
   }
   function base(t, list2) {
@@ -2432,14 +2435,14 @@ wake: any
     return w;
   }
   var HOOVES = ["cow", "pony", "horse", "goat", "sheep", "pig", "bull", "deer"];
-  function petName(mn) {
+  function petName2(mn) {
     const w = words(mn), r = api.rec(mn) || {}, t = me(mn).tier;
     const i = Math.max(0, Math.min(3, r.degradeMe ? t + 1 : r.praiseMe ? t - 1 : t));
     return w.names[i];
   }
   function say(mn, line) {
     const w = words(mn);
-    return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/\{paws\}/g, w.paws || "paws").replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
+    return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName2(mn)).replace(/\{paws\}/g, w.paws || "paws").replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
   }
   var handful = (list2, n, b) => {
     const pool = fitting(list2, b).slice();
@@ -2536,7 +2539,7 @@ wake: any
       animal: w.a,
       sound: w.s,
       body: w.p,
-      pet: petName(mn),
+      pet: petName2(mn),
       act: w.act,
       pose: w.pose,
       paws: w.paws || "paws",
@@ -2957,7 +2960,7 @@ wake: any
     const tier = MILESTONES.filter((m) => x.total >= m).length;
     if (tier > x.tier) {
       x.tier = tier;
-      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time.");
+      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName2(mn) + " now, deeper every time.");
       if (run.by !== mn) api.notice(run.by, "\u{1F300} " + api.name(mn) + " reached conditioning tier " + tier + ".");
     }
     api.save();
@@ -2978,7 +2981,7 @@ wake: any
     const tier = MILESTONES.filter((m) => x.total >= m).length;
     if (tier > x.tier) {
       x.tier = tier;
-      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time.");
+      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName2(mn) + " now, deeper every time.");
     }
     api.save();
   }
@@ -3036,7 +3039,7 @@ wake: any
   }
   var progressText = (mn) => {
     const x = me(mn), next = MILESTONES.find((m) => x.total < m);
-    return "\u{1F300} Conditioning: tier " + x.tier + " (" + petName(mn) + ") \xB7 " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " \xB7 next tier at " + next : " \xB7 top tier") + " \xB7 allows " + LEVEL_NAME[x.max] + (pullOn(mn) ? " \xB7 the farm's pull " + Math.round(pullOf(mn).n) + "%" : "");
+    return "\u{1F300} Conditioning: tier " + x.tier + " (" + petName2(mn) + ") \xB7 " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " \xB7 next tier at " + next : " \xB7 top tier") + " \xB7 allows " + LEVEL_NAME[x.max] + (pullOn(mn) ? " \xB7 the farm's pull " + Math.round(pullOf(mn).n) + "%" : "");
   };
   function companion(mn) {
     const r = api.rec(mn);
@@ -3046,7 +3049,7 @@ wake: any
       title: "Conditioning",
       text: r.hypno ? void 0 : "Sessions need ?hypno on (in your Toggles).",
       lines: [
-        ["Tier", x.tier + " \xB7 " + petName(mn)],
+        ["Tier", x.tier + " \xB7 " + petName2(mn)],
         ["Sessions", x.total],
         ["Deepest allowed", LEVEL_NAME[x.max]],
         ["Down low", lowOf(mn) === "fours" ? "on all fours" : "kneelin'"],
@@ -3114,7 +3117,7 @@ wake: any
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "2.5.0",
+    version: "2.6.0",
     // (its addon.json's, put in by the build)
     guide: "Guided trance sessions in the farm's voice, put together from the farm's trance library (inductions, deepeners, suggestions, triggers, wakes). Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [session <name>] [say <their own words>], or take yourself under with ?hyp me. With LSCG (its hypnosis on, and the farm let in under LSCG settings \u2192 Extensions \u2192 B&B Farm): you go under LSCG's own trance in the farm's name, its beats play if you turned them on, and a session's triggers go into your LSCG as its own suggestions (tick Allow suggestions). Without LSCG, the farm's own trance and triggers. ?lowpose kneel|fours picks the pose a trigger puts you in. ?planted shows what the farm planted; ?planted remove <name> takes one out. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs). Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. The farm's pull: with ?hypno on and the Companion, it builds through the day (a haze, a whisper, a blurred line); triggers, sessions and milkin's feed it, time away drains it. From 60 your words start slippin', and at 100 you drop under and the farm takes you down. Your Companion's trance settings switch it, and the slippin', off. LSCG's suggestion editor gets the farm's own instructions too (make your sound, go to a free milkin' stall, beg to be milked).",
     setup(a) {

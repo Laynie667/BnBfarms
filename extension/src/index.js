@@ -273,7 +273,7 @@ function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.type === "statue" || m.type === "statueAsk") { try { onStatueMsg(m); } catch (e) { console.warn("[Farmhand Companion] statue:", e); } return; }   // somebody under the Statue Serum (statue.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
-  if (/^visor(Ask|Tune|Unlock|Unlocked)$/.test(m.type)) { try { onVisorMsg(m); } catch (e) { console.warn("[Farmhand Companion] visor:", e); } return; }   // another Companion's visor (visor.js)
+  if (/^visor(Ask|Tune|Unlock|Unlocked|Name|Reset|Ok)$/.test(m.type)) { try { onVisorMsg(m); } catch (e) { console.warn("[Farmhand Companion] visor:", e); } return; }   // another Companion's visor (visor.js)
   if (/^disp(Hard|Ask|KeyState)$/.test(m.type)) { try { onWardMsg(m.from, m); } catch (e) { console.warn("[Farmhand Companion] keys:", e); } return; }   // somebody's Dispensary hardcore names you a keyholder (keys.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (!/^(ping|state|stateDiff|store|roomlines)$/.test(m.type)) st.lastHeard = Date.now();   // (an answer to somethin' you sent)

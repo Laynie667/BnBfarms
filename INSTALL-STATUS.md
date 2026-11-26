@@ -8,12 +8,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.103.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.5.0** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.6.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.3** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.86.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.87.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.87.0 + Conditioning 2.6.0: a visor's pet name and trigger, it comes back on its own, an afterimage, and it sinks with them** Laynie, Nov 25: "I think the next step is to add a "suggestions" tool for the visor"; from the ideas she picked "1, 5-8, 10, 11, 12" and said "sounds good" to the plan. This is the wearer's half (1, 10, 11, 12); the room's half (5-8: seen from outside, peek inside, herd trance, the crafter loomin') comes next. The crafter picks the name and the sinkin' in the Visor maker; both go into the visor's code. Visors made before keep their very same code.
+  - **The pet name**: while the visor's on, their name in the room is the crafter's pet name (the game's own nickname, so the room's told; 20 letters at most). **It's their trigger**: somebody in the room says it (in a line or an emote) and down they go for a minute or two, or deeper if they're under already. At most once every 2 minutes; never from their own lines, the farm's, or anythin' in brackets. When the visor comes off, the name hangs on: an hour after light sessions, a day after deep ones, and after no-holds-barred till the crafter or a keyholder gives their own name back (`/visor name <name>`). Changed back by hand: in the Dispensary's hardcore the visor puts it back; otherwise that ends it. If their owner keeps their name locked, the farm's voice calls them it anyway and it still takes them down.
+  - **It comes back on its own**: taken off with its icon, a visor now stays off even after a reload (it used to come back). In the Dispensary's hardcore, the icon only holds it off till they next log in or join a room, then it takes hold again and a session starts straight away. A safeword's off always sticks till the visor's taken off and put back on.
+  - **The afterimage**: after it comes off, a faint spiral at the edges of the ordinary screen and the odd word of the visor's driftin' by: 15 minutes after light sessions, 2 hours after deep, 6 after no-holds-barred. It lasts through a reload, holds still with the calm look, and the trance card lists it (and the name) with the time left.
+  - **It sinks with them** (if the crafter ticks it): counted in hours worn, per wearer and per visor, kept across wearin's. 1 hour: whispers in the chat. 3: tunnel vision. 6: one more session before it comes off. 10: the name holds twice as long. 20: other voices melt, and the afterimage lasts twice as long. 40: one more session again, and bits of the room's own words get fed into the dark. They're told each time it sinks. The crafter or a keyholder starts it over with `/visor reset <name>`.
+  - **The safeword** ends all of it at once: the visor lets go, their own name comes back, the afterimage goes.
 
 - **Companion 0.86.0 + Conditioning 2.5.0: visor spirals, chat effects, lines to write, HSC-style effects, and a close-up of the face** Laynie, Nov 25: "I would love more visual effects, especially spirals, and maybe stuff in chat"; then "i love those, so yes please. More effects too, and maybe some different ones similar to HSC?"; then "yes, the close up effect of the face would be nice too if possible". Everything below is picked by the crafter in the Visor maker and goes into the visor's code, so it's locked in like the rest. Visors made before keep their very same code and look.
   - **Spirals**: classic, pinwheel, tight, tunnel (rings driftin' out), two turnin' against each other, hearts, paw prints or bells along a spiral, the visor's words written along it, or none. Turnin' slow (a turn every 14 seconds at the fastest), slower, or still; behind the body, over everything faint, or both; how strong (20-70%); a breathin' zoom and colours driftin', each on or off.

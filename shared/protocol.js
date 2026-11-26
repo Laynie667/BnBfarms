@@ -47,7 +47,7 @@
 //   THE VISOR (Nov 25, extension/src/visor.js; shared/visor.js has the tuning and its code)
 //   ext  -> bot        visorKeep { code, t } · visorAsk { code } · visorDone { code, level, session }   keep a crafter's tuning, ask for one, a session done
 //   bot  -> ext        hypno    { do: "visor", code, t }   a tuning the farm kept
-//   ext  -> room       visorAsk { code } / visorTune { code, t } (to the asker) · visorUnlock {} / visorUnlocked { name } (to one person)
+//   ext  -> room       visorAsk { code } / visorTune { code, t } (to the asker) · visorUnlock {} / visorUnlocked { name } (to one person) · visorName {} / visorReset {} → visorOk { what, name }
 //
 // Older Companions ignore the v2 types, and older bots never send them, so either side can update first.
 

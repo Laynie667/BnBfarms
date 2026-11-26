@@ -19,7 +19,7 @@ import { redrawRoom } from "../botscreen.js";
 import { voice } from "./staffdata.js";
 import { workCard } from "./staff.js";
 import { lscgTodo, hangons } from "../trance.js";
-import { visorMakerCards } from "../visor.js";
+import { visorMakerCards, visorHolds } from "../visor.js";
 
 // the farm switches by what they're about (the commands and words are SWITCH_INFO's, livestock.js)
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
@@ -102,9 +102,9 @@ function tranceCard(ctx) {
   // part 3: what's holdin' on to you since your last session, and how long it has left (your safeword ends them all)
   const HANG = { mootalk: "moo talk", cowtalk: "no I, just this animal", yes: "every no a yes", edge: "kept at the edge", needy: "kept needy", fours: "down low",
     handsoff: "hands off yourself", hearing: "only the farm's voice", names: "names gone fuzzy", heel: "drawn to your herd leader" };
-  const held = hangons().map((x) => HANG[x.effect] + " (" + Math.max(1, Math.round((x.until - Date.now()) / 60000)) + " min)");
+  const held = hangons().map((x) => HANG[x.effect] + " (" + Math.max(1, Math.round((x.until - Date.now()) / 60000)) + " min)").concat(visorHolds());
   return card(title("🌀 The farm's trance"), muted(t.text),
-    held.length ? muted("Holdin' on since your last session: " + held.join(", ") + ". Your safeword ends them.") : null,
+    held.length ? muted("Holdin' on to you: " + held.join(", ") + ". Your safeword ends them.") : null,
     ctx.s.onBooks ? h("div", null, muted("When a trigger puts you down low:"), btn("Kneelin'", () => ctx.send("lowpose kneel")), btn("All fours", () => ctx.send("lowpose fours"))) : null,
     pref(ctx, "calmLook", "Calm trance look", "The haze holds still, the spiral doesn't turn, no rings and no shudder when you cum."),
     prefNot(ctx, "noPull", "The farm's pull through the day", "With ?hypno on: now and then a breath of haze, a whisper in the farm's voice, a blurred line or a slow turn of spiral, and it builds. Triggers, sessions and milkin's feed it; time away drains it. Built all the way up, you drop under on your own and the farm takes you down. Never while a trap, a scene or ?quiet has you, or you're away from the keys."),

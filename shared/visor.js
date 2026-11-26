@@ -34,7 +34,11 @@ export const SPINS = ["slow", "slower", "still"];
 export const PLACES = ["behind", "over", "both"];
 export const CHAT_FX = ["whisper", "melt", "fade", "watermark"];
 export const FX = ["float", "wave", "breath", "tunnel", "bloom", "warp", "ripple", "crowd", "kalei", "hearts", "aura", "meter", "face", "zoom"];
-export const LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [] };
+// …and (Nov 25, Laynie picked them: "1, 5-8, 10, 11, 12 are good") the pet name the visor gives its wearer (their name in
+// the room while it holds, and their trigger), and whether it sinks deeper the longer it's worn
+export const LOOK_DEFAULTS = { spiral: "classic", spin: "slow", place: "behind", spOp: 0.4, breathe: true, drift: true, chat: ["whisper", "fade", "watermark"], lines: "", linesNeed: 0, linesLock: false, fx: [], pet: "", sink: false };
+// a pet name the game takes as a name: letters, numbers, spaces, ' and -, 20 at most (BC's ServerCharacterNicknameRegex)
+export const petName = (s) => String(s == null ? "" : s).replace(/[^\p{L}\p{Nd}\p{Z}'-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20).trim();
 export function lookOf(t) { return Object.assign({}, LOOK_DEFAULTS, t || {}); }   // (a tuning with its defaults filled in, for showin' it)
 // a tuning, every value checked and kept inside its limits (so nothin' a crafter or another Companion sends is unsafe)
 export function normTuning(t) {
@@ -52,6 +56,8 @@ export function normTuning(t) {
   keep("linesNeed", out.lines ? Math.round(clamp(t.linesNeed, 0, 20, 0)) : 0);
   keep("linesLock", !!(out.lines && t.linesLock));
   keep("fx", FX.filter((x) => (Array.isArray(t.fx) ? t.fx : []).includes(x)));
+  keep("pet", petName(t.pet));
+  keep("sink", !!t.sink);
   return out;
 }
 function base(t, list) {

@@ -88,7 +88,8 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
     { Asset: { Name: 'KnotSlave', Group: { Name: 'FarmInk1' } } }] };
   const d1 = draw(her);
   // each design's starting size (Nov 18: k, fitted to its spot on the body)
-  const kOf = (name) => (LIST.groups.FarmInk.concat(LIST.groups.FarmBrand).find((a) => a.name === name) || {}).k || 1;
+  // (Nov 27: a womb design drawn taller than its spot comes down a touch, so it doesn't run between the legs)
+  const kOf = (name) => { const a = LIST.groups.FarmInk.concat(LIST.groups.FarmBrand).find((x) => x.name === name) || {}, k = a.k || 1; return a.spot === 'womb' ? Math.round(k * Math.min(1, 135 / (a.h * k)) * 1000) / 1000 : k; };
   const kTB = kOf('LiveTimesBred'), kKS = kOf('KnotSlave');
   ok(d1[0].src.startsWith('data:image/png') && d1[0].words.includes('31'), 'TIMES BRED drawn with the count written on it (31)');
   ok(Math.abs(d1[0].o.ScaleX - kTB / 3) < 1e-9, '...at a third of the size it was made, times its starting size (' + kTB + ')');

@@ -60,8 +60,21 @@ const picKind = (slot) => (isMark(slot) ? "FarmBrand" : isTat(slot) ? "FarmInk" 
 export const isInkSlot = (slot) => !!kindOf(slot);
 // K: each design's starting size (Nov 18, Laynie: "does that tattoos sizing and placement seem esthetically and visibly the
 // right scale per tattoo for the defaults?"): fitted to a box for its spot, width and height, so long lettering gets room
-const TITLES = {}, MANIFEST = {}, K = {};
-for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) { TITLES[kind + ":" + a.name] = a.title; if (a.live) MANIFEST[a.name] = a; if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k; }
+// (Nov 27, Sera by way of Laynie: "the knotslave tattoo, for instance sits too low, and part of those tattoos are not
+// easily visible"): the womb's designs sit higher, their foot just over the slit and clear of the thighs, and the
+// tallest are drawn a touch smaller so none of them runs down between the legs. Everything else stays where it was.
+// (Their foot: where the mock-up she OK'd had Knot Slave's. Their size as drawn: the picture's, a third, times k.)
+const WOMB_FOOT = 495, WOMB_TALL = 45;
+const wombFit = (a) => { if (a.spot !== "womb") return null; const hk = a.h * (a.k || 1) / RES, f = Math.min(1, WOMB_TALL / hk); return { f, top: Math.round(WOMB_FOOT - hk * f / 2 - a.h / 2) }; };
+const TITLES = {}, MANIFEST = {}, K = {}, SPOT = {};
+for (const kind of ["FarmInk", "FarmBrand"]) for (const a of LIST.groups[kind]) {
+  TITLES[kind + ":" + a.name] = a.title; SPOT[kind + ":" + a.name] = a.spot; if (a.live) MANIFEST[a.name] = a;
+  const w = wombFit(a), k = Math.round((a.k || 1) * (w ? w.f : 1) * 1000) / 1000; if (k !== 1) K[kind + ":" + a.name] = k;
+}
+// (Nov 27) the chest's own ink rides up with bigger breasts, so it stays on the chest over them, not slid down across
+// them ("the others seem fine as long as they are in their relative positions when the breast and stuff scale up")
+const CHEST_UP = { Large: -6, XLarge: -12 }, CHEST_SPOTS = new Set(["chest", "heart"]);
+const chestDy = (C, kind, name) => { if (!kind || !CHEST_SPOTS.has(SPOT[kind + ":" + name])) return 0; const up = C && Array.isArray(C.Appearance) ? C.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "BodyUpper") : null; return (up && CHEST_UP[up.Asset.Name]) || 0; };
 // where the farm's marks sit (centre x, y on the 500-wide body, and the spot's box, like the wardrobe's own): on your
 // other side from where your own ink starts, so a mark is never on your brand
 // (a trap's tattoos: its words across the chest above the breasts, a picture across the upper belly under them; clear
@@ -73,7 +86,7 @@ const kOf = (it) => { const g = it && it.Asset && it.Asset.Group && it.Asset.Gro
 
 function assetDef(a) {
   return {
-    Name: a.name, Random: false, Value: 0, Left: a.left, Top: a.top,
+    Name: a.name, Random: false, Value: 0, Left: a.left, Top: (wombFit(a) || a).top,
     DefaultColor: a.layers.filter((l) => l.colorize).map((l) => l.color),   // (the game up to R133 reads the starting colours here...)
     PoseMapping: { AllFours: "Hide", Hogtied: "Hide" },   // (the body's drawn another way in those: the ink would float)
     // (...and from R134 on, off each layer: without its own Color every layer started "Default", plain grey. Nov 18)
@@ -442,10 +455,10 @@ export function registerInk(W, mod) {
           const mm = (src.indexOf("/FarmMark") > 0 || src.indexOf("/FarmTat") > 0) && src.indexOf("/live/") < 0 ? MARK_SRC.exec(src) : null;
           if (mm) { const it = itemIn(C, mm[1]); if (!it || it.Asset.Name !== mm[2]) return undefined; const u = src.replace("/" + mm[1] + "/", "/" + picKind(mm[1]) + "/"); const o3 = aged(sized(o, it), it, mm[3]); if (o3.Alpha === 0) return undefined; seen.add(mm[2]); if (!ready(u)) notReady.push(mm[2]); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const lm = src.indexOf("/live/") > 0 ? LIVE_SRC.exec(src) : null;
-          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
+          if (lm) { const u = liveSrc(W, C, lm[1], lm[2], lm[3]); seen.add(lm[2]); if (!u) { notReady.push(lm[2] + " (not drawn yet)"); return undefined; } if (!ready(u)) notReady.push(lm[2]); const it = itemIn(C, lm[1]), o3 = aged(sized(o, it), it, lm[3]); if (o3.Alpha === 0) return undefined; y += chestDy(C, kindOf(lm[1]), lm[2]); if (statue(plain, this, u, x, y, o3)) return undefined; return f.call(this, u, x, y, o3); }
           const sm = OURS.test(src) ? STILL_SRC.exec(src) : null;
           if (sm) { if (DOSED_ONLY.has(sm[2]) && !dosed(W, C)) return undefined;   // (glow ink: only while dosed)
-            const it = stillItem(C, sm[1], sm[2]); o = aged(sized(o, it), it, sm[3]); if (o.Alpha === 0) return undefined; seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
+            const it = stillItem(C, sm[1], sm[2]); o = aged(sized(o, it), it, sm[3]); if (o.Alpha === 0) return undefined; y += chestDy(C, sm[1], sm[2]); seen.add(sm[2]); if (!ready(src)) notReady.push(sm[2]); if (statue(plain, this, src, x, y, o)) return undefined; }
         }
         return f.call(this, src, x, y, o);
       });

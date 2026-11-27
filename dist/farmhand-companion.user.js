@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.91.0
+// @version      0.91.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -7430,14 +7430,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var isHid = (slot) => isMark(slot) || isTat(slot);
   var ours = (slot) => !!kindOf(slot) || isHid(slot);
   var picKind = (slot) => isMark(slot) ? "FarmBrand" : isTat(slot) ? "FarmInk" : kindOf(slot);
+  var WOMB_FOOT = 495;
+  var WOMB_TALL = 45;
+  var wombFit = (a) => {
+    if (a.spot !== "womb") return null;
+    const hk = a.h * (a.k || 1) / RES, f = Math.min(1, WOMB_TALL / hk);
+    return { f, top: Math.round(WOMB_FOOT - hk * f / 2 - a.h / 2) };
+  };
   var TITLES = {};
   var MANIFEST = {};
   var K = {};
+  var SPOT = {};
   for (const kind of ["FarmInk", "FarmBrand"]) for (const a of ink_designs_default.groups[kind]) {
     TITLES[kind + ":" + a.name] = a.title;
+    SPOT[kind + ":" + a.name] = a.spot;
     if (a.live) MANIFEST[a.name] = a;
-    if (a.k && a.k !== 1) K[kind + ":" + a.name] = a.k;
+    const w = wombFit(a), k = Math.round((a.k || 1) * (w ? w.f : 1) * 1e3) / 1e3;
+    if (k !== 1) K[kind + ":" + a.name] = k;
   }
+  var CHEST_UP = { Large: -6, XLarge: -12 };
+  var CHEST_SPOTS = /* @__PURE__ */ new Set(["chest", "heart"]);
+  var chestDy = (C2, kind, name) => {
+    if (!kind || !CHEST_SPOTS.has(SPOT[kind + ":" + name])) return 0;
+    const up = C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "BodyUpper") : null;
+    return up && CHEST_UP[up.Asset.Name] || 0;
+  };
   var MARK_AT = { FarmMark1: [296, 580, 54, 48], FarmMark2: [292, 662, 50, 64], FarmMark3: [318, 300, 36, 38], FarmTat1: [250, 246, 100, 22], FarmTat2: [250, 492, 84, 30] };
   var MK = {};
   for (const slot of [...MARK_SLOTS, ...TAT_SLOTS]) for (const a of ink_designs_default.groups[picKind(slot)]) {
@@ -7455,7 +7472,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Random: false,
       Value: 0,
       Left: a.left,
-      Top: a.top,
+      Top: (wombFit(a) || a).top,
       DefaultColor: a.layers.filter((l) => l.colorize).map((l) => l.color),
       // (the game up to R133 reads the starting colours here...)
       PoseMapping: { AllFours: "Hide", Hogtied: "Hide" },
@@ -8041,6 +8058,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (!ready2(u)) notReady.push(lm[2]);
               const it = itemIn(C2, lm[1]), o3 = aged(sized(o, it), it, lm[3]);
               if (o3.Alpha === 0) return void 0;
+              y += chestDy(C2, kindOf(lm[1]), lm[2]);
               if (statue(plain2, this, u, x, y, o3)) return void 0;
               return f.call(this, u, x, y, o3);
             }
@@ -8050,6 +8068,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               const it = stillItem(C2, sm[1], sm[2]);
               o = aged(sized(o, it), it, sm[3]);
               if (o.Alpha === 0) return void 0;
+              y += chestDy(C2, sm[1], sm[2]);
               seen3.add(sm[2]);
               if (!ready2(src)) notReady.push(sm[2]);
               if (statue(plain2, this, src, x, y, o)) return void 0;
@@ -8209,7 +8228,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.91.0";
+  var VERSION = "0.91.1";
 
   // shared/species.js
   var WORDS = {

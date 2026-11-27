@@ -21,8 +21,8 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   W.AssetGetPreviewPath = (A) => 'Assets/Female3DCG/' + A.Group.Name + '/Preview';
   W.AssetBuildDescription = () => { for (const g of W.AssetGroup) { g.Description = 'MISSING ASSETGROUP DESCRIPTION: ' + g.Name; for (const a of g.Asset) a.Description = 'MISSING ASSET DESCRIPTION'; } };
   W.AssetLoadAll = () => { for (const n of [...W.AssetGroupMap.keys()]) if (/^Farm/.test(n)) W.AssetGroupMap.delete(n); W.AssetGroup = W.AssetGroup.filter((g) => !/^Farm/.test(g.Name)); };
-  let drawn = [];
-  W.CommonDrawAppearanceBuild = (C, cb) => { cb.drawImage('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/KnotSlave_Ink.png', 175, 477, { ScaleX: 1.5 }); cb.drawImage('Assets/Female3DCG/Cloth/Dress.png', 0, 0, {}); cb.drawImageColorize('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmBrand/Hucow_Brand.png', 0, 0, undefined); };
+  let drawn = [], base = null;
+  W.CommonDrawAppearanceBuild = (C, cb) => { if (base) return base(C, cb); cb.drawImage('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/KnotSlave_Ink.png', 175, 477, { ScaleX: 1.5 }); cb.drawImage('Assets/Female3DCG/Cloth/Dress.png', 0, 0, {}); cb.drawImageColorize('https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmBrand/Hucow_Brand.png', 0, 0, undefined); };
   // a ModSDK handle that wraps the functions on W the way the real one does
   const mod = (name) => ({ hookFunction(fn, pri, h) { const orig = W[fn]; W[fn] = function (...args) { return h(args, (a) => orig.apply(this, a)); }; } });
 
@@ -56,6 +56,22 @@ let fails = 0; const ok = (c, msg) => { out(msg + ' -> ' + (c ? 'true' : 'false'
   delete W.__farmInkTint;
   ok(plain[0][0] === stoneInk && near(plain[0][1].ScaleX, 0.5) && plain[2][0] === stoneInk && plain[2][2] === 'plain' && plain[2][1].HexColor === undefined, "a statue's ink: in the material, at its own size, drawn plain (not recoloured over)");
   ok(plain[1][0] === drawn[1][0], "...and the game's own pictures still as they are");
+  // (Nov 27, Sera by way of Laynie: "the knotslave tattoo, for instance sits too low, and part of those tattoos are not
+  // easily visible"): the womb's designs sit higher and the tallest come down a touch; the rest stay put
+  const womb = LIST.groups.FarmInk.filter((a) => a.spot === 'womb'), defOf = (a) => G1.Asset.find((x) => x.Name === a.name);
+  const ks = womb.find((a) => a.name === 'KnotSlave');
+  ok(womb.length >= 25 && womb.every((a) => defOf(a).Top < a.top), 'every womb design sits higher than it did (Knot Slave: ' + ks.top + ' → ' + defOf(ks).Top + ')');
+  const feet = womb.map((a) => defOf(a).Top + a.h / 2 + Math.min(a.h * (a.k || 1), 135) / 6);
+  ok(feet.every((y) => Math.abs(y - 495) <= 1), '...every one\'s foot on the same line, clear of the slit and the thighs, whatever its size (' + Math.min(...feet).toFixed(1) + ' to ' + Math.max(...feet).toFixed(1) + ')');
+  ok(LIST.groups.FarmInk.filter((a) => a.spot !== 'womb').every((a) => defOf(a).Top === a.top && defOf(a).Left === a.left), '...and every other design right where it was');
+  const IU = 'https://raw.githubusercontent.com/Laynie667/BnBfarms/main/ink/v2/FarmInk/';
+  const wearing = (upper, slot, name) => ({ Appearance: [{ Asset: { Name: upper, Group: { Name: 'BodyUpper' } } }, { Asset: { Name: name, Group: { Name: slot } }, Property: {} }] });
+  const drawAt = (C, name) => { const got = []; base = (c, cb) => cb.drawImage(IU + name + '_Ink.png', 100, 200, { ScaleX: 1, ScaleY: 1 }); W.CommonDrawAppearanceBuild(C, { drawImage: (s, x, y, o) => got.push({ x, y, o }) }); base = null; return got[0]; };
+  const kKS = drawAt(wearing('Normal', 'FarmInk1', 'KnotSlave'), 'KnotSlave');
+  ok(near(kKS.o.ScaleX, Math.round(0.78 * Math.min(1, 135 / (189 * 0.78)) * 1000) / 1000 / 3) && kKS.o.ScaleX < 0.78 / 3, 'Knot Slave, one of the tallest, drawn a touch smaller (' + (kKS.o.ScaleX * 3).toFixed(3) + ' of its size, was 0.78)');
+  const chestOn = (upper) => drawAt(wearing(upper, 'FarmInk2', 'MilkedAndBred'), 'MilkedAndBred').y;
+  ok(chestOn('Normal') === 200 && chestOn('Small') === 200 && chestOn('Large') === 194 && chestOn('XLarge') === 188, 'a chest design rides up with bigger breasts, to stay over them (Large 6, XLarge 12)');
+  ok(drawAt(wearing('XLarge', 'FarmInk1', 'KnotSlave'), 'KnotSlave').y === 200, '...and the womb\'s doesn\'t move for the breasts');
   // the game rebuilding its lists
   W.AssetBuildDescription(); ok(G1.Description === 'Farm Ink 1' && G1.Asset[0].Description !== 'MISSING ASSET DESCRIPTION', 'when the game re-reads its names (a language change), ours are put back');
   W.AssetLoadAll(); ok(W.AssetGroupMap.has('FarmInk1') && W.AssetGroupMap.has('FarmBrand'), 'when the game reloads its items, the slots are added again');

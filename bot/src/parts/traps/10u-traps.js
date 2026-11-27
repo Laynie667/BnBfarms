@@ -181,7 +181,7 @@
     if (quietMin == null) uddersSafe(mn);   // up out of the farrowin' stall (10y7-udders.js)
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
     sceneStop(mn);              // a layin' or a birth scene (10y2-brood.js)
-    gearOff(mn, null, "hold"); if (quietMin == null){ gearOff(mn, null, "trap"); gearOff(mn, null, "wild"); }   // (a safeword takes off what a wild trap left too)
+    gearOff(mn, null, "hold"); if (quietMin == null){ gearOff(mn, null, "trap"); gearOff(mn, null, "wild"); buildLetGo(mn); }   // (a safeword takes off what a wild trap left too, and a progressive set: 10z9b-gear-build.js)
     wildDone(mn);
     if (quietMin == null){ const r1 = rec(mn); if (r1){ r1.run = null; } if (state.lend && state.lend.mn === mn) state.lend = null; cursedOff(mn, "safe"); }   // a safeword ends a gauntlet run, a loan, a curse and the suit   // what it had on them comes off (all of it, on a safeword)
     { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
@@ -708,6 +708,7 @@
       }
       if (a0 === "today" || a0 === "day"){ R(trapDayLine() || "🎯 No trap of the day yet: the farm hasn't any traps out."); return true; }
       if (a0 === "wild"){ wildCommand(sender, args, R); return true; }   // the farm girl's own traps, that move (10z8-wild-traps.js)
+      if (a0 === "build"){ buildCommand(sender, args, R); return true; }   // progressive restraints (10z9b-gear-build.js)
       if (a0 === "where"){ R(isStaff(sender) ? wildWhereText() : "That's for staff, sugar. The traps are hidden, and the wild ones move."); return true; }
       if (a0 === "why"){   // what's holdin' the traps back (staff can ask about somebody else)
         const t = args[1] ? resolveTarget(args[1]) : sender;
@@ -718,7 +719,7 @@
       if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)+(a0 === "tentacle" ? " "+waterFormsText(sender) : STUD_FORMS[a0] ? " "+studFormsText(sender, a0) : "")); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         const was = isSubject(sender);
-        r.trapsOn = a0 === "on"; r.trapsOff = false; if (!r.trapsOn) trapStop(sender, 0); r.trapQuiet = 0; saveLedger(); audit(sender, "TRAPS", a0); syncCompanions(true);
+        r.trapsOn = a0 === "on"; r.trapsOff = false; if (!r.trapsOn){ trapStop(sender, 0); buildLetGo(sender); } r.trapQuiet = 0; saveLedger(); audit(sender, "TRAPS", a0); syncCompanions(true);
         R(r.trapsOn ? (was ? "🧪 Your traps are already on, sugar. Watch your step."
                            : "🧪 Traps: ON. Every trap on the farm will spring for you now, and the water's not safe either: step on the wrong spot and you might get dosed, drained, bred, stripped, pumped full or filled with eggs. "+
                              "?traps shows what's out there · ?traps skip <kind> rules one out · ?traps off and not one springs · your SAFEWORD stops a trap cold. Your hard limits still rule.")
@@ -801,5 +802,6 @@
   addCommand("eager",                    { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["eager"].concat(c.args), c.R) });   // the no-cooldown switch, as its own command (and a Toggles switch)
   // the wild traps' three switches, as their own commands for the Companion's Toggles (10z8-wild-traps.js; off till they say so)
   addCommand("wildtraps",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild"].concat(c.args), c.R) });
+  addCommand("buildtraps",               { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["build"].concat(c.args), c.R) });   // (the Companion's Progressive restraints switch)
   addCommand("wildlimbs",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "limbs"].concat(c.args), c.R) });
   addCommand("wildlaced",                { topic: "traps", run: (c) => trapCommand("traps", c.sender, ["wild", "laced"].concat(c.args), c.R) });

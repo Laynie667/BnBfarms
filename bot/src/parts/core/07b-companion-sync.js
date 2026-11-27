@@ -9,7 +9,7 @@
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", seedMilk:"seedmilk", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
                         tally:"tally", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", stallGear:"stallgear", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager", trapsOn:"traps", ownOutfit:"ownoutfit", teaseMe:"teaseme", pinMe:"pinme", broodWomb:"broodwomb",
-                        wildIn:"wildtraps", wildLimbs:"wildlimbs", wildLaced:"wildlaced" };
+                        wildIn:"wildtraps", wildLimbs:"wildlimbs", wildLaced:"wildlaced", buildOn:"buildtraps" };
   // (staff lookups about somebody else go to the Companion's Office tab: doc in 01b-commands.js)
 
   // amounts as the panel shows them (0.1 L steps from a litre up, 50 mL below): milk fillin' a few mL every
@@ -69,6 +69,7 @@
     if (downed){ s.staff = s.herdmaster = s.proprietor = s.mandated = s.onCall = false; s.krypto = Math.ceil(r.krypto.until / 60000) * 60000; }
     for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] =
       k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : k === "seedMilk" ? r.seedMilk !== false : !!r[k];
+    try { buildStateFor(mn, s); } catch(e){ stateWarn(mn, "build", e); }   // progressive restraints: how they come off, and how far along (10z9b-gear-build.js)
     try {
       const p = prodOf(mn), now = Date.now();
       // milk rounds to 10 mL so a slowly fillin' udder doesn't resend every minute

@@ -57,9 +57,12 @@
   };
   function gearOn(mn, slot, label, desc, mins, src, x){
     const r = rec(mn); if (!r || !slot) return false;
+    if (gearBlocked(mn, slot)) return false;   // a kind of gear on their "Gear the farm leaves off me" list (Nov 26, Sera's ask)
     r.gear = r.gear || {};
-    // a piece a wild trap left (keep) stays till somebody else takes it off: another trap's gear doesn't push it out of its spot
-    if (r.gear[slot] && r.gear[slot].keep && !(x && x.keep) && r.gear[slot].until > Date.now()) return false;
+    // a piece a wild trap left (keep) stays till somebody else takes it off: another trap's gear doesn't push it out of its
+    // spot; nor does it push out a piece of their progressive set (10z9b-gear-build.js), kept or not
+    const held = r.gear[slot];
+    if (held && (held.keep || held.src === "build") && !(x && x.keep) && held.until > Date.now()) return false;
     r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5)*60000, src: src || "trap" };
     if (x && x.items) r.gear[slot].items = x.items.slice(0, 4); if (x && x.color) r.gear[slot].color = x.color;
     if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);   // how it's set: "Hogtied", "Wide"… (the Companion's GEAR_OPT has the usual)
@@ -89,8 +92,9 @@
   }
   function trapGearDone(mn, plan){
     gearOff(mn, null, "hold");
-    if (plan && wildOn(mn)){ wildGear(mn, plan); return; }   // a wild trap: what it leaves stays till somebody else takes it off (10z8-wild-traps.js)
+    if (plan && wildOn(mn)){ wildGear(mn, plan); try { buildAfterTrap(mn, 2); } catch(e){ warn("gear build:", e); } return; }   // a wild trap: what it leaves stays till somebody else takes it off (10z8-wild-traps.js); and two pieces of a progressive set
     for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
+    try { buildAfterTrap(mn, 1); } catch(e){ warn("gear build:", e); }   // the next piece of their progressive set (10z9b-gear-build.js)
   }
   function farmGearTick(now){
     for (const [k, r] of Object.entries(L.people)){

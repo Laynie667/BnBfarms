@@ -537,6 +537,7 @@
       const keep = !!(old && !m.again && m.seq && old.seq === m.seq && old.ver === ver);
       const c = keep ? old : { ver };
       c.at = Date.now(); c.relay = m.relay !== false; c.off = (m.off && typeof m.off === "object") ? m.off : {};
+      c.noSlots = Array.isArray(m.noSlots) ? m.noSlots.filter((x) => typeof x === "string" && /^[A-Za-z0-9]{2,12}$/.test(x)).slice(0, 40) : [];   // the gear they've asked the farm to leave off them (Nov 26)
       c.limbs = m.limbs === true;   // their game has Echo's Limb Teleportation Device (a wild kit can take their limbs: 10z8b-wild-kits.js)
       if (typeof m.sh === "string") c.lastStoreH = m.sh;   // the store it has saved from last time
       if (!keep) dropQueuedPanels(mn);   // a panel still waitin' to go would only be patched onto the wrong one

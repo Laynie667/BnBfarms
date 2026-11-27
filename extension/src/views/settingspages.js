@@ -26,7 +26,7 @@ const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).f
 const FARM_GROUPS = [
   ["🐂 Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
   ["🥛 Milk", ["milkable", "seedmilk", "jarok", "pinme", "stallgear"]],
-  ["🪤 Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+  ["🪤 Traps and play", ["traps", "eager", "buildtraps", "bench", "potions", "dares"]],
   // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
   ["⚠️ Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
   ["🪱 Things that latch on", ["parasite", "symbiote", "watersports"]],
@@ -36,13 +36,32 @@ const pref = (ctx, key, label, desc, after) => toggle(label, desc, !!ctx.prefs[k
 const prefNot = (ctx, key, label, desc) => toggle(label, desc, !ctx.prefs[key], () => { ctx.setPref(key, !ctx.prefs[key]); ctx.api.rehello && ctx.api.rehello(); });
 const rehello = (ctx) => () => ctx.api.rehello && ctx.api.rehello();
 
+// progressive restraints (Nov 26, Sera's idea; Laynie: how it comes off "toggleable"): how far along, and its three ways off
+const BUILD_OFF = [["both", "Whichever comes first"], ["hour", "An hour after the last piece"], ["free", "Only when somebody else frees me"]];
+function buildRow(ctx) {
+  const s = ctx.s; if (!(s.switches || {}).buildtraps) return null;
+  const mode = s.buildMode || "both", b = s.build;
+  return h("div", { style: { marginTop: "6px" } },
+    b ? muted("🔗 Your " + b.title + ": " + b.n + " of " + b.of + " pieces on" + (b.done ? ", the whole set." : ".")) : null,
+    muted("Your progressive restraints come off:"),
+    h("div", null, BUILD_OFF.map(([v, label]) => h("button", { type: "button", class: "fhc-pill" + (mode === v ? " on" : ""), onclick: () => ctx.send("traps build " + v) }, label))));
+}
+// the kinds of gear the farm leaves off you (Nov 26, Sera's ask: "a way to disable hoods, or certain types of restraints")
+function gearNoCard(ctx) {
+  const kinds = ctx.api.gearKinds ? ctx.api.gearKinds() : [], no = Array.isArray(ctx.prefs.gearNo) ? ctx.prefs.gearNo : [];
+  if (!kinds.length) return null;
+  const flip = (k) => { const now = Array.isArray(ctx.prefs.gearNo) ? ctx.prefs.gearNo : []; ctx.setPref("gearNo", now.includes(k) ? now.filter((x) => x !== k) : now.concat(k)); if (ctx.api.gearResync) ctx.api.gearResync(); };
+  return card(title("🚫 Gear the farm leaves off you"),
+    muted("Tick a kind and the farm never puts it on you: no trap, wild trap, kit, stall or progressive set (a set skips to its next piece). Anythin' of that kind on you now comes off."),
+    h("div", null, kinds.map(([k, label]) => h("label", { style: { display: "block" } }, h("input", { type: "checkbox", checked: no.includes(k) || null, onchange: () => flip(k) }), " " + label))));
+}
 function farmPage(ctx) {
   const s = ctx.s;
   if (!s.onBooks) return [card(title("🐄 Farm switches"), muted("Once you're on the books, your milkin', breedin', trap and teasin' switches show up here."),
     btn("Apply to join", () => ctx.send("apply"), true))];
   return [
     muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
-    FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx, pick(...ids)))),
+    FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx, pick(...ids)), ids.includes("buildtraps") ? buildRow(ctx) : null)),
     trapThemesCard(ctx),
     extraSwitches(ctx),
   ];
@@ -77,6 +96,7 @@ function bellyToggle(ctx) {
 
 function gearPage(ctx) {
   return [
+    gearNoCard(ctx),
     card(title("⛓ On your character"), muted("All of these are off until you switch them on. Your safeword takes everything off."),
       pref(ctx, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx)),
       pref(ctx, "gearAside", "Traps can set my own things aside", "When a trap's gear needs a spot your own clothes or gear are in, they come off for the scene and go straight back on after, so you see what's done to you. Off, only your farm outfit's pieces step aside. Nothin' anybody else has locked on you is ever moved."),

@@ -364,6 +364,7 @@ export const SWITCH_INFO = [
   ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
   ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
   ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
+  ["buildtraps", "Progressive restraints", "With traps on and \"Farm can put real gear on me\" on: every trap that lets you go leaves the next piece of an outfit that suits your kind and body (a wild trap two): collar first, hood last, and they stay and add up. You pick how it comes off. Your safeword takes it all off, and nothin' on your \"Gear the farm leaves off you\" list ever goes on"],
   ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
   // Laynie, Nov 20: "add the toggles for it with a clear warning that the wild traps are more brutal, and not the kind for
   // the faint of heart, off by default for the hard ones" (all three off till switched on)
@@ -373,7 +374,7 @@ export const SWITCH_INFO = [
   ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'
-const NEEDS = { freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
+const NEEDS = { buildtraps: ["traps", "Turn Traps on first"], freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
 export function farmSwitches(ctx, list) {
   const sw = ctx.s.switches || {};
   return list.map(([cmd, label, desc]) => {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.90.0
+// @version      0.91.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -8209,7 +8209,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.90.0";
+  var VERSION = "0.91.0";
 
   // shared/species.js
   var WORDS = {
@@ -24690,7 +24690,7 @@ wake: any
   var FARM_GROUPS = [
     ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat", "broodwomb"]],
     ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok", "pinme", "stallgear"]],
-    ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+    ["\u{1FAA4} Traps and play", ["traps", "eager", "buildtraps", "bench", "potions", "dares"]],
     // (Nov 20: the wild traps' three, off till switched on; each says plainly what it does first)
     ["\u26A0\uFE0F Wild traps: not for the faint of heart", ["wildtraps", "wildlimbs", "wildlaced"]],
     ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
@@ -24704,6 +24704,33 @@ wake: any
     ctx5.api.rehello && ctx5.api.rehello();
   });
   var rehello = (ctx5) => () => ctx5.api.rehello && ctx5.api.rehello();
+  var BUILD_OFF = [["both", "Whichever comes first"], ["hour", "An hour after the last piece"], ["free", "Only when somebody else frees me"]];
+  function buildRow(ctx5) {
+    const s = ctx5.s;
+    if (!(s.switches || {}).buildtraps) return null;
+    const mode = s.buildMode || "both", b = s.build;
+    return h(
+      "div",
+      { style: { marginTop: "6px" } },
+      b ? muted("\u{1F517} Your " + b.title + ": " + b.n + " of " + b.of + " pieces on" + (b.done ? ", the whole set." : ".")) : null,
+      muted("Your progressive restraints come off:"),
+      h("div", null, BUILD_OFF.map(([v, label]) => h("button", { type: "button", class: "fhc-pill" + (mode === v ? " on" : ""), onclick: () => ctx5.send("traps build " + v) }, label)))
+    );
+  }
+  function gearNoCard(ctx5) {
+    const kinds = ctx5.api.gearKinds ? ctx5.api.gearKinds() : [], no = Array.isArray(ctx5.prefs.gearNo) ? ctx5.prefs.gearNo : [];
+    if (!kinds.length) return null;
+    const flip = (k) => {
+      const now = Array.isArray(ctx5.prefs.gearNo) ? ctx5.prefs.gearNo : [];
+      ctx5.setPref("gearNo", now.includes(k) ? now.filter((x) => x !== k) : now.concat(k));
+      if (ctx5.api.gearResync) ctx5.api.gearResync();
+    };
+    return card(
+      title("\u{1F6AB} Gear the farm leaves off you"),
+      muted("Tick a kind and the farm never puts it on you: no trap, wild trap, kit, stall or progressive set (a set skips to its next piece). Anythin' of that kind on you now comes off."),
+      h("div", null, kinds.map(([k, label]) => h("label", { style: { display: "block" } }, h("input", { type: "checkbox", checked: no.includes(k) || null, onchange: () => flip(k) }), " " + label)))
+    );
+  }
   function farmPage(ctx5) {
     const s = ctx5.s;
     if (!s.onBooks) return [card(
@@ -24713,7 +24740,7 @@ wake: any
     )];
     return [
       muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
-      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx5, pick2(...ids)))),
+      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx5, pick2(...ids)), ids.includes("buildtraps") ? buildRow(ctx5) : null)),
       trapThemesCard(ctx5),
       extraSwitches(ctx5)
     ];
@@ -24767,6 +24794,7 @@ wake: any
   }
   function gearPage(ctx5) {
     return [
+      gearNoCard(ctx5),
       card(
         title("\u26D3 On your character"),
         muted("All of these are off until you switch them on. Your safeword takes everything off."),
@@ -25605,6 +25633,7 @@ wake: any
     ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
     ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
     ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
+    ["buildtraps", "Progressive restraints", `With traps on and "Farm can put real gear on me" on: every trap that lets you go leaves the next piece of an outfit that suits your kind and body (a wild trap two): collar first, hood last, and they stay and add up. You pick how it comes off. Your safeword takes it all off, and nothin' on your "Gear the farm leaves off you" list ever goes on`],
     ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     // Laynie, Nov 20: "add the toggles for it with a clear warning that the wild traps are more brutal, and not the kind for
     // the faint of heart, off by default for the hard ones" (all three off till switched on)
@@ -25613,7 +25642,7 @@ wake: any
     ["wildlaced", "\u26A0\uFE0F Wild traps: laced kits", "NOT FOR THE FAINT OF HEART. A wild kit comes laced: heat, let-down, moo, sure-catch, haze, deep throat, denial, sedatives and more, dripped into you from the gear itself for as long as it's on. Your Dispensary gives them, or the farm girl on the farm, and its own switches and limits still rule"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
-  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
+  var NEEDS = { buildtraps: ["traps", "Turn Traps on first"], freeuse: ["breedable", "Turn Breedable on first"], wildlimbs: ["wildtraps", "Turn Wild traps on first"], wildlaced: ["wildtraps", "Turn Wild traps on first"] };
   function farmSwitches(ctx5, list2) {
     const sw = ctx5.s.switches || {};
     return list2.map(([cmd, label, desc]) => {
@@ -27483,6 +27512,26 @@ wake: any
     // Echo's Limb Teleportation Device (Nov 20, a wild kit that takes the limbs): only the item the piece names, or nothin'
     addon: { groups: ["ItemAddon"], names: [], re: /^$/ }
   };
+  var GEAR_KINDS = [
+    ["hood", "Hoods", ["hood"]],
+    ["gag", "Gags (the feed funnel too)", ["gag", "gag2", "funnel", "lips"]],
+    ["blind", "Blindfolds and blinders", ["blind"]],
+    ["earplugs", "Earplugs", ["earplugs"]],
+    ["arms", "Arm restraints: cuffs, armbinders, rope, mitts", ["arms", "ropeArms", "hands", "mitts"]],
+    ["legs", "Leg restraints: cuffs, hobbles, spreaders, rope, hoof boots", ["legs", "ropeFeet", "feet", "boots"]],
+    ["toys", "Plugs and toys", ["plug", "dildo"]],
+    ["cups", "Milkin' cups, nipple clamps and funnels", ["cups", "chestbra", "funnel"]],
+    ["chastity", "Chastity belts", ["belt"]],
+    ["collar", "Collars, leashes and tags", ["collar", "leash", "tag"]],
+    ["suit", "Suits, harnesses and latex", ["suit", "suitLower", "gloves", "socks", "torso"]],
+    ["costume", "Costume bits: ears, horns, tails, nose rings, hats", ["ears", "horns", "tail", "nose", "hat", "cloak", "bra"]],
+    ["device", "Devices: stocks, cages, frames, benches", ["device"]]
+  ];
+  function gearNoSlots(prefs2) {
+    const no = Array.isArray(prefs2 && prefs2.gearNo) ? prefs2.gearNo : [], out = /* @__PURE__ */ new Set();
+    for (const [k, , slots] of GEAR_KINDS) if (no.includes(k)) for (const s of slots) out.add(s);
+    return Array.from(out);
+  }
   var ECHO_TELEPORTER = "\u9690\u5F62\u836F\u6C34";
   var ITEM_ALIAS = { EchoLimbTeleporter: ECHO_TELEPORTER };
   var itemName = (n) => ITEM_ALIAS[n] || n;
@@ -27656,7 +27705,8 @@ wake: any
     }
     if (pruned) letGoSave(lg);
     for (const [n, t] of stuckUntil) if (t <= now) stuckUntil.delete(n);
-    const want = (Array.isArray(list2) ? list2 : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name)).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
+    const no = opts && Array.isArray(opts.no) ? opts.no : [];
+    const want = (Array.isArray(list2) ? list2 : []).filter((g) => g && GEAR_SLOTS[g.slot] && !no.includes(g.slot) && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name)).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
@@ -29774,7 +29824,7 @@ wake: any
       limbs = typeof window.AssetGet === "function" && !!window.AssetGet(window.Player.AssetFamily || "Female3DCG", "ItemAddon", ECHO_TELEPORTER);
     } catch (e) {
     }
-    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
+    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, noSlots: st.panel ? gearNoSlots(st.panel.prefs) : [], seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
   }
   function askWhole() {
     if (Date.now() - (st.wholeAt || 0) < 8e3) return;
@@ -29902,7 +29952,7 @@ wake: any
       let list2 = Array.isArray(s.farmGear) ? s.farmGear : [];
       if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
         list2 = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
-      const did = syncFarmGear(list2, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });
+      const did = syncFarmGear(list2, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside, no: gearNoSlots(st.panel.prefs) });
       if (botHere2()) gearFreedTell(null);
       try {
         syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape);
@@ -30365,6 +30415,13 @@ wake: any
     // tell the bot a setting changed (the relay switch)
     // clothes the farm (or a trap) took off them, kept on this computer: put back on (Settings, by "Farm can strip me")
     keptClothes: () => keptClothes(),
+    // the kinds of gear they've asked the farm to leave off them: the list (Settings › ⛓ Gear and marks), and off it all comes now
+    gearKinds: () => GEAR_KINDS,
+    gearResync: () => {
+      st.gearSyncAt = 0;
+      parasiteSync();
+      hello();
+    },
     dressMe: () => {
       const r = dressMe();
       toChat(r.ok ? "\u{1F457} Your own clothes are back on." : "\u{1F457} There are no clothes of yours kept to put back.", "#c79bd8");

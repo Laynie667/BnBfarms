@@ -18,7 +18,7 @@ import { mooify } from "../../shared/noises.js";
 import { BOT_MEMBER, HELLO_EVERY_MS, PREFS_KEY } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, topUpOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, rinseMarks, stripMe, dressMe, keptClothes, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, keptClothes, gearNoSlots, GEAR_KINDS, syncFarmGear, syncShape, scaleTrialCleanup, treatiseCleanup, farmPieceIn, gearFreedHere, farmGearLetGo, ECHO_TELEPORTER } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState, drawnBodyFillCheck, drawnBodyRedrawFor } from "./drawnbody.js";
 import { initStatue, onStatueMsg, statueCheck } from "./statue.js";
@@ -134,7 +134,7 @@ function hello(again) {
   // seq and sh: which panel and which store I hold, so she doesn't send them again if they're still right (Oct 27)
   // limbs: this game has Echo's Limb Teleportation Device, so a wild trap's kit can take your arms and legs (Nov 20)
   let limbs = false; try { limbs = typeof window.AssetGet === "function" && !!window.AssetGet(window.Player.AssetFamily || "Female3DCG", "ItemAddon", ECHO_TELEPORTER); } catch (e) { /* no */ }
-  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
+  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, noSlots: st.panel ? gearNoSlots(st.panel.prefs) : [], seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again, limbs });
 }
 // a patch that doesn't fit: ask once, not once per patch while the whole panel is on its way
 function askWhole() {
@@ -248,7 +248,7 @@ function parasiteSync() {
     // an older farm girl only says "parasite": that's still a piece of gear
     if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
       list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
-    const did = syncFarmGear(list, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside });   // (gearAside: a trap may set your own things aside too, Nov 24)
+    const did = syncFarmGear(list, !!st.panel.prefs.gear, { aside: !!st.panel.prefs.gearAside, no: gearNoSlots(st.panel.prefs) });   // (gearAside: a trap may set your own things aside too, Nov 24)
     if (botHere()) gearFreedTell(null);   // (any freein' she hasn't heard about yet)
     try { syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape); } catch (e2) { console.warn("[Farmhand Companion] body shape:", e2); }   // chest and hips that show the farm's sizes (marks.js)
     for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
@@ -487,6 +487,9 @@ const api = {
   rehello: () => hello(),   // tell the bot a setting changed (the relay switch)
   // clothes the farm (or a trap) took off them, kept on this computer: put back on (Settings, by "Farm can strip me")
   keptClothes: () => keptClothes(),
+  // the kinds of gear they've asked the farm to leave off them: the list (Settings › ⛓ Gear and marks), and off it all comes now
+  gearKinds: () => GEAR_KINDS,
+  gearResync: () => { st.gearSyncAt = 0; parasiteSync(); hello(); },
   dressMe: () => { const r = dressMe(); toChat(r.ok ? "👗 Your own clothes are back on." : "👗 There are no clothes of yours kept to put back.", "#c79bd8"); return r; },
   // the Log tab asks the farm girl for the record (views/log.js)
   logAsk(q) { st.panel.ui.logRows = { id: 0, rows: [], total: 0, busy: true }; st.panel.render(); toBot("logAsk", q); },

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-11-26. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-27. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.104.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.105.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.4.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **2.8.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.90.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.91.0** |
 | The Farmhand's Dispensary | `farmhand-dispensary.user.js` | any player who wants doses from crafted items, on the farm or off it | **0.29.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.105.0 + Companion 0.91.0: progressive restraints, and gear the farm leaves off you** Sera's ideas, passed on by Laynie, Nov 26: "traps and wild traps doing 'progressive restraints', which is to say the equipment builds a outfit over several traps", and "a way to disable hoods, or certain types of restraints". Laynie: "for the species, or atleast themed and complimenting their species and gender", how it comes off "iii toggleable", and the leave-off list "seems good".
+  - **Progressive restraints** (Farm switches › Traps and play, or `?traps build on|off`; off till switched on, and only with "Farm can put real gear on me"): every trap that lets them go leaves the next piece of an outfit, a wild trap two, and the pieces stay and add up, light to heavy, the collar first and the hood last, with a line for each. The outfit suits their kind and body: **dairy tack** (cows, bulls, goats, sheep, pigs: dairy collar, cowbell, nose ring, cuffs, hobbles, hoof mitts, udder cups or a bull's lock, a cow's tail, a feed bit, a heifer hood), **pony tack** (posture collar, harness, hoof boots and mitts, bridle bit, a mare's tail or a stallion's, show bells or a lock, armbinder, pony hood), **kennel gear** (collar, bone tag, lead, paw mitts, muzzle, pup tail, bells or a lock, pup pads, dog hood), **kitty kit**, **hutch gear** for bunnies and rats, and **rubber** for everyone else. A tail never goes over a tail of their own. **How it comes off is their pick** (three buttons under the switch, or `?traps build free|hour|both`): only when somebody else frees them, piece by piece; an hour after the last piece if no trap adds another; or whichever comes first (the default). The whole set on: a closin' line, and it holds till it's come off, then the next trap starts a fresh one. Their safeword, `?traps build off` or `?traps off` take it all off. No other trap's gear pushes a piece of the set out of its spot. (A "Fully Fitted" trophy needs a tattoo design of its own; it comes with the tattoo work.)
+  - **Gear the farm leaves off you** (Settings › ⛓ Gear and marks): tick any of hoods; gags (the feed funnel too); blindfolds and blinders; earplugs; arm restraints; leg restraints; plugs and toys; milkin' cups, nipple clamps and funnels; chastity belts; collars, leashes and tags; suits, harnesses and latex; costume bits; devices. The farm never puts a ticked kind on you, from a trap, a wild kit, a stall or a progressive set (a set skips to its next piece), and anything of that kind on you comes off at once. Your Companion holds to it too, even with a farm girl that hasn't heard yet.
 
 - **Bot 0.104.0 + Companion 0.90.0: traps take clothes; the hypno effects step aside off the room screen; the visor's 👁 on the map**
   - **Traps take clothes** (Laynie, Nov 26: "traps should be more liberal with stripping clothing, like for penetrative events or ones that mention stripping", then "yes" to the plan). Every trap's lines are read as they're told (the wild traps' too): a line that says clothes come off takes everything; somethin' goin' into them from below takes their bottoms, underwear and whatever covers them (skirts, trousers, panties, dresses, outfits, suits, coats); their udders, teats or nipples bein' used takes their top and bra. Once each per trap, and a short line goes on the end of the trap's own namin' what went ("Moo's jeans and panties? Torn off and tossed over the rail."). Only with "Farm can strip me" on (now told to the farm girl when it's switched), never with strippin' or nudity in their trap limits; locked pieces, ears, tails, wings and the farm's marks stay on. Their clothes are kept on their own computer, and nothin' puts them back for them: the new "👗 My clothes back on" button by "Farm can strip me" does (or the game's wardrobe). Checked against all 8,233 trap lines: a plow, a trough, the top of a well, a needle, somebody else's tits, a fleece, the dairy's strippin' cups and lines that only push clothes aside take nothin'.

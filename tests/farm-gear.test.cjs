@@ -41,6 +41,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   d=syncFarmGear([cups,lips], true);
   ok(!has('ItemButt') && d.off.join()==='Pump Bung' && has('ItemNipples'), 'off the list: the plug comes out, the rest stays');
   d=syncFarmGear([cups,lips,{ slot:'plug', name:'Old Plug', desc:'x', until:Date.now()-1000 }], true); ok(!has('ItemButt'), 'a piece whose time is up never goes on');
+  // (Nov 26, Sera's ask) the kinds of gear they've asked the farm to leave off them: never put on, and off if they're on
+  d=syncFarmGear([plug,cups,lips], true, { no:['plug','cups'] }); ok(!has('ItemButt') && !has('ItemNipples') && d.off.join()==='Growth Cups', 'gear they\'ve asked the farm to leave off: never put on, and the cups already on come off ('+d.on.join()+' / '+d.off.join()+')');
+  d=syncFarmGear([cups,lips], true);
   d=syncFarmGear([], true);
   ok(!has('ItemNipples') && !has('ItemMouth2') && has('ItemMouth','BallGag') && has('Cloth','Shirt') && P.Appearance.length===2, 'empty list: every farm piece off, her own gag and clothes untouched ('+worn().join(' ')+')');
   // the game hands the item back without its crafted name: we still know it's ours

@@ -206,6 +206,29 @@ export const GEAR_SLOTS = {
   // Echo's Limb Teleportation Device (Nov 20, a wild kit that takes the limbs): only the item the piece names, or nothin'
   addon:    { groups: ["ItemAddon"], names: [], re: /^$/ },
 };
+// THE KINDS OF GEAR SOMEBODY CAN ASK THE FARM TO LEAVE OFF THEM (Nov 26, Sera's ask via Laynie: "a way to disable hoods,
+// or certain types of restraints"). Each is a few of the slots above. The list goes to the farm girl in the hello (she
+// skips them, and a progressive set moves on to its next piece), and nothin' on it is put on here either way.
+export const GEAR_KINDS = [
+  ["hood", "Hoods", ["hood"]],
+  ["gag", "Gags (the feed funnel too)", ["gag", "gag2", "funnel", "lips"]],
+  ["blind", "Blindfolds and blinders", ["blind"]],
+  ["earplugs", "Earplugs", ["earplugs"]],
+  ["arms", "Arm restraints: cuffs, armbinders, rope, mitts", ["arms", "ropeArms", "hands", "mitts"]],
+  ["legs", "Leg restraints: cuffs, hobbles, spreaders, rope, hoof boots", ["legs", "ropeFeet", "feet", "boots"]],
+  ["toys", "Plugs and toys", ["plug", "dildo"]],
+  ["cups", "Milkin' cups, nipple clamps and funnels", ["cups", "chestbra", "funnel"]],
+  ["chastity", "Chastity belts", ["belt"]],
+  ["collar", "Collars, leashes and tags", ["collar", "leash", "tag"]],
+  ["suit", "Suits, harnesses and latex", ["suit", "suitLower", "gloves", "socks", "torso"]],
+  ["costume", "Costume bits: ears, horns, tails, nose rings, hats", ["ears", "horns", "tail", "nose", "hat", "cloak", "bra"]],
+  ["device", "Devices: stocks, cages, frames, benches", ["device"]],
+];
+export function gearNoSlots(prefs) {
+  const no = Array.isArray(prefs && prefs.gearNo) ? prefs.gearNo : [], out = new Set();
+  for (const [k, , slots] of GEAR_KINDS) if (no.includes(k)) for (const s of slots) out.add(s);
+  return Array.from(out);
+}
 // a game item whose own name a piece can't carry (Echo's are in Chinese): the piece names it in plain letters
 export const ECHO_TELEPORTER = "隐形药水";   // Echo's clothing mod: "Limb Teleportation Device", in ItemAddon
 const ITEM_ALIAS = { EchoLimbTeleporter: ECHO_TELEPORTER };
@@ -328,7 +351,8 @@ export function syncFarmGear(list, allow, opts) {
   // left off for 10. Nov 21, Laynie: "it keeps taking off the things i put on, and putting back the things it tries to take
   // off", and her game was cut off by the server for sendin' too much. A fight can't run away like that again.)
   for (const [n, t] of stuckUntil) if (t <= now) stuckUntil.delete(n);
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name))
+  const no = (opts && Array.isArray(opts.no)) ? opts.no : [];   // (the kinds of gear they've asked the farm to leave off them: never put on)
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && !no.includes(g.slot) && (g.always || allow) && (!g.until || g.until > now) && !lg[pieceKey(g.name, g.until)] && !stuckUntil.has(g.name))
     .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
